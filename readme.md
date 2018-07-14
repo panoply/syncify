@@ -11,6 +11,10 @@ Unless you're using Shopify Strap, then you shouldn't use Shopify Sync! Only in 
 ## Installation
 You need to install this dependency globally to access the `store` command.
 
+```
+npm install shopify-sync -g
+```
+
 ## Modified Features
 
 - CLI uses `store [options]` opposed to `quickshot [options]` commands.
