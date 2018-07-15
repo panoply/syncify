@@ -1,0 +1,6 @@
+
+# This your '.strignore' file. Anything you put in here will be ignored by shopify-sync. This file uses the same format as a '.gitignore' file.
+
+# Ignore maps
+/theme/assets/*.map
+
