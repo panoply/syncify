@@ -15,11 +15,11 @@ Install this dependency globally to access the `store` command from any director
 npm install shopify-sync -g
 ```
 
-If you don't want as a global dependency you will need to access the wizard by creating a script tag with the value of `store` in your projects root directory.
+If you don't want as a global dependency you will need to access the wizard by creating a script tag with the value of `sync` in your projects root directory.
 
 ```
 "scripts": {
-   "sync": "store"
+   "sync": "sync"
 }
 ```
 
@@ -27,7 +27,7 @@ If you don't want as a global dependency you will need to access the wizard by c
 
 ## Modified Features
 
-- CLI uses `store [options]` opposed to `quickshot [options]` commands.
+- CLI uses `sync [options]` opposed to `quickshot [options]` commands.
 - Uses `.strignore` opposed to `.quickshotignore` file.
 - Slightly more modified CLI logging.
 - Dependencies use latest versions.
