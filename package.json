@@ -1,7 +1,7 @@
 {
     "name": "shopify-sync",
     "description": "A shopify theme store synchronizer used in conjunction with the Shopify Strap development environment theme.",
-    "version": "0.0.9",
+    "version": "0.1.0",
     "homepage": "https://github.com/panoply/shopify-sync",
     "author": {
         "name": "Nikolas Savvidis",
