@@ -1,7 +1,7 @@
 {
     "name": "shopify-sync",
     "description": "A shopify theme store synchronizer used in conjunction with the Shopify Strap development environment theme.",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "homepage": "https://github.com/panoply/shopify-sync",
     "author": {
         "name": "Nikolas Savvidis",
@@ -21,7 +21,7 @@
     ],
     "preferGlobal": true,
     "bin": {
-        "store": "./bin/store"
+        "store": "./bin/sync"
     },
     "main": "index.js",
     "engines": {
@@ -53,7 +53,5 @@
         "request": "^2.88.0",
         "walk": "^2.3.14"
     },
-    "devDependencies": {
-        "shopify-sync": "^0.0.8"
-    }
+    "devDependencies": {}
 }
