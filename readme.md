@@ -1,3 +1,10 @@
+[![npm version](https://badge.fury.io/js/shopify-sync.svg)](https://www.npmjs.com/package/shopify-sync)
+
+##### BREAKING CHANGE
+<small>Renamed ignore file default from `.strignore` to `.syncignore` so anyone upgrading from `^0.1.3` will need change their exisiting config file and ignore file. </small>
+
+<hr>
+
 # Shopify Sync
 
 A stripped down and slightly modified version of the [Quickshot](https://github.com/internalfx/quickshot) shopify development tool which only implements the `upload`, `download` and `watch` command functionality. Shopify Sync is used in conjunction with the [Shopify Strap](https://github.com/panoply/shopify-strap) development environment theme which is an opionated jumpstart build tool and store theme boilerplate for Shopify projects.
