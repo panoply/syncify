@@ -43,7 +43,7 @@ config/local.js
 logs*
 _site
 sync.config.json
-
+yarn.lock
 
 
 ################################################
@@ -100,6 +100,7 @@ lib-cov
 *.out
 *.pid
 npm-debug.log
+
 
 
 
