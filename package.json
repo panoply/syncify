@@ -33,7 +33,7 @@
     },
     "dependencies": {
         "axios": "^0.18.0",
-        "bluebird": "^3.5.1",
+        "bluebird": "^3.5.3",
         "chokidar": "^2.0.4",
         "co": "^4.6.0",
         "co-each": "^0.1.0",
