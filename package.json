@@ -1,7 +1,7 @@
 {
     "name": "shopify-sync",
     "description": "A shopify theme synchronizer that watches a directory and uploads changed files to your Shopify theme.",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "homepage": "https://github.com/panoply/shopify-sync",
     "author": {
         "name": "Nikolas Savvidis",
@@ -53,5 +53,7 @@
         "request": "^2.88.0",
         "walk": "^2.3.14"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "shelljs": "^0.8.3"
+    }
 }
