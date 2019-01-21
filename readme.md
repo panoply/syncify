@@ -88,7 +88,7 @@ Run the Shopify Sync within a Gulp 4 task:
 ```javascript
 import sync from 'shopify-sync'
 
-function sync (done) {
+function syncTask (done) {
 
    sync({
       run: 'watch',
@@ -98,6 +98,6 @@ function sync (done) {
    done()
 }
 
-export.default = parallel(exampleTask, sync)
+export.default = parallel(exampleTask, syncTask)
 ```
 
