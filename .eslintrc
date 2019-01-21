@@ -1,0 +1,9 @@
+{
+  "extends": "standard",
+  "rules": {
+    "camelcase": "off",
+    "padded-blocks": "off",
+    "no-undef": "off",
+    "no-new": "off"
+  }
+}
