@@ -116,7 +116,11 @@ npm-debug.log
 *~
 *#
 .DS_STORE
+<<<<<<< HEAD
 .netbeans
 nbproject
 .idea
 .node_history
+=======
+sync.config.json
+>>>>>>> 7d5a8cc600ec223223883c261dca43d8b40883ff
