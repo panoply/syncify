@@ -1,9 +1,13 @@
 #!/usr/bin/env node
-var pjson = require('../package.json')
-let Promise = require('bluebird')
+
+const pjson = require('../package.json')
+const Promise = require('bluebird')
+
 global.Promise = Promise
 global.VERSION = pjson.version
 global.CONFIGVERSION = 1
-var main = require('../lib/main')
-var argv = require('minimist')(process.argv.slice(2))
+
+const main = require('../lib/main')
+const argv = require('minimist')(process.argv.slice(2))
+
 main(argv)

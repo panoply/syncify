@@ -1,42 +1,81 @@
 [![npm version](https://badge.fury.io/js/shopify-sync.svg)](https://www.npmjs.com/package/shopify-sync)
 
-##### BREAKING CHANGE
-<small>Renamed ignore file default from `.strignore` to `.syncignore` so anyone upgrading from `^0.1.3` will need change their exisiting config file and ignore file. </small>
-
-<hr>
-
 # Shopify Sync
 
-A stripped down and slightly modified version of the [Quickshot](https://github.com/internalfx/quickshot) shopify development tool which only implements the `upload`, `download` and `watch` command functionality. Shopify Sync is used in conjunction with the [Shopify Strap](https://github.com/panoply/shopify-strap) development environment theme which is an opionated jumpstart build tool and store theme boilerplate for Shopify projects.
+A node equivlent shopify [theme kit](https://shopify.github.io/themekit/) tool that can be used for watching, uploading or downloading theme files to multiple stores concurrently.
 
-### Why not just use Quickshot?
-You can! This version is just a copy with several features eliminated which enables us to keep its dependencies up-to-date and give a little more control over logging and implementations with the [Shopify Strap](https://github.com/panoply/shopify-strap) jumpstart theme. The only difference with this module is the naming conventions used features like `SCSS` and `ES6` Babel transpilation have been removed.
+> Shopify Sync is a stripped down and heavily modified version of [Quickshot](https://github.com/internalfx/quickshot).
 
 ### When should I use this?
-Only in some rare real world situations would you maybe require this module. For most projects just use [Quickshot](https://github.com/internalfx/quickshot) or the Shopify Theme Kit. All this module does is watches a folder named `theme` in your in your root directory and uploads changed files to your configured Shopify theme.
+
+You can use this in node projects. The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme.
 
 ## Installation
 Install this dependency globally to access the `sync` command from any directory.
 
-```
+```cli
 npm install shopify-sync -g
 ```
 
 If you don't want as a global dependency you will need to access the wizard by creating a script tag with the value of `sync` in your projects root directory.
 
-```
+```json
 "scripts": {
    "sync": "sync"
 }
 ```
 
-> If you're using Shopify Strap you can access the CLI wizard with `yarn sync`
+## Usage
+You can intergrate Shopify Sync into any node project and you also have the command line interface depending on how you want to control things, Below is couple of examples:
 
-## Modified Features
+#### Command Line
 
-- CLI uses `sync [options]` opposed to `quickshot [options]` commands.
-- Uses `.syncignore` opposed to `.quickshotignore` file.
-- Slightly more modified CLI logging.
-- Dependencies use latest versions.
-- No Babel (ES6) or SASS transpilation.
-- Settings use a `sync.config.json` file opposed to `quickshot.json` file.
+|     Command    | Details
+|----------------|-------------------------------
+|`sync` | Show list of commands
+|`sync configure` | Creates/Updates the configuration file
+|`sync theme` | Manage Shopify themes
+
+
+#### Node Script:
+
+```javascript
+
+import shopifySync from 'shopify-sync'
+
+
+sync({
+   run: 'watch',
+   target: 'development'
+})
+
+```
+
+
+Create a command within your `package.json` file:
+
+```json
+"scripts": {
+   "watch": "node src/sync.js"
+}
+```
+
+#### [Gulp 4](gulpjs.com) Task
+
+```javascript
+
+import shopifySync from 'shopify-sync'
+
+function shopifySync (done) {
+
+   sync({
+      run: 'watch',
+      target: 'development'
+   })
+
+   done()
+}
+
+export.default = parallel(exampleTask, shopifySync)
+```
+
