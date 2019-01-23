@@ -1829,6 +1829,13 @@ osenv@^0.1.4:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
 
+ospec@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/ospec/-/ospec-3.0.1.tgz#e1cf3893d9b9b7b5d1d7b8501a098836ce4c88f4"
+  integrity sha512-jtOXV1f8uVKIHl339VpoAwwb8kDcONAszahnanT+I4BP17WqsZNvQGDtYM6MzKYzDX1uab69sy+hkE0V7E0Rpg==
+  dependencies:
+    glob "^7.1.2"
+
 p-limit@^1.1.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-1.3.0.tgz#b86bd5f0c25690911c7590fcbfc2010d54b3ccb8"
