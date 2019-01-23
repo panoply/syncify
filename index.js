@@ -4,21 +4,26 @@ const main = require('./lib/main')
 const fancyLog = require('fancy-log')
 const chalk = require('chalk')
 
-module.exports = function (options) {
+module.exports = function (resource, options) {
 
-  if (!options.run) {
-    fancyLog(chalk`{red Error! The} {bold run} {red option must be defined!}`)
+  if (!resource) {
+    fancyLog(chalk`{red Error! The {bold resource} option is missing}!`)
     return
   }
 
   if (!options.target) {
-    fancyLog(chalk`{red Error! The} {bold target} {option must be defined!}`)
+    fancyLog(chalk`{red Error! Please define a {bold theme target}!}`)
     return
   }
 
   const config = Object.assign({}, {
-    concurrency: 20
+    target: '',
+    concurrency: 20,
+    dir: 'theme',
+    ignore: []
   }, options)
+
+  config['resource'] = resource
 
   return main(config)
 
