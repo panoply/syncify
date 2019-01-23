@@ -8,31 +8,27 @@ A node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool 
 
 ### When should I use this?
 
-The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme. You can use it to upload files during development to your store. The added bonuses of uploading and downloading themes is also available.
+The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme.
 
 ## Installation
 
 ```cli
-npm install shopify-sync
+yarn add shopify-sync --dev
 ```
 
-Access the wizard by creating a script tag with the value of `sync` in your projects root directory `package.json` file.
+After installing, you will need to create a  `sync.config.json` file. This file is used by Shopify Sync and will hold your store API credentials. You can generate this using the command line interface by running `yarn sync configure` or  you can create a file in the root of your directory named `sync.config.json` –
 
-```json
-"scripts": {
-   "sync": "sync"
-}
-```
-After installing, you will need to create a  `sync.config.json` file. This file is used by Shopify Sync and will hold your store API credentials. You can generate this using the command line interface by running `yarn sync configure` or  you can create a file in the root of your directory name `sync.config.json` – The config file should look like this:
+ The config file should look like the one below:
 
 ```json
 {
   "concurrency": 20,
   "ignore_file": ".syncignore",
-  "targets": [{
+  "targets": [
+     {
       "target_name": "development",
-      "api_key": "123456789abcdefghijklmnop",
-      "password": "123456789abcdefghijklmnop",
+      "api_key": "",
+      "password": "",
       "domain": "your-store",
       "primary_domain": "https://primary-domain.com",
       "theme_name": "Development",
@@ -44,9 +40,56 @@ After installing, you will need to create a  `sync.config.json` file. This file 
 ```
 
 ## Usage
-You can integrate Shopify Sync into any node project and you also have the command line interface depending on how you want to control things. Below is couple of examples:
+There are two different ways you can integrate and use Shopify Sync. You can include it into your node project and initialize with a script, eg:
 
-#### Command Line
+```javascript
+import sync from 'shopify-sync'
+
+sync('upload', {
+  dir: 'example',
+  target: 'development',
+  ignore: [
+    'example/sections/ignore.js',
+    'example/assets/ignore.liquid'
+  ]
+})
+
+```
+
+Create a script command within your `package.json` file.
+
+```json
+"scripts": {
+   "sync": "node src/name-of-file.js"
+}
+```
+
+
+### Options
+If you're initializing within a script you have a couple of additional options opposed to running the sync via the command line.
+
+**resource**<br>
+The `resource` option is a **required** option and is the first argument that is passed in. There are 3 avaiable resources to call which are `watch`, `upload` or `download`.
+
+**dir**<br>
+The `dir` option defaults to `theme` and is the directory that Shopify Sync will `watch`, `upload` or `download` modified or changed files from.
+
+> You cannot use deep or nested directories when using the `watch` resource. The watch resource only accepts a directory that resides within the root of your project.
+
+**target**<br>
+The `target` option is **required** and is the reference point to you store API credentials located within the `sync.config.json` file.
+
+> The target is the `target_name` property. The option accepts only a string for now.
+
+**concurrency**<br>
+The `concurrency` option defaults to 20. This option will allow you to set a number of parallel requests to run when uploading or downloading theme files.
+
+**ignore**<br>
+The ignore option accepts an array of files. You must use full path, for example `theme/assets/*.map`. You can also just use the `.syncignore` file.
+
+
+### Command Line
+You also can use this with command line
 
 |     Command    | Details
 |----------------|-------------------------------
@@ -55,44 +98,20 @@ You can integrate Shopify Sync into any node project and you also have the comma
 |`sync theme` | Manage Shopify themes
 
 
-### Node Script
-If you're initializing within a node script you have 3 options:
-
-|    Option    | Details
-|----------------|-------------------------------
-|`run` | *watch, upload or download*
-|`target` | *Name of the theme you want to target*
-|`concurrency` | *How many parallel requests to run*
-
-
-```javascript
-import sync from 'shopify-sync'
-
-sync({
-   run: 'watch', // REQUIRED
-   target: 'development' // REQUIRED
-})
-
-```
-Create a script command within your `package.json` file:
-
-```json
-"scripts": {
-   "sync": "node src/name-of-file.js"
-}
-```
-
-### Gulp 4 Task
-Run the Shopify Sync within a Gulp 4 task:
+## Usage with Gulp 4
 
 ```javascript
 import sync from 'shopify-sync'
 
 function syncTask (done) {
 
-   sync({
-      run: 'watch',
-      target: 'development'
+   sync('upload', {
+      dir: 'example',
+      target: 'development',
+      ignore: [
+         'example/sections/ignore.js',
+         'example/assets/ignore.liquid'
+      ]
    })
 
    done()
