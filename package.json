@@ -1,7 +1,7 @@
 {
   "name": "shopify-sync",
-  "description": "A shopify theme store synchronizer that watches a directory and uploads changed files.",
-  "version": "0.3.1",
+  "description": "A lightening fast shopify theme store synchronizer that watches a directory and uploads changed files.",
+  "version": "0.3.2",
   "homepage": "https://github.com/panoply/shopify-sync",
   "author": {
     "name": "Nikolas Savvidis",
@@ -18,7 +18,9 @@
   "keywords": [
     "cli",
     "command line",
-    "shopify"
+    "shopify",
+    "shopify gulp",
+    "shopify theme"
   ],
   "preferGlobal": true,
   "bin": {
