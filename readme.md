@@ -1,5 +1,11 @@
 [![npm version](https://badge.fury.io/js/shopify-sync.svg)](https://www.npmjs.com/package/shopify-sync)
 
+#### Breaking Change
+
+Shopify Sync now uses a `.sync` file to manage API credentials. Previous versions use a `sync.config.json` file. As of version **0.4.0** you must use a `.sync` configuration file.
+
+<hr>
+
 # Shopify Sync
 
 A node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool that can be used for watching, uploading or downloading theme files to multiple stores concurrently. Use in a node script, gulp task or with the command line.
@@ -42,7 +48,7 @@ You can generate this using the command line interface by running `yarn sync con
 ## Usage
 There are two different ways you can integrate and use Shopify Sync. You can include it into your node project and initialize with a script:
 
-### Script
+### Node
 
 ```javascript
 import sync from 'shopify-sync'
@@ -66,7 +72,7 @@ Create a script command within your `package.json` file.
 }
 ```
 
-### Command Line
+### CLI
 You also can use this with command line
 
 |     Command    | Details
@@ -76,7 +82,7 @@ You also can use this with command line
 |`sync theme` | Manage Shopify themes
 
 
-### Gulp 4
+### Usage with Gulp 4
 
 ```javascript
 import sync from 'shopify-sync'
@@ -96,6 +102,7 @@ function syncTask (done) {
 }
 
 export.default = parallel(exampleTask, syncTask)
+
 ```
 
 
