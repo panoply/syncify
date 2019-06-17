@@ -1,9 +1,5 @@
 [![npm version](https://badge.fury.io/js/shopify-sync.svg)](https://www.npmjs.com/package/shopify-sync)
 
-#### Breaking Change
-
-Shopify Sync now uses a `.sync` file to manage API credentials. Previous versions use a `sync.config.json` file. As of version **0.4.0** you must use a `.sync` configuration file.
-
 <hr>
 
 # Shopify Sync
@@ -22,9 +18,9 @@ The main purpose of the module is to watch a specified directory in your project
 yarn add shopify-sync --dev
 ```
 
-After installing, you will need to create a  `sync.config.json` file. This file is used by Shopify Sync and will hold your store API credentials.
+After installing, you will need to create a  `.shopifysync` file. This file is used by Shopify Sync and will hold your store API credentials.
 
-You can generate this using the command line interface by running `yarn sync configure` or  you can create a file in the root of your directory named `sync.config.json`:
+You can generate this using the command line interface by running `yarn sync configure` or  you can create a file in the root of your directory named `.shopifysync`:
 
 ```json
 {
