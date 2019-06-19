@@ -4,7 +4,7 @@ const main = require('./lib/main')
 const fancyLog = require('fancy-log')
 const chalk = require('chalk')
 
-module.exports = function (resource, options) {
+module.exports = function (resource, options, callback) {
 
   if (!resource) {
     fancyLog(chalk`{red Error! The {bold resource} option is missing}!`)
@@ -16,15 +16,13 @@ module.exports = function (resource, options) {
     return
   }
 
-  const config = Object.assign({}, {
+  const config = Object.assign({}, { resource }, {
     target: '',
     concurrency: 20,
     dir: 'theme',
     ignore: []
   }, options)
 
-  config['resource'] = resource
-
-  return main(config)
+  return main(config, callback)
 
 }

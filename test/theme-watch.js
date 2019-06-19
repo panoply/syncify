@@ -7,4 +7,6 @@ sync('watch', {
     'example/snippets/ignore.liquid',
     'example/assets/ignore.js'
   ]
+}, function () {
+  console.log('IS DONE', this.file)
 })
