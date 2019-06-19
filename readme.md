@@ -56,6 +56,10 @@ sync('upload', {
     'example/sections/ignore.js',
     'example/assets/ignore.liquid'
   ]
+}, function(){
+
+   // Execute callback function
+   // this.file (returns parsed file path object)
 })
 
 ```
@@ -124,3 +128,7 @@ The `concurrency` option defaults to 20. This option will allow you to set a num
 
 **ignore**<br>
 The ignore option accepts an array of files. You must use full path, for example `theme/assets/*.map`. You can also just use the `.syncignore` file.
+
+**callback**<br>
+The callback function. Access the passed in file path with `this.file`.
+
