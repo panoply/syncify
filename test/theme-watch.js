@@ -4,8 +4,9 @@ sync('watch', {
   dir: 'example',
   target: 'development',
   ignore: [
-    'example/snippets/ignore.liquid',
-    'example/assets/ignore.js'
+    'example/assets/*.js.map',
+    'example/sections/ignore.js',
+    'example/assets/ignore.liquid'
   ]
 }, function () {
   console.log('IS DONE', this.file)

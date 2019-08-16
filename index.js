@@ -1,8 +1,9 @@
 const Promise = require('bluebird')
-global.Promise = Promise
-const main = require('./lib/main')
 const fancyLog = require('fancy-log')
 const chalk = require('chalk')
+const main = require('./lib/Commands')
+
+global.Promise = Promise
 
 module.exports = function (resource, options, callback) {
 
@@ -20,6 +21,7 @@ module.exports = function (resource, options, callback) {
     target: '',
     concurrency: 20,
     dir: 'theme',
+    forceIgnore: false,
     ignore: []
   }, options)
 

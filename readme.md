@@ -110,6 +110,17 @@ export.default = parallel(exampleTask, syncTask)
 ## Options
 If you're initializing within a script you have a couple of additional options opposed to running the sync via the command line.
 
+| Option | Type | Default|
+|--------|------|--------|
+|`resource` | string | *Required* |
+|`target` | string | *Required* |
+|`dir` | string | 'theme' |
+|`concurrency` | Number | 20|
+|`forceIgnore` | Boolean | true |
+|`ignore` | Array | [ ] |
+|`callback` | Function | ( |
+
+
 **resource** <br>
 The `resource` option is a **required** option and is the first argument that is passed in, eg: `sync(resource, {})`. There are 3 avaiable resources to call, they are `watch`, `upload` or `download`
 
@@ -125,6 +136,9 @@ The `target` option is **required** and is the reference point to you store API 
 
 **concurrency**<br>
 The `concurrency` option defaults to 20. This option will allow you to set a number of parallel requests to run when uploading or downloading theme files.
+
+**forceIgnore**<br>
+Forcefully ignores files from the chokidor instance, preventing them from being read and printing to stdout. Reccomended if you are ignoring a large quantity of files.
 
 **ignore**<br>
 The ignore option accepts an array of files. You must use full path, for example `theme/assets/*.map`. You can also just use the `.syncignore` file.

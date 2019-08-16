@@ -1,7 +1,7 @@
 {
   "name": "shopify-sync",
   "description": "A lightening fast shopify theme store synchronizer that watches a directory and uploads changed files.",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "homepage": "https://github.com/panoply/shopify-sync",
   "author": {
     "name": "Nikolas Savvidis",
@@ -34,11 +34,12 @@
     "test-upload": "node test/theme-upload.js"
   },
   "dependencies": {
+    "anymatch": "^3.0.3",
     "axios": "^0.19.0",
     "bluebird": "^3.5.5",
     "boxen": "^4.1.0",
     "chalk": "^2.4.2",
-    "chokidar": "^3.0.1",
+    "chokidar": "^3.0.2",
     "co": "^4.6.0",
     "co-each": "^0.1.0",
     "co-limiter": "^1.0.3",
@@ -49,23 +50,25 @@
     "gitignore-parser": "^0.0.2",
     "glob": "^7.1.4",
     "iced-runtime": "^1.0.3",
-    "inquirer": "^6.3.1",
-    "lodash": "^4.17.10",
+    "inquirer": "^6.5.1",
+    "lodash": "^4.17.15",
     "machinepack-fs": "^12.0.1",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "moment": "^2.24.0",
     "request": "^2.88.0",
+    "request-promise": "^4.2.4",
     "walk": "^2.3.14"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.17.3",
+    "eslint": "^6.1.0",
+    "eslint-config-standard": "^13.0.1",
+    "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^9.1.0",
-    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
-    "ospec": "^3.1.0",
+    "ospec": "^4.0.0",
+    "rollup": "^1.19.4",
     "shelljs": "^0.8.3"
   }
 }

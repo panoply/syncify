@@ -7,7 +7,7 @@ global.Promise = Promise
 global.VERSION = pjson.version
 global.CONFIGVERSION = 1
 
-const main = require('../lib/main')
+const main = require('../lib/Commands')
 const argv = require('minimist')(process.argv.slice(2))
 
 main(argv)
