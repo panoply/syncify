@@ -4,9 +4,10 @@
 
 # Shopify Sync
 
-A node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool that can be used for watching, uploading or downloading theme files to multiple stores concurrently. Use in a node script, gulp task or with the command line.
+ A node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool that can be used for watching, uploading or downloading theme files to multiple stores concurrently.
 
-> Shopify Sync is a stripped down and heavily modified version of [Quickshot](https://github.com/internalfx/quickshot).
+ > Shopify Sync is hard fork version of the Theme development tool [Quickshot](https://github.com/internalfx/quickshot) which has been stripped down and heavily modified.
+
 
 ### Use case?
 
@@ -14,18 +15,21 @@ The main purpose of the module is to watch a specified directory in your project
 
 ## Installation
 
+Yarn
 ```cli
 yarn add shopify-sync --dev
 ```
 
-After installing, you will need to create a  `.shopifysync` file. This file is used by Shopify Sync and will hold your store API credentials.
+NPM
+```cli
+npm install shopify-sync --save-dev
+```
 
-You can generate this using the command line interface by running `yarn sync configure` or  you can create a file in the root of your directory named `.shopifysync`:
+After installing, you will need to create a  `.shopifysync` file. This file will hold your store API credentials. The configuration file is written in `JSON`. You can define configurations here.
 
-```json
+```jsonc
 {
-  "concurrency": 20,
-  "ignore_file": ".syncignore",
+  // An array of themes to sync with,
   "targets": [
      {
       "target_name": "development",
@@ -42,24 +46,26 @@ You can generate this using the command line interface by running `yarn sync con
 ```
 
 ## Usage
-There are two different ways you can integrate and use Shopify Sync. You can include it into your node project and initialize with a script:
-
-### Node
+Initialize as a function:
 
 ```javascript
 import sync from 'shopify-sync'
 
-sync('upload', {
-  dir: 'example',
-  target: 'development',
-  ignore: [
-    'example/sections/ignore.js',
-    'example/assets/ignore.liquid'
+sync('upload',  // Resource type (upload, download, watch)
+{
+  dir: 'example', // The directory of to watch
+  target: 'development', // Your theme target
+  concurrency: 20, // Number of parallel requests
+  forceIgnore: false,  // Apply ignores at chokidor instance
+  ignore: [ // Accepts an array of files and/or an anymatch `/*/**` wildcard
+    'example/assets/*.map.js',
+    'example/snippets/ignore.liquid'
   ]
 }, function(){
 
    // Execute callback function
    // this.file (returns parsed file path object)
+
 })
 
 ```
@@ -72,17 +78,7 @@ Create a script command within your `package.json` file.
 }
 ```
 
-### CLI
-You also can use this with command line
-
-|     Command    | Details
-|----------------|-------------------------------
-|`sync` | Show list of commands
-|`sync configure` | Creates/Updates the configuration file
-|`sync theme` | Manage Shopify themes
-
-
-### Usage with Gulp 4
+Additionally, if you're using Gulp 4 you can just call from within a task function:
 
 ```javascript
 import sync from 'shopify-sync'
@@ -105,6 +101,19 @@ export.default = parallel(exampleTask, syncTask)
 
 ```
 
+### CLI
+You also can intialize via the command line. Create a script reference in your `package.json` file.
+
+##### Commands
+
+|     Command    | Details
+|----------------|-------------------------------
+|`sync` | Show list of commands
+|`sync watch` | Starts watching a directory
+|`sync upload` | Uploads files, (accepts a filter).
+|`sync download` | Downloads the theme
+|`--target=[target_name]` | Explicitly select theme target
+|`--filter=[filename]` | Only transfer files matching specified filter
 
 
 ## Options

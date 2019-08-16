@@ -1,9 +1,16 @@
+import { terser } from 'rollup-plugin-terser'
+import commonjs from 'rollup-plugin-commonjs'
+
 export default {
 
-  input: 'lib/index.js',
+  input: 'lib/Entry.js',
   output: {
-    file: 'index.js',
+    file: './index.js',
     format: 'cjs'
-  }
+  },
+  plugins: [
+    commonjs(),
+    terser()
+  ]
 
 }
