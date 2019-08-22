@@ -1,7 +1,7 @@
 {
   "name": "shopify-sync",
   "description": "A lightening fast shopify theme store synchronizer that watches a directory and uploads changed files.",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "homepage": "https://github.com/panoply/shopify-sync",
   "author": {
     "name": "Nikolas Savvidis",
@@ -28,7 +28,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "rollup": "rollup -c",
+    "build": "rollup -c",
     "sync": "./bin/sync",
     "test-watch": "node test/theme-watch.js",
     "test-download": "node test/theme-download.js",
