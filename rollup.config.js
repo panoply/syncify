@@ -1,15 +1,16 @@
 import { terser } from 'rollup-plugin-terser'
-import commonjs from 'rollup-plugin-commonjs'
+import babel from 'rollup-plugin-babel'
 
 export default {
 
-  input: 'lib/Entry.js',
+  input: './lib/index.js',
   output: {
-    file: './index.js',
-    format: 'cjs'
+    file: 'index.js',
+    format: 'cjs',
+    sourcemap: false
   },
   plugins: [
-    commonjs(),
+    babel({ runtimeHelpers: true }),
     terser()
   ]
 
