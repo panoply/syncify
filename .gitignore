@@ -122,3 +122,4 @@ nbproject
 .node_history
 .shopifysync
 /example
+yarn.lock
