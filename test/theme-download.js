@@ -1,6 +1,6 @@
 const sync = require('../index.js')
 
 sync('download', {
-  dir: 'dist',
+  dir: 'example/dist',
   target: 'development'
 })
