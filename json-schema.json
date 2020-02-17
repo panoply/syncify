@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Shopify Sync Configuration File",
+  "definitions": {
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "target_name",
+          "api_key",
+          "password",
+          "domain",
+          "primary_domain",
+          "theme_name",
+          "theme_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "target_name": {
+            "type": "string",
+            "description": "The target name used reference this configuration",
+            "examples": ["development", "staging", "production"]
+          },
+          "api_key": {
+            "type": "string",
+            "title": "API Key",
+            "description": "The Shopify API Key used for this store."
+          },
+          "password": {
+            "type": "string",
+            "title": "Password",
+            "description": "The API password used for this store."
+          },
+          "domain": {
+            "type": "string",
+            "title": "Store domain name",
+            "pattern": "\\w+",
+            "description": "The domain name associated with this store. eg: \"your-store\"."
+          },
+          "primary_domain": {
+            "type": "string",
+            "title": "Store primary domain",
+            "description": "The primary domain name this store uses, eg: \"www.your-store.com\""
+          },
+          "theme_name": {
+            "type": "string",
+            "title": "Theme Name",
+            "description": "The theme name used in your Shopify Admin."
+          },
+          "theme_id": {
+            "type": "number",
+            "title": "Theme ID",
+            "description": "The theme ID to associate to this store configuration"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "dir",
+    "targets"
+  ],
+  "properties": {
+    "concurrency": {
+      "title": "Concurrency Limit",
+      "description": "This option will allow you to set a number of parallel requests to run when uploading or downloading theme files (defaults to 20)",
+      "type": "number"
+    },
+    "dir": {
+      "title": "Directory",
+      "description": "The theme directory to watch, upload or download within",
+      "type": "string"
+    },
+    "ignore": {
+      "title": "Ignored Files / Directories",
+      "description": "A glob (**/**) pattern list of files and/or directories to ignore.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "targets": {
+      "title": "Targets",
+      "description": "A list of Shopify themes this project should connects with.",
+      "$ref": "#/definitions/targets"
+    }
+  }
+}
