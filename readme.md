@@ -4,14 +4,11 @@
 
 # Shopify Sync
 
- A node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool that can be used for watching, uploading or downloading theme files to multiple stores concurrently.
-
- > Shopify Sync is hard fork version of the Theme development tool [Quickshot](https://github.com/internalfx/quickshot) which has been stripped down and heavily modified.
-
+ A lightning-fast cli/node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool. Supports watching, uploading and downloading theme files to multiple stores concurrently.
 
 ### Use case?
 
-The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme.
+The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme. Additionally, the tool supports download/upload features.
 
 ## Installation
 
@@ -25,46 +22,54 @@ NPM
 npm install shopify-sync --save-dev
 ```
 
-After installing, you will need to create a  `.shopifysync` file. This file will hold your store API credentials. The configuration file is written in `JSON`. You can define configurations here.
+After installing, you will need to create a  `.shopifysync.json` file and place it in the root of your directory. This file will hold your store API credentials. The configuration file is written in `JSON` and should be defined within the `targets[]` property, eg:
 
 ```jsonc
 {
-  // An array of themes to sync with,
+
+  // An array of themes to sync
+  "dir": "example", // The directory to watch
   "targets": [
      {
-      "target_name": "development",
-      "api_key": "",
-      "password": "",
-      "domain": "your-store",
-      "primary_domain": "https://primary-domain.com",
-      "theme_name": "Development",
-      "theme_id": 123456789
+      "target_name": "development", // The name of the theme target
+      "api_key": "", // Shopify API Key
+      "password": "", // Shopify Password
+      "domain": "your-store", // Your myshopify name (without .myshopify)
+      "primary_domain": "https://primary-domain.com", // Primary domain, eg: www.store.com
+      "theme_name": "Development", // The theme name
+      "theme_id": 123456789 // The theme ID
     }
   ]
 }
 
 ```
 
+> IntelliSense features for the configuration file can be provided by referencing the [json-schema.json](#) file of this repository via the `$schema` property.
+
 ## Usage
-Initialize as a function:
+
+You can run Shopify Sync via the [CLI](#cli) or intialize as a function using in a node script, eg:
 
 ```javascript
 import sync from 'shopify-sync'
 
-sync('upload',  // Resource type (upload, download, watch)
+sync('watch',  // Resource type (upload, download, watch)
 {
   dir: 'example', // The directory of to watch
   target: 'development', // Your theme target
   concurrency: 20, // Number of parallel requests
   forceIgnore: false,  // Apply ignores at chokidor instance
   ignore: [ // Accepts an array of files and/or an anymatch `/*/**` wildcard
+    'example/ignore-dir/**/**'
     'example/assets/*.map.js',
     'example/snippets/ignore.liquid'
   ]
 }, function(){
 
    // Execute callback function
-   // this.file (returns parsed file path object)
+   // this.file will returns parsed file path object)
+   // this.content will return the buffer content
+   console.log(this)
 
 })
 
@@ -78,14 +83,14 @@ Create a script command within your `package.json` file.
 }
 ```
 
-Additionally, if you're using Gulp 4 you can just call from within a task function:
+If you're using a tool like Gulp 4 you can call the sync from within a task function, eg:
 
 ```javascript
 import sync from 'shopify-sync'
 
 function syncTask (done) {
 
-   sync('upload', {
+   sync('watch', {
       dir: 'example',
       target: 'development',
       ignore: [
@@ -102,7 +107,15 @@ export.default = parallel(exampleTask, syncTask)
 ```
 
 ### CLI
-You also can intialize via the command line. Create a script reference in your `package.json` file.
+Intialize and execute the sync via the command line. You can install the project globaly or locally (depending on your flavour). If you're installing this on a per-project basis then create a reference in your `package.json` file set to the value `sync`, for example:
+
+```json
+{
+   "scripts": {
+      "sync": "sync",
+   }
+}
+```
 
 ##### Commands
 
@@ -115,9 +128,12 @@ You also can intialize via the command line. Create a script reference in your `
 |`--target=[target_name]` | Explicitly select theme target
 |`--filter=[filename]` | Only transfer files matching specified filter
 
+> You can use direct commands, eg: `yarn sync upload layout/theme.liquid` would upload the `theme.liquid` file.
+
 
 ## Options
-If you're initializing within a script you have a couple of additional options opposed to running the sync via the command line.
+
+When initializing via a node script you have a couple of additional options opposed to running sync from the CLI. In most cases running the command `watch` will suffice but for those who may want to manipulate files in transit or for additional control the API ships with the following:
 
 | Option | Type | Default|
 |--------|------|--------|
@@ -150,8 +166,10 @@ The `concurrency` option defaults to 20. This option will allow you to set a num
 Forcefully ignores files from the chokidor instance, preventing them from being read and printing to stdout. Reccomended if you are ignoring a large quantity of files.
 
 **ignore**<br>
-The ignore option accepts an array of files. You must use full path, for example `theme/assets/*.map`. You can also just use the `.syncignore` file.
+The ignore option accepts an array of files. You must use full path, for example `theme/assets/*.map`.
 
 **callback**<br>
-The callback function. Access the passed in file path with `this.file`.
+The callback function. Access the passed in file path and its content from within the function scope. `this.file` will return the parsed path of the file and `this.content` will supply you with a Buffer of the files contents.
+
+> Use `this.content.toString()` to return the file content as a string opposed to Buffer.
 
