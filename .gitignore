@@ -121,5 +121,6 @@ nbproject
 .idea
 .node_history
 .shopifysync
+.shopifysync.json
 /example
 yarn.lock

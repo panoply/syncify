@@ -1,5 +1,5 @@
 {
-  "$schema": "./json-schema.json",
+  "$schema": "https://raw.githubusercontent.com/panoply/shopify-sync/master/json-schema.json",
   "concurrency": 20,
   "dir": "example",
   "targets": [
