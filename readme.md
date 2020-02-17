@@ -44,7 +44,15 @@ After installing, you will need to create a  `.shopifysync.json` file and place 
 
 ```
 
-> IntelliSense features for the configuration file can be provided by referencing the [json-schema.json](#) file of this repository via the `$schema` property.
+##### JSON Schema
+
+IntelliSense features for the configuration file can be provided by referencing the [json-schema.json](https://raw.githubusercontent.com/panoply/shopify-sync/master/json-schema.json) file of this repository via the `$schema` property.
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/panoply/shopify-sync/master/json-schema.json"
+}
+```
 
 ## Usage
 
@@ -127,9 +135,6 @@ Intialize and execute the sync via the command line. You can install the project
 |`sync download` | Downloads the theme
 |`--target=[target_name]` | Explicitly select theme target
 |`--filter=[filename]` | Only transfer files matching specified filter
-
-> You can use direct commands, eg: `yarn sync upload layout/theme.liquid` would upload the `theme.liquid` file.
-
 
 ## Options
 
