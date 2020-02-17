@@ -150,14 +150,10 @@ When initializing via a node script you have a couple of additional options oppo
 The `resource` option is a **required** option and is the first argument that is passed in, eg: `sync(resource, {})`. There are 3 avaiable resources to call, they are `watch`, `upload` or `download`
 
 **dir**<br>
-The `dir` option defaults to `theme` and is the directory that Shopify Sync will `watch`, `upload` or `download` modified or changed files from.
-
-> You cannot use deep or nested directories when using the `watch` resource. The watch resource will only accepts a directory that resides within the root of your project.
+The `dir` option defaults to `theme` and is the directory that Shopify Sync will `watch`, `upload` or `download` modified or changed files from. **PLEASE NOTE:** You cannot use deep or nested directories when using the `watch` resource. The watch resource will only accepts a directory that resides within the root of your project.
 
 **target**<br>
-The `target` option is **required** and is the reference point to you store API credentials located within the `sync.config.json` file.
-
-> The target is the `target_name` property. The option accepts only a string for now.
+The `target` option is **required** and is the reference point to you store API credentials located within the `sync.config.json` file. The target is the `target_name` property. The option accepts only a string for now.
 
 **concurrency**<br>
 The `concurrency` option defaults to 20. This option will allow you to set a number of parallel requests to run when uploading or downloading theme files.
@@ -173,3 +169,11 @@ The callback function. Access the passed in file path and its content from withi
 
 > Use `this.content.toString()` to return the file content as a string opposed to Buffer.
 
+
+# Contributing
+
+Fork the project, run `yarn` and you're good to go.
+
+# Changelog
+
+Refer to the [Changelog](changelog.md) for each per-version update and/or fixes.
