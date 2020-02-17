@@ -19,10 +19,10 @@
     "cli",
     "command line",
     "shopify",
-    "shopify gulp",
-    "shopify theme"
+    "shopify node",
+    "shopify theme",
+    "shopify themekit node"
   ],
-  "preferGlobal": true,
   "bin": {
     "sync": "./bin/sync"
   },
