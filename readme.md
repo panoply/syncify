@@ -4,33 +4,33 @@
 
 # Shopify Sync
 
- A lightning-fast cli/node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool. Supports watching, uploading and downloading theme files to multiple stores concurrently.
+A lightning-fast node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool. Supports watching, uploading and downloading of Shopify theme files to multiple storefronts concurrently. A concise and clear log interface, custom file transit control and much more!
 
 ### Use case?
 
-The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme. Additionally, the tool supports download/upload features.
+The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme target. Additionally, the tool supports download/upload features.
 
 ## Installation
 
 Yarn
+
 ```cli
 yarn add shopify-sync --dev
 ```
 
 NPM
+
 ```cli
 npm install shopify-sync --save-dev
 ```
 
-After installing, you will need to create a  `.shopifysync.json` file and place it in the root of your directory. This file will hold your store API credentials. The configuration file is written in `JSON` and should be defined within the `targets[]` property, eg:
+After installing, you will need to create a `.shopifysync.json` file and place it in the root of your directory. This file will hold your store API credentials. The configuration file should be written in `JSON` and store themes to sync should be defined via the `targets[]` property, eg:
 
 ```jsonc
 {
-
-  // An array of themes to sync
   "dir": "example", // The directory to watch
   "targets": [
-     {
+    {
       "target_name": "development", // The name of the theme target
       "api_key": "", // Shopify API Key
       "password": "", // Shopify Password
@@ -41,12 +41,11 @@ After installing, you will need to create a  `.shopifysync.json` file and place 
     }
   ]
 }
-
 ```
 
 ##### JSON Schema
 
-IntelliSense features for the configuration file can be provided by referencing the [json-schema.json](https://raw.githubusercontent.com/panoply/shopify-sync/master/json-schema.json) file of this repository via the `$schema` property.
+If you're using an editor like vscode or one that supports JSON IntelliSense features you can grab the Schema Store configuration file can be provided by referencing the [json-schema](https://raw.githubusercontent.com/panoply/shopify-sync/master/json-schema.json) file in this repository via the `$schema` property, eg:
 
 ```json
 {
@@ -54,9 +53,9 @@ IntelliSense features for the configuration file can be provided by referencing 
 }
 ```
 
-## Usage
+## Script Usage
 
-You can run Shopify Sync via the [CLI](#cli) or intialize as a function using in a node script, eg:
+You can run Shopify Sync via the [CLI](#cli) or initialize as a function in a node script, eg:
 
 ```javascript
 import sync from 'shopify-sync'
@@ -91,7 +90,7 @@ Create a script command within your `package.json` file.
 }
 ```
 
-If you're using a tool like Gulp 4 you can call the sync from within a task function, eg:
+If you're using a tool like Gulp 4 you can call upon the sync from within a task function, eg:
 
 ```javascript
 import sync from 'shopify-sync'
@@ -115,65 +114,79 @@ export.default = parallel(exampleTask, syncTask)
 ```
 
 ### CLI
-Intialize and execute the sync via the command line. You can install the project globaly or locally (depending on your flavour). If you're installing this on a per-project basis then create a reference in your `package.json` file set to the value `sync`, for example:
+
+Execute the sync via the command line. You can install the project globaly or locally. If you're installing locally create a reference in your `package.json` file, for example:
 
 ```json
 {
-   "scripts": {
-      "sync": "sync",
-   }
+  "scripts": {
+    "sync": "sync"
+  }
 }
 ```
 
+> If yo've instaled globally you can access the CLI using the `sync` command
+
 ##### Commands
 
-|     Command    | Details
-|----------------|-------------------------------
-|`sync` | Show list of commands
-|`sync watch` | Starts watching a directory
-|`sync upload` | Uploads files, (accepts a filter).
-|`sync download` | Downloads the theme
-|`--target=[target_name]` | Explicitly select theme target
-|`--filter=[filename]` | Only transfer files matching specified filter
+| Command                  | Details                                       |
+| ------------------------ | --------------------------------------------- |
+| `sync`                   | Show list of commands                         |
+| `sync watch`             | Starts watching a directory                   |
+| `sync upload`            | Uploads files, (accepts a filter).            |
+| `sync download`          | Downloads the theme                           |
+| `--target=[target_name]` | Explicitly select theme target                |
+| `--filter=[filename]`    | Only transfer files matching specified filter |
 
 ## Options
 
 When initializing via a node script you have a couple of additional options opposed to running sync from the CLI. In most cases running the command `watch` will suffice but for those who may want to manipulate files in transit or for additional control the API ships with the following:
 
-| Option | Type | Default|
-|--------|------|--------|
-|`resource` | string | *Required* |
-|`target` | string | *Required* |
-|`dir` | string | 'theme' |
-|`concurrency` | Number | 20|
-|`forceIgnore` | Boolean | true |
-|`ignore` | Array | [ ] |
-|`callback` | Function | ( |
+| Option        | Type     | Default    |
+| ------------- | -------- | ---------- |
+| `resource`    | string   | _Required_ |
+| `target`      | string   | _Required_ |
+| `dir`         | string   | 'theme'    |
+| `concurrency` | Number   | `20`       |
+| `forceIgnore` | Boolean  | `true`     |
+| `ignore`      | Array    | `[]`       |
+| `callback`    | Function | `()`       |
 
+**`resource`** <br>
+The `resource` option is a **required** option and is the first argument that is passed in. There are 3 avaiable resources to call, they are: `watch`, `upload` or `download`.
 
-**resource** <br>
-The `resource` option is a **required** option and is the first argument that is passed in, eg: `sync(resource, {})`. There are 3 avaiable resources to call, they are `watch`, `upload` or `download`
+**`dir`**<br>
+The `dir` option defaults to `theme` and is the directory that the sync will watch, upload or download modified or changed files from. The watch resource will only accept a directory that resides within the root of your project.
 
-**dir**<br>
-The `dir` option defaults to `theme` and is the directory that Shopify Sync will `watch`, `upload` or `download` modified or changed files from. **PLEASE NOTE:** You cannot use deep or nested directories when using the `watch` resource. The watch resource will only accepts a directory that resides within the root of your project.
+**`target`**<br>
+The `target` option is **required** and is the reference point to your Shopify stores API credentials. The target defined here should reflect the `target_name` property defined in your config file.
 
-**target**<br>
-The `target` option is **required** and is the reference point to you store API credentials located within the `sync.config.json` file. The target is the `target_name` property. The option accepts only a string for now.
+**`concurrency`**<br>
+The `concurrency` option defaults to 20. This option will allow you to set a number of parallel requests to run when uploading or downloading theme files. Please note that all asset syncs are executed asynchronously.
 
-**concurrency**<br>
-The `concurrency` option defaults to 20. This option will allow you to set a number of parallel requests to run when uploading or downloading theme files.
+**`forceIgnore`**<br>
+Forcefully ignores files from the chokidor instance which will prevent them from being read and printing to stdout. This option is reccomended if you are ignoring a large quantity of files and want to keep your logs clean.
 
-**forceIgnore**<br>
-Forcefully ignores files from the chokidor instance, preventing them from being read and printing to stdout. Reccomended if you are ignoring a large quantity of files.
+**`ignore`**<br>
+The ignore option accepts an array of files. You must use full path (`theme/assets/*.map`) glob patterns.
 
-**ignore**<br>
-The ignore option accepts an array of files. You must use full path, for example `theme/assets/*.map`.
+**`callback`**<br>
+A callback function executed post transfer. Access the passed in file path and its content via the functions _this_ scope. `this.file` will return the parsed file path and `this.content` will supply you with a Buffer of the files contents, eg:
 
-**callback**<br>
-The callback function. Access the passed in file path and its content from within the function scope. `this.file` will return the parsed path of the file and `this.content` will supply you with a Buffer of the files contents.
+```javascript
+{
+   file: {
+      root: String,
+      dir: String,
+      base: String,
+      ext: String,
+      name: String
+   },
+   content: <Buffer>
+}
+```
 
 > Use `this.content.toString()` to return the file content as a string opposed to Buffer.
-
 
 # Contributing
 
