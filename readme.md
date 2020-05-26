@@ -190,7 +190,7 @@ A callback function executed post transfer. Access the passed in file path and i
 
 # Contributing
 
-Fork the project, run `yarn` and you're good to go.
+This project uses [pnpm](https://pnpm.js.org/en/cli/install) (because pnpm is dope and pnpm does dope shit) - Fork the project, run `pnpm i` and you're good to go. If you're using Yarn like the rest of the plebs or npm like the boomers then you will still need to install pnpm.
 
 # Changelog
 
