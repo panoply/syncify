@@ -1,5 +1,5 @@
 import { terser } from 'rollup-plugin-terser'
-import babel from 'rollup-plugin-babel'
+import { babel } from '@rollup/plugin-babel'
 
 export default {
 
@@ -10,7 +10,7 @@ export default {
     sourcemap: false
   },
   plugins: [
-    babel({ runtimeHelpers: true }),
+    babel({ babelHelpers: 'bundled' }),
     terser()
   ]
 
