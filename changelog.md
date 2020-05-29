@@ -6,11 +6,15 @@ Project changelog start at version 0.8.0. All previous version should be avoided
 
 ## [0.9.0] - <small>25/05/2020</small>
 
-The most important changes in this release is the removal of Yarn in favour of th powerful [pnpm](https://pnpm.js.org/en/cli/install) package manager and the log interface
+The most important changes in this release is the removal of Yarn in favour of the powerful [pnpm](https://pnpm.js.org/en/cli/install) package manager and the log interface. This version patches some issues and additionals. Next version will be this packages first major release.
 
 - Overhaul of upload and download cli logging
 - Now uses [fs-extra](https://www.npmjs.com/package/fs-extra)
 - [#6](https://github.com/panoply/shopify-sync/issues/6)
+- Dropped CLI `--filter` and `--target` arguments due to pnpm namespace issue, will shop fix in next major
+- Tidy up some parts of code base
+- No longer supports `.shopifysync` file, you must use `.shopifysync.json`
+- Implemented a more user friendly logging approach for upload and download features.
 
 ### Misc
 
