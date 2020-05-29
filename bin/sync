@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
 const pjson = require('../package.json')
-const Promise = require('bluebird')
 
-global.Promise = Promise
 global.VERSION = pjson.version
 global.CONFIGVERSION = 1
 
