@@ -1,3 +1,9 @@
 example/
 test/
 lib/
+versions/
+.eslintrc
+.prettierrc.js
+.prettierignore
+jsconfig.json
+.babelrc
