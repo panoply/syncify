@@ -1,4 +1,4 @@
-const sync = require('../index.js')
+const sync = require('../package/index.js')
 
 sync('watch', {
   dir: 'example',

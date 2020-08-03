@@ -1,4 +1,4 @@
-const sync = require('../index.js')
+const sync = require('../package/index.js')
 
 sync('upload', {
   dir: 'example',
@@ -11,6 +11,6 @@ sync('upload', {
   ]
 }, function () {
 
-  console.log(this)
+  // console.log(this)
 
 })

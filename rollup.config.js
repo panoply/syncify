@@ -5,7 +5,7 @@ export default {
 
   input: './lib/index.js',
   output: {
-    file: 'index.js',
+    file: 'package/index.js',
     format: 'cjs',
     sourcemap: false
   },
