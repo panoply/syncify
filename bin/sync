@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-const pjson = require('../package.json')
+const pjson = require("../package.json");
 
-global.VERSION = pjson.version
-global.CONFIGVERSION = 1
+global.VERSION = pjson.version;
+global.CONFIGVERSION = 1;
 
-const main = require('../index')
-const argv = require('minimist')(process.argv.slice(2))
+const main = require("../package/index");
+const argv = require("minimist")(process.argv.slice(2));
 
 // console.log(main)
-main(argv)
+main(argv);

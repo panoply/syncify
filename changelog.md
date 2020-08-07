@@ -4,6 +4,10 @@ Project changelog start at version 0.8.0. All previous version should be avoided
 
 <hr>
 
+## [0.9.2] - <small>07/08/2020</small>
+
+- Fix #8
+
 ## [0.9.1] - <small>03/08/2020</small>
 
 - Fix ignore issue, in watch mode
