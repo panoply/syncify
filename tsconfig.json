@@ -1,0 +1,41 @@
+{
+  "exclude": ["node_modules/**", "package", "test"],
+  "include": ["src/**/*.ts"],
+  "typeAcquisition": {
+    "enable": true,
+    "include": ["node"]
+  },
+  "compilerOptions": {
+    "types": ["node"],
+    "incremental": true,
+    "declaration": true,
+    "outDir": "package",
+    "target": "ES6",
+    "removeComments": true,
+    "lib": ["es2020"],
+    "module": "ESNext",
+    "alwaysStrict": true,
+    "allowUmdGlobalAccess": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true,
+    "skipDefaultLibCheck": false,
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "pretty": true,
+    "rootDir": "src",
+    "typeRoots": ["node_modules/@types", "src/types/*"],
+    "declarationDir": "package/@types",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["./src/*"],
+      "parser": ["./src/parser/*"],
+      "lexical": ["./src/lexical/*"],
+      "tree": ["./src/lexical/tree/*"]
+    }
+  }
+}
