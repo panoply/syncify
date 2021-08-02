@@ -3,7 +3,7 @@ logs*
 _site
 sync.config.json
 yarn.lock
-package
+package/*
 .sass-cache
 node_modules
 bower_components
