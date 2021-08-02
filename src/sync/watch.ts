@@ -47,7 +47,7 @@ export async function watch (options: CLIOptions, callback: typeof Callback) {
     }
 
     if (file.match(/[()]/)) {
-      return log.print(chalk`{red Filename cannot contain parentheses at: "${file}"`);
+      return log.print(chalk`{red Filename cannot contain parentheses at: "${file}"}`);
     }
 
     if (settings?.ignore && settings.ignore.length > 0) {

@@ -43,22 +43,28 @@ export function errors (error: any) {
 
   } else {
 
-    const plural = error.data.length > 1 ? 'Errors' : 'Error';
+    if (error?.data && Array.isArray(error.data)) {
 
-    let output: string;
+      const plural = error.data.length > 1 ? 'Errors' : 'Error';
 
-    output = chalk`{red.bold ${error.data.length}} {red ${plural}} `;
-    output += chalk`{dim in} {redBright${error.message}}`;
-    output += '\n\n';
-    output += error.data
-      .map((text: string, i: number) => (
-        chalk` {bold.dim ${i + 1}.} {redBright ${parse(text)}}`
-      ))
-      .join('\n');
+      let output: string;
 
-    output += '\n';
+      output = chalk`{red.bold ${error.data.length}} {red ${plural}} `;
+      output += chalk`{dim in} {redBright ${error.message}}`;
+      output += '\n\n';
+      output += error.data
+        .map((text: string, i: number) => (
+          chalk` {bold.dim ${i + 1}.} {redBright ${parse(text)}}`
+        ))
+        .join('\n');
 
-    return print(output);
+      output += '\n';
+
+      return print(output);
+
+    }
+
+    return print(error, 'redBright', 'error');
 
   }
 

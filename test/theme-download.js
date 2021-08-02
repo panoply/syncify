@@ -1,7 +1,7 @@
-const sync = require('../package/index.js')
+const sync = require('../package/index.js');
 
 sync('download', {
-  dir: 'example/dist',
+  dir: 'test/dist',
   target: 'development',
   ignore: [
     'snippets/*.liquid'
@@ -10,4 +10,4 @@ sync('download', {
 
   // console.log(this)
 
-})
+});

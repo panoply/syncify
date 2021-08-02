@@ -2197,6 +2197,26 @@ function getText(content) {
         : content.data) : '';
     return message;
 }
+function errors(error) {
+    if (error === null || error === void 0 ? void 0 : error.stack) {
+        throw print(error.stack);
+    }
+    else {
+        if ((error === null || error === void 0 ? void 0 : error.data) && Array.isArray(error.data)) {
+            const plural = error.data.length > 1 ? 'Errors' : 'Error';
+            let output;
+            output = chalk__default['default'] `{red.bold ${error.data.length}} {red ${plural}} `;
+            output += chalk__default['default'] `{dim in} {redBright ${error.message}}`;
+            output += '\n\n';
+            output += error.data
+                .map((text, i) => (chalk__default['default'] ` {bold.dim ${i + 1}.} {redBright ${parse(text)}}`))
+                .join('\n');
+            output += '\n';
+            return print(output);
+        }
+        return print(error, 'redBright', 'error');
+    }
+}
 function parse(error) {
     const liquid = /['"]({?[{%])(.*?)([%}]}?)['"]/g;
     const string = /(['"][\w\s]+['"])/g;
@@ -2268,6 +2288,7 @@ class Queue {
                         reject
                     });
                 }
+                console.log(error);
                 const handleError = this.error(request, error);
                 return reject(handleError);
             }
@@ -2834,7 +2855,7 @@ function watch(options, callback) {
                 return print(chalk__default['default'] `{red Issue in match "/^\..*$/" at: ${file}}"`);
             }
             if (file.match(/[()]/)) {
-                return print(chalk__default['default'] `{red Filename cannot contain parentheses at: "${file}"`);
+                return print(chalk__default['default'] `{red Filename cannot contain parentheses at: "${file}"}`);
             }
             if ((settings === null || settings === void 0 ? void 0 : settings.ignore) && settings.ignore.length > 0) {
                 if (anymatch__default['default'](settings.ignore, file)) {
@@ -2861,38 +2882,16 @@ function watch(options, callback) {
                             content: data
                         });
                     }
-                }).catch((error) => {
-                    if (error === null || error === void 0 ? void 0 : error.stack) {
-                        throw print(error.stack);
-                    }
-                    else {
-                        const plural = error.data.length > 1 ? 'Errors' : 'Error';
-                        let output;
-                        output = chalk__default['default'] `{red.bold ${error.data.length}} {red ${plural}} `;
-                        output += chalk__default['default'] `{dim in} {red.underline ${error.message}}`;
-                        output += '\n\n';
-                        output += error.data
-                            .map((text, i) => (chalk__default['default'] ` {bold.dim ${i + 1}.} {redBright ${parse(text)}}`))
-                            .join('\n');
-                        output += '\n';
-                        return print(output);
-                    }
-                });
+                }).catch(errors);
             }
             else if (event === 'unlink') {
                 const url = `/assets.json?asset[key]=${key.split(path__default['default'].sep).join('/')}`;
-                try {
-                    yield request(target, {
-                        method: 'delete',
-                        url: `/admin/themes/${url}/${target.theme_id}`
-                    });
+                yield request(target, {
+                    method: 'delete',
+                    url: `/admin/themes/${url}/${target.theme_id}`
+                }).then(() => {
                     print(chalk__default['default'] `{green Deleted} '{green ${file}}'`);
-                }
-                catch (error) {
-                    if (error === null || error === void 0 ? void 0 : error.stack) {
-                        throw print(error.stack);
-                    }
-                }
+                }).catch(errors);
             }
         }));
         let banner = (chalk__default['default'] `  Target: {green ${target.target_name}}\n` +

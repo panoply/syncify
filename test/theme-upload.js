@@ -1,16 +1,16 @@
-const sync = require('../package/index.js')
+const sync = require('../package/index.js');
 
 sync('upload', {
-  dir: 'example',
+  dir: 'test/example',
   concurrency: 5,
   target: 'development',
   ignore: [
-    'example/dist/**/**',
-    'example/sections/ignore.js',
-    'example/assets/ignore.liquid'
+    'test/example/dist/**/**',
+    'test/example/sections/ignore.js',
+    'test/example/assets/ignore.liquid'
   ]
 }, function () {
 
   // console.log(this)
 
-})
+});
