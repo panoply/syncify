@@ -1,4 +1,4 @@
-const sync = require('../package/index.js')
+const sync = require('../package/index.js');
 
 sync('watch', {
   dir: 'example',
@@ -10,5 +10,5 @@ sync('watch', {
     'example/assets/ignore.liquid'
   ]
 }, function () {
-  console.log('IS DONE', this)
-})
+  // console.log('IS DONE', this);
+});
