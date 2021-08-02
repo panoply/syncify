@@ -4,6 +4,15 @@ Project changelog start at version 0.8.0. All previous version should be avoided
 
 <hr>
 
+## [1.0.0-beta.1] - <small>01/08/2021</small>
+
+- Upgrade the project to TypeScript
+- Multiple fixes
+- New logging approach and overall better performance
+- Supports Shopify 2.0 store features.
+
+Please note, this is beta release candidate, if you have issues use 0.9.2, for those most part everything should continue works as expected. You will notice the CLI logging is far more concise, and colorizes errors for better readability.
+
 ## [0.9.2] - <small>07/08/2020</small>
 
 - Fix #8

@@ -3,7 +3,6 @@ logs*
 _site
 sync.config.json
 yarn.lock
-
 .sass-cache
 node_modules
 bower_components
@@ -37,5 +36,8 @@ nbproject
 .shopifysync
 .shopifysync.json
 example
+package
+theme
+dist
 yarn.lock
 versions

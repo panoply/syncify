@@ -6,11 +6,21 @@
 
 A lightning-fast node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool. Supports watching, uploading and downloading of Shopify theme files to multiple storefronts concurrently. A concise and clear log interface, custom file transit control and much more!
 
+### Why?
+
+Because Shopify tooling is utter garbage. The likelihood of a project maintained by the Shopify team lasting longer than 12 months is slim and typically they are just mediocre. This module does one job, it's flexible, does not require you to install 20+ fucking ruby gems and will not lock you into some poorly thought through workflow or theme development apparatus.
+
 ### Use case?
 
-The main purpose of the module is to watch a specified directory in your project and upload changed or modified files to a configured Shopify theme target. Additionally, the tool supports download/upload features.
+The main purpose of the module is to watch a specified directory in your project and upload/remove changed or modified files to a configured Shopify theme target. Additionally, the tool supports download/upload features.
 
 ## Installation
+
+PNPM
+
+```cli
+pnpm i shopify-sync --dev
+```
 
 Yarn
 
@@ -153,7 +163,7 @@ When initializing via a node script you have a couple of additional options oppo
 | `callback`    | Function | `()`       |
 
 **`resource`** <br>
-The `resource` option is a **required** option and is the first argument that is passed in. There are 3 avaiable resources to call, they are: `watch`, `upload` or `download`.
+The `resource` option is a **required** option and is the first argument that is passed in. There are 3 available resources to call, they are: `watch`, `upload` or `download`.
 
 **`dir`**<br>
 The `dir` option defaults to `theme` and is the directory that the sync will watch, upload or download modified or changed files from. The watch resource will only accept a directory that resides within the root of your project.
@@ -165,7 +175,7 @@ The `target` option is **required** and is the reference point to your Shopify s
 The `concurrency` option defaults to 20. This option will allow you to set a number of parallel requests to run when uploading or downloading theme files. Please note that all asset syncs are executed asynchronously.
 
 **`forceIgnore`**<br>
-Forcefully ignores files from the chokidor instance which will prevent them from being read and printing to stdout. This option is reccomended if you are ignoring a large quantity of files and want to keep your logs clean.
+Forcefully ignores files from the chokidar instance which will prevent them from being read and printing to stdout. This option is recommended if you are ignoring a large quantity of files and want to keep your logs clean.
 
 **`ignore`**<br>
 The ignore option accepts an array of files. You must use full path (`theme/assets/*.map`) glob patterns.
