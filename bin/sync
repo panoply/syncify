@@ -8,5 +8,4 @@ global.CONFIGVERSION = 1;
 const main = require("../package/index");
 const argv = require("minimist")(process.argv.slice(2));
 
-// console.log(main)
 main(argv);
