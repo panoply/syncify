@@ -90,8 +90,6 @@ export class Queue {
         });
       }
 
-      console.log(error);
-
       const handleError = this.error(request, error);
 
       return reject(handleError);
