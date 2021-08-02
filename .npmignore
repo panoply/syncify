@@ -1,9 +1,16 @@
 example/
 test/
 lib/
+src/
 versions/
 .eslintrc
+.vscode/
 .prettierrc.js
 .prettierignore
+.shopifysync.json
+.eslintignore
+.pnpm-debug.log
 jsconfig.json
+tsconfig.json
 .babelrc
+rollup.config.js
