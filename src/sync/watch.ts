@@ -88,13 +88,13 @@ export async function watch (options: CLIOptions, callback: typeof Callback) {
 
     } else if (event === 'unlink') {
 
-      const url = `/assets.json?asset[key]=${key.split(path.sep).join('/')}`;
+      const url = `assets.json?asset[key]=${key.split(path.sep).join('/')}`;
 
       await request(
         target
         , {
           method: 'delete',
-          url: `/admin/themes/${url}/${target.theme_id}`
+          url: `/admin/themes/${target.theme_id}/${url}`
         }
       ).then(() => {
 
