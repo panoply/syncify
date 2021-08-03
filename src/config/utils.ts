@@ -1,4 +1,4 @@
-import { ITarget, CLIOptions } from '../index.d';
+import { ITarget, CLIOptions } from '../typings';
 import chalk from 'chalk';
 
 /**
@@ -22,6 +22,15 @@ export function ignore (settings: CLIOptions, ignored = {
   }
 
   return { settings, ignored };
+
+}
+
+/**
+ * URL Generator
+ */
+export function getStoreUrl (api_key: string, password: string, domain: string): string {
+
+  return 'https://' + api_key + ':' + password + '@' + domain + '.myshopify.com';
 
 }
 
