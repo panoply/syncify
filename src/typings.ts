@@ -49,7 +49,7 @@ export interface ICallbackScope {
   }
 }
 
-export function Callback(this: ICallbackScope): string
+export declare function Callback(this: ICallbackScope): string
 
 export interface APIOptions {
   /**
