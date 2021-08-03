@@ -1,8 +1,8 @@
 import { Promise as P } from 'bluebird';
 import axios from 'axios';
-import { getTargetUrl } from './utils';
+import { getTargetUrl } from '../config/utils';
 import * as log from '../config/logger';
-import { IRequest, IPayload, ITarget, IRequestData } from '../index.d';
+import { IRequest, IPayload, ITarget, IRequestData } from '../typings';
 
 export class Queue {
 

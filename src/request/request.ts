@@ -1,5 +1,5 @@
 import { Queue } from './queue';
-import { ITarget, IRequest } from '../index.d';
+import { ITarget, IRequest } from '../typings';
 
 declare type file = {
   key: string,
