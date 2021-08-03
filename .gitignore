@@ -4,6 +4,7 @@ _site
 sync.config.json
 yarn.lock
 .sass-cache
+.env
 node_modules
 bower_components
 misc
