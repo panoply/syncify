@@ -6,12 +6,12 @@ import chokidar from 'chokidar';
 import chalk from 'chalk';
 import anymatch from 'anymatch';
 import boxen from 'boxen';
-import { request } from '../config/request';
+import { request } from '../request/request';
 import { readConfig } from '../config/config';
 import { getTarget } from '../config/target';
 import { ignore } from '../config/utils';
 import * as log from '../config/logger';
-import { CLIOptions, Callback } from '../index.d';
+import { CLIOptions, Callback } from '../typings';
 
 /**
  * Watcher
