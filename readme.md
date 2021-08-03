@@ -8,7 +8,7 @@ A lightning-fast node equivalent shopify [theme kit](https://shopify.github.io/t
 
 ### Why?
 
-Because Shopify tooling is utter garbage. The likelihood of a project maintained by the Shopify team lasting longer than 12 months is slim and typically they are just mediocre. This module does one job, it's flexible, does not require you to install 20+ fucking ruby gems and will not lock you into some poorly thought through workflow or theme development apparatus.
+Because Shopify tooling is utter garbage. The likelihood of a project maintained by the Shopify team lasting longer than 12 months is slim. This module does one job, it's flexible, does not require you to install 20+ fucking ruby gems and will not lock you into some poorly thought through workflow or theme development apparatus that is common with Shopify.
 
 ### Use case?
 
@@ -34,34 +34,49 @@ NPM
 npm install shopify-sync --save-dev
 ```
 
-After installing, you will need to create a `.shopifysync.json` file and place it in the root of your directory. This file will hold your store API credentials. The configuration file should be written in `JSON` and store themes to sync should be defined via the `targets[]` property, eg:
+## Configuration
+
+After installing you will need quickly configure a connection between your shopify store theme/s and Shopify Sync. In your `package.json` file define configuration using a `"shopifysync":{}` property. Provide your credentials in an `.env` file.
+
+> In previous versions configuration and credentials were stored in a `.shopifysync.json` file, this approach is deprecated and will not be supported in future versions.
+
+### Options
+
+Within your `package.json` file, you can provide the following configuration options:
 
 ```jsonc
 {
-  "dir": "example", // The directory to watch
-  "targets": [
-    {
-      "target_name": "development", // The name of the theme target
-      "api_key": "", // Shopify API Key
-      "password": "", // Shopify Password
-      "domain": "your-store", // Your myshopify name (without .myshopify)
-      "primary_domain": "https://primary-domain.com", // Primary domain, eg: www.store.com
-      "theme_name": "Development", // The theme name
-      "theme_id": 123456789 // The theme ID
-    }
-  ]
+  "shopifysync": {
+    "dir": "example", // The directory to watch
+    "targets": [
+      {
+        "domain": "your-store", // Your myshopify name (without .myshopify)
+        "target_name": "development", // The name of the theme target
+        "theme_name": "Development", // The theme name
+        "theme_id": 123456789 // The theme ID
+      }
+    ]
+  }
 }
 ```
 
-##### JSON Schema
+### Credentials
 
-If you're using an editor like vscode or one that supports JSON IntelliSense features you can grab the Schema Store configuration file can be provided by referencing the [json-schema](https://raw.githubusercontent.com/panoply/shopify-sync/master/json-schema.json) file in this repository via the `$schema` property, eg:
+Store credential are stored within a dotenv file. Credentials can be expressed in either upper or lowercase. Credentials **must** begin with the store name, following an underscore. For example, a store with a myshopify domain of `sissel.myshopify.com` has a store name value of `sissel` - this is how you would define the api key and password to that store within the `.env` file:
 
-```json
-{
-  "$schema": "https://raw.githubusercontent.com/panoply/shopify-sync/master/json-schema.json"
-}
+```env
+sissel_api_key = 'abcdefghijklmnopqrstuvwz'
+sissel_password = 'abcdefghijklmnopqrstuvwz'
 ```
+
+You can also express this in uppercase, if you prefer, eg:
+
+```env
+SISSEL_API_KEY = 'abcdefghijklmnopqrstuvwz'
+SISSEL_PASSWORD = 'abcdefghijklmnopqrstuvwz'
+```
+
+Refer to the `.env.example` file in this repository for an example and please remember to never commit a `.env` to a public repository.
 
 ## Script Usage
 
