@@ -3,7 +3,7 @@ import { watch } from '../sync/watch';
 import { download } from '../sync/download';
 import * as log from './logger';
 import { help } from './cli';
-import { CLIOptions, Callback } from '../index.d';
+import { CLIOptions, Callback } from '../typings';
 
 /**
  * Client
