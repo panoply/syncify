@@ -1,7 +1,7 @@
 import log from 'fancy-log';
 import chalk from 'chalk';
 import { client } from './config/client';
-import { Resource, APIOptions, CLIOptions, Callback } from './index.d';
+import { Resource, APIOptions, CLIOptions, Callback } from './typings';
 
 function sync (
   resource: Resource | CLIOptions,
@@ -12,12 +12,10 @@ function sync (
   if (typeof resource === 'object') return client(resource);
 
   if (!resource) {
-
     return log(chalk`{red Error! The {bold resource} option is missing}!`);
   }
 
   if (!options.target) {
-
     return log(chalk`{red Error! Please define a {bold theme target}!}`);
   }
 
