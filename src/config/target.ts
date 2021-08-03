@@ -1,6 +1,6 @@
 import indexOf from 'lodash.indexof';
 import inquirer from 'inquirer';
-import { CLIOptions, IConfigFile, ITarget } from '../index.d';
+import { CLIOptions, IConfigFile, ITarget } from '../typings';
 
 /**
  * Target
