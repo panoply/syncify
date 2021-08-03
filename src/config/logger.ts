@@ -1,4 +1,4 @@
-import { IRequestData } from '../index.d';
+import { IRequestData } from '../typings';
 import omit from 'lodash.omit';
 import chalk, { ForegroundColor } from 'chalk';
 import fancylog from 'fancy-log';
@@ -91,11 +91,15 @@ export function parse (error: string) {
 export function print (
   content: Content,
   color: typeof ForegroundColor = 'white',
-  type: 'none' | 'warn' | 'error' | 'info' = 'none'
+  type: 'console' | 'none' | 'warn' | 'error' | 'info' = 'none'
 ): void {
 
   const message = getText(content);
   const colorize = chalk[color](message);
+
+  if (Object.is(type, 'console')) {
+    return console.log(colorize);
+  }
 
   return Object.is(type, 'none')
     ? fancylog(colorize)
