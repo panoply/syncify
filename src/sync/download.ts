@@ -5,11 +5,11 @@ import chalk from 'chalk';
 import { readConfig } from '../config/config';
 import { getTarget } from '../config/target';
 import { ignore } from '../config/utils';
-import { request, asyncForEach, waitFor } from '../config/request';
+import { request, asyncForEach, waitFor } from '../request/request';
 import { Buffer } from 'buffer';
 import * as log from '../config/logger';
 import boxen from 'boxen';
-import { CLIOptions, Callback } from '../index.d';
+import { CLIOptions, Callback } from '../typings';
 
 /**
  * Download
@@ -71,7 +71,7 @@ export async function download (options: CLIOptions, callback: typeof Callback) 
       }
 
       const result = [
-        chalk`{magenta    Store}{dim :} {dim.underline ${target.primary_domain}}     `,
+        chalk`{magenta    Store}{dim :} {dim.underline ${target.domain}.myshopify.com}`,
         chalk`{magenta     File}{dim :} {cyan ${basename(key)}}`,
         chalk`{magenta Progress}{dim :} {cyan ${total += 1}} of {cyan ${files.length}}`,
         chalk`{magenta   Output}{dim :} {dim ${dirName}/}{cyan ${dirname(key)}}`

@@ -5,13 +5,13 @@ import glob from 'glob';
 import anymatch from 'anymatch';
 import chalk from 'chalk';
 import { readFile } from 'fs-extra';
-import { request, asyncForEach, waitFor } from '../config/request';
+import { request, asyncForEach, waitFor } from '../request/request';
 import { readConfig } from '../config/config';
 import { getTarget } from '../config/target';
 import { ignore } from '../config/utils';
 import boxen from 'boxen';
 import * as log from '../config/logger';
-import { CLIOptions, Callback } from '../index.d';
+import { CLIOptions, Callback } from '../typings';
 
 export async function upload (
   options: CLIOptions,
@@ -106,7 +106,7 @@ export async function upload (
     }
 
     const result = [
-      chalk`{magenta    Store}{dim :} {dim.underline ${target.primary_domain}}     `,
+      chalk`{magenta    Store}{dim :} {dim.underline ${target.domain}.myshopify.com}`,
       chalk`{magenta     File}{dim :} {cyan ${basename(file.key)}}`,
       chalk`{magenta Progress}{dim :} {cyan ${total += 1}} of {cyan ${items.length}}`,
       chalk`{magenta   Output}{dim :} {dim ${directory}/}{cyan ${dirname(file.key)}}`,

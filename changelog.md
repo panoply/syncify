@@ -4,7 +4,14 @@ Project changelog start at version 0.8.0. All previous version should be avoided
 
 <hr>
 
-## [1.0.0-beta.1] - <small>01/08/2021</small>
+## [1.0.0-beta.2] - <small>01/08/2021</small>
+
+- Fixed file delete logic
+- Introduced new `package.json` configuration approach
+- Provided Support for `.env` file credentials
+- Minor directory changes
+
+## [1.0.0-beta.2] - <small>01/08/2021</small>
 
 - Upgrade the project to TypeScript
 - Multiple fixes
