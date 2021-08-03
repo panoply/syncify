@@ -1,7 +1,7 @@
 {
   "name": "shopify-sync",
   "description": "A lightening fast shopify theme store synchronizer that watches a directory and uploads changed files.",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "homepage": "https://github.com/panoply/shopify-sync",
   "author": {
     "name": "Nikolas Savvidis",
@@ -28,6 +28,23 @@
   },
   "types": "./package/@types",
   "main": "./package/index.js",
+  "shopifysync": {
+    "dir": "example",
+    "targets": [
+      {
+        "domain": "boefje",
+        "target_name": "development",
+        "theme_name": "Development",
+        "theme_id": 43989205050
+      },
+      {
+        "domain": "boefje",
+        "target_name": "production",
+        "theme_name": "Production",
+        "theme_id": 43989205050
+      }
+    ]
+  },
   "eslintConfig": {
     "extends": ["@liquify/eslint-config-ts"]
   },
@@ -46,6 +63,7 @@
     "boxen": "^5.0.1",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.2",
+    "dotenv": "^10.0.0",
     "fancy-log": "^1.3.3",
     "fs-extra": "^10.0.0",
     "glob": "^7.1.7",
