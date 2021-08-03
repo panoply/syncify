@@ -14,7 +14,13 @@ export interface ITarget {
   api_key: string,
   password: string,
   domain: string,
-  primary_domain: string,
+  theme_name: string,
+  theme_id: number
+}
+
+export interface ISSTarget {
+  target_name: string,
+  domain: string,
   theme_name: string,
   theme_id: number
 }
@@ -46,12 +52,38 @@ export interface ICallbackScope {
 export function Callback(this: ICallbackScope): string
 
 export interface APIOptions {
-  resource: Resource,
-  target: string,
-  concurrency: number,
+  /**
+   * The directory to watch
+   */
   dir: string,
-  files: string[],
+  /**
+   * The resource sync method
+   *
+   * @default undefined
+   */
+  resource: Resource,
+  /**
+   * The theme to target
+   *
+   * @default undefined
+   */
+  target: string,
+  /**
+   * The number of parallel requests to run when
+   * uploading or downloading theme files.
+   *
+   * @default 20
+   */
+  concurrency: number,
+  /**
+   * Forcefully ignores files from the chokidar instance which
+   * will prevent them from being read and printing to stdout.
+   */
   forceIgnore: boolean,
+  /**
+   * The ignore option accepts an array of files.
+   * You must use full path (`theme/assets/*.map`) glob patterns.
+   */
   ignore: string[]
 }
 
