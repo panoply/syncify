@@ -1,11 +1,21 @@
 #!/usr/bin/env node
 
-const pjson = require("../package.json");
-
-global.VERSION = pjson.version;
-global.CONFIGVERSION = 1;
-
-const main = require("../package/index");
-const argv = require("minimist")(process.argv.slice(2));
+const main = require('../package/index');
+const argv = require('minimist')(process.argv.slice(1), {
+  default: {
+    cli: true,
+    cwd: process.cwd()
+  },
+  string: [
+    's',
+    't',
+    'o'
+  ],
+  alias: {
+    store: 's',
+    theme: 't',
+    output: 'o'
+  }
+});
 
 main(argv);
