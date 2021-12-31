@@ -196,7 +196,7 @@ Configuration
 
 The `package.json` configuration for the command would look like this:
 
-```json
+```jsonc
 {
   "syncify": {
     "dir": "example", // The directory to watch
