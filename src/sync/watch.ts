@@ -1,136 +1,118 @@
-import drop from 'lodash.drop';
-import lastIndexOf from 'lodash.lastindexof';
 import path from 'path';
 import { readFile } from 'fs-extra';
+import { drop, has } from 'rambdax';
 import chokidar from 'chokidar';
-import chalk from 'chalk';
-import anymatch from 'anymatch';
-import boxen from 'boxen';
-import { request } from '../request/request';
-import { readConfig } from '../config/config';
-import { getTarget } from '../config/target';
+import any from 'anymatch';
+import { client } from '../config/request';
 import { ignore } from '../config/utils';
-import * as log from '../config/logger';
-import { CLIOptions, Callback } from '../typings';
+import * as log from '../logs/console';
+import { Callback, IConfig } from '../typings';
 
 /**
- * Watcher
+ * Watch Function
+ *
+ * Sync in watch mode
  */
-export async function watch (options: CLIOptions, callback: typeof Callback) {
+export async function watch (config: Partial<IConfig>, callback: typeof Callback) {
 
-  const config = await readConfig();
-  const target = await getTarget(config, options);
-
-  if (!options.file) Object.assign(options, config);
-
-  const directory = options.dir || 'theme';
+  const request = client(config);
+  const directory = config.dir || 'theme';
   const dirMatch = new RegExp(`^${directory}`);
-  const { settings, ignored } = ignore(options);
-  const watcher = chokidar.watch(`./${directory}/`, {
-    ignored: ignored.files === null ? ignored.base : ignored.files,
+  const dirWatch = [ `./${directory}/` ];
+  const { settings, ignored } = ignore(config);
+  const watcher = chokidar.watch(dirWatch, {
     persistent: true,
     ignoreInitial: true,
     usePolling: true,
-    interval: 100,
+    interval: 50,
     binaryInterval: 100,
-    cwd: process.cwd()
+    cwd: config.cwd,
+    ignored: ignored.files === null ? ignored.base : ignored.files,
   });
 
-  watcher.on('all', async (event, file) => {
+  watcher
+  .on('ready', () => log.watching(config))
+  .on('all', async (event, file) => {
 
     const parts = file.split(path.sep);
-    const trimmed = drop(parts, (lastIndexOf(parts, directory) + 1));
-    const key = trimmed.join(path.sep);
+    const key = drop(parts.lastIndexOf(directory) + 1, parts).join(path.sep);
 
-    if (file.match(/^\..*$/) || !file.match(dirMatch)) {
-      return log.print(chalk`{red Issue in match "/^\..*$/" at: ${file}}"`);
+    if (!dirMatch.test(file) || /^\..*$/.test(file)) {
+      return log.issue(`Issue in match "/^..*$/" at: ${file}"`);
     }
 
-    if (file.match(/[()]/)) {
-      return log.print(chalk`{red Filename cannot contain parentheses at: "${file}"}`);
-    }
-
-    if (settings?.ignore && settings.ignore.length > 0) {
-      if (anymatch(settings.ignore, file)) {
-        return log.print(chalk`{gray Ignoring} '{gray ${file}}'`);
+    if (has('ignore', settings)) {
+      if(settings.ignore.length > 0) {
+        if(any(settings.ignore, file)) return log.ignoring(file);
       }
     }
+
+    const parse = path.parse(file);
 
     if (event === 'change' || event === 'add') {
 
-      const data = await readFile(file);
-      const attachment = data.toString('base64');
+      let data = await readFile(file);
 
-      await request(
-        target
-        , {
-          method: 'put',
-          url: `/admin/themes/${target.theme_id}/assets.json`,
+      if (typeof callback === 'function') {
+
+        const update = callback.apply(parse, data);
+
+        if(typeof update === 'undefined') {
+
+          log.modified(file);
+
+          if (Buffer.isBuffer(update)) {
+            data = update;
+          } else if (typeof update === 'string') {
+            data = Buffer.from(update);
+          } else {
+            return log.issue('Modifier can only return a type string or Buffer')
+          }
+
+        }
+      }
+
+      try {
+
+        await request('themes', {
+          method: 'PUT',
           data: {
             asset: {
-              key: key.split(path.sep).join('/'),
-              attachment
+              key: key,
+              attachment: data.toString('base64')
             }
           }
+        });
+
+        if(event === 'add') {
+          log.creation(file);
+        } else {
+          log.uploaded(file);
         }
-      ).then(() => {
+      } catch(e) {
 
-        log.print(chalk`{green Uploaded} '{green ${file}}'`);
+        log.error(e)
 
-        if (typeof callback === 'function') {
-          callback.apply({
-            file: path.parse(file),
-            content: data
-          });
-        }
-
-      }).catch(log.errors);
+      }
 
     } else if (event === 'unlink') {
 
-      const url = `assets.json?asset[key]=${key.split(path.sep).join('/')}`;
+      try {
 
-      await request(
-        target
-        , {
-          method: 'delete',
-          url: `/admin/themes/${target.theme_id}/${url}`
-        }
-      ).then(() => {
+        await request('themes', {
+          method: 'DELETE',
+          params: { 'asset[key]': key.split(path.sep).join('/') }
+        });
 
-        log.print(chalk`{green Deleted} '{green ${file}}'`);
+        log.deletion(file);
 
-      }).catch(log.errors);
+      } catch(e) {
 
+        log.error(e)
+
+      }
     }
 
   });
-
-  let banner = (
-    chalk`  Target: {green ${target.target_name}}\n` +
-    chalk`   Store: {green https://${target.domain}.myshopify.com}\n` +
-    chalk`Watching: {green ${directory}/**/**}`
-  );
-
-  if (ignored.log !== null) {
-    banner += chalk`\nIgnoring: {yellow ${ignored.count}} Files\n`;
-    banner += chalk`\t {whiteBright -} {yellow ${ignored.log}}`;
-  }
-
-  log.print(
-    chalk.whiteBright.bold('Shopify Sync\n') + boxen(banner, {
-      padding: 0,
-      borderColor: 'gray',
-      dimBorder: true,
-      borderStyle: {
-        topLeft: ' ',
-        topRight: ' ',
-        bottomLeft: ' ',
-        bottomRight: ' ',
-        horizontal: '-',
-        vertical: ' '
-      }
-    })
-  );
 
 }
