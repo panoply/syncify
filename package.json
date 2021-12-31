@@ -1,5 +1,5 @@
 {
-  "name": "shopify-sync",
+  "name": "@liquify/syncify",
   "description": "A lightening fast shopify theme store synchronizer that watches a directory and uploads changed files.",
   "version": "1.0.0-beta.2",
   "homepage": "https://github.com/panoply/shopify-sync",
@@ -19,84 +19,88 @@
     "cli",
     "command line",
     "shopify",
+    "shopify theme",
     "shopify node",
     "shopify theme",
-    "shopify themekit node"
+    "shopify sync"
   ],
   "bin": {
     "sync": "./bin/sync"
   },
   "types": "./package/@types",
   "main": "./package/index.js",
-  "shopifysync": {
+  "syncify": {
     "dir": "example",
-    "targets": [
+    "stores": [
       {
         "domain": "boefje",
-        "target_name": "development",
-        "theme_name": "Development",
-        "theme_id": 43989205050
+        "themes": {
+          "dev": 43989205050,
+          "prod": 43989205050
+        }
       },
       {
         "domain": "boefje",
-        "target_name": "production",
-        "theme_name": "Production",
-        "theme_id": 43989205050
+        "themes": {
+          "dev": 43989205050,
+          "prod": 43989205050
+        }
       }
     ]
   },
   "eslintConfig": {
-    "extends": ["@liquify/eslint-config-ts"]
+    "extends": "@brixtol/eslint-config"
   },
   "scripts": {
     "dev": "rollup -c -w",
     "build": "rollup -c --environment prod",
     "sync": "./bin/sync",
+    "types": "tsc --noEmit --emitDeclarationOnly false",
     "test-watch": "node test/theme-watch.js",
     "test-download": "node test/theme-download.js",
     "test-upload": "node test/theme-upload.js"
   },
   "dependencies": {
+    "@rollup/plugin-replace": "^3.0.0",
     "anymatch": "^3.1.2",
-    "axios": "^0.21.1",
-    "bluebird": "^3.7.2",
-    "boxen": "^5.0.1",
+    "axios": "^0.21.4",
+    "boxen": "^5.1.2",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.2",
+    "colorette": "^2.0.16",
     "dotenv": "^10.0.0",
     "fancy-log": "^1.3.3",
     "fs-extra": "^10.0.0",
-    "glob": "^7.1.7",
-    "inquirer": "^8.1.2",
+    "glob": "^7.2.0",
+    "inquirer": "^8.2.0",
     "lodash.drop": "^4.1.1",
     "lodash.indexof": "^4.0.5",
     "lodash.lastindexof": "^4.0.5",
     "lodash.omit": "^4.5.0",
     "log-update": "^4.0.0",
     "minimist": "^1.2.5",
-    "mkdirp": "^1.0.4"
+    "mkdirp": "^1.0.4",
+    "rambdax": "^7.4.1"
   },
   "devDependencies": {
-    "@liquify/eslint-config-ts": "^1.0.1",
+    "@brixtol/eslint-config": "^1.1.0",
     "@rollup/plugin-beep": "^0.2.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^13.0.4",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "esbuild": "^0.14.2",
     "eslint": "^7.32.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-promise": "^5.1.0",
-    "prettier": "^2.3.2",
-    "rollup": "^2.55.1",
+    "prettier": "^2.5.1",
+    "rollup": "^2.61.1",
     "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-esbuild": "^4.7.2",
     "rollup-plugin-filesize": "^9.1.1",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "typescript": "^4.3.5"
+    "typescript": "^4.5.3"
   },
   "peerDependencies": {
+    "esbuild": "^0.14.2",
     "eslint": "^7.32.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-promise": "^5.1.0",
-    "rollup": "^2.55.1"
+    "rollup": "^2.55.1",
+    "typescript": "^4.5.3"
   }
 }
