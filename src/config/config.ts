@@ -1,97 +1,217 @@
 import { resolve } from 'path';
-import { readFile, pathExistsSync } from 'fs-extra';
-import { IConfigFile } from '../typings';
-import chalk from 'chalk';
+import { readJson, pathExistsSync } from 'fs-extra';
 import dotenv from 'dotenv';
-import * as log from './logger';
+import { has, hasPath, isType } from 'rambdax';
+import { IOptions, IPkgOptions, IConfig } from '../typings';
+import * as log from '../logs/console';
 
 /**
- * Parses JSON configuration file
+ * Read Configuration
+ *
+ * Acquires the necessary configurations
+ * from the workspace. Parses the `package.json`
+ * file and the `.env` file, returning the
+ * credentials of store connection data.
  */
-function parseConfig (config: string, filename: string) {
+export async function readConfig (options: IOptions): Promise<Partial<IConfig>> {
 
   try {
-    return JSON.parse(config);
+
+    return parseCommand(options)
+
   } catch (e) {
-    throw new Error(`Your '${filename}' file is corrupt. JSON failed to parse`);
+
+    log.error(e);
+
   }
-
-}
-
-function getConfig (config: string): IConfigFile {
-
-  const options:{ shopifysync: IConfigFile } = parseConfig(config, 'package.json');
-
-  if (!options?.shopifysync) {
-    throw new Error('Your package.json file is missing a "shopifysync" property!');
-  }
-
-  for (const file of options.shopifysync.targets) {
-    Object.assign(file, parseENV(file.domain));
-  }
-
-  return options.shopifysync;
 
 }
 
 /**
- * Parses `.env` file for API and Password keys
+ * Parse Command
  */
-export function parseENV (store?: string) {
+function parseCommand (options: IOptions) {
 
-  const cwd = process.cwd();
-  const env = dotenv.config({ path: resolve(cwd, '.env') });
+  if (!options.cli) return options;
 
-  if (env.error) throw env.error;
+  if (options._.length === 0) return null;
 
-  const store_domain = store.toUpperCase();
-  const store_api_key = `${store_domain}_API_KEY`;
-  const store_password = `${store_domain}_PASSWORD`;
-
-  const api_key = env.parsed?.[store_api_key] ?? env.parsed?.[store_api_key.toLowerCase()];
-
-  if (!api_key) {
-    throw new Error(`The "${store_domain}_password" is missing in .env file!`);
+  if (options._.length === 1) {
+    options.resource = options._[0];
+  } else if (options._.length > 1) {
+    options.resource = options._[0];
+    options.store = options._[1];
   }
 
-  const password = env.parsed?.[store_password] ?? env.parsed?.[store_password.toLowerCase()];
-
-  if (!password) {
-    throw new Error(`The "${store_domain}_password" is missing in .env file!`);
+  if (has('store', options)) {
+    options.store = (options.store as string).split(',');
+  } else {
+    throw new Error('Missing "store" target in command');
   }
 
-  return { api_key, password };
+  if (options) {
+    if (has('theme', options)) {
+
+      options.theme = (options.theme as string).split(',');
+
+      if (options.store.includes('store')) {
+        throw new Error('Target name "store" is reserved, use a different name.');
+      }
+
+      if (options.store.includes('theme')) {
+        throw new Error('Target name, "theme" is reserved, use a different name.');
+      }
+    }
+  }
+
+  return resolvePaths(options);
 
 }
 
-export async function readConfig () {
+function resolvePaths (options: IOptions) {
 
-  const cwd = process.cwd();
-  const shopifysync = resolve(cwd, '.shopifysync.json');
-  const pkg = resolve(cwd, 'package.json');
+  if (has('cwd', options)) options.cwd = process.cwd();
 
-  if (pathExistsSync(shopifysync)) {
+  options.pkg = resolve(options.cwd, 'package.json');
+  options.env = resolve(options.cwd, '.env');
 
-    log.print(
-      chalk`The {cyan .shopifysync.json} configuration file approach is deprecated and will stop working in future releases. Define configuration in your {cyan package.json} file via {cyan "shopifysync"} and place credentials in a {cyan .env} file.\n\nFor more information: {white.underline https://github.com/panoply/shopify-sync}\n`,
-      'yellowBright',
-      'console'
-    );
-
-    const config = await readFile(shopifysync, 'utf8');
-
-    return parseConfig(config, '.shopifysync');
-
-  } if (pathExistsSync(pkg)) {
-
-    const config = await readFile(pkg, 'utf8');
-
-    return getConfig(config);
-
-  } else {
-
-    throw new Error('Configuration file is missing. Your workspace requires a ".shopifysync.json" or "ssconfig.json" configuration file!');
-
+  if (pathExistsSync(options.pkg)) {
+    if (pathExistsSync(options.env)) return readFiles(options);
+    throw new Error('Missing ".env" file');
   }
+
+  throw new Error('Missing "package.json" file');
+
+}
+
+async function readFiles (options: IOptions) {
+
+  const pkg: { syncify?: IPkgOptions } = await readJson(options.pkg);
+  const env = dotenv.config({ path: options.env });
+
+  // console.log(pkg);
+  if (env.error) throw env.error;
+
+  if (hasPath('syncify.stores', pkg)) {
+
+    if (isType('Array', pkg.syncify.stores)) {
+      return getCredentials({
+        options,
+        files: { pkg: pkg.syncify, env }
+      });
+    }
+
+    if (isType('Undefined', pkg.syncify.stores)) {
+      throw new Error('Missing "stores" option in syncify settings');
+    } else {
+      throw new Error('The "stores" option must be of type array');
+    }
+  }
+
+  throw new Error('Your package.json file is missing the "syncify" value.');
+
+}
+
+async function getCredentials (
+  config: {
+    options: IOptions,
+    files: {
+      env: dotenv.DotenvConfigOutput,
+      pkg: IPkgOptions
+    }
+  }
+) {
+
+  const {
+    options,
+    files: {
+      pkg,
+      env: { parsed }
+    }
+  } = config;
+
+  const state: Partial<IConfig> = {
+    dir: pkg.dir,
+    resource: options.resource,
+    sync: []
+  };
+
+  for (const store of pkg.stores) {
+
+    const { domain } = store;
+
+    if (!options.store.includes(domain)) continue;
+
+    if (state.sync.some(i => i.store === domain)) {
+      throw new Error(`Multiple store configurations of "${domain}" defined.`);
+    }
+
+    const sync: IConfig['sync'][0] = { store: domain, url: null };
+    const api_key = `${domain}_api_key`;
+    const password = `${domain}_password`;
+
+    if (has(api_key, parsed) || has(api_key.toUpperCase(), parsed)) {
+      if (has(password, parsed) || has(password.toUpperCase(), parsed)) {
+        sync.url = `https://${parsed[api_key]}:${parsed[password]}@${domain}.myshopify.com`;
+      } else {
+        throw new Error(`Missing "${password}" credential in .env file`);
+      }
+    } else {
+      throw new Error(`Missing "${api_key}" credential in .env file`);
+    }
+
+    if (options.store.includes(domain)) {
+
+      if (has('theme', options)) {
+
+        sync.themes = [];
+
+        for (const target of options.theme) {
+          if (has(target, store.themes)) {
+            sync.themes.push({ id: store.themes[target], target });
+          } else {
+            throw new Error(`Missing theme target "${target}" in ${domain} store.`);
+          }
+        }
+
+      } else if (has(domain, options)) {
+
+        sync.themes = [];
+
+        const targets = options[domain].split(',');
+
+        for (const target of targets) {
+          if (has(target, store.themes)) {
+            sync.themes.push({ id: store.themes[target], target });
+          } else {
+            throw new Error(`Missing theme target "${target}" in ${domain} store.`);
+          }
+        }
+
+      }
+    }
+
+    if (isType('String', sync.url)) {
+      if (sync.themes.length > 0) {
+
+        sync.request = {
+          inFlight: 0,
+          isProcessing: false,
+          max: 20,
+          rate: 0,
+          requests: []
+        };
+
+        state.sync.push(sync);
+
+      } else {
+        throw new Error(`Missing theme target in "${domain}" store.`);
+      }
+    }
+  }
+
+  if (state.sync.length === 0) throw new Error('Unknown or invalid store/theme targets');
+
+  return state;
 
 }
