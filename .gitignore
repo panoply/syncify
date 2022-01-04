@@ -1,5 +1,4 @@
 config/local.js
-logs*
 _site
 sync.config.json
 yarn.lock

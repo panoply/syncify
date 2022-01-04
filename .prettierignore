@@ -1,4 +1,6 @@
-example/**
-test/**
+example
+test
+src
+bin
+package
 *.js
-*.ts
