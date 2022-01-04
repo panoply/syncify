@@ -4,20 +4,22 @@
 
 # Syncify
 
-A lightning fast node equivalent shopify [theme kit](https://shopify.github.io/themekit/) tool. Supports watching, uploading and downloading of Shopify theme files to multiple storefronts. It provides a concise and clear log interface, custom file transit control, metafield sync and much more!
+A lightning fast, superior alternative, node equivalent Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify provides watch, upload, download and metafield sync capabilities to and from multiple storefronts and themes.
 
-### Features
+### Key Features
 
-- Upload to multiple storefronts and/or themes
+- Uploads to multiple storefronts and/or themes.
 - Supports HTML + Liquid minification
-- Global JSON file based metafield sync
-- Lightweight, extensible and mature
+- Provides an elegant directory + JSON file metafields sync approach
+- Fast, lightweight, extensible and scalable.
+- Simple `package.json` and `.env` based configuration
+- Clear, concise and informative logging.
 
 ### Why?
 
-Because Shopify maintained tooling is utter garbage. The likelihood of a project maintained by the Shopify team lasting longer than 12 months is slim. This module is fast and flexible. It will not lock you into some poorly thought through workflow or theme development apparatus that is common with Shopify.
+Shopify maintained tooling is a fucking mess. The likelihood of a project maintained by the Shopify team lasting longer than 12 months or better yet a project that simply works without having to install 100 Ruby gems is a rarity. This module is fast and flexible. It will not lock you into some poorly thought through workflow and setup apparatus.
 
-### Use case?
+### Use case
 
 The main purpose of Syncify is to watch a specified directory for file changes. When changes are detected Syncify will determine what action took place and publish (upload) them to store theme/s. It provides watch, upload, download and metafield sync capabilities.
 
@@ -43,7 +45,7 @@ yarn add @liquify/syncify --dev
 
 ## Setup
 
-After installing you will need to quickly configure a connection between your shopify store theme/s. In your `package.json` file define a configuration with a `"syncify":{}` property. Syncify requires you provide credentials within a `.env` file.
+After installing you will need to quickly configure a connection between your shopify store theme/s. In your `package.json` file you can define a configuration using the `"syncify":{}` property. Syncify requires you provide credentials within a `.env` file.
 
 #### Configuration
 
@@ -53,18 +55,18 @@ Within your `package.json` file, provide the following configuration:
 {
   "syncify": {
     "dir": "example", // The directory to watch
-    "targets": [
+    "stores": [
       {
-        "store": "your-store", // Your myshopify name (without .myshopify)
-        "metafields": true,
+        "domain": "your-store", // Your myshopify name (without .myshopify)
+        "metafields": true, // Whether or not to sync metafields
         "themes": {
-          "dev": 123456789,
+          "dev": 123456789, // Themes you want to sync (key property is target name)
           "prod": 543216789,
           "stage": 987651234
         }
       },
       {
-        "store": "another-store", // Optionally provide a second storefront.
+        "domain": "another-store", // Optionally provide a second storefront.
         "metafields": true,
         "themes": {
           "dev": 123456789,
@@ -79,21 +81,21 @@ Within your `package.json` file, provide the following configuration:
 
 #### Credentials
 
-Store credential are stored within a dotenv file. You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) in your store to obtain an API Key and Password. Credentials can be expressed in either upper or lowercase. Your store credentials **must** begin with the store name following an underscore. For example, a store with a _myshopify_ domain of `sissel.myshopify.com` has a store name value of `sissel` so credentials would start with `sissel`. For the sake of brevity, this is how you would define the api key and password to that store within the `.env` file:
+Store credential are stored within a `dotenv` file. You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) in your store to obtain an API Key and Password, also provide read and write access to themes and metafields. Store credentials can be expressed in either upper or lowercase in the `.env` file. Your store credentials **must** begin with the store name following an underscore character. For example, a store with a _myshopify_ domain of `sissel.myshopify.com` has a store name value of `sissel` so credentials would start with `sissel` - For the sake of brevity, this is how you would define the api key and password to such a store within the `.env` file:
 
 ```env
 sissel_api_key = 'abcdefghijklmnopqrstuvwz'
 sissel_password = 'abcdefghijklmnopqrstuvwz'
 ```
 
-You can also express this in uppercase, eg:
+As aforementioned, you can also express this in uppercase, eg:
 
 ```env
 SISSEL_API_KEY = 'abcdefghijklmnopqrstuvwz'
 SISSEL_PASSWORD = 'abcdefghijklmnopqrstuvwz'
 ```
 
-Refer to the `.env.example` file in this repository for an example and please remember to never commit a `.env` to a public repository.
+Refer to the `.env.example` file in this repository for an example and please remember to never commit the `.env` to a public repository.
 
 > If you are syncing to multiple storefronts just follow this pattern for each store.
 
@@ -145,7 +147,7 @@ $ syncify watch shop -t dev
 Breakdown
 </summary>
 
-The above command is calling `watch` on a store named `shop` and will upload changes to a theme named `dev`. We are using the shorthand `--theme` flag `-t` to inform upon the theme we want changes applied.
+The above command is calling `watch` on a store named `cool-shop` and will upload changes to a theme named `dev`. We are using the shorthand `--theme` flag (`-t`) to inform upon the theme we want changes uploaded.
 
 </details>
 
@@ -156,13 +158,13 @@ Configuration
 
 The `package.json` configuration for the command would look like this:
 
-```json
+```jsonc
 {
   "syncify": {
     "dir": "example", // The directory to watch
-    "targets": [
+    "stores": [
       {
-        "store": "shop", // The store name
+        "domain": "cool-shop", // The store name
         "themes": {
           "dev": 123456789 // The theme id and target name
         }
@@ -185,7 +187,7 @@ $ syncify watch shop -t dev,prod
 Breakdown
 </summary>
 
-The above command is calling `watch` on a store named `shop` and will upload changes to 2 different themes in that store we have named `dev` and `prod`.
+The above command is calling `watch` on a store named `my-shop` and will upload changes to 2 different themes in that store we have named `dev` and `prod`.
 
 </details>
 
@@ -200,9 +202,9 @@ The `package.json` configuration for the command would look like this:
 {
   "syncify": {
     "dir": "example", // The directory to watch
-    "targets": [
+    "stores": [
       {
-        "store": "shop", // The store name
+        "domain": "my-shop", // The store name
         "themes": {
           "dev": 123456789, // The theme id and target name
           "prod": 123456789 // The theme id and target name
@@ -241,9 +243,9 @@ The `package.json` configuration for the command would look like this:
 {
   "syncify": {
     "dir": "example", // The directory to watch
-    "targets": [
+    "stores": [
       {
-        "store": "shop1", // The store name
+        "domain": "shop1", // The store name
         "themes": {
           "test": 123456789 // The theme id and target name
         }
@@ -265,7 +267,7 @@ The `package.json` configuration for the command would look like this:
 
 ## Script Usage
 
-Syncify can be initialized within scripts. This approach is a little more feature full and allows you to integrate it with different build tools. You can hook into the transit process of files and apply modifications before they are uploaded to your store/s.
+Syncify can be initialized within scripts. This approach is a little more feature-full and allows you to integrate it with different build tools. You can hook into the transit process of files and apply modifications before they are uploaded to your store/s with this approach.
 
 ```javascript
 import syncify from 'shopify-sync'
@@ -339,7 +341,7 @@ Create a script command within your `package.json` file.
 
 #### Gulp
 
-If you're using a tool like [Gulp](https://gulpjs.com), you can call upon the sync from within a task function and it will initialize when the task is triggered.
+If you're using a tool like [Gulp](https://gulpjs.com), you can call upon the sync from within a task function and it will initialize when the task is triggered. This approach allows you process files before they are passed to Syncify and work from a `src` directory.
 
 ```javascript
 import sync from 'shopify-sync'
