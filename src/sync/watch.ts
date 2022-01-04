@@ -1,12 +1,120 @@
 import path from 'path';
 import { readFile } from 'fs-extra';
-import { drop, has } from 'rambdax';
+import { drop, has, isType, last } from 'rambdax';
 import chokidar from 'chokidar';
 import any from 'anymatch';
-import { client } from '../config/request';
+import { client } from '../client/request';
 import { ignore } from '../config/utils';
 import * as log from '../logs/console';
-import { Callback, IConfig } from '../typings';
+import { Callback, IConfig, IFile } from '../typings';
+import * as assets from '../client/assets';
+import * as metas from '../client/metafields';
+
+/**
+ * Parse File
+ *
+ * Parses the filename and returns a workable
+ * object that we will pass into requests. Determines
+ * whether or not we are working with metafield or asset
+ * and vice-versa.
+ */
+function parseFile (dir: string, file: string): IFile {
+
+  const parts = file.split(path.sep);
+  const parent = drop(parts.lastIndexOf(dir) + 1, parts);
+  const ext = file.slice(last(parts).lastIndexOf('.') + 1);
+
+  return parent[0] === 'metafields' ? {
+    ext,
+    file,
+    metafield: true,
+    namespace: parent[1],
+    key: parent[2].slice(0, 5)
+  } : {
+    ext,
+    file,
+    metafield: false,
+    key: parent.join(path.sep)
+  };
+
+}
+
+/**
+ * Minify JSON
+ *
+ * Metafields are trimmed of whitespace
+ * and comments. Syncify allows JSON with
+ * comments be provided, this function strips
+ * them and will push a minified to the store.
+ */
+function minifyJSON (data: string) {
+
+  try {
+
+    const parse = JSON.parse(data);
+
+    return JSON.stringify(parse, null, 0);
+
+  } catch (e) {
+
+    return log.error(e);
+
+  }
+
+}
+
+/**
+ * Metafields Modifier
+ *
+ * Handler function for a content modifier
+ * callback that one can optionally execute
+ * from within scripts.
+ */
+function setMetafield (
+  file: IFile,
+  data: Buffer | string | object | any[],
+  callback: typeof Callback
+) {
+
+  if (typeof callback !== 'function') return minifyJSON(data.toString());
+
+  const update = callback.apply({ ...file, ...path.parse(file.file) }, data);
+
+  if (isType('Undefined', update)) return minifyJSON(data.toString());
+  if (isType('String', update) || isType('Array', update) || isType('Object', update)) {
+    return minifyJSON(update);
+  }
+
+  return minifyJSON(data.toString());
+
+}
+
+/**
+ * Asset Modifier
+ *
+ * Handler function for a content modifier
+ * callback that one can optionally execute
+ * from within scripts.
+ */
+function setAsset (
+  file: IFile,
+  data: Buffer | string | object | any[],
+  callback: typeof Callback
+) {
+
+  if (typeof callback !== 'function') return data.toString('base64');
+
+  const update = callback.apply({ ...file, ...path.parse(file.file) }, data);
+
+  if (isType('Undefined', update)) return data.toString('base64');
+
+  if (/\.(liquid|html|json|js|css|scss|sass|txt)/.test(file.ext)) {
+    return update.toString('base64');
+  }
+
+  return data.toString('base64');
+
+}
 
 /**
  * Watch Function
@@ -16,9 +124,8 @@ import { Callback, IConfig } from '../typings';
 export async function watch (config: Partial<IConfig>, callback: typeof Callback) {
 
   const request = client(config);
-  const directory = config.dir || 'theme';
-  const dirMatch = new RegExp(`^${directory}`);
-  const dirWatch = [ `./${directory}/` ];
+  const dir = config.dir || 'theme';
+  const dirWatch = `./${dir}/`;
   const { settings, ignored } = ignore(config);
   const watcher = chokidar.watch(dirWatch, {
     persistent: true,
@@ -27,90 +134,55 @@ export async function watch (config: Partial<IConfig>, callback: typeof Callback
     interval: 50,
     binaryInterval: 100,
     cwd: config.cwd,
-    ignored: ignored.files === null ? ignored.base : ignored.files,
+    ignored: ignored.files === null ? ignored.base : ignored.files
   });
 
-  watcher
-  .on('ready', () => log.watching(config))
-  .on('all', async (event, file) => {
+  watcher.on('ready', () => log.watching(config));
 
-    const parts = file.split(path.sep);
-    const key = drop(parts.lastIndexOf(directory) + 1, parts).join(path.sep);
+  watcher.on('all', async (event, path) => {
 
-    if (!dirMatch.test(file) || /^\..*$/.test(file)) {
-      return log.issue(`Issue in match "/^..*$/" at: ${file}"`);
-    }
+    const file = parseFile(dir, path);
 
     if (has('ignore', settings)) {
-      if(settings.ignore.length > 0) {
-        if(any(settings.ignore, file)) return log.ignoring(file);
+      if (settings.ignore.length > 0) {
+        if (any(settings.ignore, file.key)) return log.ignoring(file.key);
       }
     }
-
-    const parse = path.parse(file);
 
     if (event === 'change' || event === 'add') {
 
-      let data = await readFile(file);
+      const read = await readFile(path);
 
-      if (typeof callback === 'function') {
+      if (file.metafield) {
 
-        const update = callback.apply(parse, data);
+        if (metas.queue.isPaused) metas.queue.start();
 
-        if(typeof update === 'undefined') {
+        const value = setMetafield(file, read, callback);
 
-          log.modified(file);
-
-          if (Buffer.isBuffer(update)) {
-            data = update;
-          } else if (typeof update === 'string') {
-            data = Buffer.from(update);
-          } else {
-            return log.issue('Modifier can only return a type string or Buffer')
-          }
-
+        console.log(config);
+        if (value) {
+          request.metafield.update({
+            namespace: file.namespace,
+            key: file.key,
+            value
+          });
         }
-      }
 
-      try {
+      } else {
 
-        await request('themes', {
-          method: 'PUT',
-          data: {
-            asset: {
-              key: key,
-              attachment: data.toString('base64')
-            }
-          }
+        if (assets.queue.isPaused) assets.queue.start();
+
+        request.asset.update({
+          key: file.key,
+          attachment: setAsset(file, read, callback)
         });
-
-        if(event === 'add') {
-          log.creation(file);
-        } else {
-          log.uploaded(file);
-        }
-      } catch(e) {
-
-        log.error(e)
 
       }
 
     } else if (event === 'unlink') {
 
-      try {
+      request.asset.remove(file.key);
 
-        await request('themes', {
-          method: 'DELETE',
-          params: { 'asset[key]': key.split(path.sep).join('/') }
-        });
-
-        log.deletion(file);
-
-      } catch(e) {
-
-        log.error(e)
-
-      }
     }
 
   });
