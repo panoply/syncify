@@ -1,53 +1,55 @@
-import { upload } from '../sync/upload';
+// import { upload } from '../sync/upload';
 import { watch } from '../sync/watch';
-import { download } from '../sync/download';
-import * as log from './logger';
+// import { download } from '../sync/download';
+import { readConfig } from './config';
 import { help } from './cli';
-import { CLIOptions, Callback } from '../typings';
+import * as log from '../logs/console';
+import { IOptions, Callback } from '../typings';
+import { has } from 'rambdax';
+import * as cli from '../cli/default';
 
 /**
  * Client
  */
-export async function client (options: CLIOptions, callback?: typeof Callback) {
+export async function client (options: IOptions, callback?: typeof Callback) {
 
-  let command: string;
-  let result: unknown;
-
-  if (!options?._) {
-    command = options.resource;
-    options.file = true;
+  if (!has('_', options)) {
+    options.cli = false;
   } else {
-    command = options._[0];
     options._ = options._.slice(1);
-    options.file = false;
+    options.cli = true;
+    options.interactive = true;
   }
 
-  try {
+  const config = await readConfig(options).catch(log.error);
 
-    switch (command) {
-      case 'watch':
-        result = await watch(options, callback);
-        break;
-      case 'upload':
-        result = await upload(options, callback);
-        break;
-      case 'download':
-        result = await download(options, callback);
-        break;
-      default:
-        process.stdout.write(help);
+  if (options.interactive) return cli.options(config);
+
+  if (config) {
+
+    try {
+
+      switch (config.resource) {
+        case 'watch':
+          await watch(config, callback);
+          break;
+        case 'upload':
+          // await upload(config, callback);
+          break;
+        case 'download':
+        //  await download(config);
+          break;
+        default:
+          process.stdout.write(help);
+      }
+
+      // if (typeof result !== 'undefined') process.stdout.write(result as string);
+
+    } catch (e) {
+
+      log.issue(e.message);
+
     }
-
-    if (typeof result !== 'undefined') {
-      process.stdout.write(result as string);
-    }
-
-  } catch (error) {
-
-    log.print(error.stack ?? error, 'red');
 
   }
-
-  return result;
-
 }
