@@ -1,26 +1,4 @@
-import * as c from 'colorette';
-
-type Colors = (
-  | 'dim'
-  | 'red'
-  | 'redBright'
-  | 'green'
-  | 'greenBright'
-  | 'yellow'
-  | 'yellowBright'
-  | 'blue'
-  | 'blueBright'
-  | 'magenta'
-  | 'magentaBright'
-  | 'cyan'
-  | 'cyanBright'
-  | 'white'
-  | 'gray'
-)
-
-/* -------------------------------------------- */
-/* SHOPIFY RESPONSES                            */
-/* -------------------------------------------- */
+import { yellow, white, cyan, underline, magenta, grey } from 'kleur';
 
 /**
  * Captures Line Number text in Shopify responses
@@ -63,9 +41,9 @@ const RegExpRegex = /(\/)(.*?)(\/)/g;
  *
  * Replaces all occurances of quotation characters
  */
-export function quotes (text: string, color: Colors) {
+export function quotes (text: string) {
 
-  return text.replace(RegExpQuotes, c[color]('$1'));
+  return text.replace(RegExpQuotes, white('$1'));
 
 }
 
@@ -74,9 +52,9 @@ export function quotes (text: string, color: Colors) {
  *
  * Replaces URL occurances
  */
-export function urls (text: string, color: Colors) {
+export function urls (text: string) {
 
-  return text.replace(RegExpURLs, c[color]('$1'));
+  return text.replace(RegExpURLs, underline('$1'));
 
 }
 
@@ -86,9 +64,9 @@ export function urls (text: string, color: Colors) {
  * Replaces all occurances of a value wrapped
  * in quotation characters, including the quotes.
  */
-export function string (text: string, color: Colors) {
+export function string (text: string) {
 
-  return text.replace(RegExpString, c[color]('$1'));
+  return text.replace(RegExpString, yellow('$1'));
 
 }
 
@@ -102,14 +80,14 @@ export function string (text: string, color: Colors) {
  */
 export function pretty (message: string[] | string) {
 
-  if (Array.isArray(message)) return message.map(pretty).join('\n    ');
+  if (Array.isArray(message)) return message.map(pretty).join('\n');
 
   return message
-    .replace(RegExpLineNo, c.whiteBright('$1') + c.dim('$2') + '\n\n   ')
-    .replace(RegExpString, c.yellowBright('$1'))
-    .replace(RegExpLiquid, c.cyan('$1') + c.magentaBright('$2') + c.cyan('$3'))
-    .replace(RegExpURLs, c.underline('$1'))
-    .replace(RegExpObjectTag, c.white('$1') + c.gray('$2') + c.white('$3'))
-    .replace(RegExpRegex, c.magentaBright('$1') + c.cyan('$2') + c.magentaBright('$3'));
+    .replace(RegExpLineNo, white('$1') + grey('$2') + '\n\n')
+    .replace(RegExpString, yellow('$1'))
+    .replace(RegExpLiquid, cyan('$1') + magenta('$2') + cyan('$3'))
+    .replace(RegExpURLs, underline('$1'))
+    .replace(RegExpObjectTag, white('$1') + grey('$2') + white('$3'))
+    .replace(RegExpRegex, magenta('$1') + cyan('$2') + magenta('$3'));
 
 }

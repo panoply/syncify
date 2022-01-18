@@ -37,15 +37,17 @@ export async function list (store: IStores) {
     wait = false;
   }
 
-  return axios.get<{ metafields: IMetafield[] }>(store.url).then(({ status, data }) => {
+  return axios.get<{
+    metafields: IMetafield[]
+  }>(store.endpoints.metafields).then(({ status, data }) => {
 
     if (is(status, 200)) return data.metafields;
 
   }).catch(e => {
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
+      queue.add(() => list(store), { priority: 1000 });
       wait = !wait;
-      queue.add(async () => list(store), { priority: 1000 });
     } else {
       if (!queue.isPaused) {
         queue.pause();
@@ -64,7 +66,9 @@ export async function get (store: IStores, metafield: IMetafield) {
     wait = false;
   }
 
-  return axios.get<{ metafields: IMetafield[] }>(store.url).then(({ data }) => {
+  return axios.get<{
+    metafields: IMetafield[]
+  }>(store.endpoints.metafields).then(({ data }) => {
 
     if (has('namespace', metafield) && has('key', metafield)) {
       return data.metafields.find(({
@@ -85,9 +89,11 @@ export async function get (store: IStores, metafield: IMetafield) {
 
   }).catch(e => {
 
+    if (!store.queue) return error(store.store, e.response);
+
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
+      queue.add(() => get(store, metafield), { priority: 1000 });
       wait = !wait;
-      queue.add(async () => get(store, metafield), { priority: 1000 });
     } else {
       if (!queue.isPaused) {
         queue.pause();
@@ -163,11 +169,17 @@ export async function update (url: string, metafield: IMetafield) {
   });
 }
 
-export async function write ({ store, url }: IStores, metafield: IMetafield) {
+export async function write (store: IStores, metafield: IMetafield) {
 
-  return axios.get<{ metafields: IMetafield[] }>(url).then(({ data }) => {
+  const url = store.endpoints.metafields;
 
-    if (is(data.metafields.length, 0)) return create(url, metafield);
+  return axios.get<{
+    metafields: IMetafield[]
+  }>(url).then(({ data }) => {
+
+    if (is(data.metafields.length, 0)) {
+      return create(url, metafield);
+    }
 
     const record = data.metafields.find(({
       namespace,
@@ -185,7 +197,7 @@ export async function write ({ store, url }: IStores, metafield: IMetafield) {
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       wait = !wait;
-      queue.add(async () => write({ store, url }, metafield), { priority: 1000 });
+      queue.add(async () => write(store, metafield), { priority: 1000 });
     } else {
       if (!queue.isPaused) {
         queue.pause();

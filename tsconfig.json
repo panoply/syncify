@@ -13,7 +13,7 @@
     "target": "ES6",
     "removeComments": true,
     "lib": ["es2020"],
-    "module": "ESNext",
+    "module": "Node12",
     "alwaysStrict": true,
     "allowUmdGlobalAccess": true,
     "experimentalDecorators": true,
@@ -32,10 +32,13 @@
     "declarationDir": "package/@types",
     "baseUrl": ".",
     "paths": {
-      "*": ["./src/*"],
-      "parser": ["./src/parser/*"],
-      "lexical": ["./src/lexical/*"],
-      "tree": ["./src/lexical/tree/*"]
+      "types": ["src/types/index.d.ts"],
+      "cli/*": ["src/cli/*"],
+      "sync/*": ["src/sync/*"],
+      "config/*": ["src/config/*"],
+      "logs/*": ["src/logs/*"],
+      "requests/*": ["src/requests/*"],
+      "transform/*": ["src/transform/*"]
     }
   }
 }

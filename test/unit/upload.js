@@ -1,7 +1,7 @@
 const sync = require('../package/index.js');
 
 sync('upload', {
-  dir: 'test/example',
+  dir: 'example',
   concurrency: 5,
   target: 'development',
   ignore: [
@@ -11,6 +11,6 @@ sync('upload', {
   ]
 }, function () {
 
-  // console.log(this)
+  console.log(this);
 
 });

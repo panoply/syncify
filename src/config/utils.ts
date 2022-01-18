@@ -1,10 +1,48 @@
-import { ITarget, CLIOptions } from '../typings';
-import chalk from 'chalk';
+import { white } from 'kleur';
+import { has } from 'rambdax';
+import { ICLIOptions, IRequest } from 'types';
+
+export const { assign, is, defineProperty, keys, values, create } = Object;
+export const { isArray, from } = Array;
 
 /**
- * Ignore
+ * Get the asset key reference (used for logs)
  */
-export function ignore (settings: CLIOptions, ignored = {
+export function getAssetKey (config: IRequest) {
+
+  switch (config.method) {
+    case 'put':
+    case 'post':
+
+      if (has('metafield', config.data)) {
+        return (config.data as { metafield: any }).metafield.key;
+      } else if (has('asset', config.data)) {
+        return (config.data as { asset: any }).asset.key;
+      }
+
+      break;
+
+    case 'delete':
+
+      return config.params['asset[key]'];
+
+  }
+
+}
+
+/**
+ * Upcase first letter of a string
+ */
+export function toUpcase <T extends string> (value: T) {
+
+  return value.charAt(0).toUpperCase() + value.slice(1);
+
+}
+
+/**
+ * Ignored files and/or directories
+ */
+export function ignore (settings: ICLIOptions, ignored = {
   count: 0,
   files: null,
   log: null,
@@ -12,8 +50,9 @@ export function ignore (settings: CLIOptions, ignored = {
 }) {
 
   if (settings.ignore && settings.forceIgnore) {
+
     ignored.count = settings.ignore.length;
-    ignored.log = settings.ignore.join(chalk`\n\t {whiteBright - }`);
+    ignored.log = settings.ignore.join(white('\n\t - '));
 
     // @ts-ignore
     settings.ignore.push(ignored.base);
@@ -22,23 +61,5 @@ export function ignore (settings: CLIOptions, ignored = {
   }
 
   return { settings, ignored };
-
-}
-
-/**
- * URL Generator
- */
-export function getStoreUrl (api_key: string, password: string, domain: string): string {
-
-  return 'https://' + api_key + ':' + password + '@' + domain + '.myshopify.com';
-
-}
-
-/**
- * URL Generator
- */
-export function getTargetUrl ({ api_key, password, domain }: ITarget): string {
-
-  return 'https://' + api_key + ':' + password + '@' + domain + '.myshopify.com';
 
 }

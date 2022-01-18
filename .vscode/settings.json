@@ -1,3 +1,40 @@
 {
-  "eslint.packageManager": "pnpm"
+  "eslint.packageManager": "pnpm",
+  "files.associations": {
+    "*.liquid": "html",
+    "*.scss.liquid": "scss",
+    "*.css.liquid": "css",
+    "*i18n.js.liquid": "javascript",
+    "*shop.js.liquid": "javascript",
+    "*config.js.liquid": "javascript"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/node_modules": true
+  },
+  "json.schemas": [
+    {
+      "fileMatch": ["package.json"],
+      "url": "/schema.json"
+    }
+  ],
+  "vsicons.associations.files": [
+    {
+      "icon": "svg",
+      "extensions": ["svgo.config.js", "svgo.config.cjs"],
+      "filename": true,
+      "format": "svg"
+    },
+    {
+      "icon": "liquid",
+      "extensions": ["syncify.config.js"],
+      "filename": true,
+      "format": "liquid"
+    }
+  ]
 }

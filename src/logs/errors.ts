@@ -1,5 +1,5 @@
-import * as log from './console';
-import { NotificationCenter } from 'node-notifier';
+import * as log from 'logs/console';
+// import { NotificationCenter } from 'node-notifier';
 import { join } from 'path';
 
 /**
@@ -8,7 +8,7 @@ import { join } from 'path';
  * Posts toast notifications when errors
  * have occurred.
  */
-const notifier = new NotificationCenter();
+// const notifier = new NotificationCenter();
 
 /**
  * Error Handler
@@ -130,10 +130,7 @@ export function error (file: string, e: {
         {
           file,
           message: e.statusText,
-          data: [
-            'The server is currently unavailable. Check the Shopify status page for reported service outages.',
-            'https://www.shopifystatus.com'
-          ]
+          data: 'The server is currently unavailable. Check the Shopify status page for reported service outages. See https://www.shopifystatus.com'
         }
       );
       break;
@@ -142,14 +139,13 @@ export function error (file: string, e: {
         file,
         message: e.statusText,
         data: [
-          'An unknown error has occured. Please submit stack trace to the Syncify Github repository for help or support.',
-          'https://github.com/panoply/syncify'
+          'An unknown error has occured. Please submit stack trace to the Syncify Github repository for help or support. See https://github.com/panoply/syncify'
         ]
       }
     );
   }
 
-  notifier.notify(
+  /* notifier.notify(
     {
       title: 'Syncify' + ' Error',
       subtitle: e.statusText,
@@ -158,6 +154,6 @@ export function error (file: string, e: {
       wait: false,
       timeout: 5000
     }
-  );
+  ); */
 
 }

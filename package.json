@@ -1,6 +1,6 @@
 {
   "name": "@liquify/syncify",
-  "description": "A lightening fast shopify theme store synchronizer that watches a directory and uploads changed files.",
+  "description": "A lightening fast build tool for developing Shopify themes.",
   "version": "1.0.0-beta.2",
   "homepage": "https://github.com/panoply/shopify-sync",
   "author": {
@@ -9,15 +9,32 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/panoply/shopify-sync.git"
+    "url": "git://github.com/panoply/syncify.git"
   },
   "bugs": {
-    "url": "https://github.com/panoply/shopify-sync/issues"
+    "url": "https://github.com/panoply/syncify/issues"
   },
+  "types": "package/@types",
+  "main": "package/index.js",
+  "exports": {
+    ".": {
+      "import": "./package/index.mjs",
+      "require": "./package/index.js"
+    }
+  },
+  "files": [
+    "./bin/sync",
+    "./package/index.js",
+    "./package/index.mjs",
+    "./package/index.d.ts",
+    "./schema.json"
+  ],
   "license": "ISC",
   "keywords": [
     "cli",
     "command line",
+    "themekit",
+    "syncify",
     "shopify",
     "shopify theme",
     "shopify node",
@@ -25,82 +42,56 @@
     "shopify sync"
   ],
   "bin": {
-    "sync": "./bin/sync"
+    "syncify": "./bin/sync"
   },
-  "types": "./package/@types",
-  "main": "./package/index.js",
-  "syncify": {
-    "dir": "example",
-    "stores": [
-      {
-        "domain": "boefje",
-        "themes": {
-          "dev": 43989205050,
-          "prod": 43989205050
-        }
-      },
-      {
-        "domain": "boefje",
-        "themes": {
-          "dev": 43989205050,
-          "prod": 43989205050
-        }
-      }
-    ]
-  },
+  "prettier": "@brixtol/prettier-config",
   "eslintConfig": {
     "extends": "@brixtol/eslint-config"
   },
   "scripts": {
     "dev": "rollup -c -w",
     "build": "rollup -c --environment prod",
-    "sync": "./bin/sync",
-    "types": "tsc --noEmit --emitDeclarationOnly false",
-    "test-watch": "node test/theme-watch.js",
-    "test-download": "node test/theme-download.js",
-    "test-upload": "node test/theme-upload.js"
+    "syncify": "./bin/sync",
+    "types": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@rollup/plugin-replace": "^3.0.0",
-    "anymatch": "^3.1.2",
-    "axios": "^0.21.4",
-    "boxen": "^5.1.2",
-    "chalk": "^4.1.2",
+    "axios": "^0.24.0",
     "chokidar": "^3.5.2",
-    "colorette": "^2.0.16",
     "dotenv": "^10.0.0",
-    "fancy-log": "^1.3.3",
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
-    "inquirer": "^8.2.0",
-    "lodash.drop": "^4.1.1",
-    "lodash.indexof": "^4.0.5",
-    "lodash.lastindexof": "^4.0.5",
-    "lodash.omit": "^4.5.0",
-    "log-update": "^4.0.0",
+    "kleur": "^4.1.4",
+    "micromatch": "^4.0.4",
     "minimist": "^1.2.5",
-    "mkdirp": "^1.0.4",
-    "rambdax": "^7.4.1"
+    "neo-blessed": "^0.2.0",
+    "node-notifier": "^10.0.0",
+    "p-queue": "^7.1.0",
+    "prompts": "^2.4.2",
+    "rambdax": "^8.0.0"
   },
   "devDependencies": {
-    "@brixtol/eslint-config": "^1.1.0",
-    "@rollup/plugin-beep": "^0.2.0",
-    "@rollup/plugin-commonjs": "^20.0.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^13.0.6",
-    "esbuild": "^0.14.2",
-    "eslint": "^7.32.0",
+    "@brixtol/eslint-config": "^1.2.1",
+    "@brixtol/prettier-config": "^1.2.1",
+    "@brixtol/rollup-config": "^1.5.0",
+    "@types/blessed": "^0.1.19",
+    "esbuild": "^0.14.11",
+    "eslint": "^8.7.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-promise": "^6.0.0",
+    "node-sass": "^7.0.1",
+    "postcss": "^8.4.5",
     "prettier": "^2.5.1",
-    "rollup": "^2.61.1",
-    "rollup-plugin-delete": "^2.0.0",
-    "rollup-plugin-esbuild": "^4.7.2",
-    "rollup-plugin-filesize": "^9.1.1",
-    "typescript": "^4.5.3"
+    "rollup": "^2.64.0",
+    "svg-sprite": "^1.5.3",
+    "svgo": "^2.8.0",
+    "type-fest": "^2.9.0",
+    "typescript": "^4.5.4"
   },
   "peerDependencies": {
-    "esbuild": "^0.14.2",
-    "eslint": "^7.32.0",
-    "rollup": "^2.55.1",
-    "typescript": "^4.5.3"
+    "node-sass": "^7.0.1",
+    "postcss": "^8.4.5",
+    "svg-sprite": "^1.5.3",
+    "svgo": "^2.8.0"
   }
 }

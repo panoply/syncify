@@ -1,37 +1,35 @@
-import log from 'fancy-log';
-import chalk from 'chalk';
-import { client } from './config/client';
-import { Resource, APIOptions, CLIOptions, Callback } from './typings';
+import { client } from 'config/client';
+import { Resource, APIOptions, IOptions, Callback } from 'types';
 
-function sync (
-  resource: Resource | CLIOptions,
-  options?: APIOptions,
-  callback?: typeof Callback
+function sync <R extends Resource> (
+  resource: R | IOptions,
+  options: Omit<APIOptions, 'resource'>,
+  callback?: R extends 'watch' ? typeof Callback : undefined
 ): any {
 
-  if (typeof resource === 'object') return client(resource);
+  // Initialized via CLI
+  if (typeof resource === 'object' && resource?.cli === true) return client(resource);
 
-  if (!resource) {
-    return log(chalk`{red Error! The {bold resource} option is missing}!`);
-  }
+  // Initialized via API
+  // if (!resource) return log.issue('The resource option is missing!');
 
-  if (!options.target) {
-    return log(chalk`{red Error! Please define a {bold theme target}!}`);
-  }
+  // if (!options.target) return log.issue('Missing target!');
 
-  const defaults = {
-    resource,
-    target: '',
-    concurrency: 20,
+  const defaults: APIOptions = {
+    resource: resource as R,
     dir: 'theme',
-    files: [],
+    metafields: true,
+    store: '',
+    target: [],
+    concurrency: 20,
     forceIgnore: false,
     ignore: []
   };
 
   const config = Object.assign(defaults, options);
 
-  return client(config, callback);
+  client(config, callback);
+
 }
 
 export { sync as default };

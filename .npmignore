@@ -1,16 +1,30 @@
+# DIRECTORIES
+
 example/
 test/
 lib/
 src/
 versions/
-.eslintrc
 .vscode/
+
+# DOT FILES
+
+.env
+.env.example
+.eslintrc
+.eslintignore
 .prettierrc.js
 .prettierignore
 .shopifysync.json
 .eslintignore
 .pnpm-debug.log
-jsconfig.json
+
+# BUILD FILES
+
 tsconfig.json
-.babelrc
-rollup.config.js
+rollup.config.mjs
+
+# MARKDOWN
+
+readme.md
+changelog.md

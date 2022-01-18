@@ -1,27 +1,21 @@
-import anymatch from 'anymatch';
-import { join, parse, dirname, basename } from 'path';
-import { writeFile, mkdirp } from 'fs-extra';
-import chalk from 'chalk';
-import { readConfig } from '../config/config';
-import { getTarget } from '../config/target';
+import glob from 'glob';
+import any from 'anymatch';
+import { readFile } from 'fs-extra';
+import { client, queue } from '../requests/client';
 import { ignore } from '../config/utils';
-import { request, asyncForEach, waitFor } from '../request/request';
-import { Buffer } from 'buffer';
-import * as log from '../config/logger';
-import boxen from 'boxen';
-import { CLIOptions, Callback } from '../typings';
+import * as log from '../logs/console';
+import { IConfig, Callback } from '../typings';
+import { has, mapFastAsync } from 'rambdax';
+import { parseFile, setMetafield, setAsset } from '../config/file';
 
-/**
- * Download
- */
-export async function download (options: CLIOptions, callback: typeof Callback) {
+export async function upload (
+  config: Partial<IConfig>,
+  callback?: typeof Callback
+): Promise<void> {
 
   let total = 0;
 
-  const config = await readConfig();
-  const target = await getTarget(config, options);
-
-  if (!options.file) Object.assign(options, config);
+  const request = client(config);
 
   const problems = [];
   const cwd = process.cwd();
@@ -43,9 +37,7 @@ export async function download (options: CLIOptions, callback: typeof Callback) 
 
   log.clear(true);
 
-  return asyncForEach(files, async ({ key }) => {
-
-    await waitFor(100);
+  await mapAsync(async ({ key }) => {
 
     try {
 
@@ -63,21 +55,14 @@ export async function download (options: CLIOptions, callback: typeof Callback) 
       await mkdirp(join(cwd, dirName, dirname(key)));
       await writeFile(path, buffer);
 
-      if (typeof callback === 'function') {
-        callback.apply({
-          file: parse(path),
-          content
-        });
-      }
-
-      const result = [
-        chalk`{magenta    Store}{dim :} {dim.underline ${target.domain}.myshopify.com}`,
-        chalk`{magenta     File}{dim :} {cyan ${basename(key)}}`,
-        chalk`{magenta Progress}{dim :} {cyan ${total += 1}} of {cyan ${files.length}}`,
-        chalk`{magenta   Output}{dim :} {dim ${dirName}/}{cyan ${dirname(key)}}`
-      ].join('\n');
-
-      const print = boxen(result, {
+      const print = boxen((
+        chalk`{magenta  Running}{dim :} {white downloading}\n` +
+        chalk`{magenta    Store}{dim :} {dim.underline ${target.domain}.myshopify.com}\n` +
+        chalk`{magenta     File}{dim :} {cyan ${basename(key)}}\n` +
+        chalk`{magenta Progress}{dim :} {cyan ${total += 1}} of {cyan ${files.length}}\n` +
+        chalk`{magenta   Output}{dim :} {dim ${dirName}/}{cyan ${dirname(key)}}\n` +
+        chalk`{magenta   Errors}{dim :} {red ${problems.length}}`
+      ), {
         padding: 1,
         margin: 1,
         borderColor: 'gray',
@@ -97,7 +82,7 @@ export async function download (options: CLIOptions, callback: typeof Callback) 
 
     }
 
-  }).finally(() => {
+  }, files).finally(() => {
 
     log.print(chalk`Uploaded: {green ${total}} files.`);
     log.print(chalk`Problems: {red ${problems.length}}`);

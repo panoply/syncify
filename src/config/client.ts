@@ -1,40 +1,40 @@
-// import { upload } from '../sync/upload';
-import { watch } from '../sync/watch';
-// import { download } from '../sync/download';
-import { readConfig } from './config';
-import { help } from './cli';
-import * as log from '../logs/console';
-import { IOptions, Callback } from '../typings';
 import { has } from 'rambdax';
-import * as cli from '../cli/default';
+import { ICLIOptions, Syncify } from 'types';
+import { upload } from 'sync/upload';
+import { watch } from 'sync/watch';
+import { readConfig } from 'config/config';
+import { help } from 'cli/help';
+import * as log from 'logs/console';
+import * as cli from 'cli/prompts';
 
 /**
  * Client
  */
-export async function client (options: IOptions, callback?: typeof Callback) {
+export async function client (
+  options: ICLIOptions,
+  callback?: typeof Syncify.hook
+) {
 
-  if (!has('_', options)) {
-    options.cli = false;
-  } else {
+  options.cli = has('_', options);
+
+  if (options.cli) {
     options._ = options._.slice(1);
-    options.cli = true;
-    options.interactive = true;
   }
 
-  const config = await readConfig(options).catch(log.error);
-
-  if (options.interactive) return cli.options(config);
+  const config = await readConfig(options);
 
   if (config) {
 
     try {
 
       switch (config.resource) {
+        case 'interactive':
+          return cli.options(config);
         case 'watch':
           await watch(config, callback);
           break;
         case 'upload':
-          // await upload(config, callback);
+          await upload(config, callback);
           break;
         case 'download':
         //  await download(config);
@@ -47,7 +47,7 @@ export async function client (options: IOptions, callback?: typeof Callback) {
 
     } catch (e) {
 
-      log.issue(e.message);
+      log.error(e);
 
     }
 

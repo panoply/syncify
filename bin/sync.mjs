@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-const fn = require('../package/index.js').default;
-const argv = require('minimist')(process.argv.slice(1), {
+import main from '../package/index';
+import args from 'minimist';
+
+const argv = args(process.argv.slice(1), {
   default: {
     cli: true,
     interactive: false,
-    terminal: 'dashboard',
     cwd: process.cwd(),
     dev: true,
     prod: false
@@ -18,8 +19,7 @@ const argv = require('minimist')(process.argv.slice(1), {
     's',
     't',
     'o',
-    'e',
-    'terminal'
+    'e'
   ],
   alias: {
     store: 's',
@@ -28,4 +28,4 @@ const argv = require('minimist')(process.argv.slice(1), {
   }
 });
 
-fn(argv);
+main(argv);

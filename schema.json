@@ -1,0 +1,449 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "syncify",
+  "version": 1.1,
+  "definitions": {
+    "options": {
+      "type": "object",
+      "description": "Syncify Configuration options for Shopify theme development.",
+      "required": ["stores"],
+      "additionalProperties": false,
+      "properties": {
+        "dirs": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configure the build paths Syncify should use. The options defined here will be used in watch, upload and download modes.",
+          "properties": {
+            "input": {
+              "type": "string",
+              "default": "source",
+              "description": "The source build path is the directory where theme files exist. This is typically called \"src\" but Syncify defaults this to \"source\". The value defined here will be prepended to any path you define in the configuration"
+            },
+            "output": {
+              "type": "string",
+              "default": "theme",
+              "description": "The output build path is directory where transformed theme files will be written. This is typically called \"dist\" but Syncify defaults this to \"theme\". This directory will be reflective of the theme files synced with your store."
+            },
+            "import": {
+              "type": "string",
+              "default": "import",
+              "description": "The import build path is the directory where downloaded themes and/or theme files will be written. It is relative to your projects root directory."
+            },
+            "export": {
+              "type": "string",
+              "default": "import",
+              "description": "The export path is where packaged (.zip) themes will be written when running the \"package\" resource. Packaged themes will be prepended with the version number defined in your \"package.json\" file."
+            },
+            "config": {
+              "type": "string",
+              "default": "config",
+              "description": "Syncify will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. You can optionally place these config files in a subdirectory. Use this option to inform Syncify where configuration files are located within the workspace.\n\nTypically this is named \"scripts\" in node projects."
+            }
+          }
+        },
+        "paths": {
+          "type": "object",
+          "title": "Paths",
+          "additionalProperties": false,
+          "description": "Customize the development theme structure. You can map paths to different locations within your workspace and Syncify will re-route them upon upload to their correct locations.",
+          "properties": {
+            "assets": {
+              "description": "Paths to files to be published to theme `/assets` directory. Accepts a glob pattern",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "config": {
+              "description": "Glob path to files to be published to theme `/config` directory. These are typically the `settings_schema.json` and `settings_data.json` files.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "locales": {
+              "description": "Glob path to files to be published to theme `/locales` directory. These are the translation files.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "layout": {
+              "description": "Glob path to files to be published to theme `/layout` directory. These are Liquid template files.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "snippets": {
+              "description": "Glob path to files to be published to theme `/snippets` directory. These are Liquid template files.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sections": {
+              "description": "Glob path to files to be published to theme `/sections` directory. These are Liquid template files. You can provide sub-directory references.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "templates": {
+              "description": "Glob path to files to be published to theme `/templates` directory. These can be either JSON or Liquid template files.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "templates/customers": {
+              "description": "Glob path to files to be published to theme `/templates/customers` directory. These can be either JSON or Liquid template files.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "stores": {
+          "type": "array",
+          "title": "Stores",
+          "additionalProperties": false,
+          "description": "List of Shopify stores to connect",
+          "items": {
+            "type": "object",
+            "required": ["domain", "themes"],
+            "properties": {
+              "domain": {
+                "description": "Do not include the \"myshopify.com\" portion of the domain",
+                "type": "string"
+              },
+              "themes": {
+                "description": "An object list of theme maps where the key properties represent a theme target names and their values the theme id.",
+                "examples": [
+                  {
+                    "dev": 123456789
+                  }
+                ],
+                "type": "object",
+                "propertyNames": {
+                  "pattern": "[a-z0-9_$-]{1,15}",
+                  "description": "Property keys will be used as target references by the CLI. The theme target name cannot contain spaces and cannot exceed 15 characters"
+                }
+              }
+            }
+          }
+        },
+        "spawn": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "watch": {
+              "type": "object",
+              "description": "A list of commands to spawn in watch mode. The key defintion will be used as a tab label."
+            },
+            "upload": {
+              "type": "object",
+              "description": "A list of commands to spawn in upload mode. The key defintion will be used as a tab label. This will typically be build specific spawns that should execute once."
+            }
+          }
+        },
+        "transform": {
+          "description": "Transform options applied when processing files.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "styles": {
+              "description": "A list of SCSS or SASS stylesheets to transform. Files will be processed with node-sass and then passed to PostCSS. Syncify requires you to provide a \"postcss.config.js\" configuration file in your projects root directory or within the defined \"config\" directory.",
+              "type": "array",
+              "items": {
+                "required": ["input"],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "input": {
+                    "description": "Input path to the stylesheet, eg: \"styles/stylesheet.scss\". This is the root SASS file. ",
+                    "type": "string"
+                  },
+                  "watch": {
+                    "description": "Files and/or paths to watch. When changes are detected and paths match the defined entries here the input file will be processed. Please not that you do not need to include the input file.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "rename": {
+                    "description": "Rename the stylesheet before uploading",
+                    "type": "string"
+                  },
+                  "snippet": {
+                    "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will wrapped in <style></style> tags and published to the theme \"snippets\" directory",
+                    "type": "boolean"
+                  },
+                  "include": {
+                    "description": "Paths to include. Useful when you want to include \"node_modules\" paths in @import. You will need to prefex import paths with ~ character.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "json": {
+              "description": "Transform options for handling \".json\" files",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "allowComments": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Whether or not to accepts comments in JSON files. When \"true\" comments will be stripped before upload. Please note that you will need to adjust your editor settings."
+                },
+                "minify": {
+                  "required": ["apply"],
+                  "type": "object",
+                  "description": "Minification options to be applied.",
+                  "additionalProperties": false,
+                  "properties": {
+                    "exclude": {
+                      "description": "An optional list of files which you wish to exclude from minification.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "removeSchemaRefs": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "When \"true\" Syncify will look for the existence of a \"$schema\" field in JSON files. If one is detected it will be removed before uploading."
+                    },
+                    "apply": {
+                      "type": "string",
+                      "default": "production",
+                      "description": "When to apply minification to JSON files.",
+                      "oneOf": [
+                        {
+                          "enum": ["always"],
+                          "description": "Always apply minification to JSON files, regardless of ENV flag."
+                        },
+                        {
+                          "enum": ["production"],
+                          "description": "Only apply minification to JSON files when the production flag is present."
+                        },
+                        {
+                          "enum": ["never"],
+                          "description": "Minification is never applied to JSON files."
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "icons": {
+              "type": "object",
+              "description": "Transform options for \".svg\" files. Generate an svg sprite or svg snippet files.",
+              "additionalProperties": false,
+              "properties": {
+                "sprites": {
+                  "type": "array",
+                  "description": "Generate SVG Sprites. Sprites will be exported as a snippet.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["input", "output"],
+                    "properties": {
+                      "input": {
+                        "description": "Path to SVG files",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "output": {
+                        "type": "string",
+                        "description": "The name of the generated snippet file"
+                      },
+                      "options": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "description": "Syncify exposes only a couple of options when generating SVG Sprites. These options are passed to \"svg-sprites\".",
+                        "properties": {
+                          "namespaceIDS": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "In order to avoid ID clashes, the default behavior is to namespace all IDs in the source SVGs before compiling them into a sprite. Each ID is prepended with a unique string."
+                          },
+                          "dimensionAttributes": {
+                            "type": "boolean",
+                            "default": true,
+                            "description": "If truthy, width and height attributes will be set on the sprite's element (where applicable)."
+                          },
+                          "rootAttributes": {
+                            "type": "object",
+                            "default": {},
+                            "description": "Shorthand for applying custom attributes to the outermost element. Please be aware that certain attributes (e.g. viewBox) will be calculated dynamically and override custom rootAttributes in any case."
+                          },
+                          "namespaceClassnames": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "In order to avoid CSS class name ambiguities, the default behavior is to namespace CSS class names in the source SVGs before compiling them into a sprite. Each class name is prepended with a unique string. Disable this option to keep the class names untouched."
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "inline": {
+                  "type": "array",
+                  "description": "Generates an SVG snippet from the defined SVG file paths. You can customize how each SVG file is transformed by providing an \"svgo.config.js\" configuration file in your projects root directory or the defined \"config\" directory.",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "views": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Transform options for Liquid/HTML files",
+              "properties": {
+                "sections": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Section specific transform options when processing section theme files.",
+                  "properties": {
+                    "allowPrefix": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Sections can be structured within sub-directories. If a section file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the filenames. For example,\n\nIf a section path is \"theme/sections/index/some-file.liquid\" then the filename will be prefixed with \"index\" so when referencing it within themes you'd need to use \"index_some-file.liquid\"\n\nPrefixing is helpful when you have a large number of sections and want to avoid name collusions. You can only control what sub-directories should have prefexing applied using the \"global:[]\" option or alternatively do not reference paths to sections which contain sub directories."
+                    },
+                    "onlyPrefixDuplicates": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "When \"allowPrefix\" is enabled and this is set to \"true\" then all files names will skip prefixing unless duplicates exists."
+                    },
+                    "prefixSeparator": {
+                      "type": "string",
+                      "default": "_",
+                      "description": "Define a separator character to be used for prefixing",
+                      "oneOf": [
+                        {
+                          "enum": ["-"]
+                        },
+                        {
+                          "enum": ["_"]
+                        }
+                      ]
+                    },
+                    "globals": {
+                      "description": "Glob path to files to section directories that should skip prefixing when a sub-directory structure is detected.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "minify": {
+                  "type": "object",
+                  "required": ["env"],
+                  "additionalProperties": false,
+                  "description": "Minification options to be applied to Liquid/HTML files.",
+                  "properties": {
+                    "env": {
+                      "type": "string",
+                      "default": "production",
+                      "description": "When to apply minification to Liquid/HTML files.",
+                      "oneOf": [
+                        {
+                          "enum": ["any"],
+                          "description": "Always apply minification to Liquid/HTML files, regardless of the environment variable."
+                        },
+                        {
+                          "enum": ["production"],
+                          "description": "Only apply minification to Liquid/HTML files when the \"production\" or \"staging\" environment variable is present."
+                        },
+                        {
+                          "enum": ["development"],
+                          "description": "Only apply minification to Liquid/HTML files when the \"development\" environment variable is present."
+                        },
+                        {
+                          "enum": ["never"],
+                          "description": "Minification is never applied to Liquid/HTML files."
+                        }
+                      ]
+                    },
+                    "exclude": {
+                      "description": "A list of files or paths to be excluded from minification",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minifyJS": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether or not the contents of <s></script> should be minified."
+                    },
+                    "minifyCSS": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether or not the contents of <style></style> should be minified."
+                    },
+                    "removeComments": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether or not to remove HTML comments"
+                    },
+                    "collapseWhitespace": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Should whitespace be collapsed"
+                    },
+                    "trimCustomFragments": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "ignoreCustomFragments": {
+                      "description": "A regular expression list of HTML fragments to ignore.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minifySectionSchema": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether sections schema tag JSON contents should be minified"
+                    },
+                    "removeLiquidComments": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether or not to remove Liquid comments"
+                    },
+                    "ignoredLiquidTags": {
+                      "description": "A list of Liquid tags to be ignored from minification",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": ["syncify"],
+  "properties": {
+    "syncify": {
+      "$ref": "#/definitions/options"
+    }
+  }
+}
