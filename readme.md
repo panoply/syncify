@@ -2,38 +2,73 @@
 
 <hr>
 
-# Syncify
+# @liquify/syncify
 
-A lightning fast, extensible and superior alternative (node equivalent) Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful [blessed](https://github.com/chjj/blessed) CLI dashboard, spawns child processes for bundle coupling and provides watch, upload, download, metafield and redirect sync capabilities on multiple storefronts and themes.
+A blazing fast, extensible and superior alternative Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI that will spawn child processes for compiler coupling. Supports multiple storefront/theme synchronization with watch, upload, download, metafield and redirect sync capabilities included.
+
+> Syncify exists as part of the [Liquify](https://liquify.dev) project.
 
 ### Key Features
 
 - Upload, download and watch multiple storefronts and/or themes.
-- Leverages [blessed](https://github.com/chjj/blessed) to provide an informative CLI.
+- Clear, concise and informative CLI logging.
 - Supports HTML + Liquid and JSON minification.
-- Provides an elegant directory based JSON file metafields sync approach
-- Processes SASS/SCSS files and/or CSS using [PostCSS](https://postcss.org/).
-- Supports SVG Sprite generation or inline SVG snippet generation with [SVGO](https://github.com/svg/svgo)
-- Customizable theme development directory structures.
+- An elegant directory based metafields sync approach with JSON files.
+- Built-in support for SCSS and CSS transpilation using SASS Dart and [PostCSS](https://postcss.org/).
+- SVG Sprite and inlined SVG snippet generation using [SVGO](https://github.com/svg/svgo).
+- Intelligent path mapping capabilities for custom theme directory structures.
 - Digests existing build tool configurations for asset transformations.
-- Clear, concise and informative error/warning logging.
-- Prompt based CLI/TUI dashboard and exported API for script usage.
+- Prompt based CLI/TUI and exposed module API for script usage.
 
 ### Why?
 
-Despite Shopify employing thousands of engineers and generating billions of dollars in revenue annually the company does a rather terrible job at providing quality tooling for developers working with it. The likelihood of a project maintained by the Shopify team lasting longer than 12 months or not requiring you install 50+ Ruby gems is a fucking rarity. This module is fast, it's flexible and it will not lock you into some poorly thought through workflow and setup apparatus which is common with Shopify.
+Shopify does a terrible job at providing quality tooling for developers who are working with the platform. The likelihood of a project maintained by the Shopify team lasting longer than 12 months is slim. I have been working with this SaaS for last several years and nothing the Shopify team have produced has actually helped in my productivity. Theme-kit is inconsistent, restrictive, basic and built atop of Ruby. It sucks. This module is not like Theme-Kit. Syncify is fast, it's flexible, it's build atop of Node and it will not lock you into some poorly thought through workflow and setup apparatus.
+
+# Contents
+
+- [Overview](#overview)
+  - [Theme Files](#theme-files)
+  - [Asset Pipeline](#asset-pipeline)
+  - [Built-in Support](#built-in-support)
+- [Installation](#installation)
+  - [Setup](#setup)
+  - [Credentials](#credentials)
+  - [Extending Schema](#Extending-Schema)
+- [Configuration](#configuration)
+  - [Stores](#options)
+  - [Dirs](#dirs)
+  - [Paths](#paths)
+  - [Spawn](#spawn)
+  - [Transform](#transforms)
+    - [Icons](#icons)
+    - [Styles](#styles)
+    - [JSON](#json)
+    - [Views](#views)
+- [CLI Usage](#cli-usage)
+  - [Commands](#commands)
+  - [Prompts](#prompts)
+- [API Usage](#api-usage)
+  - [Export](#export)
+  - [Config File](#config-file)
+  - [Plugin](#config-file)
+  - [Utilities](#utilities)
+- [Contributing](#contributing)
 
 # Overview
 
-The main purpose of Syncify is to watch and upload files from your local machine to your Shopify store\s via API. Syncify supports file transformation capabilities like minification and allows developers to spawn child running processes in parallel. The Syncify CLI uses blessed-cli so multiple processes are triggered concurrently. One command to rule them all.
+The main purpose of Syncify is to watch and upload files from your local machine to your Shopify store\s via API. Syncify supports file transformation capabilities like minification and allows developers to spawn child running processes in parallel. It employs an intelligent queue-based sync/burst based upload approach.
 
 ### Theme Files
 
-Syncify uses built-in capabilities when handling `.liquid` and `.json` snippets, templates, layouts, locales, configs and sections. These files are considered `views` in Syncify and content transformations like minification are applied internally.
+Syncify uses built-in capabilities when handling `.liquid` and `.json` snippets, templates, layouts, locales, configs and sections. These files are considered `views` in Syncify and content transformations like minification are applied using the features shipped within the tool.
 
-### Asset Files
+### Asset Pipeline
 
-Syncify does not want to re-create or impede on developer preferences or tool appropriation when handling asset files. You are free to processes assets types with different tools because they will execute within a spawned child process that runs in parallel. Syncify supports `.css` and `.scss` transformations via [PostCSS](#) and `.svg` sprite/inline snippet generation using [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within your project Syncify will apply those configurations to transforms.
+Syncify does not want to re-create nor impede on developer preferences or tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with the Syncify watch instance.
+
+### Built-in Support
+
+Syncify provides built-in convenience support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project the configurations specified within will used in the transform process.
 
 # Installation
 
@@ -81,7 +116,7 @@ Refer to the `.env.example` file in this repository for an example and please re
 
 ### Extending Schema
 
-Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can **optionally** extend the built-in `package.json` schema used by your editor to provide hover descriptions and auto-completions for fields and values. Extending the schema provides intellisense support to the `"syncify":{}` field. It will make your life a lot easier and is extremely helpful:
+Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can **optionally** extend the built-in `package.json` schema used by your editor to provide hover descriptions and auto-completions for fields and values. The schema will provide you with intellisense support on the `"syncify":{}` field. If you are using VSCode then Syncify will automatically apply and generate this for you. It is highly recommended that you extend the spec if your editor supports it.
 
 **Specification**
 
@@ -91,7 +126,7 @@ https://schema.liquify.dev/syncify.json
 
 **Extending in VS Code**
 <br>
-Create a `.vscode` directory in the root of your project workspace. Within the `.vscode` directory create a `settings.json` file and add the following configuration settings:
+Create a `.vscode` directory in the root of your projects workspace. `cd` into the newly created `.vscode` directory and create a `settings.json` file that uses the following configuration settings:
 
 ```json
 {
@@ -106,11 +141,13 @@ Create a `.vscode` directory in the root of your project workspace. Within the `
 
 > You can also apply this to your global workspace settings but it is recommended you extends schema on a per-project basis.
 
-### Configuration
+# Configuration
 
 Syncify configuration is defined with your projects `package.json` file. Syncify **requires** you provide references to store/s and theme/s you wish to sync via the `"stores"` property. By default Syncify will assume your store exists within a `theme` directory (relative to your project root) and the folders/files within that directory are using a default Shopify theme structure.
 
 > Please note that you will need to remove the comments if you are copy and pasting configuration settings below. Checkout the [Examples](https://github.com/panoply/syncify-examples) repository to download or clone Syncify baked templates.
+
+### Example
 
 <!-- prettier-ignore -->
 ```jsonc
@@ -160,6 +197,25 @@ Syncify configuration is defined with your projects `package.json` file. Syncify
       "snippets": [], // An optional list of file paths to snippets
       "templates": [], // An optional list of file paths to templates
       "templates/customers": [] // An optional list of file paths to templates/customers
+    },
+
+    // Spawned processes to run in parallel with Syncify
+    //
+    "spawn": {
+
+      // Child processes to run in watch mode
+      //
+      "watch": {
+        "rollup": "rollup -c -w", // Example of a rollup spawned process
+        "esbuild": "esbuild ./config/index.js --watch" // Example of an esbuild spawned process
+      },
+
+      // Child processes to run in build/upload mode
+      //
+      "build": {
+        "rollup": "rollup -c",
+        "esbuild": "esbuild ./config/index.js --watch"
+      }
     },
 
     // Transform options
@@ -235,6 +291,10 @@ Syncify configuration is defined with your projects `package.json` file. Syncify
 }
 ```
 
+### Options
+
+Below you will find the complete configuration guidelines and option references.
+
 # CLI Usage
 
 Syncify ships with a powerful command line interface that supports prompt execution. If you have installed Syncify globally, you can call `syncify` from any project but you should avoid this and instead install the module as a development dependency on a per-project basis. If you are using a package manager like [pnpm](https://pnpm.js.org/en/cli/install) you can simply call `pnpm syncify` but if you are using npm or yarn then you may need to create reference script in your `package.json` file, for example:
@@ -261,6 +321,7 @@ Commands:
   syncify watch     <store>   Starts watch mode
   syncify download  <store>   Downloads a specific theme/s from store/s
   syncify upload    <store>   Uploads the theme directory
+  syncify build               Triggers a build of te entire theme
   syncify themes              Prints list of themes, helpful when you need ids
   syncify status              Prints list of connected stores
   syncify query               Queries a resource endpoint like metafields
@@ -274,7 +335,7 @@ Flags:
 
 ### Example
 
-CLI usage aims to be as simple as possible. A typical project will be targeting a single theme but you can target multiple themes and stores. When targeting multiple stores and multiple themes within those stores the you can pass the store name as a flag, followed by comma separated list of theme targets.
+CLI usage aims to be as simple as possible. A typical project will be targeting a single Shopify theme but you can target multiple themes and stores. When targeting multiple stores/themes you can pass the store name as a flag followed by comma separated list of theme targets. See below examples:
 
 **Watching 1 store and 1 theme**
 
@@ -562,6 +623,10 @@ A callback function executed post transfer. Access the passed in file path via t
 # Contributing
 
 This project uses [pnpm](https://pnpm.js.org/en/cli/install) (because pnpm is dope and pnpm does dope shit) - Fork the project, run `pnpm i` and you're good to go. If you're using Yarn like the rest of the plebs or npm like the boomers then you will still need to install pnpm.
+
+# Sissel SaaS
+
+Syncify is shipped via by [Nίκος Σαβίδης](https://github.com/panoply) of [Sissel ΣaaΣ](https://sissel.io). It operated under the [@liquify](#) organization.
 
 # Changelog
 
