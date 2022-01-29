@@ -1,13 +1,17 @@
+/* eslint-disable new-cap */
 import { resolve, join, basename } from 'path';
 import { PartialDeep } from 'type-fest';
-import { readJson, pathExistsSync, pathExists } from 'fs-extra';
+import postcss from 'postcss';
+import YAML from 'yamljs';
+import { readJson, pathExistsSync, pathExists, mkdir, createFile, readFile } from 'fs-extra';
 import dotenv from 'dotenv';
-import { has, hasPath, isType } from 'rambdax';
-import { matcher } from 'micromatch';
-import { IOptions, ICLIOptions, IConfig, IStyles, IViews, IIcons, IJson } from 'types';
+import { has, hasPath, isType, mapFastAsync } from 'rambdax';
+import anymatch, { Tester } from 'anymatch';
+import { IOptions, ICLIOptions, IConfig, IStyles, IViews, IIcons, IJson, IStore } from 'types';
 import { assign, isArray, toUpcase, keys } from 'config/utils';
-import * as log from 'cli/panes';
-import * as bless from 'cli/blessed';
+import * as redirects from 'requests/redirects';
+import { log, screen, bless, create, nodes, terminal } from 'cli/blessed';
+import { PartialObjectDeep } from 'type-fest/source/partial-deep';
 
 /**
  * Read Configuration
@@ -19,16 +23,18 @@ import * as bless from 'cli/blessed';
  */
 export async function readConfig (options: ICLIOptions): Promise<IConfig> {
 
+  if (options.terminal === 'dashboard') bless(3);
+
   try {
 
-    if (!options.cli) return options as IConfig;
+    if (!options.cli) return options as any as IConfig;
 
-    return parseCommand(options);
+    return command(options);
 
   } catch (e) {
 
-    bless.screen.destroy();
-    log.problem.errors(e);
+    screen.destroy();
+    log.errors(e);
 
   }
 
@@ -40,11 +46,11 @@ export async function readConfig (options: ICLIOptions): Promise<IConfig> {
  * Determines what commands were passed via the
  * CLI and constructs a workable configuration.
  */
-function parseCommand (options: ICLIOptions) {
+function command (options: ICLIOptions) {
 
   if (options._.length === 0) {
     options.resource = 'interactive';
-    return resolvePackage(options);
+    return getPackage(options);
   } else if (options._.length === 1) {
     options.resource = options._[0];
   } else if (options._.length > 1) {
@@ -73,7 +79,7 @@ function parseCommand (options: ICLIOptions) {
     }
   }
 
-  return resolvePackage(options);
+  return getPackage(options);
 
 }
 
@@ -84,7 +90,7 @@ function parseCommand (options: ICLIOptions) {
  * file locations relative to the current working
  * directory.
  */
-function resolvePackage (options: ICLIOptions) {
+function getPackage (options: ICLIOptions) {
 
   if (has('cwd', options)) options.cwd = process.cwd();
 
@@ -128,21 +134,28 @@ async function readPackage (options: ICLIOptions) {
  * who accepts a string. Paths will include the directory
  * `input` folder name.
  */
-function normalizePath (cwd: string, input: string) {
+function normalize (input: string) {
 
-  const base = input.slice(input.lastIndexOf('/') + 1);
-  const regex = new RegExp(`^\\.?\\/?${base}\\/`);
+  const regex = new RegExp(`^\\.?\\/?${input}\\/`);
 
-  return {
-    base,
-    join: (path: string) => {
+  return (path: string) => {
 
-      if (regex.test(path)) return path;
+    let ignore: boolean = false;
 
-      const char = path.charCodeAt(0);
-
-      return join(base, (char === 46 || char === 47) ? path.slice(1) : path);
+    if (path.charCodeAt(0) === 33) {
+      ignore = true;
+      path = path.slice(1);
     }
+
+    if (regex.test(path)) {
+      return ignore ? '!' + path : path;
+    }
+
+    if (path.charCodeAt(0) === 46 && path.charCodeAt(1) === 46 && path.charCodeAt(2) === 47) {
+      throw new Error('Invalid path at: ' + path + ' - Paths must be relative to source');
+    }
+
+    return (ignore ? '!' : '') + join(input, path);
 
   };
 }
@@ -154,16 +167,35 @@ function normalizePath (cwd: string, input: string) {
  * This resolve the directory paths, and attempt to correct them
  * if they are misconfigured.
  */
-function setDefaults (cwd: string, options: IOptions) {
+async function defaults (cwd: string, options: IOptions) {
 
+  const cache = join(cwd, 'node_modules/.cache');
   const initial: PartialDeep<IConfig> = {
     config: cwd,
-    input: join(cwd, 'source'),
-    export: join(cwd, 'export'),
-    import: join(cwd, 'import'),
-    output: join(cwd, 'theme'),
+    cache: join(cwd, 'node_modules/.cache/syncify'),
+    source: 'source',
+    export: 'export',
+    import: 'import',
+    output: 'theme',
+    watch: [],
     transform: {}
   };
+
+  if (!pathExistsSync(cache)) {
+    try {
+      await mkdir(cache);
+    } catch (e) {
+      throw new Error('Failed to create a .cache file');
+    }
+  }
+
+  if (!pathExistsSync(initial.cache)) {
+    try {
+      await mkdir(initial.cache);
+    } catch (e) {
+      throw new Error('Failed to create a .cache file');
+    }
+  }
 
   if (!has('dirs', options)) return initial;
 
@@ -179,7 +211,7 @@ function setDefaults (cwd: string, options: IOptions) {
       if (path.charCodeAt(1) !== 47) {
         throw new Error('Directory path is invalid at: ' + path);
       } else {
-        path = path.slice(2);
+        path = path.slice(1);
       }
     }
 
@@ -189,9 +221,9 @@ function setDefaults (cwd: string, options: IOptions) {
     // path directory is valid, eg: path
     // dirs cannot reference sub directorys, eg: path/sub
     if (/^[a-zA-Z0-9_-]+/.test(path)) {
-      initial[k] = join(cwd, options.dirs[k]);
+      initial[k] = options.dirs[k];
     } else {
-      throw new Error('Directory paths is invalid at: ' + path);
+      throw new Error('Directory path is invalid at: ' + path);
     }
   }
 
@@ -207,41 +239,55 @@ function setDefaults (cwd: string, options: IOptions) {
  * defines the build directory input in directory paths
  * it will ensure it is formed correctly.
  */
-function getPaths (cwd: string, input: string, options: IOptions) {
+function getPaths (config: PartialObjectDeep<IConfig>, options: IOptions) {
 
   const paths: IConfig['paths'] = {
-    assets: [],
-    config: [],
-    customers: [],
-    locales: [],
-    sections: [],
-    snippets: [],
-    templates: []
+    assets: null,
+    config: null,
+    layout: null,
+    customers: null,
+    locales: null,
+    sections: null,
+    snippets: null,
+    templates: null,
+    metafields: null
   };
 
-  const path = normalizePath(cwd, input);
+  const path = normalize(config.source);
 
   for (const k in paths) {
-    if (has(k, options.paths)) {
 
-      paths[k] = matcher(options.paths[k].map(path), {
-        cwd,
-        nobrace: true
-      });
+    let uri: any;
+
+    if (k === 'metafields') {
+
+      uri = [ join(path(options.dirs.metafields), '**/*.json') ];
+
+    } else if (has(k, options.paths)) {
+
+      uri = isArray(options.paths[k])
+        ? options.paths[k].map(path)
+        : [ path(options.paths[k]) ];
 
     } else {
 
-      if (k === 'customers') {
-        paths[k].push(join(path.base, 'templates', k));
-      } else {
-        paths[k].push(join(path.base, k));
-      }
+      uri = [ k === 'customers' ? path('templates/' + k) : path(k) ];
 
-      paths[k] = matcher(paths[k], {
-        cwd,
-        nobrace: true
-      });
     }
+
+    if (k === 'assets') {
+
+      if (isArray(uri)) {
+        uri.push(join(config.output, 'assets/*'));
+      } else {
+        uri = [ uri, join(config.output, 'assets/*') ];
+      }
+    }
+
+    config.watch.push(...uri);
+
+    paths[k] = anymatch(uri);
+
   }
 
   return paths;
@@ -282,7 +328,8 @@ function getStores (cli: ICLIOptions, options: IOptions) {
   const file = dotenv.config();
   const state: IConfig['sync'] = {
     stores: [],
-    themes: []
+    themes: [],
+    redirects: []
   };
 
   for (const v of options.stores) {
@@ -363,16 +410,16 @@ function getStores (cli: ICLIOptions, options: IOptions) {
  * Returns path locations of config files like
  * postcss.config.js and svgo.config.js.
  */
-async function getConfigs (cwd: string, files: string[]) {
+async function getConfigs (config: IConfig, files: string[]) {
 
   const file = files.shift();
-  const path = join(cwd, file);
+  const path = join(config.cwd, config.config, file);
   const exists = await pathExists(path);
 
   if (exists) return path;
   if (file.length === 0) return null;
 
-  return getConfigs(cwd, files);
+  return getConfigs(config, files);
 
 }
 
@@ -407,8 +454,7 @@ function getViews (
         minifyCSS: true,
         removeComments: true,
         collapseWhitespace: true,
-        trimCustomFragments: true,
-        ignoreCustomFragments: []
+        trimCustomFragments: true
       }
     }
   };
@@ -454,6 +500,10 @@ function getViews (
 
   }
 
+  state.minify.terser.ignoreCustomFragments = [
+    /({%|{{)-?[\s\S]*?-?(}}|%})/g
+  ];
+
   return state;
 }
 
@@ -466,17 +516,20 @@ function getViews (
  */
 async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['transform']) {
 
-  const state = {
+  const state: IStyles = {
     postcss: null,
+    node_modules: join(config.cwd, 'node_modules') + '/',
     compile: []
   };
 
   // Find postcss configuration files
-  state.postcss = await getConfigs(config.config, [
+  const postcssconfig = await getConfigs(config as IConfig, [
     'postcss.config.js',
     'postcss.config.cjs',
     'postcss.config.mjs'
   ]);
+
+  state.postcss = postcss(require(postcssconfig));
 
   if (isType('Undefined', transform) || !has('styles', transform)) return state;
 
@@ -484,13 +537,15 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
     throw new Error('Invalid transform config, the option "styles" must be an array');
   }
 
-  const path = normalizePath(config.cwd, config.input);
+  const path = normalize(config.source);
 
   for (const v of transform.styles) {
 
     const compile: Partial<IStyles['compile'][number]> = {
-      input: path.join(v.input)
+      input: path(v.input)
     };
+
+    let rename: string;
 
     if (has('rename', v)) {
 
@@ -501,14 +556,14 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
       // handle renamed files
       if (!v.rename.endsWith('.css')) {
         if (v.rename.endsWith('.scss')) {
-          compile.rename = v.rename.replace('.scss', '.css');
+          rename = v.rename.replace('.scss', '.css');
         } else if (v.rename.endsWith('.sass') || v.input.endsWith('.sass')) {
-          compile.rename = v.rename.replace('.sass', '.css');
+          rename = v.rename.replace('.sass', '.css');
         } else {
-          compile.rename = v.rename + '.css';
+          rename = v.rename + '.css';
         }
       } else {
-        compile.rename = v.rename;
+        rename = v.rename;
       }
 
     } else {
@@ -516,38 +571,60 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
       const name = basename(v.input);
 
       if (name.endsWith('.scss')) {
-        compile.rename = name.replace('.scss', '.css');
+        rename = name.replace('.scss', '.css');
       } else if (name.endsWith('.sass')) {
-        compile.rename = name.replace('.sass', '.css');
+        rename = name.replace('.sass', '.css');
       } else if (!name.endsWith('.css')) {
-        compile.rename = name + '.css';
+        rename = name + '.css';
       } else {
-        compile.rename = name;
+        rename = name;
       }
     }
 
     if (has('watch', v)) {
-      if (!isArray(v.watch)) {
-        throw new Error('You must use an array type for "watch" path style directories');
+      if (isArray(v.watch)) {
+
+        const watch = v.watch.map(path);
+
+        watch.push(compile.input);
+
+        compile.watch = anymatch([ ...watch ]);
+        config.watch.push(...watch);
+
       } else {
-        compile.watch = v.watch.map(path.join);
+        throw new Error('You must use an array type for "watch" path style directories');
       }
+
     } else {
-      compile.watch = [ path.join(v.input) ];
+      compile.watch = anymatch([ compile.input ]);
+      config.watch.push(compile.input);
     }
 
-    compile.include = has('include', v)
-      ? v.include.map(include => join(config.cwd, include))
-      : [ 'node_modules' ];
+    if (has('include', v)) {
+      if (isArray(v.include)) {
+        compile.include = v.include.map(include => join(config.cwd, include));
+      } else {
+        throw new Error('You must use an array type for "include" paths');
+      }
+    } else {
+      compile.include = [];
+    }
+
+    compile.include.unshift(
+      config.cwd,
+      compile.input.replace(basename(v.input), '')
+    );
 
     if (has('snippet', v) && v.snippet === true) {
-      compile.rename = compile.rename + '.liquid';
+      compile.output = join('snippets', rename + '.liquid');
       compile.snippet = true;
     } else {
+      compile.output = join('assets', rename);
+      config.watch.push('!' + join(config.output, compile.output));
       compile.snippet = false;
     }
 
-    state.compile.push(compile);
+    state.compile.push(compile as IStyles['compile'][number]);
 
   }
 
@@ -570,7 +647,7 @@ async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['tran
   };
 
   // Find postcss configuration files
-  state.svgo = await getConfigs(config.config, [
+  state.svgo = await getConfigs(config as IConfig, [
     'svgo.config.js',
     'svgo.config.cjs',
     'svgo.config.mjs'
@@ -578,7 +655,7 @@ async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['tran
 
   if (isType('Undefined', transform) || !has('icons', transform)) return state;
 
-  const path = normalizePath(config.cwd, config.input);
+  const path = normalize(config.metafields);
 
   if (has('snippets', transform.icons)) {
 
@@ -586,7 +663,7 @@ async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['tran
       throw new Error('Icon snippet paths must use an array type');
     }
 
-    state.snippets = transform.icons.snippets.map(path.join);
+    state.snippets = transform.icons.snippets.map(path);
 
   }
 
@@ -619,12 +696,10 @@ async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['tran
 
     if (has('options', v)) sprite.options = assign(sprite.options, v);
 
-    sprite.input = v.input.map(path.join);
+    sprite.input = v.input.map(path);
 
     // handle renamed files
-    if (!v.output.endsWith('.liquid')) {
-      sprite.output = v.output + '.liquid';
-    }
+    if (!v.output.endsWith('.liquid')) sprite.output = v.output + '.liquid';
 
     state.sprites.push(sprite);
 
@@ -670,9 +745,9 @@ function getJson (config: PartialDeep<IConfig>, transform: IOptions['transform']
         throw new Error('JSON excludes must use an array type');
       }
 
-      const path = normalizePath(config.cwd, config.input);
+      const path = normalize(config.source);
 
-      state.minify.exclude = state.minify.exclude.map(path.join);
+      state.minify.exclude = state.minify.exclude.map(path);
 
     }
 
@@ -685,6 +760,33 @@ function getJson (config: PartialDeep<IConfig>, transform: IOptions['transform']
   return state;
 }
 
+async function getRedirects (config: PartialDeep<IConfig>, options: IOptions) {
+
+  const cachePath = join(config.cache, 'redirects.json');
+  const path = await getConfigs(config, [
+    'redirects.yaml',
+    'redirects.yml'
+  ]);
+
+  const cache = pathExistsSync(cachePath)
+    ? await readJson(cachePath, {
+      encoding: 'utf-8',
+      throws: true
+    }) : {};
+
+  const yaml = await readFile(path);
+  const file = YAML.parse(yaml.toString());
+
+  /* redirects.queue.add(() => mapFastAsync(store => {
+
+    return redirects.list(store as IStore, cache, file);
+
+  }, config.sync.stores)); */
+
+  return file;
+
+}
+
 /**
  * Resolve Paths
  *
@@ -694,17 +796,49 @@ function getJson (config: PartialDeep<IConfig>, transform: IOptions['transform']
  */
 async function storeConfig (options: ICLIOptions, pkg: IOptions) {
 
-  const config = setDefaults(options.cwd, pkg);
+  const config = await defaults(options.cwd, pkg);
 
   // basic config
   config.spawns = pkg.spawn[options.resource];
+
+  // blessed initializes
+  create(
+    {
+      group: 'Logs',
+      tabs: [ 'errors', 'warnings', 'console' ],
+      row: 6,
+      col: 5,
+      rowSpan: 8,
+      colSpan: 9,
+      spawns: null
+    },
+    {
+      group: 'Store',
+      tabs: [ 'files', 'metafields', 'redirects' ],
+      row: 0,
+      col: 0,
+      rowSpan: 9,
+      colSpan: 5,
+      spawns: null
+    },
+    {
+      group: 'Assets',
+      tabs: [ 'scripts', 'json', 'styles', 'icons' ],
+      row: 0,
+      col: 5,
+      rowSpan: 6,
+      colSpan: 9,
+      spawns: config.spawns
+    }
+  );
+
   config.cwd = options.cwd;
   config.env = options.env as IConfig['env'] ? 'dev' : 'prod';
   config.mode = options.cli ? 'cli' : 'api';
   config.terminal = options.terminal;
   config.resource = options.resource;
   config.sync = getStores(options, pkg);
-  config.paths = getPaths(options.cwd, config.input, pkg);
+  config.paths = getPaths(config, pkg);
 
   // transform config
   config.transform.views = getViews(config, pkg.transform);
@@ -717,17 +851,18 @@ async function storeConfig (options: ICLIOptions, pkg: IOptions) {
   process.env.SYNCIFY_MODE = config.mode;
   process.env.SYNCIFY_RESOURCE = config.resource;
 
-  // blessed initializes
-  log.status.render(config as IConfig);
-  log.spawned.render(pkg.spawn[config.resource]);
+  // const yaml = await getRedirects(config, pkg);
 
-  // render blessed
-  bless.render(log.spawned);
+  if (terminal === 2) {
+    screen.render();
 
-  // forward console
-  console.log = log.problem.console;
-  console.info = log.problem.console;
-  console.error = log.problem.errors;
+    // render blessed
+    console.log = log.console;
+    console.info = log.console;
+    console.error = log.errors;
+    console.warn = log.warnings;
+
+  }
 
   return config as IConfig;
 }

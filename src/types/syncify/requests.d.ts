@@ -3,12 +3,31 @@ import { AxiosRequestConfig } from 'axios';
 /**
  * Resources
  */
-export type Resource = 'watch' | 'upload' |'download' | 'interactive'
+export type Resource = 'build' | 'watch' | 'upload' |'download' | 'interactive'
 
 /**
  * Chokidor Event Names
  */
 export type ChokidorEvents = 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir'
+
+/**
+ * Shopify theme asset paths, we use this to when re-pathing
+ * custom directories.
+ */
+export type GetAsset = (
+  `templates/${string}${'.liquid' | '.json'}` |
+  `templates/customer/${string}${'.liquid' | '.json'}` |
+  `assets/${string}` |
+  `sections/${string}${'.liquid'}` |
+  `snippets/${string}${'.liquid'}` |
+  `layout/${string}${'.liquid'}` |
+  `locales/${string}${'.json'}` |
+  `config/settings_${'data' | 'schema'}${'.json'}`
+)
+
+/* -------------------------------------------- */
+/* ASSETS                                       */
+/* -------------------------------------------- */
 
 /**
  * Return response for Shopify theme assets
@@ -72,6 +91,10 @@ export interface IAsset {
   attachment: string
 }
 
+/* -------------------------------------------- */
+/* METAFIELDS                                   */
+/* -------------------------------------------- */
+
 /**
  * The request body for Shopify metafields
  */
@@ -103,20 +126,24 @@ export interface IMetafield {
 
 }
 
-/**
- * Shopify theme asset paths, we use this to when re-pathing
- * custom directories.
- */
-export type GetAsset = (
-  `templates/${string}${'.liquid' | '.json'}` |
-  `templates/customer/${string}${'.liquid' | '.json'}` |
-  `assets/${string}` |
-  `sections/${string}${'.liquid'}` |
-  `snippets/${string}${'.liquid'}` |
-  `layout/${string}${'.liquid'}` |
-  `locales/${string}${'.json'}` |
-  `config/settings_${'data' | 'schema'}${'.json'}`
-)
+/* -------------------------------------------- */
+/* REDIRECTS                                    */
+/* -------------------------------------------- */
+
+export interface IRedirect {
+  /**
+   * Redirect ID
+   */
+  id: number;
+  /**
+   * The redirect from path
+   */
+  path: string;
+  /**
+   * The redirect to path
+   */
+  target: string;
+}
 
 /**
  * Extended request options passed to axios when
@@ -127,7 +154,7 @@ export interface IRequest extends AxiosRequestConfig {
   url?: string;
   method: 'get' | 'post' | 'put' | 'delete';
   responseType?: 'json',
-  data?: { asset: IAsset } | { metafield: IMetafield };
+  data?: { asset: IAsset } | { metafield: IMetafield } | { redirect: IRedirect }
   params?: {
     'asset[key]'?: string;
     fields?: string

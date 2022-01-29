@@ -1,25 +1,45 @@
+/* eslint-disable no-unused-vars */
+
+import { ParsedPath } from 'path';
+
 /**
  * File context generated when passed to a sync
  * resource and used to dispatch to correct transform
  * process.
  */
-export interface IFile {
+interface IFile extends ParsedPath {
   /**
-   * Whether or not the change is a metafield
+   * Index references to additional configurations
    */
-  metafield: boolean;
+  idx: number
+  /**
+   * The file type that was intercepted
+   */
+  type: number;
   /**
    * The filename extension
    */
   ext: string;
   /**
-   * The filename
+   * The filename with extension
    */
   base: string;
   /**
    * The resolved file path
    */
+  root: string;
+  /**
+   * The chokidar passed path
+   */
   path: string;
+  /**
+   * The output directory
+   */
+  output: string;
+  /**
+   * The filename
+   */
+  name: string;
   /**
    * When `metafield` is `true` this value will be the
    * parent directory name of the changed file, else this

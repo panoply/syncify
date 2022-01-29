@@ -1,5 +1,8 @@
 import { AcceptedPlugin } from 'postcss';
 import { OptimizeOptions } from 'svgo';
+import { Sync, Assets, Console } from './cli';
+import { Tester } from 'anymatch';
+import { Options } from 'html-minifier-terser';
 
 /* -------------------------------------------- */
 /* THEMES                                       */
@@ -66,6 +69,15 @@ export interface IJson {
 /* VIEW FILES                                   */
 /* -------------------------------------------- */
 
+export interface ITerser extends Options {
+  minifyJS?: boolean;
+  minifyCSS?: boolean;
+  removeComments?: boolean;
+  collapseWhitespace?: boolean;
+  trimCustomFragments?: boolean;
+  ignoreCustomFragments?: RegExp[];
+}
+
 export interface IViews {
   /**
    * Section specific view handling options
@@ -99,14 +111,7 @@ export interface IViews {
     /**
      * HTML minification options to be passed to terser
      */
-    terser: {
-      minifyJS?: boolean;
-      minifyCSS?: boolean;
-      removeComments?: boolean;
-      collapseWhitespace?: boolean;
-      trimCustomFragments?: boolean;
-      ignoreCustomFragments?: string[];
-    }
+    terser: ITerser;
     /**
      * Liquid specific minification options
      */
@@ -135,6 +140,11 @@ export interface IStyles {
     plugins?: AcceptedPlugin[];
   }
   /**
+   * Path to node_modules directory relative to current working directory.
+   * This is used to re-write `~` dashed paths.
+   */
+  node_modules: string;
+  /**
    * List of stylesheet files to process.
    */
   compile: Array<{
@@ -143,9 +153,9 @@ export interface IStyles {
      */
     input: string;
     /**
-     * The stylesheet
+     * Output Path
      */
-    rename: string;
+    output: string;
     /**
      * Optionally write the stylesheet inline
      * as a snippet, this will transform the
@@ -157,7 +167,7 @@ export interface IStyles {
      * Stylesheet paths to watch, when changes
      * are applied files will be processed.
      */
-    watch: string[];
+    watch: Tester;
     /**
      * A list of paths to include, ie: node_modules.
      */
@@ -247,6 +257,10 @@ export interface IIcons {
 }
 
 /* -------------------------------------------- */
+/* FILE CONFIG                                  */
+/* -------------------------------------------- */
+
+/* -------------------------------------------- */
 /* CONSTRUCTED CONFIGURATION                    */
 /* -------------------------------------------- */
 
@@ -259,6 +273,14 @@ export interface IConfig {
    * The mode from which Syncify was intialized.
    */
   mode: 'cli' | 'api';
+  /**
+   * The CLI console instances
+   */
+  cli: {
+    sync: Sync,
+    assets: Assets,
+    console: Console
+  }
   /**
    * The mode from which Syncify was intialized.
    */
@@ -274,25 +296,45 @@ export interface IConfig {
   /**
    * The list of spawned child proccesses running
    */
-  spawns: string[];
+  spawns: { [name: string]: string };
+  /**
+   * List of paths to watch or build from
+   */
+  watch: string[];
+  /**
+   * The resolved `.cache/syncify` directory path. This directory
+   * is written into `node_modules` and files contained
+   * within are JSON reference files used for various operations.
+   */
+  cache: string;
   /**
    * The resolved `input` directory path
+   *
+   * @default 'source'
    */
-  input: string;
+  source: string;
   /**
    * The resolved `output` directory path
+   *
+   * @default 'theme'
    */
   output: string;
   /**
    * The resolved `import` (downloads) directory path
+   *
+   * @default 'import'
    */
   import: string;
   /**
    * The resolved `export` (packaged .zip) directory path
+   *
+   * @default 'export'
    */
   export: string;
   /**
    * The resolved `config` directory path for build tool files
+   *
+   * @default '.' // defaults to root directory
    */
   config: string;
   /**
@@ -302,31 +344,41 @@ export interface IConfig {
     /**
      * An array list of files to be uploaded as assets
      */
-    assets: string[];
+    assets: Tester;
     /**
      * An array list of files to be uploaded as snippets
      */
-    snippets: string[];
+    snippets: Tester;
     /**
      * An array list of files to be uploaded as sections
      */
-    sections: string[];
+    sections: Tester;
+    /**
+     * An array list of files to be uploaded as layouts
+     */
+    layout: Tester;
     /**
      * An array list of files to be uploaded as templates
      */
-    templates: string[];
+    templates: Tester;
     /**
      * An array list of files to be uploads as template/customers
      */
-    customers: string[];
+    customers: Tester;
     /**
      * An array list of files to be uploaded as configs
      */
-    config: string[];
+    config: Tester;
     /**
      * An array list of files to be uploaded as locales
      */
-    locales: string[];
+    locales: Tester;
+    /**
+     * The resolved `metafields` directory path
+     *
+     * @default 'source/metafields'
+     */
+    metafields: Tester;
   };
   /**
    * The build configuration
@@ -347,13 +399,35 @@ export interface IConfig {
     /**
      * JSON file transformation options
      */
-    json: IViews
+    json: IJson
   };
   /**
    * The sync data model. Multiple stores and themes
    * can run concurrently.
    */
   sync: {
+    /**
+     * Redirect Sync
+     */
+    redirects: {
+
+      [store: IStore['domain']]: {
+        /**
+         * The redirect id, this is optional and applied
+         * only when redirect exists.
+         */
+        id?: number;
+        /**
+         * The redirect pathname
+         */
+        path: string;
+        /**
+         * The redirect target path
+         */
+        target: string;
+      }
+    };
+
     /**
      * Theme synchronization options
      */

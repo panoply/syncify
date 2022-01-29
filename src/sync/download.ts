@@ -3,7 +3,7 @@ import any from 'anymatch';
 import { readFile } from 'fs-extra';
 import { client, queue } from '../requests/client';
 import { ignore } from '../config/utils';
-import * as log from '../logs/console';
+import * as log from '../cli/console';
 import { IConfig, Callback } from '../typings';
 import { has, mapFastAsync } from 'rambdax';
 import { parseFile, setMetafield, setAsset } from '../config/file';

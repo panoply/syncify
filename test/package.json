@@ -40,7 +40,8 @@
       "source": "theme",
       "import": "import",
       "export": "export",
-      "config": "config"
+      "config": "config",
+      "metafields": "metafields"
     },
     "paths": {
       "assets": [

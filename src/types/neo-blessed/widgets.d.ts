@@ -54,15 +54,31 @@ declare module 'neo-blessed' {
 
   export interface ITabState {
     [prop: string]: {
-      tabs: Widgets.ButtonElement;
-      panes: Widgets.Log;
+      tab: Widgets.ButtonElement;
+      pane: Widgets.Log;
+      count: number;
+    }
+  }
+
+  export interface ITabSpawn {
+    running: boolean;
+    command: string;
+    process: ChildProcessWithoutNullStreams
+  }
+
+  export interface ITabStates {
+    [prop: string]: {
+      tab: Widgets.ButtonElement;
+      pane: Widgets.Log;
+      count: number;
+      spawn: ITabSpawn;
     }
   }
 
   export interface ITabSpawnState {
     [prop: string]: {
-      tabs: Widgets.ButtonElement;
-      panes: Widgets.Log;
+      tab: Widgets.ButtonElement;
+      pane: Widgets.Log;
       process: ChildProcessWithoutNullStreams
     }
   }

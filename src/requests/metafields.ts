@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { delay, has } from 'rambdax';
 import Queue from 'p-queue';
-import { IMetafield, IStores } from '../typings';
+import { IMetafield, IStore } from 'types';
 import { is } from '../config/utils';
-import * as log from '../logs/console';
-import { error } from '../logs/errors';
+import * as log from '../cli/console';
+import { error } from '../cli/errors';
 
 /**
  * Wait Condition
@@ -30,7 +30,7 @@ export const queue = new Queue(
   }
 );
 
-export async function list (store: IStores) {
+export async function list (store: IStore) {
 
   if (wait) {
     await delay(500);
@@ -59,7 +59,7 @@ export async function list (store: IStores) {
 
 }
 
-export async function get (store: IStores, metafield: IMetafield) {
+export async function get (store: IStore, metafield: IMetafield) {
 
   if (wait) {
     await delay(500);
@@ -115,7 +115,7 @@ export async function create (url: string, metafield: IMetafield) {
   return axios.post(url, { metafield }).then(({ status }) => {
 
     if (is(status, 200)) {
-      log.creation(`${metafield.namespace}.${metafield.key} metafield`);
+      log.created(`${metafield.namespace}.${metafield.key} metafield`);
     }
 
   }).catch(e => {
@@ -150,7 +150,7 @@ export async function update (url: string, metafield: IMetafield) {
   }).then(({ status }) => {
 
     if (is(status, 200)) {
-      log.creation(`${metafield.namespace}.${metafield.key} metafield`);
+      log.created(`${metafield.namespace}.${metafield.key} metafield`);
     }
 
   }).catch(e => {
@@ -169,7 +169,7 @@ export async function update (url: string, metafield: IMetafield) {
   });
 }
 
-export async function write (store: IStores, metafield: IMetafield) {
+export async function write (store: IStore, metafield: IMetafield) {
 
   const url = store.endpoints.metafields;
 

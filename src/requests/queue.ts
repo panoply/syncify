@@ -3,8 +3,8 @@ import axios from 'axios';
 import { mapFastAsync, delay } from 'rambdax';
 import { IRequest, IThemes, IStore } from 'types';
 import { is, getAssetKey } from 'config/utils';
-import * as log from 'logs/console';
-import { error } from 'logs/errors';
+import * as log from 'cli/console';
+import { error } from 'cli/errors';
 
 /* -------------------------------------------- */
 /* EXPORTED                                     */
@@ -87,13 +87,13 @@ async function request (sync: IThemes | IStore, config: IRequest) {
 
       switch (config.method) {
         case 'delete':
-          log.deletion(file);
+          log.deleted(file);
           break;
         case 'put':
-          log.uploaded(file);
+          log.updated(file);
           break;
         case 'post':
-          log.creation(file);
+          log.created(file);
           break;
       }
 

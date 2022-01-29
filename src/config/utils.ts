@@ -1,9 +1,43 @@
 import { white } from 'kleur';
 import { has } from 'rambdax';
 import { ICLIOptions, IRequest } from 'types';
+import importcwd from 'import-cwd';
 
-export const { assign, is, defineProperty, keys, values, create } = Object;
+export const {
+  assign,
+  is,
+  defineProperty,
+  defineProperties,
+  keys,
+  values,
+  create
+} = Object;
 export const { isArray, from } = Array;
+export const redirects = /^(\/[\w-]+)\s*:\s*((?:https?:\/\/(?:w{3})?)?\/?[/\w_.-]*)$/gm;
+
+export function env (value: 'prod' | 'dev') {
+
+  return process.env.SYNCIFY_ENV === value;
+}
+
+export function lastPath (path: string) {
+
+  return path.match(/[^/]+(?:\/$|$)/)[0];
+}
+
+/**
+ * Load module
+ */
+export function loadModule (moduleId: string) {
+
+  try {
+    return require(moduleId);
+  } catch {
+    // Ignore error
+  }
+
+  return importcwd.silent(moduleId);
+}
 
 /**
  * Get the asset key reference (used for logs)

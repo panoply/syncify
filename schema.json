@@ -12,32 +12,42 @@
         "dirs": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Configure the build paths Syncify should use. The options defined here will be used in watch, upload and download modes.",
+          "description": "Configure the build paths Syncify should use. The options defined here will be used in watch, build, upload and download modes. You cannot define reverse paths and defined must be relative to root directory.",
           "properties": {
-            "input": {
+            "source": {
               "type": "string",
               "default": "source",
+              "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
               "description": "The source build path is the directory where theme files exist. This is typically called \"src\" but Syncify defaults this to \"source\". The value defined here will be prepended to any path you define in the configuration"
             },
             "output": {
               "type": "string",
               "default": "theme",
+              "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
               "description": "The output build path is directory where transformed theme files will be written. This is typically called \"dist\" but Syncify defaults this to \"theme\". This directory will be reflective of the theme files synced with your store."
             },
             "import": {
               "type": "string",
               "default": "import",
+              "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
               "description": "The import build path is the directory where downloaded themes and/or theme files will be written. It is relative to your projects root directory."
             },
             "export": {
               "type": "string",
               "default": "import",
+              "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
               "description": "The export path is where packaged (.zip) themes will be written when running the \"package\" resource. Packaged themes will be prepended with the version number defined in your \"package.json\" file."
             },
             "config": {
               "type": "string",
               "default": "config",
+              "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
               "description": "Syncify will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. You can optionally place these config files in a subdirectory. Use this option to inform Syncify where configuration files are located within the workspace.\n\nTypically this is named \"scripts\" in node projects."
+            },
+            "metafields": {
+              "description": "Paths to global shop metafields. You must link to directory paths only. Glob file patterns are not accepted.",
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$"
             }
           }
         },
@@ -45,12 +55,13 @@
           "type": "object",
           "title": "Paths",
           "additionalProperties": false,
-          "description": "Customize the development theme structure. You can map paths to different locations within your workspace and Syncify will re-route them upon upload to their correct locations.",
+          "description": "Customize the development theme structure. You can map paths to different locations within your workspace and Syncify will re-route them upon upload to their correct locations. You cannot define reverse paths and defined must be relative to root directory.",
           "properties": {
             "assets": {
               "description": "Paths to files to be published to theme `/assets` directory. Accepts a glob pattern",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
@@ -58,6 +69,7 @@
               "description": "Glob path to files to be published to theme `/config` directory. These are typically the `settings_schema.json` and `settings_data.json` files.",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
@@ -65,6 +77,7 @@
               "description": "Glob path to files to be published to theme `/locales` directory. These are the translation files.",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
@@ -72,6 +85,7 @@
               "description": "Glob path to files to be published to theme `/layout` directory. These are Liquid template files.",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
@@ -79,6 +93,7 @@
               "description": "Glob path to files to be published to theme `/snippets` directory. These are Liquid template files.",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
@@ -86,6 +101,7 @@
               "description": "Glob path to files to be published to theme `/sections` directory. These are Liquid template files. You can provide sub-directory references.",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
@@ -93,6 +109,7 @@
               "description": "Glob path to files to be published to theme `/templates` directory. These can be either JSON or Liquid template files.",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
@@ -100,10 +117,26 @@
               "description": "Glob path to files to be published to theme `/templates/customers` directory. These can be either JSON or Liquid template files.",
               "type": "array",
               "items": {
+                "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             }
           }
+        },
+        "terminal": {
+          "type": "string",
+          "default": "dashboard",
+          "description": "The type of terminal interface Syncify should use. By default, \"dashboard\" is loaded. When your terminal size is small then Syncify will load \"rolling\" mode.",
+          "oneOf": [
+            {
+              "enum": ["dashboard"],
+              "description": "Multiple pane blessed powered terminal interface."
+            },
+            {
+              "enum": ["rolling"],
+              "description": "Standard rolling terminal log"
+            }
+          ]
         },
         "stores": {
           "type": "array",
@@ -116,7 +149,8 @@
             "properties": {
               "domain": {
                 "description": "Do not include the \"myshopify.com\" portion of the domain",
-                "type": "string"
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]+$"
               },
               "themes": {
                 "description": "An object list of theme maps where the key properties represent a theme target names and their values the theme id.",
@@ -127,7 +161,7 @@
                 ],
                 "type": "object",
                 "propertyNames": {
-                  "pattern": "[a-z0-9_$-]{1,15}",
+                  "pattern": "^[a-z0-9_$-]{1,15}$",
                   "description": "Property keys will be used as target references by the CLI. The theme target name cannot contain spaces and cannot exceed 15 characters"
                 }
               }

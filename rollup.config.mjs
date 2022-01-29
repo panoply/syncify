@@ -16,10 +16,18 @@ export default rollup(
       'neo-blessed',
       'node-notifier',
       'node-sass',
+      'sass',
+      'pify',
+      'terminal-kit',
       'svg-sprite',
       'svgo',
       'postcss',
-      'kleur'
+      'sass-embedded',
+      'yamljs',
+      'html-minifier-terser',
+      'kleur',
+      'ansis',
+      'cli-size'
     ],
     output: [
       {
@@ -30,6 +38,7 @@ export default rollup(
         esModule: true,
         exports: 'named',
         chunkFileNames: '[name].js',
+
         plugins: env.is('prod', [
           plugin.esminify(),
           plugin.filesize(

@@ -52,34 +52,43 @@
     "dev": "rollup -c -w",
     "build": "rollup -c --environment prod",
     "syncify": "./bin/sync",
-    "types": "tsc --noEmit --emitDeclarationOnly false"
+    "types": "tsc --noEmit --emitDeclarationOnly false",
+    "test": "ava ./test/transform/minify.js --watch"
   },
   "dependencies": {
+    "ansis": "^1.3.2",
+    "anymatch": "^3.1.2",
     "axios": "^0.24.0",
     "chokidar": "^3.5.2",
     "dotenv": "^10.0.0",
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
+    "html-minifier-terser": "^7.0.0-alpha.1",
+    "import-cwd": "^3.0.0",
     "kleur": "^4.1.4",
-    "micromatch": "^4.0.4",
     "minimist": "^1.2.5",
     "neo-blessed": "^0.2.0",
-    "node-notifier": "^10.0.0",
+    "node-sass": "^7.0.1",
+    "node-sass-package-importer": "^5.3.2",
     "p-queue": "^7.1.0",
+    "pify": "^5.0.0",
     "prompts": "^2.4.2",
-    "rambdax": "^8.0.0"
+    "rambdax": "^8.0.0",
+    "sass": "^1.49.0",
+    "sass-embedded": "^1.0.0-rc.1",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@brixtol/eslint-config": "^1.2.1",
     "@brixtol/prettier-config": "^1.2.1",
-    "@brixtol/rollup-config": "^1.5.0",
+    "@brixtol/rollup-config": "^1.5.1",
     "@types/blessed": "^0.1.19",
+    "ava": "^4.0.1",
     "esbuild": "^0.14.11",
     "eslint": "^8.7.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-promise": "^6.0.0",
-    "node-sass": "^7.0.1",
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
     "rollup": "^2.64.0",
@@ -89,7 +98,6 @@
     "typescript": "^4.5.4"
   },
   "peerDependencies": {
-    "node-sass": "^7.0.1",
     "postcss": "^8.4.5",
     "svg-sprite": "^1.5.3",
     "svgo": "^2.8.0"

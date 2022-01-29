@@ -81,6 +81,7 @@ export function string (text: string) {
 export function pretty (message: string[] | string) {
 
   if (Array.isArray(message)) return message.map(pretty).join('\n');
+  if (!message) return message;
 
   return message
     .replace(RegExpLineNo, white('$1') + grey('$2') + '\n\n')

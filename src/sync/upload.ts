@@ -2,12 +2,13 @@ import glob from 'glob';
 import { readFile } from 'fs-extra';
 import { basename } from 'path';
 import { client, queue } from '../requests/client';
+
 // import { ignore } from '../config/utils';
 // import * as log from '../logs/console';
 // import * as screen from '../logs/screen';
 import { IConfig, Syncify } from 'types';
 import { mapFastAsync } from 'rambdax';
-import { parseFile, setMetafield, setAsset } from '../config/file';
+import { parseFile } from '../config/file';
 
 export async function upload (
   config: IConfig,
@@ -20,8 +21,9 @@ export async function upload (
 
   // const filter = settings?._?.[0] ? dirMatch : null;
 
-  const files = glob.sync(`${config.output}/**/*`, { nodir: true });
+  const files = glob.sync(`${config.output}/**`, { nodir: true });
   const request = client(config, files.length * config.sync.themes.length);
+  const parse = parseFile(config);
 
   // When using the CLI and passing in filter
   // if (filter) files = files.filter(file => filter.test(file));
@@ -32,9 +34,8 @@ export async function upload (
 
   await mapFastAsync(async (path: string) => {
 
-    const file = parseFile(config.output, path.split('/').slice(-2).join('/'));
+    const file = parse(path);
 
-    console.log(file);
     // if (has('ignore', settings)) {
     //  if (settings.ignore.length > 0) {
     //   if (any(settings.ignore, file.key)) return log.ignoring(file.key);

@@ -7,16 +7,18 @@ export interface IOptions {
   }>
   terminal?: 'dashboard' | 'minimal' | 'default'
   dirs?: {
-    input?: string;
+    source?: string;
     output?: string;
     import?: string;
     export?: string;
     config?: string;
+    metafields?: string;
   };
   paths?: {
-    assets?: string[],
+    assets?: string[];
     snippets?: string[];
     sections?: string[];
+    layout?: string[];
     templates?: string[];
     customers?: string[];
     config?: string[];
@@ -29,6 +31,10 @@ export interface IOptions {
     upload?: {
       [label: string]: string;
     }
+  };
+  redirects?: {
+    populate?: boolean;
+    cache?: boolean;
   };
   transform?: {
     styles?: Array<{

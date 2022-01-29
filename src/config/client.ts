@@ -4,7 +4,7 @@ import { upload } from 'sync/upload';
 import { watch } from 'sync/watch';
 import { readConfig } from 'config/config';
 import { help } from 'cli/help';
-import * as log from 'logs/console';
+import * as log from 'cli/console';
 import * as cli from 'cli/prompts';
 
 /**

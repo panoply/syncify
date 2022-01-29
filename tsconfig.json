@@ -13,7 +13,7 @@
     "target": "ES6",
     "removeComments": true,
     "lib": ["es2020"],
-    "module": "Node12",
+    "module": "ES6",
     "alwaysStrict": true,
     "allowUmdGlobalAccess": true,
     "experimentalDecorators": true,

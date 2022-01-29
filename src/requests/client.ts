@@ -21,6 +21,9 @@ export function client ({
     },
     assets: {
       queue: queue(themes, size)
+    },
+    redirects: {
+      queue: queue(stores)
     }
   };
 

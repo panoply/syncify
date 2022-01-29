@@ -1,14 +1,4 @@
-import * as log from 'logs/console';
-// import { NotificationCenter } from 'node-notifier';
-import { join } from 'path';
-
-/**
- * Node Notifier
- *
- * Posts toast notifications when errors
- * have occurred.
- */
-// const notifier = new NotificationCenter();
+import * as log from 'cli/console';
 
 /**
  * Error Handler
@@ -46,7 +36,7 @@ export function error (file: string, e: {
         {
           file,
           message: '404 ' + e.statusText,
-          data: 'The requested resource was not found but could be available again in the future.'
+          data: 'The requested resource was not found.'
         }
       );
       break;
@@ -144,16 +134,5 @@ export function error (file: string, e: {
       }
     );
   }
-
-  /* notifier.notify(
-    {
-      title: 'Syncify' + ' Error',
-      subtitle: e.statusText,
-      message: file,
-      contentImage: join(__dirname, 'icon.png'),
-      wait: false,
-      timeout: 5000
-    }
-  ); */
 
 }
