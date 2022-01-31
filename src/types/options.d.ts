@@ -91,3 +91,10 @@ export interface IOptions {
 
   }
 }
+
+export interface IPackage {
+  syncify?: IOptions;
+  dependencies?: { [module: string]: string; };
+  devDependencies?: { [module: string]: string };
+  peerDependencies?: { [module: string]: string };
+}

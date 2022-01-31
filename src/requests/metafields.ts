@@ -3,7 +3,7 @@ import { delay, has } from 'rambdax';
 import Queue from 'p-queue';
 import { IMetafield, IStore } from 'types';
 import { is } from '../config/utils';
-import * as log from '../cli/console';
+import * as log from '../cli/logs';
 import { error } from '../cli/errors';
 
 /**
@@ -138,8 +138,6 @@ export async function create (url: string, metafield: IMetafield) {
 
 export async function update (url: string, metafield: IMetafield) {
 
-  console.log(url, metafield);
-
   if (wait) {
     await delay(500);
     wait = false;
@@ -185,6 +183,8 @@ export async function write (store: IStore, metafield: IMetafield) {
       namespace,
       key
     }) => (metafield.namespace === namespace && metafield.key === key));
+
+    console.log(record);
 
     if (!record) return create(url, metafield);
 

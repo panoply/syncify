@@ -2,7 +2,7 @@ import { minify } from 'html-minifier-terser';
 import { IFile, IViews, Syncify } from 'types';
 import { join } from 'path';
 import * as json from 'transform/json';
-import * as log from 'cli/console';
+import * as log from 'cli/logs';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
 import { is } from 'config/utils';

@@ -38,7 +38,8 @@
       "config/*": ["src/config/*"],
       "logs/*": ["src/logs/*"],
       "requests/*": ["src/requests/*"],
-      "transform/*": ["src/transform/*"]
+      "transform/*": ["src/transform/*"],
+      "utils/*": ["src/utils/*"]
     }
   }
 }

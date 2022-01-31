@@ -87,7 +87,8 @@ export default rollup(
             'logs',
             'requests',
             'sync',
-            'transform'
+            'transform',
+            'utils'
           ])
         }
       ),

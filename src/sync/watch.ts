@@ -1,6 +1,5 @@
 import chokidar from 'chokidar';
 import { IConfig, IFile, Syncify } from 'types';
-import { client } from 'requests/client';
 import { parseFile } from 'config/file';
 import { transforms, Events } from 'transform/transform';
 
@@ -11,7 +10,6 @@ import { transforms, Events } from 'transform/transform';
  */
 export async function watch (config: IConfig, callback: typeof Syncify.hook) {
 
-  const request = client(config);
   const watcher = chokidar.watch(config.watch, {
     persistent: true,
     ignoreInitial: true,
@@ -25,7 +23,7 @@ export async function watch (config: IConfig, callback: typeof Syncify.hook) {
   });
 
   const parse = parseFile(config.paths, config.output);
-  const transform = transforms(request, config, callback);
+  const transform = transforms(config, callback);
 
   watcher.on('all', (event, path) => {
 

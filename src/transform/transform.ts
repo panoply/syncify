@@ -1,15 +1,14 @@
 /* eslint-disable no-unused-vars */
 
-import { IConfig, IFile, Syncify } from 'types';
+import { IConfig, IFile, IStyle, Syncify } from 'types';
 import { client } from 'requests/client';
 import { Type, isStyle, isMetafield, isSection, asset } from 'config/file';
-import { join } from 'path';
 import * as metas from 'requests/metafields';
 import { compile as liquid } from 'transform/liquid';
 import { compile as styles } from 'transform/styles';
 import { compile as json } from 'transform/json';
 import { is } from 'config/utils';
-import { readFile, writeFile } from 'fs-extra';
+import { readFile } from 'fs-extra';
 
 export const enum Events {
   Update = 2,
@@ -21,11 +20,11 @@ export const enum Events {
  *
  * Sync in watch mode
  */
-export function transforms (req: ReturnType<typeof client>, opts: IConfig, cb: typeof Syncify.hook) {
+export function transforms (config: IConfig, cb: typeof Syncify.hook) {
+
+  const request = client(config);
 
   return async (event: Events, file: IFile) => {
-
-    let data: string | Buffer;
 
     if (is(event, Events.Update)) {
 
@@ -35,138 +34,156 @@ export function transforms (req: ReturnType<typeof client>, opts: IConfig, cb: t
 
       if (is(file.type, Type.Style)) {
 
-        const style = isStyle(file, opts.transform.styles);
-        const data = await readFile(style.path);
+        const style = isStyle(file as IFile<IStyle>, config.transform.styles);
+        const data = await readFile(style.config.input);
 
-        return styles(style, data.toString(), opts.transform.styles, req.assets);
+        return styles(style, data.toString(), request.assets);
 
-        /* -------------------------------------------- */
-        /* METAFIELDS                                   */
-        /* -------------------------------------------- */
+      }
 
-      } else if (is(file.type, Type.Metafield)) {
+      /* -------------------------------------------- */
+      /* METAFIELDS                                   */
+      /* -------------------------------------------- */
+
+      if (is(file.type, Type.Metafield)) {
 
         if (metas.queue.isPaused) metas.queue.start();
 
-        file = isMetafield(file);
-        data = await json(file, opts.transform.json, cb);
+        const metafield = isMetafield(file);
+        const data = await json(metafield, config.transform.json, cb);
 
-        return req.metafields.queue(
+        return request.metafields.queue(
           {
-            method: 'put',
-            data: {
-              metafield: {
-                namespace: file.namespace,
-                key: file.key,
-                value: data
-              }
-            }
+            namespace: file.namespace,
+            key: file.key,
+            value: data
           }
         );
 
-        /* -------------------------------------------- */
-        /* SECTIONS                                     */
-        /* -------------------------------------------- */
+      }
 
-      } else if (is(file.type, Type.Section)) {
+      /* -------------------------------------------- */
+      /* SECTIONS                                     */
+      /* -------------------------------------------- */
 
-        file = isSection(file, opts.transform.views.sections);
-        data = await liquid(file, opts.transform.views.minify, cb);
+      if (is(file.type, Type.Section)) {
 
-        return req.assets.queue(
-          {
-            method: 'put',
-            data: {
-              asset: {
-                key: file.key,
-                attachment: asset(file, data, cb)
-              }
-            }
-          }
-        );
+        const section = isSection(file, config.transform.views.sections);
+        const attachment = await liquid(section, config.transform.views.minify, cb);
 
-        /* -------------------------------------------- */
-        /* LAYOUTS AND SNIPPETS                         */
-        /* -------------------------------------------- */
-
-      } else if (is(file.type, Type.Layout) || is(file.type, Type.Snippet)) {
-
-        const data = await liquid(file, opts.transform.views.minify, cb);
-
-        req.assets.queue(
+        return request.assets.queue(
           {
             method: 'put',
             data: {
               asset: {
                 key: file.key,
-                attachment: asset(file, data, cb)
+                attachment
               }
             }
           }
         );
 
-        /* -------------------------------------------- */
-        /* CONFIG AND LOCALES                           */
-        /* -------------------------------------------- */
+      }
 
-      } else if (is(file.type, Type.Config) || is(file.type, Type.Locale)) {
+      /* -------------------------------------------- */
+      /* LAYOUTS AND SNIPPETS                         */
+      /* -------------------------------------------- */
 
-        data = await json(file, opts.transform.json, cb);
+      if (is(file.type, Type.Layout) || is(file.type, Type.Snippet)) {
 
-        req.assets.queue(
+        const attachment = await liquid(file, config.transform.views.minify, cb);
+
+        return request.assets.queue(
           {
             method: 'put',
             data: {
               asset: {
                 key: file.key,
-                attachment: asset(file, data, cb)
+                attachment
               }
             }
           }
         );
 
-        /* -------------------------------------------- */
-        /* TEMPLATES                                    */
-        /* -------------------------------------------- */
+      }
 
-      } else if (is(file.type, Type.Template)) {
+      /* -------------------------------------------- */
+      /* CONFIG AND LOCALES                           */
+      /* -------------------------------------------- */
 
-        data = file.ext === '.json'
-          ? await json(file, opts.transform.json, cb)
-          : await liquid(file, opts.transform.views.minify, cb);
+      if (is(file.type, Type.Config) || is(file.type, Type.Locale)) {
 
-        req.assets.queue(
+        const attachment = await json(file, config.transform.json, cb);
+
+        return request.assets.queue(
           {
             method: 'put',
             data: {
               asset: {
                 key: file.key,
-                attachment: asset(file, data, cb)
+                attachment
               }
             }
           }
         );
 
-      } else if (is(file.type, Type.Asset)) {
+      }
+
+      /* -------------------------------------------- */
+      /* TEMPLATES                                    */
+      /* -------------------------------------------- */
+
+      if (is(file.type, Type.Template)) {
+
+        const attachment = file.ext === '.json'
+          ? await json(file, config.transform.json, cb)
+          : await liquid(file, config.transform.views.minify, cb);
+
+        return request.assets.queue(
+          {
+            method: 'put',
+            data: {
+              asset: {
+                key: file.key,
+                attachment
+              }
+            }
+          }
+        );
+
+      }
+
+      /* -------------------------------------------- */
+      /* ASSETS                                       */
+      /* -------------------------------------------- */
+
+      if (is(file.type, Type.Asset)) {
 
         const data = await readFile(file.path);
+        const attachment = asset(file, data, cb);
 
-        req.assets.queue(
+        return request.assets.queue(
           {
             method: 'put',
             data: {
               asset: {
                 key: file.key,
-                attachment: asset(file, data, cb)
+                attachment
               }
             }
           }
         );
       }
 
-    } else if (is(event, Events.Delete)) {
+    }
 
-      req.assets.queue(
+    /* -------------------------------------------- */
+    /* DELETED FILE                                 */
+    /* -------------------------------------------- */
+
+    if (is(event, Events.Delete)) {
+
+      return request.assets.queue(
         {
           method: 'delete',
           params: {

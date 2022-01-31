@@ -1,17 +1,16 @@
 /* eslint-disable new-cap */
 import { resolve, join, basename } from 'path';
 import { PartialDeep } from 'type-fest';
-import postcss from 'postcss';
-import YAML from 'yamljs';
-import { readJson, pathExistsSync, pathExists, mkdir, createFile, readFile } from 'fs-extra';
+// import YAML from 'yamljs';
+import { readJson, pathExistsSync, pathExists, mkdir } from 'fs-extra';
 import dotenv from 'dotenv';
-import { has, hasPath, isType, mapFastAsync } from 'rambdax';
-import anymatch, { Tester } from 'anymatch';
-import { IOptions, ICLIOptions, IConfig, IStyles, IViews, IIcons, IJson, IStore } from 'types';
-import { assign, isArray, toUpcase, keys } from 'config/utils';
-import * as redirects from 'requests/redirects';
-import { log, screen, bless, create, nodes, terminal } from 'cli/blessed';
-import { PartialObjectDeep } from 'type-fest/source/partial-deep';
+import { has, hasPath, isNil } from 'rambdax';
+import anymatch from 'anymatch';
+import { assign, is, isArray, isUndefined, keys } from 'utils/native';
+import { normalPath, toUpcase } from 'utils/helpers';
+import { IOptions, ICLIOptions, IConfig, IStyles, IIcons, IPackage } from 'types';
+import { log, create } from 'cli/console';
+import * as style from 'transform/styles';
 
 /**
  * Read Configuration
@@ -21,22 +20,11 @@ import { PartialObjectDeep } from 'type-fest/source/partial-deep';
  * file and the `.env` file, returning the
  * credentials of store connection data.
  */
-export async function readConfig (options: ICLIOptions): Promise<IConfig> {
+export async function readConfig (options: ICLIOptions) {
 
-  if (options.terminal === 'dashboard') bless(3);
+  if (!options.cli) return options as any as IConfig;
 
-  try {
-
-    if (!options.cli) return options as any as IConfig;
-
-    return command(options);
-
-  } catch (e) {
-
-    screen.destroy();
-    log.errors(e);
-
-  }
+  return command(options) as unknown as IConfig;
 
 }
 
@@ -48,10 +36,10 @@ export async function readConfig (options: ICLIOptions): Promise<IConfig> {
  */
 function command (options: ICLIOptions) {
 
-  if (options._.length === 0) {
+  if (is(options._.length, 0)) {
     options.resource = 'interactive';
     return getPackage(options);
-  } else if (options._.length === 1) {
+  } else if (is(options._.length, 1)) {
     options.resource = options._[0];
   } else if (options._.length > 1) {
     options.resource = options._[0];
@@ -66,13 +54,10 @@ function command (options: ICLIOptions) {
 
   if (options) {
     if (has('theme', options)) {
-
       options.theme = (options.theme as any).split(',');
-
       if (options.store.includes('store')) {
         throw new Error('Target name "store" is reserved, use a different name.');
       }
-
       if (options.store.includes('theme')) {
         throw new Error('Target name, "theme" is reserved, use a different name.');
       }
@@ -110,13 +95,11 @@ function getPackage (options: ICLIOptions) {
  */
 async function readPackage (options: ICLIOptions) {
 
-  const pkg: { syncify?: IOptions } = await readJson(options.pkg);
+  const pkg: IPackage = await readJson(options.pkg);
 
   if (hasPath('syncify.stores', pkg)) {
-
-    if (isType('Array', pkg.syncify.stores)) return storeConfig(options, pkg.syncify);
-
-    if (isType('Undefined', pkg.syncify.stores)) {
+    if (isArray(pkg.syncify.stores)) return defaults(options, pkg);
+    if (isUndefined(pkg.syncify.stores)) {
       throw new Error('Missing "stores" option in syncify settings');
     } else {
       throw new Error('The "stores" option must be of type array');
@@ -128,37 +111,38 @@ async function readPackage (options: ICLIOptions) {
 }
 
 /**
- * Normalize path
+ * Set Global Configuration
  *
- * Resolve CWD to a path definition. Returns a function type
- * who accepts a string. Paths will include the directory
- * `input` folder name.
+ * Applies node specific environment globals
+ * for the current syncify instance.
  */
-function normalize (input: string) {
+function setGlobals ({ env, mode, resource, spawns }: PartialDeep<IConfig>) {
 
-  const regex = new RegExp(`^\\.?\\/?${input}\\/`);
+  // env variables
+  process.env.SYNCIFY_ENV = env;
+  process.env.SYNCIFY_MODE = mode;
+  process.env.SYNCIFY_RESOURCE = resource;
 
-  return (path: string) => {
-
-    let ignore: boolean = false;
-
-    if (path.charCodeAt(0) === 33) {
-      ignore = true;
-      path = path.slice(1);
+  // blessed initializes
+  create(
+    {
+      group: 'Assets',
+      tabs: [
+        'throw',
+        'scripts',
+        'assets',
+        'files',
+        'metafields',
+        'redirects'
+      ],
+      spawns
     }
-
-    if (regex.test(path)) {
-      return ignore ? '!' + path : path;
-    }
-
-    if (path.charCodeAt(0) === 46 && path.charCodeAt(1) === 46 && path.charCodeAt(2) === 47) {
-      throw new Error('Invalid path at: ' + path + ' - Paths must be relative to source');
-    }
-
-    return (ignore ? '!' : '') + join(input, path);
-
-  };
+  );
 }
+
+/* -------------------------------------------- */
+/* DEFAULT CONFIGURATIONS                       */
+/* -------------------------------------------- */
 
 /**
  * Set Base defaults
@@ -167,153 +151,137 @@ function normalize (input: string) {
  * This resolve the directory paths, and attempt to correct them
  * if they are misconfigured.
  */
-async function defaults (cwd: string, options: IOptions) {
+async function defaults (cli: ICLIOptions, pkg: IPackage) {
 
-  const cache = join(cwd, 'node_modules/.cache');
-  const initial: PartialDeep<IConfig> = {
-    config: cwd,
-    cache: join(cwd, 'node_modules/.cache/syncify'),
+  const cache = join(cli.cwd, 'node_modules/.cache');
+  const apply = cli.env === 'prod';
+  const config: PartialDeep<IConfig> = {
+    cwd: cli.cwd,
+    env: cli.env ? 'dev' : 'prod',
+    mode: cli.cli ? 'cli' : 'api',
+    resource: cli.resource,
+    spawns: pkg.syncify.spawn[cli.resource],
+    cache: join(cache, 'syncify'),
+    node_modules: join(cli.cwd, 'node_modules'),
+    config: cli.cwd,
     source: 'source',
     export: 'export',
     import: 'import',
     output: 'theme',
     watch: [],
-    transform: {}
+    transform: {
+      icons: {
+        svgo: null,
+        snippets: null,
+        sprites: []
+      },
+      json: {
+        allowComments: false,
+        minify: {
+          apply,
+          exclude: null,
+          removeSchemaRefs: true
+        }
+      },
+      styles: {
+        postcss: null,
+        compile: []
+      },
+      views: {
+        sections: {
+          allowPrefix: false,
+          globals: null,
+          onlyPrefixDuplicates: false,
+          prefixSeparator: '-'
+        },
+        minify: {
+          apply,
+          exclude: [],
+          liquid: {
+            minifySectionSchema: true,
+            removeLiquidComments: true,
+            ignoredLiquidTags: []
+          },
+          terser: {
+            minifyJS: true,
+            minifyCSS: true,
+            removeComments: true,
+            collapseWhitespace: true,
+            trimCustomFragments: true,
+            ignoreCustomFragments: [
+              /({%|{{)-?[\s\S]*?-?(}}|%})/g
+            ]
+          }
+        }
+      }
+    },
+    sync: {
+      stores: [],
+      themes: []
+    },
+    paths: {
+      assets: null,
+      config: null,
+      layout: null,
+      customers: null,
+      locales: null,
+      sections: null,
+      snippets: null,
+      templates: null,
+      metafields: null
+    }
   };
+
+  setGlobals(config);
 
   if (!pathExistsSync(cache)) {
     try {
       await mkdir(cache);
     } catch (e) {
-      throw new Error('Failed to create a .cache file');
+      log.throw('Failed to create a ".cache" file.');
     }
   }
 
-  if (!pathExistsSync(initial.cache)) {
+  if (!pathExistsSync(config.cache)) {
     try {
-      await mkdir(initial.cache);
+      await mkdir(config.cache);
     } catch (e) {
-      throw new Error('Failed to create a .cache file');
+      log.throw('Failed to create a ".cache" file.');
     }
   }
 
-  if (!has('dirs', options)) return initial;
+  if (!has('dirs', pkg.syncify)) return getStores(config, cli, pkg);
 
-  for (const k in options.dirs) {
+  for (const dir in pkg.syncify.dirs) {
 
-    let path: string = options.dirs[k];
+    let path: string = pkg.syncify.dirs[dir];
 
     // path directory starts with . character
-    if (path.charCodeAt(0) === 46) {
+    if (is(path.charCodeAt(0), 46)) {
 
       // path directory next character is not forard slash
       // for example, ".folder" this will be invalid
-      if (path.charCodeAt(1) !== 47) {
-        throw new Error('Directory path is invalid at: ' + path);
-      } else {
+      if (is(path.charCodeAt(1), 47)) {
         path = path.slice(1);
+      } else {
+        log.throw('Directory path is invalid at: "' + path + '"');
       }
     }
 
     // path directory starts with / character
-    if (path.charCodeAt(0) === 47) path = path.slice(1);
+    if (is(path.charCodeAt(0), 47)) path = path.slice(1);
 
     // path directory is valid, eg: path
     // dirs cannot reference sub directorys, eg: path/sub
     if (/^[a-zA-Z0-9_-]+/.test(path)) {
-      initial[k] = options.dirs[k];
+      config[dir] = pkg.syncify.dirs[dir];
     } else {
-      throw new Error('Directory path is invalid at: ' + path);
+      log.throw('Directory path is invalid at: "' + path + '"');
     }
   }
 
-  return initial;
+  return getStores(config, cli, pkg);
 
-}
-
-/**
- * Get Paths
- *
- * Utility function for normalizing the paths configuration.
- * This will fix and resolve custom paths. If a user
- * defines the build directory input in directory paths
- * it will ensure it is formed correctly.
- */
-function getPaths (config: PartialObjectDeep<IConfig>, options: IOptions) {
-
-  const paths: IConfig['paths'] = {
-    assets: null,
-    config: null,
-    layout: null,
-    customers: null,
-    locales: null,
-    sections: null,
-    snippets: null,
-    templates: null,
-    metafields: null
-  };
-
-  const path = normalize(config.source);
-
-  for (const k in paths) {
-
-    let uri: any;
-
-    if (k === 'metafields') {
-
-      uri = [ join(path(options.dirs.metafields), '**/*.json') ];
-
-    } else if (has(k, options.paths)) {
-
-      uri = isArray(options.paths[k])
-        ? options.paths[k].map(path)
-        : [ path(options.paths[k]) ];
-
-    } else {
-
-      uri = [ k === 'customers' ? path('templates/' + k) : path(k) ];
-
-    }
-
-    if (k === 'assets') {
-
-      if (isArray(uri)) {
-        uri.push(join(config.output, 'assets/*'));
-      } else {
-        uri = [ uri, join(config.output, 'assets/*') ];
-      }
-    }
-
-    config.watch.push(...uri);
-
-    paths[k] = anymatch(uri);
-
-  }
-
-  return paths;
-
-}
-
-/**
- * Store Authorization URL
- *
- * Generate the the authorization URL to
- * be used for requests.
- */
-function getURL (domain: string, env: object): false | string {
-
-  const api_key = `${domain}_api_key`;
-  const password = `${domain}_password`;
-
-  if (has(api_key, env) || has(api_key.toUpperCase(), env)) {
-    if (has(password, env) || has(password.toUpperCase(), env)) {
-      return `https://${env[api_key]}:${env[password]}@${domain}.myshopify.com`;
-    } else {
-      throw new Error(`Missing "${password}" credential for store "${domain}"`);
-    }
-  } else {
-    throw new Error(`Missing "${api_key}" credential for store "${domain}"`);
-  }
 }
 
 /**
@@ -323,19 +291,15 @@ function getURL (domain: string, env: object): false | string {
  * file and the `.env` file locations relative to the current
  * working directory.
  */
-function getStores (cli: ICLIOptions, options: IOptions) {
+function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
 
-  const file = dotenv.config();
-  const state: IConfig['sync'] = {
-    stores: [],
-    themes: [],
-    redirects: []
-  };
+  const file = dotenv.config({ path: join(config.cwd, '.env') });
+  const { syncify } = pkg;
 
-  for (const v of options.stores) {
+  for (const field of syncify.stores) {
 
     // Upcase the store name for logs, eg: sissel > Sissel
-    const store = toUpcase(v.domain);
+    const store = toUpcase(field.domain);
 
     // The myshopify store domain
     const domain = `${store}.myshopify.com`.toLowerCase();
@@ -344,13 +308,13 @@ function getStores (cli: ICLIOptions, options: IOptions) {
     const env = file.error ? process.env : file.parsed;
 
     // Get authorization url for the store
-    const base = getURL(v.domain, env);
+    const base = getURL(field.domain, env);
 
     // Whether or not to queue this request
     const queue = cli.resource !== 'interactive';
 
     // Set store endpoints
-    state.stores.push(
+    config.sync.stores.push(
       {
         store,
         domain,
@@ -365,42 +329,78 @@ function getStores (cli: ICLIOptions, options: IOptions) {
     );
 
     if (queue) {
-      if (!cli.store.includes(v.domain)) {
-        throw new Error(`Unknown store "${v.domain}" domain was provided`);
+      if (!cli.store.includes(field.domain)) {
+        log.throw(`Unknown store "${field.domain}" domain was provided`);
       }
     }
 
-    const themes = has('theme', options)
+    const themes = has('theme', syncify)
       ? cli.theme
-      : has(v.domain, options)
-        ? options[v.domain].split(',')
-        : keys(v.themes);
+      : has(field.domain, syncify)
+        ? syncify[field.domain].split(',')
+        : keys(field.themes);
 
     for (const target of themes) {
 
-      if (!has(target, v.themes)) {
-        throw new Error(`Missing theme target "${target}" in ${v.domain} store.`);
+      if (!has(target, field.themes)) {
+        log.throw(`Missing theme target "${target}" in ${field.domain} store.`);
       }
 
-      state.themes.push(
-        {
-          target,
-          store,
-          domain,
-          queue,
-          id: v.themes[target],
-          url: `${base}/admin/themes/${v.themes[target]}/assets.json`
-        }
-      );
+      config.sync.themes.push({
+        target,
+        store,
+        domain,
+        queue,
+        id: field.themes[target],
+        url: `${base}/admin/themes/${field.themes[target]}/assets.json`
+      });
+    }
+  }
+
+  if (is(config.sync.stores.length, 0)) {
+    log.throw('Unknown, missing or invalid store/theme targets');
+  }
+
+  return getPaths(config, pkg);
+
+}
+
+/**
+ * Get Paths
+ *
+ * Utility function for normalizing the paths configuration.
+ * This will fix and resolve custom paths. If a user
+ * defines the build directory input in directory paths
+ * it will ensure it is formed correctly.
+ */
+function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
+
+  const path = normalPath(config.source);
+  const { syncify } = pkg;
+
+  for (const key in config.paths) {
+
+    let uri: any;
+
+    if (key === 'metafields') {
+      uri = [ join(path(syncify.dirs.metafields), '**/*.json') ];
+    } else if (has(key, syncify.paths)) {
+      uri = isArray(syncify.paths[key]) ? syncify.paths[key].map(path) : [ path(syncify.paths[key]) ];
+    } else {
+      uri = [ key === 'customers' ? path('templates/' + key) : path(key) ];
     }
 
+    if (key === 'assets') {
+      const glob = join(config.output, 'assets/*');
+      if (isArray(uri)) uri.push(glob); else uri = [ uri, glob ];
+    }
+
+    config.watch.push(...uri);
+    config.paths[key] = anymatch(uri);
+
   }
 
-  if (state.stores.length === 0) {
-    throw new Error('Unknown, missing or invalid store/theme targets');
-  }
-
-  return state;
+  return getViews(config, pkg);
 
 }
 
@@ -410,101 +410,112 @@ function getStores (cli: ICLIOptions, options: IOptions) {
  * Returns path locations of config files like
  * postcss.config.js and svgo.config.js.
  */
-async function getConfigs (config: IConfig, files: string[]) {
+function getViews (config: PartialDeep<IConfig>, pkg: IPackage) {
 
-  const file = files.shift();
-  const path = join(config.cwd, config.config, file);
-  const exists = await pathExists(path);
+  if (isUndefined(pkg.syncify.transform) || !has('views', pkg.syncify.transform)) {
+    return getJson(config, pkg);
+  }
 
-  if (exists) return path;
-  if (file.length === 0) return null;
-
-  return getConfigs(config, files);
-
-}
-
-/**
- * Get Configs
- *
- * Returns path locations of config files like
- * postcss.config.js and svgo.config.js.
- */
-function getViews (
-  config: PartialDeep<IConfig>,
-  transform: IOptions['transform']
-) {
-
-  const state: Partial<IViews> = {
-    sections: {
-      allowPrefix: false,
-      globals: [],
-      onlyPrefixDuplicates: false,
-      prefixSeparator: '-'
-    },
-    minify: {
-      apply: config.env === 'prod',
-      exclude: [],
-      liquid: {
-        minifySectionSchema: true,
-        removeLiquidComments: true,
-        ignoredLiquidTags: []
-      },
-      terser: {
-        minifyJS: true,
-        minifyCSS: true,
-        removeComments: true,
-        collapseWhitespace: true,
-        trimCustomFragments: true
-      }
-    }
-  };
-
-  if (isType('Undefined', transform) || !has('views', transform)) return state;
+  const { transform } = pkg.syncify;
 
   if (has('sections', transform.views)) {
-    state.sections = assign(state.sections, transform.views.sections);
+
+    assign(config.transform.views.sections, transform.views.sections);
+
+    if (has('globals', transform.views.sections)) {
+      const { globals } = transform.views.sections;
+      if (isArray(globals)) {
+        config.transform.views.sections.globals = new RegExp(globals.join('|'));
+      } else {
+        log.throw('Section "global" configuration must be an array type.');
+      }
+    }
+
   }
 
   if (has('minify', transform.views)) {
 
-    for (const v in transform.views.minify) {
+    for (const key in transform.views.minify) {
 
-      const minify = transform.views.minify[v];
+      const minify = transform.views.minify[key];
 
-      if (has(v, state.minify.terser)) {
-        state.minify.terser[v] = minify;
-        continue;
-      }
+      if (has(key, config.transform.views.minify.terser)) {
 
-      if (has(v, state.minify.liquid)) {
-        state.minify.liquid[v] = minify;
-        continue;
-      }
+        config.transform.views.minify.terser[key] = minify;
 
-      if (v === 'env') {
-        if (minify.env === 'any') state.minify.apply = true;
-        else if (minify.env === 'never') state.minify.apply = false;
-        else state.minify.apply = minify.env === config.env;
-        continue;
-      }
+      } else if (has(key, config.transform.views.minify.liquid)) {
 
-      if (v === 'exclude') {
-        if (!isArray(minify)) {
-          throw new Error('View minification excludes must be array type');
+        config.transform.views.minify.liquid[key] = minify;
+
+      } else if (key === 'env') {
+
+        if (minify.env === 'any') {
+          config.transform.views.minify.apply = true;
+        } else if (minify.env === 'never') {
+          config.transform.views.minify.apply = false;
         } else {
-          state.minify.exclude = minify;
+          config.transform.views.minify.apply = minify.env === config.env;
+        }
+
+      } else if (key === 'exclude') {
+
+        if (isArray(minify)) {
+          config.transform.views.minify.exclude = minify;
+        } else {
+          log.throw('The views "minification" excludes must be array type');
         }
       }
+    }
+  }
 
+  return getJson(config, pkg);
+
+}
+
+/**
+ * JSON
+ *
+ * Applied defaults for JSON configuration
+ */
+function getJson (config: PartialDeep<IConfig>, pkg: IPackage) {
+
+  if (isUndefined(pkg.syncify.transform) || !has('json', pkg.syncify.transform)) {
+    return getStyles(config, pkg);
+  }
+
+  const { transform } = pkg.syncify;
+
+  if (has('minify', transform.json)) {
+
+    if (has('env', transform.json.minify)) {
+      if (transform.json.minify.env === 'any') {
+        config.transform.json.minify.apply = true;
+      } else if (transform.json.minify.env === 'never') {
+        config.transform.json.minify.apply = false;
+      } else {
+        config.transform.json.minify.apply = transform.json.minify.env === config.env;
+      }
+    }
+
+    if (has('exclude', transform.json.minify.exclude)) {
+
+      if (!isArray(transform.json.minify.exclude)) {
+        log.throw('JSON "excludes" must use an array type');
+      }
+
+      const path = normalPath(config.source);
+
+      config.transform.json.minify.exclude = config.transform.json.minify.exclude.map(path);
+
+    }
+
+    if (has('removeSchemaRefs', transform.json.minify)) {
+      config.transform.json.minify.removeSchemaRefs = transform.json.minify.removeSchemaRefs;
     }
 
   }
 
-  state.minify.terser.ignoreCustomFragments = [
-    /({%|{{)-?[\s\S]*?-?(}}|%})/g
-  ];
-
-  return state;
+  return getStyles(config, pkg);
 }
 
 /**
@@ -514,13 +525,7 @@ function getViews (
  * parses the `postcss.config.js` configuration file and
  * normalizes the configuration object.
  */
-async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['transform']) {
-
-  const state: IStyles = {
-    postcss: null,
-    node_modules: join(config.cwd, 'node_modules') + '/',
-    compile: []
-  };
+async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   // Find postcss configuration files
   const postcssconfig = await getConfigs(config as IConfig, [
@@ -529,20 +534,31 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
     'postcss.config.mjs'
   ]);
 
-  state.postcss = postcss(require(postcssconfig));
-
-  if (isType('Undefined', transform) || !has('styles', transform)) return state;
-
-  if (!isArray(transform.styles)) {
-    throw new Error('Invalid transform config, the option "styles" must be an array');
+  if (!isNil(postcssconfig)) {
+    if (getModules(pkg, 'postcss')) {
+      style.processer(postcssconfig);
+    } else {
+      log.throw('Missing "postcss" dependency');
+    }
   }
 
-  const path = normalize(config.source);
+  const { transform } = pkg.syncify;
+
+  if (isUndefined(transform) || !has('styles', transform)) {
+    return getIcons(config, transform);
+  }
+
+  if (!isArray(transform.styles)) {
+    log.throw('Invalid transform configuration, the option "styles" must be an array type');
+  }
+
+  const path = normalPath(config.source);
 
   for (const v of transform.styles) {
 
     const compile: Partial<IStyles['compile'][number]> = {
-      input: path(v.input)
+      input: path(v.input),
+      node_modules: config.node_modules + '/'
     };
 
     let rename: string;
@@ -550,7 +566,7 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
     if (has('rename', v)) {
 
       if (!/[a-zA-Z0-9_.-]+/.test(v.rename)) {
-        throw new Error('Invalid rename config defined on stylesheet: ' + v.rename);
+        log.throw('Invalid rename config defined on stylesheet: ' + v.rename);
       }
 
       // handle renamed files
@@ -592,7 +608,7 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
         config.watch.push(...watch);
 
       } else {
-        throw new Error('You must use an array type for "watch" path style directories');
+        log.throw('You must use an array type for "watch" path style directories');
       }
 
     } else {
@@ -604,7 +620,7 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
       if (isArray(v.include)) {
         compile.include = v.include.map(include => join(config.cwd, include));
       } else {
-        throw new Error('You must use an array type for "include" paths');
+        log.throw('You must use an array type for "include" paths');
       }
     } else {
       compile.include = [];
@@ -624,11 +640,11 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
       compile.snippet = false;
     }
 
-    state.compile.push(compile as IStyles['compile'][number]);
+    config.transform.styles.compile.push(compile as IStyles['compile'][number]);
 
   }
 
-  return state as IStyles;
+  return getIcons(config, transform);
 
 }
 
@@ -640,38 +656,27 @@ async function getStyles (config: PartialDeep<IConfig>, transform: IOptions['tra
  */
 async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['transform']) {
 
-  const state: IIcons = {
-    svgo: null,
-    snippets: null,
-    sprites: []
-  };
-
   // Find postcss configuration files
-  state.svgo = await getConfigs(config as IConfig, [
+  config.transform.icons.svgo = await getConfigs(config as IConfig, [
     'svgo.config.js',
     'svgo.config.cjs',
     'svgo.config.mjs'
   ]);
 
-  if (isType('Undefined', transform) || !has('icons', transform)) return state;
+  if (isUndefined(transform) || !has('icons', transform)) return config;
 
-  const path = normalize(config.metafields);
+  const path = normalPath(config.source);
 
   if (has('snippets', transform.icons)) {
-
-    if (!isArray(transform.icons.snippets)) {
+    if (isArray(transform.icons.snippets)) {
+      config.transform.icons.snippets = transform.icons.snippets.map(path);
+    } else {
       throw new Error('Icon snippet paths must use an array type');
     }
-
-    state.snippets = transform.icons.snippets.map(path);
-
   }
 
-  if (!has('sprites', transform.icons)) return state;
-
-  if (!isArray(transform.icons.sprites)) {
-    throw new Error('Icon sprites must use an array type');
-  }
+  if (!has('sprites', transform.icons)) return config;
+  if (!isArray(transform.icons.sprites)) throw new Error('Icon sprites must use an array type');
 
   for (const v of transform.icons.sprites) {
 
@@ -694,76 +699,94 @@ async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['tran
       throw new Error('Invalid output name defined on sprite: ' + v.output);
     }
 
-    if (has('options', v)) sprite.options = assign(sprite.options, v);
+    if (has('options', v)) assign(sprite.options, v.options);
 
     sprite.input = v.input.map(path);
 
     // handle renamed files
     if (!v.output.endsWith('.liquid')) sprite.output = v.output + '.liquid';
 
-    state.sprites.push(sprite);
+    config.transform.icons.sprites.push(sprite);
 
   }
 
-  return state;
+  return config;
 
 }
 
 /**
- * JSON
+ * Store Authorization URL
  *
- * Applied defaults for JSON configuration
+ * Generate the the authorization URL to
+ * be used for requests.
  */
-function getJson (config: PartialDeep<IConfig>, transform: IOptions['transform']) {
+function getURL (domain: string, env: object): false | string {
 
-  const state: IJson = {
-    allowComments: false,
-    minify: {
-      apply: config.env === 'prod',
-      exclude: null,
-      removeSchemaRefs: true
+  const api_key = domain + '_api_key';
+  const password = domain + '_password';
+
+  if (has(api_key, env) || has(api_key.toUpperCase(), env)) {
+    if (has(password, env) || has(password.toUpperCase(), env)) {
+      return `https://${env[api_key]}:${env[password]}@${domain}.myshopify.com`;
+    } else {
+      throw new Error(`Missing "${password}" credential for store "${domain}"`);
     }
-  };
-
-  if (isType('Undefined', transform) || !has('json', transform)) return state;
-
-  if (has('minify', transform.json)) {
-
-    if (has('env', transform.json.minify)) {
-      if (transform.json.minify.env === 'any') {
-        state.minify.apply = true;
-      } else if (transform.json.minify.env === 'never') {
-        state.minify.apply = false;
-      } else {
-        state.minify.apply = transform.json.minify.env === config.env;
-      }
-    }
-
-    if (has('exclude', transform.json.minify.exclude)) {
-
-      if (!isArray(transform.json.minify.exclude)) {
-        throw new Error('JSON excludes must use an array type');
-      }
-
-      const path = normalize(config.source);
-
-      state.minify.exclude = state.minify.exclude.map(path);
-
-    }
-
-    if (has('removeSchemaRefs', transform.json.minify)) {
-      state.minify.removeSchemaRefs = transform.json.minify.removeSchemaRefs;
-    }
-
+  } else {
+    throw new Error(`Missing "${api_key}" credential for store "${domain}"`);
   }
-
-  return state;
 }
 
+/**
+ * Get Configs
+ *
+ * Returns path locations of config files like
+ * postcss.config.js and svgo.config.js.
+ */
+async function getConfigs (config: IConfig, files: string[]) {
+
+  const file = files.shift();
+  const path = join(config.cwd, config.config, file);
+  const exists = await pathExists(path);
+
+  if (exists) return path;
+  if (is(file.length, 0)) return null;
+
+  return getConfigs(config, files);
+
+}
+
+/**
+ * Get Required modules
+ *
+ * Ensures that peer dependencies exists for
+ * the transform processors.
+ */
+function getModules (pkg: IPackage, name: string) {
+
+  if (has('devDependencies', pkg)) {
+    if (has(name, pkg.devDependencies)) return true;
+  }
+
+  if (has('peerDependencies', pkg)) {
+    if (has(name, pkg.peerDependencies)) return true;
+  }
+
+  if (has('dependencies', pkg)) {
+    if (has(name, pkg.dependencies)) {
+      log.warn('Module ' + name + ' should not be a dependency');
+      return true;
+    }
+  }
+
+  return false;
+
+}
+
+/*
 async function getRedirects (config: PartialDeep<IConfig>, options: IOptions) {
 
   const cachePath = join(config.cache, 'redirects.json');
-  const path = await getConfigs(config, [
+  const path = await getConfigs(config as IConfig, [
     'redirects.yaml',
     'redirects.yml'
   ]);
@@ -783,86 +806,6 @@ async function getRedirects (config: PartialDeep<IConfig>, options: IOptions) {
 
   }, config.sync.stores)); */
 
-  return file;
+// return file;
 
-}
-
-/**
- * Resolve Paths
- *
- * Resolves `package.json` file and the `.env`
- * file locations relative to the current working
- * directory
- */
-async function storeConfig (options: ICLIOptions, pkg: IOptions) {
-
-  const config = await defaults(options.cwd, pkg);
-
-  // basic config
-  config.spawns = pkg.spawn[options.resource];
-
-  // blessed initializes
-  create(
-    {
-      group: 'Logs',
-      tabs: [ 'errors', 'warnings', 'console' ],
-      row: 6,
-      col: 5,
-      rowSpan: 8,
-      colSpan: 9,
-      spawns: null
-    },
-    {
-      group: 'Store',
-      tabs: [ 'files', 'metafields', 'redirects' ],
-      row: 0,
-      col: 0,
-      rowSpan: 9,
-      colSpan: 5,
-      spawns: null
-    },
-    {
-      group: 'Assets',
-      tabs: [ 'scripts', 'json', 'styles', 'icons' ],
-      row: 0,
-      col: 5,
-      rowSpan: 6,
-      colSpan: 9,
-      spawns: config.spawns
-    }
-  );
-
-  config.cwd = options.cwd;
-  config.env = options.env as IConfig['env'] ? 'dev' : 'prod';
-  config.mode = options.cli ? 'cli' : 'api';
-  config.terminal = options.terminal;
-  config.resource = options.resource;
-  config.sync = getStores(options, pkg);
-  config.paths = getPaths(config, pkg);
-
-  // transform config
-  config.transform.views = getViews(config, pkg.transform);
-  config.transform.json = getJson(config, pkg.transform);
-  config.transform.styles = await getStyles(config, pkg.transform);
-  config.transform.icons = await getIcons(config, pkg.transform);
-
-  // env variables
-  process.env.SYNCIFY_ENV = config.env;
-  process.env.SYNCIFY_MODE = config.mode;
-  process.env.SYNCIFY_RESOURCE = config.resource;
-
-  // const yaml = await getRedirects(config, pkg);
-
-  if (terminal === 2) {
-    screen.render();
-
-    // render blessed
-    console.log = log.console;
-    console.info = log.console;
-    console.error = log.errors;
-    console.warn = log.warnings;
-
-  }
-
-  return config as IConfig;
-}
+// }

@@ -1,6 +1,6 @@
 import { has, isType } from 'rambdax';
 import { IFile, Syncify, IJson } from 'types';
-import * as log from 'cli/console';
+import * as log from 'cli/logs';
 import { readJson } from 'fs-extra';
 import { is } from 'config/utils';
 
@@ -17,29 +17,29 @@ export async function compile (file: IFile, options: IJson, callback: typeof Syn
 
   if (options.minify.removeSchemaRefs) data = strip(file, data);
 
-  if (!isType('Function', callback)) return minify(file, data, options.minify.apply ? 2 : 0);
+  if (!isType('Function', callback)) return transform(file, data, options.minify.apply ? 2 : 0);
 
   const update = callback.apply({ ...file }, data);
 
   if (isType('Undefined', update)) {
 
-    return minify(file, data, options.minify.apply ? 2 : 0);
+    return transform(file, data, options.minify.apply ? 2 : 0);
 
   } else if (isType('Array', update) || isType('Object', update)) {
 
-    return minify(file, update, options.minify.apply ? 2 : 0);
+    return transform(file, update, options.minify.apply ? 2 : 0);
 
   } else if (isType('String', update)) {
 
-    return minify(file, parse(update), options.minify.apply ? 2 : 0);
+    return transform(file, parse(update), options.minify.apply ? 2 : 0);
 
   } else if (Buffer.isBuffer(update)) {
 
-    return minify(file, parse(update.toString()), options.minify.apply ? 2 : 0);
+    return transform(file, parse(update.toString()), options.minify.apply ? 2 : 0);
 
   }
 
-  return minify(file, data, options.minify.apply ? 2 : 0);
+  return transform(file, data, options.minify.apply ? 2 : 0);
 
 }
 
@@ -98,6 +98,32 @@ export function minify (file: IFile, data: string, space = 0): any {
     if (is(space, 0)) log.json('minified ' + file.base);
 
     return minified;
+
+  } catch (e) {
+
+    return log.error(e);
+
+  }
+
+}
+
+/**
+ * Minify JSON
+ *
+ * Metafields are trimmed of whitespace
+ * and comments. Syncify allows JSON with
+ * comments be provided, this function strips
+ * them and will push a minified to the store.
+ */
+export function transform (file: IFile, data: string, space = 0): any {
+
+  try {
+
+    const minified = JSON.stringify(data, null, space);
+
+    if (is(space, 0)) log.json('minified ' + file.base);
+
+    return Buffer.from(minified).toString('base64');
 
   } catch (e) {
 

@@ -1,6 +1,12 @@
 import { client } from 'config/client';
 import { Resource, APIOptions, IOptions, Callback } from 'types';
 
+/* -------------------------------------------- */
+/* EXPORTS                                      */
+/* -------------------------------------------- */
+
+export { env } from 'config/utils';
+
 function sync <R extends Resource> (
   resource: R | IOptions,
   options: Omit<APIOptions, 'resource'>,

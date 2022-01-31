@@ -3,7 +3,7 @@ import axios from 'axios';
 import { mapFastAsync, delay } from 'rambdax';
 import { IRequest, IThemes, IStore } from 'types';
 import { is, getAssetKey } from 'config/utils';
-import * as log from 'cli/console';
+import * as log from 'cli/logs';
 import { error } from 'cli/errors';
 
 /* -------------------------------------------- */
@@ -31,7 +31,7 @@ export const requests = new Queue(
  * Maps queued requests, returning an array of
  * promises used for multiple storefront execution.
  */
-export function queue (list: any[], size?: number) {
+export function queue (list: any[], q?: any) {
 
   // const num = 0;
 
@@ -45,7 +45,7 @@ export function queue (list: any[], size?: number) {
 
       // screen.percent(num++, size);
 
-      return request(store, config as IRequest);
+      return q ? q(store, config) : request(store, config as IRequest);
 
     }, list));
 

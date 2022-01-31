@@ -1,4 +1,4 @@
-import * as log from 'cli/console';
+import * as log from 'cli/logs';
 
 /**
  * Error Handler

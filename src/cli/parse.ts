@@ -1,4 +1,5 @@
-import { yellow, white, cyan, underline, magenta, grey } from 'kleur';
+import ansis from 'ansis';
+import { Warning } from 'postcss';
 
 /**
  * Captures Line Number text in Shopify responses
@@ -43,7 +44,7 @@ const RegExpRegex = /(\/)(.*?)(\/)/g;
  */
 export function quotes (text: string) {
 
-  return text.replace(RegExpQuotes, white('$1'));
+  return text.replace(RegExpQuotes, ansis.white('$1'));
 
 }
 
@@ -54,7 +55,7 @@ export function quotes (text: string) {
  */
 export function urls (text: string) {
 
-  return text.replace(RegExpURLs, underline('$1'));
+  return text.replace(RegExpURLs, ansis.underline('$1'));
 
 }
 
@@ -66,8 +67,24 @@ export function urls (text: string) {
  */
 export function string (text: string) {
 
-  return text.replace(RegExpString, yellow('$1'));
+  return text.replace(RegExpString, ansis.yellow('$1'));
 
+}
+
+/**
+ * PostCSS Warning Parser
+ *
+ * Pretty formatted log for postcss warnings.
+ */
+export function postcss (data: Warning) {
+
+  return (
+    ansis.yellow.bold(data.text) + '\n\n' +
+    ansis.yellow(data.node.toString()) + '\n\n' +
+    ansis.dim('Lines:  ') + data.line + ' > ' + data.endLine + '\n' +
+    ansis.dim('Column: ') + data.column + '\n' +
+    ansis.dim('Plugin: ') + data.plugin + '\n'
+  );
 }
 
 /**
@@ -84,11 +101,11 @@ export function pretty (message: string[] | string) {
   if (!message) return message;
 
   return message
-    .replace(RegExpLineNo, white('$1') + grey('$2') + '\n\n')
-    .replace(RegExpString, yellow('$1'))
-    .replace(RegExpLiquid, cyan('$1') + magenta('$2') + cyan('$3'))
-    .replace(RegExpURLs, underline('$1'))
-    .replace(RegExpObjectTag, white('$1') + grey('$2') + white('$3'))
-    .replace(RegExpRegex, magenta('$1') + cyan('$2') + magenta('$3'));
+    .replace(RegExpLineNo, ansis.white('$1') + ansis.gray('$2') + '\n\n')
+    .replace(RegExpString, ansis.yellow('$1'))
+    .replace(RegExpLiquid, ansis.cyan('$1') + ansis.magenta('$2') + ansis.cyan('$3'))
+    .replace(RegExpURLs, ansis.underline('$1'))
+    .replace(RegExpObjectTag, ansis.white('$1') + ansis.gray('$2') + ansis.white('$3'))
+    .replace(RegExpRegex, ansis.magenta('$1') + ansis.cyan('$2') + ansis.magenta('$3'));
 
 }

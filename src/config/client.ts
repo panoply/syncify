@@ -4,22 +4,21 @@ import { upload } from 'sync/upload';
 import { watch } from 'sync/watch';
 import { readConfig } from 'config/config';
 import { help } from 'cli/help';
-import * as log from 'cli/console';
+import * as log from 'cli/logs';
 import * as cli from 'cli/prompts';
 
 /**
  * Client
+ *
+ * Determines how Syncify was initialized.
+ * It will dispatch and construct the correct
+ * configuration model accordingly.
  */
-export async function client (
-  options: ICLIOptions,
-  callback?: typeof Syncify.hook
-) {
+export async function client (options: ICLIOptions, callback?: typeof Syncify.hook) {
 
   options.cli = has('_', options);
 
-  if (options.cli) {
-    options._ = options._.slice(1);
-  }
+  if (options.cli) options._ = options._.slice(1);
 
   const config = await readConfig(options);
 

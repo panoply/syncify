@@ -98,7 +98,7 @@ export interface IViews {
     /**
      * A list directories or files that should never be prefixed
      */
-    globals: string[];
+    globals: RegExp;
   },
   /**
    * Liquid + HTML minifier options
@@ -131,6 +131,38 @@ export interface IViews {
 /* STYLE OPTIONS                                */
 /* -------------------------------------------- */
 
+export interface IStyle {
+  /**
+   * Stylesheet inputs src paths
+   */
+  input: string;
+  /**
+   * Output Path
+   */
+  output: string;
+  /**
+   * Optionally write the stylesheet inline
+   * as a snippet, this will transform the
+   * CSS, wrap it within `<style></style>` tags
+   * output its contents as a snippet.liquid file.
+   */
+  snippet: boolean;
+  /**
+   * Stylesheet paths to watch, when changes
+   * are applied files will be processed.
+   */
+  watch: Tester;
+  /**
+   * Path to node_modules directory relative to current working directory.
+   * This is used to re-write `~` dashed paths.
+   */
+  node_modules: string;
+  /**
+   * A list of paths to include, ie: node_modules.
+   */
+  include: string[];
+}
+
 export interface IStyles {
   /**
    * POSTCSS transform options provided in a `postcss.config.js` file,
@@ -147,32 +179,7 @@ export interface IStyles {
   /**
    * List of stylesheet files to process.
    */
-  compile: Array<{
-    /**
-     * Stylesheet inputs src paths
-     */
-    input: string;
-    /**
-     * Output Path
-     */
-    output: string;
-    /**
-     * Optionally write the stylesheet inline
-     * as a snippet, this will transform the
-     * CSS, wrap it within `<style></style>` tags
-     * output its contents as a snippet.liquid file.
-     */
-    snippet: boolean;
-    /**
-     * Stylesheet paths to watch, when changes
-     * are applied files will be processed.
-     */
-    watch: Tester;
-    /**
-     * A list of paths to include, ie: node_modules.
-     */
-    include: string[];
-  }>
+  compile: IStyle[]
 
 }
 
@@ -282,10 +289,6 @@ export interface IConfig {
     console: Console
   }
   /**
-   * The mode from which Syncify was intialized.
-   */
-  terminal: 'default' | 'minimal' | 'dashboard';
-  /**
    * The resource to execute, eg: 'watch', 'upload' or 'download'
    */
   resource: string;
@@ -293,6 +296,10 @@ export interface IConfig {
    * The current working directory
    */
   cwd: string;
+  /**
+   * Path to node_modules directory relative from root path.
+   */
+  node_modules: string;
   /**
    * The list of spawned child proccesses running
    */
@@ -400,6 +407,7 @@ export interface IConfig {
      * JSON file transformation options
      */
     json: IJson
+
   };
   /**
    * The sync data model. Multiple stores and themes
@@ -420,11 +428,11 @@ export interface IConfig {
         /**
          * The redirect pathname
          */
-        path: string;
+        path?: string;
         /**
          * The redirect target path
          */
-        target: string;
+        target?: string;
       }
     };
 

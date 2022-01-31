@@ -1,4 +1,4 @@
-[![npm version](https://badge.fury.io/js/shopify-sync.svg)](https://www.npmjs.com/package/shopify-sync)
+**BETA VERSION**
 
 <hr>
 
@@ -557,76 +557,13 @@ Create a script command within your `package.json` file.
 }
 ```
 
-### Gulp
-
-If you're using a tool like [Gulp](https://gulpjs.com), you can call upon the sync from within a task function and it will initialize when the task is triggered. This approach allows you process files before they are passed to Syncify and work from a `src` directory.
-
-```javascript
-import sync from 'shopify-sync'
-
-function sync (done) {
-
-  sync('watch', {
-    dir: 'example',
-    target: 'development',
-    ignore: [
-        'example/sections/ignore.js',
-        'example/assets/ignore.liquid'
-    ]
-  })
-
-  done()
-
-}
-
-export.default = parallel(exampleTask, syncTask)
-
-```
-
-## Options
-
-When initializing via a node script you have a couple of additional options opposed to running sync from the CLI. In most cases running the command `watch` will suffice but for those who may want to manipulate files in transit or for additional control the API ships with the following:
-
-**`dir`**<br>
-The `dir` option defaults to `theme` and is the directory that the sync will watch, upload or download modified or changed files from. The watch resource will only accept a directory that resides within the root of your project.
-
-**`metafields`** (experimental)<br>
-This `metafields` option will provide synchronization for JSON metafields. You will need to provide a `path` reference to a specific `metafields` directory within your development workspace. The `metafields` directory treats every sub-directory as metafield `namespace` and the files contained within the namespace sub-directory will be synchronized to your store.
-
-**`target`**<br>
-The `target` option is **required** and is the reference point to your Shopify stores API credentials. The target defined here should reflect the `target_name` property defined in your config file.
-
-**`concurrency`**<br>
-The `concurrency` option defaults to 20. This option will allow you to set a number of parallel requests to run when uploading or downloading theme files. Please note that all asset syncs are executed asynchronously.
-
-**`forceIgnore`**<br>
-Forcefully ignores files from the chokidar instance which will prevent them from being read and printing to stdout. This option is recommended if you are ignoring a large quantity of files and want to keep your logs clean.
-
-**`ignore`**<br>
-The ignore option accepts an array of files. You must use full path (`theme/assets/*.map`) glob patterns.
-
-**`callback`**<br>
-A callback function executed post transfer. Access the passed in file path via the functions _this_ scope which will return the parsed file path. You function will pass a Buffer as parameter value which contains the files contents. See below file `this` scope.
-
-```typescript
-{
-  root: string,
-  dir: string,
-  base: string,
-  ext: string,
-  name: string
-}
-```
-
-> Use `content.toString()` to return the file content as a string opposed to Buffer.
-
 # Contributing
 
-This project uses [pnpm](https://pnpm.js.org/en/cli/install) (because pnpm is dope and pnpm does dope shit) - Fork the project, run `pnpm i` and you're good to go. If you're using Yarn like the rest of the plebs or npm like the boomers then you will still need to install pnpm.
+This project uses [pnpm](https://pnpm.js.org/en/cli/install). Fork the project, run `pnpm i` and you're good to go. If you're using Yarn like the rest of the plebs or then you will still need to install pnpm.
 
-# Sissel SaaS
+# Author
 
-Syncify is shipped via by [Nίκος Σαβίδης](https://github.com/panoply) of [Sissel ΣaaΣ](https://sissel.io). It operated under the [@liquify](#) organization.
+Created by [Nίκος Σαβίδης](https://github.com/panoply) of [Sissel ΣaaΣ](https://sissel.io).
 
 # Changelog
 

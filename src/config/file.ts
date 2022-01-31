@@ -1,13 +1,9 @@
 /* eslint-disable no-unused-vars */
 
-import { join, parse, ParsedPath, basename } from 'path';
-import { isType } from 'rambdax';
-import * as log from '../cli/console';
-import { Syncify, IFile, IConfig, IStyles, IViews } from 'types';
-import { Merge } from 'type-fest';
-import { assign, is, lastPath } from 'config/utils';
-import * as view from 'transform/liquid';
-import { writeFile } from 'fs-extra';
+import { join, parse } from 'path';
+import { Syncify, IFile, IConfig, IStyles, IViews, IStyle } from 'types';
+import { assign, isRegex, isUndefined } from 'utils/native';
+import { lastPath } from 'utils/helpers';
 
 /**
  * File types are represented as numeric values.
@@ -15,48 +11,37 @@ import { writeFile } from 'fs-extra';
  *
  */
 export const enum Type {
-
-  /* VIEWS -------------------------------------- */
   Template = 1,
   Layout,
   Snippet,
   Section,
-
-  /* JSON --------------------------------------- */
   Config,
   Locale,
   Metafield,
-
-  /* STYLES ------------------------------------- */
   Style,
   CSS,
   SASS,
-
-  /* ICONS -------------------------------------- */
   Icon,
   Sprite,
-
-  /* ASSETS ------------------------------------- */
-
   Asset,
-
-  /* OTHER -------------------------------------- */
   Redirect,
 }
 
 function setProps (path: string, output: string) {
 
-  const file: Partial<IFile> = assign(parse(path), { output });
+  const file: Partial<IFile> = parse(path);
 
   return {
     file,
     merge: (namespace: string, type: Type): IFile => {
       return assign(file as IFile, {
-        idx: -1,
         namespace,
         type,
         path,
-        key: join(namespace, file.base)
+        output,
+        parent: lastPath(file.dir),
+        key: join(namespace, file.base),
+        config: null
       });
     }
   };
@@ -127,38 +112,19 @@ export function parseFile (paths: IConfig['paths'], output: string) {
 
 }
 
-async function findAsyncSeq<T> (
-  array: T[],
-  predicate: (t: T) => Promise<boolean>
-): Promise<number> {
-
-  for (let i = 0; i < array.length; i++) {
-    const element = array[i];
-    if (await predicate(element)) {
-      return i;
-    }
-
-  }
-
-  return -1;
-}
-
 /**
  * Augment the file configuration to accept
  * style types.
  */
-export function isStyle (file: IFile, transform: IStyles) {
+export function isStyle (file: IFile<IStyle>, transform: IStyles) {
 
-  const idx = transform.compile.findIndex(x => x.watch(file.path));
-  const style = transform.compile[idx];
+  file.config = transform.compile.find(x => x.watch(file.path));
+  file.type = file.ext === '.css' ? Type.CSS : Type.SASS;
+  file.output = join(file.output, file.config.output);
+  file.namespace = file.namespace === 'snippets' ? 'snippets' : file.namespace;
+  file.key = file.config.output;
 
-  return assign({}, file as IFile, {
-    idx,
-    path: style.input,
-    key: style.output,
-    type: file.ext === '.css' ? Type.CSS : Type.SASS,
-    namespace: file.namespace === 'snippets' ? 'snippets' : file.namespace
-  });
+  return file;
 
 }
 
@@ -178,13 +144,21 @@ export function isMetafield (file: IFile) {
  */
 export function isSection (file: IFile, transform: IViews['sections']) {
 
-  if (!transform.allowPrefix) return file;
-
-  if (!transform.globals.includes(file.namespace)) {
-    file.key = join('sections', transform.prefixSeparator + file.base);
+  if (!transform.allowPrefix) {
+    file.key = join(file.namespace, file.base);
+  } else {
+    if (isRegex(transform.globals)) {
+      if (transform.globals.test(file.parent)) {
+        file.key = join(file.namespace, file.base);
+      } else {
+        file.key = join(file.namespace, file.parent + transform.prefixSeparator + file.base);
+      }
+    } else {
+      file.key = join(file.namespace, file.parent + transform.prefixSeparator + file.base);
+    }
   }
 
-  return assign(file as IFile, { key: file.base });
+  return file;
 
 }
 
@@ -205,7 +179,7 @@ export function asset (
 
   const update = callback.apply({ ...file }, data);
 
-  if (isType('Undefined', update)) return data;
+  if (isUndefined(update)) return data;
 
   if (/\.(liquid|html|json|js|css|scss|sass|txt|svg)/.test(file.ext)) {
     return update.toString();

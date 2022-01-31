@@ -1,4 +1,4 @@
-import { green, bold, gray, italic, dim } from 'kleur';
+import ansis from 'ansis';
 
 /**
  * Help Text
@@ -6,36 +6,36 @@ import { green, bold, gray, italic, dim } from 'kleur';
  * Shown when using the CLI
  */
 export const help = `
-  ${gray('---------------------------------------------------------')}
+  ${ansis.gray('---------------------------------------------------------')}
 
-  ${green(bold('Syncify'))}                                       ${dim('by Panoply')}
+  ${ansis.green(ansis.bold('Syncify'))}                                       ${ansis.dim('by Panoply')}
 
-  ${bold('Version')}
+  ${ansis.bold('Version')}
   <!version!>
 
-  ${bold('Usage')}
+  ${ansis.bold('Usage')}
   Welcome to the Syncify CLI. The command line utility assumes that
-  you have defined store targets in the ${dim('package.json')} file
-  and setup credentials within a ${dim('.env')} file.
+  you have defined store targets in the ${ansis.dim('package.json')} file
+  and setup credentials within a ${ansis.dim('.env')} file.
 
-  ${bold('Commands:')}
+  ${ansis.bold('Commands:')}
   $ sync
-    ${gray(italic('Interactive prompt'))}
+    ${ansis.gray(ansis.italic('Interactive prompt'))}
   $ sync status
-    ${gray(italic('Prints list of connected stores'))}
+    ${ansis.gray(ansis.italic('Prints list of connected stores'))}
   $ sync themes    <store>
-    ${gray(italic('Prints list of themes, helpful when you need ids'))}
+    ${ansis.gray(ansis.italic('Prints list of themes, helpful when you need ids'))}
   $ sync watch     <store>  --flags
-    ${gray(italic('Starts watch mode'))}
+    ${ansis.gray(ansis.italic('Starts watch mode'))}
   $ sync upload    <store>  --flags
-    ${gray(italic('Uploads the theme directory'))}
+    ${ansis.gray(ansis.italic('Uploads the theme directory'))}
   $ sync download  <store>  --flags
-    ${gray(italic('Downloads a specific theme/s from store/s'))}
+    ${ansis.gray(ansis.italic('Downloads a specific theme/s from store/s'))}
 
-  ${bold('Flags:')}
-    -t, --theme   <list>  ${gray(italic('A comma seprated list of themes'))}
-    -s, --store   <list>  ${gray(italic('A comma separated list of stores'))}
-    -o, --output  <path>  ${gray(italic('A path value (used for downloads)'))}
-    -h, --help    ${gray(italic('Prints commands list and help information'))}
+  ${ansis.bold('Flags:')}
+    -t, --theme   <list>  ${ansis.gray(ansis.italic('A comma seprated list of themes'))}
+    -s, --store   <list>  ${ansis.gray(ansis.italic('A comma separated list of stores'))}
+    -o, --output  <path>  ${ansis.gray(ansis.italic('A path value (used for downloads)'))}
+    -h, --help    ${ansis.gray(ansis.italic('Prints commands list and help information'))}
 
 `;

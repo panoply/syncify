@@ -1,31 +1,7 @@
-import { has, isType } from 'rambdax';
+import { has } from 'rambdax';
 import { IRequest } from 'types';
 import { join } from 'path';
-
-/**
- * Native Object Methods
- */
-export const { assign, is, defineProperty, defineProperties, keys, values, create } = Object;
-
-/**
- * Native Array Methods
- */
-export const { isArray, from } = Array;
-
-/**
- * is Undefined
- */
-export const isUndefined = isType('Undefined');
-
-/**
- * is Object
- */
-export const isObject = isType('Object');
-
-/**
- * is Boolean
- */
-export const isBoolean = isType('Boolean');
+import { is } from 'utils/native';
 
 /**
  * Environment

@@ -1,72 +1,145 @@
-import sass, { Options, renderSync } from 'node-sass';
-import { join } from 'path';
-import * as log from '../cli/console';
-import { IFile, IStyles } from 'types';
-import { readFile, writeFile } from 'fs-extra';
-import Queue from 'p-queue';
+import { renderSync } from 'node-sass';
+import * as log from 'cli/logs';
+import * as parse from 'cli/parse';
+import { is } from 'utils/native';
+import { IFile, IStyle } from 'types';
+import { writeFile } from 'fs-extra';
+import { Processor } from 'postcss';
+import { isNil } from 'rambdax';
+import { Type } from 'config/file';
 
-// This queue makes sure node-sass leaves one thread available for executing fs tasks
-// See: https://github.com/sass/node-sass/issues/857
-const concurrency = Number(process.env.UV_THREADPOOL_SIZE) || 4;
-const queue = new Queue({ concurrency: concurrency - 1 });
+/**
+ * PostCSS Module
+ */
+let postcss: Processor = null;
 
-export function compile (file: IFile, scss: string, styles: IStyles, req) {
+/**
+ * Create inline snippet
+ */
+function snippet (isSnippet: boolean, css: string) {
 
-  const style = styles.compile[file.idx];
-  const outFile = join(file.output, style.output);
+  return Buffer.from(isSnippet ? '<style>' + css + '</style>' : css);
 
-  return queue.add(async () => {
+}
 
-    const { css, map } = sass.renderSync({
-      data: scss,
-      outFile,
-      file: file.path,
-      includePaths: style.include,
-      outputStyle: 'compressed',
-      indentedSyntax: false,
-      omitSourceMapUrl: true,
-      sourceMapContents: true,
-      sourceMap: true, // or an absolute or relative (to outFile) path
-      importer (url: string) {
+function sass (config: IStyle, data: string) {
 
-        return url.startsWith('~') ? { file: url.replace('~', styles.node_modules) } : null;
+  const { css, map } = renderSync({
+    data,
+    outFile: config.output,
+    file: config.input,
+    includePaths: config.include,
+    outputStyle: 'compressed',
+    indentedSyntax: false,
+    omitSourceMapUrl: true,
+    sourceMapContents: true,
+    sourceMap: true,
+    importer (url: string) {
+      return is(url.charCodeAt(0), 126) // ~
+        ? { file: url.slice(1) + config.node_modules }
+        : null;
+    }
+  });
 
-      }
-    });
+  return {
+    to: config.output,
+    css: css.toString(),
+    map: map.toString()
+  };
+}
 
-    const string = styles.postcss ? await styles.postcss.process(css.toString(), {
-      from: undefined,
-      to: outFile,
-      map: map.toString() ? {
-        prev: map.toString(),
-        inline: false
-      } : null
-    }) : css;
+/**
+ * Post Processor
+ *
+ * Runs postcss on compiled SASS or CSS styles
+ */
+async function postprocess ({ css, map, to }: ReturnType<typeof sass>) {
 
-    const compiled = style.snippet ? '<style>' + string.toString() + '</style>' : string.toString();
+  const result = await postcss.process(css, {
+    from: undefined,
+    to,
+    map: map ? {
+      prev: map,
+      inline: false
+    } : null
+  });
+
+  result.warnings().forEach(warning => log.warn(parse.postcss(warning)));
+
+  return result.toString();
+
+}
+
+function write (request: any, file: IFile<IStyle>) {
+
+  return async (css: Buffer, _map?: string) => {
 
     try {
 
-      return Promise.all([
-        await req.queue({
-          method: 'put',
-          data: {
-            asset: {
-              key: file.key,
-              attachment: Buffer.from(compiled).toString('base64')
-            }
+      await writeFile(file.output, css);
+
+      return request.queue({
+        method: 'put',
+        data: {
+          asset: {
+            key: file.key,
+            attachment: css.toString('base64')
           }
-        }),
-        await writeFile(outFile, compiled)
-      // await writeFile(outFile + '.map', map)
-      ]);
+        }
+      });
 
     } catch (e) {
 
       return log.error(e);
 
     }
+  };
 
-  });
+}
+/**
+ * Loads PostCSS
+ *
+ * This is executed and the `postcss` variable is
+ * assigned upon initialization.
+ */
+export function processer (path: string) {
+
+  postcss = require('postcss')(require(path));
+
+}
+
+/**
+ * SASS and PostCSS Compiler
+ */
+export async function compile (file: IFile<IStyle>, data: string, request: any) {
+
+  const generate = write(request, file);
+
+  if (is(file.type, Type.SASS)) {
+
+    const compiled = sass(file.config, data);
+    const css = isNil(postcss)
+      ? compiled.css
+      : await postprocess(compiled);
+
+    return generate(snippet(file.config.snippet, css), compiled.map);
+
+  }
+
+  if (!isNil(postcss)) {
+    if (is(file.type, Type.CSS)) {
+
+      const css = await postprocess({
+        css: data,
+        map: undefined,
+        to: file.output
+      });
+
+      return generate(snippet(file.config.snippet, css), null);
+
+    }
+  }
+
+  return generate(snippet(file.config.snippet, data), null);
 
 }

@@ -1,5 +1,6 @@
 import { IConfig } from 'types';
 import { queue } from './queue';
+import { write } from './metafields';
 export { requests as queue } from './queue';
 
 /**
@@ -17,10 +18,10 @@ export function client ({
 
   return {
     metafields: {
-      queue: queue(stores)
+      queue: queue(stores, write)
     },
     assets: {
-      queue: queue(themes, size)
+      queue: queue(themes)
     },
     redirects: {
       queue: queue(stores)
