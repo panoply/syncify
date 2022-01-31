@@ -1,17 +1,19 @@
 import { minify } from 'html-minifier-terser';
 import { IFile, IViews, Syncify } from 'types';
 import { join } from 'path';
-import * as json from 'transform/json';
 import * as log from 'cli/logs';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
-import { is } from 'config/utils';
 import { Type } from 'config/file';
+import { is, isRegex } from 'utils/native';
 
-export function htmlOpts (fragments: string[], tags: string[]) {
+export function htmlOpts (fragments: RegExp[] | string[], tags: string[]) {
 
   const liquid = new RegExp(`{%-?\\s*(?:(?!${tags.join('|')})[\\s\\S])*?%}`);
-  const ignore = fragments.map(fragment => new RegExp(fragment));
+  const ignore = fragments.map((fragment: any) => {
+    if (isRegex(fragment)) return fragment;
+    return new RegExp(fragment);
+  });
 
   ignore.push(
     // Ignore Inline Style
@@ -22,6 +24,9 @@ export function htmlOpts (fragments: string[], tags: string[]) {
 
     // Ignore content for header
     /{{-?\s*content_header[\s\S]*?}}/,
+
+    // Ignore content for header
+    /(?<={%-?\s{0,}style\s\s{0,}-?%})[\s\S]*?(?={%-?\s{0,}endstyle\s\s{0,}-?%})/,
 
     // Ignored liquid tags
     liquid
@@ -44,10 +49,39 @@ function minifySchema (file: IFile, content: string) {
     /({%-?\s*schema\s*-?%})([\s\S]*?)({%-?\s*endschema\s*-?%})/,
     (_, open, data, close) => {
 
-      return open + json.minify(file, json.parse(data)) + close;
+      try {
+
+        const parsed = JSON.parse(data);
+        const minified = JSON.stringify(parsed, null, 0);
+
+        return open + minified + close;
+
+      } catch (e) {
+
+        log.error(e);
+
+        return open + data + close;
+
+      }
 
     }
   );
+
+}
+
+/**
+ * Remove Liquid Comments
+ *
+ * Strips Liquid comments from file content.
+ * This is executed before passing to HTML terser.
+ */
+function stripNewlinesFromAttrs (content: string) {
+
+  return content.replace(/(?<=["])[\s\S]*?(?=")/g, (match) => (
+    match
+      .replace(/\n/g, '')
+      .replace(/\s{2,}/g, ' ')
+  ));
 
 }
 
@@ -78,9 +112,12 @@ function transform (file: IFile, config: IViews['minify']) {
     }
 
     if (config.liquid.removeLiquidComments) data = removeComments(data);
+    if (config.liquid.removeAttributeNewlines) data = stripNewlinesFromAttrs(data);
     if (config.apply) data = await minify(data, config.terser);
 
-    writeFile(join(file.output, file.key), data);
+    console.log(join(file.output, file.key));
+
+    await writeFile(join(file.output, file.key), data);
 
     return Buffer.from(data).toString('base64');
 
