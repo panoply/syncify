@@ -181,6 +181,8 @@ function stdout () {
           message = message.toString();
         } else if (isObject(message) || isArray(message)) {
           message = render(message);
+        } else {
+          message = String(message);
         }
 
         process.stdout.write(message.replace(/^/gm, dim('│  ')) + '\n');
@@ -264,7 +266,7 @@ export function create <T extends Array<keyof ILoggers>> (...options: Create<T>)
 
   const pipe = stdout();
 
-  console.log = pipe('console').print;
+  // console.log = pipe('console').print;
   console.error = pipe('error').print;
   console.info = pipe('info').print;
   console.warn = pipe('warn').print;

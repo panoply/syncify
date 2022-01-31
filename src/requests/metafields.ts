@@ -184,8 +184,6 @@ export async function write (store: IStore, metafield: IMetafield) {
       key
     }) => (metafield.namespace === namespace && metafield.key === key));
 
-    console.log(record);
-
     if (!record) return create(url, metafield);
 
     metafield.id = record.id;

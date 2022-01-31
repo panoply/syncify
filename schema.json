@@ -452,6 +452,11 @@
                       "default": true,
                       "description": "Whether sections schema tag JSON contents should be minified"
                     },
+                    "removeAttributeNewlines": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether or not to remove newlines contained within attributes. This is specifically helpful when you a expressing Liquid in HTML attributes that spans newlines."
+                    },
                     "removeLiquidComments": {
                       "type": "boolean",
                       "default": true,

@@ -33,7 +33,7 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
           await watch(config, callback);
           break;
         case 'upload':
-          await upload(config, callback);
+          // await upload(config, callback);
           break;
         case 'download':
         //  await download(config);
