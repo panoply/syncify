@@ -11,6 +11,7 @@ import { normalPath, toUpcase } from 'utils/helpers';
 import { IOptions, ICLIOptions, IConfig, IStyles, IIcons, IPackage } from 'types';
 import { log, create } from 'cli/console';
 import * as style from 'transform/styles';
+import * as liquid from 'transform/liquid';
 
 /**
  * Read Configuration
@@ -199,6 +200,7 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
           exclude: [],
           liquid: {
             minifySectionSchema: true,
+            removeAttributeNewlines: true,
             removeLiquidComments: true,
             ignoredLiquidTags: []
           },
@@ -208,6 +210,7 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
             removeComments: true,
             collapseWhitespace: true,
             trimCustomFragments: true,
+            continueOnParseError: true,
             ignoreCustomFragments: [
               /({%|{{)-?[\s\S]*?-?(}}|%})/g
             ]
@@ -247,6 +250,14 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
       await mkdir(config.cache);
     } catch (e) {
       log.throw('Failed to create a ".cache" file.');
+    }
+  }
+
+  if (!pathExistsSync(config.output)) {
+    try {
+      await mkdir(config.output);
+    } catch (e) {
+      log.throw('Failed to create a "output" directory "' + config.output + '"');
     }
   }
 
@@ -365,6 +376,34 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
 
 }
 
+export async function createDirs (output: string, path: string) {
+
+  if (path === 'templates/customers') {
+    const uri = join(output, 'templates');
+    const has = await pathExists(join(output, 'templates'));
+    if (!has) {
+      try {
+        await mkdir(uri);
+      } catch (e) {
+        log.throw('Failed to create output directory "' + uri + '"');
+      }
+
+    }
+  }
+
+  const uri = join(output, path);
+  const has = await pathExists(uri);
+
+  if (!has) {
+    try {
+      await mkdir(uri);
+    } catch (e) {
+      log.throw('Failed to create output directory "' + uri + '"');
+    }
+  }
+
+}
+
 /**
  * Get Paths
  *
@@ -373,7 +412,7 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
  * defines the build directory input in directory paths
  * it will ensure it is formed correctly.
  */
-function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
+async function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   const path = normalPath(config.source);
   const { syncify } = pkg;
@@ -384,10 +423,14 @@ function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
 
     if (key === 'metafields') {
       uri = [ join(path(syncify.dirs.metafields), '**/*.json') ];
+    } else if (key === 'customers') {
+      await createDirs(config.output, 'templates/customers');
+      uri = [ path('templates/' + key) ];
     } else if (has(key, syncify.paths)) {
+      await createDirs(config.output, key);
       uri = isArray(syncify.paths[key]) ? syncify.paths[key].map(path) : [ path(syncify.paths[key]) ];
     } else {
-      uri = [ key === 'customers' ? path('templates/' + key) : path(key) ];
+      uri = [ path(key) ];
     }
 
     if (key === 'assets') {
@@ -395,10 +438,16 @@ function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
       if (isArray(uri)) uri.push(glob); else uri = [ uri, glob ];
     }
 
-    config.watch.push(...uri);
-    config.paths[key] = anymatch(uri);
+    if (!isUndefined(uri)) {
+
+      config.watch.push(...uri);
+      config.paths[key] = anymatch(uri);
+
+    }
 
   }
+
+  console.log(config.watch);
 
   return getViews(config, pkg);
 
@@ -449,12 +498,12 @@ function getViews (config: PartialDeep<IConfig>, pkg: IPackage) {
 
       } else if (key === 'env') {
 
-        if (minify.env === 'any') {
+        if (minify === 'any') {
           config.transform.views.minify.apply = true;
-        } else if (minify.env === 'never') {
+        } else if (minify === 'never') {
           config.transform.views.minify.apply = false;
-        } else {
-          config.transform.views.minify.apply = minify.env === config.env;
+        } else if (minify === 'production') {
+          config.transform.views.minify.apply = true;
         }
 
       } else if (key === 'exclude') {
@@ -467,6 +516,11 @@ function getViews (config: PartialDeep<IConfig>, pkg: IPackage) {
       }
     }
   }
+
+  config.transform.views.minify.terser.ignoreCustomFragments = liquid.htmlOpts(
+    config.transform.views.minify.terser.ignoreCustomFragments,
+    config.transform.views.minify.liquid.ignoredLiquidTags
+  );
 
   return getJson(config, pkg);
 
