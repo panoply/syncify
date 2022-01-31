@@ -1,8 +1,10 @@
 import { has, isType } from 'rambdax';
 import { IFile, Syncify, IJson } from 'types';
 import * as log from 'cli/logs';
-import { readJson } from 'fs-extra';
+import { join } from 'path';
+import { readJson, writeFile } from 'fs-extra';
 import { is } from 'config/utils';
+import { Type } from 'config/file';
 
 /**
  * Read JSON
@@ -122,6 +124,8 @@ export function transform (file: IFile, data: string, space = 0): any {
     const minified = JSON.stringify(data, null, space);
 
     if (is(space, 0)) log.json('minified ' + file.base);
+
+    if (file.type !== Type.Metafield) writeFile(join(file.output, file.key), minified);
 
     return Buffer.from(minified).toString('base64');
 
