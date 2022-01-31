@@ -1,3 +1,4 @@
+/* eslint-disable brace-style */
 /* eslint-disable no-unused-vars */
 
 import { IConfig, IFile, IStyle, Syncify } from 'types';
@@ -37,7 +38,7 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
         const style = isStyle(file as IFile<IStyle>, config.transform.styles);
         const data = await readFile(style.config.input);
 
-        return styles(style, data.toString(), request.assets);
+        await styles(style, data.toString(), request.assets);
 
       }
 
@@ -45,14 +46,14 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
       /* METAFIELDS                                   */
       /* -------------------------------------------- */
 
-      if (is(file.type, Type.Metafield)) {
+      else if (is(file.type, Type.Metafield)) {
 
         if (metas.queue.isPaused) metas.queue.start();
 
         const metafield = isMetafield(file);
         const data = await json(metafield, config.transform.json, cb);
 
-        return request.metafields.queue(
+        await request.metafields.queue(
           {
             namespace: file.namespace,
             key: file.key,
@@ -66,22 +67,20 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
       /* SECTIONS                                     */
       /* -------------------------------------------- */
 
-      if (is(file.type, Type.Section)) {
+      else if (is(file.type, Type.Section)) {
 
         const section = isSection(file, config.transform.views.sections);
         const attachment = await liquid(section, config.transform.views.minify, cb);
 
-        return request.assets.queue(
-          {
-            method: 'put',
-            data: {
-              asset: {
-                key: file.key,
-                attachment
-              }
+        await request.assets.queue({
+          method: 'put',
+          data: {
+            asset: {
+              key: file.key,
+              attachment
             }
           }
-        );
+        });
 
       }
 
@@ -89,11 +88,11 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
       /* LAYOUTS AND SNIPPETS                         */
       /* -------------------------------------------- */
 
-      if (is(file.type, Type.Layout) || is(file.type, Type.Snippet)) {
+      else if (is(file.type, Type.Layout) || is(file.type, Type.Snippet)) {
 
         const attachment = await liquid(file, config.transform.views.minify, cb);
 
-        return request.assets.queue(
+        await request.assets.queue(
           {
             method: 'put',
             data: {
@@ -111,11 +110,11 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
       /* CONFIG AND LOCALES                           */
       /* -------------------------------------------- */
 
-      if (is(file.type, Type.Config) || is(file.type, Type.Locale)) {
+      else if (is(file.type, Type.Config) || is(file.type, Type.Locale)) {
 
         const attachment = await json(file, config.transform.json, cb);
 
-        return request.assets.queue(
+        await request.assets.queue(
           {
             method: 'put',
             data: {
@@ -133,13 +132,13 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
       /* TEMPLATES                                    */
       /* -------------------------------------------- */
 
-      if (is(file.type, Type.Template)) {
+      else if (is(file.type, Type.Template)) {
 
         const attachment = file.ext === '.json'
           ? await json(file, config.transform.json, cb)
           : await liquid(file, config.transform.views.minify, cb);
 
-        return request.assets.queue(
+        await request.assets.queue(
           {
             method: 'put',
             data: {
@@ -157,12 +156,12 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
       /* ASSETS                                       */
       /* -------------------------------------------- */
 
-      if (is(file.type, Type.Asset)) {
+      else if (is(file.type, Type.Asset)) {
 
         const data = await readFile(file.path);
         const attachment = asset(file, data, cb);
 
-        return request.assets.queue(
+        await request.assets.queue(
           {
             method: 'put',
             data: {
@@ -181,9 +180,9 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
     /* DELETED FILE                                 */
     /* -------------------------------------------- */
 
-    if (is(event, Events.Delete)) {
+    else if (is(event, Events.Delete)) {
 
-      return request.assets.queue(
+      await request.assets.queue(
         {
           method: 'delete',
           params: {
