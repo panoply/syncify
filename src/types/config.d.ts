@@ -119,6 +119,7 @@ export interface IViews {
       minifySectionSchema?: boolean;
       removeLiquidComments?: boolean;
       ignoredLiquidTags?: string[];
+      removeAttributeNewlines?: boolean;
     }
     /**
      * A list of files or directories to exclude from minification
