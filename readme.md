@@ -147,8 +147,6 @@ Syncify configuration is defined with your projects `package.json` file. Syncify
 
 > Please note that you will need to remove the comments if you are copy and pasting configuration settings below. Checkout the [Examples](https://github.com/panoply/syncify-examples) repository to download or clone Syncify baked templates.
 
-### Example
-
 <!-- prettier-ignore -->
 ```jsonc
 {
@@ -196,7 +194,7 @@ Syncify configuration is defined with your projects `package.json` file. Syncify
       "sections": [], // An optional list of file paths to sections
       "snippets": [], // An optional list of file paths to snippets
       "templates": [], // An optional list of file paths to templates
-      "templates/customers": [] // An optional list of file paths to templates/customers
+      "customers": [] // An optional list of file paths to templates/customers
     },
 
     // Spawned processes to run in parallel with Syncify
@@ -291,9 +289,49 @@ Syncify configuration is defined with your projects `package.json` file. Syncify
 }
 ```
 
-### Options
+### Stores
 
-Below you will find the complete configuration guidelines and option references.
+The `stores` option accepts an `array` type and holds a reference to all your shopify themes/store to sync. For each store you define, Syncify requires you provide the `domain` and the `themes` you wish to target. The `themes` object keys are target names and the value is an `id` of a theme.
+
+Please see theme [Command][#commands] examples for more information.
+
+### Dirs
+
+The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to the name of directories which are relative to the root of your project. You cannot define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). The directories should preface folders contained from the root directory only.
+
+##### input
+
+The `input` option refers to your projects src build path. This is the directory where your development theme files exist. Syncify defaults this directory to `source`. The value defined here will be prepended to any path you define within `paths`.
+
+##### output
+
+The `output` option refers to your project dist build path. This is the directory where transformed theme files from `input` will be written. Syncify defaults this to `theme`. The output directory will be reflective of your online shop. You should point any asset files executing via a spawned process to point to the `assets` directory contained within.
+
+##### config
+
+The `config` option refers to a directory within your project where configuration files exist, like (for example) a `rollup.config.js` or `webpack.config.js` file. Syncify by default (when this option is undefined) will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. This `config` directory allows you to optionally place spawn config files within a sub-directory that is relative to root.
+
+> Typically this is named `scripts` in most node projects. Be sure to point any third party configurations paths correctly.
+
+##### import
+
+The `import` option refers to a directory where downloaded themes will be written. Syncify provides the ability to download themes from your online store and it is within this directory theme files will be created.
+
+##### export
+
+The `export` option refers to a directory where packaged (.zip) themes will be written when running the `package` resource via the CLI. Packaged themes will be prepended with the version number defined in your `package.json` file and are exported as `.zip` files.
+
+### Paths
+
+The `paths` option allows you to define a custom set of paths to theme specific files which are contained within the `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify as paths a re-routed to the defined `output` directory which adheres to the structure which is imposed. Each path option accepts an `array` of glob ([anymatch](https://www.npmjs.com/package/anymatch)) patterns. By default, Syncify assumes you are using the basic-bitch structure.
+
+### Spawn
+
+TODO
+
+### Transform
+
+TODO
 
 # CLI Usage
 
@@ -315,22 +353,24 @@ The Syncify CLI provides the following commands:
 
 ```cli
 Default:
-  syncify       Starts interactive CLI command prompt
+  $ syncify       Starts interactive CLI command prompt
 
 Commands:
-  syncify watch     <store>   Starts watch mode
-  syncify download  <store>   Downloads a specific theme/s from store/s
-  syncify upload    <store>   Uploads the theme directory
-  syncify build               Triggers a build of te entire theme
-  syncify themes              Prints list of themes, helpful when you need ids
-  syncify status              Prints list of connected stores
-  syncify query               Queries a resource endpoint like metafields
+  $ syncify watch     <store>   Starts watch mode
+  $ syncify download  <store>   Downloads a specific theme/s from store/s
+  $ syncify upload    <store>   Uploads the theme directory
+  $ syncify build               Triggers a build of te entire theme
+  $ syncify themes              Prints list of themes, helpful when you need ids
+  $ syncify status              Prints list of connected stores
+  $ syncify query     <store>   Queries a resource endpoint like metafields
+  $ syncify vsc                 Generates JSON schema spec for vscode users
 
 Flags:
   -t, --theme   <list>   A comma separated list of themes
   -s, --store   <list>   A comma separated list of store
   -o, --output  <path>   A path value (used in download mode only)
   -h, --help             Prints command list and some help information
+  -c, --clean            Executes a purge of all output files
 ```
 
 ### Example
@@ -461,15 +501,19 @@ The `package.json` configuration for the command would look like this:
 }
 ```
 
+### Prompts
+
+Syncify provides a helpful command prompt feature. Running `syncify` or `syncify --interactive` will provide you a simple prompt interface.
+
 </details>
 
-# API
+# API Usage
 
 Syncify can be initialized within scripts. This approach is a little more feature-full and allows you to integrate it with different build tools. You can hook into the transit process of files and apply modifications before they are uploaded to your store/s with this approach.
 
 ### Utilities
 
-Utilities will return some basic information about the Syncify instance. These are extremely helpful when when you are executing spawned processes and need to control what feature to load. For example, if you are spawning a webpack process for compiling JavaScript assets and need to inform upon watch mode you'd can use `util.resource('watch')` which returns a boolean value when running in watch mode.
+Utilities will return some basic information about the Syncify instance. These are extremely helpful when when you are executing spawned processes and need to control what feature to load. For example, if you are spawning a webpack process for compiling JavaScript assets and need to inform upon watch mode you'd use `util.resource('watch')` which returns a boolean value when running in watch mode.
 
 ```typescript
 import { util } from 'shopify-sync'
@@ -559,7 +603,7 @@ Create a script command within your `package.json` file.
 
 # Contributing
 
-This project uses [pnpm](https://pnpm.js.org/en/cli/install). Fork the project, run `pnpm i` and you're good to go. If you're using Yarn like the rest of the plebs or then you will still need to install pnpm.
+This project uses [pnpm](https://pnpm.js.org/en/cli/install). Fork the project, run `pnpm i` and you're good to go. If you're using Yarn like the rest of the plebs or npm then you will still need to install pnpm.
 
 # Author
 
