@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { delay, has } from 'rambdax';
-import Queue from 'p-queue';
-import { IMetafield, IStore } from 'types';
-import { is } from '../config/utils';
-import * as log from '../cli/logs';
-import { error } from '../cli/errors';
+import { IFile, IMetafield, IStore } from 'types';
+import { is } from 'config/utils';
+import * as log from 'cli/logs';
+import { error } from 'cli/errors';
+import { queue } from 'requests/queue';
 
 /**
  * Wait Condition
@@ -16,20 +16,11 @@ import { error } from '../cli/errors';
 let wait: boolean = false;
 
 /**
- * The Request Queue
+ * List Metafields
  *
- * We exceed the rate limits set by Shitify.
- * This allows us to upload in bursts, when we hit
- * the rates we requeue the requests.
+ * Metafields listing request, typically called
+ * from the prompt to query and explore metafields.
  */
-export const queue = new Queue(
-  {
-    concurrency: 5,
-    interval: 500,
-    intervalCap: 4
-  }
-);
-
 export async function list (store: IStore) {
 
   if (wait) {
@@ -39,7 +30,7 @@ export async function list (store: IStore) {
 
   return axios.get<{
     metafields: IMetafield[]
-  }>(store.endpoints.metafields).then(({ status, data }) => {
+  }>(store.url.metafields).then(({ status, data }) => {
 
     if (is(status, 200)) return data.metafields;
 
@@ -59,6 +50,12 @@ export async function list (store: IStore) {
 
 }
 
+/**
+ * Get Metafield
+ *
+ * Returns a metafield by walking through
+ * results to find relevant match.
+ */
 export async function get (store: IStore, metafield: IMetafield) {
 
   if (wait) {
@@ -66,9 +63,7 @@ export async function get (store: IStore, metafield: IMetafield) {
     wait = false;
   }
 
-  return axios.get<{
-    metafields: IMetafield[]
-  }>(store.endpoints.metafields).then(({ data }) => {
+  return axios.get<{ metafields: IMetafield[] }>(store.url.metafields).then(({ data }) => {
 
     if (has('namespace', metafield) && has('key', metafield)) {
       return data.metafields.find(({
@@ -105,7 +100,17 @@ export async function get (store: IStore, metafield: IMetafield) {
 
 }
 
+/**
+ * Create Metafield
+ *
+ * Creates a new metafield on the global
+ * shop. This is called when a metafield does
+ * not exists.
+ */
 export async function create (url: string, metafield: IMetafield) {
+
+  metafield.type = 'json';
+  metafield.value_type = 'json_string';
 
   if (wait) {
     await delay(500);
@@ -136,6 +141,12 @@ export async function create (url: string, metafield: IMetafield) {
 
 }
 
+/**
+ * Update Metafield
+ *
+ * Updates an existing metafield using its unique `id`.
+ * This is applied only when a metafield reference exists.
+ */
 export async function update (url: string, metafield: IMetafield) {
 
   if (wait) {
@@ -143,12 +154,10 @@ export async function update (url: string, metafield: IMetafield) {
     wait = false;
   }
 
-  return axios.put(url, { metafield }, {
-    responseType: 'json'
-  }).then(({ status }) => {
+  return axios.put(url, { metafield }, { responseType: 'json' }).then(({ status }) => {
 
     if (is(status, 200)) {
-      log.created(`${metafield.namespace}.${metafield.key} metafield`);
+      log.updated(`${metafield.namespace}.${metafield.key} metafield`);
     }
 
   }).catch(e => {
@@ -167,22 +176,23 @@ export async function update (url: string, metafield: IMetafield) {
   });
 }
 
-export async function write (store: IStore, metafield: IMetafield) {
+/**
+ * Metafields
+ *
+ * Metafield handler function. This is used in the
+ * resource modes and will query, create or update
+ * metafields.
+ */
+export async function metafields (url: string, file: IFile, metafield: IMetafield) {
 
-  const url = store.endpoints.metafields;
+  return axios.get<{ metafields: IMetafield[] }>(url).then(({ data }) => {
 
-  return axios.get<{
-    metafields: IMetafield[]
-  }>(url).then(({ data }) => {
+    if (is(data.metafields.length, 0)) return create(url, metafield);
 
-    if (is(data.metafields.length, 0)) {
-      return create(url, metafield);
-    }
-
-    const record = data.metafields.find(({
-      namespace,
-      key
-    }) => (metafield.namespace === namespace && metafield.key === key));
+    const record = data.metafields.find(({ namespace, key }) => (
+      metafield.namespace === namespace &&
+      metafield.key === key
+    ));
 
     if (!record) return create(url, metafield);
 
@@ -195,7 +205,7 @@ export async function write (store: IStore, metafield: IMetafield) {
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       wait = !wait;
-      queue.add(async () => write(store, metafield), { priority: 1000 });
+      queue.add(async () => metafields(url, file, metafield), { priority: 1000 });
     } else {
       if (!queue.isPaused) {
         queue.pause();
