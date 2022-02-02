@@ -1,41 +1,12 @@
 import { minify } from 'html-minifier-terser';
-import { IFile, IViews, Syncify } from 'types';
+import { IFile, ILiquidMinifyOptions, IViews, Syncify } from 'types';
 import { join } from 'path';
 import * as log from 'cli/logs';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
 import { Type } from 'config/file';
-import { is, isRegex } from 'utils/native';
-
-export function htmlOpts (fragments: RegExp[] | string[], tags: string[]) {
-
-  const liquid = new RegExp(`{%-?\\s*(?:(?!${tags.join('|')})[\\s\\S])*?%}`);
-  const ignore = fragments.map((fragment: any) => {
-    if (isRegex(fragment)) return fragment;
-    return new RegExp(fragment);
-  });
-
-  ignore.push(
-    // Ignore Inline Style
-    /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
-
-    // Ignore <style></style>
-    /<style[\s\S]*?<\/style>/,
-
-    // Ignore content for header
-    /{{-?\s*content_header[\s\S]*?}}/,
-
-    // Ignore content for header
-    /(?<={%-?\s{0,}style\s\s{0,}-?%})[\s\S]*?(?={%-?\s{0,}endstyle\s\s{0,}-?%})/,
-
-    // Ignored liquid tags
-    liquid
-
-  );
-
-  return ignore;
-
-}
+import { is, nil } from 'utils/native';
+import * as R from 'utils/regex';
 
 /**
  * Minify Section Schema
@@ -43,29 +14,30 @@ export function htmlOpts (fragments: RegExp[] | string[], tags: string[]) {
  * Minfies the contents of a `{% schema %}` tag
  * from within sections.
  */
-function minifySchema (file: IFile, content: string) {
+function minifySchema (content: string, options: ILiquidMinifyOptions) {
 
-  return content.replace(
-    /({%-?\s*schema\s*-?%})([\s\S]*?)({%-?\s*endschema\s*-?%})/,
-    (_, open, data, close) => {
+  if (!options.minifySectionSchema) return removeComments(content, options);
 
-      try {
+  const minified = content.replace(R.LiquidSchemaTag, data => {
 
-        const parsed = JSON.parse(data);
-        const minified = JSON.stringify(parsed, null, 0);
+    try {
 
-        return open + minified + close;
+      const parsed = JSON.parse(data);
+      const minified = JSON.stringify(parsed, null, 0);
 
-      } catch (e) {
+      return minified;
 
-        log.error(e);
+    } catch (e) {
 
-        return open + data + close;
+      log.error(e);
 
-      }
+      return data;
 
     }
-  );
+
+  });
+
+  return removeComments(minified, options);
 
 }
 
@@ -75,13 +47,13 @@ function minifySchema (file: IFile, content: string) {
  * Strips Liquid comments from file content.
  * This is executed before passing to HTML terser.
  */
-function stripNewlinesFromAttrs (content: string) {
+function removeComments (content: string, options: ILiquidMinifyOptions) {
 
-  return content.replace(/(?<=["])[\s\S]*?(?=")/g, (match) => (
-    match
-      .replace(/\n/g, '')
-      .replace(/\s{2,}/g, ' ')
-  ));
+  if (!options.removeLiquidComments) return stripNewlinesFromAttrs(content, options);
+
+  const minified = content.replace(R.LiquidComments, nil);
+
+  return stripNewlinesFromAttrs(minified, options);
 
 }
 
@@ -91,37 +63,59 @@ function stripNewlinesFromAttrs (content: string) {
  * Strips Liquid comments from file content.
  * This is executed before passing to HTML terser.
  */
-function removeComments (content: string) {
+function stripNewlinesFromAttrs (content: string, options: ILiquidMinifyOptions) {
 
-  return content.replace(
-    /{%-?\s*comment\s*-?%}[\s\S]*?{%-?\s*endcomment\s*-?%}/g,
-    ''
-  );
+  if (!options.removeLiquidNewlineAttributes) return content;
 
+  return content.replace(R.HTMLAttributeValues, match => {
+
+    return R.LiquidDelimiter.test(match)
+      ? match
+        .replace(/\n/g, nil)
+        .replace(/\s{2,}/g, ' ')
+        .replace(/(?<=[%}]})\s(?={[{%])/g, nil)
+      : match;
+
+  });
+
+}
+
+/**
+ * Remove Extranous Whitespace Dashes
+ *
+ * Strips Liquid whitespace dashes when previous characters
+ * are of not whitespace. this is executed in the post-minify
+ * cycle and will help reduce the render times imposed by Liquid.
+ */
+function stripExtranousDashes (content: string, options: ILiquidMinifyOptions) {
+
+  if (!options.removeRedundantWhitespaceDashes) return content;
+
+  return content
+    .replace(/(?<=[>}])\s(?={[{%])/g, nil)
+    .replace(/(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g, nil)
+    .replace(/(?<=\S){[{%]-|-?[%}]}{[{%]-|-[%}]}<\/?(?=[a-zA-Z]{1,})/g, match => match.replace(/-/g, nil));
 }
 
 function transform (file: IFile, config: IViews['minify']) {
 
   return async (data: string) => {
 
-    if (is(file.type, Type.Section)) {
-      if (config.liquid.minifySectionSchema) {
-        data = minifySchema(file, data);
-        log.json('minified {% schema %} in ' + file.base);
-      }
-    }
+    if (!config.apply) return Buffer.from(data).toString('base64');
 
-    if (config.liquid.removeLiquidComments) data = removeComments(data);
-    if (config.liquid.removeAttributeNewlines) data = stripNewlinesFromAttrs(data);
-    if (config.apply) data = await minify(data, config.terser);
+    const content = is(file.type, Type.Section)
+      ? minifySchema(data, config.liquid)
+      : removeComments(data, config.liquid);
 
-    console.log(join(file.output, file.key));
+    const htmlmin = await minify(content, config.terser);
+    const minified = stripExtranousDashes(htmlmin, config.liquid);
 
-    await writeFile(join(file.output, file.key), data);
+    await writeFile(join(file.output, file.key), minified);
 
-    return Buffer.from(data).toString('base64');
+    return Buffer.from(minified).toString('base64');
 
   };
+
 }
 
 /**
