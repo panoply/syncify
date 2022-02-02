@@ -1,4 +1,28 @@
 import Queue from 'p-queue';
+import connect from 'axios';
+import https from 'https';
+import http from 'http';
+
+/**
+ * Axios Request
+ *
+ * Creates a request instance
+ */
+export const axios = connect.create(
+  {
+    responseType: 'json',
+    httpAgent: new http.Agent(
+      {
+        keepAlive: true
+      }
+    ),
+    httpsAgent: new https.Agent(
+      {
+        keepAlive: true
+      }
+    )
+  }
+);
 
 /**
  * The Request Queue
