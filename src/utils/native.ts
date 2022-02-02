@@ -34,3 +34,8 @@ export const isBoolean = isType('Boolean');
  * is Boolean
  */
 export const isRegex = isType('RegExp');
+
+/**
+ * is String
+ */
+export const isString = isType('String');

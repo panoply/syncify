@@ -6,8 +6,8 @@ import { readJson, pathExistsSync, pathExists, mkdir } from 'fs-extra';
 import dotenv from 'dotenv';
 import { has, hasPath, isNil } from 'rambdax';
 import anymatch from 'anymatch';
-import { assign, is, isArray, isObject, isRegex, isUndefined, keys } from 'utils/native';
-import { normalPath, toUpcase } from 'utils/helpers';
+import { assign, is, isArray, isObject, isRegex, isString, isUndefined, keys } from 'utils/native';
+import { lastPath, normalPath, toUpcase } from 'utils/helpers';
 import { IOptions, ICLIOptions, IConfig, IStyles, IIcons, IPackage } from 'types';
 import { log, create } from 'cli/console';
 import * as style from 'transform/styles';
@@ -671,9 +671,13 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
   const styles = transform.styles.reduce((acc, v, i) => {
 
     if (isArray(v.input)) {
-      acc.push(...v.input.flatMap(input => {
-        return /\*\.s?css/.test(input) ? glob.sync(path(input)).map(input => ({ input })) : { ...v, input };
-      }));
+      acc.push(
+        ...v.input.flatMap(input => {
+          return /\*\.s?css/.test(input)
+            ? glob.sync(path(input)).map(input => ({ ...v, input }))
+            : { ...v, input };
+        })
+      );
     } else if (/\*\.s?css/.test(v.input)) {
       acc.push(...glob.sync(path(v.input)).map(input => ({ input })));
     } else {
@@ -696,9 +700,23 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
       if (isObject(v.rename)) {
 
+        const base = basename(v.input);
+        const sep = has('separator', v.rename) ? v.rename.separator : '-';
+        const parent = lastPath(v.input.replace(base, '')).replace('/', '');
 
+        if (has('prefixDir', v.rename) && v.rename.prefixDir === true) {
 
-      } else {
+          v.rename = v.input.replace(base, parent + sep + base);
+
+        } else {
+          if (has('prefix', v.rename)) {
+            v.rename = v.input.replace(base, parent + sep + base);
+          }
+        }
+
+      }
+
+      if (isString(v.rename)) {
 
         if (!/[a-zA-Z0-9_.-]+/.test(v.rename)) {
           log.throw('Invalid rename config defined on stylesheet: ' + v.rename);
@@ -783,6 +801,8 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
     config.transform.styles.compile.push(compile as IStyles['compile'][number]);
 
   }
+
+  console.log(config.transform.styles.compile);
 
   return getIcons(config, transform);
 

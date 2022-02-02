@@ -38,8 +38,12 @@ export interface IOptions {
   };
   transform?: {
     styles?: Array<{
-      input: string;
-      rename?: string;
+      input: string | string[];
+      rename?: string | {
+        prefix?: string;
+        prefixDir?: boolean;
+        separator?: string;
+      };
       snippet?: boolean;
       watch?: string[];
       include?: string[]
