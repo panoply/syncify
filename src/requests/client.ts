@@ -1,7 +1,7 @@
 import { IConfig } from 'types';
-import { queue } from './queue';
-import { write } from './metafields';
-export { requests as queue } from './queue';
+import { request } from 'requests/request';
+
+export { queue } from 'requests/queue';
 
 /**
  * Request Client
@@ -9,23 +9,45 @@ export { requests as queue } from './queue';
  * Wrapper requests handler. Acts as the client
  * interface from which we will dispatch requests.
  */
-export function client ({
-  sync: {
-    stores,
-    themes
-  }
-}: IConfig, size?: number) {
+export function client ({ sync: { stores, themes } }: IConfig) {
 
   return {
-    metafields: {
-      queue: queue(stores, write)
+    queue: {
+      metafields: request(stores),
+      assets: request(themes),
+      redirects: request(stores)
     },
-    assets: {
-      queue: queue(themes)
-    },
-    redirects: {
-      queue: queue(stores)
+    get request () {
+
+      return {
+        themes: {
+          get: null,
+          list: null,
+          update: null,
+          delete: null
+        },
+        metafields: {
+          get: null,
+          list: null,
+          update: null,
+          delete: null
+        },
+        assets: {
+          get: null,
+          list: null,
+          update: null,
+          delete: null
+        },
+        redirect: {
+          get: null,
+          list: null,
+          update: null,
+          delete: null
+        }
+
+      };
     }
+
   };
 
 }
