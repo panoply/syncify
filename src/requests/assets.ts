@@ -1,7 +1,6 @@
-import axios from 'axios';
 import { delay } from 'rambdax';
 import { IRequest, IThemes, IFile } from 'types';
-import { queue } from 'requests/queue';
+import { queue, axios } from 'requests/queue';
 import { is } from 'config/utils';
 import * as log from 'cli/logs';
 import { error } from 'cli/errors';
@@ -38,19 +37,13 @@ export async function assets (sync: IThemes, file: IFile, config: IRequest) {
   return axios(config).then(({ status }) => {
 
     if (is(status, 200)) {
-
-      switch (config.method) {
-        case 'delete':
-          log.deleted(file.key);
-          break;
-        case 'put':
-          log.updated(file.key);
-          break;
-        case 'post':
-          log.created(file.key);
-          break;
+      if (config.method === 'put') {
+        log.updated(file.key);
+      } else if (config.method === 'delete') {
+        log.deleted(file.key);
+      } else if (config.method === 'post') {
+        log.created(file.key);
       }
-
     }
 
   }).catch(e => {
