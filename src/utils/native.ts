@@ -16,6 +16,11 @@ export const { isArray, from } = Array;
 export const nil = '';
 
 /**
+ * Is Buffer
+ */
+export const { isBuffer } = Buffer;
+
+/**
  * is Undefined
  */
 export const isUndefined = isType('Undefined');
