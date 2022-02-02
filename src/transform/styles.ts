@@ -1,17 +1,18 @@
-import { compileString } from 'sass';
+import { compile } from 'sass';
 import * as log from 'cli/logs';
 import * as parse from 'cli/parse';
-import { is } from 'utils/native';
-import { IFile, IStyle } from 'types';
-import { writeFile } from 'fs-extra';
+import { is, isUndefined } from 'utils/native';
+import { IFile, IStyle, Methods } from 'types';
+import { readFile, writeFile } from 'fs-extra';
 import { Processor } from 'postcss';
-import { isNil } from 'rambdax';
+import { isNil, pipeAsync, curry, F } from 'rambdax';
 import { Type } from 'config/file';
+import stringify from 'fast-safe-stringify';
 
 /**
  * PostCSS Module
  */
-let postcss: Processor = null;
+let pcss: Processor = null;
 
 /**
  * Loads PostCSS
@@ -19,110 +20,110 @@ let postcss: Processor = null;
  * This is executed and the `postcss` variable is
  * assigned upon initialization.
  */
-export function processer (path: string) {
+export const processer = (path: string) => {
 
-  postcss = require('postcss')(require(path));
+  pcss = require('postcss')(require(path));
 
-}
+};
 
-/**
- * Create inline snippet
- */
-function snippet (isSnippet: boolean, css: string) {
+const write = (path: string) => (data: Buffer | string) => {
 
-  return Buffer.from(isSnippet ? '<style>' + css + '</style>' : css);
+  writeFile(path, data, (e) => e ? console.log(e) : null);
 
-}
+  return data;
 
-function sass (config: IStyle, data: string) {
+};
 
-  const { css, sourceMap } = compileString(data, {
-    sourceMapIncludeSources: true,
-    style: 'compressed',
-    sourceMap: true, // or an absolute or relative (to outFile) path
-    loadPaths: config.include
-  });
+const sass = async ({ config, type, base }: IFile<IStyle>) => {
 
-  return {
-    to: config.output,
-    css,
-    map: sourceMap
-  };
-}
+  if (is(type, Type.SASS)) {
+
+    const { css, sourceMap } = compile(config.input, {
+      sourceMapIncludeSources: true,
+      style: 'compressed',
+      sourceMap: true, // or an absolute or relative (to outFile) path
+      loadPaths: config.include
+    });
+
+    log.updated('processed scss');
+
+    write(config.cache + base + '.map')(stringify(sourceMap));
+
+    return [
+      css,
+      sourceMap,
+      config
+    ];
+
+  }
+
+  try {
+
+    const css = await readFile(config.input);
+
+    return [ css.toString(), null, config ];
+
+  } catch (e) {
+
+    log.error(e);
+  }
+
+};
 
 /**
  * Post Processor
  *
  * Runs postcss on compiled SASS or CSS styles
  */
-async function postprocess ({ css, map, to }: any) {
+const postcss = async ([ css, map, style ]:[ string, any, IStyle]) => {
 
-  const result = await postcss.process(css, {
-    from: undefined,
-    to,
-    map: map ? {
-      prev: map,
-      inline: false
-    } : null
+  if (isNil(postcss)) return css;
+
+  const result = await pcss.process(css, {
+    from: style.output,
+    to: style.output,
+    map: map ? { prev: map, inline: false } : null
   });
 
   result.warnings().forEach(warning => log.warn(parse.postcss(warning)));
 
-  return result.toString();
+  return [ result.toString(), style ];
 
-}
+};
 
-function write (request: any, file: IFile<IStyle>) {
+/**
+ * Create inline snippet
+ */
+const snippet = ([ css, style ]:[ string, IStyle ]) => {
 
-  return async (css: Buffer, _map?: string) => {
+  return style.snippet ? '<style>' + css + '</style>' : css;
 
-    try {
-
-      writeFile(file.output, css);
-
-      return request('put', file, css.toString('base64'));
-
-    } catch (e) {
-
-      return log.error(e);
-
-    }
-  };
-
-}
+};
 
 /**
  * SASS and PostCSS Compiler
  */
-export async function compile (file: IFile<IStyle>, data: string, request: any) {
+export async function transform (
+  file: IFile<IStyle>,
+  request?: (
+    method: Methods,
+    file: IFile,
+    content: string
+  ) => Promise<void>
+) {
 
-  const generate = write(request, file);
+  log.updated(file.key);
 
-  if (is(file.type, Type.SASS)) {
+  const queue = isUndefined(request) ? (a, b) => F : curry(request);
+  const output = write(file.output);
 
-    const compiled = sass(file.config, data);
-    const css = isNil(postcss)
-      ? compiled.css
-      : await postprocess(compiled);
-
-    return generate(snippet(file.config.snippet, css), compiled.map);
-
-  }
-
-  if (!isNil(postcss)) {
-    if (is(file.type, Type.CSS)) {
-
-      const css = await postprocess({
-        css: data,
-        map: undefined,
-        to: file.output
-      });
-
-      return generate(snippet(file.config.snippet, css), null);
-
-    }
-  }
-
-  return generate(snippet(file.config.snippet, data), null);
+  return pipeAsync(
+    sass,
+    postcss,
+    snippet,
+    Buffer.from,
+    output,
+    queue('put', file)
+  )(file);
 
 }
