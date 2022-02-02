@@ -1,12 +1,12 @@
 import { AxiosRequestConfig } from 'axios';
 import { queue } from 'requests/queue';
 import { mapFastAsync } from 'rambdax';
-import { IRequest, IStore, IFile, IThemes, Methods } from 'types';
+import { IRequest, IStore, IFile, IThemes, Methods, IMetafield } from 'types';
 import { is } from 'config/utils';
 import { assets } from 'requests/assets';
 import { metafields } from 'requests/metafields';
 import { Type } from 'config/file';
-import { assign } from 'utils/native';
+import { assign, isBuffer, isUndefined } from 'utils/native';
 
 /* -------------------------------------------- */
 /* EXPORTED                                     */
@@ -20,27 +20,27 @@ import { assign } from 'utils/native';
  */
 export function request (list: any[]) {
 
-  return (method: Methods, file: IFile, data: any) => {
+  return (method: Methods, file: IFile, content?: Buffer | IMetafield | unknown) => {
 
     if (is(file.type, Type.Metafield)) {
 
-      return queue.add(() => (
-        is(list.length, 1)
-          ? metafields(list[0].url.metafields, file, data)
-          : mapFastAsync<IStore, void>(({ url }) => metafields(url.metafields, file, data), list)
-      ));
+      return is(list.length, 1) ? queue.add(
+        async () => {
+          await metafields(list[0].url.metafields, file, content);
+        }
+      ) : queue.add(
+        async () => {
+          await mapFastAsync<IStore, any>(({ url }) => metafields(url.metafields, file, content), list);
+        }
+      );
 
     } else if (is(file.type, Type.Redirect)) {
 
       return null;
 
-    }
+    } else {
 
-    const config = assign<unknown, AxiosRequestConfig>(
-      {
-        method,
-        responseType: 'json'
-      }, data === false ? {
+      const config = assign<unknown, AxiosRequestConfig>({ method }, isUndefined(content) ? {
         params: {
           'asset[key]': file.key
         }
@@ -48,17 +48,23 @@ export function request (list: any[]) {
         data: {
           asset: {
             key: file.key,
-            attachment: data
+            attachment: isBuffer(content)
+              ? content.toString('base64')
+              : content
           }
         }
-      }
-    );
+      });
 
-    return queue.add(() => (
-      is(list.length, 1)
-        ? assets(list[0], file, config as IRequest)
-        : mapFastAsync<IThemes, void>(store => assets(store, file, config as IRequest), list)
-    ));
+      return is(list.length, 1) ? queue.add(
+        async () => {
+          await assets(list[0], file, config as IRequest);
+        }
+      ) : queue.add(
+        async () => {
+          await mapFastAsync<IThemes, any>(store => assets(store, file, config as IRequest), list);
+        }
+      );
 
+    };
   };
 }
