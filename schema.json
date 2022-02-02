@@ -213,22 +213,41 @@
                 "if": {
                   "properties": {
                     "input": {
-                      "oneOf": [
-                        {
-                          "pattern": "\\*\\.s?css"
-                        },
-                        {
-                          "type": "array"
-                        }
-                      ]
+                      "type": "array"
                     }
                   }
                 },
                 "then": {
                   "properties": {
-                    "prefix": {
+                    "rename": {
                       "description": "Rename the stylesheet before uploading to theme assets.",
-                      "type": "string"
+                      "type": "object",
+                      "properties": {
+                        "prefix": {
+                          "type": "string",
+                          "description": "Prefix compiled CSS stylesheets name"
+                        },
+                        "prefixDir": {
+                          "type": "boolean",
+                          "description": "Whether or not to prefix the parent directory to the file name.",
+                          "default": false
+                        }
+                      },
+                      "if": {
+                        "properties": {
+                          "prefixDir": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "separator": {
+                            "description": "Optionally provide a prefix separator to be appended to the directory name of the CSS file.",
+                            "type": "string"
+                          }
+                        }
+                      }
                     },
                     "snippet": {
                       "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will be wrapped in <style></style> tags and published to the theme \"snippets\" directory opposed to the theme \"assets\" directory.",

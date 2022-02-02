@@ -6,8 +6,8 @@ import { readJson, pathExistsSync, pathExists, mkdir } from 'fs-extra';
 import dotenv from 'dotenv';
 import { has, hasPath, isNil } from 'rambdax';
 import anymatch from 'anymatch';
-import { assign, is, isArray, isRegex, isUndefined, keys } from 'utils/native';
-import { lastPath, normalPath, toUpcase } from 'utils/helpers';
+import { assign, is, isArray, isObject, isRegex, isUndefined, keys } from 'utils/native';
+import { normalPath, toUpcase } from 'utils/helpers';
 import { IOptions, ICLIOptions, IConfig, IStyles, IIcons, IPackage } from 'types';
 import { log, create } from 'cli/console';
 import * as style from 'transform/styles';
@@ -448,8 +448,6 @@ async function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   }
 
-  console.log(config.watch);
-
   return getViews(config, pkg);
 
 }
@@ -696,21 +694,28 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
     if (has('rename', v)) {
 
-      if (!/[a-zA-Z0-9_.-]+/.test(v.rename)) {
-        log.throw('Invalid rename config defined on stylesheet: ' + v.rename);
-      }
+      if (isObject(v.rename)) {
 
-      // handle renamed files
-      if (!v.rename.endsWith('.css')) {
-        if (v.rename.endsWith('.scss')) {
-          rename = v.rename.replace('.scss', '.css');
-        } else if (v.rename.endsWith('.sass') || v.input.endsWith('.sass')) {
-          rename = v.rename.replace('.sass', '.css');
-        } else {
-          rename = v.rename + '.css';
-        }
+
+
       } else {
-        rename = v.rename;
+
+        if (!/[a-zA-Z0-9_.-]+/.test(v.rename)) {
+          log.throw('Invalid rename config defined on stylesheet: ' + v.rename);
+        }
+
+        // handle renamed files
+        if (!v.rename.endsWith('.css')) {
+          if (v.rename.endsWith('.scss')) {
+            rename = v.rename.replace('.scss', '.css');
+          } else if (v.rename.endsWith('.sass') || v.input.endsWith('.sass')) {
+            rename = v.rename.replace('.sass', '.css');
+          } else {
+            rename = v.rename + '.css';
+          }
+        } else {
+          rename = v.rename;
+        }
       }
 
     } else {
@@ -779,7 +784,6 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   }
 
-  console.log(config.transform.styles.compile);
   return getIcons(config, transform);
 
 }
