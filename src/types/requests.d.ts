@@ -1,6 +1,11 @@
 import { AxiosRequestConfig } from 'axios';
 
 /**
+ * Axios Request Methods
+ */
+export type Methods = 'get' | 'post' | 'put' | 'delete'
+
+/**
  * Resources
  */
 export type Resource = 'build' | 'watch' | 'upload' |'download' | 'interactive'
@@ -152,7 +157,7 @@ export interface IRedirect {
  */
 export interface IRequest extends AxiosRequestConfig {
   url?: string;
-  method: 'get' | 'post' | 'put' | 'delete';
+  method: Methods;
   responseType?: 'json',
   data?: { asset: IAsset } | { metafield: IMetafield } | { redirect: IRedirect }
   params?: {

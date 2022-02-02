@@ -6,12 +6,11 @@ import { readJson, pathExistsSync, pathExists, mkdir } from 'fs-extra';
 import dotenv from 'dotenv';
 import { has, hasPath, isNil } from 'rambdax';
 import anymatch from 'anymatch';
-import { assign, is, isArray, isUndefined, keys } from 'utils/native';
+import { assign, is, isArray, isRegex, isUndefined, keys } from 'utils/native';
 import { normalPath, toUpcase } from 'utils/helpers';
 import { IOptions, ICLIOptions, IConfig, IStyles, IIcons, IPackage } from 'types';
 import { log, create } from 'cli/console';
 import * as style from 'transform/styles';
-import * as liquid from 'transform/liquid';
 
 /**
  * Read Configuration
@@ -200,7 +199,8 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
           exclude: [],
           liquid: {
             minifySectionSchema: true,
-            removeAttributeNewlines: true,
+            removeLiquidNewlineAttributes: true,
+            removeRedundantWhitespaceDashes: true,
             removeLiquidComments: true,
             ignoredLiquidTags: []
           },
@@ -330,7 +330,7 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
         store,
         domain,
         queue,
-        endpoints: {
+        url: {
           themes: `${base}/admin/themes.json`,
           redirects: `${base}/admin/redirects.json`,
           metafields: `${base}/admin/metafields.json`,
@@ -462,7 +462,7 @@ async function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
 function getViews (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   if (isUndefined(pkg.syncify.transform) || !has('views', pkg.syncify.transform)) {
-    return getJson(config, pkg);
+    return minifyOptions(config, pkg);
   }
 
   const { transform } = pkg.syncify;
@@ -517,10 +517,71 @@ function getViews (config: PartialDeep<IConfig>, pkg: IPackage) {
     }
   }
 
-  config.transform.views.minify.terser.ignoreCustomFragments = liquid.htmlOpts(
-    config.transform.views.minify.terser.ignoreCustomFragments,
-    config.transform.views.minify.liquid.ignoredLiquidTags
-  );
+  return minifyOptions(config, pkg);
+
+}
+
+/**
+ * Minification Options
+ *
+ * Apply minification options for views. This will write
+ * logic for both liquid and HTML terser minifier options.
+ */
+function minifyOptions (config: PartialDeep<IConfig>, pkg: IPackage) {
+
+  if (hasPath('transform.views.minify', pkg.syncify)) {
+
+    if (has('ignoreCustomFragments', pkg.syncify.transform.views.minify)) {
+
+      const { ignoreCustomFragments } = pkg.syncify.transform.views.minify;
+
+      if (isArray(ignoreCustomFragments)) {
+
+        const tags = ignoreCustomFragments.map(
+          (fragment: any) => isRegex(fragment)
+            ? fragment
+            : new RegExp(fragment)
+        );
+
+        config.transform.views.minify.terser.ignoreCustomFragments.push(
+          ...tags,
+          // Ignore Inline Style
+          /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+
+          // Ignore <style></style>
+          /<style[\s\S]*?<\/style>/,
+
+          // Ignore Liquid tabs blocks
+          /{%-?\s{0,}liquid[\s\S]*?-?%}/,
+
+          // Ignore content for header
+          /{{-?\s*content_header[\s\S]*?}}/,
+
+          // Ignore content for header
+          /(?<={%-?\s{0,}style\s{0,}-?%})[\s\S]*?(?={%-?\s{0,}endstyle\s{0,}-?%})/
+        );
+
+      } else {
+
+        log.throw('The "ignoredLiquidTags" option must be an array type');
+      }
+
+    }
+
+    if (has('ignoredLiquidTags', pkg.syncify.transform.views.minify)) {
+
+      const { ignoredLiquidTags } = pkg.syncify.transform.views.minify;
+
+      if (isArray(ignoredLiquidTags)) {
+        const tags = new RegExp(`{%-?\\s*(?:(?!${ignoredLiquidTags.join('|')})[\\s\\S])*?%}`);
+        config.transform.views.minify.terser.ignoreCustomFragments.push(tags);
+      } else {
+        log.throw('The "ignoredLiquidTags" option must be an array type');
+      }
+
+    }
+
+  }
 
   return getJson(config, pkg);
 
@@ -767,6 +828,10 @@ async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['tran
   return config;
 
 }
+
+/* -------------------------------------------- */
+/* UTILITIES                                    */
+/* -------------------------------------------- */
 
 /**
  * Store Authorization URL

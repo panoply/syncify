@@ -78,6 +78,31 @@ export interface ITerser extends Options {
   ignoreCustomFragments?: RegExp[];
 }
 
+export interface ILiquidMinifyOptions {
+  /**
+   * Minifies JSON contained within schema sections
+   */
+  minifySectionSchema?: boolean;
+  /**
+   * A List of Liquid tags to ignore from minification
+   */
+  ignoredLiquidTags?: string[];
+  /**
+   * Remove all occurances of Liquid comments
+   */
+  removeLiquidComments?: boolean;
+  /**
+   * Removes and strips Liquid syntax contained within HTML
+   * Attributes that span newlines or apply extraneous whitespace.
+   */
+  removeLiquidNewlineAttributes?: boolean;
+  /**
+   * Removes redundant whitespace Liquid dash trims from Liquid
+   * tags and objects.
+   */
+  removeRedundantWhitespaceDashes: boolean;
+}
+
 export interface IViews {
   /**
    * Section specific view handling options
@@ -115,12 +140,7 @@ export interface IViews {
     /**
      * Liquid specific minification options
      */
-    liquid: {
-      minifySectionSchema?: boolean;
-      removeLiquidComments?: boolean;
-      ignoredLiquidTags?: string[];
-      removeAttributeNewlines?: boolean;
-    }
+    liquid: ILiquidMinifyOptions;
     /**
      * A list of files or directories to exclude from minification
      */
@@ -204,7 +224,7 @@ export interface IStore {
   /**
    * Preset API endpoint URLs
    */
-  endpoints: {
+  url: {
     /**
      * The authorized URL for pages
      */

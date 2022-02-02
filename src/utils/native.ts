@@ -11,6 +11,11 @@ export const { assign, is, defineProperty, defineProperties, keys, values, creat
 export const { isArray, from } = Array;
 
 /**
+ * Empty String
+ */
+export const nil = '';
+
+/**
  * is Undefined
  */
 export const isUndefined = isType('Undefined');

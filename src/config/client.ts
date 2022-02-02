@@ -22,6 +22,7 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
 
   const config = await readConfig(options);
 
+  console.log(config.transform.icons.sprites);
   if (config) {
 
     try {

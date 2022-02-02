@@ -48,7 +48,8 @@
   "eslintConfig": {
     "extends": "@brixtol/eslint-config",
     "rules": {
-      "object-curly-newline": "off"
+      "object-curly-newline": "off",
+      "no-import-assign": "off"
     }
   },
   "scripts": {
@@ -72,6 +73,7 @@
     "prettyjson": "^1.2.5",
     "prompts": "^2.4.2",
     "rambdax": "^8.0.0",
+    "svgstore": "^3.0.1",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

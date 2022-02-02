@@ -25,7 +25,7 @@ export default rollup(
       'sass-embedded',
       'yamljs',
       'html-minifier-terser',
-      'kleur',
+      'svgstore',
       'ansis',
       'cli-size'
     ],

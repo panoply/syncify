@@ -14,6 +14,18 @@ import { Type } from 'config/file';
 let postcss: Processor = null;
 
 /**
+ * Loads PostCSS
+ *
+ * This is executed and the `postcss` variable is
+ * assigned upon initialization.
+ */
+export function processer (path: string) {
+
+  postcss = require('postcss')(require(path));
+
+}
+
+/**
  * Create inline snippet
  */
 function snippet (isSnippet: boolean, css: string) {
@@ -78,15 +90,7 @@ function write (request: any, file: IFile<IStyle>) {
 
       await writeFile(file.output, css);
 
-      return request.queue({
-        method: 'put',
-        data: {
-          asset: {
-            key: file.key,
-            attachment: css.toString('base64')
-          }
-        }
-      });
+      return request('put', file, css.toString('base64'));
 
     } catch (e) {
 
@@ -94,17 +98,6 @@ function write (request: any, file: IFile<IStyle>) {
 
     }
   };
-
-}
-/**
- * Loads PostCSS
- *
- * This is executed and the `postcss` variable is
- * assigned upon initialization.
- */
-export function processer (path: string) {
-
-  postcss = require('postcss')(require(path));
 
 }
 

@@ -8,15 +8,6 @@ import { isArray, toUpcase } from 'config/utils';
 
 type Logger = (message: string) => void;
 
-type State = {
-  focus?: number,
-  nodes?: Array<{
-    label?: string;
-    count?: number;
-    spawn?: boolean;
-  }>
-} | string
-
 interface ILoggers {
   tracked?: string;
   scripts?: Logger,

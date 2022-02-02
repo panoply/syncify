@@ -118,13 +118,15 @@ export function parseFile (paths: IConfig['paths'], output: string) {
  */
 export function isStyle (file: IFile<IStyle>, transform: IStyles) {
 
-  file.config = transform.compile.find(x => x.watch(file.path));
-  file.type = file.ext === '.css' ? Type.CSS : Type.SASS;
-  file.output = join(file.output, file.config.output);
-  file.namespace = file.namespace === 'snippets' ? 'snippets' : file.namespace;
-  file.key = file.config.output;
+  const config = transform.compile.find(x => x.watch(file.path));
 
-  return file;
+  return assign({}, file, {
+    config,
+    type: file.ext === '.css' ? Type.CSS : Type.SASS,
+    output: join(file.output, config.output),
+    namespace: file.namespace === 'snippets' ? 'snippets' : file.namespace,
+    key: config.output
+  });
 
 }
 
@@ -134,7 +136,7 @@ export function isStyle (file: IFile<IStyle>, transform: IStyles) {
  */
 export function isMetafield (file: IFile) {
 
-  return assign(file as IFile, { key: file.base });
+  return assign(file as IFile, { key: file.name });
 
 }
 
