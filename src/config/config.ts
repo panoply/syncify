@@ -802,7 +802,7 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   }
 
-  console.log(config.transform.styles.compile);
+  // console.log(config.transform.styles.compile);
 
   return getIcons(config, transform);
 
