@@ -1,7 +1,7 @@
 import { has } from 'rambdax';
 import { IRequest } from 'types';
 import { join } from 'path';
-import { is } from 'utils/native';
+import { is, isArray } from 'utils/native';
 
 /**
  * Environment
@@ -52,7 +52,9 @@ export function normalPath (input: string) {
 
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
 
-  return (path: string) => {
+  return function prepend (path: string | string[]) {
+
+    if (isArray(path)) return path.map(prepend);
 
     let ignore: boolean = false;
 

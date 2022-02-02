@@ -179,11 +179,21 @@
               "items": {
                 "required": ["input"],
                 "type": "object",
-                "additionalProperties": false,
                 "properties": {
                   "input": {
-                    "description": "Input path to the stylesheet, eg: \"styles/stylesheet.scss\". This is the root SCSS file. When changes are detected Syncify will trigger the build from this file.",
-                    "type": "string"
+                    "oneOf": [
+                      {
+                        "description": "Input path to the stylesheet, eg: \"styles/stylesheet.scss\". This is the root SCSS file. When changes are detected Syncify will trigger the build from this file.",
+                        "type": "string"
+                      },
+                      {
+                        "description": "Input paths to the stylesheet, eg: \"styles/stylesheet.scss\". This is the root SCSS file. When changes are detected Syncify will trigger the build from this file.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ]
                   },
                   "watch": {
                     "description": "Files and/or paths to watch. When changes are detected and paths match the defined entries within this option then the input file will be processed.\n\nPlease note that you do not need to include the input file within this configuration setting, Syncify will automatically apply this.",
@@ -192,19 +202,52 @@
                       "type": "string"
                     }
                   },
-                  "rename": {
-                    "description": "Rename the stylesheet before uploading to theme assets.",
-                    "type": "string"
-                  },
-                  "snippet": {
-                    "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will be wrapped in <style></style> tags and published to the theme \"snippets\" directory opposed to the theme \"assets\" directory.",
-                    "type": "boolean"
-                  },
                   "include": {
                     "description": "Define a list of include paths. These will be passed to SASS and are useful when you want to include \"node_modules\" within @import references. You will need to prefex import paths with ~ character to inform Syncify to resolve imports from \"node_modules\" directory.",
                     "type": "array",
                     "items": {
                       "type": "string"
+                    }
+                  }
+                },
+                "if": {
+                  "properties": {
+                    "input": {
+                      "oneOf": [
+                        {
+                          "pattern": "\\*\\.s?css"
+                        },
+                        {
+                          "type": "array"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "prefix": {
+                      "description": "Rename the stylesheet before uploading to theme assets.",
+                      "type": "string"
+                    },
+                    "snippet": {
+                      "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will be wrapped in <style></style> tags and published to the theme \"snippets\" directory opposed to the theme \"assets\" directory.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "rename": {
+                      "description": "Rename the stylesheet before uploading to theme assets.",
+                      "type": "string"
+                    },
+                    "snippet": {
+                      "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will be wrapped in <style></style> tags and published to the theme \"snippets\" directory opposed to the theme \"assets\" directory.",
+                      "type": "boolean"
                     }
                   }
                 }

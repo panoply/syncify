@@ -1,4 +1,4 @@
-import { renderSync } from 'node-sass';
+import { compileString } from 'sass';
 import * as log from 'cli/logs';
 import * as parse from 'cli/parse';
 import { is } from 'utils/native';
@@ -36,27 +36,17 @@ function snippet (isSnippet: boolean, css: string) {
 
 function sass (config: IStyle, data: string) {
 
-  const { css, map } = renderSync({
-    data,
-    outFile: config.output,
-    file: config.input,
-    includePaths: config.include,
-    outputStyle: 'compressed',
-    indentedSyntax: false,
-    omitSourceMapUrl: true,
-    sourceMapContents: true,
-    sourceMap: true,
-    importer (url: string) {
-      return is(url.charCodeAt(0), 126) // ~
-        ? { file: url.slice(1) + config.node_modules }
-        : null;
-    }
+  const { css, sourceMap } = compileString(data, {
+    sourceMapIncludeSources: true,
+    style: 'compressed',
+    sourceMap: true, // or an absolute or relative (to outFile) path
+    loadPaths: config.include
   });
 
   return {
     to: config.output,
-    css: css.toString(),
-    map: map.toString()
+    css,
+    map: sourceMap
   };
 }
 
@@ -65,7 +55,7 @@ function sass (config: IStyle, data: string) {
  *
  * Runs postcss on compiled SASS or CSS styles
  */
-async function postprocess ({ css, map, to }: ReturnType<typeof sass>) {
+async function postprocess ({ css, map, to }: any) {
 
   const result = await postcss.process(css, {
     from: undefined,
@@ -88,7 +78,7 @@ function write (request: any, file: IFile<IStyle>) {
 
     try {
 
-      await writeFile(file.output, css);
+      writeFile(file.output, css);
 
       return request('put', file, css.toString('base64'));
 

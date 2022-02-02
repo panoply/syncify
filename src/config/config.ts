@@ -7,10 +7,11 @@ import dotenv from 'dotenv';
 import { has, hasPath, isNil } from 'rambdax';
 import anymatch from 'anymatch';
 import { assign, is, isArray, isRegex, isUndefined, keys } from 'utils/native';
-import { normalPath, toUpcase } from 'utils/helpers';
+import { lastPath, normalPath, toUpcase } from 'utils/helpers';
 import { IOptions, ICLIOptions, IConfig, IStyles, IIcons, IPackage } from 'types';
 import { log, create } from 'cli/console';
 import * as style from 'transform/styles';
+import { glob } from 'glob';
 
 /**
  * Read Configuration
@@ -669,7 +670,22 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   const path = normalPath(config.source);
 
-  for (const v of transform.styles) {
+  const styles = transform.styles.reduce((acc, v, i) => {
+
+    if (isArray(v.input)) {
+      acc.push(...v.input.flatMap(input => {
+        return /\*\.s?css/.test(input) ? glob.sync(path(input)).map(input => ({ input })) : { ...v, input };
+      }));
+    } else if (/\*\.s?css/.test(v.input)) {
+      acc.push(...glob.sync(path(v.input)).map(input => ({ input })));
+    } else {
+      acc.push(v);
+    }
+    return acc;
+
+  }, []);
+
+  for (const v of styles) {
 
     const compile: Partial<IStyles['compile'][number]> = {
       input: path(v.input),
@@ -711,11 +727,12 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
         rename = name;
       }
     }
+    let watch: string[];
 
     if (has('watch', v)) {
       if (isArray(v.watch)) {
 
-        const watch = v.watch.map(path);
+        watch = v.watch.map(path);
 
         watch.push(compile.input);
 
@@ -727,8 +744,11 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
       }
 
     } else {
-      compile.watch = anymatch([ compile.input ]);
+
+      watch = [ compile.input ];
+      compile.watch = anymatch(watch);
       config.watch.push(compile.input);
+
     }
 
     if (has('include', v)) {
@@ -759,6 +779,7 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   }
 
+  console.log(config.transform.styles.compile);
   return getIcons(config, transform);
 
 }
