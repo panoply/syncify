@@ -125,8 +125,9 @@ export function transform (file: IFile, data: string, space = 0): any {
 
     if (is(space, 0)) log.json('minified ' + file.base);
 
-    if (file.type !== Type.Metafield) writeFile(join(file.output, file.key), minified);
+    if (is(file.type, Type.Metafield)) return minified;
 
+    writeFile(join(file.output, file.key), minified);
     return Buffer.from(minified).toString('base64');
 
   } catch (e) {
