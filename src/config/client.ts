@@ -1,6 +1,6 @@
 import { has } from 'rambdax';
 import { ICLIOptions, Syncify } from 'types';
-import { upload } from 'sync/upload';
+// import { upload } from 'sync/upload';
 import { watch } from 'sync/watch';
 import { readConfig } from 'config/config';
 import { help } from 'cli/help';
@@ -22,7 +22,8 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
 
   const config = await readConfig(options);
 
-  console.log(config.transform.icons.sprites);
+  // console.log(config.transform.icons.sprites);
+
   if (config) {
 
     try {

@@ -92,16 +92,6 @@ export default rollup(
           ])
         }
       ),
-      plugin.copy(
-        {
-          targets: [
-            {
-              src: 'assets/icon.png',
-              dest: 'package'
-            }
-          ]
-        }
-      ),
       plugin.replace(
         {
           preventAssignment: true,
