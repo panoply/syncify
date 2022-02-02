@@ -1,19 +1,11 @@
 import glob from 'glob';
 import { readFile } from 'fs-extra';
-import { basename } from 'path';
-import { client, queue } from '../requests/client';
-
-// import { ignore } from '../config/utils';
-// import * as log from '../logs/console';
-// import * as screen from '../logs/screen';
+import { client, queue } from 'requests/client';
 import { IConfig, Syncify } from 'types';
 import { mapFastAsync } from 'rambdax';
-import { parseFile } from '../config/file';
+import { parseFile } from 'config/file';
 
-export async function upload (
-  config: IConfig,
-  callback?: typeof Syncify.hook
-): Promise<void> {
+export async function upload (config: IConfig, callback?: typeof Syncify.hook): Promise<void> {
 
   // let total: number = 0;
 
@@ -22,6 +14,8 @@ export async function upload (
   // const filter = settings?._?.[0] ? dirMatch : null;
 
   const files = glob.sync(`${config.output}/**`, { nodir: true });
+  const parse = parseFile(config.paths, config.output);
+  const transform = transforms(config, callback);
   const request = client(config, files.length * config.sync.themes.length);
   const parse = parseFile(config);
 

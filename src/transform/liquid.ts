@@ -112,6 +112,8 @@ function transform (file: IFile, config: IViews['minify']) {
 
     await writeFile(join(file.output, file.key), minified);
 
+    log.created(file.key);
+
     return Buffer.from(minified).toString('base64');
 
   };
