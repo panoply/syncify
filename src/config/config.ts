@@ -40,6 +40,9 @@ function command (options: ICLIOptions) {
   if (is(options._.length, 0)) {
     options.resource = 'interactive';
     return getPackage(options);
+  } else if (options._[0] === 'build') {
+    options.resource = 'build';
+    return getPackage(options);
   } else if (is(options._.length, 1)) {
     options.resource = options._[0];
   } else if (options._.length > 1) {
@@ -307,6 +310,8 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
 
   const file = dotenv.config({ path: join(config.cwd, '.env') });
   const { syncify } = pkg;
+
+  if (config.resource === 'build') return getPaths(config, pkg);
 
   for (const field of syncify.stores) {
 
@@ -691,7 +696,7 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
     const compile: Partial<IStyles['compile'][number]> = {
       input: path(v.input),
-      node_modules: config.node_modules + '/'
+      cache: config.cache + '/'
     };
 
     let rename: string;
@@ -706,11 +711,11 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
         if (has('prefixDir', v.rename) && v.rename.prefixDir === true) {
 
-          v.rename = v.input.replace(base, parent + sep + base);
+          v.rename = parent + sep + base;
 
         } else {
           if (has('prefix', v.rename)) {
-            v.rename = v.input.replace(base, parent + sep + base);
+            v.rename = parent + sep + base;
           }
         }
 
