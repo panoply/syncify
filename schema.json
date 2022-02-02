@@ -12,40 +12,40 @@
         "dirs": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Configure the build paths Syncify should use. The options defined here will be used in watch, build, upload and download modes. You cannot define reverse paths and defined must be relative to root directory.",
+          "description": "Configures the build directory base paths of your project. The options defined here will be used in watch, build, upload and download modes. You cannot define reverse paths or sub-directory paths. All values must be relative to root directory.",
           "properties": {
             "source": {
               "type": "string",
               "default": "source",
               "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
-              "description": "The source build path is the directory where theme files exist. This is typically called \"src\" but Syncify defaults this to \"source\". The value defined here will be prepended to any path you define in the configuration"
+              "description": "The source build path is the directory where theme files exist. Syncify defaults this to \"source\". The value defined here will be prepended to any path you define within \"paths\"."
             },
             "output": {
               "type": "string",
               "default": "theme",
               "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
-              "description": "The output build path is directory where transformed theme files will be written. This is typically called \"dist\" but Syncify defaults this to \"theme\". This directory will be reflective of the theme files synced with your store."
+              "description": "The output build path is the directory where transformed theme files will be written. This is typically called \"dist\" in most projects but Syncify defaults this to \"theme\". The output directory will reflect the theme files synced with your store online."
             },
             "import": {
               "type": "string",
               "default": "import",
               "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
-              "description": "The import build path is the directory where downloaded themes and/or theme files will be written. It is relative to your projects root directory."
+              "description": "The import build path is the directory where downloaded themes and files will be written. It is relative to your projects root directory and only used in the download mode."
             },
             "export": {
               "type": "string",
               "default": "import",
               "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
-              "description": "The export path is where packaged (.zip) themes will be written when running the \"package\" resource. Packaged themes will be prepended with the version number defined in your \"package.json\" file."
+              "description": "The export path is where packaged (.zip) themes will be written when running the \"package\" resource. Packaged themes will be prepended with the version number defined in your \"package.json\" file and are exported as \".zip\" files."
             },
             "config": {
               "type": "string",
               "default": "config",
               "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
-              "description": "Syncify will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. You can optionally place these config files in a subdirectory. Use this option to inform Syncify where configuration files are located within the workspace.\n\nTypically this is named \"scripts\" in node projects."
+              "description": "Syncify will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. You can optionally place these config files within a sub-directory (relative to root) and Syncify will look for any spawned of config files from within this directory (opposed to root). \n\nTypically this is named \"scripts\" in most node projects, you can place config files like you \"rollup.config.js\" or \"postcss.config.js\" files within."
             },
             "metafields": {
-              "description": "Paths to global shop metafields. You must link to directory paths only. Glob file patterns are not accepted.",
+              "description": "The directory path to global shop metafields. Syncify provides a elegant approach to metafield synchronization using a directory > file based structure.",
               "type": "string",
               "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$"
             }
@@ -55,10 +55,10 @@
           "type": "object",
           "title": "Paths",
           "additionalProperties": false,
-          "description": "Customize the development theme structure. You can map paths to different locations within your workspace and Syncify will re-route them upon upload to their correct locations. You cannot define reverse paths and defined must be relative to root directory.",
+          "description": "Customize the development theme structure of your project. You can create path maps to different locations within your project and Syncify will re-route them to the accepted theme structure imposed by Shopify. You cannot define reverse paths and globs must be relative to your root directory.\n\nAll paths must point to directories and files contained within the \"source\" directory defined. You can optionally omit the \"source\" entry from paths as Syncify will normalize and prepend that to all values defined.",
           "properties": {
             "assets": {
-              "description": "Paths to files to be published to theme `/assets` directory. Accepts a glob pattern",
+              "description": "Paths to files to be published to theme \"/assets\" directory. Accepts a glob (anymatch) pattern.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
@@ -66,7 +66,7 @@
               }
             },
             "config": {
-              "description": "Glob path to files to be published to theme `/config` directory. These are typically the `settings_schema.json` and `settings_data.json` files.",
+              "description": "Paths to files to be published to the theme \"/config\" directory. These are typically the \"settings_schema.json\" and \"settings_data.json\" files.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
@@ -74,7 +74,7 @@
               }
             },
             "locales": {
-              "description": "Glob path to files to be published to theme `/locales` directory. These are the translation files.",
+              "description": "Paths to files to be published to theme \"/locales\" directory. These are the translation files used by your store.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
@@ -82,7 +82,7 @@
               }
             },
             "layout": {
-              "description": "Glob path to files to be published to theme `/layout` directory. These are Liquid template files.",
+              "description": "Paths to files to be published to the theme \"/layout\" directory. These are Liquid template files.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
@@ -90,7 +90,7 @@
               }
             },
             "snippets": {
-              "description": "Glob path to files to be published to theme `/snippets` directory. These are Liquid template files.",
+              "description": "Paths to files to be published to the theme \"/snippets\" directory. These are Liquid template files.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
@@ -98,7 +98,7 @@
               }
             },
             "sections": {
-              "description": "Glob path to files to be published to theme `/sections` directory. These are Liquid template files. You can provide sub-directory references.",
+              "description": "Paths to files to be published to the theme \"/sections\" directory. These are Liquid template files.\n\nYou can provide sub-directory references here and Syncify will re-path values. See the \"views.sections\" options to control how sections should be output.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
@@ -106,15 +106,15 @@
               }
             },
             "templates": {
-              "description": "Glob path to files to be published to theme `/templates` directory. These can be either JSON or Liquid template files.",
+              "description": "Paths to files to be published to the theme \"/templates\" directory.. These can be either JSON or Liquid template files.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
                 "type": "string"
               }
             },
-            "templates/customers": {
-              "description": "Glob path to files to be published to theme `/templates/customers` directory. These can be either JSON or Liquid template files.",
+            "customers": {
+              "description": "Paths to files to be published to the theme \"/templates/customers\" directory. directory. These can be either JSON or Liquid template files.",
               "type": "array",
               "items": {
                 "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
@@ -122,21 +122,6 @@
               }
             }
           }
-        },
-        "terminal": {
-          "type": "string",
-          "default": "dashboard",
-          "description": "The type of terminal interface Syncify should use. By default, \"dashboard\" is loaded. When your terminal size is small then Syncify will load \"rolling\" mode.",
-          "oneOf": [
-            {
-              "enum": ["dashboard"],
-              "description": "Multiple pane blessed powered terminal interface."
-            },
-            {
-              "enum": ["rolling"],
-              "description": "Standard rolling terminal log"
-            }
-          ]
         },
         "stores": {
           "type": "array",
@@ -148,7 +133,7 @@
             "required": ["domain", "themes"],
             "properties": {
               "domain": {
-                "description": "Do not include the \"myshopify.com\" portion of the domain",
+                "description": "Do not include the \"myshopify.com\" portion of the domain.",
                 "type": "string",
                 "pattern": "^[a-zA-Z0-9_-]+$"
               },
@@ -171,24 +156,25 @@
         "spawn": {
           "type": "object",
           "additionalProperties": false,
+          "description": "Spawned child processes to run in parallel with the Syncify resource instance. Supply the CLI command of the process to execute.\n\nYou can leverage Syncify utilities and environment variables to conditionally execute different builds, eg: production or development.",
           "properties": {
             "watch": {
               "type": "object",
-              "description": "A list of commands to spawn in watch mode. The key defintion will be used as a tab label."
+              "description": "Supply the script commands you wish to spawn in watch mode. The \"key\" value will be used as the group reference in the CLI logs."
             },
-            "upload": {
+            "build": {
               "type": "object",
-              "description": "A list of commands to spawn in upload mode. The key defintion will be used as a tab label. This will typically be build specific spawns that should execute once."
+              "description": "Supply the script commands you wish to spawn in build mode. Build mode will trigger spawns in resource modes such as \"upload\" and \"build\". The \"key\" value will be used as the group reference in the CLI logs.\n\nBuild spawns will execute only once."
             }
           }
         },
         "transform": {
-          "description": "Transform options applied when processing files.",
+          "description": "Transform configuration options for processing in the asset and file pipeline.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "styles": {
-              "description": "A list of SCSS or SASS stylesheets to transform. Files will be processed with node-sass and then passed to PostCSS. Syncify requires you to provide a \"postcss.config.js\" configuration file in your projects root directory or within the defined \"config\" directory.",
+              "description": "A list of SCSS or SASS stylesheets to transform. Files will be processed with \"node-sass\" and then if defined, contents will be passed to PostCSS for post-processing. If you want to process SASS/SCSS that has been compiled into CSS using PostCSS you will need to provide a \"postcss.config.js\" configuration file in your projects root directory or if defined, the \"config\" directory path.",
               "type": "array",
               "items": {
                 "required": ["input"],
@@ -196,26 +182,26 @@
                 "additionalProperties": false,
                 "properties": {
                   "input": {
-                    "description": "Input path to the stylesheet, eg: \"styles/stylesheet.scss\". This is the root SASS file. ",
+                    "description": "Input path to the stylesheet, eg: \"styles/stylesheet.scss\". This is the root SCSS file. When changes are detected Syncify will trigger the build from this file.",
                     "type": "string"
                   },
                   "watch": {
-                    "description": "Files and/or paths to watch. When changes are detected and paths match the defined entries here the input file will be processed. Please not that you do not need to include the input file.",
+                    "description": "Files and/or paths to watch. When changes are detected and paths match the defined entries within this option then the input file will be processed.\n\nPlease note that you do not need to include the input file within this configuration setting, Syncify will automatically apply this.",
                     "type": "array",
                     "items": {
                       "type": "string"
                     }
                   },
                   "rename": {
-                    "description": "Rename the stylesheet before uploading",
+                    "description": "Rename the stylesheet before uploading to theme assets.",
                     "type": "string"
                   },
                   "snippet": {
-                    "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will wrapped in <style></style> tags and published to the theme \"snippets\" directory",
+                    "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will be wrapped in <style></style> tags and published to the theme \"snippets\" directory opposed to the theme \"assets\" directory.",
                     "type": "boolean"
                   },
                   "include": {
-                    "description": "Paths to include. Useful when you want to include \"node_modules\" paths in @import. You will need to prefex import paths with ~ character.",
+                    "description": "Define a list of include paths. These will be passed to SASS and are useful when you want to include \"node_modules\" within @import references. You will need to prefex import paths with ~ character to inform Syncify to resolve imports from \"node_modules\" directory.",
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -225,19 +211,19 @@
               }
             },
             "json": {
-              "description": "Transform options for handling \".json\" files",
+              "description": "Transform options for handling \".json\" files. The configuration options you define here will be applied to all JSON file types intercepted by Syncify.",
               "type": "object",
               "additionalProperties": false,
               "properties": {
                 "allowComments": {
                   "type": "boolean",
                   "default": false,
-                  "description": "Whether or not to accepts comments in JSON files. When \"true\" comments will be stripped before upload. Please note that you will need to adjust your editor settings."
+                  "description": "Whether or not to accepts comments in JSON files. When \"true\" comments will be stripped before uploading. Please note that you will need to adjust your editor settings to prevent errors from being thrown.\n\nTypically, you can leave this option to \"false\" and avoid processing such files."
                 },
                 "minify": {
                   "required": ["apply"],
                   "type": "object",
-                  "description": "Minification options to be applied.",
+                  "description": "Minification options to be applied to JSON files. The settings defined here will be applied to all intercepted JSON files.",
                   "additionalProperties": false,
                   "properties": {
                     "exclude": {
@@ -440,26 +426,61 @@
                       "type": "boolean",
                       "default": true
                     },
+                    "caseSensitive": {
+                      "type": "boolean",
+                      "description": "Treat attributes in case sensitive manner (useful for custom HTML tags)",
+                      "default": false
+                    },
+                    "omitBooleanValues": {
+                      "type": "boolean",
+                      "description": "Omit attribute values from boolean attributes",
+                      "default": false
+                    },
+                    "keepClosingSlash": {
+                      "type": "boolean",
+                      "description": "Keep the trailing slash on singleton elements",
+                      "default": false
+                    },
                     "ignoreCustomFragments": {
-                      "description": "A regular expression list of HTML fragments to ignore.",
+                      "description": "A regular expression list of HTML fragments to ignore. Please keep in mind that the expressions will be converted using new RegExp() method so ensure to escape character where necessary.",
                       "type": "array",
                       "items": {
                         "type": "string"
                       }
                     },
+                    "sortAttributes": {
+                      "type": "boolean",
+                      "description": "Sort attributes by frequency",
+                      "default": false
+                    },
                     "minifySectionSchema": {
                       "type": "boolean",
                       "default": true,
-                      "description": "Whether sections schema tag JSON contents should be minified"
+                      "description": "Whether JSON section schema tag contents should be minified."
                     },
-                    "removeAttributeNewlines": {
+                    "removeRedundantAttributes": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Remove attributes when value matches default"
+                    },
+                    "removeAttributeQuotes": {
+                      "type": "boolean",
+                      "description": "Remove quotes around HTML attributes when possible",
+                      "default": false
+                    },
+                    "removeLiquidNewlineAttributes": {
                       "type": "boolean",
                       "default": true,
                       "description": "Whether or not to remove newlines contained within attributes. This is specifically helpful when you a expressing Liquid in HTML attributes that spans newlines."
                     },
+                    "removeRedundantWhitespaceDashes": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Whether or not to remove redundant whitespace dashes from Liquid tags when proceeding characters are not whitespace values."
+                    },
                     "removeLiquidComments": {
                       "type": "boolean",
-                      "default": true,
+                      "default": false,
                       "description": "Whether or not to remove Liquid comments"
                     },
                     "ignoredLiquidTags": {
