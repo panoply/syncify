@@ -1,10 +1,9 @@
-import axios from 'axios';
 import { delay, has } from 'rambdax';
 import { IFile, IMetafield, IStore } from 'types';
 import { is } from 'config/utils';
 import * as log from 'cli/logs';
 import { error } from 'cli/errors';
-import { queue } from 'requests/queue';
+import { queue, axios } from 'requests/queue';
 
 /**
  * Wait Condition
