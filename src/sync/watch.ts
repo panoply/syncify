@@ -14,7 +14,7 @@ export async function watch (config: IConfig, callback: typeof Syncify.hook) {
     persistent: true,
     ignoreInitial: true,
     usePolling: true,
-    interval: 25,
+    interval: 50,
     binaryInterval: 100,
     cwd: config.cwd,
     ignored: [
@@ -25,12 +25,12 @@ export async function watch (config: IConfig, callback: typeof Syncify.hook) {
   const parse = parseFile(config.paths, config.output);
   const transform = transforms(config, callback);
 
-  watcher.on('all', (event, path) => {
+  watcher.on('all', async (event, path) => {
 
     const file: IFile = parse(path);
     const type: Events = (event === 'change' || event === 'add') ? Events.Update : Events.Delete;
 
-    return transform(type, file);
+    await transform(type, file);
 
   });
 
