@@ -5,7 +5,7 @@ import { IConfig, IFile, IStyle, Syncify } from 'types';
 import { client, queue } from 'requests/client';
 import { Type, isStyle, isMetafield, isSection, asset } from 'config/file';
 import { compile as liquid } from 'transform/liquid';
-import { compile as styles } from 'transform/styles';
+import { transform as styles } from 'transform/styles';
 import { compile as json } from 'transform/json';
 import { is } from 'config/utils';
 import { readFile } from 'fs-extra';
@@ -35,9 +35,8 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
       if (is(file.type, Type.Style)) {
 
         const style = isStyle(file as IFile<IStyle>, config.transform.styles);
-        const data = await readFile(style.config.input);
 
-        await styles(style, data.toString(), request.queue.assets);
+        await styles(style, request.queue.assets);
 
       }
 
@@ -132,7 +131,7 @@ export function transforms (config: IConfig, cb: typeof Syncify.hook) {
 
     else if (is(event, Events.Delete)) {
 
-      await request.queue.assets('delete', file, false);
+      await request.queue.assets('delete', file);
 
     }
 
