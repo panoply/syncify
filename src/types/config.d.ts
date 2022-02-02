@@ -174,10 +174,9 @@ export interface IStyle {
    */
   watch: Tester;
   /**
-   * Path to node_modules directory relative to current working directory.
-   * This is used to re-write `~` dashed paths.
+   * Path location to the sass map cache
    */
-  node_modules: string;
+  cache: string;
   /**
    * A list of paths to include, ie: node_modules.
    */
