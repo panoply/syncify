@@ -1,6 +1,6 @@
-import { has, isType } from 'rambdax';
-import { IRequest } from 'types';
+import { isType } from 'rambdax';
 import { join } from 'path';
+import { Blob } from 'buffer';
 
 /**
  * Native Object Methods
@@ -117,28 +117,28 @@ export function loadModule (moduleId: string) {
 }
 
 /**
- * Get the asset key reference (used for logs)
+ * Returns the byte size of a string value
  */
-export function getAssetKey (config: IRequest) {
+export function byteSize (string: string): number {
 
-  switch (config.method) {
-    case 'put':
-    case 'post':
+  return new Blob([ string ]).size;
 
-      if (has('metafield', config.data)) {
-        return (config.data as { metafield: any }).metafield.key;
-      } else if (has('asset', config.data)) {
-        return (config.data as { asset: any }).asset.key;
-      }
+}
 
-      break;
+/**
+ * Converts byte size to killobyte, megabyre,
+ * gigabyte or terrabyte
+ */
+export function byteConvert (bytes: number): string {
 
-    case 'delete':
+  if (bytes === 0) return '0 bytes';
 
-      return config.params['asset[key]'];
+  const size = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
+  const unit = [ 'bytes', 'kb', 'mb', 'gb', 'tb' ];
 
-  }
-
+  return size === 0
+    ? `${bytes} ${unit[size]}`
+    : `${(bytes / 1024 ** size).toFixed(1)} ${unit[size]}`;
 }
 
 /**
