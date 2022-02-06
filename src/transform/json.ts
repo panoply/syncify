@@ -1,10 +1,13 @@
 import { has, isType } from 'rambdax';
+import c from 'ansis';
 import { IFile, Syncify, IJson } from 'types';
 import * as log from 'cli/logs';
 import { join } from 'path';
 import { readJson, writeFile } from 'fs-extra';
 import { is } from 'config/utils';
 import { Type } from 'config/file';
+import stringify from 'fast-safe-stringify';
+import { byteSize } from 'shared/helpers';
 
 /**
  * Read JSON
@@ -17,7 +20,11 @@ export async function compile (file: IFile, options: IJson, callback: typeof Syn
 
   let data = await readJson(file.path);
 
-  if (options.minify.removeSchemaRefs) data = strip(file, data);
+  file.size.before = byteSize(data);
+
+  if (options.minify.removeSchemaRefs) {
+    data = strip(file, data);
+  }
 
   if (!isType('Function', callback)) return transform(file, data, options.minify.apply ? 2 : 0);
 
@@ -58,7 +65,7 @@ export function parse (data: string) {
 
   } catch (e) {
 
-    return log.error(e);
+    return log.throws(e);
 
   }
 
@@ -77,7 +84,7 @@ export function strip (file: IFile, data: { $schema?: string }) {
 
   delete json.$schema;
 
-  log.json('$schema field removed from ' + file.base);
+  log.fileTask(file, `removed ${c.bold.magenta('$schema')} field removed from json}`);
 
   return json;
 
@@ -95,15 +102,13 @@ export function minify (file: IFile, data: string, space = 0): any {
 
   try {
 
-    const minified = JSON.stringify(data, null, space);
-
-    if (is(space, 0)) log.json('minified ' + file.base);
+    const minified = stringify(data, null, space);
 
     return minified;
 
   } catch (e) {
 
-    return log.error(e);
+    return log.throws(e);
 
   }
 
@@ -121,18 +126,21 @@ export function transform (file: IFile, data: string, space = 0): any {
 
   try {
 
-    const minified = JSON.stringify(data, null, space);
+    const minified = stringify(data, null, space);
 
-    if (is(space, 0)) log.json('minified ' + file.base);
+    if (is(space, 0)) log.fileTask(file, 'minified json file');
 
     if (is(file.type, Type.Metafield)) return minified;
 
+    file.size.after = byteSize(minified);
+
     writeFile(join(file.output, file.key), minified);
-    return Buffer.from(minified).toString('base64');
+
+    return minified;
 
   } catch (e) {
 
-    return log.error(e);
+    return log.throws(e);
 
   }
 

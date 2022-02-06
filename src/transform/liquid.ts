@@ -5,8 +5,9 @@ import * as log from 'cli/logs';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
 import { Type } from 'config/file';
-import { is, nil } from 'utils/native';
-import * as R from 'utils/regex';
+import { is, nil } from 'shared/native';
+import * as R from 'shared/regex';
+import { byteSize } from 'shared/helpers';
 
 /**
  * Minify Section Schema
@@ -14,7 +15,7 @@ import * as R from 'utils/regex';
  * Minfies the contents of a `{% schema %}` tag
  * from within sections.
  */
-function minifySchema (content: string, options: ILiquidMinifyOptions) {
+function minifySchema (file: IFile, content: string, options: ILiquidMinifyOptions) {
 
   if (!options.minifySectionSchema) return removeComments(content, options);
 
@@ -25,11 +26,13 @@ function minifySchema (content: string, options: ILiquidMinifyOptions) {
       const parsed = JSON.parse(data);
       const minified = JSON.stringify(parsed, null, 0);
 
+      log.fileTask(file, 'minified JSON section schema');
+
       return minified;
 
     } catch (e) {
 
-      log.error(e);
+      log.fileError(e);
 
       return data;
 
@@ -101,20 +104,23 @@ function transform (file: IFile, config: IViews['minify']) {
 
   return async (data: string) => {
 
-    if (!config.apply) return Buffer.from(data).toString('base64');
+    if (!config.apply) return data;
 
     const content = is(file.type, Type.Section)
-      ? minifySchema(data, config.liquid)
+      ? minifySchema(file, data, config.liquid)
       : removeComments(data, config.liquid);
 
     const htmlmin = await minify(content, config.terser);
     const minified = stripExtranousDashes(htmlmin, config.liquid);
 
+    file.size.after = byteSize(minified);
+
     await writeFile(join(file.output, file.key), minified);
 
-    log.created(file.key);
+    log.fileTask(file, 'minified liquid + html');
+    log.fileSize(file);
 
-    return Buffer.from(minified).toString('base64');
+    return minified;
 
   };
 
@@ -129,6 +135,9 @@ function transform (file: IFile, config: IViews['minify']) {
 export async function compile (file: IFile, config: IViews['minify'], callback: typeof Syncify.hook) {
 
   const read = await readFile(file.path);
+
+  file.size.before = byteSize(read);
+
   const edit = transform(file, config);
   const data = read.toString();
 

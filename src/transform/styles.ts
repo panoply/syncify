@@ -1,11 +1,12 @@
-import { compile } from 'sass';
+import { compile, Logger } from 'sass';
+import c from 'ansis';
 import * as log from 'cli/logs';
 import * as parse from 'cli/parse';
-import { is, isUndefined } from 'utils/native';
-import { IFile, IStyle, Methods } from 'types';
+import { is } from 'shared/native';
+import { IFile, IStyle } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { Processor } from 'postcss';
-import { isNil, pipeAsync, curry, F } from 'rambdax';
+import type { Processor } from 'postcss';
+import { isNil, pipeAsync } from 'rambdax';
 import { Type } from 'config/file';
 import stringify from 'fast-safe-stringify';
 
@@ -26,7 +27,9 @@ export const processer = (path: string) => {
 
 };
 
-const write = (path: string) => (data: Buffer | string) => {
+const write = (path: string) => (data: string) => {
+
+  if (isNil(data)) return null;
 
   writeFile(path, data, (e) => e ? console.log(e) : null);
 
@@ -34,26 +37,43 @@ const write = (path: string) => (data: Buffer | string) => {
 
 };
 
-const sass = async ({ config, type, base }: IFile<IStyle>) => {
+const sass = async (file: IFile<IStyle>) => {
+
+  const { config, type, base } = file;
 
   if (is(type, Type.SASS)) {
 
-    const { css, sourceMap } = compile(config.input, {
-      sourceMapIncludeSources: true,
-      style: 'compressed',
-      sourceMap: true, // or an absolute or relative (to outFile) path
-      loadPaths: config.include
-    });
+    try {
 
-    log.updated('processed scss');
+      const { css, sourceMap } = compile(config.input, {
+        sourceMapIncludeSources: false,
+        style: config.sass.style,
+        quietDeps: config.sass.warnings,
+        sourceMap: config.sass.sourcemap,
+        loadPaths: config.include,
+        logger: config.sass.warnings ? {
+          debug: log.sassDebug,
+          warn: log.sassWarn
+        } : Logger.silent
+      });
 
-    write(config.cache + base + '.map')(stringify(sourceMap));
+      if (config.sass.sourcemap) write(config.cache + base + '.map')(stringify(sourceMap));
 
-    return [
-      css,
-      sourceMap,
-      config
-    ];
+      log.fileTask(file, `compiled ${c.bold('sass')} to ${c.bold('css')}`);
+
+      return [
+        css,
+        sourceMap,
+        config
+      ];
+
+    } catch (e) {
+
+      log.sassError(e);
+
+      return null;
+
+    }
 
   }
 
@@ -65,7 +85,7 @@ const sass = async ({ config, type, base }: IFile<IStyle>) => {
 
   } catch (e) {
 
-    log.error(e);
+    log.throws(e);
   }
 
 };
@@ -75,9 +95,13 @@ const sass = async ({ config, type, base }: IFile<IStyle>) => {
  *
  * Runs postcss on compiled SASS or CSS styles
  */
-const postcss = async ([ css, map, style ]:[ string, any, IStyle]) => {
+const postcss = async (params:[ string, any, IStyle]) => {
 
-  if (isNil(postcss)) return css;
+  if (isNil(params)) return null;
+
+  const [ css, map, style ] = params;
+
+  if (isNil(postcss) || style.postcss === false) return [ css, style ];
 
   const result = await pcss.process(css, {
     from: style.output,
@@ -85,7 +109,7 @@ const postcss = async ([ css, map, style ]:[ string, any, IStyle]) => {
     map: map ? { prev: map, inline: false } : null
   });
 
-  result.warnings().forEach(warning => log.warn(parse.postcss(warning)));
+  result.warnings().forEach(warning => log.fileWarn(parse.postcss(warning)));
 
   return [ result.toString(), style ];
 
@@ -94,36 +118,21 @@ const postcss = async ([ css, map, style ]:[ string, any, IStyle]) => {
 /**
  * Create inline snippet
  */
-const snippet = ([ css, style ]:[ string, IStyle ]) => {
+const snippet = (params: [ string, IStyle ]) => {
 
-  return style.snippet ? '<style>' + css + '</style>' : css;
+  if (isNil(params)) return null;
+
+  return params[1].snippet ? '<style>' + params[0] + '</style>' : params[0];
 
 };
 
 /**
  * SASS and PostCSS Compiler
  */
-export async function transform (
-  file: IFile<IStyle>,
-  request?: (
-    method: Methods,
-    file: IFile,
-    content: string
-  ) => Promise<void>
-) {
+export async function transform (file: IFile<IStyle>): Promise<string> {
 
-  log.updated(file.key);
-
-  const queue = isUndefined(request) ? (a, b) => F : curry(request);
   const output = write(file.output);
 
-  return pipeAsync(
-    sass,
-    postcss,
-    snippet,
-    Buffer.from,
-    output,
-    queue('put', file)
-  )(file);
+  return pipeAsync<string>(sass, postcss, snippet, output)(file);
 
 }
