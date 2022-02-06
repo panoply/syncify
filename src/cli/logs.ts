@@ -1,101 +1,241 @@
 import c from 'ansis';
 import * as parse from 'cli/parse';
-import * as cli from 'cli/console';
-import * as ansis from 'cli/ansi';
+import { task, prepend } from 'cli/ansi';
+import { log } from 'cli/console';
+import * as marky from 'marky';
+import { IFile } from 'types';
+import type { SourceSpan, Exception } from 'sass';
+import { has, hasPath } from 'rambdax';
+import { byteConvert } from 'shared/helpers';
+
+let hasError: boolean = false;
 
 /**
- * Prints Deletions
+ * File Change
+ *
+ * File source path that was changed
  */
-export function deleted (file: string) {
+export const fileChange = (file: IFile) => {
 
-  cli.log.files(c.blue.bold('␡ ') + c.blue(file));
+  if (hasError) {
+    hasError = false;
+  }
 
-}
+  marky.mark('change');
+  marky.mark(file.path);
+
+  log.files(
+    task(
+      c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`)
+    )
+  );
+
+};
 
 /**
- * Prints Created
+ * File Task
+ *
+ * File operation (transform) executed on file
  */
-export function created (file: string) {
+export const fileRemove = (file: IFile) => {
 
-  cli.log.files(c.green.bold('+ ') + c.green(file));
+  marky.mark(file.key);
 
-}
+  log.files(
+    task(
+      c.cyan('␡ deleted ' + file.key)
+    )
+  );
+
+};
 
 /**
- * Prints Metafield
+ * File Task
+ *
+ * File operation (transform) executed on file
  */
-export function metafield (message: string) {
+export const fileTask = (file: IFile, message: string) => {
 
-  cli.log.metafields(c.green.bold('✓ ' + message));
+  const duration = marky.stop(file.path).duration.toFixed(0);
 
-}
+  log.files(
+    task(`✓ ${message} ${c.gray('in')} ${duration}ms`)
+  );
+
+  marky.mark(file.path);
+
+};
+
+export const fileSize = (file: IFile) => {
+
+  if (!has('size', file)) return;
+
+  const saved = byteConvert(file.size.before - file.size.after);
+  const size = byteConvert(file.size.after);
+
+  log.files(
+    task(
+      c.magentaBright(`𝌹 filesize is ${c.bold(size)} saved ${c.bold(saved)}`)
+    )
+  );
+
+};
 
 /**
- * Prints Redirect
+ * File Sync
+ *
+ * File was synced to a store and theme
  */
-export function redirect (text: string) {
+export const fileSync = (file: IFile, store: string, theme: string) => {
 
-  cli.log.redirects(c.green.bold('✓ ') + c.green(text));
+  if (!hasError) {
 
-}
+    const time = marky.stop('change').duration.toFixed(0);
+    const shop = `${c.magenta(theme)} ${c.gray('on')} ${c.blue(store)} ${c.gray('in')}`;
+
+    log.files(
+      task(c.green(`✓ uploaded ${c.bold(file.key)} ${c.gray('to')} ${shop} ${c.white(time + 'ms')}`))
+    );
+
+  } else {
+
+    hasError = true;
+  }
+
+};
 
 /**
- * Prints Updates
+ * File Upload
+ *
+ * File is uploading to a store and theme
  */
-export function updated (text: string) {
+export const fileDelete = (storeName: string, themeName: string) => {
 
-  cli.log.files(c.green.bold('✓ ') + c.green(text));
+  log.files(
+    task(c.gray(`deleted from ${c.white(themeName)} (${c.white(storeName)})`))
+  );
 
-}
+};
 
 /**
- * Prints JSON
+ * File Ignored
+ *
+ * File was ignored from transform and sync
  */
-export function json (file: string) {
+export const fileIgnore = (filePath: string) => {
 
-  cli.log.files(c.magenta.bold('✓ ') + c.magenta(file));
+  log.files(
+    task(c.gray(`${c.bold('!')} ignoring ${filePath}`))
+  );
 
-}
+};
 
 /**
- * Prints ignoring
+ * File Completion
+ *
+ * File was transformed and uploaded
  */
-export function ignoring (file: string) {
+export const fileWarn = (message: string) => {
 
-  cli.log.files(c.gray.bold('! ') + c.gray(file));
+  log.files(
+    task(c.yellow('! warning')),
+    prepend(message)
+  );
 
-}
+};
 
 /**
- * Prints Warnings
+ * File Completion
+ *
+ * File was transformed and uploaded
  */
-export function warn (message: string) {
+export const fileError = (error: { file: string; message: string; data: string | string[] }) => {
 
-  cli.log.files(c.yellow.bold('! ') + c.yellow(parse.pretty(message)));
+  hasError = true;
 
-}
+  log.files(
+    task(c.red(`⨯ ${error.message}`)),
+    prepend('\n' + c.red(parse.liquidPretty(error.data)))
+  );
+
+  marky.clear();
+
+};
+
+/**
+ * File Completion
+ *
+ * File was transformed and uploaded
+ */
+export const sassDebug = (message: string, options: { span: SourceSpan; }) => {
+
+  log.files(task(c.yellow(`${c.bold('!')} ${message}`)));
+  log.files(prepend(options.span.context));
+
+};
+
+/**
+ * SASS Error
+ *
+ * File was transformed and uploaded
+ */
+export const sassError = (error: Exception) => {
+
+  hasError = true;
+
+  const title = `⨯ sass error starting ${c.gray('on')} line ${error.span.start.line}${c.white(':')}`;
+
+  log.files(
+    task(c.redBright(title)),
+    prepend(parse.sassError(error))
+  );
+
+  marky.clear();
+
+};
+
+/**
+ * SASS Warning
+ *
+ * Prints a sass file warning
+ */
+export const sassWarn = (message: string, options: {
+  deprecation: boolean;
+  span?: SourceSpan;
+  stack?: string;
+}) => {
+
+  const title = c.bold(`sass ${options.deprecation ? 'deprecation' : 'warning'}`);
+
+  if (!hasPath('span.start.line', options)) {
+
+    log.files(
+      task(c.yellow('! ' + title)),
+      prepend(parse.sassSplit(message))
+    );
+
+  } else {
+
+    log.files(
+      task(c.yellow.bold(`${title} on line ${options.span.start.line}${c.white(':')}`)),
+      prepend(parse.sassPetty(message, options.span, options.stack))
+    );
+
+  }
+
+};
 
 /**
  * Throws Error
  */
 export function throws (message: string) {
 
-  throw cli.log.throw(c.red(parse.quotes(message)));
-
-}
-
-/**
- * Error Log
- *
- * Prints a message in Red. Typically called to
- * format a thrown `Error` which is using a custom
- * defined error message (ie: one written by syncify)
- */
-export function error (e: { file: string; message: string; data: string | string[] }) {
-
-  cli.log.files(c.red('⨯ ' + e.file));
-  cli.log.files(
-    ('\n' + c.redBright(parse.pretty(e.message)) + '\n').replace(/^/gm, ansis.dim('│  '))
+  return console.error(
+    '\n' + prepend(
+      c.red(
+        parse.quotes(message)
+      )
+    )
   );
 
 }

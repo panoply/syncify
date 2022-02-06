@@ -1,4 +1,4 @@
-import ansis from 'ansis';
+import c from 'ansis';
 
 /**
  * Help Text
@@ -6,36 +6,41 @@ import ansis from 'ansis';
  * Shown when using the CLI
  */
 export const help = `
-  ${ansis.gray('---------------------------------------------------------')}
+  ${c.gray('---------------------------------------------------------')}
 
-  ${ansis.green(ansis.bold('Syncify'))}                                       ${ansis.dim('by Panoply')}
+  ${c.green(c.bold('Syncify'))}                                       ${c.dim('by Panoply')}
 
-  ${ansis.bold('Version')}
+  ${c.bold('Version')}
   <!version!>
 
-  ${ansis.bold('Usage')}
+  ${c.bold('Usage')}
   Welcome to the Syncify CLI. The command line utility assumes that
-  you have defined store targets in the ${ansis.dim('package.json')} file
-  and setup credentials within a ${ansis.dim('.env')} file.
+  you have defined stores/themes in the ${c.dim('package.json')} file
+  and setup credentials within a ${c.dim('.env')} file.
 
-  ${ansis.bold('Commands:')}
+  ${c.bold('Aliases:')}
   $ sync
-    ${ansis.gray(ansis.italic('Interactive prompt'))}
-  $ sync status
-    ${ansis.gray(ansis.italic('Prints list of connected stores'))}
-  $ sync themes    <store>
-    ${ansis.gray(ansis.italic('Prints list of themes, helpful when you need ids'))}
-  $ sync watch     <store>  --flags
-    ${ansis.gray(ansis.italic('Starts watch mode'))}
-  $ sync upload    <store>  --flags
-    ${ansis.gray(ansis.italic('Uploads the theme directory'))}
-  $ sync download  <store>  --flags
-    ${ansis.gray(ansis.italic('Downloads a specific theme/s from store/s'))}
 
-  ${ansis.bold('Flags:')}
-    -t, --theme   <list>  ${ansis.gray(ansis.italic('A comma seprated list of themes'))}
-    -s, --store   <list>  ${ansis.gray(ansis.italic('A comma separated list of stores'))}
-    -o, --output  <path>  ${ansis.gray(ansis.italic('A path value (used for downloads)'))}
-    -h, --help    ${ansis.gray(ansis.italic('Prints commands list and help information'))}
+  ${c.bold('Commands:')}
+  $ syncify
+    ${c.gray(c.italic('Interactive prompt'))}
+  $ syncify status
+    ${c.gray(c.italic('Prints list of connected stores'))}
+  $ syncify build
+    ${c.gray(c.italic('Triggers build. Accepts the env flag --prod (default is --dev'))}
+  $ syncify themes    <store>
+    ${c.gray(c.italic('Prints list of themes, helpful when you need ids'))}
+  $ syncify watch     <store>  --flags
+    ${c.gray(c.italic('Starts watch mode'))}
+  $ syncify upload    <store>  --flags
+    ${c.gray(c.italic('Uploads the theme directory'))}
+  $ syncify download  <store>  --flags
+    ${c.gray(c.italic('Downloads a specific theme/s from store/s'))}
+
+  ${c.bold('Flags:')}
+    -t, --theme   <list>  ${c.gray(c.italic('A comma seprated list of themes'))}
+    -s, --store   <list>  ${c.gray(c.italic('A comma separated list of stores'))}
+    -o, --output  <path>  ${c.gray(c.italic('A path value (used for downloads)'))}
+    -h, --help    ${c.gray(c.italic('Prints commands list and help information'))}
 
 `;

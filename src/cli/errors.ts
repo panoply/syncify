@@ -23,7 +23,7 @@ export function error (file: string, e: {
 
   switch (e.status) {
     case 422:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -32,7 +32,7 @@ export function error (file: string, e: {
       );
       break;
     case 404:
-      log.error(
+      log.fileError(
         {
           file,
           message: '404 ' + e.statusText,
@@ -41,19 +41,16 @@ export function error (file: string, e: {
       );
       break;
     case 400:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
-          data: [
-            'The request was not understood by the server, generally due to bad syntax or because the Content-Type header was not correctly set to application/json.',
-            'This status is also returned when the request provides an invalid code parameter during the OAuth token exchange process.'
-          ]
+          data: 'The request was not understood by the server, generally due to bad syntax or because the Content-Type header was not correctly set to application/json. This status is also returned when the request provides an invalid code parameter during the OAuth token exchange process.'
         }
       );
       break;
     case 303:
-      log.error(
+      log.fileError(
         {
           file,
           message: '404 ' + e.statusText,
@@ -62,7 +59,7 @@ export function error (file: string, e: {
       );
       break;
     case 401:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -71,7 +68,7 @@ export function error (file: string, e: {
       );
       break;
     case 402:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -80,7 +77,7 @@ export function error (file: string, e: {
       );
       break;
     case 406:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -89,7 +86,7 @@ export function error (file: string, e: {
       );
       break;
     case 423:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -98,7 +95,7 @@ export function error (file: string, e: {
       );
       break;
     case 403:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -107,7 +104,7 @@ export function error (file: string, e: {
       );
       break;
     case 501:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -116,7 +113,7 @@ export function error (file: string, e: {
       );
       break;
     case 503:
-      log.error(
+      log.fileError(
         {
           file,
           message: e.statusText,
@@ -124,7 +121,7 @@ export function error (file: string, e: {
         }
       );
       break;
-    default: log.error(
+    default: log.fileError(
       {
         file,
         message: e.statusText,

@@ -1,38 +1,22 @@
-
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { has } from 'rambdax';
 import { render } from 'prettyjson';
-import { isObject } from 'utils/native';
+import { isObject, isArray, nil, isUndefined, isFunction } from 'shared/native';
+import { kill, spawned, spawns } from 'cli/spawn';
+import * as ansi from 'cli/ansi';
 import c from 'ansis';
-import { isArray, toUpcase } from 'config/utils';
-
-type Logger = (message: string) => void;
+import { IConfig } from 'types';
 
 interface ILoggers {
   tracked?: string;
-  scripts?: Logger,
-  assets?: Logger,
-  files?: Logger,
-  metafields?: Logger,
-  redirects?: Logger,
-  console?: Logger,
-  throw?: Logger,
-  warn?: Logger
+  files?: (...message: string[]) => void,
+  metafields?: (message: string) => void,
+  redirects?: (message: string) => void,
+  throw?: (message: string) => void,
+  warn?: (message: string) => void
 }
-
-const dim = c.hex('#2a2a2e');
 
 /* -------------------------------------------- */
 /* EXPORTED LETTINGS                            */
 /* -------------------------------------------- */
-
-/**
- * Blessed Screen
- *
- * Exported letting. Blessed will load only when
- * the `bless()` function is invoked.
- */
-export let screen: Console;
 
 /**
  * Log Instances
@@ -41,10 +25,7 @@ export let screen: Console;
  * populated within `create()` and will hold
  * a reference to each log group.
  */
-export const log: ILoggers = {
-  tracked: undefined,
-  console: console.log
-};
+export const log: ILoggers = { tracked: undefined };
 
 /* -------------------------------------------- */
 /* EXPORTED CONSTANTS                           */
@@ -53,164 +34,90 @@ export const log: ILoggers = {
 /**
  * Nodes
  *
- * State references. Each console is stores within this
+ * State references. Each console is stored within this
  * object and keeps tracks of messages.
  */
 export const nodes: { [label: string]: string } = {};
-
-/**
-  * Spawned Processes
-  *
-  * Set collection of spawned child proccesses.
-  * We need to hold reference of these to kill
-  * when ending the session.
-  */
-export const spawns: Set<ChildProcessWithoutNullStreams> = new Set();
 
 /* -------------------------------------------- */
 /* PRIVATE FUNCTIONS                            */
 /* -------------------------------------------- */
 
-function print (index: number, state: number) {
+/**
+ * Tracer
+ *
+ * Tracks the logging groups and swaps group when
+ * newly intercepted logs are detected.
+ */
+const tracer = (config: IConfig, reset: boolean = false) => (name: string, group: string) => {
 
-  const node = nodes[index] as any;
+  if (name === log.tracked) return;
+  if (isUndefined(log.tracked)) process.stdout.write(ansi.header(config));
+  if (!reset) reset = true;
 
-  return (message: string) => {
+  nodes[name] = group;
+  log.tracked = name;
 
-    const active = node.nodes[state];
+  process.stdout.write(nodes[name]);
 
-    if (Buffer.isBuffer(message)) {
-      active.pane.log(message.toString());
-    } else if (isObject(message) || isArray(message)) {
-      active.pane.log(JSON.stringify(message, null, 2));
-    } else {
-      active.pane.log(message);
-    }
-
-    node.focus = state;
-
-  };
 };
 
 /**
- * Spawned Proccesses
+ * Logger
  *
- * Syncify spins up a child process for
- * compiling spawns/typescript. The spawned
- * process is encapsulted and `stdio` is piped.
+ * Applies the logging to output. Determines whether
+ * we need to pass the spawn logger or just print.
  */
-function spawned (command: string, callback: ReturnType<typeof print>) {
+const logger = (trace: ReturnType<typeof tracer>) => (name: string, wrap?: (param: string) => string) => {
 
-  const arg: string[] = /\s/g.test(command) ? command.split(' ') : [ command ];
-  const cmd = arg.shift();
-  const child = spawn(cmd, arg, {
-    stdio: [
-      'pipe',
-      'pipe',
-      'pipe',
-      'pipe',
-      'pipe'
-    ]
-  });
+  const group = ansi.group(name);
+  const spawn = isFunction(wrap);
 
-  child.stdio[1].on('data', callback);
-  child.stdio[2].on('data', callback);
-  child.stdio[3].on('data', callback);
+  return (...message: string[]) => {
 
-  spawns.add(child);
+    trace(name, group);
 
-  return child;
+    while (message.length !== 0) {
+
+      let text = message.shift();
+
+      if (Buffer.isBuffer(text)) {
+        text = text.toString();
+      } else if (isObject(text) || isArray(text)) {
+        text = render(text);
+      } else {
+        text = String(text);
+      }
+
+      process.stdout.write(spawn ? wrap(text) : text);
+
+    }
+
+  };
 
 };
 
-function stdout () {
+/**
+ * Logging Initializer
+ *
+ * Passes to logger and used to setup the
+ * stdout, stderr and stdio pipes.
+ */
+const stdout = (config: IConfig) => {
 
   clear(true);
 
-  let reset: boolean = false;
+  const trace = tracer(config);
+  const print = logger(trace);
 
-  const heading = (
-    dim('┌── ') + c.bold(c.cyanBright('Syncify ')) + c.gray(' <!version!>') + '\n' +
-    dim('│') + '\n'
-  );
+  // console.error = print('error', ansi.prepend);
 
-  const trace = (name: string, group: string) => {
+  return (name: string) => ({
+    spawn: print(name, ansi.prepend),
+    print: print(name)
+  });
 
-    if (name !== log.tracked) {
-
-      if (typeof log.tracked === 'undefined') {
-        process.stdout.write(heading);
-      }
-
-      const endnode = nodes[name] as string;
-      const newline = endnode ? endnode.charCodeAt(endnode.length - 1) === 10 : true;
-      const message = dim(newline
-        ? (dim('│') + '\n' + '├── ')
-        : (dim('│'))) + group + '\n' + dim('│') + '\n';
-
-      nodes[name] = message;
-      process.stdout.write(nodes[name]);
-
-      log.tracked = name;
-
-      if (!reset) reset = true;
-
-    }
-  };
-
-  return (name: string) => {
-
-    const group = c.white.bold(toUpcase(name));
-
-    return ({
-
-      print: (message: string) => {
-
-        trace(name, group);
-
-        if (Buffer.isBuffer(message)) {
-          message = message.toString();
-        } else if (isObject(message) || isArray(message)) {
-          message = render(message);
-        } else {
-          message = String(message);
-        }
-
-        process.stdout.write(message.replace(/^/gm, dim('│  ')) + '\n');
-
-      },
-
-      spawn: (message: string) => {
-
-        trace(name, group);
-
-        process.stdout.write(message.toString().replace(/^/gm, dim('│  ')) + '\n');
-
-      }
-    });
-  };
-}
-
-function standard <T extends Array<keyof ILoggers>> (options: Create<T>) {
-
-  const output = stdout();
-
-  for (const { tabs, spawns } of options) {
-    for (const name of tabs) {
-
-      nodes[name] = '';
-
-      if (has(name, spawns)) {
-        // @ts-ignore
-        spawned(spawns[name], output(name).spawn);
-      } else {
-        // @ts-ignore
-        log[name] = output(name).print;
-      }
-    }
-  }
-
-}
+};
 
 /* -------------------------------------------- */
 /* PUBLIC METHODS                               */
@@ -231,37 +138,38 @@ export function clear (isSoft?: boolean) {
 };
 
 /**
- * Blessed kill
- *
- * Kills both blessed and any spawned child processes
- * which are running in parallel. We listen for key
- * events from the `screen` instance.
- */
-export function kill () {
-
-  // clear(true);
-  spawns.forEach(child => child.kill());
-  spawns.clear();
-  process.exit(0);
-
-};
-
-/**
  * Create Consoles
  *
  * Generates a tabbed TUI panes within. Multiple
  * nodes are generated and state is written in a
  * progressive manner.
  */
-export function create <T extends Array<keyof ILoggers>> (...options: Create<T>) {
+export function create (config: IConfig, panes: string[]) {
 
-  const pipe = stdout();
+  const pipe = stdout(config);
 
-  // console.log = pipe('console').print;
-  console.error = pipe('error').print;
-  console.info = pipe('info').print;
-  console.warn = pipe('warn').print;
+  for (const child in config.spawns) {
+    nodes[child] = nil;
+    spawned(child, config.spawns[child], pipe(child).spawn);
+  }
 
-  standard<T>(options);
+  for (const script of panes) {
+    nodes[script] = nil;
+    log[script] = pipe(script).print;
+  }
 
+  return kill(() => {
+
+    let first: boolean = true;
+
+    spawns.forEach((child, name) => {
+      child.kill();
+      console.log((first ? '\n- ' : '- ') + c.dim.italic(name + ' process exited'));
+      first = false;
+    });
+
+    spawns.clear();
+    process.exit(0);
+
+  });
 };

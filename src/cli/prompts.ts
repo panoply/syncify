@@ -1,8 +1,9 @@
 import prompts from 'prompts';
 import { IConfig } from 'types';
 import { toLower } from 'rambdax';
-import * as metafields from 'requests/metafields';
 import { toUpcase } from 'config/utils';
+
+import * as metafields from 'requests/metafields';
 
 async function resource (config: IConfig) {
 
