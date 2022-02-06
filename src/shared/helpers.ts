@@ -1,7 +1,7 @@
 import { has } from 'rambdax';
 import { IRequest } from 'types';
 import { join } from 'path';
-import { is, isArray } from 'utils/native';
+import { is, isArray, isString } from 'shared/native';
 
 /**
  * Environment
@@ -39,6 +39,24 @@ export function toUpcase <T extends string> (value: T) {
 export function lastPath (path: string) {
 
   return is(path.indexOf('/'), -1) ? path : path.match(/[^/]+(?:\/$|$)/)[0];
+}
+
+/**
+ * Parent Path
+ *
+ * Will return the parent path of a URL, ie: that of which
+ * omits the file name. Omits any glob patterns.
+ */
+export function parentPath (path: string) {
+
+  const last = path.lastIndexOf('/');
+
+  if (is(last, -1)) return path;
+
+  const glob = path.indexOf('*');
+
+  return is(glob, -1) ? path.slice(0, last) : path.slice(0, glob);
+
 }
 
 /**
@@ -119,6 +137,30 @@ export function getAssetKey (config: IRequest) {
 
 }
 
+/**
+ * Returns the byte size of a string value
+ */
+export function byteSize (string: string | Buffer): number {
+
+  return isString(string) ? Buffer.from(string).toString().length : string.toString().length;
+
+}
+
+/**
+ * Converts byte size to killobyte, megabyre,
+ * gigabyte or terrabyte
+ */
+export function byteConvert (bytes: number): string {
+
+  if (bytes === 0) return '0 bytes';
+
+  const size = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
+  const unit = [ 'bytes', 'kb', 'mb', 'gb', 'tb' ];
+
+  return size === 0
+    ? `${bytes}${unit[size]}`
+    : `${(bytes / 1024 ** size).toFixed(1)} ${unit[size]}`;
+}
 /**
  * Ignored files and/or directories
 

@@ -15,6 +15,11 @@ export const JsonExt = /\.json/;
 export const StyleExt = /\.(?:css|scss|sass)/;
 
 /**
+ * Stylesheet Glob extension
+ */
+export const StyleGlob = /\*\.(?:css|scss|sass)/;
+
+/**
  * HTML Style attribute
  */
 export const StyleAttribute = /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/;

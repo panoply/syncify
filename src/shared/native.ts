@@ -44,3 +44,8 @@ export const isRegex = isType('RegExp');
  * is String
  */
 export const isString = isType('String');
+
+/**
+ * is Function
+ */
+export const isFunction = isType('Function');
