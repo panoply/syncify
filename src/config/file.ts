@@ -3,7 +3,7 @@
 import { join, parse } from 'path';
 import { Syncify, IFile, IConfig, IViews, IStyle } from 'types';
 import { assign, isRegex, isUndefined } from 'shared/native';
-import { lastPath } from 'shared/helpers';
+import { lastPath, parentPath } from 'shared/helpers';
 
 /**
  * File types are represented as numeric values.
@@ -49,7 +49,20 @@ const setProps = (path: string, output: string) => {
 
 };
 
-export const outputFile = (paths: IConfig['paths'], output: string) => (path: string) => {
+export const outputFile = (output: string) => (path: string) => {
+
+  const { file, merge } = setProps(path, output);
+
+  switch (lastPath(file.dir)) {
+    case 'sections': return merge('sections', Type.Section);
+    case 'snippets': return merge('sections', Type.Snippet);
+    case 'layout': return merge('sections', Type.Layout);
+    case 'templates': return merge('templates', Type.Template);
+    case 'customers': return merge('templates', Type.Template);
+    case 'config': return merge('config', Type.Config);
+    case 'locales': return merge('locales', Type.Locale);
+    case 'assets': return merge('assets', Type.Locale);
+  }
 
 };
 

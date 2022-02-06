@@ -422,7 +422,8 @@ export async function createDirs (output: string, path: string) {
 async function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   const { syncify } = pkg;
-  const path = normalPath(config.source);
+  const mode = config.resource === 'upload' ? config.output : config.source;
+  const path = normalPath(mode);
 
   for (const key in config.paths) {
 

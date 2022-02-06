@@ -10,7 +10,7 @@ import { is } from 'shared/native';
 import { byteConvert } from 'shared/helpers';
 
 let hasError: boolean = false;
-
+let hasMarks: boolean = false;
 /* -------------------------------------------- */
 /* SHARED LOGGERS                               */
 /* -------------------------------------------- */
@@ -50,6 +50,7 @@ export const fileChange = (file: IFile) => {
     tui.task(c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`))
   );
 
+  hasMarks = true;
 };
 
 /**
@@ -93,12 +94,18 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
 
   if (!hasError) {
 
-    const time = marky.stop('change').duration.toFixed(0);
     const shop = `${c.magenta(theme)} ${c.gray('on')} ${c.blue(store)} ${c.gray('in')}`;
 
-    log.files(
-      tui.task(c.greenBright(`✓ uploaded ${file.key} ${c.gray('to')} ${shop} ${c.white(time + 'ms')}`))
-    );
+    if (hasMarks) {
+      const time = marky.stop('change').duration.toFixed(0);
+      log.files(
+        tui.task(c.greenBright(`✓ uploaded ${file.key} ${c.gray('to')} ${shop} ${c.white(time + 'ms')}`))
+      );
+    } else {
+      log.files(
+        tui.task(c.greenBright(`✓ uploaded ${file.key} ${c.gray('to')} ${shop}`))
+      );
+    }
 
   } else {
 
@@ -154,14 +161,15 @@ export const fileWarn = (message: string) => {
  */
 export const fileError = (error: { file: string; message: string; data: string | string[] }) => {
 
-  hasError = true;
-
   log.files(
     tui.task(c.red(`⨯ ${error.message}`)),
     tui.indent('\n' + c.red(parse.liquidPretty(error.data)))
   );
 
-  marky.clear();
+  if (hasMarks) {
+    hasError = true;
+    marky.clear();
+  }
 
 };
 

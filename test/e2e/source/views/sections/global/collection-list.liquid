@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{ 'component-slider.css' | asset_url }}" media="print" onload="this.media='all'">
 <noscript>{{ 'component-slider.css' | asset_url | stylesheet_tag }}</noscript>
 
-{%- style -%}
+{% style %}
 
 .section-{{section.id}}-padding {
   padding-top: {{section.settings.padding_top | times: 0.75 | round: 0}}
@@ -12,6 +12,7 @@
   padding-bottom: {{section.settings.padding_bottom | times: 0.75 | round: 0}}
   px;
 }
+
 
 @media screen and(min-width: 750px) {
   .section-{{section.id}}-padding {
@@ -22,7 +23,7 @@
   }
 }
 
-{%- endstyle -%}
+{% endstyle %}
 
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <div class="collection-list-wrapper page-width{% if section.settings.swipe_on_mobile == true %} page-width-desktop{% endif %}{% if section.settings.title == blank %} no-heading{% endif %}{% if section.settings.show_view_all == false or section.blocks.size > collections.size %} no-mobile-link{% endif %} section-{{ section.id }}-padding">

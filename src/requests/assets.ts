@@ -44,7 +44,7 @@ export async function assets (sync: IThemes, file: IFile, config: IRequest) {
 
   }).catch(e => {
 
-    if (!sync.queue) return error(file.key, e.response);
+    // if (!sync.queue) return error(file.key, e.response);
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       queue.add(() => assets(sync, file, config), { priority: 1000 });
