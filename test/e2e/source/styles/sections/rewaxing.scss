@@ -1,0 +1,193 @@
+.rewaxing {
+	// products
+
+	&-img {
+		width: 100%;
+		max-width: 300px;
+	}
+}
+
+.template_rewaxing {
+	.wrapper {
+		@include media-breakpoint-down(md) {
+			padding-top: $navbar-height-desktop;
+		}
+		@include media-breakpoint-down(sm) {
+			padding-top: 0;
+		}
+	}
+	h1 {
+		margin: 0;
+		text-transform: uppercase;
+		font-size: 1.295rem;
+		font-weight: 600;
+	}
+	h6 {
+		text-transform: uppercase;
+		font-size: $font-size-sm;
+		font-weight: 500;
+		letter-spacing: 0.075rem;
+		color: $gray;
+	}
+	.process {
+		font-size: $font-size-sm;
+		font-weight: 600;
+		letter-spacing: 0.025rem;
+		width: 100%;
+	}
+	.icon {
+		overflow: hidden;
+		fill: $eerie;
+		&.fabric {
+			width: 50px;
+			height: 30px;
+		}
+		&.parcel {
+			width: 40px;
+			height: 40px;
+		}
+	}
+}
+
+.carousel {
+	&__sections {
+		width: 100%;
+		max-width: 1420px;
+
+		@media only screen and (min-width: 1345px) {
+			height: 520px;
+			max-height: 520px;
+		}
+
+		@media only screen and (max-width: 1344px) {
+			max-height: 590px;
+		}
+	}
+	&__rewaxing {
+		.icon {
+			width: 27px;
+			height: 27px;
+		}
+	}
+	&__garments {
+		display: none;
+	}
+}
+
+.rewaxing {
+	&__header {
+		background-color: $white;
+		@include media-breakpoint-up(sm) {
+			border-bottom: 1px solid $gray-400;
+		}
+		@include media-breakpoint-down(xs) {
+			.bd-bottom {
+				border-bottom: 1px solid $gray-400;
+			}
+		}
+	}
+	&__step {
+		.label {
+			text-transform: uppercase;
+			font-size: 1.1rem;
+			font-weight: 600;
+			letter-spacing: 0.035rem;
+			&.number {
+				padding-right: 3px;
+			}
+		}
+		.icon {
+			width: 17px;
+			height: 17px;
+		}
+	}
+	&__service,
+	&__garment,
+	&__summary {
+		font-size: $font-size-sm;
+		height: 100%;
+		width: 100%;
+
+		img {
+			width: 100%;
+			max-width: 290px;
+			@include media-breakpoint-up(sm) {
+				max-width: 250px;
+			}
+		}
+	}
+	&__summary {
+		.hidden {
+			opacity: 0;
+			display: none;
+			&.fadeIn {
+				opacity: 1;
+				animation-name: fadeIn;
+				animation-iteration-count: 1;
+				animation-timing-function: ease-in;
+				animation-duration: 0.225s;
+			}
+		}
+		.loading {
+			display: none;
+			border: 5px solid rgba($black, 0.3);
+			height: 45px;
+			width: 45px;
+			border-top-color: rgba($black, 0.8);
+			border-radius: 100%;
+			animation: rotate 0.6s infinite linear;
+		}
+		.confirmation {
+			.icon {
+				width: 35px;
+				height: 35px;
+			}
+		}
+		.cart__checkout--submit {
+			font-size: 1rem;
+
+			.icon {
+				fill: $white;
+			}
+		}
+	}
+}
+
+.rewaxing-steps {
+	display: none !important;
+	@media only screen and (min-width: 767px) and (max-width: 1114px) {
+		display: block !important;
+	}
+}
+
+.garments-loading {
+	visibility: hidden;
+	max-height: 500px;
+
+	&.ready {
+		visibility: visible;
+		max-height: auto;
+	}
+}
+.sections-sticky {
+	@media only screen and (min-width: 1114px) {
+		display: none !important;
+	}
+
+	@include media-breakpoint-down(sm) {
+		position: fixed;
+		bottom: 0;
+	}
+	.row {
+		border-top: 1px solid $gray-400;
+		border-bottom: 1px solid $gray-400;
+	}
+	.bd-right {
+		border-color: $gray-400;
+	}
+	.bg-smoke {
+		@include media-breakpoint-up(sm) {
+			background-color: none !important;
+		}
+	}
+}

@@ -1,0 +1,175 @@
+/* -------------------------------------------- */
+/*                    PALETTE                   */
+/* -------------------------------------------- */
+
+$green: #28a745;
+$red: #dc3545;
+$yellow: #e2c444;
+$orange: #e98b3d;
+$blue: #2b65c9; //#0c81e4;
+$night: #363b48;
+$white: #ffffff;
+$gray: #aaa6a6;
+$black: #000000;
+$eerie: #000000;
+$smoke: $gray;
+$fb-blue: #475993;
+
+/* -------------------------------------------- */
+/*                     TONES                    */
+/* -------------------------------------------- */
+
+$black-100: #343434;
+$black-200: #282626;
+$black-300: #201e1e;
+$black-400: #181616;
+$black-500: #110f0f;
+$black-600: #0e0c0c;
+$black-700: #141313;
+$black-800: #202020;
+
+$white-100: #f8f8f8;
+$white-200: #e9e9e9;
+$white-300: #e0e0e0;
+$white-400: #fbfafa;
+$white-500: #fdfdfd;
+
+$gray-100: #f1f1f1;
+$gray-200: #f0f0f0;
+$gray-300: #e6e4e4;
+$gray-400: #d1cece;
+$gray-500: #c9c2c2;
+$gray-600: #acacac;
+$gray-700: #a7a5a5;
+
+/* -------------------------------------------- */
+/*                     FONTS                    */
+/* -------------------------------------------- */
+
+$font-family-sans-serif: "Arial", Helvetica Neue, Helvetica, sans-serif !default;
+
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+	"Liberation Mono", "Courier New", monospace !default;
+
+$font-family-base: $font-family-sans-serif !default;
+
+$futura: $font-family-base !default;
+$nimbus: $font-family-base !default;
+
+$font-size-base: 1rem !default; // Assumes the browser default, typically `16px`
+$font-size-xl: $font-size-base * 1.45 !default;
+$font-size-lg: $font-size-base * 1.25 !default;
+$font-size-md: $font-size-base * 1.085 !default;
+$font-size-sm: $font-size-base * 0.875 !default;
+$font-size-xs: $font-size-base * 0.675 !default;
+$font-size-xxs: $font-size-base * 0.545 !default;
+
+$font-weight-lighter: lighter !default;
+$font-weight-light: 300 !default;
+$font-weight-normal: 400 !default;
+$font-weight-bold: 700 !default;
+$font-weight-bolder: bolder !default;
+
+$font-weight-base: $font-weight-normal !default;
+$line-height-base: 1.5 !default;
+
+$h1-font-size: $font-size-base * 2;
+$h2-font-size: $font-size-base * 1.75;
+$h3-font-size: $font-size-base * 1.5;
+$h4-font-size: $font-size-base * 1.3;
+$h5-font-size: $font-size-base * 1.1;
+$h6-font-size: 0.895rem;
+
+$headings-margin-bottom: $spacer / 2 !default;
+$headings-font-family: null !default;
+$headings-font-weight: 500 !default;
+$headings-line-height: 1.2 !default;
+$headings-color: null !default;
+
+/* -------------------------------------------- */
+/*                    OFFERS                    */
+/* -------------------------------------------- */
+
+$offers-height-desktop: 45px;
+$offers-height-slides: 40px;
+$offers-height-mobile: 35px;
+$offers-font-size: 0.945rem;
+$offers-box-shadow: inset 0px -2px 20px -4px rgba(0, 0, 0, 0.12);
+
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map, should you need more variation.
+
+$spacer: 1rem !default;
+$spacers: () !default;
+
+$spacer-1: $spacer * 0.25;
+$spacer-2: $spacer * 0.5;
+$spacer-3: $spacer;
+$spacer-4: $spacer * 1.5;
+$spacer-5: $spacer * 3;
+
+$spacers: map-merge(
+	(
+		0: 0,
+		1: $spacer-1,
+		2: $spacer-2,
+		3: $spacer-3,
+		4: $spacer-4,
+		5: $spacer-5,
+	),
+	$spacers
+);
+
+/* -------------------------------------------- */
+/*                  BREAKPOINTS                 */
+/* -------------------------------------------- */
+
+$grid-breakpoints: (
+	xs: 0,
+	sm: 576px,
+	md: 768px,
+	lg: 1080px,
+	xl: 1240px,
+);
+
+$container-max-widths: (
+	sm: 540px,
+	md: 720px,
+	lg: 960px,
+	xl: 1180px,
+);
+
+$screen-min-height: map-get($grid-breakpoints, sm);
+
+/* -------------------------------------------- */
+/*                    Z-INDEX                   */
+/* -------------------------------------------- */
+
+$zindex-modal: 900;
+$zindex-drawer: 900;
+
+$zindex-header: 800;
+$zindex-footer: 800;
+
+$zindex-dropdown: 600;
+$zindex-stretch: 500; // container zindex
+
+/* old ---------------------------------------- */
+
+$zindex-hero-content: 300;
+$zindex-hero-overlay: 200;
+
+/* -------------------------------------------- */
+/*                    MARGINS                   */
+/* -------------------------------------------- */
+
+$label-margin-bottom: 0;
+
+/* -------------------------------------------- */
+/*                   ICON SVG                   */
+/* -------------------------------------------- */
+
+$icon-chevron: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.23 25.2"%3E%3Cpath d="M46.54.69a4.34 4.34 0 01.69.79c0 .06-5.31 5.42-11.81 11.91L23.62 25.2 11.81 13.39C5.32 6.9 0 1.54 0 1.48A8.84 8.84 0 011.45 0s5 5 11.07 11 11 11 11.07 11 5-4.95 11.07-11 11-11 11.1-11a4.19 4.19 0 01.78.69z"/%3E%3C/svg%3E';

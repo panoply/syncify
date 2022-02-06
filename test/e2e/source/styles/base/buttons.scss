@@ -1,0 +1,174 @@
+/* VARIABLES ---------------------------------- */
+
+$button-size: 36px;
+$button-radius: 3px;
+$button-shadow: 1px 1px 12px -2px rgba(50, 50, 50, 0.2);
+$button-xs: 16px;
+$button-sm: 24px;
+$button-md: $button-size;
+$button-lg: 42px;
+$button-xl: 54px;
+
+/* MIXINS ------------------------------------- */
+
+@mixin button-icon($size: $button-size) {
+  position: absolute;
+  width: decimal-ceil($size / 1.8);
+  height: decimal-ceil($size / 1.8);
+
+  &-right {
+    right: decimal-ceil($size / 3);
+  }
+  &-right-flush {
+    right: 0;
+  }
+
+  &-left {
+    left: decimal-ceil($size / 3);
+  }
+  &-left-flush {
+    left: 0;
+  }
+}
+
+@mixin button-loading($size: $button-size) {
+  background-size: decimal-ceil($size / 1.8) decimal-ceil($size / 1.8);
+  background-image: $spinner;
+  background-repeat: no-repeat;
+  background-position: right decimal-ceil($size / 3) center;
+
+  svg {
+    &.icon-right + {
+      background-position: left decimal-ceil($size / 3) center;
+    }
+    &.icon-left + {
+      background-position: right decimal-ceil($size / 3) center;
+    }
+  }
+}
+
+@mixin button-size($font: $font-size-sm, $button: $button-size) {
+  font-size: $font;
+  height: $button;
+  padding-left: decimal-ceil($button / 2);
+  padding-right: decimal-ceil($button / 2);
+}
+
+/* BUTTON BASE -------------------------------- */
+
+button,
+a.btn,
+a.button {
+  font-family: $heading-font-family;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+
+  @include button-size;
+  @include transition($btn-transition);
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    border-color: $gray-600;
+    opacity: 0.5;
+    background-color: $gray-600;
+
+    &.btn-reset,
+    &.btn-line {
+      border-color: $gray-600;
+      background-color: transparent;
+    }
+  }
+
+  &.w-auto {
+    width: auto;
+  }
+
+  /* BUTTON LOADING ----------------------------- */
+
+  &.loading {
+    @include button-loading($button-size);
+
+    &.bg-red,
+    &.bg-green,
+    &.bg-light,
+    &.bg-fb-blue {
+      background-image: $spinner-white;
+    }
+
+    &.btn-xs + {
+      @include button-loading($button-size);
+    }
+  }
+
+  /* BUTTONS SIZES ------------------------------ */
+
+  &.btn-xs {
+    @include button-size($font-size-xs, $button-xs);
+  }
+  &.btn-sm {
+    @include button-size($font-size-sm, $button-sm);
+  }
+  &.btn-md {
+    @include button-size($font-size-sm, $button-md);
+  }
+  &.btn-lg {
+    @include button-size($font-size-md, $button-lg);
+  }
+  &.btn-xl {
+    @include button-size($font-size-lg, $button-xl);
+  }
+
+  /* BUTTON STYLES ------------------------------ */
+
+  &.btn-reset {
+    width: initial;
+    height: initial;
+    display: initial;
+    padding: initial;
+  }
+
+  &.btn-shadow {
+    box-shadow: $button-shadow;
+  }
+
+  &.btn-line {
+    border: 1px solid $black-500;
+  }
+
+  &.btn-radius {
+    border-radius: $button-radius;
+  }
+
+  &.btn-link {
+    height: auto;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  /* BUTTON ICONS ------------------------------- */
+
+  svg.icon {
+    @include button-icon($button-size);
+
+    + span {
+      margin-left: #{$button-size / 2};
+    }
+  }
+}

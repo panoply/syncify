@@ -1,0 +1,277 @@
+$footer-width: map-get($container-max-widths, xl);
+$footer-space: $grid-gutter-width / 2;
+$footer-height: calc(50px + $spacer-5);
+
+footer {
+	position: relative;
+	z-index: $zindex-footer;
+
+	nav {
+		width: 100%;
+		text-transform: uppercase;
+
+		ul > li {
+			line-height: 1.5em;
+			text-align: center;
+			list-style: none;
+			display: inline-flex;
+			margin-right: 25px;
+
+			&:last-child {
+				margin-right: 0;
+			}
+
+			@include media-breakpoint-down(sm) {
+				text-align: left;
+			}
+
+			a {
+				//color: $footer-link-color;
+				text-decoration: none;
+
+				&:focus,
+				&:hover {
+					// color: transparentize($footer-color, 0);
+				}
+			}
+
+			h3 {
+				margin-top: 40px;
+				margin-bottom: 0.4em;
+				//color: $footer-color;
+				font-size: 0.95rem;
+			}
+		}
+	}
+}
+
+.footer {
+	border-top: 1px solid $black-400;
+
+	@include media-breakpoint-down(sm) {
+		border-color: $gray-400;
+	}
+
+	h1 {
+		margin: 15px 0 10px 0;
+		font-weight: 600;
+		font-size: 2rem !important;
+		text-transform: uppercase;
+	}
+
+	&-newsletter {
+		position: relative;
+		width: 315px;
+
+		@include media-breakpoint-down(sm) {
+			width: 100%;
+		}
+
+		button {
+			position: absolute;
+			top: 2px;
+			right: 0;
+		}
+
+		.icon {
+			margin-right: 80px;
+		}
+
+		form & {
+			width: 315px;
+
+			@include media-breakpoint-down(sm) {
+				width: 100%;
+			}
+		}
+
+		.subscriber {
+			border-bottom: 0;
+		}
+
+		input {
+			//	width: 100%;
+			//border: none;
+			//font-family: $heading-font-family;
+			//font-size: $font-size-sm;
+			border-radius: 0;
+		}
+
+		.response {
+			font-size: $font-size-sm - 0.1;
+			color: $black;
+		}
+
+		.gdrp {
+			font-size: $font-size-sm - 0.1;
+			color: $black;
+		}
+
+		&.subscribed {
+			.text-submit {
+				display: none;
+			}
+
+			.icon-close {
+				display: inline !important;
+			}
+
+			.icon-mail {
+				display: none !important;
+			}
+
+			.icon-tick {
+				fill: $black;
+				display: inline !important;
+			}
+		}
+	}
+
+	&__brand {
+		color: black;
+		font-size: 1rem;
+		text-align: center;
+
+		p {
+			margin: 0 0 30px 0;
+		}
+
+		.icon {
+			width: 250px;
+			height: 125px;
+
+			@include media-breakpoint-down(sm) {
+				width: 225px;
+				height: 100px;
+			}
+		}
+	}
+
+	&__social {
+		ul > li {
+			display: inline-block;
+			padding-right: 20px;
+
+			a {
+				color: black;
+				opacity: 0.2;
+
+				&:hover {
+					color: black;
+					opacity: 1;
+				}
+
+				.icon {
+					width: 30px;
+					height: 30px;
+					@include media-breakpoint-down(sm) {
+						width: 25px;
+						height: 25px;
+					}
+				}
+			}
+		}
+	}
+
+	&__organization {
+		// color: $footer-disclaimer-color;
+		font-size: 0.9em;
+		line-height: 1.5em;
+		text-align: center;
+	}
+
+	&__payments {
+		margin: 40px auto -25px auto;
+		text-align: center;
+
+		ul > li {
+			display: inline-block;
+			padding-right: 20px;
+		}
+
+		img {
+			max-width: 60px;
+		}
+
+		.paypal {
+			max-width: 75px;
+		}
+
+		.ideal {
+			max-width: 45px;
+		}
+	}
+
+	.list-products {
+		position: relative;
+	}
+}
+
+.footer-payments > li {
+	display: inline-block;
+
+	img {
+		max-width: 60px;
+	}
+
+	.paypal {
+		max-width: 75px;
+	}
+
+	.ideal {
+		max-width: 45px;
+	}
+}
+
+.footer {
+	// Brand statement
+	&-brand {
+		color: $black;
+		font-size: 1rem;
+		text-align: center;
+		@include media-breakpoint-down(sm) {
+			p {
+				display: inline;
+			}
+		}
+	}
+
+	// Brand Logo (SVG)
+	.icon-logo {
+		width: 200px;
+		height: 95px;
+
+		@include media-breakpoint-down(sm) {
+			width: 225px;
+			height: 100px;
+		}
+	}
+
+	.social-icon {
+		color: black;
+		opacity: 0.2;
+
+		&:hover {
+			color: black;
+			opacity: 1;
+		}
+
+		.icon {
+			width: 30px;
+			height: 30px;
+
+			@include media-breakpoint-down(sm) {
+				width: 25px;
+				height: 25px;
+			}
+		}
+	}
+}
+
+.instafeed {
+	img {
+		width: 100%;
+		max-width: 115px;
+		height: auto;
+	}
+}

@@ -1,0 +1,40 @@
+.contact-form {
+	margin: 20px 0;
+	max-width: 500px;
+
+	/*label {
+		font-size: $font-size-xs;
+		text-transform: uppercase;
+	}
+
+	input {
+		font-family: var(--heading-font-family);
+
+		&::placeholder {
+			text-transform: uppercase;
+			font-size: $font-size-sm;
+		}
+	}
+
+	textarea,
+	input {
+		width: 100%;
+		border: 0;
+		//	border-bottom: 1px solid $black-300;
+		padding: 8px 14px 8px 0;
+
+		&:focus {
+			border: 1px solid $black-300;
+		}
+
+		@include media-breakpoint-down(sm) {
+			width: 100%;
+		}
+	}*/
+}
+
+.page-help {
+	p {
+		margin-bottom: 15px;
+	}
+}

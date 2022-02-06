@@ -1,0 +1,289 @@
+/* -------------------------------------------------------------------
+  Microtip
+
+  Modern, lightweight css-only tooltips
+  Just 1kb minified and gzipped
+
+  @author Ghosh
+  @package Microtip
+
+----------------------------------------------------------------------
+  1. Base Styles
+  2. Direction Modifiers
+  3. Position Modifiers
+--------------------------------------------------------------------*/
+
+/* ------------------------------------------------
+  [1] Base Styles
+-------------------------------------------------*/
+
+[aria-label][role~='tooltip'] {
+  position: relative;
+
+  &::before,
+  &::after {
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+    opacity: 0;
+    pointer-events: none;
+    transition: all var(--microtip-transition-duration, 0.18s)
+      var(--microtip-transition-easing, ease-in-out)
+      var(--microtip-transition-delay, 0s);
+    position: absolute;
+    box-sizing: border-box;
+    z-index: 1000;
+    transform-origin: top;
+  }
+
+  &::before {
+    background-size: 100% auto !important;
+    content: '';
+  }
+
+  &::after {
+    background: $white;
+    border-radius: 0px;
+    color: $black-500;
+    border: 0.025rem $black-800 solid;
+    border-radius: 3px;
+    content: attr(aria-label);
+    font-family: $body-font-family;
+    font-size: var(--microtip-font-size, 13px);
+    font-weight: var(--microtip-font-weight, normal);
+    text-transform: var(--microtip-text-transform, none);
+    text-align: center;
+    padding: 8px;
+    line-height: 0.85rem;
+    white-space: nowrap;
+    box-sizing: content-box;
+  }
+
+  &:hover {
+    &::before,
+    &::after {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &:focus {
+    &::before,
+    &::after {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+/* ------------------------------------------------
+  [2] Position Modifiers
+-------------------------------------------------*/
+
+[role~='tooltip'] {
+  &[data-tooltip-position|='top'] {
+    &::before {
+      background: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2236px%22%20height%3D%2212px%22%3E%3Cpath%20fill%3D%22rgba%2817,%2017,%2017,%200.9%29%22%20transform%3D%22rotate%280%29%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E')
+        no-repeat;
+      height: 6px;
+      width: 18px;
+      margin-bottom: 5px;
+    }
+
+    &::after {
+      margin-bottom: 11px;
+    }
+
+    &::before {
+      transform: translate3d(-50%, 0, 0);
+      bottom: 100%;
+      left: 50%;
+    }
+
+    &:hover::before {
+      transform: translate3d(-50%, -5px, 0);
+    }
+
+    &::after {
+      transform: translate3d(-50%, 0, 0);
+      bottom: 100%;
+      left: 50%;
+    }
+  }
+
+  &[data-tooltip-position='top']:hover::after {
+    transform: translate3d(-50%, -5px, 0);
+  }
+
+  &[data-tooltip-position='top-left'] {
+    &::after {
+      transform: translate3d(calc(-100% + 16px), 0, 0);
+      bottom: 100%;
+    }
+
+    &:hover::after {
+      transform: translate3d(calc(-100% + 16px), -5px, 0);
+    }
+  }
+
+  &[data-tooltip-position='top-right'] {
+    &::after {
+      transform: translate3d(calc(0% + -16px), 0, 0);
+      bottom: 100%;
+    }
+
+    &:hover::after {
+      transform: translate3d(calc(0% + -16px), -5px, 0);
+    }
+  }
+
+  &[data-tooltip-position|='bottom'] {
+    &::before {
+      background: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2236px%22%20height%3D%2212px%22%3E%3Cpath%20fill%3D%22rgba%2817,%2017,%2017,%200.9%29%22%20transform%3D%22rotate%28180%2018%206%29%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E')
+        no-repeat;
+      height: 6px;
+      width: 18px;
+      margin-top: 5px;
+      margin-bottom: 0;
+    }
+
+    &::after {
+      margin-top: 11px;
+    }
+
+    &::before {
+      transform: translate3d(-50%, -10px, 0);
+      bottom: auto;
+      left: 50%;
+      top: 100%;
+    }
+
+    &:hover::before {
+      transform: translate3d(-50%, 0, 0);
+    }
+
+    &::after {
+      transform: translate3d(-50%, -10px, 0);
+      top: 100%;
+      left: 50%;
+    }
+  }
+
+  &[data-tooltip-position='bottom']:hover::after {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  &[data-tooltip-position='bottom-left'] {
+    &::after {
+      transform: translate3d(calc(-100% + 16px), -10px, 0);
+      top: 100%;
+    }
+
+    &:hover::after {
+      transform: translate3d(calc(-100% + 16px), 0, 0);
+    }
+  }
+
+  &[data-tooltip-position='bottom-right'] {
+    &::after {
+      transform: translate3d(calc(0% + -16px), -10px, 0);
+      top: 100%;
+    }
+
+    &:hover::after {
+      transform: translate3d(calc(0% + -16px), 0, 0);
+    }
+  }
+
+  &[data-tooltip-position='left'] {
+    &::before,
+    &::after {
+      bottom: auto;
+      left: auto;
+      right: 100%;
+      top: 50%;
+      transform: translate3d(10px, -50%, 0);
+    }
+
+    &::before {
+      background: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212px%22%20height%3D%2236px%22%3E%3Cpath%20fill%3D%22rgba%2817,%2017,%2017,%200.9%29%22%20transform%3D%22rotate%28-90%2018%2018%29%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E')
+        no-repeat;
+      height: 18px;
+      width: 6px;
+      margin-right: 5px;
+      margin-bottom: 0;
+    }
+
+    &::after {
+      margin-right: 11px;
+    }
+
+    &:hover {
+      &::before,
+      &::after {
+        transform: translate3d(0, -50%, 0);
+      }
+    }
+  }
+
+  &[data-tooltip-position='right'] {
+    &::before,
+    &::after {
+      bottom: auto;
+      left: 100%;
+      top: 50%;
+      transform: translate3d(-10px, -50%, 0);
+    }
+
+    &::before {
+      background: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212px%22%20height%3D%2236px%22%3E%3Cpath%20fill%3D%22rgba%2817,%2017,%2017,%200.9%29%22%20transform%3D%22rotate%2890%206%206%29%22%20d%3D%22M2.658,0.000%20C-13.615,0.000%2050.938,0.000%2034.662,0.000%20C28.662,0.000%2023.035,12.002%2018.660,12.002%20C14.285,12.002%208.594,0.000%202.658,0.000%20Z%22/%3E%3C/svg%3E')
+        no-repeat;
+      height: 18px;
+      width: 6px;
+      margin-bottom: 0;
+      margin-left: 5px;
+    }
+
+    &::after {
+      margin-left: 11px;
+    }
+
+    &:hover {
+      &::before,
+      &::after {
+        transform: translate3d(0, -50%, 0);
+      }
+    }
+  }
+
+  &[data-tooltip-size='x-small']::after {
+    white-space: initial;
+    max-width: 100px;
+    width: 100px;
+    text-align: center;
+    font-size: $font-size-xs;
+    padding: 6px;
+    font-style: italic;
+    line-height: 0.8rem;
+  }
+
+  &[data-tooltip-size='small']::after {
+    white-space: initial;
+    max-width: 120px;
+    width: 100%;
+    text-align: center;
+  }
+
+  &[data-tooltip-size='medium']::after {
+    white-space: initial;
+    max-width: 200px;
+    width: 100%;
+  }
+
+  &[data-tooltip-size='large']::after {
+    white-space: initial;
+    max-width: 260px;
+    width: 100%;
+  }
+}

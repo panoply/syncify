@@ -1,0 +1,48 @@
+/* MIXINS ------------------------------------- */
+
+@mixin bg-blur($alpha: 0.845, $blur: 5px) {
+  background-color: rgba($white, $alpha);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+@mixin bg-color($background-color, $text-color) {
+  background-color: $background-color !important;
+  color: $text-color !important;
+
+  .icon {
+    fill: $text-color !important;
+  }
+}
+
+/* SOLID BACKGROUNDS -------------------------- */
+
+.bg-transparent {
+  background-color: transparent !important;
+}
+
+.bg-blur {
+  @include bg-blur;
+}
+.bg-white {
+  @include bg-color($white, $black-500);
+}
+.bg-gray {
+  @include bg-color($white-100, $black-500);
+}
+.bg-dark {
+  @include bg-color($black-500, $white);
+}
+.bg-red {
+  @include bg-color($red, $white);
+}
+.bg-green {
+  @include bg-color($green, $white);
+}
+
+/* BRANDS ------------------------------------- */
+
+.bg-fb-blue {
+  @include bg-color($fb-blue, $white);
+}

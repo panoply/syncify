@@ -1,0 +1,103 @@
+.navbar {
+  color: $black;
+  position: relative;
+  text-transform: uppercase;
+  font-weight: inherit;
+  font-size: inherit;
+  position: relative;
+  z-index: 800;
+
+  li {
+    position: relative;
+    display: inline-block;
+    margin: 0 7px;
+    padding: 0 $navbar-navbar-spacing;
+
+    &:hover {
+      background-color: $black;
+
+      a {
+        color: $white;
+      }
+
+      ul {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        background-color: rgba($color: $white, $alpha: 0.695);
+        @include transition(opacity 0.845s linear);
+
+        li > a {
+          color: $black;
+
+          &.text-red {
+            color: $red;
+          }
+        }
+      }
+    }
+
+    a {
+      color: $black;
+    }
+
+    a:focus {
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    a:hover {
+      //color: lighten($black-100, 20%);
+      color: $white;
+      text-decoration: none;
+    }
+
+    &.active {
+      //	background-color: $black;
+
+      > a {
+        //	color: $white;
+        //text-decoration: underline;
+        font-weight: 600;
+      }
+    }
+
+    &:last-child {
+      margin-right: 0;
+      border-right: none;
+    }
+
+    ul {
+      position: absolute;
+      display: none;
+      width: 170px;
+      left: 0;
+      z-index: 200;
+      background-color: $white;
+      visibility: hidden;
+      opacity: 0;
+
+      > li {
+        display: block;
+        margin: 0;
+        padding: 0;
+
+        &:hover {
+          background-color: transparent;
+          a {
+            text-decoration: underline;
+          }
+        }
+
+        a {
+          font-size: 0.895rem;
+          padding: 3px $navbar-navbar-spacing;
+          width: 100%;
+          display: block;
+        }
+      }
+    }
+  }
+}

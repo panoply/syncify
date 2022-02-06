@@ -1,0 +1,40 @@
+.product-viewer {
+	position: relative;
+
+	.aspect-ratio {
+		@include aspect-ratio(1365, 2048, $gray-100);
+		cursor: zoom-in;
+	}
+
+	.prev {
+		left: 20px;
+		height: 20px;
+	}
+
+	.next {
+		right: 40px;
+		height: 20px;
+	}
+
+	.prev,
+	.next {
+		position: absolute;
+		height: 100%;
+		top: 0;
+		bottom: 0;
+		z-index: 100;
+		cursor: pointer;
+
+		&:hover {
+			.icon {
+				opacity: 1;
+			}
+		}
+
+		.icon {
+			width: 24px;
+			height: 24px;
+			opacity: 0.25;
+		}
+	}
+}

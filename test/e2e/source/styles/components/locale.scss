@@ -1,0 +1,75 @@
+.locale {
+  font-family: $headings-font-family;
+  display: inherit;
+  z-index: 200;
+  height: 20px;
+
+  > div {
+    padding-top: 3px !important;
+  }
+
+  &-flag {
+    width: 16px;
+    height: 12px;
+    margin-right: 10px;
+
+    &::before {
+      width: 16px;
+      height: 12px;
+      background-color: $gray-100;
+      content: '';
+    }
+  }
+
+  &-search {
+    width: 150px;
+    border: none;
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
+    font-size: $navbar-font-size;
+
+    &::placeholder {
+      font-size: $navbar-font-size;
+    }
+  }
+
+  &-list {
+    height: 125px;
+    width: 250px;
+    overflow-y: scroll;
+    border-color: $gray-100;
+    position: absolute;
+    left: pipe-offset(20);
+    z-index: 200;
+    background-color: rgba($color: $white, $alpha: 0.695);
+    font-family: $heading-font-family;
+    font-size: $navbar-font-size;
+    @include transition(opacity 0.845s linear);
+
+    > li {
+      padding: 2px 10px 2px 26px;
+      display: block;
+
+      &.active {
+        //text-decoration: underline;
+        font-weight: 600;
+      }
+
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

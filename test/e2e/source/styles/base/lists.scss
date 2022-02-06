@@ -1,0 +1,66 @@
+/* MIXINS ------------------------------------- */
+
+@function pipe-offset($size) {
+	@return #{decimal-ceil($size / 1.3, 0)}px;
+}
+
+@mixin pipe-list($height, $pipe-color: $gray-500) {
+	height: #{$height}px;
+	position: relative;
+	//overflow: hidden;
+	display: inline-flex;
+
+	> li {
+		padding: 0 pipe-offset($height);
+		height: #{$height}px;
+		position: relative;
+		align-self: center;
+
+		&:after {
+			content: " ";
+			top: $height * 1%;
+			height: 100% - decimal-ceil($height, 2);
+			position: absolute;
+			border-right: 1px solid $pipe-color;
+			right: 0;
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+
+		&:first-child {
+			padding-left: 0;
+		}
+
+		&:last-child {
+			padding-right: 0;
+
+			&:after {
+				border-right: none;
+			}
+		}
+	}
+}
+
+@mixin icon-list($icon-size, $icon-color: $black-500) {
+	.icon {
+		fill: $icon-color;
+		width: #{$icon-size}px;
+		height: #{$icon-size}px;
+	}
+}
+
+/* Dash Menu
+ *
+ * Inline list menu, with dash seperator, e.g:  one | two | three
+ */
+.list {
+	position: relative;
+
+	&-pipe {
+		@include pipe-list(20);
+	}
+
+	&-icon {
+		@include icon-list(20);
+	}
+}

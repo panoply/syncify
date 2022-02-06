@@ -1,0 +1,9 @@
+# Redirects for syncify.myshopify.com
+syncify:
+  /some-url: /products/foo-bar
+  /another-url: /products/foo-bar
+
+# Redirects for boefje.myshopify.com
+boefje:
+  /some-url: /products/foo-bar
+  /another-url: /products/foo-bar

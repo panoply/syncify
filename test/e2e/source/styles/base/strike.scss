@@ -1,0 +1,50 @@
+.strike {
+	display: flex;
+	flex-basis: 100%;
+	align-items: center;
+	color: $gray;
+	margin: 0 auto;
+	text-align: center;
+	text-transform: uppercase;
+	width: 100%;
+	font-weight: 500;
+	font-family: $heading-font-family;
+	font-size: $font-size-xs;
+	color: $gray;
+
+	&::before {
+		margin-right: 8px;
+	}
+
+	&::after {
+		margin-left: 8px;
+	}
+
+	&::before,
+	&::after {
+		content: "";
+		flex-grow: 1;
+		background: rgba(0, 0, 0, 0.281);
+		height: 1px;
+		font-size: 0;
+		line-height: 0;
+	}
+
+	&-sm > span {
+		font-weight: 500;
+		font-size: $font-size-sm;
+		padding: 0 8px;
+	}
+
+	&-md > span {
+		font-weight: 500;
+		font-size: $font-size-md;
+		padding: 0 12px;
+	}
+
+	&-lg > span {
+		font-weight: 500;
+		font-size: $font-size-lg;
+		padding: 0 12px;
+	}
+}

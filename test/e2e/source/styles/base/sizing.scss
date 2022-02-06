@@ -1,0 +1,25 @@
+/* RESPONSIZE PERCENTS ------------------------ */
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+	@include media-breakpoint-up($breakpoint) {
+		$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+		.h#{$infix}-100 {
+			height: 100% !important;
+		}
+
+		.w#{$infix}-100 {
+			width: 100% !important;
+		}
+	}
+}
+
+/* SET WIDTHS --------------------------------- */
+
+.w-300px {
+	width: 300px;
+}
+
+.w-500px {
+	width: 500px;
+}

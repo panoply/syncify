@@ -1,0 +1,42 @@
+// SIZES
+//
+.size-chart {
+	position: relative;
+	font-size: $font-size-sm;
+
+	.bd-bottom {
+		border-bottom: 1px solid $gray-200;
+	}
+
+	// TOGGLE
+	// Switches between the metric (cm) and imperial (inches) size guides
+	//
+	&__toggle > button {
+		font-size: $font-size-xs;
+		color: $gray-500;
+		display: inline;
+
+		&.active {
+			color: $black-700;
+		}
+	}
+
+	// TABLE
+	// The table styling of the sizes
+	//
+	&__table {
+		font-family: $heading-font-family;
+		text-transform: uppercase;
+		border-collapse: collapse;
+		width: 100%;
+
+		thead > tr > th {
+			background-color: lighten($color: $gray-100, $amount: 4);
+		}
+
+		th,
+		td {
+			border: 1px solid $gray-200;
+		}
+	}
+}

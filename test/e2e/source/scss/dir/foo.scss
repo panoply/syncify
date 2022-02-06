@@ -1,0 +1,10 @@
+.something {
+
+  > span {
+    color: $font-color;
+
+    &.bar{
+      font-size: $font-size;
+    }
+  }
+}

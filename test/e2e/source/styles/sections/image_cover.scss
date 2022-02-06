@@ -1,0 +1,71 @@
+.image_cover {
+	z-index: 1;
+	position: relative;
+
+	&-caption {
+		z-index: 2;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+
+		@include media-breakpoint-down(sm) {
+			.h1 {
+				font-size: $h3-font-size;
+			}
+			.h2 {
+				font-size: $h4-font-size;
+			}
+			.h3 {
+				font-size: $h5-font-size;
+			}
+			.h4 {
+				font-size: $h6-font-size;
+			}
+			.h5 {
+				font-size: $h6-font-size;
+			}
+		}
+	}
+
+	.aspect-ratio {
+		&.x920 {
+			@include media-breakpoint-down(xl) {
+				@include aspect-ratio(1440, 920, $gray-200);
+			}
+			@include media-breakpoint-down(sm) {
+				@include aspect-ratio(1024, 1024, $gray-200);
+			}
+		}
+
+		&.x840 {
+			@include media-breakpoint-down(xl) {
+				@include aspect-ratio(1440, 840, $gray-200);
+			}
+			@include media-breakpoint-down(sm) {
+				@include aspect-ratio(1024, 1024, $gray-200);
+			}
+		}
+
+		&.x780 {
+			@include media-breakpoint-down(xl) {
+				@include aspect-ratio(1440, 780, $gray-200);
+			}
+			@include media-breakpoint-down(sm) {
+				@include aspect-ratio(1024, 1024, $gray-200);
+			}
+		}
+
+		&.x720 {
+			@include media-breakpoint-down(xl) {
+				@include aspect-ratio(1440, 720, $gray-200);
+			}
+			@include media-breakpoint-down(sm) {
+				@include aspect-ratio(1024, 1024, $gray-200);
+			}
+		}
+	}
+}

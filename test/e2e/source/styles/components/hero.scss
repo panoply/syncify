@@ -1,0 +1,186 @@
+//–––––––––––––––––––––––––––––––––––––––––––––––
+// Hierarchy Adaptation
+
+//–––––––––––––––––––––––––––––––––––––––––––––––
+// Hero Component
+
+$hero-height: 720px;
+
+// set the fallback-cover image
+
+// import package
+
+.hero {
+	position: relative;
+	z-index: 2; //$zindex-hero;
+	max-height: 100vh;
+	margin-right: -15px;
+	margin-left: -15px;
+	overflow: hidden;
+
+	@include media-breakpoint-down(xs) {
+		//	margin-top: $header-height-mobile;
+	}
+
+	@include media-breakpoint-up(xxl) {
+		max-height: 100vh;
+	}
+
+	&__aspect-ratio {
+		@include media-breakpoint-down(xl) {
+			@include aspect-ratio(1620, 1000, $gray-200);
+		}
+
+		@include media-breakpoint-down(sm) {
+			@include aspect-ratio(1080, 1080, $gray-200);
+		}
+	}
+
+	svg {
+		&.hero__img {
+			height: 100%;
+		}
+	}
+
+	&__img {
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		width: 100%;
+		height: auto;
+		overflow: hidden;
+	}
+
+	&__video {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+
+		/* 16:9 */
+		height: 0;
+		//max-height: $hero-height;
+		padding-bottom: 56.25%;
+
+		video {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: auto;
+		}
+
+		&.hidden {
+			background-image: url("{{ 'hero_desktop.jpg' | asset_url }}");
+			background-repeat: no-repeat;
+			background-size: cover;
+
+			video {
+				opacity: 0;
+			}
+		}
+	}
+
+	&__caption {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 3;
+		width: 100%;
+		height: 100%;
+		font-weight: 600;
+
+		&.overlay {
+			background-color: rgba(0, 0, 0, 0.1);
+		}
+
+		/* Caption Styling */
+		/*-----------------*/
+
+		.inner {
+			width: 100%;
+			text-align: justify;
+		}
+
+		h1 {
+			color: $white;
+			font-weight: 900;
+			font-size: 3rem;
+
+			@include media-breakpoint-down(sm) {
+				font-size: 1.9rem;
+			}
+		}
+
+		h2 {
+			color: $red;
+			font-size: 1.5rem;
+
+			@include media-breakpoint-down(sm) {
+				font-size: 1.9rem;
+			}
+		}
+
+		h3 {
+			color: $red;
+			font-weight: 900;
+			font-size: 2.7rem;
+
+			@include media-breakpoint-down(sm) {
+				font-size: 1.7rem;
+			}
+		}
+
+		.a-link {
+			color: $white;
+			font-size: 1.3rem;
+			border: 1px solid $white;
+
+			@include media-breakpoint-down(sm) {
+				font-size: 0.995rem;
+			}
+
+			&:hover {
+				color: $red;
+				text-decoration: none;
+				border-color: $red;
+			}
+		}
+	}
+
+	&__buttons {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 100%;
+
+		.prev {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 50px;
+		}
+
+		.next {
+			position: absolute;
+			top: 0;
+			right: 50px;
+			bottom: 0;
+		}
+
+		.icon {
+			width: 25px;
+			opacity: 0.25;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+}

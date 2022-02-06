@@ -1,0 +1,63 @@
+/* -------------------------------------------- */
+/*                     BODY                     */
+/* -------------------------------------------- */
+
+$body-font-family: var(--body-font-family);
+$body-font-size: var(--body-font-size);
+$body-font-weight: var(--body-font-weight);
+$body-font-colour: var(--body-font-colour);
+$body-bg-color: var(--body-bg-color);
+
+/* -------------------------------------------- */
+/*                  HREF LINKS                  */
+/* -------------------------------------------- */
+
+$href-color: var(--href-color);
+$href-hover: var(--href-hover);
+
+/* -------------------------------------------- */
+/*                    HEADINGS                  */
+/* -------------------------------------------- */
+
+$heading-font-family: var(--heading-font-family);
+
+/* -------------------------------------------- */
+/*                  NAVIGATION                  */
+/* -------------------------------------------- */
+
+$navigation-font-size: var(--navigation-font-size);
+$navigation-font-weight: var(--navigation-font-weight);
+
+/* -------------------------------------------- */
+/*                    H1 > H6                   */
+/* -------------------------------------------- */
+
+$h1-font-size: var(--h1-font-size);
+$h2-font-size: var(--h2-font-size);
+$h3-font-size: var(--h3-font-size);
+$h4-font-size: var(--h4-font-size);
+$h5-font-size: var(--h5-font-size);
+$h6-font-size: var(--h6-font-size);
+
+/* -------------------------------------------- */
+/*                 PROGRESS BAR                 */
+/* -------------------------------------------- */
+
+$progress-bar-color: var(--progress-bar-color);
+$progress-bar-height: var(--progress-bar-height);
+
+$spinner: var(--loading-spinner-black);
+$spinner-white: var(--loading-spinner-white);
+$photoswipe-icons: var(--loading-spinner);
+
+$logo-bg-image: var(--logo-bg-image);
+
+/* -------------------------------------------- */
+/*                   ICON SVG                   */
+/* -------------------------------------------- */
+
+$icon-alert: '\e900';
+$icon-check: '\e901';
+$icon-x: '\e905';
+$icon-minus: '\e902';
+$icon-plus: '\e903';

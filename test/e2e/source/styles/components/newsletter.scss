@@ -1,0 +1,57 @@
+/* -------------------------------------------- */
+/*                  NEWSLETTER                  */
+/* -------------------------------------------- */
+
+form.newsletter {
+  height: 25px;
+  width: 315px;
+
+  fieldset {
+    //
+    //	&::before {
+    //		content: $icon-mail;
+    //}
+  }
+
+  &[data-newsletter-subscribed-value='true'] {
+    //
+
+    input:disabled {
+      color: $black-600;
+      background-color: transparent;
+    }
+
+    button {
+      font-family: 'form-icons';
+
+      &:hover {
+        color: $black-600;
+      }
+
+      &::before {
+        content: $icon-x;
+      }
+
+      span {
+        display: none !important;
+      }
+    }
+  }
+
+  &[data-newsletter-status-value='invalid'] {
+    output {
+      color: $red;
+    }
+  }
+
+  &[data-newsletter-pending-value='true'] {
+    output {
+      color: $green;
+    }
+  }
+
+  svg {
+    z-index: 100;
+    margin-left: 2px;
+  }
+}

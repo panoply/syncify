@@ -1,0 +1,68 @@
+.drawer-open {
+  .drawer-bottom {
+    z-index: 1050;
+  }
+
+  .gdrp-banner {
+    background-color: $white;
+    border-top: none;
+  }
+}
+
+.gdrp-settings {
+  .drawer-bottom & {
+    @include media-breakpoint-down(md) {
+      overflow-y: scroll;
+    }
+  }
+
+  .btn-link {
+    width: 100px;
+  }
+}
+
+.gdrp-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: $white;
+  color: $black;
+  z-index: 1000;
+  line-height: 1.1rem;
+  height: 80px;
+  width: 108%;
+
+  .btn {
+    @include button-size($font-size-sm, $button-md);
+    @include media-breakpoint-down(sm) {
+      @include button-size($font-size-sm, $button-md);
+    }
+  }
+
+  @include media-breakpoint-down(sm) {
+    height: 220px;
+    width: 108%;
+  }
+
+  .drawer-bottom & {
+    background-color: $white;
+  }
+
+  @include media-breakpoint-down(sm) {
+    height: 220px;
+  }
+
+  a {
+    //color: $gray;
+    font-size: $font-size-sm;
+    font-family: $body-font-family;
+    color: $black-100;
+
+    &:hover {
+      color: $black;
+      text-decoration: underline;
+    }
+  }
+}

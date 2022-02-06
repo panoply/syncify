@@ -1,0 +1,188 @@
+.product-item {
+  position: relative;
+  z-index: 3;
+  touch-action: manipulation;
+
+  .feature {
+    overflow: hidden;
+    position: absolute;
+    bottom: $spacer-2;
+    left: $spacer-2;
+    right: $spacer-2;
+    height: 30px;
+    color: $black;
+    z-index: 4;
+    background-color: rgba($color: $gray-300, $alpha: 0.845);
+    border: 1px transparent;
+
+    > .ribbon {
+      overflow: hidden;
+      text-transform: uppercase;
+      font-size: $font-size-xs;
+      font-family: $heading-font-family;
+      font-weight: 500;
+      height: 100%;
+      width: 100%;
+
+      @include media-breakpoint-down(sm) {
+        font-size: $font-size-xxs;
+      }
+
+      > span {
+        overflow: hidden;
+
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+    }
+  }
+
+  .badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 25px;
+    z-index: 4;
+    font-weight: 500;
+    font-family: $heading-font-family;
+    font-size: $h5-font-size;
+    text-transform: uppercase;
+
+    @include media-breakpoint-down(sm) {
+      font-size: $h6-font-size;
+    }
+
+    &.sale {
+      color: $red;
+    }
+
+    &.sold-out {
+      color: $black-500;
+    }
+  }
+
+  .aspect-ratio {
+    @include aspect-ratio(1365, 2048, $gray-100);
+
+    &::before {
+      background-image: $logo-bg-image;
+      background-size: 30%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    &:hover {
+      .details {
+        background-color: rgba($color: $white, $alpha: 0.745);
+        visibility: visible;
+        opacity: 1;
+        border: 1px solid rgba($color: $gray-100, $alpha: 0.745);
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        @include transition(opacity 0.1s linear);
+      }
+
+      .feature {
+        background-color: transparent;
+        border: 1px solid transparent;
+        @include transition(background-color 0.1s linear);
+      }
+    }
+  }
+
+  .image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: block;
+  }
+
+  a {
+    font-weight: 600;
+    font-size: $font-size-sm;
+    text-transform: uppercase;
+    position: relative;
+    touch-action: manipulation;
+    #shadow-root #alttext-container {
+      font-size: $font-size-xl;
+    }
+
+    .aspect-ratio {
+      display: block;
+    }
+  }
+
+  .details {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    opacity: 0;
+
+    .low-stock {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 22px;
+
+      &.h5 {
+        color: $gray-400;
+      }
+    }
+
+    .highlight {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+    }
+
+    .h5 {
+      font-weight: 500;
+    }
+
+    h6 {
+      color: darken($color: $gray-500, $amount: 20);
+    }
+
+    .title {
+      font-weight: 600;
+    }
+
+    .price {
+      font-weight: 600;
+      letter-spacing: 0.035rem;
+    }
+
+    .price-old {
+      color: rgb(117, 113, 113);
+      text-decoration: line-through;
+      font-size: 0.895rem;
+
+      @include media-breakpoint-down(sm) {
+        font-size: 0.795rem;
+      }
+    }
+  }
+
+  .title-button > a {
+    padding: 7px 25px;
+    background-color: $black-200;
+  }
+}
+
+img.lazy:not([src]) {
+  visibility: hidden;
+}

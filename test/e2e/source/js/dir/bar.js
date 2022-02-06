@@ -1,5 +1,4 @@
 export default function () {
 
-  return 'foo';
-
+  return 'bar';
 }

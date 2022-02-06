@@ -1,0 +1,93 @@
+.pswp__button--arrow--right:before,
+.pswp__button--arrow--left:before,
+[class^='icon-'],
+[class*=' icon-'] {
+  font-family: 'icons' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+$icon-xs: 12px;
+
+span.icon {
+  fill: inherit;
+
+  /* SIZES -------------------------------------- */
+  &-xs {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  &-sm {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  &-md {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  &-lg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  &-xl {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* COLORS ------------------------------------- */
+
+  &-white {
+    fill: $white;
+  }
+  &-green {
+    fill: $green;
+  }
+  &-red {
+    fill: $red;
+  }
+  &-orange {
+    fill: $red;
+  }
+  &-gray {
+    fill: $gray-600;
+  }
+}
+
+/* FONTS -------------------------------------- */
+.icon-alert {
+  &:before {
+    content: $icon-alert;
+  }
+}
+.icon-check {
+  &:before {
+    content: $icon-check;
+  }
+}
+.icon-x {
+  &:before {
+    content: $icon-x;
+  }
+}
+.icon-minus {
+  &:before {
+    content: $icon-minus;
+  }
+}
+.icon-plus {
+  &:before {
+    content: $icon-plus;
+  }
+}
+
+.product-tags {
+  .icon {
+    width: 62px;
+  }
+}

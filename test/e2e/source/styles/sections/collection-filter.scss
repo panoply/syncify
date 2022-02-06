@@ -1,0 +1,167 @@
+.filter {
+	width: 200px;
+
+	@include media-breakpoint-down(lg) {
+		width: 240px;
+	}
+
+	ul > li {
+		position: relative;
+		display: block;
+		padding: 0;
+		text-transform: uppercase;
+		list-style: none;
+
+		@include media-breakpoint-down(sm) {
+			margin-bottom: 5px;
+		}
+	}
+
+	&-mobile {
+		z-index: 2;
+		width: 100%;
+		height: auto;
+		background-color: $navbar-background;
+		border-bottom: 1px solid $gray-200;
+
+		@include media-breakpoint-up(md) {
+			right: 0;
+			// position: fixed;
+			left: 0;
+			//top: $navbar-height-desktop + 1;
+		}
+
+		button {
+			display: flex;
+		}
+
+		.filter,
+		.sorting {
+			width: 25px;
+			height: 25px;
+		}
+	}
+
+	&-title {
+		height: 42px;
+		font-weight: 500;
+		font-size: 1rem;
+
+		.remove {
+
+			.icon {
+				width: 12px;
+				height: 12px;
+			}
+		}
+	}
+
+	&-link {
+
+		a {
+			display: inline-flex;
+			padding-bottom: 5px;
+			color: $black-200;
+			font-weight: 400;
+			font-size: 0.845rem;
+			letter-spacing: 0.025rem;
+			text-transform: uppercase;
+			text-decoration: none;
+
+			.empty {
+
+				.icon {
+
+					&.checked {
+						display: block;
+					}
+				}
+			}
+
+			.icon {
+				display: flex;
+				align-self: center;
+				width: 12px;
+				height: 12px;
+				margin-right: 7px;
+
+				&.checked {
+					display: none;
+				}
+
+				&.unchecked {
+					display: block;
+				}
+
+				&.loading {
+					display: none;
+					width: 16px;
+					height: 16px;
+					border: 3px solid rgba(#000, 0.3);
+					border-top-color: rgba(#000, 0.8);
+					border-radius: 100%;
+					animation: rotate 0.7s infinite linear;
+				}
+			}
+
+			@include media-breakpoint-down(sm) {
+				font-size: 0.985rem;
+
+				.icon {
+					width: 16px;
+					height: 16px;
+				}
+			}
+
+			&.active {
+
+				.icon {
+
+					&.checked {
+						display: block;
+					}
+
+					&.remove {
+						display: none;
+					}
+				}
+			}
+
+			&:hover {
+				text-decoration: none;
+
+				@include media-breakpoint-up(sm) {
+
+					.icon {
+
+						&.checked {
+							display: block;
+						}
+
+						&.unchecked {
+							display: none;
+						}
+					}
+
+					&.active {
+
+						.icon {
+
+							&.checked {
+								display: block;
+							}
+
+							&.remove {
+								display: none;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.filter-sticky {
+	z-index: 3;
+}

@@ -1,0 +1,41 @@
+/* -------------------------------------------- */
+/*               BACKGROUND COLORS              */
+/* -------------------------------------------- */
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .bd#{$infix}-none {
+      border: none !important;
+    }
+
+    .bd#{$infix} {
+      border: 1px solid transparent;
+    }
+
+    .bd#{$infix}-left {
+      border-left: 1px solid transparent;
+    }
+
+    .bd#{$infix}-right {
+      border-right: 1px solid transparent;
+    }
+
+    .bd#{$infix}-top {
+      border-top: 1px solid transparent;
+    }
+
+    .bd#{$infix}-bottom {
+      border-bottom: 1px solid transparent;
+    }
+  }
+}
+
+.bd-gray {
+  border-color: $gray-300;
+}
+
+.bd-gray-200 {
+  border-color: $gray-200;
+}

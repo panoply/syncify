@@ -1,0 +1,332 @@
+.template_addresses,
+.template_order,
+.template_account {
+	@include media-breakpoint-down(md) {
+		margin-top: $navbar-height-mobile;
+	}
+}
+
+.account {
+	&__header {
+		background: $gray-400;
+		border-bottom: 1px solid $gray-500;
+		h1 {
+			font-size: ($font-size-sm + 0.25rem);
+			font-weight: 400;
+			color: $black;
+			text-transform: uppercase;
+			margin-bottom: 5px;
+		}
+		.icon {
+			width: 30px;
+			height: 30px;
+		}
+	}
+	&__menu {
+		a {
+			display: block;
+
+			&:hover {
+				color: $black-500;
+				background-color: $white-200;
+				@include transition(background-color 0.2s linear);
+			}
+
+			.icon {
+				.icon-orders,
+				.icon-eye,
+				.icon-house-address,
+				.icon-email-bell,
+				.icon-checkout,
+				.icon-user-support,
+				.icon-mod-logo {
+					width: 50px;
+					height: 50px;
+				}
+			}
+		}
+		&--1,
+		&--2,
+		&--3 {
+			border: 1px solid $gray-500;
+		}
+		&--2 {
+			@include media-breakpoint-up(sm) {
+				border-right: none;
+				border-left: none;
+			}
+			@include media-breakpoint-down(xs) {
+				border-top: none;
+				border-bottom: none;
+			}
+		}
+	}
+	&__navigation {
+		list-style-type: none;
+		li {
+			padding: 5px 0px;
+			a {
+				display: block;
+				text-transform: uppercase;
+				font-size: $font-size-xs;
+				@include media-breakpoint-down(sm) {
+					color: $black-500;
+					display: block;
+					border-bottom: 1px solid $gray-400;
+					width: 100%;
+					font-size: 0.795rem;
+					letter-spacing: 0.035rem;
+					padding: 12px 20px;
+				}
+			}
+		}
+	}
+}
+
+.order {
+	&__items {
+		&--list {
+			border-top: 1px solid $gray-500;
+			border-left: 1px solid $gray-500;
+			border-right: 1px solid $gray-500;
+			font-size: ($font-size-xs + 0.095);
+			text-transform: uppercase;
+			a {
+				&:hover {
+					color: darken($black-300, 25%);
+				}
+			}
+			@include media-breakpoint-down(md) {
+				font-size: $font-size-xs;
+			}
+			img {
+				max-width: 80px;
+				float: left;
+				display: inline-flex;
+				@include media-breakpoint-down(md) {
+					max-width: 65px;
+				}
+				@include media-breakpoint-down(sm) {
+					max-width: 80px;
+				}
+				@include media-breakpoint-down(xs) {
+					max-width: 65px;
+				}
+			}
+		}
+		&--legend {
+			text-transform: uppercase;
+			font-size: $font-size-xs;
+			font-weight: 500;
+			letter-spacing: 0.025rem;
+			border-top: 1px solid $gray-500;
+			border-left: 1px solid $gray-500;
+			border-right: 1px solid $gray-500;
+		}
+		&--summary {
+			border: 1px solid $gray-500;
+			font-size: ($font-size-xs + 0.095);
+			text-transform: uppercase;
+			small {
+				color: darken($black-300, 10%);
+			}
+			.legend {
+				font-size: $font-size-sm;
+				font-weight: 500;
+				letter-spacing: 0.025rem;
+			}
+		}
+		&--mob-total {
+			@include media-breakpoint-down(sm) {
+				background-color: $white-200;
+				border-top: 1px solid $gray-500;
+			}
+		}
+		&--mob-track {
+			@include media-breakpoint-down(sm) {
+				border-top: 1px solid $gray-500;
+			}
+		}
+		&--item-wrap {
+			//border-left: 1px solid $gray-500;
+		}
+		&--item {
+			//border-bottom: 1px solid $gray-500;
+		}
+	}
+	&__address {
+		border-top: 1px solid $gray-500;
+		&--billing {
+			text-transform: none;
+			h4 {
+				color: $gray;
+				opacity: 0.5;
+				border: 1px solid $gray;
+				border-radius: 5px;
+				display: inline-block;
+				padding: 12px;
+				@include media-breakpoint-down(lg) {
+					font-size: $font-size-sm;
+				}
+				@include media-breakpoint-down(sm) {
+					font-size: 1.45rem;
+				}
+			}
+			h5 {
+				text-transform: uppercase;
+				font-size: $font-size-xs;
+				font-weight: 500;
+				letter-spacing: 0.025rem;
+			}
+		}
+		&--shipping {
+			border: 1px solid $gray-500;
+			height: 261px;
+			@include media-breakpoint-down(sm) {
+				height: auto;
+			}
+		}
+		&--shipping-header {
+			text-transform: uppercase;
+			font-size: 1.45rem;
+			font-weight: 500;
+			letter-spacing: 0.025rem;
+		}
+	}
+	&__list {
+		&--head {
+			font-size: ($font-size-xs + 0.025rem);
+			text-transform: uppercase;
+			font-weight: 500;
+			border: 1px solid $gray-500;
+			@include media-breakpoint-down(sm) {
+				font-size: $font-size-xs;
+				font-weight: 500;
+			}
+		}
+		&--items {
+			font-size: $font-size-sm;
+			@include media-breakpoint-up(sm) {
+				&:hover {
+					background-color: $gray-400;
+				}
+			}
+			.mob-title {
+				//font-size: ($font-size-xs + 0.025rem);
+				text-transform: uppercase;
+				width: 50%;
+				font-weight: 500;
+			}
+		}
+		&--order,
+		&--date,
+		&--status,
+		&--fulfillment,
+		&--discount,
+		&--total {
+			border-bottom: 1px solid $gray-500;
+			@include media-breakpoint-down(xs) {
+				//font-size: $font-size-xs;
+				border-bottom: none;
+				border-left: 1px solid $gray-500;
+				border-right: 1px solid $gray-500;
+			}
+		}
+		&--order {
+			border-left: 1px solid $gray-500;
+			@include media-breakpoint-down(xs) {
+				border: 1px solid $gray-500;
+				background-color: $gray-400;
+			}
+		}
+		&--total {
+			border-right: 1px solid $gray-500;
+		}
+		&--discount {
+			font-size: 0.675rem;
+		}
+		&--total {
+			@include media-breakpoint-down(xs) {
+				font-weight: normal;
+				.legend {
+					font-size: $font-size-xs;
+					font-weight: 500;
+					text-transform: uppercase;
+				}
+			}
+		}
+		&--view {
+			font-size: $font-size-xs;
+			background-color: $gray-400;
+			@include media-breakpoint-down(xs) {
+				border: 1px solid $gray-500;
+			}
+		}
+	}
+}
+
+.tracking-number {
+	text-decoration: underline;
+}
+
+.address {
+	&__item {
+		border: 1px solid $gray-500;
+		&--edit {
+			position: absolute;
+			top: 15px;
+			right: 25px;
+			a {
+				.icon-edit {
+					width: 20px;
+					height: 20px;
+				}
+			}
+		}
+		&--delete {
+		}
+		&--name {
+			font-size: $font-size-sm;
+			color: $black-500;
+			font-weight: 500;
+		}
+		&--company {
+			font-size: $font-size-xs;
+			color: darken($black-300, 15%);
+			font-weight: 300;
+		}
+		&--address {
+			font-size: $font-size-sm;
+		}
+		&--phone {
+			font-size: $font-size-xs;
+		}
+	}
+	&__edit {
+		label {
+			text-transform: uppercase;
+			font-size: 0.675rem;
+			display: block;
+			margin-bottom: 2px;
+		}
+		input {
+			width: 100%;
+			border: 1px solid $gray-500;
+			font-size: $font-size-xs;
+			display: block;
+			margin-bottom: 10px;
+			padding: 7px;
+		}
+		input[type="checkbox"] {
+			display: inline-block;
+			width: auto;
+		}
+		select {
+			width: 100%;
+			border: 1px solid $gray-500;
+			padding: 8px 12px;
+			font-size: $font-size-xs;
+			color: $black-500;
+		}
+	}
+}

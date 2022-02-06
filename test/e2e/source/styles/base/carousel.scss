@@ -1,0 +1,59 @@
+.carousel-navs {
+	li {
+		display: inline-flex;
+		margin-right: 10px;
+
+		button {
+			height: 12px;
+			width: 12px;
+			background-color: $black-500;
+
+			@include media-breakpoint-up(md) {
+				height: 9px;
+				width: 9px;
+			}
+
+			&:hover,
+			&.active {
+				background-color: $gray-500;
+			}
+		}
+	}
+}
+
+.carousel-rewaxing {
+	position: relative;
+
+	.aspect-ratio {
+		@include aspect-ratio(1365, 2048, $gray-100);
+	}
+
+	.prev {
+		left: 0px;
+	}
+
+	.next {
+		right: 0px;
+	}
+
+	.prev,
+	.next {
+		position: absolute;
+		height: 100%;
+		top: 0;
+		bottom: 0;
+		z-index: 100;
+
+		&:hover {
+			.icon {
+				opacity: 1;
+			}
+		}
+
+		.icon {
+			width: 14px;
+			height: auto;
+			opacity: 0.75;
+		}
+	}
+}
