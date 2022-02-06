@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 
 import { join, parse } from 'path';
-import { Syncify, IFile, IConfig, IStyles, IViews, IStyle } from 'types';
-import { assign, isRegex, isUndefined } from 'utils/native';
-import { lastPath } from 'utils/helpers';
+import { Syncify, IFile, IConfig, IViews, IStyle } from 'types';
+import { assign, isRegex, isUndefined } from 'shared/native';
+import { lastPath } from 'shared/helpers';
 
 /**
  * File types are represented as numeric values.
@@ -41,7 +41,8 @@ function setProps (path: string, output: string) {
         output,
         parent: lastPath(file.dir),
         key: join(namespace, file.base),
-        config: null
+        config: null,
+        size: {}
       });
     }
   };
@@ -116,17 +117,17 @@ export function parseFile (paths: IConfig['paths'], output: string) {
  * Augment the file configuration to accept
  * style types.
  */
-export function isStyle (file: IFile<IStyle>, transform: IStyles) {
+export function isStyle<T extends IFile<IStyle>> (file: T, transform: IStyle[]) {
 
-  const config = transform.compile.find(x => x.watch(file.path));
+  const item = { ...file };
 
-  return assign({}, file, {
-    config,
-    type: file.ext === '.css' ? Type.CSS : Type.SASS,
-    output: join(file.output, config.output),
-    namespace: file.namespace === 'snippets' ? 'snippets' : file.namespace,
-    key: config.output
-  });
+  item.config = transform.find(x => x.watch(file.path));
+  item.type = item.ext === '.css' ? Type.CSS : Type.SASS;
+  item.output = join(item.output, item.config.output);
+  item.namespace = item.namespace === 'snippets' ? 'snippets' : item.namespace;
+  item.key = item.config.output;
+
+  return item;
 
 }
 
@@ -136,7 +137,9 @@ export function isStyle (file: IFile<IStyle>, transform: IStyles) {
  */
 export function isMetafield (file: IFile) {
 
-  return assign(file as IFile, { key: file.name });
+  file.key = file.name;
+
+  return file;
 
 }
 
@@ -179,7 +182,7 @@ export function asset (
 
   if (typeof callback !== 'function') return data.toString();
 
-  const update = callback.apply({ ...file }, data);
+  const update = callback.call({ ...file }, data);
 
   if (isUndefined(update)) return data;
 
