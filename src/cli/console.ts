@@ -2,7 +2,7 @@ import { render } from 'prettyjson';
 import { isObject, isArray, nil, isUndefined, isFunction } from 'shared/native';
 import { kill, spawned, spawns } from 'cli/spawn';
 import * as ansi from 'cli/ansi';
-import c from 'ansis';
+import * as c from 'cli/colors';
 import { IConfig } from 'types';
 
 interface ILoggers {
@@ -11,7 +11,7 @@ interface ILoggers {
   metafields?: (message: string) => void,
   redirects?: (message: string) => void,
   throw?: (message: string) => void,
-  warn?: (message: string) => void
+  error?: (...message: string[]) => void,
 }
 
 /* -------------------------------------------- */
@@ -21,8 +21,7 @@ interface ILoggers {
 /**
  * Log Instances
  *
- * The blessed log panes. This object is
- * populated within `create()` and will hold
+ * This object is populated within `create()` and will hold
  * a reference to each log group.
  */
 export const log: ILoggers = { tracked: undefined };
@@ -110,10 +109,8 @@ const stdout = (config: IConfig) => {
   const trace = tracer(config);
   const print = logger(trace);
 
-  // console.error = print('error', ansi.prepend);
-
   return (name: string) => ({
-    spawn: print(name, ansi.prepend),
+    spawn: print(name, ansi.indent),
     print: print(name)
   });
 
@@ -148,9 +145,11 @@ export function create (config: IConfig, panes: string[]) {
 
   const pipe = stdout(config);
 
-  for (const child in config.spawns) {
-    nodes[child] = nil;
-    spawned(child, config.spawns[child], pipe(child).spawn);
+  if (config.resource !== 'upload') {
+    for (const child in config.spawns) {
+      nodes[child] = nil;
+      spawned(child, config.spawns[child], pipe(child).spawn);
+    }
   }
 
   for (const script of panes) {
@@ -164,7 +163,7 @@ export function create (config: IConfig, panes: string[]) {
 
     spawns.forEach((child, name) => {
       child.kill();
-      console.log((first ? '\n- ' : '- ') + c.dim.italic(name + ' process exited'));
+      console.log((first ? '\n- ' : '- ') + c.gray.italic(name + ' process exited'));
       first = false;
     });
 

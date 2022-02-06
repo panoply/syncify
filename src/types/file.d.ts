@@ -60,8 +60,6 @@ interface IFile<T = unknown> extends ParsedPath {
   /**
    * The file size before and after transformation.
    */
-  size?: {
-    before: number;
-    after: number
-  };
+  size?:number;
+
 }

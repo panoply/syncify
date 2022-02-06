@@ -1,7 +1,7 @@
 import prompts from 'prompts';
 import { IConfig } from 'types';
 import { toLower } from 'rambdax';
-import { toUpcase } from 'config/utils';
+import { toUpcase } from 'shared/helpers';
 
 import * as metafields from 'requests/metafields';
 

@@ -1,18 +1,34 @@
-import ansis from 'ansis';
+import * as c from 'cli/colors';
+import { isNil } from 'rambdax';
 import { toUpcase } from 'shared/helpers';
 import { keys } from 'shared/native';
-import { IConfig } from 'types';
+import { IConfig, IThemes } from 'types';
 
 /**
- * Grey Dimming - Applied to line tracers
+ * Alignment - Returns aligned themes previews upon initialization
  */
-export const dim = ansis.hex('#2a2a2e');
+const alignment = (themes: IThemes[]) => {
+
+  const width = themes.reduce((size, { target }) => {
+    if (target.length > size) size = target.length;
+    return size;
+  }, 0);
+
+  const previews = themes.map(({ id, domain, target }) => {
+    const offset = width - target.length;
+    return (
+      c.line('│ ') + ' '.repeat((offset)) + c.pink(target) + ': ' +
+      c.gray('https://' + domain + '?preview_theme_id=' + id)
+    );
+  });
+
+  return previews.join('\n');
+
+};
 
 /* -------------------------------------------- */
-/* INTERFACE                                    */
+/* PUBLIC                                       */
 /* -------------------------------------------- */
-
-export const line = dim('│');
 
 /**
  * Prepend - Prepends vertical line to texts
@@ -23,7 +39,7 @@ export const line = dim('│');
  * │ spawned message
  * ```
  */
-export const prepend = (message: string) => message.replace(/^/gm, dim('│  ')) + '\n';
+export const indent = (message: string) => message.replace(/^/gm, c.line('│  ')) + '\n';
 
 /**
  * Header - Prints a small overview of runing resource
@@ -44,46 +60,28 @@ export const prepend = (message: string) => message.replace(/^/gm, dim('│  '))
  * │
  * ```
  */
-export const header = (config: IConfig) => {
+export const header = ({ sync, spawns, resource, env }: IConfig) => {
 
-  const color = ansis.cyan.bold;
+  const stores = c.cyan.bold(String(sync.stores.length)) + (sync.stores.length > 1 ? ' stores' : ' store');
+  const themes = c.cyan.bold(String(sync.themes.length)) + (sync.themes.length > 1 ? ' themes' : ' theme');
+  const preview = alignment(sync.themes);
 
-  const stores = config.sync.stores.length > 1
-    ? color(String(config.sync.stores.length)) + ' stores'
-    : color(String(config.sync.stores.length)) + ' store';
+  let heading: string = (
+    c.line('┌─ ') + c.cyan.bold('Syncify ') + c.gray('<!version!>') + '\n' +
+    c.line('│ ') + '\n' +
+    c.line('│ ') + 'Running ' + c.cyan.bold(resource) + ' mode in ' + c.cyan.bold(env) + '\n' +
+    c.line('│ ') + 'Syncing to ' + stores + '  and ' + themes + '\n'
+  );
 
-  const themes = config.sync.themes.length > 1
-    ? color(String(config.sync.themes.length)) + ' themes'
-    : color(String(config.sync.themes.length)) + ' theme';
+  if (!isNil(spawns)) {
+    const spawnz = keys(spawns).length;
+    const spawned = c.cyan.bold(String(spawnz)) + (spawnz > 1 ? ' child processes' : ' child process');
+    heading += c.line('│ ') + 'Spawned ' + spawned + '\n' + c.line('│\n');
+  }
 
-  const spawned = keys(config.spawns).length;
-  const spawns = spawned > 1
-    ? color(String(spawned)) + 'child processes'
-    : color(String(spawned)) + 'child process';
-
-  const width = config.sync.themes.reduce((size, { target }) => {
-    if (target.length > size) size = target.length;
-    return size;
-  }, 0);
-
-  const previews = config.sync.themes.map(({ id, domain, target }) => {
-
-    const offset = width - target.length;
-
-    return (
-      dim('│ ') + ' '.repeat((offset)) + ansis.magenta.bold(target) + ': ' +
-      ansis.gray('https://' + domain + '?preview_theme_id=' + id)
-    );
-  });
-
-  return (
-    dim('┌─ ') + color('Syncify ') + ansis.gray('<!version!>') + '\n' +
-    dim('│ ') + '\n' +
-    dim('│ ') + 'Running ' + color(config.resource) + ' mode in ' + color(config.env) + '\n' +
-    dim('│ ') + 'Syncing to ' + stores + '  and ' + themes + '\n' +
-    dim('│ ') + 'Spawned ' + spawns + '\n' + dim('│\n') +
-    dim('│ ') + 'Previews:' + dim('\n│\n') + previews.join('\n') + '\n' +
-    dim('│ ') + '\n'
+  return heading + (
+    c.line('│ ') + 'Previews:' + c.line('\n│\n') + preview + '\n' +
+    c.line('│ ') + '\n'
   );
 
 };
@@ -93,18 +91,18 @@ export const header = (config: IConfig) => {
  *
  * `├─ title`
  */
-export const group = (title: string) => dim('│\n├─ ') + ansis.bold(toUpcase(title)) + '\n' + dim('│') + '\n';
+export const group = (title: string) => c.line('│\n├─ ') + c.bold(toUpcase(title)) + c.line('\n│\n');
 
 /**
  * Task - Prints the executed task/operation
  *
  * `│`
  */
-export const task = (message: string) => dim('│ ') + message + '\n';
+export const task = (message: string) => c.line('│ ') + message + '\n';
 
 /**
  * Footer - Printed as the very bottom
  *
  * `└── message`
  */
-export const footer = (message: string) => dim('│\n└── ') + message + '\n';
+export const footer = (message: string) => c.line('│\n└── ') + message + '\n';

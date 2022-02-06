@@ -1,8 +1,8 @@
 import { delay, has } from 'rambdax';
 import { IFile, IMetafield, IStore } from 'types';
-import { is } from 'config/utils';
 import * as log from 'cli/logs';
 import { error } from 'cli/errors';
+import { is } from 'shared/native';
 import { queue, axios } from 'requests/queue';
 
 /**
@@ -20,18 +20,16 @@ let wait: boolean = false;
  * Metafields listing request, typically called
  * from the prompt to query and explore metafields.
  */
-export async function list (store: IStore) {
+export const list = async (store: IStore) => {
 
   if (wait) {
     await delay(500);
     wait = false;
   }
 
-  return axios.get<{
-    metafields: IMetafield[]
-  }>(store.url.metafields).then(({ status, data }) => {
+  return axios.get<{ metafields: IMetafield[] }>(store.url.metafields).then(({ data }) => {
 
-    if (is(status, 200)) return data.metafields;
+    return data.metafields;
 
   }).catch(e => {
 
@@ -47,7 +45,7 @@ export async function list (store: IStore) {
 
   });
 
-}
+};
 
 /**
  * Get Metafield
@@ -55,7 +53,7 @@ export async function list (store: IStore) {
  * Returns a metafield by walking through
  * results to find relevant match.
  */
-export async function get (store: IStore, metafield: IMetafield) {
+export const get = async (store: IStore, field: IMetafield) => {
 
   if (wait) {
     await delay(500);
@@ -64,19 +62,16 @@ export async function get (store: IStore, metafield: IMetafield) {
 
   return axios.get<{ metafields: IMetafield[] }>(store.url.metafields).then(({ data }) => {
 
-    if (has('namespace', metafield) && has('key', metafield)) {
-      return data.metafields.find(({
-        namespace,
-        key
-      }) => (metafield.namespace === namespace && metafield.key === key));
+    if (has('namespace', field) && has('key', field)) {
+      return data.metafields.find(m => (field.namespace === m.namespace && field.key === m.key));
     }
 
-    if (has('namespace', metafield)) {
-      return data.metafields.filter(({ namespace }) => namespace === metafield.namespace);
+    if (has('namespace', field)) {
+      return data.metafields.filter(({ namespace }) => namespace === field.namespace);
     }
 
-    if (has('key', metafield)) {
-      return data.metafields.filter(({ key }) => key === metafield.namespace);
+    if (has('key', field)) {
+      return data.metafields.filter(({ key }) => key === field.namespace);
     }
 
     return data.metafields;
@@ -86,7 +81,7 @@ export async function get (store: IStore, metafield: IMetafield) {
     if (!store.queue) return error(store.store, e.response);
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
-      queue.add(() => get(store, metafield), { priority: 1000 });
+      queue.add(() => get(store, field), { priority: 1000 });
       wait = !wait;
     } else {
       if (!queue.isPaused) {
@@ -97,7 +92,7 @@ export async function get (store: IStore, metafield: IMetafield) {
 
   });
 
-}
+};
 
 /**
  * Create Metafield
@@ -106,7 +101,7 @@ export async function get (store: IStore, metafield: IMetafield) {
  * shop. This is called when a metafield does
  * not exists.
  */
-export async function create (url: string, metafield: IMetafield) {
+export const create = async (url: string, file: IFile, metafield: IMetafield) => {
 
   metafield.type = 'json';
   metafield.value_type = 'json_string';
@@ -116,17 +111,15 @@ export async function create (url: string, metafield: IMetafield) {
     wait = false;
   }
 
-  return axios.post(url, { metafield }).then(({ status }) => {
+  return axios.post(url, { metafield }).then(() => {
 
-    if (is(status, 200)) {
-      log.created(`${metafield.namespace}.${metafield.key} metafield`);
-    }
+    log.fileSync(file, metafield.namespace, metafield.key);
 
   }).catch(e => {
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       wait = !wait;
-      queue.add(async () => create(url, metafield), { priority: 1000 });
+      queue.add(async () => create(url, file, metafield), { priority: 1000 });
     } else {
 
       if (!queue.isPaused) {
@@ -138,7 +131,7 @@ export async function create (url: string, metafield: IMetafield) {
 
   });
 
-}
+};
 
 /**
  * Update Metafield
@@ -146,24 +139,22 @@ export async function create (url: string, metafield: IMetafield) {
  * Updates an existing metafield using its unique `id`.
  * This is applied only when a metafield reference exists.
  */
-export async function update (url: string, metafield: IMetafield) {
+export const update = async (url: string, file: IFile, metafield: IMetafield) => {
 
   if (wait) {
     await delay(500);
     wait = false;
   }
 
-  return axios.put(url, { metafield }, { responseType: 'json' }).then(({ status }) => {
+  return axios.put(url, { metafield }, { responseType: 'json' }).then(() => {
 
-    if (is(status, 200)) {
-      log.updated(`${metafield.namespace}.${metafield.key} metafield`);
-    }
+    log.fileSync(file, metafield.namespace, metafield.key);
 
   }).catch(e => {
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       wait = !wait;
-      queue.add(async () => update(url, metafield), { priority: 1000 });
+      queue.add(async () => update(url, file, metafield), { priority: 1000 });
     } else {
 
       if (!queue.isPaused) {
@@ -173,7 +164,7 @@ export async function update (url: string, metafield: IMetafield) {
     }
 
   });
-}
+};
 
 /**
  * Metafields
@@ -182,36 +173,33 @@ export async function update (url: string, metafield: IMetafield) {
  * resource modes and will query, create or update
  * metafields.
  */
-export async function metafields (url: string, file: IFile, metafield: IMetafield) {
+export const metafields = async (url: string, file: IFile, field: IMetafield) => {
 
   return axios.get<{ metafields: IMetafield[] }>(url).then(({ data }) => {
 
-    if (is(data.metafields.length, 0)) return create(url, metafield);
+    if (is(data.metafields.length, 0)) return create(url, file, field);
 
-    const record = data.metafields.find(({ namespace, key }) => (
-      metafield.namespace === namespace &&
-      metafield.key === key
-    ));
+    const record = data.metafields.find(m => (field.namespace === m.namespace && field.key === m.key));
 
-    if (!record) return create(url, metafield);
+    if (!record) return create(url, file, field);
 
-    metafield.id = record.id;
-    metafield.type = 'json';
+    field.id = record.id;
+    field.type = 'json';
 
-    return update(url.replace('.json', `/${record.id}.json`), metafield);
+    return update(url.replace('.json', `/${record.id}.json`), file, field);
 
   }).catch(e => {
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       wait = !wait;
-      queue.add(async () => metafields(url, file, metafield), { priority: 1000 });
+      queue.add(async () => metafields(url, file, field), { priority: 1000 });
     } else {
       if (!queue.isPaused) {
         queue.pause();
-        return error(metafield.namespace, e.response);
+        return error(field.namespace, e.response);
       }
     }
 
   });
 
-}
+};

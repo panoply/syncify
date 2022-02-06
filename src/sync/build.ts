@@ -6,21 +6,22 @@ import { transform as styles } from 'transform/styles';
 import { compile as json } from 'transform/json';
 import { glob } from 'glob';
 import { is } from 'shared/native';
+import * as log from 'cli/logs';
 
 /**
  * Build Function
  *
- * Sync in watch mode
+ * Triggers a compile of the project
  */
-export async function build (config: IConfig, callback: typeof Syncify.hook) {
+export const build = async (config: IConfig, callback: typeof Syncify.hook) => {
 
-  const parse = parseFile(config.paths, config.output);
   const { transform } = config;
-  const source = config.watch.flatMap(p => {
+  const parse = parseFile(config.paths, config.output);
+  const source = config.watch.flatMap(path => {
 
-    if (p[0] === '!') p = p.slice(1);
+    if (path[0] === '!') path = path.slice(1);
 
-    return glob.sync(p, { cwd: config.cwd });
+    return glob.sync(path, { cwd: config.cwd });
 
   }).filter(p => !/theme\//.test(p));
 
@@ -29,6 +30,8 @@ export async function build (config: IConfig, callback: typeof Syncify.hook) {
     const file: IFile = parse(path);
 
     if (!file) continue;
+
+    log.fileChange(file);
 
     /* -------------------------------------------- */
     /* STYLES                                       */
@@ -102,4 +105,4 @@ export async function build (config: IConfig, callback: typeof Syncify.hook) {
 
   }
 
-}
+};

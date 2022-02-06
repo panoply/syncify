@@ -1,14 +1,36 @@
-import c from 'ansis';
-import * as parse from 'cli/parse';
-import { task, prepend } from 'cli/ansi';
-import { log } from 'cli/console';
 import * as marky from 'marky';
+import * as c from 'cli/colors';
+import * as parse from 'cli/parse';
+import * as tui from 'cli/ansi';
+import { log } from 'cli/console';
 import { IFile } from 'types';
 import type { SourceSpan, Exception } from 'sass';
-import { has, hasPath } from 'rambdax';
+import { hasPath } from 'rambdax';
+import { is } from 'shared/native';
 import { byteConvert } from 'shared/helpers';
 
 let hasError: boolean = false;
+
+/* -------------------------------------------- */
+/* SHARED LOGGERS                               */
+/* -------------------------------------------- */
+
+export const fileSize = (before: number, after: number) => {
+
+  if (!is(before, after)) return;
+
+  const saved = byteConvert(before - after);
+  const size = byteConvert(after);
+
+  log.files(
+    tui.task(c.pink(`𐄹 filesize is ${size} saved ${saved}`))
+  );
+
+};
+
+/* -------------------------------------------- */
+/* FILE LOGGERS                                 */
+/* -------------------------------------------- */
 
 /**
  * File Change
@@ -25,9 +47,7 @@ export const fileChange = (file: IFile) => {
   marky.mark(file.path);
 
   log.files(
-    task(
-      c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`)
-    )
+    tui.task(c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`))
   );
 
 };
@@ -42,9 +62,7 @@ export const fileRemove = (file: IFile) => {
   marky.mark(file.key);
 
   log.files(
-    task(
-      c.cyan('␡ deleted ' + file.key)
-    )
+    tui.task(c.orange('␡ deleted ' + file.key))
   );
 
 };
@@ -59,25 +77,10 @@ export const fileTask = (file: IFile, message: string) => {
   const duration = marky.stop(file.path).duration.toFixed(0);
 
   log.files(
-    task(`✓ ${message} ${c.gray('in')} ${duration}ms`)
+    tui.task(c.orange(`✓ ${message} ${c.gray('in')} ${duration}ms`))
   );
 
   marky.mark(file.path);
-
-};
-
-export const fileSize = (file: IFile) => {
-
-  if (!has('size', file)) return;
-
-  const saved = byteConvert(file.size.before - file.size.after);
-  const size = byteConvert(file.size.after);
-
-  log.files(
-    task(
-      c.magentaBright(`𝌹 filesize is ${c.bold(size)} saved ${c.bold(saved)}`)
-    )
-  );
 
 };
 
@@ -94,7 +97,7 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
     const shop = `${c.magenta(theme)} ${c.gray('on')} ${c.blue(store)} ${c.gray('in')}`;
 
     log.files(
-      task(c.green(`✓ uploaded ${c.bold(file.key)} ${c.gray('to')} ${shop} ${c.white(time + 'ms')}`))
+      tui.task(c.greenBright(`✓ uploaded ${file.key} ${c.gray('to')} ${shop} ${c.white(time + 'ms')}`))
     );
 
   } else {
@@ -112,7 +115,7 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
 export const fileDelete = (storeName: string, themeName: string) => {
 
   log.files(
-    task(c.gray(`deleted from ${c.white(themeName)} (${c.white(storeName)})`))
+    tui.task(c.gray(`deleted from ${c.white(themeName)} (${c.white(storeName)})`))
   );
 
 };
@@ -125,7 +128,7 @@ export const fileDelete = (storeName: string, themeName: string) => {
 export const fileIgnore = (filePath: string) => {
 
   log.files(
-    task(c.gray(`${c.bold('!')} ignoring ${filePath}`))
+    tui.task(c.gray(`${c.bold('!')} ignoring ${filePath}`))
   );
 
 };
@@ -138,8 +141,8 @@ export const fileIgnore = (filePath: string) => {
 export const fileWarn = (message: string) => {
 
   log.files(
-    task(c.yellow('! warning')),
-    prepend(message)
+    tui.task(c.yellow('! warning')),
+    tui.indent(message)
   );
 
 };
@@ -154,13 +157,17 @@ export const fileError = (error: { file: string; message: string; data: string |
   hasError = true;
 
   log.files(
-    task(c.red(`⨯ ${error.message}`)),
-    prepend('\n' + c.red(parse.liquidPretty(error.data)))
+    tui.task(c.red(`⨯ ${error.message}`)),
+    tui.indent('\n' + c.red(parse.liquidPretty(error.data)))
   );
 
   marky.clear();
 
 };
+
+/* -------------------------------------------- */
+/* SASS LOGGERS                                 */
+/* -------------------------------------------- */
 
 /**
  * File Completion
@@ -169,8 +176,10 @@ export const fileError = (error: { file: string; message: string; data: string |
  */
 export const sassDebug = (message: string, options: { span: SourceSpan; }) => {
 
-  log.files(task(c.yellow(`${c.bold('!')} ${message}`)));
-  log.files(prepend(options.span.context));
+  log.files(
+    tui.task(c.yellow(`${c.bold('✲')} ${message}`)),
+    tui.indent(options.span.context)
+  );
 
 };
 
@@ -186,8 +195,8 @@ export const sassError = (error: Exception) => {
   const title = `⨯ sass error starting ${c.gray('on')} line ${error.span.start.line}${c.white(':')}`;
 
   log.files(
-    task(c.redBright(title)),
-    prepend(parse.sassError(error))
+    tui.task(c.redBright(title)),
+    tui.indent(parse.sassError(error))
   );
 
   marky.clear();
@@ -210,18 +219,26 @@ export const sassWarn = (message: string, options: {
   if (!hasPath('span.start.line', options)) {
 
     log.files(
-      task(c.yellow('! ' + title)),
-      prepend(parse.sassSplit(message))
+      tui.task(c.yellow('! ' + title)),
+      tui.indent(parse.sassSplit(message))
     );
 
   } else {
 
     log.files(
-      task(c.yellow.bold(`${title} on line ${options.span.start.line}${c.white(':')}`)),
-      prepend(parse.sassPetty(message, options.span, options.stack))
+      tui.task(c.yellow.bold(`${title} on line ${options.span.start.line}${c.white(':')}`)),
+      tui.indent(parse.sassPetty(message, options.span, options.stack))
     );
 
   }
+
+};
+
+export const errors = (error: Error) => {
+
+  return log.error('\n' + (
+    tui.indent(c.red(parse.quotes(error.message)))
+  ));
 
 };
 
@@ -230,12 +247,8 @@ export const sassWarn = (message: string, options: {
  */
 export function throws (message: string) {
 
-  return console.error(
-    '\n' + prepend(
-      c.red(
-        parse.quotes(message)
-      )
-    )
-  );
+  return console.error('\n' + (
+    tui.indent(c.red(parse.quotes(message)))
+  ));
 
 }

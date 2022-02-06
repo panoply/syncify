@@ -4,41 +4,45 @@ import { is, isArray, nil } from 'shared/native';
 import type { Exception, SourceSpan } from 'sass';
 import { range } from 'rambdax';
 
+/* -------------------------------------------- */
+/* EXPRESSIONS                                  */
+/* -------------------------------------------- */
+
+/**
+ * Captures Strings in Shopify responses
+ */
+const QuotedString = /(['"][\w\s]+['"])/g;
+
+/**
+  * Captures Strings in Shopify responses
+  */
+const RegExpURLs = /((?:www|http:|https:)+[^\s]+[\w])/g;
+
+/**
+  * Captures Quotations in string
+  */
+const Quotations = /(["'])/g;
+
+/**
+  * Captures Regular Expressions in Shopify responses
+  */
+const RegExpRegex = /(\/)(.*?)(\/)/g;
+
 /**
  * Captures Line Number text in Shopify responses
  */
-const RegExpLineNo = /\((line\s[0-9]+)\)(:)/g;
+const LiquidLineNo = /\((line\s[0-9]+)\)(:)/g;
 
 /**
  * Captures Liquid tags in Shopify responses
  */
-const RegExpLiquid = /['"]({?[{%])(.*?)([%}]}?)['"]/g;
+const LiquidTags = /['"]({?[{%])(.*?)([%}]}?)['"]/g;
 
 /**
  * Captures Liquid Object tag (with no spaces), typically used
  * for tags like {{content_for_header}}
  */
-const RegExpObjectTag = /({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g;
-
-/**
- * Captures Strings in Shopify responses
- */
-const RegExpString = /(['"][\w\s]+['"])/g;
-
-/**
- * Captures Strings in Shopify responses
- */
-const RegExpURLs = /((?:www|http:|https:)+[^\s]+[\w])/g;
-
-/**
- * Captures Quotations in string
- */
-const RegExpQuotes = /(["'])/g;
-
-/**
- * Captures Regular Expressions in Shopify responses
- */
-const RegExpRegex = /(\/)(.*?)(\/)/g;
+const LiquidObjects = /({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g;
 
 /**
  * Captures SASS Variable names
@@ -50,12 +54,16 @@ const SassMessage = /\n?\b([a-zA-Z\s]+)(:)(\s+)([^\n]+)/g;
  */
 const SassStack = /([^\n]+\b)([0-9]+)(:)([0-9]+)([^\n]+)/g;
 
+/* -------------------------------------------- */
+/* PUBLIC METHODS                               */
+/* -------------------------------------------- */
+
 /**
  * Quotes Parse
  *
  * Replaces all occurances of quotation characters
  */
-export const quotes = (text: string) => text.replace(RegExpQuotes, c.white('$1'));
+export const quotes = (text: string) => text.replace(Quotations, c.white('$1'));
 
 /**
  * URL Parse
@@ -70,7 +78,7 @@ export const urls = (text: string) => text.replace(RegExpURLs, c.underline('$1')
  * Replaces all occurances of a value wrapped
  * in quotation characters, including the quotes.
  */
-export const string = (text: string) => text.replace(RegExpString, c.yellow('$1'));
+export const string = (text: string) => text.replace(QuotedString, c.yellow('$1'));
 
 /**
  * PostCSS Warning Parser
@@ -87,16 +95,21 @@ export const postcss = (data: Warning) => {
 
 };
 
-export const sassspan = (data: SourceSpan) => {
+/**
+ * Pretty Stacks
+ *
+ * Formats stack tracers into a prretty formatted variation.
+ */
+export const sassStack = (stack: string) => {
 
-  return c.cyanBright(data.context) + '\n\n' +
-  c.dim('Lines:  ') + data.start.line + ' > ' + data.end.line + '\n' +
-  c.dim('Column: ') + data.start.column + '\n' +
-  c.dim('File: ') + data.url + '\n';
+  return (
+    c.dim('Stack Trace') + ':\n' +
+    stack.replace(SassStack, `  $1 ${c.bold('$2')}$3${c.bold('$4')}${c.dim('$5')}`) + '\n'
+  );
 
 };
 
-export function sassError (error: Exception) {
+export const sassError = (error: Exception) => {
 
   const removed = error.message.replace(error.sassMessage, nil);
   const omitted = removed.lastIndexOf('╵'); // omit stack from message
@@ -107,18 +120,14 @@ export function sassError (error: Exception) {
     sassStack(error.sassStack)
   );
 
-}
+};
 
-export function sassStack (stack: string) {
-
-  return (
-    c.dim('Stack Trace') + ':\n' +
-    stack.replace(SassStack, `  $1 ${c.bold('$2')}$3${c.bold('$4')}${c.dim('$5')}`) + '\n'
-  );
-
-}
-
-export function sassSplit (stack: string) {
+/**
+ * Split Warning
+ *
+ * Formats a string with newlines that is a warning
+ */
+export const sassSplit = (stack: string) => {
 
   return '\n' + stack
     .split('\n')
@@ -126,7 +135,7 @@ export function sassSplit (stack: string) {
     .map((v, i) => `${c.white(String(i + 1))}. ${c.yellowBright(v)}`)
     .join('\n') + '\n';
 
-}
+};
 
 /**
  * Pretty SASS
@@ -136,7 +145,7 @@ export function sassSplit (stack: string) {
  * specific strings in request responses and replacing
  * them with colourized equivalents.
  */
-export function sassPetty (message: string, span: SourceSpan, stack: string) {
+export const sassPetty = (message: string, span: SourceSpan, stack: string) => {
 
   const loc = message.search(SassMessage);
   const at = is(loc, -1) ? 0 : loc;
@@ -168,7 +177,7 @@ export function sassPetty (message: string, span: SourceSpan, stack: string) {
       .replace(RegExpURLs, c.white.underline('$1')) + '\n'
   );
 
-}
+};
 
 /**
  * Pretty Parse
@@ -178,14 +187,14 @@ export function sassPetty (message: string, span: SourceSpan, stack: string) {
  * specific strings in request responses and replacing
  * them with colourized equivalents.
  */
-export function liquidPretty (message: string[] | string) {
+export const liquidPretty = (message: string[] | string) => {
 
   return isArray(message) ? message.map(liquidPretty).join('\n') : message
-    .replace(RegExpLineNo, c.white('$1') + c.gray('$2') + '\n\n')
-    .replace(RegExpString, c.yellow('$1'))
-    .replace(RegExpLiquid, c.cyan('$1') + c.magenta('$2') + c.cyan('$3'))
+    .replace(LiquidLineNo, c.white('$1') + c.gray('$2') + '\n\n')
+    .replace(QuotedString, c.yellow('$1'))
+    .replace(LiquidTags, c.cyan('$1') + c.magenta('$2') + c.cyan('$3'))
     .replace(RegExpURLs, c.underline('$1'))
-    .replace(RegExpObjectTag, c.white('$1') + c.gray('$2') + c.white('$3'))
+    .replace(LiquidObjects, c.white('$1') + c.gray('$2') + c.white('$3'))
     .replace(RegExpRegex, c.magenta('$1') + c.cyan('$2') + c.magenta('$3'));
 
-}
+};

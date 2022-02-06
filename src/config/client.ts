@@ -1,6 +1,6 @@
 import { has } from 'rambdax';
 import { ICLIOptions, Syncify } from 'types';
-// import { upload } from 'sync/upload';
+import { upload } from 'sync/upload';
 import { build } from 'sync/build';
 import { watch } from 'sync/watch';
 import { readConfig } from 'config/config';
@@ -23,8 +23,6 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
 
   const config = await readConfig(options);
 
-  // console.log(config);
-
   if (config) {
 
     try {
@@ -33,14 +31,12 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
         case 'interactive':
           return cli.options(config);
         case 'watch':
-          await watch(config, callback);
-          break;
+          return watch(config, callback);
         case 'build':
           await build(config, callback);
           break;
         case 'upload':
-          // await upload(config, callback);
-          break;
+          return upload(config, callback);
         case 'download':
         //  await download(config);
           break;
@@ -50,9 +46,9 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
 
       // if (typeof result !== 'undefined') process.stdout.write(result as string);
 
-    } catch (e) {
+    } catch (error) {
 
-      log.error(e);
+      log.errors(error);
 
     }
 

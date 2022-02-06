@@ -73,7 +73,7 @@ export interface IOptions {
       }>;
     };
     json?: {
-      allowComments?: boolean;
+      spaces?: number;
       minify?: {
         env?: 'dev' | 'prod' | 'any' | 'never';
         removeSchemaRefs?: boolean;

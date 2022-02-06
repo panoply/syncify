@@ -129,10 +129,10 @@ const snippet = (params: [ string, IStyle ]) => {
 /**
  * SASS and PostCSS Compiler
  */
-export async function transform (file: IFile<IStyle>): Promise<string> {
+export const transform = async (file: IFile<IStyle>): Promise<string> => {
 
   const output = write(file.output);
 
   return pipeAsync<string>(sass, postcss, snippet, output)(file);
 
-}
+};

@@ -41,7 +41,7 @@ export interface IJson {
   /**
    * Whether or not JSON files accept comments
    */
-  allowComments: boolean;
+  spaces: number;
   /**
    * JSON file minification options
    */

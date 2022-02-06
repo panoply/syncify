@@ -2,7 +2,7 @@ import axios from 'axios';
 import { delay } from 'rambdax';
 import Queue from 'p-queue';
 import { IStore, IRedirect } from 'types';
-import { assign, is } from '../config/utils';
+import { assign, is } from 'shared/native';
 import * as log from 'cli/logs';
 import { error } from 'cli/errors';
 

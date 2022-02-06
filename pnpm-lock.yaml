@@ -19,6 +19,7 @@ specifiers:
   fs-extra: ^10.0.0
   glob: ^7.2.0
   html-minifier-terser: ^7.0.0-alpha.1
+  marky: ^1.2.2
   minimist: ^1.2.5
   node-sass: ^7.0.1
   p-queue: ^7.1.0
@@ -46,6 +47,7 @@ dependencies:
   fs-extra: 10.0.0
   glob: 7.2.0
   html-minifier-terser: 7.0.0-alpha.1
+  marky: 1.2.2
   minimist: 1.2.5
   p-queue: 7.1.0
   prettyjson: 1.2.5
@@ -3542,6 +3544,10 @@ packages:
     engines: {node: '>=8'}
     dev: false
     optional: true
+
+  /marky/1.2.2:
+    resolution: {integrity: sha512-k1dB2HNeaNyORco8ulVEhctyEGkKHb2YWAhDsxeFlW2nROIirsctBYzKwwS3Vza+sKTS1zO4Z+n9/+9WbGLIxQ==}
+    dev: false
 
   /matched/5.0.1:
     resolution: {integrity: sha512-E1fhSTPRyhAlNaNvGXAgZQlq1hL0bgYMTk/6bktVlIhzUnX/SZs7296ACdVeNJE8xFNGSuvd9IpI7vSnmcqLvw==}

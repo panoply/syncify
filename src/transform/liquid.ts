@@ -1,13 +1,98 @@
 import { minify } from 'html-minifier-terser';
-import { IFile, ILiquidMinifyOptions, IViews, Syncify } from 'types';
+import stringify from 'fast-safe-stringify';
+import { IFile, ILiquidMinifyOptions, IViews, Syncify, ITerser } from 'types';
 import { join } from 'path';
-import * as log from 'cli/logs';
 import { readFile, writeFile } from 'fs-extra';
-import { isType } from 'rambdax';
+import { isNil, isType } from 'rambdax';
 import { Type } from 'config/file';
 import { is, nil } from 'shared/native';
-import * as R from 'shared/regex';
 import { byteSize } from 'shared/helpers';
+import * as log from 'cli/logs';
+
+/* -------------------------------------------- */
+/* REGEX EXPRESSIONS                            */
+/* -------------------------------------------- */
+
+/**
+ * Liquid Delimiter
+ */
+const LiquidDelimiter = /{[{%]/g;
+
+/**
+ * Liquid Comments
+ */
+const LiquidComments = /{%-?\s*comment\s*-?%}[\s\S]*?{%-?\s*endcomment\s*-?%}/g;
+
+/**
+ * Liquid Schema Tag
+ */
+const LiquidSchemaTag = /(?<={%-?\s{0,}schema\s{0,}-?%})[\s\S]*?(?={%-?\s{0,}endschema\s{0,}-?%})/;
+
+/**
+ * Liquid Strip Dash Spaces
+ */
+const LiquidStripDashSpace = /(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g;
+
+/**
+ * Liquid Useless Whitespace Dashes
+ */
+const LiquidUselessDashes = /(?<=\S){[{%]-|-?[%}]}{[{%]-?|-}[%}]<\/?(?=[a-zA-Z]{1,})/g;
+
+/**
+ * Liquid Strip Dash Spaces
+ */
+const HTMLStripDashSpace = /(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g;
+
+/**
+ * HTML Attribute Values
+ */
+const HTMLAttributeValues = /(?<==["])[\s\S]*?(?=["][a-zA-Z\s\n/{>])/g;
+
+/**
+ * Touching Attrbiutes
+ */
+const TouchingAttributes = /(?<=[%}]})\s(?={[{%])/g;
+
+/* -------------------------------------------- */
+/* PRIVATE FUNCTIONS                            */
+/* -------------------------------------------- */
+
+/**
+ * Remove Liquid Comments
+ *
+ * Strips Liquid comments from file content.
+ * This is executed before passing to HTML terser.
+ */
+const removeAttrNewline = (content: string, options: ILiquidMinifyOptions) => {
+
+  if (!options.removeLiquidNewlineAttributes) return content;
+
+  return content.replace(HTMLAttributeValues, match => (
+
+    LiquidDelimiter.test(match) ? match
+      .replace(/\n/g, nil)
+      .replace(/\s{2,}/g, ' ')
+      .replace(TouchingAttributes, nil) : match
+
+  ));
+
+};
+
+/**
+ * Remove Liquid Comments
+ *
+ * Strips Liquid comments from file content.
+ * This is executed before passing to HTML terser.
+ */
+const removeComments = (content: string, options: ILiquidMinifyOptions) => {
+
+  if (!options.removeLiquidComments) return removeAttrNewline(content, options);
+
+  const remove = content.replace(LiquidComments, nil);
+
+  return removeAttrNewline(remove, options);
+
+};
 
 /**
  * Minify Section Schema
@@ -15,16 +100,16 @@ import { byteSize } from 'shared/helpers';
  * Minfies the contents of a `{% schema %}` tag
  * from within sections.
  */
-function minifySchema (file: IFile, content: string, options: ILiquidMinifyOptions) {
+const minifySchema = (file: IFile, content: string, options: ILiquidMinifyOptions) => {
 
   if (!options.minifySectionSchema) return removeComments(content, options);
 
-  const minified = content.replace(R.LiquidSchemaTag, data => {
+  const minified = content.replace(LiquidSchemaTag, data => {
 
     try {
 
       const parsed = JSON.parse(data);
-      const minified = JSON.stringify(parsed, null, 0);
+      const minified = stringify(parsed, null, 0);
 
       log.fileTask(file, 'minified JSON section schema');
 
@@ -42,46 +127,7 @@ function minifySchema (file: IFile, content: string, options: ILiquidMinifyOptio
 
   return removeComments(minified, options);
 
-}
-
-/**
- * Remove Liquid Comments
- *
- * Strips Liquid comments from file content.
- * This is executed before passing to HTML terser.
- */
-function removeComments (content: string, options: ILiquidMinifyOptions) {
-
-  if (!options.removeLiquidComments) return stripNewlinesFromAttrs(content, options);
-
-  const minified = content.replace(R.LiquidComments, nil);
-
-  return stripNewlinesFromAttrs(minified, options);
-
-}
-
-/**
- * Remove Liquid Comments
- *
- * Strips Liquid comments from file content.
- * This is executed before passing to HTML terser.
- */
-function stripNewlinesFromAttrs (content: string, options: ILiquidMinifyOptions) {
-
-  if (!options.removeLiquidNewlineAttributes) return content;
-
-  return content.replace(R.HTMLAttributeValues, match => {
-
-    return R.LiquidDelimiter.test(match)
-      ? match
-        .replace(/\n/g, nil)
-        .replace(/\s{2,}/g, ' ')
-        .replace(/(?<=[%}]})\s(?={[{%])/g, nil)
-      : match;
-
-  });
-
-}
+};
 
 /**
  * Remove Extranous Whitespace Dashes
@@ -90,41 +136,72 @@ function stripNewlinesFromAttrs (content: string, options: ILiquidMinifyOptions)
  * are of not whitespace. this is executed in the post-minify
  * cycle and will help reduce the render times imposed by Liquid.
  */
-function stripExtranousDashes (content: string, options: ILiquidMinifyOptions) {
+const removeDashes = (content: string, options: ILiquidMinifyOptions) => {
 
   if (!options.removeRedundantWhitespaceDashes) return content;
 
   return content
-    .replace(/(?<=[>}])\s(?={[{%])/g, nil)
-    .replace(/(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g, nil)
-    .replace(/(?<=\S){[{%]-|-?[%}]}{[{%]-|-[%}]}<\/?(?=[a-zA-Z]{1,})/g, match => match.replace(/-/g, nil));
-}
+    .replace(HTMLStripDashSpace, nil)
+    .replace(LiquidStripDashSpace, nil)
+    .replace(LiquidUselessDashes, m => m.replace(/-/g, nil));
+};
 
-function transform (file: IFile, config: IViews['minify']) {
+/**
+ * HTML Minfication
+ *
+ * Executes html terser on remaining document contents
+ * and applied rules that were previously setup in config.
+ */
+const htmlMinify = async (content: string, terser: ITerser) => {
 
-  return async (data: string) => {
+  try {
 
-    if (!config.apply) return data;
+    const htmlmin = await minify(content, terser);
 
-    const content = is(file.type, Type.Section)
-      ? minifySchema(file, data, config.liquid)
-      : removeComments(data, config.liquid);
+    return htmlmin;
 
-    const htmlmin = await minify(content, config.terser);
-    const minified = stripExtranousDashes(htmlmin, config.liquid);
+  } catch (error) {
 
-    file.size.after = byteSize(minified);
+    log.errors(error);
 
-    await writeFile(join(file.output, file.key), minified);
+    return null;
 
-    log.fileTask(file, 'minified liquid + html');
-    log.fileSize(file);
+  }
 
-    return minified;
+};
 
-  };
+/**
+ * Liquid File Transforms
+ *
+ * Applies minification and handles `.liquid` files.
+ * Determines what action should take place.
+ */
+const transform = (file: IFile, config: IViews['minify']) => async (data: string) => {
 
-}
+  if (!config.apply) return data;
+
+  const content = is(file.type, Type.Section)
+    ? minifySchema(file, data, config.liquid)
+    : removeComments(data, config.liquid);
+
+  const htmlmin = await htmlMinify(content, config.terser);
+
+  if (isNil(htmlmin)) return data;
+
+  const postmin = removeDashes(htmlmin, config.liquid);
+
+  writeFile(join(file.output, file.key), postmin, (e) => e ? log.errors(e) : null);
+
+  log.fileTask(file, 'minified liquid + html');
+  log.fileSize(file.size, byteSize(postmin));
+
+  return postmin;
+
+};
+
+/* -------------------------------------------- */
+/* EXPORTED FUNCTION                            */
+/* -------------------------------------------- */
 
 /**
  * Minifier
@@ -132,18 +209,18 @@ function transform (file: IFile, config: IViews['minify']) {
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export async function compile (file: IFile, config: IViews['minify'], callback: typeof Syncify.hook) {
+export const compile = async (file: IFile, config: IViews['minify'], cb: typeof Syncify.hook) => {
 
   const read = await readFile(file.path);
 
-  file.size.before = byteSize(read);
+  file.size = byteSize(read);
 
   const edit = transform(file, config);
   const data = read.toString();
 
-  if (!isType('Function', callback)) return edit(data);
+  if (!isType('Function', cb)) return edit(data);
 
-  const update = callback.apply({ ...file }, data);
+  const update = cb.apply({ ...file }, data);
 
   if (isType('Undefined', update) || update === false) {
 
@@ -161,4 +238,4 @@ export async function compile (file: IFile, config: IViews['minify'], callback: 
 
   return edit(data);
 
-}
+};

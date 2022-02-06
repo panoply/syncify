@@ -1,82 +1,20 @@
-import { has, isType } from 'rambdax';
+import { has, isNil, isType } from 'rambdax';
 import c from 'ansis';
 import { IFile, Syncify, IJson } from 'types';
 import * as log from 'cli/logs';
 import { join } from 'path';
 import { readJson, writeFile } from 'fs-extra';
-import { is } from 'config/utils';
+import { is } from 'shared/native';
 import { Type } from 'config/file';
 import stringify from 'fast-safe-stringify';
 import { byteSize } from 'shared/helpers';
-
-/**
- * Read JSON
- *
- * Handler function for a content modifier
- * callback that one can optionally execute
- * from within scripts.
- */
-export async function compile (file: IFile, options: IJson, callback: typeof Syncify.hook): Promise<string> {
-
-  let data = await readJson(file.path);
-
-  file.size.before = byteSize(data);
-
-  if (options.minify.removeSchemaRefs) {
-    data = strip(file, data);
-  }
-
-  if (!isType('Function', callback)) return transform(file, data, options.minify.apply ? 2 : 0);
-
-  const update = callback.apply({ ...file }, data);
-
-  if (isType('Undefined', update)) {
-
-    return transform(file, data, options.minify.apply ? 2 : 0);
-
-  } else if (isType('Array', update) || isType('Object', update)) {
-
-    return transform(file, update, options.minify.apply ? 2 : 0);
-
-  } else if (isType('String', update)) {
-
-    return transform(file, parse(update), options.minify.apply ? 2 : 0);
-
-  } else if (Buffer.isBuffer(update)) {
-
-    return transform(file, parse(update.toString()), options.minify.apply ? 2 : 0);
-
-  }
-
-  return transform(file, data, options.minify.apply ? 2 : 0);
-
-}
-
-/**
- * Parse JSON
- *
- * Parses a string into valid JSON
- */
-export function parse (data: string) {
-
-  try {
-
-    return JSON.parse(data);
-
-  } catch (e) {
-
-    return log.throws(e);
-
-  }
-
-}
 
 /**
  * Parse JSON
  *
  * Strips `$schema` spec field from JSON
  */
-export function strip (file: IFile, data: { $schema?: string }) {
+export const $schema = (file: IFile, data: { $schema?: string }) => {
 
   if (!has('$schema', data)) return data;
 
@@ -84,11 +22,32 @@ export function strip (file: IFile, data: { $schema?: string }) {
 
   delete json.$schema;
 
-  log.fileTask(file, `removed ${c.bold.magenta('$schema')} field removed from json}`);
+  log.fileTask(file, `stripped ${c.bold.yellow('$schema')} field removed from JSON`);
 
   return json;
 
-}
+};
+
+/**
+ * Parse JSON
+ *
+ * Parses a string into valid JSON
+ */
+export const parse = (data: string) => {
+
+  try {
+
+    return JSON.parse(data);
+
+  } catch (e) {
+
+    log.throws(e);
+
+    return null;
+
+  }
+
+};
 
 /**
  * Minify JSON
@@ -98,50 +57,87 @@ export function strip (file: IFile, data: { $schema?: string }) {
  * comments be provided, this function strips
  * them and will push a minified to the store.
  */
-export function minify (file: IFile, data: string, space = 0): any {
+export const minify = (data: string, space = 0): any => {
 
   try {
 
-    const minified = stringify(data, null, space);
-
-    return minified;
+    return stringify(data, null, space);
 
   } catch (e) {
 
-    return log.throws(e);
+    log.throws(e);
+
+    return null;
 
   }
 
-}
+};
 
 /**
- * Minify JSON
+ * Minify and Write JSON file
  *
- * Metafields are trimmed of whitespace
- * and comments. Syncify allows JSON with
- * comments be provided, this function strips
- * them and will push a minified to the store.
+ * Applies minification and publishment of
+ * passed in file and contents. We do not publish
+ * metafield file types to output directory.
  */
-export function transform (file: IFile, data: string, space = 0): any {
+export const transform = (file: IFile, data: string, space = 0): any => {
 
-  try {
+  const minified = minify(data, space);
 
-    const minified = stringify(data, null, space);
+  if (isNil(minified)) return minified;
 
-    if (is(space, 0)) log.fileTask(file, 'minified json file');
+  if (is(space, 0)) {
+    log.fileTask(file, 'minified json file');
+    log.fileSize(file.size, byteSize(minified));
+  }
 
-    if (is(file.type, Type.Metafield)) return minified;
-
-    file.size.after = byteSize(minified);
-
-    writeFile(join(file.output, file.key), minified);
-
+  if (is(file.type, Type.Metafield)) {
     return minified;
+  } else {
+    writeFile(join(file.output, file.key), minified, (e) => e ? log.errors(e) : null);
+    return minified;
+  }
 
-  } catch (e) {
+};
 
-    return log.throws(e);
+/**
+ * Read JSON
+ *
+ * Handler function for a content modifier
+ * cb that one can optionally execute
+ * from within scripts.
+ */
+export const compile = async (file: IFile, options: IJson, cb: typeof Syncify.hook): Promise<string> => {
+
+  const data = await readJson(file.path);
+
+  file.size = byteSize(data);
+
+  const space = options.minify.apply ? options.spaces : 0;
+  const refs = options.minify.removeSchemaRefs ? $schema(file, data) : data;
+
+  if (!isType('Function', cb)) return transform(file, refs, space);
+
+  const update = cb.apply({ ...file }, refs);
+
+  if (isType('Undefined', update)) {
+
+    return transform(file, refs, space);
+
+  } else if (isType('Array', update) || isType('Object', update)) {
+
+    return transform(file, update, space);
+
+  } else if (isType('String', update)) {
+
+    return transform(file, parse(update), space);
+
+  } else if (Buffer.isBuffer(update)) {
+
+    return transform(file, parse(update.toString()), space);
 
   }
 
-}
+  return transform(file, refs, space);
+
+};

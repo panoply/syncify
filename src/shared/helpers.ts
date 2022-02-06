@@ -1,7 +1,9 @@
 import { has } from 'rambdax';
-import { IRequest } from 'types';
+import { IConfig, IPackage } from 'types';
 import { join } from 'path';
 import { is, isArray, isString } from 'shared/native';
+import { bold } from 'cli/colors';
+import { pathExists } from 'fs-extra';
 
 /**
  * Environment
@@ -11,11 +13,7 @@ import { is, isArray, isString } from 'shared/native';
  *
  * > This function is exposed in the distribution bundle.
  */
-export function env (value: 'prod' | 'dev') {
-
-  return process.env.SYNCIFY_ENV === value;
-
-}
+export const env = (value: 'prod' | 'dev') => process.env.SYNCIFY_ENV === value;
 
 /**
  * To Upcase
@@ -23,11 +21,7 @@ export function env (value: 'prod' | 'dev') {
  * Will captilalize the first letter of a string. Used
  * by the console for names and various other informatives.
  */
-export function toUpcase <T extends string> (value: T) {
-
-  return value.charAt(0).toUpperCase() + value.slice(1);
-
-}
+export const toUpcase = <T extends string> (value: T) => value.charAt(0).toUpperCase() + value.slice(1);
 
 /**
  * Last Path
@@ -36,10 +30,7 @@ export function toUpcase <T extends string> (value: T) {
  * the path does not not contain forward slashes it
  * returns the passed string.
  */
-export function lastPath (path: string) {
-
-  return is(path.indexOf('/'), -1) ? path : path.match(/[^/]+(?:\/$|$)/)[0];
-}
+export const lastPath = (path: string) => is(path.indexOf('/'), -1) ? path : path.match(/[^/]+(?:\/$|$)/)[0];
 
 /**
  * Parent Path
@@ -47,7 +38,7 @@ export function lastPath (path: string) {
  * Will return the parent path of a URL, ie: that of which
  * omits the file name. Omits any glob patterns.
  */
-export function parentPath (path: string) {
+export const parentPath = (path: string) => {
 
   const last = path.lastIndexOf('/');
 
@@ -57,7 +48,7 @@ export function parentPath (path: string) {
 
   return is(glob, -1) ? path.slice(0, last) : path.slice(0, glob);
 
-}
+};
 
 /**
  * Normalize path
@@ -66,7 +57,7 @@ export function parentPath (path: string) {
  * who accepts a string. Paths will include the directory
  * `input` folder name.
  */
-export function normalPath (input: string) {
+export const normalPath = (input: string) => {
 
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
 
@@ -74,13 +65,9 @@ export function normalPath (input: string) {
 
     if (isArray(path)) return path.map(prepend);
 
-    let ignore: boolean = false;
+    const ignore = is(path.charCodeAt(0), 33);
 
-    if (is(path.charCodeAt(0), 33)) {
-      ignore = true;
-      path = path.slice(1);
-    }
-
+    if (ignore) path = path.slice(1);
     if (regex.test(path)) return ignore ? '!' + path : path;
 
     if (
@@ -94,12 +81,12 @@ export function normalPath (input: string) {
     return (ignore ? '!' : '') + join(input, path);
 
   };
-}
+};
 
 /**
  * Load module
  */
-export function loadModule (moduleId: string) {
+export const loadModule = (moduleId: string) => {
 
   try {
 
@@ -110,57 +97,77 @@ export function loadModule (moduleId: string) {
     // Ignore error
   }
 
-}
-
-/**
- * Get the asset key reference (used for logs)
- */
-export function getAssetKey (config: IRequest) {
-
-  switch (config.method) {
-    case 'put':
-    case 'post':
-
-      if (has('metafield', config.data)) {
-        return (config.data as { metafield: any }).metafield.key;
-      } else if (has('asset', config.data)) {
-        return (config.data as { asset: any }).asset.key;
-      }
-
-      break;
-
-    case 'delete':
-
-      return config.params['asset[key]'];
-
-  }
-
-}
+};
 
 /**
  * Returns the byte size of a string value
  */
-export function byteSize (string: string | Buffer): number {
+export const byteSize = (string: string | Buffer): number => {
 
-  return isString(string) ? Buffer.from(string).toString().length : string.toString().length;
+  return isString(string)
+    ? Buffer.from(string).toString().length
+    : string.toString().length;
 
-}
+};
 
 /**
  * Converts byte size to killobyte, megabyre,
  * gigabyte or terrabyte
  */
-export function byteConvert (bytes: number): string {
+export const byteConvert = (bytes: number): string => {
 
-  if (bytes === 0) return '0 bytes';
+  if (bytes === 0) return '0b';
 
   const size = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
-  const unit = [ 'bytes', 'kb', 'mb', 'gb', 'tb' ];
+  const unit = [ 'b', 'kb', 'mb', 'gb', 'tb' ];
 
   return size === 0
-    ? `${bytes}${unit[size]}`
-    : `${(bytes / 1024 ** size).toFixed(1)} ${unit[size]}`;
-}
+    ? `${bold(String(bytes))}${unit[size]}`
+    : `${bold((bytes / 1024 ** size).toFixed(1))}${unit[size]}`;
+};
+
+/**
+ * Get Configs
+ *
+ * Returns path locations of config files like
+ * postcss.config.js and svgo.config.js.
+ */
+export const getConfigs = async (config: IConfig, files: string[]) => {
+
+  const file = files.shift();
+  const path = join(config.cwd, config.config, file);
+  const exists = await pathExists(path);
+
+  if (exists) return path;
+  if (is(file.length, 0)) return null;
+
+  return getConfigs(config, files);
+
+};
+
+/**
+ * Get Required modules
+ *
+ * Ensures that peer dependencies exists for
+ * the transform processors.
+ */
+export const getModules = (pkg: IPackage, name: string) => {
+
+  if (has('devDependencies', pkg)) {
+    if (has(name, pkg.devDependencies)) return true;
+  }
+
+  if (has('peerDependencies', pkg)) {
+    if (has(name, pkg.peerDependencies)) return true;
+  }
+
+  if (has('dependencies', pkg)) {
+    if (has(name, pkg.dependencies)) return true;
+  }
+
+  return false;
+
+};
 /**
  * Ignored files and/or directories
 

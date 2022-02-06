@@ -27,7 +27,7 @@ export const enum Type {
   Redirect,
 }
 
-function setProps (path: string, output: string) {
+const setProps = (path: string, output: string) => {
 
   const file: Partial<IFile> = parse(path);
 
@@ -42,12 +42,16 @@ function setProps (path: string, output: string) {
         parent: lastPath(file.dir),
         key: join(namespace, file.base),
         config: null,
-        size: {}
+        size: NaN
       });
     }
   };
 
-}
+};
+
+export const outputFile = (paths: IConfig['paths'], output: string) => (path: string) => {
+
+};
 
 /**
  * Parse File
@@ -57,67 +61,63 @@ function setProps (path: string, output: string) {
  * whether or not we are working with metafield or asset
  * and vice-versa.
  */
-export function parseFile (paths: IConfig['paths'], output: string) {
+export const parseFile = (paths: IConfig['paths'], output: string) => (path: string) => {
 
-  return (path: string) => {
+  const { file, merge } = setProps(path, output);
 
-    const { file, merge } = setProps(path, output);
+  if (/\.liquid/.test(file.ext)) {
 
-    if (/\.liquid/.test(file.ext)) {
-
-      if (paths.sections(path)) {
-        return merge('sections', Type.Section);
-      }
-      if (paths.snippets(path)) {
-        return merge('snippets', Type.Snippet);
-      }
-      if (paths.layout(path)) {
-        return merge('layout', Type.Layout);
-      }
-      if (paths.templates(path)) {
-        return merge('templates', Type.Template);
-      }
-      if (paths.customers(path)) {
-        return merge('templates/customers', Type.Template);
-      }
-
-    } else if (/\.json/.test(file.ext)) {
-
-      if (paths.metafields(path)) {
-        return merge(lastPath(file.dir), Type.Metafield);
-      }
-      if (paths.templates(path)) {
-        return merge('templates', Type.Template);
-      }
-      if (paths.config(path)) {
-        return merge('config', Type.Config);
-      }
-      if (paths.locales(path)) {
-        return merge('locales', Type.Locale);
-      }
-      if (paths.customers(path)) {
-        return merge('templates/customers', Type.Template);
-      }
-
-    } else if (/\.(?:css|scss|sass)/.test(file.ext)) {
-
-      return merge('assets', Type.Style);
-
-    } else if (paths.assets(path)) {
-
-      return merge('assets', Type.Asset);
-
+    if (paths.sections(path)) {
+      return merge('sections', Type.Section);
+    }
+    if (paths.snippets(path)) {
+      return merge('snippets', Type.Snippet);
+    }
+    if (paths.layout(path)) {
+      return merge('layout', Type.Layout);
+    }
+    if (paths.templates(path)) {
+      return merge('templates', Type.Template);
+    }
+    if (paths.customers(path)) {
+      return merge('templates/customers', Type.Template);
     }
 
-  };
+  } else if (/\.json/.test(file.ext)) {
 
-}
+    if (paths.metafields(path)) {
+      return merge(lastPath(file.dir), Type.Metafield);
+    }
+    if (paths.templates(path)) {
+      return merge('templates', Type.Template);
+    }
+    if (paths.config(path)) {
+      return merge('config', Type.Config);
+    }
+    if (paths.locales(path)) {
+      return merge('locales', Type.Locale);
+    }
+    if (paths.customers(path)) {
+      return merge('templates/customers', Type.Template);
+    }
+
+  } else if (/\.(?:css|scss|sass)/.test(file.ext)) {
+
+    return merge('assets', Type.Style);
+
+  } else if (paths.assets(path)) {
+
+    return merge('assets', Type.Asset);
+
+  }
+
+};
 
 /**
  * Augment the file configuration to accept
  * style types.
  */
-export function isStyle<T extends IFile<IStyle>> (file: T, transform: IStyle[]) {
+export const isStyle = (file: IFile<IStyle>, transform: IStyle[]) => {
 
   const item = { ...file };
 
@@ -129,25 +129,25 @@ export function isStyle<T extends IFile<IStyle>> (file: T, transform: IStyle[]) 
 
   return item;
 
-}
+};
 
 /**
  * Augment the file configuration to accept
  * metafield types.
  */
-export function isMetafield (file: IFile) {
+export const isMetafield = (file: IFile) => {
 
   file.key = file.name;
 
   return file;
 
-}
+};
 
 /**
  * Augment the file configuration to accept
  * metafield types.
  */
-export function isSection (file: IFile, transform: IViews['sections']) {
+export const isSection = (file: IFile, transform: IViews['sections']) => {
 
   if (!transform.allowPrefix) {
     file.key = join(file.namespace, file.base);
@@ -165,7 +165,7 @@ export function isSection (file: IFile, transform: IViews['sections']) {
 
   return file;
 
-}
+};
 
 /**
  * Asset Modifier
@@ -174,15 +174,11 @@ export function isSection (file: IFile, transform: IViews['sections']) {
  * callback that one can optionally execute
  * from within scripts.
  */
-export function asset (
-  file: IFile,
-  data: Buffer | string | object | any[],
-  callback: typeof Syncify.hook
-) {
+export const isAsset = (file: IFile, data: Buffer | string | object | any[], cb: typeof Syncify.hook) => {
 
-  if (typeof callback !== 'function') return data.toString();
+  if (typeof cb !== 'function') return data.toString();
 
-  const update = callback.call({ ...file }, data);
+  const update = cb.call({ ...file }, data);
 
   if (isUndefined(update)) return data;
 
@@ -192,4 +188,4 @@ export function asset (
 
   return data.toString();
 
-}
+};

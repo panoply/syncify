@@ -8,8 +8,10 @@ import { transforms, Events } from 'transform/transform';
  *
  * Sync in watch mode
  */
-export async function watch (config: IConfig, callback: typeof Syncify.hook) {
+export const watch = (config: IConfig, callback: typeof Syncify.hook) => {
 
+  const parse = parseFile(config.paths, config.output);
+  const transform = transforms(config, callback);
   const watcher = chokidar.watch(config.watch, {
     persistent: true,
     ignoreInitial: true,
@@ -22,9 +24,6 @@ export async function watch (config: IConfig, callback: typeof Syncify.hook) {
     ]
   });
 
-  const parse = parseFile(config.paths, config.output);
-  const transform = transforms(config, callback);
-
   watcher.on('all', async (event, path) => {
 
     const file: IFile = parse(path);
@@ -34,4 +33,4 @@ export async function watch (config: IConfig, callback: typeof Syncify.hook) {
 
   });
 
-}
+};

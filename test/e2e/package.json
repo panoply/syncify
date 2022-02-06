@@ -12,7 +12,7 @@
     "test:build:prod": "syncify build",
     "test:watch": "syncify watch -s syncify -t test,dev --prod",
     "test:watch:multi": "syncify watch -s syncify,boefje --syncify dev,prod,stage,test --boefje dev,prod",
-    "test:upload": "sync upload --store syncify --theme test",
+    "test:upload": "syncify upload --store syncify --theme test",
     "test:upload:multi": "sync upload --store syncify,boefje --syncify dev --boefje dev,prod",
     "test:download": "sync watch syncify -t dev -o downloads",
     "test:download:multi": "sync watch --store syncify,boefje --syncify dev --boefje dev,prod -o downloads/",

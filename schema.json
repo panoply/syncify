@@ -306,10 +306,12 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "allowComments": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether or not to accepts comments in JSON files. When \"true\" comments will be stripped before uploading. Please note that you will need to adjust your editor settings to prevent errors from being thrown.\n\nTypically, you can leave this option to \"false\" and avoid processing such files."
+        "spaces": {
+          "type": "number",
+          "maximum": 5,
+          "minimum": 1,
+          "default": 2,
+          "description": "An optional spaces preset which will ensure JSON files are published with this indentation level."
         },
         "minify": {
           "required": ["apply"],

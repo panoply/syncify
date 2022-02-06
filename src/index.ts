@@ -5,7 +5,7 @@ import { Resource, APIOptions, IOptions, Callback } from 'types';
 /* EXPORTS                                      */
 /* -------------------------------------------- */
 
-export { env } from 'config/utils';
+export { env } from 'shared/helpers';
 
 function sync <R extends Resource> (
   resource: R | IOptions,

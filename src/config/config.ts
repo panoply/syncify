@@ -9,8 +9,7 @@ import { readJson, pathExistsSync, pathExists, mkdir } from 'fs-extra';
 import dotenv from 'dotenv';
 // import YAML from 'yamljs';
 import { assign, is, isArray, isObject, isRegex, isString, isUndefined, keys } from 'shared/native';
-import { lastPath, normalPath, parentPath, toUpcase } from 'shared/helpers';
-import * as regex from 'shared/regex';
+import { lastPath, normalPath, parentPath, getConfigs, getModules } from 'shared/helpers';
 import { log, create } from 'cli/console';
 import * as style from 'transform/styles';
 
@@ -22,13 +21,13 @@ import * as style from 'transform/styles';
  * file and the `.env` file, returning the
  * credentials of store connection data.
  */
-export async function readConfig (options: ICLIOptions) {
+export const readConfig = async (options: ICLIOptions) => {
 
   if (!options.cli) return options as any as IConfig;
 
   return command(options) as unknown as IConfig;
 
-}
+};
 
 /**
  * Parse Command
@@ -125,6 +124,10 @@ async function readPackage (options: ICLIOptions) {
 
 }
 
+/* -------------------------------------------- */
+/* DEFAULT CONFIGURATIONS                       */
+/* -------------------------------------------- */
+
 /**
  * Set Global Configuration
  *
@@ -141,16 +144,12 @@ function setGlobals (config: PartialDeep<IConfig>) {
   // blessed initializes
   create(config as IConfig, [
     'throw',
-    'assets',
+    'error',
     'files',
     'metafields',
     'redirects'
   ]);
 }
-
-/* -------------------------------------------- */
-/* DEFAULT CONFIGURATIONS                       */
-/* -------------------------------------------- */
 
 /**
  * Set Base defaults
@@ -168,7 +167,7 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
     env: cli.env ? cli.env as 'dev' : 'prod',
     mode: cli.cli ? 'cli' : 'api',
     resource: cli.resource,
-    spawns: pkg.syncify.spawn[cli.resource],
+    spawns: pkg.syncify.spawn[cli.resource] || null,
     cache: join(cache, 'syncify'),
     config: cli.cwd,
     source: 'source',
@@ -183,7 +182,7 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
         sprites: []
       },
       json: {
-        allowComments: false,
+        spaces: 2,
         minify: {
           apply,
           exclude: null,
@@ -347,13 +346,6 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
       }
     );
 
-    // if (queue) {
-    // if (!cli.store.includes(field.domain)) {
-    // continue;
-    // log.throw(`Unknown store "${field.domain}" domain was provided`);
-    // }
-    // }
-
     const themes = has('theme', cli)
       ? cli.theme
       : has(field.domain, cli)
@@ -385,6 +377,12 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
 
 }
 
+/**
+ * Create Dirs
+ *
+ * Generates output directories if they are non existent
+ * within the workspace.
+ */
 export async function createDirs (output: string, path: string) {
 
   if (path === 'templates/customers') {
@@ -629,6 +627,10 @@ function getJson (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   const { transform } = pkg.syncify;
 
+  if (has('spaces', transform.json)) {
+    config.transform.json.spaces = transform.json.spaces;
+  }
+
   if (has('minify', transform.json)) {
 
     if (has('env', transform.json.minify)) {
@@ -648,7 +650,6 @@ function getJson (config: PartialDeep<IConfig>, pkg: IPackage) {
       }
 
       const path = normalPath(config.source);
-
       config.transform.json.minify.exclude = config.transform.json.minify.exclude.map(path);
 
     }
@@ -702,13 +703,13 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
     if (isArray(style.input)) {
 
       return style.input.flatMap(input => {
-        if (!regex.StyleGlob.test(input)) return { ...style, input };
+        if (!/\*\.(?:css|scss|sass)/.test(input)) return { ...style, input };
         return glob.sync(path(input)).map(input => ({ ...style, input }));
       });
 
     }
 
-    return regex.StyleGlob.test(style.input)
+    return /\*\.(?:css|scss|sass)/.test(style.input)
       ? glob.sync(path(style.input)).map(input => ({ input }))
       : style;
 
@@ -838,8 +839,6 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
   }
 
-  // console.log(config.transform.styles.compile);
-
   return getIcons(config, transform);
 
 }
@@ -934,52 +933,6 @@ function getURL (domain: string, env: object): false | string {
   } else {
     throw new Error(`Missing "${api_key}" credential for store "${domain}"`);
   }
-}
-
-/**
- * Get Configs
- *
- * Returns path locations of config files like
- * postcss.config.js and svgo.config.js.
- */
-async function getConfigs (config: IConfig, files: string[]) {
-
-  const file = files.shift();
-  const path = join(config.cwd, config.config, file);
-  const exists = await pathExists(path);
-
-  if (exists) return path;
-  if (is(file.length, 0)) return null;
-
-  return getConfigs(config, files);
-
-}
-
-/**
- * Get Required modules
- *
- * Ensures that peer dependencies exists for
- * the transform processors.
- */
-function getModules (pkg: IPackage, name: string) {
-
-  if (has('devDependencies', pkg)) {
-    if (has(name, pkg.devDependencies)) return true;
-  }
-
-  if (has('peerDependencies', pkg)) {
-    if (has(name, pkg.peerDependencies)) return true;
-  }
-
-  if (has('dependencies', pkg)) {
-    if (has(name, pkg.dependencies)) {
-      log.warn('Module ' + name + ' should not be a dependency');
-      return true;
-    }
-  }
-
-  return false;
-
 }
 
 /*

@@ -1,7 +1,7 @@
 import { delay } from 'rambdax';
 import { IRequest, IThemes, IFile } from 'types';
 import { queue, axios } from 'requests/queue';
-import { is } from 'config/utils';
+import { is } from 'shared/native';
 import * as log from 'cli/logs';
 import { error } from 'cli/errors';
 
