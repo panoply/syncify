@@ -34,16 +34,12 @@ export async function assets (sync: IThemes, file: IFile, config: IRequest) {
     wait = false;
   }
 
-  return axios(config).then(({ status }) => {
+  return axios(config).then(() => {
 
-    if (is(status, 200)) {
-      if (config.method === 'put') {
-        log.updated(file.key);
-      } else if (config.method === 'delete') {
-        log.deleted(file.key);
-      } else if (config.method === 'post') {
-        log.created(file.key);
-      }
+    if (config.method === 'delete') {
+      log.fileDelete(sync.store, sync.target);
+    } else {
+      log.fileSync(file, sync.store, sync.target);
     }
 
   }).catch(e => {
