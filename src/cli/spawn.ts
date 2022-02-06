@@ -1,4 +1,5 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { ChildProcessWithoutNullStreams } from 'child_process';
+import spawn from 'cross-spawn';
 
 /* -------------------------------------------- */
 /* PRIVATE                                      */
