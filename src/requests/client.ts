@@ -12,42 +12,33 @@ export { queue } from 'requests/queue';
 export function client ({ sync: { stores, themes } }: IConfig) {
 
   return {
-    queue: {
-      metafields: request(stores),
-      assets: request(themes),
-      redirects: request(stores)
+    themes: {
+      get: null,
+      list: null,
+      update: null,
+      delete: null
     },
-    get request () {
-
-      return {
-        themes: {
-          get: null,
-          list: null,
-          update: null,
-          delete: null
-        },
-        metafields: {
-          get: null,
-          list: null,
-          update: null,
-          delete: null
-        },
-        assets: {
-          get: null,
-          list: null,
-          update: null,
-          delete: null
-        },
-        redirect: {
-          get: null,
-          list: null,
-          update: null,
-          delete: null
-        }
-
-      };
+    metafields: {
+      queue: request(stores),
+      get: null,
+      list: null,
+      update: null,
+      delete: null
+    },
+    assets: {
+      queue: request(themes),
+      get: null,
+      list: null,
+      update: null,
+      delete: null
+    },
+    redirect: {
+      queue: request(stores),
+      get: null,
+      list: null,
+      update: null,
+      delete: null
     }
-
   };
 
 }
