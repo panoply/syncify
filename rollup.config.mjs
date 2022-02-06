@@ -17,12 +17,11 @@ export default rollup(
       'node-notifier',
       'node-sass',
       'sass',
-      'pify',
-      'terminal-kit',
+      'nodejs-base64-converter',
       'svg-sprite',
       'svgo',
       'postcss',
-      'sass-embedded',
+      'sass',
       'yamljs',
       'html-minifier-terser',
       'svgstore',
@@ -85,10 +84,11 @@ export default rollup(
             'cli',
             'config',
             'logs',
+            'shared',
             'requests',
             'sync',
-            'transform',
-            'utils'
+            'transform'
+
           ])
         }
       ),
