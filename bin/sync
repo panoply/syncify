@@ -8,7 +8,8 @@ const argv = require('minimist')(process.argv.slice(1), {
     terminal: 'dashboard',
     cwd: process.cwd(),
     dev: true,
-    prod: false
+    prod: false,
+    env: 'production'
   },
   boolean: [
     'dev',
@@ -19,7 +20,7 @@ const argv = require('minimist')(process.argv.slice(1), {
     't',
     'o',
     'e',
-    'terminal'
+    'env'
   ],
   alias: {
     store: 's',
