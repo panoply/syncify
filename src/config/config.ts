@@ -1,17 +1,18 @@
 /* eslint-disable new-cap */
-import { resolve, join, basename } from 'path';
+import { IOptions, ICLIOptions, IConfig, IIcons, IPackage, IStyle } from 'types';
 import { PartialDeep } from 'type-fest';
-// import YAML from 'yamljs';
+import { resolve, join, basename } from 'path';
+import { glob } from 'glob';
+import { has, hasPath, includes, isNil } from 'rambdax';
+import anymatch from 'anymatch';
 import { readJson, pathExistsSync, pathExists, mkdir } from 'fs-extra';
 import dotenv from 'dotenv';
-import { has, hasPath, isNil } from 'rambdax';
-import anymatch from 'anymatch';
-import { assign, is, isArray, isObject, isRegex, isString, isUndefined, keys } from 'utils/native';
-import { lastPath, normalPath, toUpcase } from 'utils/helpers';
-import { IOptions, ICLIOptions, IConfig, IStyles, IIcons, IPackage } from 'types';
+// import YAML from 'yamljs';
+import { assign, is, isArray, isObject, isRegex, isString, isUndefined, keys } from 'shared/native';
+import { lastPath, normalPath, parentPath, toUpcase } from 'shared/helpers';
+import * as regex from 'shared/regex';
 import { log, create } from 'cli/console';
 import * as style from 'transform/styles';
-import { glob } from 'glob';
 
 /**
  * Read Configuration
@@ -38,16 +39,26 @@ export async function readConfig (options: ICLIOptions) {
 function command (options: ICLIOptions) {
 
   if (is(options._.length, 0)) {
+
     options.resource = 'interactive';
+
     return getPackage(options);
+
   } else if (options._[0] === 'build') {
+
     options.resource = 'build';
+
     return getPackage(options);
+
   } else if (is(options._.length, 1)) {
+
     options.resource = options._[0];
+
   } else if (options._.length > 1) {
+
     options.resource = options._[0];
     options.store = options._[1];
+
   }
 
   if (has('store', options)) {
@@ -120,28 +131,21 @@ async function readPackage (options: ICLIOptions) {
  * Applies node specific environment globals
  * for the current syncify instance.
  */
-function setGlobals ({ env, mode, resource, spawns }: PartialDeep<IConfig>) {
+function setGlobals (config: PartialDeep<IConfig>) {
 
   // env variables
-  process.env.SYNCIFY_ENV = env;
-  process.env.SYNCIFY_MODE = mode;
-  process.env.SYNCIFY_RESOURCE = resource;
+  process.env.SYNCIFY_ENV = config.env;
+  process.env.SYNCIFY_MODE = config.mode;
+  process.env.SYNCIFY_RESOURCE = config.resource;
 
   // blessed initializes
-  create(
-    {
-      group: 'Assets',
-      tabs: [
-        'throw',
-        'scripts',
-        'assets',
-        'files',
-        'metafields',
-        'redirects'
-      ],
-      spawns
-    }
-  );
+  create(config as IConfig, [
+    'throw',
+    'assets',
+    'files',
+    'metafields',
+    'redirects'
+  ]);
 }
 
 /* -------------------------------------------- */
@@ -158,15 +162,14 @@ function setGlobals ({ env, mode, resource, spawns }: PartialDeep<IConfig>) {
 async function defaults (cli: ICLIOptions, pkg: IPackage) {
 
   const cache = join(cli.cwd, 'node_modules/.cache');
-  const apply = cli.env === 'prod';
+  const apply = cli.env === 'prod' || cli.env === 'production';
   const config: PartialDeep<IConfig> = {
     cwd: cli.cwd,
-    env: cli.env ? 'dev' : 'prod',
+    env: cli.env ? cli.env as 'dev' : 'prod',
     mode: cli.cli ? 'cli' : 'api',
     resource: cli.resource,
     spawns: pkg.syncify.spawn[cli.resource],
     cache: join(cache, 'syncify'),
-    node_modules: join(cli.cwd, 'node_modules'),
     config: cli.cwd,
     source: 'source',
     export: 'export',
@@ -187,10 +190,7 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
           removeSchemaRefs: true
         }
       },
-      styles: {
-        postcss: null,
-        compile: []
-      },
+      styles: [],
       views: {
         sections: {
           allowPrefix: false,
@@ -245,7 +245,7 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
     try {
       await mkdir(cache);
     } catch (e) {
-      log.throw('Failed to create a ".cache" file.');
+      log.throw('Failed to create a ".cache" directory');
     }
   }
 
@@ -253,7 +253,7 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
     try {
       await mkdir(config.cache);
     } catch (e) {
-      log.throw('Failed to create a ".cache" file.');
+      log.throw('Failed to create a ".cache/syncify" directory.');
     }
   }
 
@@ -313,10 +313,12 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
 
   if (config.resource === 'build') return getPaths(config, pkg);
 
-  for (const field of syncify.stores) {
+  const stores = syncify.stores.filter(({ domain }) => includes(domain, cli.store));
+
+  for (const field of stores) {
 
     // Upcase the store name for logs, eg: sissel > Sissel
-    const store = toUpcase(field.domain);
+    const store = field.domain;
 
     // The myshopify store domain
     const domain = `${store}.myshopify.com`.toLowerCase();
@@ -345,16 +347,17 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
       }
     );
 
-    if (queue) {
-      if (!cli.store.includes(field.domain)) {
-        log.throw(`Unknown store "${field.domain}" domain was provided`);
-      }
-    }
+    // if (queue) {
+    // if (!cli.store.includes(field.domain)) {
+    // continue;
+    // log.throw(`Unknown store "${field.domain}" domain was provided`);
+    // }
+    // }
 
-    const themes = has('theme', syncify)
+    const themes = has('theme', cli)
       ? cli.theme
-      : has(field.domain, syncify)
-        ? syncify[field.domain].split(',')
+      : has(field.domain, cli)
+        ? cli[field.domain].split(',')
         : keys(field.themes);
 
     for (const target of themes) {
@@ -420,28 +423,48 @@ export async function createDirs (output: string, path: string) {
  */
 async function getPaths (config: PartialDeep<IConfig>, pkg: IPackage) {
 
-  const path = normalPath(config.source);
   const { syncify } = pkg;
+  const path = normalPath(config.source);
 
   for (const key in config.paths) {
 
-    let uri: any;
+    let uri: string[];
 
     if (key === 'metafields') {
-      uri = [ join(path(syncify.dirs.metafields), '**/*.json') ];
+
+      if (hasPath('metafields.input', syncify)) {
+        uri = [ join(path(syncify.metafields.input), '**/*.json') ];
+      } else {
+        uri = [ join(path('metafields'), '**/*.json') ];
+      }
+
     } else if (key === 'customers') {
+
       await createDirs(config.output, 'templates/customers');
+
       uri = [ path('templates/' + key) ];
+
     } else if (has(key, syncify.paths)) {
+
       await createDirs(config.output, key);
+
       uri = isArray(syncify.paths[key]) ? syncify.paths[key].map(path) : [ path(syncify.paths[key]) ];
+
     } else {
+
       uri = [ path(key) ];
+
     }
 
     if (key === 'assets') {
-      const glob = join(config.output, 'assets/*');
-      if (isArray(uri)) uri.push(glob); else uri = [ uri, glob ];
+
+      const glob = join(config.output, 'assets/**');
+
+      if (isArray(uri)) {
+        uri.push(glob);
+      } else {
+        uri = [ uri, glob ];
+      }
     }
 
     if (!isUndefined(uri)) {
@@ -476,7 +499,9 @@ function getViews (config: PartialDeep<IConfig>, pkg: IPackage) {
     assign(config.transform.views.sections, transform.views.sections);
 
     if (has('globals', transform.views.sections)) {
+
       const { globals } = transform.views.sections;
+
       if (isArray(globals)) {
         config.transform.views.sections.globals = new RegExp(globals.join('|'));
       } else {
@@ -672,78 +697,81 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
   }
 
   const path = normalPath(config.source);
+  const list = transform.styles.flatMap((style) => {
 
-  const styles = transform.styles.reduce((acc, v, i) => {
+    if (isArray(style.input)) {
 
-    if (isArray(v.input)) {
-      acc.push(
-        ...v.input.flatMap(input => {
-          return /\*\.s?css/.test(input)
-            ? glob.sync(path(input)).map(input => ({ ...v, input }))
-            : { ...v, input };
-        })
-      );
-    } else if (/\*\.s?css/.test(v.input)) {
-      acc.push(...glob.sync(path(v.input)).map(input => ({ input })));
-    } else {
-      acc.push(v);
+      return style.input.flatMap(input => {
+        if (!regex.StyleGlob.test(input)) return { ...style, input };
+        return glob.sync(path(input)).map(input => ({ ...style, input }));
+      });
+
     }
-    return acc;
 
-  }, []);
+    return regex.StyleGlob.test(style.input)
+      ? glob.sync(path(style.input)).map(input => ({ input }))
+      : style;
 
-  for (const v of styles) {
+  });
 
-    const compile: Partial<IStyles['compile'][number]> = {
-      input: path(v.input),
-      cache: config.cache + '/'
-    };
+  for (const style of list) {
+
+    const compile: Partial<IStyle> = {};
+    const parent = parentPath(style.input);
+
+    compile.input = path(style.input);
+    compile.cache = config.cache + '/';
+    compile.sass = { sourcemap: true, style: 'compressed', warnings: true };
+    compile.postcss = has('postcss', style)
+      ? (style.postcss === 'prod' || style.postcss === 'production')
+      : false;
+
+    if (has('sass', style)) for (const sass in style.sass) compile.sass[sass] = style.sass[sass];
 
     let rename: string;
+    let watch: string[];
 
-    if (has('rename', v)) {
+    if (has('rename', style)) {
 
-      if (isObject(v.rename)) {
+      if (isObject(style.rename)) {
 
-        const base = basename(v.input);
-        const sep = has('separator', v.rename) ? v.rename.separator : '-';
-        const parent = lastPath(v.input.replace(base, '')).replace('/', '');
+        const base = basename(style.input);
+        const sep = has('separator', style.rename) ? style.rename.separator : '-';
 
-        if (has('prefixDir', v.rename) && v.rename.prefixDir === true) {
+        if (has('prefixDir', style.rename) && style.rename.prefixDir === true) {
 
-          v.rename = parent + sep + base;
+          style.rename = lastPath(parent) + sep + base;
 
-        } else {
-          if (has('prefix', v.rename)) {
-            v.rename = parent + sep + base;
-          }
+        } else if (has('prefix', style.rename)) {
+
+          style.rename = lastPath(parent) + sep + base;
+
         }
 
       }
 
-      if (isString(v.rename)) {
+      if (isString(style.rename)) {
 
-        if (!/[a-zA-Z0-9_.-]+/.test(v.rename)) {
-          log.throw('Invalid rename config defined on stylesheet: ' + v.rename);
+        if (!/[a-zA-Z0-9_.-]+/.test(style.rename)) {
+          log.throw('Invalid rename config defined on stylesheet: ' + style.rename);
         }
 
-        // handle renamed files
-        if (!v.rename.endsWith('.css')) {
-          if (v.rename.endsWith('.scss')) {
-            rename = v.rename.replace('.scss', '.css');
-          } else if (v.rename.endsWith('.sass') || v.input.endsWith('.sass')) {
-            rename = v.rename.replace('.sass', '.css');
+        if (!style.rename.endsWith('.css')) {
+          if (style.rename.endsWith('.scss')) {
+            rename = style.rename.replace('.scss', '.css');
+          } else if (style.rename.endsWith('.sass') || style.input.endsWith('.sass')) {
+            rename = style.rename.replace('.sass', '.css');
           } else {
-            rename = v.rename + '.css';
+            rename = style.rename + '.css';
           }
         } else {
-          rename = v.rename;
+          rename = style.rename;
         }
       }
 
     } else {
 
-      const name = basename(v.input);
+      const name = basename(style.input);
 
       if (name.endsWith('.scss')) {
         rename = name.replace('.scss', '.css');
@@ -755,20 +783,20 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
         rename = name;
       }
     }
-    let watch: string[];
 
-    if (has('watch', v)) {
-      if (isArray(v.watch)) {
+    if (has('watch', style)) {
 
-        watch = v.watch.map(path);
+      if (isArray(style.watch)) {
 
+        watch = style.watch.map(path);
         watch.push(compile.input);
-
-        compile.watch = anymatch([ ...watch ]);
+        compile.watch = anymatch(watch);
         config.watch.push(...watch);
 
       } else {
+
         log.throw('You must use an array type for "watch" path style directories');
+
       }
 
     } else {
@@ -779,31 +807,34 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
 
     }
 
-    if (has('include', v)) {
-      if (isArray(v.include)) {
-        compile.include = v.include.map(include => join(config.cwd, include));
+    if (has('include', style)) {
+
+      if (isArray(style.include)) {
+        compile.include = style.include.map(include => join(config.cwd, include));
       } else {
         log.throw('You must use an array type for "include" paths');
       }
+
     } else {
       compile.include = [];
     }
 
-    compile.include.unshift(
-      config.cwd,
-      compile.input.replace(basename(v.input), '')
-    );
+    compile.include.unshift(config.cwd, parent);
 
-    if (has('snippet', v) && v.snippet === true) {
-      compile.output = join('snippets', rename + '.liquid');
+    if (has('snippet', style) && style.snippet === true) {
+
       compile.snippet = true;
+      compile.output = join('snippets', rename + '.liquid');
+
     } else {
+
+      compile.snippet = false;
       compile.output = join('assets', rename);
       config.watch.push('!' + join(config.output, compile.output));
-      compile.snippet = false;
+
     }
 
-    config.transform.styles.compile.push(compile as IStyles['compile'][number]);
+    config.transform.styles.push(compile);
 
   }
 
