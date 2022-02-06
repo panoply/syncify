@@ -5,7 +5,7 @@ import { compile as liquid } from 'transform/liquid';
 import { transform as styles } from 'transform/styles';
 import { compile as json } from 'transform/json';
 import { glob } from 'glob';
-import { is } from 'utils/native';
+import { is } from 'shared/native';
 
 /**
  * Build Function

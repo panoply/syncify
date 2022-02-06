@@ -1,9 +1,15 @@
 import { AxiosRequestConfig } from 'axios';
+import { IFile } from './file';
 
 /**
  * Axios Request Methods
  */
 export type Methods = 'get' | 'post' | 'put' | 'delete'
+
+/**
+ * Client Request
+ */
+export type Client = (method: Methods, file: IFile, content?: string) => Promise<void>
 
 /**
  * Resources
@@ -89,11 +95,15 @@ export interface IAsset {
   /**
    * The asset path
    */
-  key: string,
+  key?: string,
   /**
    * Base64 Encoded File
    */
-  attachment: string
+  attachment?: string
+  /**
+   * Value file string
+   */
+  value?: string
 }
 
 /* -------------------------------------------- */
@@ -139,15 +149,15 @@ export interface IRedirect {
   /**
    * Redirect ID
    */
-  id: number;
+  id?: number;
   /**
    * The redirect from path
    */
-  path: string;
+  path?: string;
   /**
    * The redirect to path
    */
-  target: string;
+  target?: string;
 }
 
 /**
@@ -157,9 +167,9 @@ export interface IRedirect {
  */
 export interface IRequest extends AxiosRequestConfig {
   url?: string;
-  method: Methods;
+  method?: Methods;
   responseType?: 'json',
-  data?: { asset: IAsset } | { metafield: IMetafield } | { redirect: IRedirect }
+  data?: { asset?: IAsset } | { metafield?: IMetafield } | { redirect?: IRedirect }
   params?: {
     'asset[key]'?: string;
     fields?: string

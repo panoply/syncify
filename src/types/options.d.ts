@@ -12,7 +12,6 @@ export interface IOptions {
     import?: string;
     export?: string;
     config?: string;
-    metafields?: string;
   };
   paths?: {
     assets?: string[];
@@ -36,14 +35,24 @@ export interface IOptions {
     populate?: boolean;
     cache?: boolean;
   };
+  metafields?: {
+    input?: string;
+    bind?: boolean;
+  }
   transform?: {
     styles?: Array<{
-      input: string | string[];
+      input: any;
+      postcss?: string;
+      sass?: {
+        style?: 'expanded' | 'compressed';
+        sourcemap?: boolean;
+        warnings?: boolean;
+      };
       rename?: string | {
         prefix?: string;
         prefixDir?: boolean;
         separator?: string;
-      };
+      } | any;
       snippet?: boolean;
       watch?: string[];
       include?: string[]

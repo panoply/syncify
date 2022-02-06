@@ -1,6 +1,4 @@
-import { AcceptedPlugin } from 'postcss';
 import { OptimizeOptions } from 'svgo';
-import { Sync, Assets, Console } from './cli';
 import { Tester } from 'anymatch';
 import { Options } from 'html-minifier-terser';
 
@@ -178,29 +176,30 @@ export interface IStyle {
    */
   cache: string;
   /**
+   * Run PostCSS
+   */
+  postcss: boolean;
+  /**
+   * Options to be passed to Dart SASS
+   */
+  sass: {
+    /**
+     * Whether or not to generate sourcemaps
+     */
+    sourcemap: boolean;
+    /**
+     * The style compiled CSS should be output
+     */
+    style: 'expanded' | 'compressed';
+    /**
+     * Whether or not to print warnings to CLI
+     */
+    warnings: boolean;
+  };
+  /**
    * A list of paths to include, ie: node_modules.
    */
   include: string[];
-}
-
-export interface IStyles {
-  /**
-   * POSTCSS transform options provided in a `postcss.config.js` file,
-   * when no `postcss.config.js` file is present this will be `null`
-   */
-  postcss: {
-    plugins?: AcceptedPlugin[];
-  }
-  /**
-   * Path to node_modules directory relative to current working directory.
-   * This is used to re-write `~` dashed paths.
-   */
-  node_modules: string;
-  /**
-   * List of stylesheet files to process.
-   */
-  compile: IStyle[]
-
 }
 
 /* -------------------------------------------- */
@@ -300,14 +299,6 @@ export interface IConfig {
    * The mode from which Syncify was intialized.
    */
   mode: 'cli' | 'api';
-  /**
-   * The CLI console instances
-   */
-  cli: {
-    sync: Sync,
-    assets: Assets,
-    console: Console
-  }
   /**
    * The resource to execute, eg: 'watch', 'upload' or 'download'
    */
@@ -414,7 +405,7 @@ export interface IConfig {
     /**
      * Stylesheet transforms, supports CSS/SASS
      */
-    styles: IStyles;
+    styles: IStyle[];
     /**
      * Iconset transforms, sprites and inline snippets
      */
@@ -455,7 +446,15 @@ export interface IConfig {
         target?: string;
       }
     };
-
+    /**
+     * Metafield synchronization options
+     */
+    metafields: {
+      /**
+       * Whether or not to bind remote and local metafields
+       */
+      bind: boolean;
+    };
     /**
      * Theme synchronization options
      */
