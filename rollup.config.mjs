@@ -6,6 +6,7 @@ export default rollup(
     external: [
       'anymatch',
       'axios',
+      'cross-spawn',
       'prompts',
       'chokidar',
       'fs-extra',
@@ -13,20 +14,17 @@ export default rollup(
       'minimist',
       'mkdirp',
       'nanomatch',
-      'neo-blessed',
-      'node-notifier',
-      'node-sass',
       'sass',
-      'nodejs-base64-converter',
       'svg-sprite',
       'svgo',
+      'marky',
+      'prettyjson',
       'postcss',
       'sass',
       'yamljs',
       'html-minifier-terser',
       'svgstore',
-      'ansis',
-      'cli-size'
+      'ansis'
     ],
     output: [
       {
