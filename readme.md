@@ -55,25 +55,7 @@ Shopify does a terrible job at providing quality tooling for developers who are 
   - [Utilities](#utilities)
 - [Contributing](#contributing)
 
-# Overview
-
-The main purpose of Syncify is to watch and upload files from your local machine to your Shopify store\s via API. Syncify supports file transformation capabilities like minification and allows developers to spawn child running processes in parallel. It employs an intelligent queue-based sync/burst based upload approach.
-
-### Theme Files
-
-Syncify uses built-in capabilities when handling snippets, templates, layouts, locales, configs and sections. Files using a `.liquid` or `.json` extensions are considered `views` in Syncify and content transformations like minification are applied to them using features shipped within the tool.
-
-### Asset Pipeline
-
-Syncify does not want to re-create or impede on developer preferences and tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify instances. Spawned processes will run independent of Syncify and their generated output is synchronized to stores automatically.
-
-### Supported Handling
-
-Syncify provides built-in convenience support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project the configurations specified within will used in the transform process.
-
 # Installation
-
-Syncify has peer dependencies on [PostCSS](#), [Svgo](#) and [Sass (Dart)](#). You will need to install these together with Syncify if you wish to leverage the built-in support capabilities provided around these compilers.
 
 PNPM
 
@@ -93,51 +75,45 @@ Yarn
 yarn add @liquify/syncify --dev
 ```
 
-<details>
-<summary>
-Installing Peers
-</summary>
+# Overview
 
-PNPM
+The main purpose of Syncify is to watch and upload files from your local machine to your Shopify store\s via API. Syncify supports file transformation capabilities like minification and allows developers to spawn child running processes in parallel. It employs an intelligent queue-based sync/burst based upload approach.
 
-```cli
-pnpm add @liquify/syncify sass postcss svgo -D
-```
+### Theme Files
 
-NPM
+Syncify uses built-in capabilities when handling snippets, templates, layouts, locales, configs and sections. Files using a `.liquid` or `.json` extensions are considered **views** in Syncify and content transformations like minification are applied to them using features shipped within the tool.
 
-```cli
-npm i @liquify/syncify sass postcss svgo --save-dev
-```
+### Asset Pipeline
 
-Yarn
+Syncify does not want to re-create or impede on developer preferences and tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify instances. Spawned processes will run independent of Syncify and their generated output is synchronized to stores automatically.
 
-```cli
-yarn add sass postcss svgo --dev
-```
+### Supported Handling
 
-</details>
+Syncify provides built-in convenience support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project the configurations specified within will used in the transform process.
 
-### Setup
+# Setup
 
-After installing you will need to quickly configure a connection between your shopify store theme/s. In your `package.json` file you can define a configuration using the `"syncify":{}` property. Syncify requires you provide **Admin API access token** (recommended) or **API Key and Secret** as credentials. You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) in your store to these credentials. If you are coming from Theme Kit it is recommended that you create a new app for Syncify specifically as permissions differ.
+After installing you will need to quickly configure a connection to your shopify store. In your `package.json` file you can define a configuration within a `syncify{}` property. Syncify requires you provide admin API access token (recommended) or API Key and Secret as credentials. You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) to obtain this information.
 
-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
+### Scopes
 
-### Required Scopes
+You need to provide Syncify read and write access to a couple admin endpoints so it can perform operations. Below are the required scopes you will need to enable within in your private app.
 
-You need to provide Syncify read and write access to a couple admin endpoints so it can perform its operations. Below are the required scopes you will need to enable within in your private app. You should only request the minimum amount of data that's necessary.
+**Files**
+`write_files, read_files`
 
-| Endpoint          | Scopes                                                | Required                                            |
-| ----------------- | ----------------------------------------------------- | --------------------------------------------------- |
-| **Files**         | `write_files`, `read_files`                           | Allows Syncify to publish assets to your shop files |
-| **Pages**         | `write_online_store_pages`, `read_online_store_pages` | Allows Syncify to publish content to pages          |
-| **Store content** | `write_content`, `read_content`                       | Allows Syncify to publish redirects                 |
-| **Themes**        | `write_themes`, `read_themes`                         | Allows Syncify to publish themes and assets         |
+**Pages**
+`write_online_store_pages`, `read_online_store_pages`
+
+**Store Content**
+`write_content, `read_content`
+
+**Themes**
+`write_themes`, `read_themes`
 
 ### Credentials
 
-Shop credentials are stored within a `.env` file. Store credentials **must** begin with the store name following an underscore character. If your shopify store _myshopify_ domain is `sissel.myshopify.com` then your store name value is `sissel` so the credentials would start with `sissel` - for the sake of brevity this is how one would define credentials within the `.env`:
+Shop credentials are stored within a `.env` file. Store credentials **must** begin with the store name following an underscore character. For the sake of brevity this is how one would define credentials within the `.env` if your _myshopify_ domain was `sissel.myshopify.com`:
 
 If you are using an **Using an API Access Token**
 
@@ -154,49 +130,26 @@ SISSEL_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 
 You can provide credentials in either uppercase of lowercase. Please refer to the `.env.example` file in this repository for an example and please remember to never commit the `.env` to a public repository. If you are syncing to multiple storefronts just follow this pattern for each store.
 
-<details>
-<summary>
-Multiple storefront example
-</summary>
+### Schemas
 
-If you are using an **Using an API Access Token**
-
-```env
-store-1_api_token = 'shpat_abcdefghijklmnopqrstuvwz
-store-2_api_token = 'shpat_abcdefghijklmnopqrstuvwz
-store-3_api_token = 'shpat_abcdefghijklmnopqrstuvwz
-```
-
-If you are using the **API key** and **API Secret**
-
-```env
-store-1_api_key = 'abcdefghijklmnopqrstuvwz'
-store-1_api_secret = 'abcdefghijklmnopqrstuvwz'
-
-store-2_api_key = 'abcdefghijklmnopqrstuvwz'
-store-2_api_secret = 'abcdefghijklmnopqrstuvwz'
-
-store-3_api_key = 'abcdefghijklmnopqrstuvwz'
-store-3_api_secret = 'abcdefghijklmnopqrstuvwz'
-```
-
-</details>
-
-### Extending Schema
-
-Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can **optionally** extend the built-in `package.json` schema used by your editor to provide hover descriptions, auto-completions and intellisense support on the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
+Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can **optionally** extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support on the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
 
 **Generate using CLI** (recommended)
 
-Syncify can automatically generate the `package.json* specs for developers using VS Code. The settings reference will be written within `.vscode` directory in your workspace root.
+Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project.
+
+Use the following command:
 
 ```
-$ syncify vsc
+$ syncify --vsc
 ```
 
-**Provide Manually**
+<details>
+<summary>
+<strong>Provide Manually</strong>
+</summary>
 
-If you wish to provide the specs manually your will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
+If you wish to provide the specs manually you will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
 
 ```json
 {
@@ -211,9 +164,11 @@ If you wish to provide the specs manually your will need to create a `.vscode` d
 
 > You can also apply this to your global workspace settings too, but it is recommended you extends schema on a per-project basis.
 
+</details>
+
 # Configuration
 
-Syncify configuration and options are defined with a `package.json` file. Syncify **requires** you provide references to store/s and theme/s you wish to sync via the `"stores"` property. By default, Syncify will assume your _src_ files exists within a `source` directory (relative to your project root) and the folders/files within that directory are using a default Shopify theme structure.
+Syncify configuration and options are defined with a `package.json` file. Syncify requires you provide references to shop and themes. You can use the `"stores"` property for this information. By default, Syncify will assume your _src_ files exists within a `source` directory (relative to your project root) and the folders/files within adhere to the default Shopify theme structure.
 
 > Please note that you will need to remove the comments if you are copy and pasting configuration settings below. Checkout the [Examples](https://github.com/panoply/syncify-examples) repository to download or clone Syncify baked template.
 
@@ -392,7 +347,7 @@ The `output` option refers to your project dist build path. This is the director
 
 The `config` option refers to a directory within your project where configuration files exist, like (for example) a `rollup.config.js` or `webpack.config.js` file. Syncify by default (when this option is undefined) will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. This `config` directory allows you to optionally place spawn config files within a sub-directory that is relative to root.
 
-> Typically this is named `scripts` in most node projects. Be sure to point any third party configurations paths correctly.
+> Typically this is named `scripts` in most node projects. Be sure to point output paths within third party configs to the assets output assets directory..
 
 #### `import`
 
@@ -405,6 +360,43 @@ The `export` option refers to a directory where packaged (.zip) themes will be w
 ### Paths
 
 The `paths` option allows you to define a custom set of paths to theme specific files which are contained within the `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify as paths a re-routed to the defined `output` directory which adheres to the structure which is imposed. Each path option accepts an `array` of glob ([anymatch](https://www.npmjs.com/package/anymatch)) patterns. By default, Syncify assumes you are using the basic-bitch structure.
+
+```
+CUSTOM DIRECTORY STRUCTURE          BASIC BITCH STRUCTURE        OUTPUT STRUCTURE
+
+┌─ config                           ┌─ source                     ┌─ assets
+│  ├─ rollup.config.js              │  ├─ assets                  ├─ config
+│  ├─ postcss.config.js             │  ├─ config                  ├─ layout
+│  └─ svgo.config.js                │  ├─ layout                  ├─ sections
+├─ source                           │  ├─ metafields              ├─ snippets
+│  ├─ assets                        │  ├─ sections                ├─ templates
+│  │  ├─ files                      │  ├─ snippets                └─ customer
+│  │  ├─ icons                      │  └─ templates
+│  │  │  ├─ inline                  │     └─ customers
+│  │  │  └─ sprite                  ├── .env
+│  │  └─ images                     ├── .liquidrc
+│  ├─ data                          ├── redirects.yml
+│  │  ├─ config                     └── package.json
+│  │  ├─ locales
+│  │  └─ metafields
+│  │     └─ namespace
+│  ├─ styles
+│  ├─ scripts
+│  └─ views
+│     ├─ customers
+│     ├─ sections
+│     │  ├─ layout
+│     │  ├─ pages
+│     │  ├─ product
+│     │  └─ shared
+│     ├─ snippets
+│     ├─ templates
+│     └─ theme.liquid
+├── .env
+├── .liquidrc
+├── redirects.yml
+└── package.json
+```
 
 ### Spawn
 
@@ -441,8 +433,8 @@ Aliases:
 
 Commands:
   $ syncify                   Starts interactive CLI command prompt
-  $ syncify --flags           Passing
-  $ syncify <store> --flags   Store name or comma separated list of stores
+  $ syncify --flags           Passing flags
+  $ syncify <store> --flags   Store name or comma separated list of stores and flags
 
 Flags:
   -b, --build            Triggers a build, use with upload to run build before uploading
@@ -591,7 +583,7 @@ The `package.json` configuration for the command would look like this:
 
 ### Prompts
 
-Syncify provides a helpful command prompt feature. Running `syncify` or `syncify --interactive` will provide you a simple prompt interface.
+Syncify provides a helpful command prompt feature. Running `syncify` will provide you a simple prompt interface.
 
 # API Usage
 
@@ -618,63 +610,7 @@ util.spawned(): string[]
 ### Instance
 
 ```javascript
-import syncify from 'shopify-sync'
-
-// Create a resource instance
-// which returns a hook function callback
-
-const watch = syncify('watch', {
-
-  // The path to a directory to watch (optional if defined in package.json)
-  dir: 'example',
-
-  // The target store name (key) and themes as (value)
-  target: {
-
-    // Reference a theme defined in your package.json config
-    shop1: ['theme-name'],
-
-    // Reference by theme id
-    shop2: [1234567890, 0987654321]
-
-  },
-
-  // Number of parallel requests
-  concurrency: 20,
-
-  // Metafields feature, will publish JSON file contents to metafields
-  metafields: true,
-
-  // Apply ignores at chokidar instance
-  forceIgnore: false,
-
-  // An array of files and/or an any-match `/*/**` wildcard paths to ignore
-  ignore: [
-    'example/ignore-dir/**/**'
-    'example/assets/*.map.js',
-    'example/snippets/ignore.liquid'
-  ]
-})
-
-// Syncify returns a function, call this to
-// hook into the transit process of files.
-
-watch(function(content){
-
-  // this scope will returns parsed file path object
-  console.log(this)
-
-  // The content parameter passes a Buffer
-  console.log(content)
-
-  // Convert the content parameter Buffer to a string.
-  console.log(content.toString())
-
-  // Returning a string or buffer will modify contents.
-  return 'hello world'
-
-})
-
+import syncify from '@liquify/syncify';
 ```
 
 Create a script command within your `package.json` file.

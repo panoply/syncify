@@ -60,13 +60,13 @@ export const indent = (message: string) => message.replace(/^/gm, c.line('│  '
  * │
  * ```
  */
-export const header = ({ sync, spawns, resource, env }: IConfig) => {
+export const header = ({ sync, spawns, resource, env, mode }: IConfig) => {
 
   const stores = c.cyan.bold(String(sync.stores.length)) + (sync.stores.length > 1 ? ' stores' : ' store');
   const themes = c.cyan.bold(String(sync.themes.length)) + (sync.themes.length > 1 ? ' themes' : ' theme');
   const preview = alignment(sync.themes);
 
-  let heading: string = (
+  let heading: string = '\n' + (
     c.line('┌─ ') + c.cyan.bold('Syncify ') + c.gray('<!version!>') + '\n' +
     c.line('│ ') + '\n' +
     c.line('│ ') + 'Running ' + c.cyan.bold(resource) + ' mode in ' + c.cyan.bold(env) + '\n' +
@@ -78,6 +78,8 @@ export const header = ({ sync, spawns, resource, env }: IConfig) => {
     const spawned = c.cyan.bold(String(spawnz)) + (spawnz > 1 ? ' child processes' : ' child process');
     heading += c.line('│ ') + 'Spawned ' + spawned + '\n' + c.line('│\n');
   }
+
+  if (mode.build) return heading;
 
   return heading + (
     c.line('│ ') + 'Previews:' + c.line('\n│\n') + preview + '\n' +
@@ -91,8 +93,9 @@ export const header = ({ sync, spawns, resource, env }: IConfig) => {
  *
  * `├─ title`
  */
-export const group = (title: string) => c.line('│\n├─ ') + c.bold(toUpcase(title)) + c.line('\n│\n');
-
+export const group = (title: string) => (
+  c.line('│\n├─ ') + c.bold.doubleUnderline(toUpcase(title)) + c.line('\n│\n')
+);
 /**
  * Task - Prints the executed task/operation
  *
@@ -105,4 +108,4 @@ export const task = (message: string) => c.line('│ ') + message + '\n';
  *
  * `└── message`
  */
-export const footer = (message: string) => c.line('│\n└── ') + message + '\n';
+export const footer = (message: string) => c.line('│\n└── ') + c.cyan(message) + '\n\n';

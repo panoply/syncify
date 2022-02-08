@@ -23,9 +23,13 @@ export const request = (list: any[]) => (method: Methods, file?: IFile, content?
   if (is(file.type, Type.Metafield)) {
 
     if (is(list.length, 1)) {
-      queue.add(() => metafields(list[0].url.metafields, file, content));
+      queue.add(
+        () => metafields(list[0].url.metafields, file, content)
+      );
     } else {
-      queue.add(() => mapFastAsync<IStore, any>(v => metafields(v.url.metafields, file, content), list));
+      queue.add(
+        () => mapFastAsync<IStore, any>(v => metafields(v.url.metafields, file, content), list)
+      );
     };
 
   } else if (is(file.type, Type.Redirect)) {
@@ -48,9 +52,13 @@ export const request = (list: any[]) => (method: Methods, file?: IFile, content?
     };
 
     if (is(list.length, 1)) {
-      queue.add(() => assets(list[0], file, config));
+      queue.add(
+        () => assets(list[0], file, config)
+      );
     } else {
-      queue.add(() => mapFastAsync<IThemes, any>(store => assets(store, file, config), list));
+      queue.add(
+        () => mapFastAsync<IThemes, any>(store => assets(store, file, config), list)
+      );
     }
 
   };

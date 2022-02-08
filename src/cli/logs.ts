@@ -3,7 +3,7 @@ import * as c from 'cli/colors';
 import * as parse from 'cli/parse';
 import * as tui from 'cli/ansi';
 import { log } from 'cli/console';
-import { IFile } from 'types';
+import { IConfig, IFile } from 'types';
 import type { SourceSpan, Exception } from 'sass';
 import { hasPath } from 'rambdax';
 import { is } from 'shared/native';
@@ -11,13 +11,76 @@ import { byteConvert } from 'shared/helpers';
 
 let hasError: boolean = false;
 let hasMarks: boolean = false;
+let logBuild: boolean = false;
+
+/* -------------------------------------------- */
+/* RE-EXPORT                                    */
+/* -------------------------------------------- */
+
+export * as timer from 'marky';
+
+/**
+ * Define Preset
+ *
+ * Letting setter which is used to determine
+ * when we are triggering a certain build mode.
+ */
+export const presets = (config: IConfig['mode']) => { logBuild = config.build; };
+
+/**
+ * Build Time
+ *
+ * Returns the build time in miliseconds
+ */
+export const time = (id: string) => (`${marky.stop(id).duration.toFixed(0)}ms`);
+
 /* -------------------------------------------- */
 /* SHARED LOGGERS                               */
 /* -------------------------------------------- */
 
+/**
+ * Clean Log
+ *
+ * Prints the clean operation when flag is passed
+ */
+export const cleanTask = (files: number) => {
+
+  if (is(files, 0)) {
+    log.clean(tui.task(c.greenBright('✓ output directory is clean')));
+    return false;
+  }
+
+  marky.mark('clean');
+
+  log.clean(
+    tui.task(c.cyanBright(`${c.bold('+')} cleaning ${c.bold(String(files))} files output directory`))
+  );
+
+  return (dir: string, result: number) => {
+    log.clean(
+      tui.task(
+        c.greenBright(`✓ removed ${c.bold(String(result))} of ${c.bold(String(files))} files`)
+      ),
+      tui.task(
+        c.greenBright(`✓ cleaned ${c.white('\'')}${dir}/**${c.white('\'')} ${c.gray('in')} ${time('clean')}`)
+      )
+    );
+  };
+
+};
+
+/* -------------------------------------------- */
+/* FILE LOGGERS                                 */
+/* -------------------------------------------- */
+
+/**
+ * File Size
+ *
+ * Informs of the file size before and after minification
+ */
 export const fileSize = (before: number, after: number) => {
 
-  if (!is(before, after)) return;
+  if (is(before, 0) || !is(before, after)) return;
 
   const saved = byteConvert(before - after);
   const size = byteConvert(after);
@@ -28,10 +91,6 @@ export const fileSize = (before: number, after: number) => {
 
 };
 
-/* -------------------------------------------- */
-/* FILE LOGGERS                                 */
-/* -------------------------------------------- */
-
 /**
  * File Change
  *
@@ -39,18 +98,15 @@ export const fileSize = (before: number, after: number) => {
  */
 export const fileChange = (file: IFile) => {
 
-  if (hasError) {
-    hasError = false;
+  if (hasError) hasError = false;
+  if (logBuild) {
+    marky.mark('c');
+    marky.mark(file.path);
+    hasMarks = true;
   }
 
-  marky.mark('change');
-  marky.mark(file.path);
+  log.files(tui.task(c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`)));
 
-  log.files(
-    tui.task(c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`))
-  );
-
-  hasMarks = true;
 };
 
 /**
@@ -62,9 +118,7 @@ export const fileRemove = (file: IFile) => {
 
   marky.mark(file.key);
 
-  log.files(
-    tui.task(c.orange('␡ deleted ' + file.key))
-  );
+  log.files(tui.task(c.orange('⌧ deleted ' + file.key)));
 
 };
 
@@ -75,13 +129,12 @@ export const fileRemove = (file: IFile) => {
  */
 export const fileTask = (file: IFile, message: string) => {
 
-  const duration = marky.stop(file.path).duration.toFixed(0);
-
-  log.files(
-    tui.task(c.orange(`✓ ${message} ${c.gray('in')} ${duration}ms`))
-  );
-
-  marky.mark(file.path);
+  if (hasMarks) {
+    log.files(tui.task(c.orange(`✓ ${message} ${c.gray('in')} ${time(file.path)}`)));
+    marky.mark(file.path);
+  } else {
+    log.files(tui.task(c.greenBright(`✓ ${file.key}`)));
+  }
 
 };
 
@@ -94,17 +147,12 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
 
   if (!hasError) {
 
-    const shop = `${c.magenta(theme)} ${c.gray('on')} ${c.blue(store)} ${c.gray('in')}`;
+    const shop = `uploaded ${file.key} ${c.gray('to')} ${c.magenta(theme)} ${c.gray('on')} ${c.blue(store)}`;
 
     if (hasMarks) {
-      const time = marky.stop('change').duration.toFixed(0);
-      log.files(
-        tui.task(c.greenBright(`✓ uploaded ${file.key} ${c.gray('to')} ${shop} ${c.white(time + 'ms')}`))
-      );
+      log.files(tui.task(c.greenBright(`✓ ${shop} ${c.gray('in')} ${time('c')}`)));
     } else {
-      log.files(
-        tui.task(c.greenBright(`✓ uploaded ${file.key} ${c.gray('to')} ${shop}`))
-      );
+      log.files(tui.task(c.greenBright(`✓ ${shop}`)));
     }
 
   } else {
@@ -121,9 +169,7 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
  */
 export const fileDelete = (storeName: string, themeName: string) => {
 
-  log.files(
-    tui.task(c.gray(`deleted from ${c.white(themeName)} (${c.white(storeName)})`))
-  );
+  log.files(tui.task(c.gray(`deleted from ${c.white(themeName)} (${c.white(storeName)})`)));
 
 };
 
@@ -134,9 +180,7 @@ export const fileDelete = (storeName: string, themeName: string) => {
  */
 export const fileIgnore = (filePath: string) => {
 
-  log.files(
-    tui.task(c.gray(`${c.bold('!')} ignoring ${filePath}`))
-  );
+  log.files(tui.task(c.gray(`${c.bold('!')} ignoring ${filePath}`)));
 
 };
 
@@ -147,10 +191,7 @@ export const fileIgnore = (filePath: string) => {
  */
 export const fileWarn = (message: string) => {
 
-  log.files(
-    tui.task(c.yellow('! warning')),
-    tui.indent(message)
-  );
+  log.files(tui.task(c.yellow('! warning')), tui.indent(message));
 
 };
 
@@ -159,12 +200,9 @@ export const fileWarn = (message: string) => {
  *
  * File was transformed and uploaded
  */
-export const fileError = (error: { file: string; message: string; data: string | string[] }) => {
+export const fileError = (e: { file: string; message: string; data: string | string[] }) => {
 
-  log.files(
-    tui.task(c.red(`⨯ ${error.message}`)),
-    tui.indent('\n' + c.red(parse.liquidPretty(error.data)))
-  );
+  log.files(tui.task(c.red(`⨯ ${e.message}`)), tui.indent('\n' + c.red(parse.liquidPretty(e.data))));
 
   if (hasMarks) {
     hasError = true;
@@ -184,10 +222,7 @@ export const fileError = (error: { file: string; message: string; data: string |
  */
 export const sassDebug = (message: string, options: { span: SourceSpan; }) => {
 
-  log.files(
-    tui.task(c.yellow(`${c.bold('✲')} ${message}`)),
-    tui.indent(options.span.context)
-  );
+  log.files(tui.task(c.yellow(`${c.bold('✲')} ${message}`)), tui.indent(options.span.context));
 
 };
 
@@ -202,11 +237,7 @@ export const sassError = (error: Exception) => {
 
   const title = `⨯ sass error starting ${c.gray('on')} line ${error.span.start.line}${c.white(':')}`;
 
-  log.files(
-    tui.task(c.redBright(title)),
-    tui.indent(parse.sassError(error))
-  );
-
+  log.files(tui.task(c.redBright(title)), tui.indent(parse.sassError(error)));
   marky.clear();
 
 };
@@ -226,10 +257,7 @@ export const sassWarn = (message: string, options: {
 
   if (!hasPath('span.start.line', options)) {
 
-    log.files(
-      tui.task(c.yellow('! ' + title)),
-      tui.indent(parse.sassSplit(message))
-    );
+    log.files(tui.task(c.yellow('! ' + title)), tui.indent(parse.sassSplit(message)));
 
   } else {
 
@@ -239,6 +267,12 @@ export const sassWarn = (message: string, options: {
     );
 
   }
+
+};
+
+export const finish = (timer: string) => {
+
+  return log.print(tui.footer(c.bold(`Generated Theme ${c.gray('in')} ${time(timer)}`)));
 
 };
 

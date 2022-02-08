@@ -83,7 +83,7 @@
       },
       "build": {
         "rollup": "rollup -c config/rollup.config.js",
-        "webpack": "webpack --config ./config/webpack.config.js"
+        "webpack": "webpack --config config/webpack.config.js --color"
       }
     },
     "metafields": {
@@ -139,7 +139,7 @@
         }
       },
       "json": {
-        "allowComments": false,
+        "spaces": 2,
         "minify": {
           "apply": "production",
           "removeSchemaRefs": true,

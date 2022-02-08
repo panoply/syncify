@@ -4,28 +4,43 @@ const fn = require('../package/index.js').default;
 const argv = require('minimist')(process.argv.slice(1), {
   default: {
     cli: true,
-    interactive: false,
-    terminal: 'dashboard',
-    cwd: process.cwd(),
     dev: true,
+    build: true,
     prod: false,
-    env: 'production'
+    watch: false,
+    clean: false,
+    upload: false,
+    download: false,
+    help: false,
+    env: 'production',
+    cwd: process.cwd()
   },
   boolean: [
+    'vsc',
     'dev',
-    'prod'
+    'prod',
+    'build',
+    'watch',
+    'upload',
+    'download',
+    'help'
   ],
   string: [
-    's',
-    't',
-    'o',
-    'e',
+    'store',
+    'theme',
+    'output',
     'env'
   ],
   alias: {
+    build: 'b',
+    watch: 'w',
+    clean: 'c',
+    upload: 'u',
+    download: 'd',
     store: 's',
     theme: 't',
-    output: 'o'
+    output: 'o',
+    help: 'h'
   }
 });
 

@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import spawn from 'cross-spawn';
+import { IConfig } from 'types';
 
 /* -------------------------------------------- */
 /* PRIVATE                                      */
@@ -18,7 +19,7 @@ let registers = false;
 /**
  * Callback exist hooks
  */
-const callbacks: Set<Function> = new Set();
+const exited: Set<Function> = new Set();
 
 /**
  * Exist handler
@@ -32,7 +33,7 @@ function exit (manualExit: boolean, signal: number) {
 
   triggered = true;
 
-  for (const callback of callbacks) callback();
+  for (const callback of exited) callback();
   if (manualExit === true) process.exit(128 + signal);
 
 }
@@ -48,7 +49,10 @@ function exit (manualExit: boolean, signal: number) {
  * We need to hold reference of these to kill
  * when ending the session.
  */
-export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
+export const spawns: Set<[
+  name: string,
+  child: ChildProcessWithoutNullStreams
+]> = new Set();
 
 /**
  * Exist Hook
@@ -58,7 +62,7 @@ export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
  */
 export function kill (fn: Function) {
 
-  callbacks.add(fn);
+  exited.add(fn);
 
   if (!registers) {
 
@@ -71,7 +75,7 @@ export function kill (fn: Function) {
 
   }
 
-  return () => callbacks.delete(fn);
+  return () => exited.delete(fn);
 
 }
 
@@ -82,8 +86,9 @@ export function kill (fn: Function) {
  * using spawns. The spawned process is encapsulted
  * and `stdio` is piped.
  */
-export function spawned (name: string, command: string, callback: (message: string) => void) {
+export function spawned (name: string, config: IConfig, callback: (message: string) => void) {
 
+  const command = config.spawns[name];
   const arg: string[] = /\s/g.test(command) ? command.split(' ') : [ command ];
   const cmd = arg.shift();
   const child = spawn(cmd, arg, {
@@ -100,7 +105,7 @@ export function spawned (name: string, command: string, callback: (message: stri
   child.stdio[1].on('data', callback);
   child.stdio[2].on('data', callback);
 
-  spawns.set(name, child);
+  spawns.add([ name, child ]);
 
   return child;
 

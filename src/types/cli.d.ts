@@ -5,7 +5,7 @@
 
 export interface ICLIOptions {
   /**
-   * The command triggered
+   * The command triggered (converted into stores)
    */
   _?: string[];
   /**
@@ -29,9 +29,33 @@ export interface ICLIOptions {
    */
   resource?: string;
   /**
-   *  The resource to be executed
+   *  Run in watch mode
    */
-  terminal?: 'default' | 'minimal' | 'dashboard';
+  watch?: boolean;
+  /**
+   *  Run in build mode
+   */
+  build?: boolean;
+  /**
+   *  Run in  upload mode
+   */
+  upload?: boolean;
+  /**
+   *  Run in download mode
+   */
+  download?: boolean;
+  /**
+   * Generate VS Code JSON schema spec
+   */
+  vsc?: boolean;
+  /**
+   *  Run a clean of output directory
+   */
+  clean?: boolean;
+  /**
+   *  Show help
+   */
+  help?: boolean;
   /**
    * Provided stores to run sync on
    */

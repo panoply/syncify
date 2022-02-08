@@ -1,9 +1,9 @@
 /* eslint-disable new-cap */
-import { IOptions, ICLIOptions, IConfig, IIcons, IPackage, IStyle } from 'types';
+import { IOptions, ICLIOptions, IConfig, IIcons, IPackage, IStyle, IStore } from 'types';
 import { PartialDeep } from 'type-fest';
 import { resolve, join, basename } from 'path';
 import { glob } from 'glob';
-import { has, hasPath, includes, isNil } from 'rambdax';
+import { has, hasPath, includes, isEmpty, isNil } from 'rambdax';
 import anymatch from 'anymatch';
 import { readJson, pathExistsSync, pathExists, mkdir } from 'fs-extra';
 import dotenv from 'dotenv';
@@ -38,43 +38,27 @@ export const readConfig = async (options: ICLIOptions) => {
 function command (options: ICLIOptions) {
 
   if (is(options._.length, 0)) {
-
-    options.resource = 'interactive';
-
+    options.resource = 'flags';
     return getPackage(options);
-
-  } else if (options._[0] === 'build') {
-
-    options.resource = 'build';
-
-    return getPackage(options);
-
-  } else if (is(options._.length, 1)) {
-
-    options.resource = options._[0];
-
-  } else if (options._.length > 1) {
-
-    options.resource = options._[0];
-    options.store = options._[1];
-
   }
 
-  if (has('store', options)) {
-    options.store = (options.store as string).split(',');
+  options.store = options._[0].split(',');
+
+  if (has('theme', options)) {
+    options.theme = (options.theme as any).split(',');
   } else {
-    throw new Error('Missing "store" target in command');
+    throw new Error('Missing "theme" target in command');
   }
 
-  if (options) {
-    if (has('theme', options)) {
-      options.theme = (options.theme as any).split(',');
-      if (options.store.includes('store')) {
-        throw new Error('Target name "store" is reserved, use a different name.');
-      }
-      if (options.store.includes('theme')) {
-        throw new Error('Target name, "theme" is reserved, use a different name.');
-      }
+  if (has('theme', options)) {
+    if (options.store.includes('store')) {
+      throw new Error('Theme name "store" is reserved, use a different name.');
+    }
+    if (options.store.includes('theme')) {
+      throw new Error('Theme name, "theme" is reserved, use a different name.');
+    }
+    if (options.store.includes('vsc')) {
+      throw new Error('Theme name, "vsc" is reserved, use a different name.');
     }
   }
 
@@ -129,29 +113,6 @@ async function readPackage (options: ICLIOptions) {
 /* -------------------------------------------- */
 
 /**
- * Set Global Configuration
- *
- * Applies node specific environment globals
- * for the current syncify instance.
- */
-function setGlobals (config: PartialDeep<IConfig>) {
-
-  // env variables
-  process.env.SYNCIFY_ENV = config.env;
-  process.env.SYNCIFY_MODE = config.mode;
-  process.env.SYNCIFY_RESOURCE = config.resource;
-
-  // blessed initializes
-  create(config as IConfig, [
-    'throw',
-    'error',
-    'files',
-    'metafields',
-    'redirects'
-  ]);
-}
-
-/**
  * Set Base defaults
  *
  * Utility function for normalizing dirs paths configuration.
@@ -164,10 +125,18 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
   const apply = cli.env === 'prod' || cli.env === 'production';
   const config: PartialDeep<IConfig> = {
     cwd: cli.cwd,
+    cli: true,
     env: cli.env ? cli.env as 'dev' : 'prod',
-    mode: cli.cli ? 'cli' : 'api',
-    resource: cli.resource,
-    spawns: pkg.syncify.spawn[cli.resource] || null,
+    mode: {
+      help: cli.help,
+      vsc: cli.vsc,
+      clean: cli.upload ? false : cli.clean,
+      build: (cli.watch || cli.upload || cli.download) ? false : cli.build,
+      watch: (cli.upload || cli.download) ? false : cli.watch,
+      upload: (cli.download || cli.watch) ? false : cli.upload,
+      download: (cli.upload || cli.watch || cli.build) ? false : cli.download
+    },
+    resource: null,
     cache: join(cache, 'syncify'),
     config: cli.cwd,
     source: 'source',
@@ -238,7 +207,17 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
     }
   };
 
-  setGlobals(config);
+  console.log(config);
+
+  if (!config.mode.build && (isEmpty(cli.store) || config.mode.vsc || config.mode.help)) return config;
+
+  config.resource = config.mode.watch
+    ? 'watch'
+    : config.mode.build
+      ? 'build'
+      : null;
+
+  if (!isNil(config.resource)) config.spawns = pkg.syncify.spawn[config.resource];
 
   if (!pathExistsSync(cache)) {
     try {
@@ -247,6 +226,32 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
       log.throw('Failed to create a ".cache" directory');
     }
   }
+
+  // env variables
+  process.env.SYNCIFY_ENV = config.env;
+  process.env.SYNCIFY_WATCH = String(config.mode.watch);
+  process.env.SYNCIFY_RESOURCE = config.resource;
+
+  // blessed initializes
+  create(config as IConfig, [
+    'print',
+    'throw',
+    'error',
+    'clean',
+    'files'
+  ]);
+
+  return setGlobals(config, cli, pkg);
+
+}
+
+/**
+ * Set Global Configuration
+ *
+ * Applies node specific environment globals
+ * for the current syncify instance.
+ */
+async function setGlobals (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
 
   if (!pathExistsSync(config.cache)) {
     try {
@@ -295,6 +300,49 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
   }
 
   return getStores(config, cli, pkg);
+}
+
+/**
+ * Store Authorization URL
+ *
+ * Generate the the authorization URL to
+ * be used for requests.
+ */
+function getURL (domain: string, env: object): { token: string; base: string; } {
+
+  let api_token = domain + '_api_token';
+
+  if (has(api_token, env)) {
+    return {
+      token: env[api_token],
+      base: `https://${domain}.myshopify.com`
+    };
+  }
+
+  api_token = api_token.toUpperCase();
+
+  if (has(api_token, env)) {
+    return {
+      token: env[api_token],
+      base: `https://${domain}.myshopify.com`
+    };
+  }
+
+  api_token = undefined;
+
+  let api_key = domain + '_api_key';
+  let api_secret = domain + '_api_secret';
+
+  if (!has(api_key, env)) api_key = api_key.toUpperCase();
+  if (!has(api_secret, env)) api_secret = api_secret.toUpperCase();
+  if (has(api_key, env) && has(api_secret, env)) {
+    return {
+      token: null,
+      base: `https://${env[api_key]}:${env[api_secret]}@${domain}.myshopify.com`
+    };
+  }
+
+  throw new Error(`Missing "${domain}" credentials`);
 
 }
 
@@ -307,8 +355,8 @@ async function defaults (cli: ICLIOptions, pkg: IPackage) {
  */
 function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
 
-  const file = dotenv.config({ path: join(config.cwd, '.env') });
   const { syncify } = pkg;
+  const file = dotenv.config({ path: join(config.cwd, '.env') });
 
   if (config.resource === 'build') return getPaths(config, pkg);
 
@@ -316,35 +364,38 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
 
   for (const field of stores) {
 
+    const store: PartialDeep<IStore> = {};
+
     // Upcase the store name for logs, eg: sissel > Sissel
-    const store = field.domain;
+    store.store = field.domain;
 
     // The myshopify store domain
-    const domain = `${store}.myshopify.com`.toLowerCase();
+    store.domain = `${store.store}.myshopify.com`.toLowerCase();
 
     // Fallback to environment variables if no .env file
     const env = file.error ? process.env : file.parsed;
 
     // Get authorization url for the store
-    const base = getURL(field.domain, env);
+    const { base, token } = getURL(field.domain, env);
 
-    // Whether or not to queue this request
-    const queue = cli.resource !== 'interactive';
+    // Set token (if defined)
+    store.token = token;
+
+    // Set URLs
+    store.url = {
+      themes: `${base}/admin/themes.json`,
+      redirects: `${base}/admin/redirects.json`,
+      metafields: `${base}/admin/metafields.json`,
+      pages: `${base}/admin/pages.json`
+    };
+
+    if (isNil(token)) {
+      store.token = token;
+
+    }
 
     // Set store endpoints
-    config.sync.stores.push(
-      {
-        store,
-        domain,
-        queue,
-        url: {
-          themes: `${base}/admin/themes.json`,
-          redirects: `${base}/admin/redirects.json`,
-          metafields: `${base}/admin/metafields.json`,
-          pages: `${base}/admin/pages.json`
-        }
-      }
-    );
+    config.sync.stores.push(store);
 
     const themes = has('theme', cli)
       ? cli.theme
@@ -360,9 +411,9 @@ function getStores (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackag
 
       config.sync.themes.push({
         target,
-        store,
-        domain,
-        queue,
+        store: store.store,
+        token: store.token,
+        domain: store.domain,
         id: field.themes[target],
         url: `${base}/admin/themes/${field.themes[target]}/assets.json`
       });
@@ -786,7 +837,7 @@ async function getStyles (config: PartialDeep<IConfig>, pkg: IPackage) {
       }
     }
 
-    if (has('watch', style)) {
+    if (config.mode.watch && has('watch', style)) {
 
       if (isArray(style.watch)) {
 
@@ -913,28 +964,6 @@ async function getIcons (config: PartialDeep<IConfig>, transform: IOptions['tran
 /* -------------------------------------------- */
 /* UTILITIES                                    */
 /* -------------------------------------------- */
-
-/**
- * Store Authorization URL
- *
- * Generate the the authorization URL to
- * be used for requests.
- */
-function getURL (domain: string, env: object): false | string {
-
-  const api_key = domain + '_api_key';
-  const password = domain + '_password';
-
-  if (has(api_key, env) || has(api_key.toUpperCase(), env)) {
-    if (has(password, env) || has(password.toUpperCase(), env)) {
-      return `https://${env[api_key]}:${env[password]}@${domain}.myshopify.com`;
-    } else {
-      throw new Error(`Missing "${password}" credential for store "${domain}"`);
-    }
-  } else {
-    throw new Error(`Missing "${api_key}" credential for store "${domain}"`);
-  }
-}
 
 /*
 async function getRedirects (config: PartialDeep<IConfig>, options: IOptions) {

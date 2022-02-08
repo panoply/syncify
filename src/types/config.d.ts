@@ -8,13 +8,13 @@ import { Options } from 'html-minifier-terser';
 
 export interface IThemes {
   /**
-   * Whether or not we require queued requests
-   */
-  queue: boolean;
-  /**
    * The store domain name in Upcase (without `myshopify.com`)
    */
   store: string;
+  /**
+   * The store token (returns `null` is using API key and secret)
+   */
+  token: string;
   /**
    * The store myshopify domain, eg: `store.myshopify.com`
    */
@@ -216,9 +216,9 @@ export interface IStore {
    */
   domain: string;
   /**
-   * Whether or not we require queued requests
+   * The store token (returns `null` is using API key and secret)
    */
-  queue: boolean;
+  token: string;
   /**
    * Preset API endpoint URLs
    */
@@ -298,7 +298,7 @@ export interface IConfig {
   /**
    * The mode from which Syncify was intialized.
    */
-  mode: 'cli' | 'api';
+  cli: boolean;
   /**
    * The resource to execute, eg: 'watch', 'upload' or 'download'
    */
@@ -356,39 +356,88 @@ export interface IConfig {
    */
   config: string;
   /**
+   * The operation to run
+   */
+  mode: {
+    /**
+     * Shows help information
+     */
+    help: boolean;
+    /**
+     * Execute a build
+     */
+    build: boolean;
+    /**
+     * Execute watch
+     */
+    watch: boolean;
+    /**
+     * Execute Upload
+     */
+    upload: boolean;
+    /**
+     * Execute Download
+     */
+    download: boolean;
+    /**
+     * Execute Clean
+     */
+    clean: boolean;
+    /**
+     * Generates VSC Schema spec file
+     */
+    vsc: boolean;
+  }
+  /**
    * Directory structure paths
    */
   paths: {
     /**
      * An array list of files to be uploaded as assets
+     *
+     * @default 'source/assets'
      */
     assets: Tester;
     /**
      * An array list of files to be uploaded as snippets
+     *
+     * @default 'source/snippets'
      */
     snippets: Tester;
     /**
      * An array list of files to be uploaded as sections
+     *
+     * @default 'source/sections'
      */
     sections: Tester;
     /**
      * An array list of files to be uploaded as layouts
+     *
+     * @default 'source/layout'
      */
     layout: Tester;
     /**
      * An array list of files to be uploaded as templates
+     *
+     * @default 'source/templates'
      */
     templates: Tester;
     /**
      * An array list of files to be uploads as template/customers
+     *
+     * @default 'source/templates/customers'
      */
     customers: Tester;
     /**
      * An array list of files to be uploaded as configs
+     *
+     * @default 'source/config'
      */
     config: Tester;
     /**
      * An array list of files to be uploaded as locales
+     *
+     * @default 'source/locales'
      */
     locales: Tester;
     /**

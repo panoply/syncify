@@ -3,10 +3,10 @@ import { ICLIOptions, Syncify } from 'types';
 import { upload } from 'sync/upload';
 import { build } from 'sync/build';
 import { watch } from 'sync/watch';
+import { prompt } from 'cli/prompts';
 import { readConfig } from 'config/config';
 import { help } from 'cli/help';
 import * as log from 'cli/logs';
-import * as cli from 'cli/prompts';
 
 /**
  * Client
@@ -27,24 +27,21 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
 
     try {
 
-      switch (config.resource) {
-        case 'interactive':
-          return cli.options(config);
-        case 'watch':
-          return watch(config, callback);
-        case 'build':
-          await build(config, callback);
-          break;
-        case 'upload':
-          return upload(config, callback);
-        case 'download':
-        //  await download(config);
-          break;
-        default:
-          process.stdout.write(help);
+      if (config.mode.vsc) {
+        return null;
+      } else if (config.mode.build) {
+        return build(config, callback);
+      } else if (config.mode.watch) {
+        return watch(config, callback);
+      } else if (config.mode.upload) {
+        return upload(config, callback);
+      } else if (config.mode.download) {
+        return null;
+      } else if (config.mode.help) {
+        return process.stdout.write(help);
       }
 
-      // if (typeof result !== 'undefined') process.stdout.write(result as string);
+      return prompt(config);
 
     } catch (error) {
 

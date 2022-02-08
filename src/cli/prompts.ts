@@ -68,8 +68,10 @@ async function resource (config: IConfig) {
       if (prompt.name === 'resource') {
 
         switch (answer) {
+          case 'clean':
           case 'watch':
           case 'upload':
+          case 'build':
           case 'download': config.resource = answer; break;
         }
 
@@ -127,7 +129,7 @@ async function query (
         {
           title: 'pages',
           description: 'Search pages in the shop',
-          value: 'upload'
+          value: 'pages'
         },
         {
           title: 'redirects',
@@ -174,7 +176,7 @@ async function themes (
   }
 ) {
 
-  const { assets } = config.sync;
+  const { themes } = config.sync;
   const prompt = await prompts(options.stores.map(
     (
       store
@@ -183,7 +185,7 @@ async function themes (
       name: store,
       message: toUpcase(store) + ' Themes',
       instructions: false,
-      choices: assets.filter(v => toLower(v.store) === store).map(
+      choices: themes.filter(v => toLower(v.store) === store).map(
         (
           {
             id,
@@ -198,7 +200,7 @@ async function themes (
     })
   ));
 
-  config.sync.assets = assets.filter(v => prompt[toLower(v.store)].includes(v.target));
+  config.sync.themes = themes.filter(v => prompt[toLower(v.store)].includes(v.target));
 
   return prompt;
 
@@ -207,8 +209,4 @@ async function themes (
 /**
  * Target
  */
-export async function options (config: IConfig): Promise<any> {
-
-  return resource(config);
-
-}
+export const prompt = async (config: IConfig): Promise<any> => resource(config);

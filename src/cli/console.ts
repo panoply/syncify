@@ -4,19 +4,23 @@ import { kill, spawned, spawns } from 'cli/spawn';
 import * as ansi from 'cli/ansi';
 import * as c from 'cli/colors';
 import { IConfig } from 'types';
+import { queue } from 'requests/queue';
+import { clean } from 'sync/clean';
 
 interface ILoggers {
   tracked?: string;
   files?: (...message: string[]) => void,
-  metafields?: (message: string) => void,
-  redirects?: (message: string) => void,
+  clean?: (...message: string[]) => void,
   throw?: (message: string) => void,
   error?: (...message: string[]) => void,
+  print?: (...message: string[]) => void,
 }
 
 /* -------------------------------------------- */
 /* EXPORTED LETTINGS                            */
 /* -------------------------------------------- */
+
+export const ran: Set<string> = new Set();
 
 /**
  * Log Instances
@@ -50,7 +54,7 @@ export const nodes: { [label: string]: string } = {};
  */
 const tracer = (config: IConfig, reset: boolean = false) => (name: string, group: string) => {
 
-  if (name === log.tracked) return;
+  if (name === log.tracked || name === 'print') return;
   if (isUndefined(log.tracked)) process.stdout.write(ansi.header(config));
   if (!reset) reset = true;
 
@@ -141,34 +145,48 @@ export function clear (isSoft?: boolean) {
  * nodes are generated and state is written in a
  * progressive manner.
  */
-export function create (config: IConfig, panes: string[]) {
+export const create = async (config: IConfig, panes: string[]) => {
 
   const pipe = stdout(config);
-
-  if (config.resource !== 'upload') {
-    for (const child in config.spawns) {
-      nodes[child] = nil;
-      spawned(child, config.spawns[child], pipe(child).spawn);
-    }
-  }
 
   for (const script of panes) {
     nodes[script] = nil;
     log[script] = pipe(script).print;
   }
 
-  return kill(() => {
+  if (config.mode.clean) await clean(config, log.clean);
 
-    let first: boolean = true;
+  if (config.resource !== 'upload') {
+    for (const process in config.spawns) {
+      nodes[process] = nil;
+      spawned(process, config, pipe(process).spawn);
+    }
+  }
 
-    spawns.forEach((child, name) => {
-      child.kill();
-      console.log((first ? '\n- ' : '- ') + c.gray.italic(name + ' process exited'));
-      first = false;
+  if (spawns.size > 0) {
+
+    kill(() => {
+
+      let first: boolean = true;
+
+      spawns.forEach(([ name, child ]) => {
+        child.kill();
+        console.log(
+          (
+            (
+              first ? '\n- ' : '- '
+            ) + c.gray.italic(name + '(' + child.pid + ')' + ' process exited')
+          )
+        );
+        first = false;
+      });
+
+      queue.pause();
+      queue.clear();
+      spawns.clear();
+      process.exit(0);
+
     });
 
-    spawns.clear();
-    process.exit(0);
-
-  });
+  }
 };

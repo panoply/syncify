@@ -145,6 +145,12 @@ export const getConfigs = async (config: IConfig, files: string[]) => {
 
 };
 
+export const convertTimer = (ms: number) => {
+  const m = Math.floor(ms / 60000);
+  const s = ((ms % 60000) / 1000).toFixed(0);
+  return m > 0 ? (m + 'min' + (Number(s) < 10 ? '0' : '') + s) : s;
+};
+
 /**
  * Get Required modules
  *
