@@ -362,40 +362,40 @@ The `export` option refers to a directory where packaged (.zip) themes will be w
 The `paths` option allows you to define a custom set of paths to theme specific files which are contained within the `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify as paths a re-routed to the defined `output` directory which adheres to the structure which is imposed. Each path option accepts an `array` of glob ([anymatch](https://www.npmjs.com/package/anymatch)) patterns. By default, Syncify assumes you are using the basic-bitch structure.
 
 ```
-CUSTOM DIRECTORY STRUCTURE          BASIC BITCH STRUCTURE        OUTPUT STRUCTURE
+      CUSTOM DIRECTORY STRUCTURE          BASIC BITCH STRUCTURE        OUTPUT STRUCTURE
 
-┌─ config                           ┌─ source                     ┌─ assets
-│  ├─ rollup.config.js              │  ├─ assets                  ├─ config
-│  ├─ postcss.config.js             │  ├─ config                  ├─ layout
-│  └─ svgo.config.js                │  ├─ layout                  ├─ sections
-├─ source                           │  ├─ metafields              ├─ snippets
-│  ├─ assets                        │  ├─ sections                ├─ templates
-│  │  ├─ files                      │  ├─ snippets                └─ customer
-│  │  ├─ icons                      │  └─ templates
-│  │  │  ├─ inline                  │     └─ customers
-│  │  │  └─ sprite                  ├── .env
-│  │  └─ images                     ├── .liquidrc
-│  ├─ data                          ├── redirects.yml
-│  │  ├─ config                     └── package.json
-│  │  ├─ locales
-│  │  └─ metafields
-│  │     └─ namespace
-│  ├─ styles
-│  ├─ scripts
-│  └─ views
-│     ├─ customers
-│     ├─ sections
-│     │  ├─ layout
-│     │  ├─ pages
-│     │  ├─ product
-│     │  └─ shared
-│     ├─ snippets
-│     ├─ templates
-│     └─ theme.liquid
-├── .env
-├── .liquidrc
-├── redirects.yml
-└── package.json
+      ┌─ config                           ┌─ source                     ┌─ assets
+      │  ├─ rollup.config.js              │  ├─ assets                  ├─ config
+      │  ├─ postcss.config.js             │  ├─ config                  ├─ layout
+      │  └─ svgo.config.js                │  ├─ layout                  ├─ sections
+      ├─ source                           │  ├─ metafields              ├─ snippets
+      │  ├─ assets                        │  ├─ sections                ├─ templates
+      │  │  ├─ files                      │  ├─ snippets                └─ customer
+      │  │  ├─ icons                      │  └─ templates
+      │  │  │  ├─ inline                  │     └─ customers
+      │  │  │  └─ sprite                  ├── .env
+      │  │  └─ images                     ├── .liquidrc
+      │  ├─ data                          ├── redirects.yml
+      │  │  ├─ config                     └── package.json
+      │  │  ├─ locales
+      │  │  └─ metafields
+      │  │     └─ namespace
+      │  ├─ styles
+      │  ├─ scripts
+      │  └─ views
+      │     ├─ customers
+      │     ├─ sections
+      │     │  ├─ layout
+      │     │  ├─ pages
+      │     │  ├─ product
+      │     │  └─ shared
+      │     ├─ snippets
+      │     ├─ templates
+      │     └─ theme.liquid
+      ├── .env
+      ├── .liquidrc
+      ├── redirects.yml
+      └── package.json
 ```
 
 ### Spawn
