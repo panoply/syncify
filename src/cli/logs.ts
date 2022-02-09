@@ -5,7 +5,7 @@ import * as tui from 'cli/ansi';
 import { log } from 'cli/console';
 import { IConfig, IFile } from 'types';
 import type { SourceSpan, Exception } from 'sass';
-import { hasPath } from 'rambdax';
+import { has, hasPath } from 'rambdax';
 import { is } from 'shared/native';
 import { byteConvert } from 'shared/helpers';
 
@@ -133,7 +133,12 @@ export const fileTask = (file: IFile, message: string) => {
     log.files(tui.task(c.orange(`✓ ${message} ${c.gray('in')} ${time(file.path)}`)));
     marky.mark(file.path);
   } else {
-    log.files(tui.task(c.greenBright(`✓ ${file.key}`)));
+
+    if (has(file.namespace, log)) {
+      log[file.namespace](tui.task(c.greenBright(`✓ ${file.key}`)));
+    }
+
+    // log.files(tui.task(c.greenBright(`✓ ${file.key}`)));
   }
 
 };
@@ -152,7 +157,11 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
     if (hasMarks) {
       log.files(tui.task(c.greenBright(`✓ ${shop} ${c.gray('in')} ${time('c')}`)));
     } else {
-      log.files(tui.task(c.greenBright(`✓ ${shop}`)));
+      if (has(file.namespace, log)) {
+        log[file.namespace](tui.task(c.greenBright(`✓ ${file.key}`)));
+      } else {
+        log.files(tui.task(c.greenBright(`✓ ${shop}`)));
+      }
     }
 
   } else {
@@ -163,7 +172,7 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
 };
 
 /**
- * File Upload
+ * File Delete
  *
  * File is uploading to a store and theme
  */
@@ -202,7 +211,7 @@ export const fileWarn = (message: string) => {
  */
 export const fileError = (e: { file: string; message: string; data: string | string[] }) => {
 
-  log.files(tui.task(c.red(`⨯ ${e.message}`)), tui.indent('\n' + c.red(parse.liquidPretty(e.data))));
+  // log.files(tui.task(c.red(`⨯ ${e.message}`)), tui.indent('\n' + c.red(parse.liquidPretty(e.data))));
 
   if (hasMarks) {
     hasError = true;
