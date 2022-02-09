@@ -113,7 +113,7 @@ export const compile = async (file: IFile, options: IJson, cb: typeof Syncify.ho
 
   file.size = byteSize(data);
 
-  const space = options.minify.apply ? options.spaces : 0;
+  const space = options.minify.apply ? 0 : options.spaces;
   const refs = options.minify.removeSchemaRefs ? $schema(file, data) : data;
 
   if (!isType('Function', cb)) return transform(file, refs, space);
