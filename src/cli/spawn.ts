@@ -27,7 +27,7 @@ const exited: Set<Function> = new Set();
  * Triggers functions to run before
  * existing out of process.
  */
-function exit (manualExit: boolean, signal: number) {
+const exit = (manualExit: boolean, signal: number) => {
 
   if (triggered) return;
 
@@ -36,7 +36,7 @@ function exit (manualExit: boolean, signal: number) {
   for (const callback of exited) callback();
   if (manualExit === true) process.exit(128 + signal);
 
-}
+};
 
 /* -------------------------------------------- */
 /* EXPORTS                                      */
@@ -60,7 +60,7 @@ export const spawns: Set<[
  * An exit hook for killing running processes
  * when ctrl+c is executed.
  */
-export function kill (fn: Function) {
+export const kill = (fn: Function) => {
 
   exited.add(fn);
 
@@ -77,7 +77,7 @@ export function kill (fn: Function) {
 
   return () => exited.delete(fn);
 
-}
+};
 
 /**
  * Spawned Proccesses
@@ -86,7 +86,7 @@ export function kill (fn: Function) {
  * using spawns. The spawned process is encapsulted
  * and `stdio` is piped.
  */
-export function spawned (name: string, config: IConfig, callback: (message: string) => void) {
+export const spawned = (name: string, config: IConfig, callback: (message: string) => void) => {
 
   const command = config.spawns[name];
   const arg: string[] = /\s/g.test(command) ? command.split(' ') : [ command ];

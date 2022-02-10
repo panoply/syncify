@@ -29,6 +29,8 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
 
       if (config.mode.vsc) {
         return null;
+      } else if (config.mode.prompt) {
+        return prompt(config);
       } else if (config.mode.build) {
         return build(config, callback);
       } else if (config.mode.watch) {
@@ -40,8 +42,6 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
       } else if (config.mode.help) {
         return process.stdout.write(help);
       }
-
-      return prompt(config);
 
     } catch (error) {
 

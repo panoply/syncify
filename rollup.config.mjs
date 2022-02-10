@@ -4,27 +4,24 @@ export default rollup(
   {
     input: 'src/index.ts',
     external: [
+      'ansis',
       'anymatch',
       'axios',
-      'cross-spawn',
-      'prompts',
       'chokidar',
+      'cross-spawn',
+      'dotenv',
+      'fast-safe-stringify',
       'fs-extra',
       'glob',
+      'html-minifier-terser',
       'minimist',
-      'mkdirp',
-      'nanomatch',
-      'sass',
-      'svg-sprite',
-      'svgo',
-      'marky',
-      'prettyjson',
+      'prompts',
+      'yamljs',
+      'browser-sync',
       'postcss',
       'sass',
-      'yamljs',
-      'html-minifier-terser',
-      'svgstore',
-      'ansis'
+      'svg-sprite',
+      'svgo'
     ],
     output: [
       {
@@ -86,7 +83,6 @@ export default rollup(
             'requests',
             'sync',
             'transform'
-
           ])
         }
       ),

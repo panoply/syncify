@@ -5,7 +5,7 @@ const argv = require('minimist')(process.argv.slice(1), {
   default: {
     cli: true,
     dev: true,
-    prompt: true,
+    prompt: false,
     build: false,
     prod: false,
     watch: false,

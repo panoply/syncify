@@ -4,9 +4,6 @@ import ansis from 'ansis';
 /* CUSTOM COLORS                                */
 /* -------------------------------------------- */
 
-/**
- * Grey Lines
- */
 export const line = ansis.hex('#2a2a2e');
 
 /**

@@ -8,9 +8,10 @@ import { compile as json } from 'transform/json';
 import { glob } from 'glob';
 import { from, is } from 'shared/native';
 import { spawns } from 'cli/spawn';
-import * as log from 'cli/logs';
+import * as time from 'cli/timer';
 import anymatch from 'anymatch';
 import { last } from 'rambdax';
+import * as log from 'cli/logs';
 
 /**
  * Build Function
@@ -19,13 +20,13 @@ import { last } from 'rambdax';
  */
 const trigger = (config: IConfig, callback: typeof Syncify.hook) => {
 
-  log.timer.mark('build');
+  time.start('build');
 
   const { transform } = config;
   const parse = parseFile(config.paths, config.output);
   const match = anymatch(config.watch);
   const paths = glob.sync(config.source + '/**', { cwd: config.cwd });
-  const source = paths.filter(match);
+  const source = paths.filter(match).sort();
 
   return async () => {
 
@@ -67,7 +68,13 @@ const trigger = (config: IConfig, callback: typeof Syncify.hook) => {
       /* LAYOUTS AND SNIPPETS                         */
       /* -------------------------------------------- */
 
-      else if (is(file.type, Type.Layout) || is(file.type, Type.Snippet)) {
+      else if (is(file.type, Type.Layout)) {
+
+        await liquid(file, transform.views.minify, callback);
+
+      }
+
+      else if (is(file.type, Type.Snippet)) {
 
         await liquid(file, transform.views.minify, callback);
 
@@ -77,7 +84,13 @@ const trigger = (config: IConfig, callback: typeof Syncify.hook) => {
       /* CONFIG AND LOCALES                           */
       /* -------------------------------------------- */
 
-      else if (is(file.type, Type.Config) || is(file.type, Type.Locale)) {
+      else if (is(file.type, Type.Config)) {
+
+        await json(file, transform.json, callback);
+
+      }
+
+      else if (is(file.type, Type.Locale)) {
 
         await json(file, transform.json, callback);
 

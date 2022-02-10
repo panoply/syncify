@@ -14,7 +14,7 @@ import { byteSize } from 'shared/helpers';
  *
  * Strips `$schema` spec field from JSON
  */
-export const $schema = (file: IFile, data: { $schema?: string }) => {
+export function $schema (file: IFile, data: { $schema?: string }) {
 
   if (!has('$schema', data)) return data;
 
@@ -33,7 +33,7 @@ export const $schema = (file: IFile, data: { $schema?: string }) => {
  *
  * Parses a string into valid JSON
  */
-export const parse = (data: string) => {
+export function parse (data: string) {
 
   try {
 
@@ -57,7 +57,7 @@ export const parse = (data: string) => {
  * comments be provided, this function strips
  * them and will push a minified to the store.
  */
-export const minify = (data: string, space = 0): any => {
+export function minify (data: string, space = 0): any {
 
   try {
 
@@ -80,7 +80,7 @@ export const minify = (data: string, space = 0): any => {
  * passed in file and contents. We do not publish
  * metafield file types to output directory.
  */
-export const transform = (file: IFile, data: string, space = 0): any => {
+export function transform (file: IFile, data: string, space = 0): any {
 
   const minified = minify(data, space);
 
@@ -88,8 +88,11 @@ export const transform = (file: IFile, data: string, space = 0): any => {
 
   if (is(space, 0)) {
     log.fileTask(file, 'minified json file');
-    log.fileSize(file.size, byteSize(minified));
+  } else {
+    log.fileTask(file, 'processed json file');
   }
+
+  log.fileSize(file.size, byteSize(minified));
 
   if (is(file.type, Type.Metafield)) {
     return minified;
@@ -107,7 +110,7 @@ export const transform = (file: IFile, data: string, space = 0): any => {
  * cb that one can optionally execute
  * from within scripts.
  */
-export const compile = async (file: IFile, options: IJson, cb: typeof Syncify.hook): Promise<string> => {
+export async function compile (file: IFile, options: IJson, cb: typeof Syncify.hook): Promise<string> {
 
   const data = await readJson(file.path);
 

@@ -7,10 +7,10 @@ import * as log from 'cli/logs';
 
 export const upload = async (config: IConfig, cb?: typeof Syncify.hook): Promise<void> => {
 
-  log.timer.mark('upload');
+  log.time.start('upload');
 
   const parse = outputFile(config.output);
-  const files = glob.sync(`${config.output}/**`, { nodir: true, cwd: config.cwd });
+  const files = glob.sync(`${config.output}/**`, { nodir: true, cwd: config.cwd }).sort();
   const request = client(config);
 
   for (const path of files) {

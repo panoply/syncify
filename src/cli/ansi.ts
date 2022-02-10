@@ -17,7 +17,7 @@ const alignment = (themes: IThemes[]) => {
   const previews = themes.map(({ id, domain, target }) => {
     const offset = width - target.length;
     return (
-      c.line('│ ') + ' '.repeat((offset)) + c.pink(target) + ': ' +
+      c.line('│ ') + ' '.repeat((offset)) + c.pink.bold(target) + ': ' +
       c.gray('https://' + domain + '?preview_theme_id=' + id)
     );
   });
@@ -34,9 +34,9 @@ const alignment = (themes: IThemes[]) => {
  * Prepend - Prepends vertical line to texts
  *
  * ```
- * │ spawned message
- * │ spawned message
- * │ spawned message
+ * │ lorem ipsum lorem ipsum
+ * │ lorem ipsum lorem ipsum
+ * │ lorem ipsum lorem ipsum
  * ```
  */
 export const indent = (message: string) => message.replace(/^/gm, c.line('│  ')) + '\n';
@@ -60,28 +60,33 @@ export const indent = (message: string) => message.replace(/^/gm, c.line('│  '
  * │
  * ```
  */
-export const header = ({ sync, spawns, resource, env, mode }: IConfig) => {
+export const header = ({ sync, spawns, env, mode }: IConfig) => {
 
   const stores = c.cyan.bold(String(sync.stores.length)) + (sync.stores.length > 1 ? ' stores' : ' store');
   const themes = c.cyan.bold(String(sync.themes.length)) + (sync.themes.length > 1 ? ' themes' : ' theme');
   const preview = alignment(sync.themes);
 
+  let running: string;
+
+  if (mode.build) running = 'build';
+  if (mode.watch) running = 'watch';
+  if (mode.upload) running = 'upload';
+  if (mode.download) running = 'download';
+
   let heading: string = '\n' + (
     c.line('┌─ ') + c.cyan.bold('Syncify ') + c.gray('<!version!>') + '\n' +
     c.line('│ ') + '\n' +
-    c.line('│ ') + 'Running ' + c.cyan.bold(resource) + ' mode in ' + c.cyan.bold(env) + '\n' +
+    c.line('│ ') + 'Running ' + c.cyan.bold(running) + ' mode in ' + c.cyan.bold(env) + '\n' +
     c.line('│ ') + 'Syncing to ' + stores + '  and ' + themes + '\n'
   );
 
   if (!isNil(spawns)) {
-    const spawnz = keys(spawns).length;
-    const spawned = c.cyan.bold(String(spawnz)) + (spawnz > 1 ? ' child processes' : ' child process');
+    const size = keys(spawns).length;
+    const spawned = c.cyan.bold(String(size)) + (size > 1 ? ' child processes' : ' child process');
     heading += c.line('│ ') + 'Spawned ' + spawned + '\n' + c.line('│\n');
   }
 
-  if (mode.build) return heading;
-
-  return heading + (
+  return (mode.build || mode.clean) ? heading : heading + (
     c.line('│ ') + 'Previews:' + c.line('\n│\n') + preview + '\n' +
     c.line('│ ') + '\n'
   );
@@ -101,7 +106,7 @@ export const group = (title: string) => (
  *
  * `│`
  */
-export const task = (message: string) => c.line('│ ') + message + '\n';
+export const task = (message: string) => c.line('├ ') + message + '\n';
 
 /**
  * Footer - Printed as the very bottom

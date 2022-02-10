@@ -1,20 +1,11 @@
-import { render } from 'prettyjson';
 import { isObject, isArray, nil, isUndefined, isFunction } from 'shared/native';
 import { kill, spawned, spawns } from 'cli/spawn';
 import * as ansi from 'cli/ansi';
 import * as c from 'cli/colors';
-import { IConfig } from 'types';
+import { IConfig, ILog } from 'types';
 import { queue } from 'requests/queue';
 import { clean } from 'sync/clean';
-
-interface ILoggers {
-  tracked?: string;
-  files?: (...message: string[]) => void,
-  clean?: (...message: string[]) => void,
-  throw?: (message: string) => void,
-  error?: (...message: string[]) => void,
-  print?: (...message: string[]) => void,
-}
+import stringify from 'fast-safe-stringify';
 
 /* -------------------------------------------- */
 /* EXPORTED LETTINGS                            */
@@ -28,7 +19,7 @@ export const ran: Set<string> = new Set();
  * This object is populated within `create()` and will hold
  * a reference to each log group.
  */
-export const log: ILoggers = { tracked: undefined };
+export const log: ILog = { tracked: undefined };
 
 /* -------------------------------------------- */
 /* EXPORTED CONSTANTS                           */
@@ -87,7 +78,7 @@ const logger = (trace: ReturnType<typeof tracer>) => (name: string, wrap?: (para
       if (Buffer.isBuffer(text)) {
         text = text.toString();
       } else if (isObject(text) || isArray(text)) {
-        text = render(text);
+        text = stringify(text);
       } else {
         text = String(text);
       }
@@ -95,8 +86,20 @@ const logger = (trace: ReturnType<typeof tracer>) => (name: string, wrap?: (para
       process.stdout.write(spawn ? wrap(text) : text);
 
     }
-
   };
+};
+
+/**
+ * Clear CLI
+ *
+ * Clears the console logs. Accepts
+ * a boolean which will determine whether
+ * or not clear (`ctrl+k`) or remove the
+ * previous logged outputs.
+ */
+const clear = (isSoft?: boolean) => {
+
+  process.stdout.write(isSoft ? '\x1B[H\x1B[2J' : '\x1B[2J\x1B[3J\x1B[H\x1Bc');
 
 };
 
@@ -125,31 +128,36 @@ const stdout = (config: IConfig) => {
 /* -------------------------------------------- */
 
 /**
- * Clear CLI
- *
- * Clears the console logs. Accepts
- * a boolean which will determine whether
- * or not clear (`ctrl+k`) or remove the
- * previous logged outputs.
- */
-export function clear (isSoft?: boolean) {
-
-  process.stdout.write(isSoft ? '\x1B[H\x1B[2J' : '\x1B[2J\x1B[3J\x1B[H\x1Bc');
-
-};
-
-/**
  * Create Consoles
  *
  * Generates a tabbed TUI panes within. Multiple
  * nodes are generated and state is written in a
  * progressive manner.
  */
-export const create = async (config: IConfig, panes: string[]) => {
+export const create = async (config: IConfig) => {
 
   const pipe = stdout(config);
+  const labels = config.mode.build ? [
+    'assets',
+    'config',
+    'layout',
+    'locales',
+    'sections',
+    'snippets',
+    'templates',
+    'metafields',
+    'print'
+  ] : [
+    'print',
+    'throw',
+    'error',
+    'clean',
+    'files'
+  ];
 
-  for (const script of panes) {
+  if (config.mode.clean) labels.push('clean');
+
+  for (const script of labels) {
     nodes[script] = nil;
     log[script] = pipe(script).print;
   }
@@ -167,18 +175,9 @@ export const create = async (config: IConfig, panes: string[]) => {
 
     kill(() => {
 
-      let first: boolean = true;
-
       spawns.forEach(([ name, child ]) => {
         child.kill();
-        console.log(
-          (
-            (
-              first ? '\n- ' : '- '
-            ) + c.gray.italic(name + '(' + child.pid + ')' + ' process exited')
-          )
-        );
-        first = false;
+        console.log('- ' + c.gray.italic(name + '(' + child.pid + ')' + ' process exited'));
       });
 
       queue.pause();
@@ -189,4 +188,7 @@ export const create = async (config: IConfig, panes: string[]) => {
     });
 
   }
+
+  return config;
+
 };

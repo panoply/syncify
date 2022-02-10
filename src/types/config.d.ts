@@ -3,6 +3,45 @@ import { Tester } from 'anymatch';
 import { Options } from 'html-minifier-terser';
 
 /* -------------------------------------------- */
+/* MODES                                        */
+/* -------------------------------------------- */
+
+export interface IModes {
+  /**
+   * Run the command prompt
+   */
+  prompt: boolean;
+  /**
+   * Shows help information, alias: `-h`
+   */
+  help: boolean;
+  /**
+   * Execute a build, alias: `-b`
+   */
+  build: boolean;
+  /**
+   * Execute watch, alias: `-w`
+   */
+  watch: boolean;
+  /**
+   * Execute Upload, alias: `-u`
+   */
+  upload: boolean;
+  /**
+   * Execute Download, alias: `-d`
+   */
+  download: boolean;
+  /**
+   * Execute Clean, alias: `-c`
+   */
+  clean: boolean;
+  /**
+   * Generates VSC Schema spec file
+   */
+  vsc: boolean;
+}
+
+/* -------------------------------------------- */
 /* THEMES                                       */
 /* -------------------------------------------- */
 
@@ -332,6 +371,27 @@ export interface IConfig {
    */
   source: string;
   /**
+   * Redirect Sync
+   */
+  redirects: {
+
+    [store: IStore['domain']]: {
+      /**
+       * The redirect id, this is optional and applied
+       * only when redirect exists.
+       */
+      id?: number;
+      /**
+       * The redirect pathname
+       */
+      path?: string;
+      /**
+       * The redirect target path
+       */
+      target?: string;
+    }
+  };
+  /**
    * The resolved `output` directory path
    *
    * @default 'theme'
@@ -358,36 +418,7 @@ export interface IConfig {
   /**
    * The operation to run
    */
-  mode: {
-    /**
-     * Shows help information
-     */
-    help: boolean;
-    /**
-     * Execute a build
-     */
-    build: boolean;
-    /**
-     * Execute watch
-     */
-    watch: boolean;
-    /**
-     * Execute Upload
-     */
-    upload: boolean;
-    /**
-     * Execute Download
-     */
-    download: boolean;
-    /**
-     * Execute Clean
-     */
-    clean: boolean;
-    /**
-     * Generates VSC Schema spec file
-     */
-    vsc: boolean;
-  }
+  mode: IModes
   /**
    * Directory structure paths
    */
@@ -474,27 +505,6 @@ export interface IConfig {
    * can run concurrently.
    */
   sync: {
-    /**
-     * Redirect Sync
-     */
-    redirects: {
-
-      [store: IStore['domain']]: {
-        /**
-         * The redirect id, this is optional and applied
-         * only when redirect exists.
-         */
-        id?: number;
-        /**
-         * The redirect pathname
-         */
-        path?: string;
-        /**
-         * The redirect target path
-         */
-        target?: string;
-      }
-    };
     /**
      * Metafield synchronization options
      */

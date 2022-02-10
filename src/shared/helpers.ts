@@ -135,7 +135,11 @@ export const byteConvert = (bytes: number): string => {
 export const getConfigs = async (config: IConfig, files: string[]) => {
 
   const file = files.shift();
-  const path = join(config.cwd, config.config, file);
+
+  const path = (file.endsWith('.yaml') || file.endsWith('.yml'))
+    ? join(config.cwd, file)
+    : join(config.cwd, config.config, file);
+
   const exists = await pathExists(path);
 
   if (exists) return path;

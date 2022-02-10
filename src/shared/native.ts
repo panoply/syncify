@@ -49,3 +49,8 @@ export const isString = isType('String');
  * is Function
  */
 export const isFunction = isType('Function');
+
+/**
+ * is Async
+ */
+export const isAsync = isType('Async');

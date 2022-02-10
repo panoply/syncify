@@ -11,6 +11,7 @@ import http from 'http';
 export const axios = connect.create(
   {
     responseType: 'json',
+    headers: {},
     httpAgent: new http.Agent(
       {
         keepAlive: true
@@ -35,6 +36,6 @@ export const queue = new Queue(
   {
     concurrency: 5,
     interval: 500,
-    intervalCap: 4
+    intervalCap: 5
   }
 );

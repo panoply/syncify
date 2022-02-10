@@ -1,4 +1,3 @@
-import * as marky from 'marky';
 import * as c from 'cli/colors';
 import * as parse from 'cli/parse';
 import * as tui from 'cli/ansi';
@@ -8,16 +7,17 @@ import type { SourceSpan, Exception } from 'sass';
 import { has, hasPath } from 'rambdax';
 import { is } from 'shared/native';
 import { byteConvert } from 'shared/helpers';
-
-let hasError: boolean = false;
-let hasMarks: boolean = false;
-let logBuild: boolean = false;
+import * as time from 'cli/timer';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
 /* -------------------------------------------- */
 
-export * as timer from 'marky';
+export * as time from 'cli/timer';
+
+let hasError: boolean = false;
+let hasMarks: boolean = false;
+let logBuild: boolean = false;
 
 /**
  * Define Preset
@@ -26,48 +26,6 @@ export * as timer from 'marky';
  * when we are triggering a certain build mode.
  */
 export const presets = (config: IConfig['mode']) => { logBuild = config.build; };
-
-/**
- * Build Time
- *
- * Returns the build time in miliseconds
- */
-export const time = (id: string) => (`${marky.stop(id).duration.toFixed(0)}ms`);
-
-/* -------------------------------------------- */
-/* SHARED LOGGERS                               */
-/* -------------------------------------------- */
-
-/**
- * Clean Log
- *
- * Prints the clean operation when flag is passed
- */
-export const cleanTask = (files: number) => {
-
-  if (is(files, 0)) {
-    log.clean(tui.task(c.greenBright('✓ output directory is clean')));
-    return false;
-  }
-
-  marky.mark('clean');
-
-  log.clean(
-    tui.task(c.cyanBright(`${c.bold('+')} cleaning ${c.bold(String(files))} files output directory`))
-  );
-
-  return (dir: string, result: number) => {
-    log.clean(
-      tui.task(
-        c.greenBright(`✓ removed ${c.bold(String(result))} of ${c.bold(String(files))} files`)
-      ),
-      tui.task(
-        c.greenBright(`✓ cleaned ${c.white('\'')}${dir}/**${c.white('\'')} ${c.gray('in')} ${time('clean')}`)
-      )
-    );
-  };
-
-};
 
 /* -------------------------------------------- */
 /* FILE LOGGERS                                 */
@@ -82,11 +40,10 @@ export const fileSize = (before: number, after: number) => {
 
   if (is(before, 0) || !is(before, after)) return;
 
-  const saved = byteConvert(before - after);
-  const size = byteConvert(after);
-
   log.files(
-    tui.task(c.pink(`𐄹 filesize is ${size} saved ${saved}`))
+    tui.task(
+      c.pink(`𐄹 filesize is ${byteConvert(after)} saved ${byteConvert(before - after)}`)
+    )
   );
 
 };
@@ -100,12 +57,16 @@ export const fileChange = (file: IFile) => {
 
   if (hasError) hasError = false;
   if (logBuild) {
-    marky.mark('c');
-    marky.mark(file.path);
+    time.start('c');
+    time.start(file.path);
     hasMarks = true;
   }
 
-  log.files(tui.task(c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`)));
+  log.files(
+    tui.task(
+      c.cyan(`${c.bold('+')} modified ${c.bold(file.path)}`)
+    )
+  );
 
 };
 
@@ -116,9 +77,13 @@ export const fileChange = (file: IFile) => {
  */
 export const fileRemove = (file: IFile) => {
 
-  marky.mark(file.key);
+  time.start(file.key);
 
-  log.files(tui.task(c.orange('⌧ deleted ' + file.key)));
+  log.files(
+    tui.task(
+      c.orange('⌧ deleted ' + file.key)
+    )
+  );
 
 };
 
@@ -130,8 +95,8 @@ export const fileRemove = (file: IFile) => {
 export const fileTask = (file: IFile, message: string) => {
 
   if (hasMarks) {
-    log.files(tui.task(c.orange(`✓ ${message} ${c.gray('in')} ${time(file.path)}`)));
-    marky.mark(file.path);
+    log.files(tui.task(c.orange(`✓ ${message} ${c.gray('in')} ${time.stop(file.path)}`)));
+    time.start(file.path);
   } else {
 
     if (has(file.namespace, log)) {
@@ -155,7 +120,7 @@ export const fileSync = (file: IFile, store: string, theme: string) => {
     const shop = `uploaded ${file.key} ${c.gray('to')} ${c.magenta(theme)} ${c.gray('on')} ${c.blue(store)}`;
 
     if (hasMarks) {
-      log.files(tui.task(c.greenBright(`✓ ${shop} ${c.gray('in')} ${time('c')}`)));
+      log.files(tui.task(c.greenBright(`✓ ${shop} ${c.gray('in')} ${time.stop('c')}`)));
     } else {
       if (has(file.namespace, log)) {
         log[file.namespace](tui.task(c.greenBright(`✓ ${file.key}`)));
@@ -215,7 +180,7 @@ export const fileError = (e: { file: string; message: string; data: string | str
 
   if (hasMarks) {
     hasError = true;
-    marky.clear();
+    time.clear();
   }
 
 };
@@ -247,7 +212,7 @@ export const sassError = (error: Exception) => {
   const title = `⨯ sass error starting ${c.gray('on')} line ${error.span.start.line}${c.white(':')}`;
 
   log.files(tui.task(c.redBright(title)), tui.indent(parse.sassError(error)));
-  marky.clear();
+  time.clear();
 
 };
 
@@ -281,7 +246,7 @@ export const sassWarn = (message: string, options: {
 
 export const finish = (timer: string) => {
 
-  return log.print(tui.footer(c.bold(`Generated Theme ${c.gray('in')} ${time(timer)}`)));
+  return log.print(tui.footer(c.bold(`Generated Theme ${c.gray('in')} ${time.stop(timer)}`)));
 
 };
 

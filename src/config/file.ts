@@ -86,7 +86,7 @@ export const parseFile = (paths: IConfig['paths'], output: string) => (path: str
 
   const { file, merge } = setProps(path, output);
 
-  if (/\.liquid/.test(file.ext)) {
+  if (file.ext === '.liquid') {
 
     if (paths.sections(path)) {
       return merge('sections', Type.Section);
@@ -104,7 +104,7 @@ export const parseFile = (paths: IConfig['paths'], output: string) => (path: str
       return merge('templates/customers', Type.Template);
     }
 
-  } else if (/\.json/.test(file.ext)) {
+  } else if (file.ext === '.json') {
 
     if (paths.metafields(path)) {
       return merge(lastPath(file.dir), Type.Metafield);

@@ -1,3 +1,52 @@
+/* -------------------------------------------- */
+/* LOGGER                                       */
+/* -------------------------------------------- */
+
+type Log = (...message: string[]) => void
+
+export interface IBuildLog {
+  /**
+   * Assets Group
+   */
+  assets?: Log,
+  /**
+   * Sections Group
+   */
+  sections?: Log,
+  /**
+   * Snippets Group
+   */
+  snippets?: Log,
+  /**
+   * Layout Group
+   */
+  layout?: Log,
+  /**
+   * Templates Group
+   */
+  templates?: Log,
+  /**
+   * Config Group
+   */
+  config?: Log,
+  /**
+   * Locales Group
+   */
+  locales?: Log,
+  /**
+   * Metafields Group
+   */
+  metafields?: Log,
+}
+
+export interface ILog extends IBuildLog {
+  tracked?: string;
+  files?: Log,
+  clean?: Log,
+  throw?: Log,
+  error?: Log,
+  print?: Log,
+}
 
 /* -------------------------------------------- */
 /* CLI OPTIONS                                  */
@@ -28,6 +77,18 @@ export interface ICLIOptions {
    *  The resource to be executed
    */
   resource?: string;
+  /**
+   *  Run in production mode
+   */
+  prod?: boolean;
+  /**
+   *  Run in development mode
+   */
+  dev?: boolean;
+  /**
+   * Show command prompt
+   */
+  prompt?: boolean;
   /**
    *  Run in watch mode
    */

@@ -5,23 +5,17 @@
   "main": "index.js",
   "license": "ISC",
   "scripts": {
-    "test:prompts": "syncify",
-    "test:vsc": "syncify vsc",
+    "test:syncify": "syncify",
+    "test:vsc": "syncify --vsc",
     "test:export": "syncify export",
-    "test:build": "syncify build",
-    "test:build:prod": "syncify build",
+    "test:build": "syncify --build",
+    "test:build:prod": "syncify -b --prod",
     "test:watch": "syncify watch -s syncify -t test,dev --prod",
     "test:watch:multi": "syncify watch -s syncify,boefje --syncify dev,prod,stage,test --boefje dev,prod",
-    "test:upload": "syncify upload --store syncify --theme test",
+    "test:upload": "sync syncify -t test -u",
     "test:upload:multi": "syncify upload --store syncify,boefje --syncify dev --boefje dev,prod",
-    "test:download": "sync watch syncify -t dev -o downloads",
-    "test:download:multi": "sync watch --store syncify,boefje --syncify dev --boefje dev,prod -o downloads/",
-    "test:spawns": "syncify watch syncify -t test --var spawns",
-    "test:spawn:rollup": "syncify watch syncify -t test --var rollup",
-    "test:spawn:postcss": "syncify watch syncify -t test --var postcss",
-    "test:spawn:webpack": "syncify watch syncify -t test --var webpack",
-    "test:spawn:esbuild": "syncify watch syncify -t test --var esbuild",
-    "test:spawn:gulp": "syncify watch syncify -t test --var gulp"
+    "test:download": "sync syncify -d -t dev",
+    "test:download:multi": "sync watch --store syncify,boefje --syncify dev --boefje dev,prod -o downloads/"
   },
   "syncify": {
     "stores": [
