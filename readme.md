@@ -68,7 +68,7 @@ After installing you will need to configure a connection to your shopify store. 
 
 <details>
 <summary>
-<strong>Private App</strong>
+<strong>Access</strong>
 </summary>
 <p>
 
