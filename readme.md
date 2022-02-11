@@ -435,6 +435,8 @@ The `import` option refers to a directory where downloaded themes will be writte
 
 The `export` option refers to a directory where packaged (.zip) themes will be written when running the `package` resource via the CLI. Packaged themes will be prepended with the version number defined in your `package.json` file and are exported as `.zip` files.
 
+</details>
+
 <details>
 <summary>
 <strong><code>metafields</code></strong>
