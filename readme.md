@@ -153,7 +153,10 @@ You need to provide Syncify read and write access to a couple admin endpoints so
 
 </details>
 
-### Credentials
+<details>
+<summary>
+<strong>Credentials</strong>
+</summary>
 
 Shop credentials are stored within a `.env` file. You can provide credentials in either uppercase of lowercase. Your store credentials **must** begin with the shop name following an underscore `_` character. Please refer to the `.env.example` file in this repository for an example. If you are syncing to multiple storefronts just follow the pattern for each store.
 
@@ -169,6 +172,8 @@ Using an **API key** and **API Secret**
 YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
+
+</details>
 
 # Configuration
 
