@@ -26,6 +26,8 @@ I have been working on the Shopify platform for last several years and nothing t
 
 # Install
 
+Install as development dependency in your project. Syncify will run a script on post-install which will add default `syncify{}` configuration options to your `package.json` file. If you are using [VS Code](https://code.visualstudio.com/) it is highly recommended that you provide the [package schema](#package-schema) to your workspace settings.
+
 **PNPM**
 
 ```cli
@@ -44,40 +46,9 @@ npm i @liquify/syncify --save-dev
 yarn add @liquify/syncify --dev
 ```
 
-# Contents
-
-- [Overview](#overview)
-  - [Theme Files](#theme-files)
-  - [Asset Pipeline](#asset-pipeline)
-  - [Built-in Support](#built-in-support)
-- [Installation](#installation)
-  - [Setup](#setup)
-  - [Scopes](#scopes)
-  - [Credentials](#credentials)
-  - [Extending Schema](#Extending-Schema)
-- [Configuration](#configuration)
-  - [Stores](#options)
-  - [Dirs](#dirs)
-  - [Paths](#paths)
-  - [Spawn](#spawn)
-  - [Transform](#transforms)
-    - [Icons](#icons)
-    - [Styles](#styles)
-    - [JSON](#json)
-    - [Views](#views)
-- [CLI Usage](#cli-usage)
-  - [Commands](#commands)
-  - [Prompts](#prompts)
-- [API Usage](#api-usage)
-  - [Export](#export)
-  - [Config File](#config-file)
-  - [Plugin](#config-file)
-  - [Utilities](#utilities)
-- [Contributing](#contributing)
-
 # Overview
 
-The main purpose of Syncify is to watch, build, download or upload files to and from your local machine to Shopify store\s via API. Syncify supports file transformation capabilities like minification and allows developers to spawn child running processes in parallel. It employs an intelligent queue-based sync/burst based upload approach.
+The main purpose of Syncify is to watch, build, download or upload files to and from your local machine to Shopify store\s via API. Syncify supports file transformation capabilities like minification, path mappings, runs spawned processes in parallel and provides an intelligent queue-based sync approach.
 
 #### Theme Files
 
@@ -89,47 +60,11 @@ Syncify does not want to re-create or impede on developer preferences and tool a
 
 #### Asset Support
 
-Syncify provides built-in support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project, Syncify will consume them and generate output by passing their configurations through the transform process.
+Syncify provides built-in support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project, Syncify will consume them and generate output using their configurations.
 
 # Setup
 
-After installing you will need to quickly configure a connection to your shopify store. In your `package.json` file you can define configuration using a `syncify{}` property. Syncify requires you provide admin API access token (recommended) or API Key and Secret as credentials. You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) to obtain this information from Shopify.
-
-<details>
-<summary>
-<strong>Schemas</strong>
-</summary>
-<p>
-
-Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
-
-**Generate using CLI**
-
-Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project. Use the following command:
-
-```
-$ syncify --vsc
-```
-
-**Provide Manually**
-
-If you wish to provide the specs manually you will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
-
-```json
-{
-  "json.schemas": [
-    {
-      "fileMatch": ["package.json"],
-      "url": "https://schema.liquify.dev/syncify.json"
-    }
-  ]
-}
-```
-
-> You can also apply this to your global workspace settings too, but it is recommended you extends schema on a per-project basis.
-
-</p>
-</details>
+After installing you will need to configure a connection to your shopify store. In your `package.json` file you can define configuration within the `syncify{}` property. Syncify requires you provide either an admin API access token (recommended) or API Key and secret as credentials. You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) to obtain this information from Shopify. Below you will find the necessary information pertaining to the setup process.
 
 <details>
 <summary>
@@ -181,169 +116,144 @@ YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 </p>
 </details>
 
+### Package Schema
+
+Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
+
+**Generate via CLI** (vscode)
+
+Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project. Use the following command:
+
+```
+$ syncify --vsc
+```
+
+**Provide Manually**
+
+If you wish to provide the specs manually you will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
+
+```json
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["package.json"],
+      "url": "https://schema.liquify.dev/syncify.json"
+    }
+  ]
+}
+```
+
+> You can also apply this to your global workspace settings too, but it is recommended you extends schema on a per-project basis.
+
 # Configuration
 
 Syncify configuration and options are defined with a `package.json` file. You can use the `"stores"` property to define theme targets. By default, Syncify will assume your _src_ files exist within a `source` directory (relative to your project root) and folders/files within the directory are structured in the default Shopify theme structure.
 
-<details>
-<summary>
-<strong>Provide Manually</strong>
-</summary>
+### Defaults
+
+The default configuration options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add [Package Schema](#package-schema) reference to your workspace settings.
 
 <!-- prettier-ignore -->
 ```jsonc
 {
   "syncify": {
-
-    // THIS SETTING IS REQUIRED
-
-    // Stores and themes to sync
-    //
     "stores": [
-      {
-        "domain": "your-store", // Your myshopify name (without .myshopify)
-        "themes": {
-          "dev": 123456789, // Theme you want to sync (key property is target name)
-          "prod": 543216789 // Another theme you want to sync
-        }
-      },
-      {
-        "domain": "example", // Optionally provide a second storefront.
-        "themes": {
-          "dev": 123456789 // Theme you want to sync (key property is target name)
-        }
+       {
+        "domain": null,
+        "themes": {}
       }
     ],
-
-    // THESE SETTINGS ARE OPTIONAL
-
-    // Directory paths
-    //
     "dirs": {
-      "input": "source", // The src directory of files, relative to the root directory.
-      "output": "theme", // The dist directory of files, relative to the root directory.
-      "import": "import", // The directory for downloaded themes
-      "export": "export", // The directory for packaged .zip theme files
-      "config": "" // The directory of build config files (eg: rollup.config.js) - defaults to root.
+      "input": "source",
+      "output": "theme",
+      "import": "import",
+      "export": "export",
+      "config": "."
     },
-
-    // Customize the directory structures
-    //
     "paths": {
-      "assets": [], // An optional list of file paths to sync to the assets directory
-      "config": [], // An optional list of paths to configuration files
-      "locales": [], // An optional list of paths to locale files
-      "layout": [], // An optional list of file paths to configuration files
-      "sections": [], // An optional list of file paths to sections
-      "snippets": [], // An optional list of file paths to snippets
-      "templates": [], // An optional list of file paths to templates
-      "customers": [], // An optional list of file paths to templates/customers
-      "metafields": [] // An optional list of directories that contain metafields
+      "assets": [],
+      "config": [],
+      "locales": [],
+      "layout": [],
+      "sections": [],
+      "snippets": [],
+      "templates": [],
+      "customers": [],
+      "metafields": []
     },
-
-    // Spawned processes to run in parallel with Syncify
-    //
     "spawn": {
-
-      // Child processes to run in watch mode
-      //
-      "watch": {
-        "rollup": "rollup -c -w", // Example of a rollup spawned process
-        "esbuild": "esbuild ./config/index.js --watch" // Example of an esbuild spawned process
-      },
-
-      // Child processes to run in build/upload mode
-      //
-      "build": {
-        "rollup": "rollup -c",
-        "esbuild": "esbuild ./config/index.js --watch"
-      }
+      "watch": {},
+      "build": {}
     },
-
-    // Transform options
-    //
     "transform": {
-
-      // SASS, SCSS files processing
-      //
       "styles": [
         {
-          "input": "", // An stylesheet input path, eg: styles/stylesheet.scss
-          "snippet": false, // Generates an inline <style> tag and outputs as a snippet
-          "rename": "", // Optionally rename the file, default to input name
-          "watch": [], // A list of file paths that when changed should trigger compile
-          "include": [], // An optional list of paths to include, eg: node_modules
+          "input": null,
+          "rename": null,
+          "watch": [],
+          "include": [],
+          "snippet": false,
           "postcss": {
-            "env": "any" // Define an environment where postcss should run
+            "env": "all"
           },
           "sass": {
-            "logWarnings": true, // If Dart SASS should log warnings to CLI
-            "sourcemap": true, // Whether or not to generate sourcemaps
-            "style": "compressed" // The output style, accepts either "compressed" or "expanded"
+            "logWarnings": true,
+            "sourcemap": true,
+            "style": "compressed"
           }
         }
       ],
 
-      // SVG icon processing
-      //
       "icons": {
-        "snippets": [], // A list of paths to SVG files to process as snippets
+        "snippets": [],
         "sprites": [
           {
-            "input": [], // A list of paths to SVG files to generate a as sprite
-            "output": "", // Sprites are exported as snippets, define the filename here
+            "input": [],
+            "output": null,
             "options": {
-              "dimensionAttributes": true, // Options passed to SVG Sprite
-              "namespaceClassnames": false, // Options passed to SVG Sprite
-              "namespaceIDS": false, // Options passed to SVG Sprite
-              "rootAttributes": {} // A key > value list of attributes to applied to Sprite
+              "dimensionAttributes": true,
+              "namespaceClassnames": false,
+              "namespaceIDS": false,
+              "rootAttributes": {}
             }
           }
         ]
       },
-
-      // JSON file processing
-      //
       "json": {
-        "spaces": 2, // Define the beautification spaces JSON files should be written using.
+        "spaces": 2,
         "minify": {
-          "env": "never", // What ENV variable should minification be applied
-          "removeSchemaRefs": true, // Strips $schema references from JSON (if any)
-          "exclude": [] // An optional list of files to exclude from minification
+          "env": "never",
+          "removeSchemaRefs": true,
+          "exclude": []
         }
       },
-
-      // Liquid file processing
-      //
       "views": {
         "sections": {
-          "allowPrefix": true, // Allow parent directory name prefix on sub dir nested sections
-          "onlyPrefixDuplicates": false, // Only apply prefixing on duplicate named snippets
-          "prefixSeparator": "_", // The separator character to use when prefixing
-          "globals": [] // A list of directories or files to never have prefixing applied
+          "allowPrefix": true,
+          "onlyPrefixDuplicates": false,
+          "prefixSeparator": "-",
+          "globals": []
         },
         "minify": {
-          "env": "never", // What ENV variable should minification be applied on templates
-          "minifyJS": true, // Whether or not to minify <script> tag contents
-          "minifyCSS": true, // Whether or not to minify <style> tag contents
-          "removeComments": true, // Whether or not to remove HTML comments
-          "collapseWhitespace": true, // Whether or not to collapse whitespace
-          "trimCustomFragments": true, // Whether or not to trim custom fragments
-          "ignoreCustomFragments": [], // A regular expression list of fragments to ignore
-          "minifySectionSchema": true, // Whether or not to minify {% schema %} contents
-          "removeLiquidComments": true, // Whether or not to remove Liquid comments
-          "removeAttributeNewlines": true, // Whether to strip newlines from HTML attribute values
-          "removeRedundantDashTrims": false, // Remove redundant whitespace dash trims from liquid tags
-          "ignoredLiquidTags": [], // A List of Liquid tags to ignore from minification
-          "exclude": [] // A list of files/paths to exclude from minification.
+          "env": "never",
+          "minifyJS": true,
+          "minifyCSS": true,
+          "removeComments": true,
+          "collapseWhitespace": true,
+          "trimCustomFragments": true,
+          "ignoreCustomFragments": [],
+          "minifySectionSchema": true,
+          "removeLiquidComments": true,
+          "removeAttributeNewlines": true,
+          "removeRedundantDashTrims": false,
+          "ignoredLiquidTags": [],
+          "exclude": []
         }
       }
     }
   }
 }
 ```
-
-</details>
 
 ### Stores
 
@@ -754,7 +664,7 @@ An array list of glob path patterns to `.json` or `.liquid` **template** files. 
 
 The spawn option accepts a key > value list of commands (scripts) which you can run in `watch` and `build` modes. Spawn allows you to leverage additional build tools and have them run in parallel with Syncify.
 
-### Define
+### Options
 
 There are 2 available modes from which you can trigger a spawned process. When a process is spawned in `watch` mode it will run along side Syncify, so you need to provide any flags the build tool may require in watch mode. Spawning a process in `build` mode will trigger the commands only 1 time, so it is here where you would pass your bundle specific command.
 
@@ -774,7 +684,7 @@ There are 2 available modes from which you can trigger a spawned process. When a
 
 In most situations you will leverage the spawn option to compile TypeScript or JavaScript assets. Below we will walk through how we can run 2 well known JavaScript bundlers, rollup and webpack together with Syncify in both watch and build modes.
 
-### Spawn Rollup
+### Rollup
 
 <!-- prettier-ignore -->
 ```json
@@ -792,7 +702,7 @@ In most situations you will leverage the spawn option to compile TypeScript or J
 }
 ```
 
-### Spawn Webpack
+### Webpack
 
 <!-- prettier-ignore -->
 ```json
@@ -812,7 +722,22 @@ In most situations you will leverage the spawn option to compile TypeScript or J
 
 # Transform
 
-TODO
+In Syncify, `input` files can be transformed and augmented. The `transform` option allows you to control how files are processed. Syncify supports processing for the following file types:
+
+- `.liquid`
+- `.json`
+- `.css`
+- `.svg`
+- `.scss`
+- `.sass`
+
+### Views
+
+### Json
+
+### Icons
+
+### Styles
 
 # CLI Usage
 
@@ -834,19 +759,18 @@ The Syncify CLI provides the following commands:
 
 ```cli
 Default:
-  $ syncify       Starts interactive CLI command prompt
+  syncify       Starts interactive CLI command prompt
 
 Aliases:
-  $ sync          An alias of syncify (can be used instead of syncify)
+  sync          An alias of syncify (can be used instead of syncify)
 
 Commands:
-  $ syncify                   Starts interactive CLI command prompt
-  $ syncify --flags           Passing flags
-  $ syncify <store> --flags   Store name or comma separated list of stores and flags
+  syncify                   Starts interactive CLI command prompt
+  syncify <store> --flags   Store name or comma separated list of stores and flags
 
 Flags:
   -b, --build            Triggers a build, use with upload to run build before uploading
-  -w, --watch            Starts watching for changes of files
+  -w, --watch            Starts watching for changes of files building when they occur
   -u, --upload           Triggers a build, use with upload to run build before uploading
   -d, --download         Downloads themes/s from specified stores
   -s, --store            A comma separated list of stores
@@ -991,11 +915,27 @@ The `package.json` configuration for the command would look like this:
 
 ### Prompts
 
-Syncify provides a helpful command prompt feature. Running `syncify` will provide you a simple prompt interface.
+Syncify provides a helpful command prompt feature. Running `syncify` will provide you a simple prompt interface from which you can use to explore endpoints directly from your CLI or trigger commands.
 
 # API Usage
 
 Syncify can be initialized within scripts. This approach is a little more feature-full and allows you to integrate it with different build tools. You can hook into the transit process of files and apply modifications before they are uploaded to your store/s with this approach.
+
+### Instance
+
+```javascript
+import syncify from '@liquify/syncify';
+```
+
+Create a script command within your `package.json` file.
+
+```json
+{
+  "scripts": {
+    "watch": "node src/name-of-file.js"
+  }
+}
+```
 
 ### Utilities
 
@@ -1013,22 +953,6 @@ util.resource('watch' | 'upload' | 'download'): boolean
 // Returns spawns
 util.spawned(): string[]
 
-```
-
-### Instance
-
-```javascript
-import syncify from '@liquify/syncify';
-```
-
-Create a script command within your `package.json` file.
-
-```json
-{
-  "scripts": {
-    "watch": "node src/name-of-file.js"
-  }
-}
 ```
 
 # Contributing
