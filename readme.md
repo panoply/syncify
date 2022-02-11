@@ -347,7 +347,9 @@ Syncify configuration and options are defined with a `package.json` file. You ca
 
 ### Stores
 
-The `stores` option accepts an `array` type and holds a reference to all your shopify themes/store to sync. For each store you define, Syncify requires you provide the `domain` and the `themes` you wish to target. The `themes` object keys are target names and the value is an `id` of a theme. Please see theme [Command](#commands) examples for more information.
+The `stores` option accepts an `array` type and holds a reference to all your shopify themes/store to sync. For each store you define, Syncify requires you provide the `domain` and the `themes` you wish to target. The `themes` object keys are target names and the value is an `id` of a theme.
+
+Please see theme [Command](#commands) examples for more information.
 
 ```json
 {
@@ -367,7 +369,27 @@ The `stores` option accepts an `array` type and holds a reference to all your sh
 }
 ```
 
-Please see theme [Command](#commands) examples for more information.
+<details>
+<summary>
+<strong><code>Domain</code></strong>
+</summary>
+<p>
+
+The `domain` option expects a string value, which is your Shopify store name without the `myshopify.com` portion. The domain will be used by the CLI as a target reference. Each store (domain) can have multiple themes.
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Themes</code></strong>
+</summary>
+<p>
+
+The `themes` option refers to theme ids your store contains. This option is an object type which uses key > value mappings. The theme keys represent a unique target name, this can be anything you like. The `key` value will be used by the CLI to reference the specific theme. The `value` should be the theme `id` which you can find acquire within your Shopify dashboard.
+
+</p>
+</details>
 
 ## Dirs
 
@@ -600,6 +622,7 @@ The **customized structure** shown below is an example of how you _could_ arrang
         ㅤ
         ㅤ
         ㅤ
+        ㅤ
       </code>
       </pre>
       </td>
@@ -747,7 +770,7 @@ There are 2 available modes from which you can trigger a spawned process. When a
 }
 ```
 
-### Example
+### Examples
 
 In most situations you will leverage the spawn option to compile TypeScript or JavaScript assets. Below we will walk through how we can run 2 well known JavaScript bundlers, rollup and webpack together with Syncify in both watch and build modes.
 
