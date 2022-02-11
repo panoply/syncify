@@ -99,6 +99,7 @@ After installing you will need to quickly configure a connection to your shopify
 <summary>
 <strong>Schemas</strong>
 </summary>
+<p>
 
 Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
 
@@ -127,12 +128,14 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 
 > You can also apply this to your global workspace settings too, but it is recommended you extends schema on a per-project basis.
 
+</p>
 </details>
 
 <details>
 <summary>
 <strong>Scopes</strong>
 </summary>
+<p>
 
 You need to provide Syncify read and write access to a couple admin endpoints so it can perform operations. Below are the required scopes you will need to enable within in your private app.
 
@@ -151,12 +154,14 @@ You need to provide Syncify read and write access to a couple admin endpoints so
 - write_themes
 - read_themes
 
+</p>
 </details>
 
 <details>
 <summary>
 <strong>Credentials</strong>
 </summary>
+<p>
 
 Shop credentials are stored within a `.env` file. You can provide credentials in either uppercase of lowercase. Your store credentials **must** begin with the shop name following an underscore `_` character. Please refer to the `.env.example` file in this repository for an example. If you are syncing to multiple storefronts just follow the pattern for each store.
 
@@ -173,6 +178,7 @@ YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
 
+</p>
 </details>
 
 # Configuration
@@ -341,14 +347,7 @@ Syncify configuration and options are defined with a `package.json` file. You ca
 
 ### Stores
 
-The `stores` option accepts an `array` type and holds a reference to all your shopify themes/store to sync. For each store you define, Syncify requires you provide the `domain` and the `themes` you wish to target. The `themes` object keys are target names and the value is an `id` of a theme.
-
-<details>
-<summary>
-<strong>Example</strong>
-</summary>
-
-The `package.json` default stores configuration:
+The `stores` option accepts an `array` type and holds a reference to all your shopify themes/store to sync. For each store you define, Syncify requires you provide the `domain` and the `themes` you wish to target. The `themes` object keys are target names and the value is an `id` of a theme. Please see theme [Command](#commands) examples for more information.
 
 ```json
 {
@@ -367,8 +366,6 @@ The `package.json` default stores configuration:
   }
 }
 ```
-
-</details>
 
 Please see theme [Command](#commands) examples for more information.
 
@@ -392,7 +389,7 @@ The `dirs` option allows you to define custom base directories. In Syncify, `dir
 
 <details>
 <summary>
-<strong><code>Input</code></strong>
+<strong>Input</code></strong>
 </summary>
 <p>
 
@@ -403,7 +400,7 @@ The `input` option refers to your projects src build path. This is the directory
 
 <details>
 <summary>
-<strong><code>Output</code></strong>
+<strong>Output</code></strong>
 </summary>
 <p>
 
@@ -414,7 +411,7 @@ The `output` option refers to your project dist build path. This is the director
 
 <details>
 <summary>
-<strong><code>Config</code></strong>
+<strong>Config</strong>
 </summary>
 <p>
 
@@ -427,7 +424,7 @@ The `config` option refers to a directory within your project where configuratio
 
 <details>
 <summary>
-<strong><code>Import</code></strong>
+<strong>Import</strong>
 </summary>
 <p>
 
@@ -438,7 +435,7 @@ The `import` option refers to a directory where downloaded themes will be writte
 
 <details>
 <summary>
-<strong><code>Export</code></strong>
+<strong>Export</strong>
 </summary>
 <p>
 
@@ -449,7 +446,7 @@ The `export` option refers to a directory where packaged (.zip) themes will be w
 
 <details>
 <summary>
-<strong><code>Metafields</code></strong>
+<strong>Metafields</strong>
 </summary>
 <p>
 
