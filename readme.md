@@ -97,6 +97,40 @@ After installing you will need to quickly configure a connection to your shopify
 
 <details>
 <summary>
+<strong>Schemas</strong>
+</summary>
+
+Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
+
+**Generate using CLI**
+
+Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project. Use the following command:
+
+```
+$ syncify --vsc
+```
+
+**Provide Manually**
+
+If you wish to provide the specs manually you will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
+
+```json
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["package.json"],
+      "url": "https://schema.liquify.dev/syncify.json"
+    }
+  ]
+}
+```
+
+> You can also apply this to your global workspace settings too, but it is recommended you extends schema on a per-project basis.
+
+</details>
+
+<details>
+<summary>
 <strong>Scopes</strong>
 </summary>
 
@@ -135,38 +169,6 @@ Using an **API key** and **API Secret**
 YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
-
-### Schemas
-
-Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
-
-Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project. Use the following command:
-
-```
-$ syncify --vsc
-```
-
-<details>
-<summary>
-<strong>Provide Manually</strong>
-</summary>
-
-If you wish to provide the specs manually you will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
-
-```json
-{
-  "json.schemas": [
-    {
-      "fileMatch": ["package.json"],
-      "url": "https://schema.liquify.dev/syncify.json"
-    }
-  ]
-}
-```
-
-> You can also apply this to your global workspace settings too, but it is recommended you extends schema on a per-project basis.
-
-</details>
 
 # Configuration
 
