@@ -64,7 +64,31 @@ Syncify provides built-in support for handling SCSS, CSS and SVG files. These as
 
 # Setup
 
-After installing you will need to configure a connection to your shopify store. In your `package.json` file you can define configuration within the `syncify{}` property. Syncify requires you provide either an admin API access token (recommended) or API Key and secret as credentials. You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) to obtain this information from Shopify. Below you will find the necessary information pertaining to the setup process.
+After installing you will need to configure a connection to your shopify store. In your `package.json` file you can define configuration within the `syncify{}` property. Syncify requires you provide either an admin API access token (recommended) or API Key and secret as credentials.
+
+<details>
+<summary>
+<strong>Private App</strong>
+</summary>
+<p>
+
+You will need to create a [private app](https://help.shopify.com/en/manual/apps/private-apps) to obtain this information from Shopify. If you are coming from [Theme Kit](https://shopify.dev/themes/tools/theme-kit) you might be able to port those settings but it is recommended that you generate access information specifically for usage with Syncify.
+
+**Steps:**
+
+1. From your Shopify admin, go to **Apps**.
+2. Click **Develop apps**.
+3. Click **Create an app**.
+4. Provide an App name (eg: `Syncify`) and click **Create app**
+5. The app will be created, then click **Configure Admin API Scope**
+6. Select the required scopes (listed below)
+7. Click **Save**
+8. Goto the **API credentials** tab,
+9. Under **Access Tokens** press the **Install app** button.
+10. Press **Reveal token once** and copy the token into an `.env` file.
+
+</p>
+</details>
 
 <details>
 <summary>
@@ -92,11 +116,7 @@ You need to provide Syncify read and write access to a couple admin endpoints so
 </p>
 </details>
 
-<details>
-<summary>
-<strong>Credentials</strong>
-</summary>
-<p>
+### Credentials
 
 Shop credentials are stored within a `.env` file. You can provide credentials in either uppercase of lowercase. Your store credentials **must** begin with the shop name following an underscore `_` character. Please refer to the `.env.example` file in this repository for an example. If you are syncing to multiple storefronts just follow the pattern for each store.
 
@@ -113,14 +133,11 @@ YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
 
-</p>
-</details>
-
-# Schema
+# Package Schema
 
 Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
 
-**Generate via CLI** (vscode)
+### Generate via CLI (vscode)
 
 Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project. Use the following command:
 
@@ -128,7 +145,7 @@ Syncify can automatically generate the `package.json` specs for developers using
 $ syncify --vsc
 ```
 
-**Provide Manually**
+### Provide Manually
 
 If you wish to provide the specs manually you will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
 
@@ -143,15 +160,13 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 }
 ```
 
-> You can also apply this to your global workspace settings too, but it is recommended you extends schema on a per-project basis.
-
 # Configuration
 
 Syncify configuration and options are defined with a `package.json` file. You can use the `"stores"` property to define theme targets. By default, Syncify will assume your _src_ files exist within a `source` directory (relative to your project root) and folders/files within the directory are structured in the default Shopify theme structure.
 
 ### Defaults
 
-The default configuration options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add [Package Schema](#package-schema) reference to your workspace settings.
+The default configuration options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference to your workspace settings file to enable intellisense features.
 
 <!-- prettier-ignore -->
 ```jsonc
@@ -630,7 +645,7 @@ An array list of glob path patterns to `.liquid` **layout** files. These will be
 
 An array list of glob path patterns to `.liquid` **section** files. These will be written to the `sections` directory of your defined `output` path. Sections can be structured within sub-directories. If a section file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the output filenames.
 
-If the section input path is `source/sections/index/some-file.liquid` then the filename will be prefixed with `index` so when referencing it within themes you'd need to use `index_some-file.liquid` in `{% section %}` tags. Prefixing is helpful when you have a large number of sections and want to avoid name collusions. You can only control what sub-directories should have prefexing applied using the `global[]` option or alternatively do not reference paths to sections which contain sub directories.
+If the section input path is `source/sections/index/some-file.liquid` then the filename will be prefixed with `index` so when referencing it within themes you'd need to use `index_some-file.liquid` in `{% section %}` tags. Prefixing is helpful when you have a large number of sections and want to avoid name collusion's. You can only control what sub-directories should have prefexing applied using the `global[]` option or alternatively do not reference paths to sections which contain sub directories.
 
 See [Sections](#sections).
 
@@ -686,6 +701,8 @@ In most situations you will leverage the spawn option to compile TypeScript or J
 
 ### Rollup
 
+If you are processing JavaScript asset files using the [Rollup](#) bundler you can spawn build and watch processes by providing the rollup commands to each mode accordingly.
+
 <!-- prettier-ignore -->
 ```json
 {
@@ -703,6 +720,10 @@ In most situations you will leverage the spawn option to compile TypeScript or J
 ```
 
 ### Webpack
+
+If you are processing JavaScript asset files using the [Webpack](#) bundler you can spawn build and watch processes by providing the webpack commands to each mode accordingly. You will need to be using the [Webpack CLI](#) module to ensure a successful spawn is triggered.
+
+> Notice how we also provide the `--color` flag in the spawn. If you omit this flag then the webpack logs will be printed to the CLI without colors.
 
 <!-- prettier-ignore -->
 ```json
@@ -722,7 +743,7 @@ In most situations you will leverage the spawn option to compile TypeScript or J
 
 # Transform
 
-In Syncify, `input` files can be transformed and augmented. The `transform` option allows you to control how files are processed. Syncify supports processing for the following file types:
+In Syncify, `input` files can be transformed and augmented. The `transform` option allows you to control how files are processed. Syncify supports built-in or partial processing for the following file types:
 
 - `.liquid`
 - `.json`
@@ -731,13 +752,211 @@ In Syncify, `input` files can be transformed and augmented. The `transform` opti
 - `.scss`
 - `.sass`
 
+Processing `.liquid` and `.json` files are handled using built-in capabilities whereas `.css`, `.sass`, `scss` and `.svg` file types require additional tooling to be installed.
+
 ### Views
+
+The `views` transform option controls how `.liquid` file types should be handled. Snippets, Templates, Sections and Layout paths are typically where liquid files are used. Options defined here will be used when Syncify is processing such types.
+
+<details>
+<summary>
+<strong><code>Sections</code></strong>
+</summary>
+<p>
+
+**allowPrefix**
+
+**onlyPrefixDuplicates**
+
+**prefixSeparator**
+
+**globals**
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Minify</code></strong>
+</summary>
+<p>
+
+**env**
+
+`never`
+
+**minifyJS**
+
+`boolean`
+
+**minifyCSS**
+
+`boolean`
+
+**removeComments**
+
+`boolean`
+
+**collapseWhitespace**
+
+`boolean`
+
+**trimCustomFragments**
+
+`boolean`
+
+**ignoreCustomFragments**
+
+`string[]`
+
+**minifySectionSchema**
+
+`boolean`
+
+**removeLiquidComments**
+
+`boolean`
+
+**removeAttributeNewlines**
+
+`boolean`
+
+**removeRedundantDashTrims**
+
+`boolean`
+
+**ignoredLiquidTags**
+
+`string[]`
+
+**exclude**
+
+`string[]`
+
+</p>
+</details>
 
 ### Json
 
-### Icons
+<details>
+<summary>
+<strong><code>Spaces</code></strong>
+</summary>
+<p>
+
+Beautification `2`
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Minify</code></strong>
+</summary>
+<p>
+
+Minification options
+
+**env**
+
+`never`
+
+**removeSchemaRefs**
+
+`true`
+
+**exclude**
+
+`string[]`
+
+</p>
+</details>
 
 ### Styles
+
+<details>
+<summary>
+<strong><code>Input</code></strong>
+</summary>
+<p>
+
+Path `string[]` or `string`
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Rename</code></strong>
+</summary>
+<p>
+
+Rename Options
+
+`string[]`
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Watch</code></strong>
+</summary>
+<p>
+
+Watch Options
+
+`string[]`
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Snippet</code></strong>
+</summary>
+<p>
+
+`boolean`
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>PostCSS</code></strong>
+</summary>
+<p>
+
+PostCSS options
+
+**env**
+
+`all`, `dev`, `prod` `never`
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>SASS</code></strong>
+</summary>
+<p>
+
+**logWarnings**
+
+`boolean`
+
+**sourcemap**
+
+`boolean`
+
+**style**
+
+`compressed` or `expanded`
+
+</p>
+</details>
 
 # CLI Usage
 
