@@ -389,7 +389,7 @@ The `dirs` option allows you to define custom base directories. In Syncify, `dir
 
 <details>
 <summary>
-<h3>Input</h3>
+<strong><code>Input</code></strong>
 </summary>
 <p>
 
@@ -400,7 +400,7 @@ The `input` option refers to your projects src build path. This is the directory
 
 <details>
 <summary>
-<h3>Output</h3>
+<strong><code>Output</code></strong>
 </summary>
 <p>
 
@@ -411,7 +411,7 @@ The `output` option refers to your project dist build path. This is the director
 
 <details>
 <summary>
-<h3>Config</h3>
+<strong><code>Config</code></strong>
 </summary>
 <p>
 
@@ -424,7 +424,7 @@ The `config` option refers to a directory within your project where configuratio
 
 <details>
 <summary>
-<h3>Import</h3>
+<strong><code>Import</code></strong>
 </summary>
 <p>
 
@@ -435,7 +435,7 @@ The `import` option refers to a directory where downloaded themes will be writte
 
 <details>
 <summary>
-<h3>Export</h3>
+<strong><code>Export</code></strong>
 </summary>
 <p>
 
@@ -446,7 +446,7 @@ The `export` option refers to a directory where packaged (.zip) themes will be w
 
 <details>
 <summary>
-<h3>Metafields</h3>
+<strong><code>Metafields</code></strong>
 </summary>
 <p>
 
