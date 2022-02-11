@@ -116,7 +116,7 @@ YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 </p>
 </details>
 
-### Package Schema
+# Schema
 
 Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
 
