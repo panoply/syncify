@@ -392,55 +392,66 @@ The `dirs` option allows you to define custom base directories. In Syncify, `dir
 
 <details>
 <summary>
-<strong><code>input</code></strong>
+<strong><code>Input</code></strong>
 </summary>
+<p>
 
 The `input` option refers to your projects src build path. This is the directory where your development theme files exist. Syncify defaults this directory to `source`. The value defined here will be prepended to any path you define within `paths`.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>output</code></strong>
+<strong><code>Output</code></strong>
 </summary>
+<p>
 
 The `output` option refers to your project dist build path. This is the directory where transformed theme files from `input` will be written. Syncify defaults this to `theme`. The output directory will be reflective of your online shop. You should point any asset files executing via a spawned process to point to the `assets` directory contained within.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>config</code></strong>
+<strong><code>Config</code></strong>
 </summary>
+<p>
 
 The `config` option refers to a directory within your project where configuration files exist, like (for example) a `rollup.config.js` or `webpack.config.js` file. Syncify by default (when this option is undefined) will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. This `config` directory allows you to optionally place spawn config files within a sub-directory that is relative to root.
 
 > Typically this is named `scripts` in most node projects. Be sure to point output paths within third party configs to the assets output assets directory..
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>import</code></strong>
+<strong><code>Import</code></strong>
 </summary>
+<p>
 
 The `import` option refers to a directory where downloaded themes will be written. Syncify provides the ability to download themes from your online store and it is within this directory theme files will be created.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>export</code></strong>
+<strong><code>Export</code></strong>
 </summary>
+<p>
 
 The `export` option refers to a directory where packaged (.zip) themes will be written when running the `package` resource via the CLI. Packaged themes will be prepended with the version number defined in your `package.json` file and are exported as `.zip` files.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>metafields</code></strong>
+<strong><code>Metafields</code></strong>
 </summary>
+<p>
 
 The `metafields` option refers to a directory within your project which can contain global JSON metafield files. Syncify supports metafield sync capabilities using a simple directory > file based approach, where sub-directories represent metafield a `namespace` value, JSON files contained within represent metafield `key` values and the contents files the JSON to be written to you store.
 
@@ -488,6 +499,7 @@ The `metafields` option refers to a directory within your project which can cont
   </tbody>
 </table>
 
+</p>
 </details>
 
 ## Paths
@@ -628,35 +640,42 @@ _There is no distributed difference between the **customized** and **default** s
 
 <details>
 <summary>
-<strong><code>assets[]</code></strong>
+<strong><code>Assets</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to **asset** files. These will be written to the `assets` directory of your defined `output` path. Please note that you if you transforming CSS, SCSS, SASS or SVG file types using Syncify then you do not need to define those paths here as the transform option will do automatically route them. This is the same for assets being processed by spawns. Any paths defined in `assets` will typically just pass through.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>customers[]</code></strong>
+<strong><code>Customers</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to `.liquid` or `.json` **customer** template files. These will be written to the `templates/customers` directory of your defined `output` path.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>locales[]</code></strong>
+<strong><code>Locales</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to `.json` **locale** files. These will be written to the `locales` directory of your defined `output` path.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>config[]</code></strong>
+<strong><code>Config</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to `.json` **config** files. These will be written to the `config` directory of your defined `output` path.
 
@@ -664,17 +683,20 @@ An array list of glob path patterns to `.json` **config** files. These will be w
 
 <details>
 <summary>
-<strong><code>layout[]</code></strong>
+<strong><code>Layout</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to `.liquid` **layout** files. These will be written to the `layout` directory of your defined `output` path.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>sections[]</code></strong>
+<strong><code>Sections</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to `.liquid` **section** files. These will be written to the `sections` directory of your defined `output` path. Sections can be structured within sub-directories. If a section file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the output filenames.
 
@@ -682,24 +704,30 @@ If the section input path is `source/sections/index/some-file.liquid` then the f
 
 See [Sections](#sections).
 
+</p>
+
 </details>
 
 <details>
 <summary>
-<strong><code>snippets[]</code></strong>
+<strong><code>Snippets</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to `.liquid` **snippet** files. These will be written to the `snippets` directory of your defined `output` path.
 
+</p>
 </details>
 
 <details>
 <summary>
-<strong><code>templates[]</code></strong>
+<strong><code>Templates</code></strong>
 </summary>
+<p>
 
 An array list of glob path patterns to `.json` or `.liquid` **template** files. These will be written to the `templates` directory of your defined `output` path.
 
+</p>
 </details>
 
 # Spawn
