@@ -369,7 +369,7 @@ The `stores` option accepts an `array` type and holds a reference to all your sh
 
 Please see theme [Command](#commands) examples for more information.
 
-### Dirs
+## Dirs
 
 The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to the name of directories which are relative to the root of your project. You cannot define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). The directories should preface folders contained from the root directory only.
 
@@ -389,7 +389,7 @@ The `dirs` option allows you to define custom base directories. In Syncify, `dir
 
 <details>
 <summary>
-<strong>Input</code></strong>
+<h3>Input</h3>
 </summary>
 <p>
 
@@ -400,7 +400,7 @@ The `input` option refers to your projects src build path. This is the directory
 
 <details>
 <summary>
-<strong>Output</code></strong>
+<h3>Output</h3>
 </summary>
 <p>
 
@@ -411,7 +411,7 @@ The `output` option refers to your project dist build path. This is the director
 
 <details>
 <summary>
-<strong>Config</strong>
+<h3>Config</h3>
 </summary>
 <p>
 
@@ -424,7 +424,7 @@ The `config` option refers to a directory within your project where configuratio
 
 <details>
 <summary>
-<strong>Import</strong>
+<h3>Import</h3>
 </summary>
 <p>
 
@@ -435,7 +435,7 @@ The `import` option refers to a directory where downloaded themes will be writte
 
 <details>
 <summary>
-<strong>Export</strong>
+<h3>Export</h3>
 </summary>
 <p>
 
@@ -446,7 +446,7 @@ The `export` option refers to a directory where packaged (.zip) themes will be w
 
 <details>
 <summary>
-<strong>Metafields</strong>
+<h3>Metafields</h3>
 </summary>
 <p>
 
