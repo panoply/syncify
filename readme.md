@@ -60,7 +60,7 @@ Syncify does not want to re-create or impede on developer preferences and tool a
 
 #### Asset Support
 
-Syncify provides built-in support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project, Syncify will consume them and generate output using their configurations.
+Syncify provides wrapper support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project, Syncify will consume them and generate output using their configurations.
 
 # Setup
 
@@ -116,14 +116,18 @@ You need to provide Syncify read and write access to a couple admin endpoints so
 </p>
 </details>
 
-### Credentials
+# Credentials
 
-Shop credentials are stored within a `.env` file. You can provide credentials in either uppercase of lowercase. Your store credentials **must** begin with the shop name following an underscore `_` character. Please refer to the `.env.example` file in this repository for an example. If you are syncing to multiple storefronts just follow the pattern for each store.
+Shop credentials can be stored within a `.env`, `.syncifyrc` file or supplied at runtime by assigning `process.env` variables. Typically, using a `.env` file is the preferred approach for developers working on a single store whereas those working within a large team, the `.syncifyrc` file approach is likely a better choice because it accepts additional configuration options.
+
+### Using a `.env` file
+
+When using an `.env` file credentials can be expressed in either uppercase of lowercase format and **must** begin with the shop name following an underscore `_` character. If you are syncing to multiple storefronts just follow the pattern for each store.
 
 Using an **API Access Token**
 
 ```env
-YOUR-SHOP-NAME_API_TOKEN = 'shpat_abcdefghijklmnopqrstuvwz
+YOUR-SHOP-NAME_API_TOKEN = 'shpat_abcdefghijklmnopqrstuvwz'
 ```
 
 Using an **API key** and **API Secret**
@@ -133,11 +137,57 @@ YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
 
+### Using a `.syncifyrc` or `.syncifyrc.json` file
+
+If you do not wish to use an `.env` file you can store API credentials within a `.syncifyrc` or `.syncifyrc.json` file. When using this approach it is important that the file is added to your `.gitignore` file. The `.syncifyrc` file expects credentials be provided as array list of items and depending on your authorization be using one of following structures:
+
+Using an **API Access Token**
+
+```json
+[
+  {
+    "domain": "your-shop-name",
+    "token": "shpat_abcdefghijklmnopqrstuvwz
+  }
+]
+```
+
+Using an **API key** and **API Secret**
+
+```json
+[
+  {
+    "domain": "your-shop-name",
+    "key": "abcdefghijklmnopqrstuvwz",
+    "secret": "abcdefghijklmnopqrstuvwz"
+  }
+]
+```
+
+### Using `process.env` variables
+
+Syncify also supports runtime reference for credentials. This approach allows you to set credentials via the command line or form within a script executable. This approach is highly discouraged and rather insecure.
+
+Using an **API Access Token**
+
+```js
+// Using an API Access Token
+process.env['YOUR-SHOP-NAME_API_TOKEN'] = 'shpat_abcdefghijklmnopqrstuvwz';
+```
+
+Using an **API key** and **API Secret**
+
+```js
+// Using an API Key and API Secret
+process.env['YOUR-SHOP-NAME_API_KEY'] = 'abcdefghijklmnopqrstuvwz';
+process.env['YOUR-SHOP-NAME_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
+```
+
 # Package Schema
 
 Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema the editor uses to provide features like hover descriptions, auto-completions and intellisense support for the `"syncify":{}` field. It is highly recommended that you extend the `package.json` json specifications.
 
-### Generate via CLI (vscode)
+### Generate via CLI (vscode users)
 
 Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project. Use the following command:
 
@@ -155,6 +205,10 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
     {
       "fileMatch": ["package.json"],
       "url": "https://schema.liquify.dev/syncify.json"
+    },
+    {
+      "fileMatch": [".syncifyrc", ".syncifyrc.json"],
+      "url": "https://schema.liquify.dev/syncifyrc.json"
     }
   ]
 }
@@ -162,11 +216,11 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 
 # Configuration
 
-Syncify configuration and options are defined with a `package.json` file. You can use the `"stores"` property to define theme targets. By default, Syncify will assume your _src_ files exist within a `source` directory (relative to your project root) and folders/files within the directory are structured in the default Shopify theme structure.
+Syncify configuration options can be defined using `syncify` property within your `package.json` file. By default, Syncify will assume your _src_ files exist within a directory named `source` (which is relative to the projects root) and contents within the `source` directory are structured as a default Shopify theme.
 
 ### Defaults
 
-The default configuration options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference to your workspace settings file to enable intellisense features.
+The default configuration options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference to your workspace settings to enable intellisense features.
 
 <!-- prettier-ignore -->
 ```jsonc
@@ -272,7 +326,7 @@ The default configuration options Syncify uses will be automatically applied to 
 
 ### Stores
 
-The `stores` option accepts an `array` type and holds a reference to all your shopify themes/store to sync. For each store you define, Syncify requires you provide the `domain` and the `themes` you wish to target. The `themes` object keys are target names and the value is an `id` of a theme.
+The `stores` option accepts an `array` type and holds a reference to all your shopify themes/store to sync. This information can be provided to Syncify via the `package.json` file or alternatively you can use a `.syncifyrc` or `.syncifyrc.json` file. For each store you define, Syncify requires you provide the `domain` and the `themes` you wish to target. The `themes` object keys are target names and the value is an `id` of a theme.
 
 Please see theme [Command](#commands) examples for more information.
 
@@ -293,6 +347,26 @@ Please see theme [Command](#commands) examples for more information.
   }
 }
 ```
+
+#### Using a `.syncifyrc` file
+
+In some situations using the `package.json` file to reference Shopify stores and themes may not be the ideal, especially for those working in larger teams and using multiple development stores with different theme ids. If the default approach is problematic to your use cases then you can optionally provide the `stores` information within a `.syncifyrc` or `.syncifyrc.json` file.
+
+```json
+[
+  {
+    "domain": "shop-name",
+    "themes": {
+      "dev": 123456789,
+      "prod": 123456789,
+      "stage": 123456789,
+      "test": 123456789
+    }
+  }
+]
+```
+
+> If you are using a `.syncifyrc` file to store your shop credentials, then you need only add theme id reference to object tha
 
 <details>
 <summary>
@@ -838,6 +912,8 @@ The `views` transform option controls how `.liquid` file types should be handled
 
 ### Json
 
+The `json` transform option controls how `.json` files should be processed. Templates, Config, Locales and Metafields paths typically where JSON files are used. Options defined here will be used when Syncify is processing these file types. In addition, Syncify will also apply handle any Assets that have `.json` extension using these options.
+
 <details>
 <summary>
 <strong><code>Spaces</code></strong>
@@ -873,6 +949,8 @@ Minification options
 </details>
 
 ### Styles
+
+The `styles` transform option accepts an array type. This option requires you have [Dart SASS](#) and/or [PostCSS](#) installed as a development dependencies in your project. Syncify supports the handling of `.sass`, `.scss` and `.css` file types using these tools and the options are convenience wrappers for them.
 
 <details>
 <summary>
@@ -960,7 +1038,7 @@ PostCSS options
 
 # CLI Usage
 
-Syncify ships with a powerful command line interface that supports prompt execution. If you have installed Syncify globally, you can call `syncify` from any project but you should avoid this and instead install the module as a development dependency on a per-project basis. If you are using a package manager like [pnpm](https://pnpm.js.org/en/cli/install) you can simply call `pnpm syncify` but if you are using npm or yarn then you may need to create reference script in your `package.json` file, for example:
+Syncify ships with a powerful command line interface that supports prompt execution. If you have installed Syncify globally, you can call `syncify` (or `sync`) from any project but you should avoid this and instead install the module as a development dependency on a per-project basis. If you are using a package manager like [pnpm](https://pnpm.js.org/en/cli/install) you can simply call `pnpm syncify` (or `pnpm sync`) but if you are using npm or yarn then you may need to create reference script within your `package.json` file, for example:
 
 ```json
 {
@@ -996,7 +1074,7 @@ Flags:
   -t, --theme            A comma separated list of themes
   -o, --output  <path>   A path value (used in download and build mode only)
   -h, --help,            Prints command list and some help information
-  --clean,               Removes all output files, use with --build to clean before bundling
+  -c, --clean,           Removes all output files, use with --build to clean before bundling
   --vsc                  Generates JSON schema spec for vscode users
   --dev                  Run in development mode (default)
   --prod                 Run in production mode
@@ -1004,7 +1082,7 @@ Flags:
 
 ### Example
 
-CLI usage aims to be as simple as possible. A typical project will be targeting a single Shopify theme but you can target multiple themes and stores. When targeting multiple stores/themes you can pass the store name as a flag followed by comma separated list of theme targets. See below examples:
+CLI usage aims to be as simple as possible. A typical project will be targeting a single Shopify theme but you can target multiple themes and stores in seamless and productive manner. When targeting multiple stores or themes the CLI employs a flag based naming approach.
 
 **Watching 1 store and 1 theme**
 
@@ -1136,24 +1214,41 @@ The `package.json` configuration for the command would look like this:
 
 Syncify provides a helpful command prompt feature. Running `syncify` will provide you a simple prompt interface from which you can use to explore endpoints directly from your CLI or trigger commands.
 
-# API Usage
+**Options**
+
+**Queries**
+
+# API
 
 Syncify can be initialized within scripts. This approach is a little more feature-full and allows you to integrate it with different build tools. You can hook into the transit process of files and apply modifications before they are uploaded to your store/s with this approach.
 
-### Instance
+### Usage
 
-```javascript
-import syncify from '@liquify/syncify';
-```
+Syncify exports a function that has several methods which you can use to trigger specific modes. The default export can also target multiple hooks in accordance with what was passed from the command line.
 
-Create a script command within your `package.json` file.
+```typescript
+import { syncify } from '@liquify/syncify';
 
-```json
-{
-  "scripts": {
-    "watch": "node src/name-of-file.js"
-  }
-}
+// Build hook
+syncify.build(options: {}, async function(content?: Buffer): Promise<Buffer|string|void|false>);
+
+// Watch hook
+syncify.watch(options: {}, async function(content?: Buffer): Promise<Buffer|string|void|false>);
+
+// Upload hook
+syncify.upload(options: {}, async function(content?: Buffer): Promise<Buffer|string|void|false>);
+
+// Download hook
+syncify.download(options: {}, async function(content?: Buffer): Promise<Buffer|string|void|false>);
+
+// Targeting all hooks
+syncify(options: {})({
+  async build(content?: Buffer): Promise<Buffer|string|void|false>,
+  async watch(content?: Buffer): Promise<Buffer|string|void|false>,
+  async upload(content?: Buffer): Promise<Buffer|string|void|false>,
+  async download(content?: Buffer): Promise<Buffer|string|void|false>,
+});
+
 ```
 
 ### Utilities
@@ -1161,16 +1256,38 @@ Create a script command within your `package.json` file.
 Utilities will return some basic information about the Syncify instance. These are extremely helpful when when you are executing spawned processes and need to control what feature to load. For example, if you are spawning a webpack process for compiling JavaScript assets and need to inform upon watch mode you'd use `util.resource('watch')` which returns a boolean value when running in watch mode.
 
 ```typescript
-import { util } from 'shopify-sync'
+import { util, env } from 'shopify-sync'
 
-// Environment
-util.env('dev' | 'prod' ): boolean
+// Environment Conditions
+env.prod: boolean;
+env.dev: boolean;
+env.build: boolean;
+env.watch: boolean;
+env.download: boolean;
+env.upload: boolean;
+
+// Returns environment
+util.env('dev' | 'prod'): boolean
 
 // Returns the current resource
-util.resource('watch' | 'upload' | 'download'): boolean
+util.mode('build' | 'watch' | 'upload' | 'download'): boolean
 
 // Returns spawns
 util.spawned(): string[]
+
+```
+
+### Backwards Compatibility
+
+Syncify supports backward compatibility for [shopify-sync](https://github.com/panoply/shopify-sync). This allows you to use it as you would have in earlier versions with build tools like [Gulp](https://gulpjs.com).
+
+> Please note this support for this will eventually be deprecated.
+
+```typescript
+import { shopifysync as sync } from '@liquify/syncify';
+
+// Backward compatible, ie: shopify-sync
+sync(mode: string, options: {}, function() {})
 
 ```
 
