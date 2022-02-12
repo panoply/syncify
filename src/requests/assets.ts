@@ -1,4 +1,4 @@
-import { isNil } from 'rambdax';
+import { has, isNil } from 'rambdax';
 import { IRequest, IThemes, IFile } from 'types';
 import { queue, axios } from 'requests/queue';
 import { is } from 'shared/native';
@@ -40,7 +40,11 @@ export async function assets (sync: IThemes, file: IFile, config: IRequest) {
 
   config.url = sync.url;
 
-  if (!isNil(sync.token)) config.headers['X-Shopify-Access-Token'] = sync.token;
+  if (isNil(sync.token)) {
+    if (has('X-Shopify-Access-Token', config.headers)) delete config.headers['X-Shopify-Access-Token'];
+  } else {
+    config.headers['X-Shopify-Access-Token'] = sync.token;
+  }
 
   return axios(config).then(({ headers, data }) => {
 

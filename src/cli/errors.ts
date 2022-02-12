@@ -76,7 +76,7 @@ export function error (file: string, e: {
         }
       );
 
-      return process.exit();
+      // return process.exit();
 
     case 402:
 

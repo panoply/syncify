@@ -153,7 +153,7 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
 
     if (key === 'assets') {
 
-      const assets = join('assets/**');
+      const assets = join(config.output, 'assets/**');
 
       if (isArray(uri)) {
         uri.push(assets);

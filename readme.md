@@ -4,7 +4,7 @@
 
 # @liquify/syncify
 
-A blazing fast, extensible and superior alternative Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI that will spawn child processes for compiler coupling. Supports multiple storefront/theme synchronization with watch, upload, download and metafield sync capabilities included.
+A blazing fast, extensible and superior alternative Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI that can spawn child processes (compiler coupling). Supports multiple storefront theme synchronization with watch, upload, download and metafield capabilities included.
 
 **Syncify exists as part of the [Liquify](https://liquify.dev) project**
 
@@ -22,11 +22,11 @@ A blazing fast, extensible and superior alternative Shopify [theme kit](https://
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit is an embarrassment and reflective of how deeply out of touch the companies engineers are with theme development. Syncify is not like Theme Kit. This tool is fast, flexible, extensible, scalable and will not lock you into some poorly thought through workflow and setup apparatus.
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit is an embarrassment any all other tools in this nexus fail to achieve fluidity. Syncify is not like Theme Kit. This tool is fast, flexible, extensible, scalable and will not lock you into some poorly thought through workflow and setup apparatus.
 
 # Install
 
-Install as development dependency in your project. Syncify will run a script on post-install which will add default `syncify{}` configuration options to your `package.json` file. If you are using [VS Code](https://code.visualstudio.com/) it is highly recommended that you provide the [package schema](#package-schema) to your workspace settings.
+Install as development dependency in your project. Syncify will run a script on post-install which writes default configuration options to your `package.json` file.
 
 **PNPM**
 
@@ -48,7 +48,7 @@ yarn add @liquify/syncify --dev
 
 # Overview
 
-The main purpose of Syncify is to watch, build, download or upload files to and from your local machine to Shopify store\s via API. Syncify supports file transformation capabilities like minification, path mappings, runs spawned processes in parallel and provides an intelligent queue-based sync approach.
+The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store. It ships with build, watch, build download, upload, merge and pull capabilities.
 
 ### Theme Files
 
@@ -118,11 +118,11 @@ You need to provide Syncify read and write access to a couple admin endpoints so
 
 # Credentials
 
-Shop credentials can be stored within a `.env` file, a `.syncifyrc` file, or supplied at runtime by assigning `process.env` variables. Using an `.env` file is the preferred approach for those working on a single store. Developers working within a large team, the `.syncifyrc` file approach is likely to be a better choice because it accepts additional configuration options.
+Shop credentials can be stored within a `.env`, `.syncifyrc` file or supplied at runtime by assigning `process.env` variables. Using an `.env` file is the preferred approach for most use cases.
 
 ### Using a `.env` file
 
-When using an `.env` file credentials can be expressed in either uppercase of lowercase format and **must** begin with the shop name following an underscore `_` character. If you are syncing to multiple storefronts just follow the pattern for each store.
+When using a `.env` file, you can provide shop credentials in either uppercase of lowercase format. The `.env` values **must** begin with the shop name following an underscore `_` character. If you are syncing to multiple storefronts just follow the pattern for each store.
 
 Using an **API Access Token**
 
@@ -137,9 +137,9 @@ YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
 
-### Using a `rc` file
+### Using a `.syncifyrc` file
 
-If you do not wish to use an `.env` file you can store API credentials within a `.syncifyrc` or `.syncifyrc.json` file. When using this approach it is important that the file is added to `.gitignore` and never committed to a public repository. The `.syncifyrc` file expects credentials be supplied as _array_ list and depending on your authorization method, each item uses one of following structures:
+If you do not wish to use an `.env` file you can store API credentials within a `.syncifyrc` or `.syncifyrc.json` file. When using this approach it is important that the file is added to `.gitignore` and never committed to a public repository. The `.syncifyrc` file expects credentials be supplied as array list and depending on your authorization method, each item should use one of following structures:
 
 Using an **API Access Token**
 
@@ -166,7 +166,7 @@ Using an **API key** and **API Secret**
 
 ### Using `process.env` variables
 
-Syncify also supports runtime credential referencing. This approach allows you to set credentials via the command line or from within a script executable. This approach is highly discouraged and rather insecure, avoid doing this and instead leverage one of the other methods.
+Syncify also supports runtime credential referencing. This approach allows you to set credentials via the command line or within a script executable. This approach is highly discouraged and rather insecure, so avoid doing this and instead leverage one of the other methods available.
 
 Using an **API Access Token**
 
@@ -185,21 +185,21 @@ process.env['YOUR-SHOP-NAME_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
 
 # Package Schema
 
-Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one that supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend the built-in `package.json` json schema used to provide features like hover descriptions, validations, auto-completion and intellisense. Extending the package schema will enable these capabilities on the `syncify` field.
+Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one which supports extension of [JSON Schema Specs](https://json-schema.org/specification.html) then you can optionally extend `package.json` schemas. JSON schema specs provide features like hover descriptions, validations, auto-completion and intellisense with JSON file types. Extending the package schema will enable these capabilities on the `syncify` field.
 
 > It is **highly recommended** that you extend the `package.json` json specifications.
 
 ### Generate via CLI (vscode users)
 
-Syncify can automatically generate the `package.json` specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project. Run the following command:
+Syncify can automatically generate the `package.json` schema specs for developers using VS Code. The settings reference will be written within a `.vscode` directory in the root of your project workspace:
 
 ```
-$ syncify --vsc
+syncify --vsc
 ```
 
 ### Provide Manually
 
-If you wish to provide the specs manually you will need to create a `.vscode` directory and a `settings.json` within that directory in the root of your projects workspace. The `settings.json` should contain the following configuration settings:
+If you wish to provide the specs manually you will need to create a `.vscode` directory and `settings.json` file within in it. The `settings.json` should contain the following configuration settings:
 
 ```json
 {
@@ -218,11 +218,11 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 
 # Configuration
 
-Syncify configuration options can be defined from a `syncify` property within your `package.json` file. By default, Syncify will assume your **src** files exist within a directory named `source` and the contents of the directory are using the default Shopify theme structure.
+Syncify configuration options can be defined from a `syncify` property in your `package.json` file. By default, Syncify assumes **src** files exist within a directory named `source` and the contents of this directory are using the default Shopify theme structure.
 
 ### Options
 
-The default configuration options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference to your workspace settings to enable intellisense features on the field. Below are the default configuration option that will be applied.
+The default options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference to your workspace settings to enable intellisense features on this field. Below is the default settings that are applied.
 
 <!-- prettier-ignore -->
 ```jsonc
@@ -328,7 +328,7 @@ The default configuration options Syncify uses will be automatically applied to 
 
 ### Stores
 
-The `stores` option accepts an `array` list of items. Each item in this array will hold an object reference to your shopify stores and themes. This information can be provided to Syncify via the `package.json` file or alternatively you can use a `.syncifyrc` or `.syncifyrc.json` file. For each store you define, Syncify requires shop `domain` name and `themes` be provided. The `themes` object keys represent target names and its value the theme `id`.
+The `stores` option accepts an `array` list of items. Each item in this array will hold an object reference to your shopify stores and their themes. This information can be provided to Syncify within your `package.json` file or alternatively you can use a `.syncifyrc` or `.syncifyrc.json` file. For each store you define, Syncify requires you provide the shop name and theme ids you wish to sync. The `themes` object uses a **key** > **value** approach.
 
 Please see theme [Command](#commands) examples for more information on how this is used with the CLI.
 
@@ -352,7 +352,7 @@ Please see theme [Command](#commands) examples for more information on how this 
 
 #### Using a `.syncifyrc` file
 
-In some situations using the `package.json` file to reference Shopify stores and themes may not be the ideal, especially for those working in larger teams and using multiple development stores and different theme ids. If the default approach is problematic to your use case then you can provide the `stores` information within a `.syncifyrc` or `.syncifyrc.json` file.
+In some situations using the `package.json` file for store and theme references may not be the ideal. If you are working with a large and using multiple development stores you can provide `stores` within a `.syncifyrc` or `.syncifyrc.json` file.
 
 ```json
 [
@@ -376,7 +376,7 @@ In some situations using the `package.json` file to reference Shopify stores and
 </summary>
 <p>
 
-The `domain` option expects a string value, which is your Shopify store name without the `myshopify.com` portion. The domain will be used by the CLI as a target reference. Each store (domain) can have multiple themes.
+The `domain` option expects a string value, which is your Shopify store name without the `myshopify.com` portion. The domain will be used by the CLI as a target reference argument. Each store (domain) can have multiple themes.
 
 </p>
 </details>
@@ -387,14 +387,14 @@ The `domain` option expects a string value, which is your Shopify store name wit
 </summary>
 <p>
 
-The `themes` option refers to theme ids your store contains. This option is an object type which uses key > value mappings. The theme keys represent a unique target name, this can be anything you like. The `key` value will be used by the CLI to reference the specific theme. The `value` should be the theme `id` which you can find acquire within your Shopify dashboard.
+The `themes` option refers to theme ids the store contains. This option is an object type which uses **key** > **value** mappings. The theme **keys** represent a unique target name, this can be any alpha numeric value. The **key** value will be used by the CLI as target names. The **value** should be the theme id.
 
 </p>
 </details>
 
 ## Dirs
 
-The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to the name of directories which are relative to the root of your project. You cannot define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). The directories should preface folders contained from the root directory only.
+The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to a directory name which is relative to the root of your project. You cannot define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). This option accepts string values only.
 
 ```json
 {
@@ -416,7 +416,7 @@ The `dirs` option allows you to define custom base directories. In Syncify, `dir
 </summary>
 <p>
 
-The `input` option refers to your projects src build path. This is the directory where your development theme files exist. Syncify defaults this directory to `source`. The value defined here will be prepended to any path you define within `paths`.
+The `input` option refers to your projects **src** location This is the directory where your development theme files exist. Syncify defaults this directory to `source`. The value defined here will be prepended to any path you define within `paths`.
 
 </p>
 </details>
@@ -427,7 +427,7 @@ The `input` option refers to your projects src build path. This is the directory
 </summary>
 <p>
 
-The `output` option refers to your project dist build path. This is the directory where transformed theme files from `input` will be written. Syncify defaults this to `theme`. The output directory will be reflective of your online shop. You should point any asset files executing via a spawned process to point to the `assets` directory contained within.
+The `output` option refers to your project **dist** location. This is the directory where transformed theme files from `input` will be written. Syncify defaults this to `theme`. The `output` directory will be reflective of your online shop. You should point any asset files executing via spawned processes to the `assets` directory contained within this location.
 
 </p>
 </details>
@@ -438,9 +438,9 @@ The `output` option refers to your project dist build path. This is the director
 </summary>
 <p>
 
-The `config` option refers to a directory within your project where configuration files exist, like (for example) a `rollup.config.js` or `webpack.config.js` file. Syncify by default (when this option is undefined) will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. This `config` directory allows you to optionally place spawn config files within a sub-directory that is relative to root.
+The `config` option refers to a directory within your project where configuration files exist, like (for example) a `rollup.config.js` or `webpack.config.js` file. Syncify by default (when this option is **undefined**) will look for config files in the root of your project but this might not always be ideal as it can create clutter in the workspace. The `config` directory allows you to optionally place spawned config files within a sub-directory and informs Syncify to look for these files from that location.
 
-> Typically this is named `scripts` in most node projects. Be sure to point output paths within third party configs to the assets output assets directory..
+> Typically this is directory is named `scripts` in node projects.
 
 </p>
 </details>
@@ -451,7 +451,7 @@ The `config` option refers to a directory within your project where configuratio
 </summary>
 <p>
 
-The `import` option refers to a directory where downloaded themes will be written. Syncify provides the ability to download themes from your online store and it is within this directory theme files will be created.
+The `import` option refers to a directory where downloaded themes will be written. Syncify provides the ability to download themes from your online store and it is within this directory the files are created.
 
 </p>
 </details>
@@ -462,7 +462,7 @@ The `import` option refers to a directory where downloaded themes will be writte
 </summary>
 <p>
 
-The `export` option refers to a directory where packaged (.zip) themes will be written when running the `package` resource via the CLI. Packaged themes will be prepended with the version number defined in your `package.json` file and are exported as `.zip` files.
+The `export` option refers to a directory where packaged (`.zip`) themes will be written when running the `package` command. Packaged themes will be prepended with the version number defined in the projects `package.json` file.
 
 </p>
 </details>
@@ -473,7 +473,7 @@ The `export` option refers to a directory where packaged (.zip) themes will be w
 </summary>
 <p>
 
-The `metafields` option refers to a directory within your project which can contain global JSON metafield files. Syncify supports metafield sync capabilities using a simple **directory** > **file** based approach, where sub-directory names represent a metafield a `namespace` value. JSON file names contained within represent a metafield `key` and their contents the value.
+The `metafields` option refers to a directory within your project which can contain global JSON metafield files. Syncify supports metafield sync capabilities using a simple **directory** > **file** based approach. Sub-directory names in this location represent a metafield `namespace` value. JSON file names contained within the sub-directory represent a metafield `key` value. JSON contents represent metafield value.
 
 <table>
   <thead>
@@ -504,7 +504,7 @@ The `metafields` option refers to a directory within your project which can cont
       <td>
        &nbsp;&nbsp;&nbsp;Metafields will be published to the global <code>shop</code> object.<br>
        &nbsp;&nbsp;&nbsp;Syncify will use the sub-directory names as the metafield<br>
-       &nbsp;&nbsp;&nbsp; <code>namespace</code> and the JSON file names contained within<br>
+       &nbsp;&nbsp;&nbsp;<code>namespace</code> and the JSON file names contained within<br>
        &nbsp;&nbsp;&nbsp;each namespace directory are used as the metafield <code>key</code> name.<br><br>
        <strong>Example:</strong><br><br>
         <ul>
@@ -524,7 +524,7 @@ The `metafields` option refers to a directory within your project which can cont
 
 ## Paths
 
-The `paths` option allows you to define a custom set of paths that point to theme specific files contained within your defined `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify because files are re-routed to the standard theme structure. Each path option accepts an `array` of glob ([anymatch](https://www.npmjs.com/package/anymatch)) patterns. By default, Syncify assumes you are using the basic-bitch (default) structure.
+The `paths` option allows you to define a custom set of path locations which point to theme specific files contained within your defined `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify because files are re-routed to the standard theme structure. Each path option accepts an `array` of glob ([anymatch](https://www.npmjs.com/package/anymatch)) patterns. By default, Syncify assumes you are using the basic-bitch (default) structure.
 
 <!-- prettier-ignore -->
 ```json

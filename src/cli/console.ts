@@ -118,8 +118,8 @@ const stdout = (config: IConfig) => {
 
   return (name: string) => ({
     spawn: print(name, ansi.indent),
-    print: print(name),
-    warn: print(name)
+    print: print(name)
+
   });
 
 };
