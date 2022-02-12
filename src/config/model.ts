@@ -4,6 +4,18 @@ import { ICLIOptions, IConfig, IModes, IRedirect } from 'types';
 
 export class Model implements PartialDeep<IConfig> {
 
+  static output = [
+    'assets',
+    'config',
+    'layout',
+    'locales',
+    'sections',
+    'snippets',
+    'templates',
+    'templates/customers',
+    'metafields'
+  ];
+
   public cwd: string;
   public mode: IModes;
   public env: 'prod' | 'dev';
@@ -13,6 +25,7 @@ export class Model implements PartialDeep<IConfig> {
   public resource: string;
   public spawns: IConfig['spawns'];
   public node_modules: string;
+  public version: string;
   public cli = true;
   public config = '.';
   public source = 'source';

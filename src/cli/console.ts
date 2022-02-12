@@ -118,7 +118,8 @@ const stdout = (config: IConfig) => {
 
   return (name: string) => ({
     spawn: print(name, ansi.indent),
-    print: print(name)
+    print: print(name),
+    warn: print(name)
   });
 
 };
@@ -137,7 +138,7 @@ const stdout = (config: IConfig) => {
 export const create = async (config: IConfig) => {
 
   const pipe = stdout(config);
-  const labels = config.mode.build ? [
+  const labels = (config.mode.build || config.mode.download) ? [
     'assets',
     'config',
     'layout',

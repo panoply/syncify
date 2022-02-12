@@ -1,6 +1,7 @@
 import { has } from 'rambdax';
 import { ICLIOptions, Syncify } from 'types';
 import { upload } from 'sync/upload';
+import { download } from 'sync/download';
 import { build } from 'sync/build';
 import { watch } from 'sync/watch';
 import { prompt } from 'cli/prompts';
@@ -17,9 +18,7 @@ import * as log from 'cli/logs';
  */
 export async function client (options: ICLIOptions, callback?: typeof Syncify.hook) {
 
-  options.cli = has('_', options);
-
-  if (options.cli) options._ = options._.slice(1);
+  if (has('_', options)) options._ = options._.slice(1);
 
   const config = await readConfig(options);
 
@@ -38,7 +37,7 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
       } else if (config.mode.upload) {
         return upload(config, callback);
       } else if (config.mode.download) {
-        return null;
+        return download(config, callback);
       } else if (config.mode.help) {
         return process.stdout.write(help);
       }

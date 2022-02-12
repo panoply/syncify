@@ -1,5 +1,6 @@
-import { IConfig } from 'types';
+import { IConfig, IFile, IThemes } from 'types';
 import { request } from 'requests/request';
+import { get } from 'requests/assets';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -29,7 +30,7 @@ export const client = ({ sync: { stores, themes } }: IConfig) => ({
   },
   assets: {
     queue: request(themes),
-    get: null,
+    get: get,
     list: null,
     update: null,
     delete: null

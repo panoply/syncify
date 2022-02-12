@@ -106,6 +106,7 @@ export interface IOptions {
 }
 
 export interface IPackage {
+  version?: string;
   syncify?: IOptions;
   dependencies?: { [module: string]: string; };
   devDependencies?: { [module: string]: string };

@@ -101,6 +101,14 @@ export const header = ({ sync, spawns, env, mode }: IConfig) => {
 export const group = (title: string) => (
   c.line('│\n├─ ') + c.bold.doubleUnderline(toUpcase(title)) + c.line('\n│\n')
 );
+
+/**
+ * Task - Prints the executed task/operation
+ *
+ * `│`
+ */
+export const newline = (amount = 1) => c.line('│\n'.repeat(amount));
+
 /**
  * Task - Prints the executed task/operation
  *

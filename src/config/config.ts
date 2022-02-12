@@ -1,11 +1,11 @@
 import { PartialDeep } from 'type-fest';
 import { resolve, join } from 'path';
-import { hasPath, isNil, has, includes } from 'rambdax';
+import { hasPath, isNil, has, includes, allFalse } from 'rambdax';
 import { readJson, pathExistsSync, mkdir } from 'fs-extra';
 import { is, isArray, keys } from 'shared/native';
 import { create, log } from 'cli/console';
 import * as transforms from 'config/transforms';
-import { ICLIOptions, IConfig, IPackage, IStore } from 'types';
+import { ICLIOptions, IConfig, IModes, IPackage, IStore } from 'types';
 import { Model } from 'config/model';
 import dotenv from 'dotenv';
 
@@ -60,7 +60,7 @@ function getURL (domain: string, env: object): { token: string; base: string; } 
  * file and the `.env` file locations relative to the current
  * working directory.
  */
-function shops (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
+async function shops (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
 
   const file = dotenv.config({ path: join(config.cwd, '.env') });
 
@@ -112,6 +112,32 @@ function shops (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
 
       if (!has(target, field.themes)) {
         log.throw(`Missing theme target "${target}" in ${field.domain} store.`);
+      }
+
+      if (config.mode.download) {
+
+        const domain = join(config.cwd, config.import, store.domain);
+        const dirname = join(domain, target);
+        const dir = transforms.directories(config.mode as IModes, dirname);
+
+        if (!pathExistsSync(domain)) {
+          try {
+            await mkdir(domain);
+          } catch (e) {
+            log.throw('Failed to create a "domain" directory "' + domain + '"');
+          }
+        }
+
+        if (!pathExistsSync(dirname)) {
+          try {
+            await mkdir(dirname);
+          } catch (e) {
+            log.throw('Failed to create a "domain theme" directory "' + dirname + '"');
+          }
+        }
+
+        for (const out of Model.output) await dir(out);
+
       }
 
       config.sync.themes.push({
@@ -197,6 +223,20 @@ async function caches (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPac
     }
   }
 
+  if (config.mode.download) {
+
+    const imports = join(cli.cwd, config.import);
+
+    if (!pathExistsSync(imports)) {
+      try {
+        await mkdir(imports);
+      } catch (e) {
+        log.throw('Failed to create a "import" directory "' + config.import + '"');
+      }
+    }
+
+  }
+
   return dirs(config, cli, pkg);
 
 };
@@ -212,7 +252,7 @@ async function runtime (cli: ICLIOptions, pkg: IPackage) {
 
   const config = new Model(cli);
 
-  console.log(config);
+  config.version = pkg.version;
 
   /* if (
     (
@@ -293,7 +333,17 @@ function getPackage (options: ICLIOptions) {
 function command (options: ICLIOptions) {
 
   if (is(options._.length, 0)) {
-    options.prompt = true;
+
+    options.prompt = allFalse(
+      options.build,
+      options.clean,
+      options.download,
+      options.help,
+      options.upload,
+      options.vsc,
+      options.watch
+    );
+
     return getPackage(options);
   }
 

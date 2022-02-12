@@ -17,18 +17,37 @@ import { AxiosError } from 'axios';
  * REST endpoint. When request rates are exceeded
  * the handler will re-queue them.
  */
+export async function get (url: string, config: IRequest) {
+
+  return axios.get(url, config).then(({ data }) => {
+
+    return data;
+
+  }).catch((e: AxiosError) => {
+
+  });
+
+};
+
+/**
+ * Request Handler
+ *
+ * Executes a request to a Shopify resource
+ * REST endpoint. When request rates are exceeded
+ * the handler will re-queue them.
+ */
 export async function assets (sync: IThemes, file: IFile, config: IRequest) {
 
   config.url = sync.url;
 
-  if (!isNil(sync.token)) {
-    config.headers['X-Shopify-Access-Token'] = sync.token;
-  }
+  if (!isNil(sync.token)) config.headers['X-Shopify-Access-Token'] = sync.token;
 
-  return axios(config).then(({ headers }) => {
+  return axios(config).then(({ headers, data }) => {
 
     if (config.method === 'delete') {
       log.fileDelete(sync.store, sync.target);
+    } else if (config.method === 'get') {
+      return data;
     } else {
       log.fileSync(file, sync.store, sync.target);
     }

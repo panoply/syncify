@@ -1,16 +1,15 @@
 import { PartialDeep } from 'type-fest';
-import { IConfig, IIcons, IPackage, IStyle } from 'types';
+import { IConfig, IIcons, IModes, IPackage, IStyle } from 'types';
 import glob from 'glob';
-import YAML from 'yamljs';
-import { has, hasPath, isNil, mapFastAsync } from 'rambdax';
+import { has, hasPath, isNil } from 'rambdax';
 import { join, basename, extname } from 'path';
-import { assign, isArray, isObject, isRegex, isString, isUndefined } from 'shared/native';
+import { assign, is, isArray, isObject, isRegex, isString, isUndefined } from 'shared/native';
 import { getConfigs, getModules, lastPath, normalPath, parentPath } from 'shared/helpers';
 import * as style from 'transform/styles';
-import * as redirect from 'requests/redirects';
 import anymatch from 'anymatch';
-import { mkdir, pathExists, pathExistsSync, readFile, readJson } from 'fs-extra';
+import { mkdir, pathExists, readdir } from 'fs-extra';
 import { log } from 'cli/console';
+import { cancel, dirEmpty } from 'cli/logs';
 
 /* -------------------------------------------- */
 /* PRIVATES                                     */
@@ -20,21 +19,32 @@ import { log } from 'cli/console';
  * Create Dirs
  *
  * Generates output directories if they are non existent
- * within the workspace.
+ * within the workspace. Returns an enum value which infers
+ * the status of the output directory:
+ *
+ * - `0` Directory is valid
+ * - `1` Directory was created
+ * - `2` Directory is empty
+ * - `3` Directory is assets and empty
  */
-async function directories (output: string, path: string) {
+export const directories = (mode: IModes, output: string) => async (path: string) => {
+
+  let state: number = 0;
 
   if (path === 'templates/customers') {
+
     const uri = join(output, 'templates');
-    const has = await pathExists(join(output, 'templates'));
+    const has = await pathExists(uri);
+
     if (!has) {
       try {
         await mkdir(uri);
+        state = 1;
       } catch (e) {
         log.throw('Failed to create output directory "' + uri + '"');
       }
-
     }
+
   }
 
   const uri = join(output, path);
@@ -43,10 +53,29 @@ async function directories (output: string, path: string) {
   if (!has) {
     try {
       await mkdir(uri);
+      state = 1;
     } catch (e) {
       log.throw('Failed to create output directory "' + uri + '"');
     }
+  } else {
+
+    if (mode.upload) {
+
+      const empty = await readdir(uri);
+
+      if (path === 'templates') {
+        if (is(empty.length, 1) && empty[0] === 'customers') empty.shift();
+      }
+
+      if (is(empty.length, 0)) {
+        state = path === 'assets' ? 3 : 2;
+        dirEmpty(uri);
+      }
+
+    }
   }
+
+  return state;
 
 };
 
@@ -64,8 +93,12 @@ async function directories (output: string, path: string) {
  */
 export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
 
-  // Path normalize
+  // Path normalize,
+  // When mode is upload we reference output directory
   const path = normalPath(config.mode.upload ? config.output : config.source);
+  const dirs = directories(config.mode as IModes, config.output);
+
+  let valid: number = 8;
 
   // iterate over the define path mappings
   for (const key in config.paths) {
@@ -92,7 +125,9 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
     } else if (key === 'customers') {
 
       // customers directory lives with the templates directory
-      await directories(config.output, 'templates/customers');
+      const dir = await dirs('templates/customers');
+
+      if (is(dir, 0)) valid--;
 
       uri = has(key, this.syncify.paths)
         ? isArray(this.syncify.paths[key])
@@ -102,7 +137,9 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
 
     } else if (has(key, this.syncify.paths)) {
 
-      await directories(config.output, key);
+      const dir = await dirs(key);
+
+      if (is(dir, 0) || is(dir, 3)) valid--;
 
       uri = isArray(this.syncify.paths[key])
         ? this.syncify.paths[key].map(path)
@@ -116,7 +153,7 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
 
     if (key === 'assets') {
 
-      const assets = join(config.output, 'assets/**');
+      const assets = join('assets/**');
 
       if (isArray(uri)) {
         uri.push(assets);
@@ -132,6 +169,13 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
 
     }
 
+  }
+
+  if (config.mode.upload) {
+    if (!is(valid, 0)) {
+      cancel('Output directories empty, no files can be uploaded');
+      process.exit();
+    }
   }
 
   return views.call(this, config);
@@ -537,7 +581,6 @@ export async function styles (this: IPackage, config: PartialDeep<IConfig>) {
  */
 export async function icons (this: IPackage, config: PartialDeep<IConfig>) {
 
-  return redirects.call(this, config);
   // Find postcss configuration files
   config.transform.icons.svgo = await getConfigs(config as IConfig, [
     'svgo.config.js',
@@ -548,7 +591,7 @@ export async function icons (this: IPackage, config: PartialDeep<IConfig>) {
   const { transform } = this.syncify;
 
   // Ensure options have been passed in package
-  if (isUndefined(transform) || !has('styles', transform)) return redirects.call(this, config);
+  if (isUndefined(transform) || !has('styles', transform)) return config;
 
   const path = normalPath(config.source);
 
@@ -593,31 +636,6 @@ export async function icons (this: IPackage, config: PartialDeep<IConfig>) {
 
     config.transform.icons.sprites.push(sprite);
 
-  }
-
-  return redirects.call(this, config);
-
-}
-
-async function redirects (this: IPackage, config: PartialDeep<IConfig>) {
-
-  const path = await getConfigs(config as IConfig, [
-    'redirects.yaml',
-    'redirects.yml'
-  ]);
-
-  const yaml = await readFile(path);
-  const file = YAML.parse(yaml.toString());
-
-  for (const store of config.sync.stores) {
-
-    const item = await redirect.list(store.url.redirects, {
-      headers: store.token ? {
-        'X-Shopify-Access-Token': store.token
-      } : {}
-    });
-
-    console.log(item);
   }
 
   return config;

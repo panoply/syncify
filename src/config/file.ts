@@ -49,6 +49,30 @@ const setProps = (path: string, output: string) => {
 
 };
 
+export const importFile = (output: string) => (path: string) => {
+
+  const { merge } = setProps(path, output);
+
+  if (path.startsWith('sections/')) {
+    return merge('sections', Type.Section);
+  } else if (path.startsWith('snippets/')) {
+    return merge('sections', Type.Snippet);
+  } else if (path.startsWith('layout/')) {
+    return merge('sections', Type.Layout);
+  } else if (path.startsWith('templates/')) {
+    return merge('sections', Type.Template);
+  } else if (path.startsWith('customers/', 10)) {
+    return merge('sections', Type.Template);
+  } else if (path.startsWith('config/')) {
+    return merge('sections', Type.Config);
+  } else if (path.startsWith('locales/')) {
+    return merge('sections', Type.Locale);
+  } else if (path.startsWith('assets/')) {
+    return merge('sections', Type.Asset);
+  }
+
+};
+
 export const outputFile = (output: string) => (path: string) => {
 
   const { file, merge } = setProps(path, output);
@@ -69,7 +93,7 @@ export const outputFile = (output: string) => (path: string) => {
     case 'locales':
       return merge('locales', Type.Locale);
     case 'assets':
-      return merge('assets', Type.Locale);
+      return merge('assets', Type.Asset);
   }
 
 };

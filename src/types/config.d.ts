@@ -331,6 +331,10 @@ export interface IIcons {
 
 export interface IConfig {
   /**
+   * The version defined in the package.json
+   */
+  version: string;
+  /**
    * The environment we are running
    */
   env: 'dev' | 'prod';

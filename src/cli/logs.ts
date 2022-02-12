@@ -92,6 +92,19 @@ export const fileRemove = (file: IFile) => {
  *
  * File operation (transform) executed on file
  */
+export const fileTouch = (key: string) => {
+
+  log.print(tui.task(c.greenBright(`✓ ${key}`)));
+
+  // log.files(tui.task(c.greenBright(`✓ ${file.key}`)));
+
+};
+
+/**
+ * File Task
+ *
+ * File operation (transform) executed on file
+ */
 export const fileTask = (file: IFile, message: string) => {
 
   if (hasMarks) {
@@ -174,6 +187,19 @@ export const fileWarn = (message: string) => {
  *
  * File was transformed and uploaded
  */
+export const dirEmpty = (path: string) => {
+
+  log.files(
+    tui.task(c.yellow(`${c.bold('! empty directory')} ${c.gray('at')} ${c.yellowBright(path)}`))
+  );
+
+};
+
+/**
+ * File Completion
+ *
+ * File was transformed and uploaded
+ */
 export const fileError = (e: { file: string; message: string; data: string | string[] }) => {
 
   // log.files(tui.task(c.red(`⨯ ${e.message}`)), tui.indent('\n' + c.red(parse.liquidPretty(e.data))));
@@ -247,6 +273,16 @@ export const sassWarn = (message: string, options: {
 export const finish = (timer: string) => {
 
   return log.print(tui.footer(c.bold(`Generated Theme ${c.gray('in')} ${time.stop(timer)}`)));
+
+};
+
+export const cancel = (message: string) => {
+
+  return log.print(
+    tui.newline(),
+    tui.task(`${c.yellow.bold('⨯')} ${c.yellowBright(message)}`),
+    tui.footer(c.redBright.bold('Cancelled'))
+  );
 
 };
 

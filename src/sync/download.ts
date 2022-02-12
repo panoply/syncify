@@ -1,93 +1,48 @@
-import glob from 'glob';
-import any from 'anymatch';
-import { readFile } from 'fs-extra';
-import { client, queue } from '../requests/client';
-import { ignore } from '../config/utils';
-import * as log from '../cli/logs';
-import { IConfig, Callback } from '../typings';
-import { has, mapFastAsync } from 'rambdax';
-import { parseFile, setMetafield, setAsset } from '../config/file';
+// import { readFile } from 'fs-extra';
+import { client } from 'requests/client';
+import { join } from 'path';
+// import { importFile } from 'config/file';
+// import * as log from 'cli/logs';
+import { IConfig, Syncify } from 'types';
+import { isNil, has } from 'rambdax';
+import { writeFile } from 'fs-extra';
+import * as log from 'cli/logs';
 
-export async function upload (
-  config: Partial<IConfig>,
-  callback?: typeof Callback
-): Promise<void> {
+export const download = async (config: IConfig, cb?: typeof Syncify.hook): Promise<void> => {
 
-  let total = 0;
+  log.time.start('download');
 
   const request = client(config);
 
-  const problems = [];
-  const cwd = process.cwd();
-  const dirName = options.dir || 'theme';
-  const filter = options._?.[0] ? new RegExp(dirName) : null;
-  const { settings } = ignore(options);
-  const { assets } = await request(target, {
-    method: 'GET',
-    url: `/admin/themes/${target.theme_id}/assets.json`
-  });
+  for (const theme of config.sync.themes) {
 
-  let files: Array<{ key: string, name: string, path: string}>;
+    const req = !isNil(theme.token) ? { headers: { 'X-Shopify-Access-Token': theme.token } } : {};
 
-  if (filter) files = assets.filter((file: string) => filter.test(file));
+    const { assets } = await request.assets.get(theme.url, req);
 
-  files = settings?.ignore?.length > 0
-    ? assets.filter(({ key }) => !anymatch(settings.ignore, key))
-    : files || assets;
+    for (const asset of assets) {
 
-  log.clear(true);
+      try {
 
-  await mapAsync(async ({ key }) => {
+        const item = await request.assets.get(theme.url, { ...req, params: { 'asset[key]': asset.key } });
+        const path = join(config.cwd, config.import, theme.domain, theme.target, asset.key);
+        const buffer = has('attachment', item.asset)
+          ? Buffer.from(item.asset.attachment, 'base64')
+          : Buffer.from(item.asset.value || null, 'utf8');
 
-    try {
+        await writeFile(path, buffer);
 
-      const { asset } = await request(target, {
-        method: 'GET',
-        url: `/admin/themes/${target.theme_id}/assets.json`,
-        params: { 'asset[key]': key }
-      });
+        log.fileTouch(`${asset.key} (${theme.domain})`);
 
-      const encode = asset.attachment ? 'base64' : 'utf8';
-      const content = asset.attachment || asset.value;
-      const buffer = Buffer.from(content, encode);
-      const path = join(cwd, dirName, key || null);
+      } catch (e) {
 
-      await mkdirp(join(cwd, dirName, dirname(key)));
-      await writeFile(path, buffer);
-
-      const print = boxen((
-        chalk`{magenta  Running}{dim :} {white downloading}\n` +
-        chalk`{magenta    Store}{dim :} {dim.underline ${target.domain}.myshopify.com}\n` +
-        chalk`{magenta     File}{dim :} {cyan ${basename(key)}}\n` +
-        chalk`{magenta Progress}{dim :} {cyan ${total += 1}} of {cyan ${files.length}}\n` +
-        chalk`{magenta   Output}{dim :} {dim ${dirName}/}{cyan ${dirname(key)}}\n` +
-        chalk`{magenta   Errors}{dim :} {red ${problems.length}}`
-      ), {
-        padding: 1,
-        margin: 1,
-        borderColor: 'gray',
-        dimBorder: true,
-        borderStyle: 'round'
-      });
-
-      log.update(print, problems.length > 0 ? `\n${problems.join('\n')}` : '');
-
-    } catch (error) {
-
-      const report = Array.isArray(error.data)
-        ? error.data.map((value: string) => chalk`{red >} {white.dim ${value}}`)
-        : chalk`{yellow.dim.italic ${error.data}}`;
-
-      problems.push(chalk`{red Failed} '{red ${error.message}}'`, report);
+        console.log(e);
+      }
 
     }
 
-  }, files).finally(() => {
+  }
 
-    log.print(chalk`Uploaded: {green ${total}} files.`);
-    log.print(chalk`Problems: {red ${problems.length}}`);
+  log.finish('download');
 
-  });
-  ;
-
-}
+};
