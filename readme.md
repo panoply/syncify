@@ -22,7 +22,7 @@ A blazing fast, extensible and superior alternative Shopify [theme kit](https://
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit is an embarrassment any all other tools in this nexus fail to achieve fluidity. Syncify is not like Theme Kit. This tool is fast, flexible, extensible, scalable and will not lock you into some poorly thought through workflow and setup apparatus.
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit and other tools in this nexus fail to achieve fluidity imp. Syncify is how I handle theme creation, development and maintenance, it's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
 
 # Install
 
@@ -565,99 +565,100 @@ The `paths` option allows you to define a custom set of path locations which poi
 }
 ```
 
-The **customized structure** shown below is an example of how you _could_ arrange an `input` directory using Syncify. The **default structure** is what Syncify will use if no `paths` are defined in your configuration. The **output structure** is what Syncify will build from source structures.
+Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use if no `paths` have been defined in your configuration, the tool defaults to this. The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** structure that Shopify understands.
 
 <table>
   <thead>
     <tr>
-      <th colspan="3">
-        Customized Structure&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇨&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output Structure&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇦&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Structure</th>
+      <th>Default Structure</th>
+      <th>Customized Structure</th>
+      <th>Output Structure</th>
     </tr>
   </thead>
   <tbody>
-      <td>
-        <pre>
-        <code>
-  source
-  │
-  ├── assets
-  │  ├─ files
-  │  ├─ icons
-  │  └─ images
-  ├─ data
-  │  ├─ config
-  │  ├─ locales
-  │  └─ metafields
-  │     └─ namespace
-  │        └─ key.json ㅤ ㅤ ㅤㅤ
-  ├─ styles
-  ├─ scripts
-  └─ views
-     ├─ customers
-     ├─ sections
-     ├─ snippets
-     ├─ templates
-     └─ theme.liquid
-        </code>
-        </pre>
-      </td>
           <td>
       <pre>
-      <code>ㅤ
-          ㅤ
-          ㅤ
-          ㅤ
-         ㅤㅤ
-         ㅤ
-  theme
-  │
-  ├─ assets
-  ├─ config
-  ├─ locales
-  ├─ layout
-  ├─ sections
-  ├─ snippets
-  └─ template
-     └─ customer ㅤㅤ
-        ㅤ
-        ㅤ
-        ㅤ
-        ㅤ
-        ㅤ
-      </code>
+      <code>
+      ㅤ
+      ㅤ
+      ㅤ
+      ㅤ
+   source
+   └─┐
+     ├─ assets
+     ├─ config
+     ├─ layout
+     ├─ locales
+     ├─ metafields
+     │  └─ namespace
+     │     └─ key.json ㅤ ㅤㅤㅤㅤ
+     ├─ sections
+     ├─ snippets
+     └─ templates
+        └─ customers
+       ㅤ
+       ㅤ
+       ㅤ
+</code>
       </pre>
       </td>
       <td>
+        <pre>
+        <code>
+ source
+ └─┐
+   ├── assets
+   │  ├─ files
+   │  ├─ icons
+   │  └─ images
+   ├─ data
+   │  ├─ config
+   │  ├─ locales
+   │  └─ metafields
+   │     └─ namespace
+   │        └─ key.json ㅤ ㅤ ㅤㅤ
+   ├─ styles
+   ├─ scripts
+   └─ views
+      ├─ customers
+      ├─ sections
+      ├─ snippets
+      ├─ templates
+      └─ theme.liquid
+      </code>
+        </pre>
+      </td>
+       <td>
       <pre>
       <code>
-           ㅤ
-         ㅤㅤ
-         ㅤ
-         ㅤ
-  source
-  │
-  └── assets
-      ├─ config
-      ├─ layout
-      ├─ locales
-      ├─ metafields
-      │  └─ namespace
-      │     └─ key.json ㅤ ㅤㅤ
-      ├─ sections
-      ├─ snippets
-      └─ templates
-         └─ customers
-         ㅤ
-         ㅤ
-         ㅤ
-      </code>
+      ㅤㅤ
+      ㅤ
+      ㅤ      ㅤ
+      ㅤ      ㅤ
+      ㅤ      ㅤ
+      ㅤ
+  output
+  └─┐
+    ├─ assets
+    ├─ config
+    ├─ locales
+    ├─ layout
+    ├─ sections
+    ├─ snippets
+    └─ template
+       └─ customers ㅤㅤㅤㅤㅤ
+       ㅤ
+       ㅤ
+       ㅤ
+       ㅤ
+</code>
       </pre>
       </td>
     </tr>
   </tbody>
 </table>
 
-_There is no distributed difference between the **customized** and **default** structures. Both would generate output that Shopify understands. Only the input file `source` locations differ but the **output** will always be written to a standard Shopify theme._
+There is no distributed difference between the **default** and **customized** structures. Both would generate output that Shopify understands. Only the input file `source` locations differ. The **output** will always be written to a standard Shopify theme regardless of how you decide to organize the **input** structure.
 
 <details>
 <summary>
@@ -665,7 +666,11 @@ _There is no distributed difference between the **customized** and **default** s
 </summary>
 <p>
 
-An array list of glob path patterns to **asset** files. These will be written to the `assets` directory of your defined `output` path. Please note that you if you transforming CSS, SCSS, SASS or SVG file types using Syncify then you do not need to define those paths here as the transform option will do automatically route them. This is the same for assets being processed by spawns. Any paths defined in `assets` will typically just pass through.
+An array list of glob path patterns for **asset** files. These will be written in the `assets` directory of your defined `output` path. Please note that you if you transforming CSS, SCSS, SASS or SVG file types using Syncify then you do not need to define those paths here as the transform option will do automatically route them. This is the same for assets being processed by spawns. Any paths defined in `assets` will typically just pass through.
+
+**Understanding Spawns in watch mode**
+
+Syncify will automatically set watch paths of assets when running in watch mode. It will glob match all files being written to your defined `{output}/assets` path but exclude those which you have set to be handled or transformed. For example, if you are using a JavaScript bundler like webpack of rollup, Syncify will watch for any files that are written and handled by these tools or any other spawned process for that matter and once written will trigger an upload.
 
 </p>
 </details>
@@ -676,7 +681,7 @@ An array list of glob path patterns to **asset** files. These will be written to
 </summary>
 <p>
 
-An array list of glob path patterns to `.liquid` or `.json` **customer** template files. These will be written to the `templates/customers` directory of your defined `output` path.
+An array list of glob path patterns to `.liquid` or `.json` **customer** template files. These will be written to the `{output}/templates/customers` directory of your defined `output` path.
 
 </p>
 </details>
@@ -687,7 +692,7 @@ An array list of glob path patterns to `.liquid` or `.json` **customer** templat
 </summary>
 <p>
 
-An array list of glob path patterns to `.json` **locale** files. These will be written to the `locales` directory of your defined `output` path.
+An array list of glob path patterns to `.json` **locale** files. These will be written to the `{output}/locales` directory of your defined `output` path.
 
 </p>
 </details>
@@ -698,7 +703,7 @@ An array list of glob path patterns to `.json` **locale** files. These will be w
 </summary>
 <p>
 
-An array list of glob path patterns to `.json` **config** files. These will be written to the `config` directory of your defined `output` path.
+An array list of glob path patterns to `.json` **config** files. These will be written to the `{output}/config` directory of your defined `output` path.
 
 </details>
 
@@ -708,7 +713,7 @@ An array list of glob path patterns to `.json` **config** files. These will be w
 </summary>
 <p>
 
-An array list of glob path patterns to `.liquid` **layout** files. These will be written to the `layout` directory of your defined `output` path.
+An array list of glob path patterns to `.liquid` **layout** files. These will be written to the `{output}/layout` directory of your defined `output` path.
 
 </p>
 </details>
@@ -753,11 +758,13 @@ An array list of glob path patterns to `.json` or `.liquid` **template** files. 
 
 # Spawn
 
-The spawn option accepts a key > value list of commands (scripts) which you can run in `watch` and `build` modes. Spawn allows you to leverage additional build tools and have them run in parallel with Syncify.
+The spawn option accepts a **key** > **value** list of commands (ie: scripts) which you can be used when we are running `watch` or `build` modes. Spawn allows you to leverage additional build tools and have them execute in parallel with Syncify. Spawned processes allow you use your preferred asset bundlers, like [Rollup](#), [Webpack](#), [Gulp](#) and many more without having to run multiple npm-scripts.
 
-### Options
+### Overview
 
-There are 2 available modes from which you can trigger a spawned process. When a process is spawned in `watch` mode it will run along side Syncify, so you need to provide any flags the build tool may require in watch mode. Spawning a process in `build` mode will trigger the commands only 1 time, so it is here where you would pass your bundle specific command.
+There are 2 available modes from which you can trigger a spawned process. When a process is spawned in `watch` mode it will run along side Syncify in parallel and executing sequentially in the order of which they are defined. You need to provide any --flags your spawned command (build tool or bundler) requires when running in **watch** mode.
+
+Spawning a process in `build` mode will trigger spawned commands only 1 time, so it is here where you would provide the compile-only or build-only command, ie: not using watch flags/arguments. The Syncify **build** mode re-builds the entire theme and you might choose to run this mode using the Syncify `--prod` flag, if you require context of the environment, mode or action taking place within spawned config files, then take a look at the available [Utilities](#utilities) Syncify exposes to help you conditionally load plugins or trigger different build types in accordance with Syncify.
 
 <!-- prettier-ignore -->
 ```json
@@ -771,13 +778,13 @@ There are 2 available modes from which you can trigger a spawned process. When a
 }
 ```
 
-### Examples
+### Usage Examples
 
-In most situations you will leverage the spawn option to compile TypeScript or JavaScript assets. Below we will walk through how we can run 2 well known JavaScript bundlers, rollup and webpack together with Syncify in both watch and build modes.
+In most situations you will leverage the spawn option to compile TypeScript or JavaScript assets, but it is important to note that this capability is not specifically for these assets types. Below are a couple examples were we spawn up 2 well known JavaScript bundlers. If you run into any problems, please submit an issue.
 
 ### Rollup
 
-If you are processing JavaScript asset files using the [Rollup](#) bundler you can spawn build and watch processes by providing the rollup commands to each mode accordingly.
+If you are processing JavaScript asset files using the [Rollup](#) bundler you can spawn build and watch processes by providing the rollup commands to each mode accordingly. Rollup is a fantastic choice for handling `.js` files and is the preferred option for processing these asset types. In this example, it is assumed that a `rollup.config.js` file is located in the root of your project.
 
 <!-- prettier-ignore -->
 ```json
@@ -797,9 +804,9 @@ If you are processing JavaScript asset files using the [Rollup](#) bundler you c
 
 ### Webpack
 
-If you are processing JavaScript asset files using the [Webpack](#) bundler you can spawn build and watch processes by providing the webpack commands to each mode accordingly. You will need to be using the [Webpack CLI](#) module to ensure a successful spawn is triggered.
+If you are processing JavaScript asset files using the [Webpack](#) bundler you can spawn build and watch processes by providing the webpack commands to each mode accordingly. You will need to be using the [Webpack CLI](#) module to ensure a successful spawn is triggered. In this example, it is assumed that a `webpack.config.js` file is located within a `config` directory and you have informed upon this via the `dirs` option in your Syncify configuration.
 
-> Notice how we also provide the `--color` flag in the spawn. If you omit this flag then the webpack logs will be printed to the CLI without colors.
+> Notice how we also provide the `--color` flag in the spawn. If you omit this flag then the webpack logs will be printed to the CLI without colors, when using webpack you should provide this flag.
 
 <!-- prettier-ignore -->
 ```json
@@ -819,7 +826,7 @@ If you are processing JavaScript asset files using the [Webpack](#) bundler you 
 
 # Transform
 
-In Syncify, `input` files can be transformed and augmented. The `transform` option allows you to control how files are processed. Syncify supports built-in or partial processing for the following file types:
+In Syncify, `input` files can be transformed and augmented before being written to your define `output` path location. The `transform` option allows you to control how your **input** files are processed. Syncify supports built-in and partial processing for the following file types:
 
 - `.liquid`
 - `.json`
@@ -828,11 +835,130 @@ In Syncify, `input` files can be transformed and augmented. The `transform` opti
 - `.scss`
 - `.sass`
 
-Processing `.liquid` and `.json` files are handled using built-in capabilities whereas `.css`, `.sass`, `scss` and `.svg` file types require additional tooling to be installed.
+Processing `.liquid` and `.json` files are handled using built-in capabilities support by Syncify. Handling of `.css`, `.sass`, `scss` and `.svg` file types requires you install additional tooling which Syncify uses in their transform process. By default, Syncify assumes that it should only handle `.liquid` and `.json` files.
+
+### SASS Support
+
+Syncify provides partial processing of `.scss` and `.sass` file types using [Dart SASS](#). If you require transform support for these files you need to install Dart module as a development dependency in your project.
+
+**PNPM**
+
+```
+pnpm add sass -D
+```
+
+### CSS Support
+
+In addition to SASS transformation, Syncify also support CSS processing using [PostCSS](#). If you wish have Syncify handle CSS transforms then you need to install **PostCSS** as a development dependency and also include a `postcss.config.js` file in your project. Syncify expects you will inform upon how CSS files are to be handled within a `postcss.config.js` file and look for the existence of one within your workspace. Provide PostCSS plugins and any specific settings within the `postcss.config.js` file.
+
+**PNPM**
+
+```
+pnpm add postcss -D
+```
+
+> **Please note:** If you are using Syncify to compile SASS files, then by default the transformed CSS will be passed to PostCSS. Use the available Syncify `style` options to disable this behavior.
 
 ### Views
 
 The `views` transform option controls how `.liquid` file types should be handled. Snippets, Templates, Sections and Layout paths are typically where liquid files are used. Options defined here will be used when Syncify is processing such types.
+
+#### Sections
+
+Syncify provides sub-directory grouping and rename prefixing capabilities when handling theme sections. You might be accustom to storing sections within a single directory and despite Shopify using this approach in their Dawn theme, it is restrictive and rather chaotic to the developer experience. A far better approach is to take advantage of the sub-directory grouping feature which Syncify provides.
+
+#### Grouping Sub-directories
+
+Shopify shipped "sections everywhere" capabilities in Online Store 2.0 and while this is a great feature to have it opens the door to inconsistent structures. The logic of Shopify here has been to provide store developers "freedom" but it is a double edged sword. Sections everywhere has consequently resulted in developers indirectly facilitating merchants the ability to leverage sections on pages where they should otherwise be avoided. For instance, enabling merchants to add a featured-collection, featured-blog or full-screen hero image to product pages is not necessarily a good idea. Developers may be more inclined to provide such section types when working from within a single directory structure the lacks clear and organized order.
+
+Shopify tends to push a DRY infrastructure approach for the theme development wherein store sections _should_ be capable of appropriation within any template. This is great in theory but in order to achieve aesthetic fluidity it is not realistic when we go beyond a Dawn structure and even there we find the utter chaos. Approaching things in a compartmentalized manner is just better approach but this is difficult when working from a single level structured directory.
+
+Grouping section into sub-directories results is far better consideration, organization and order at the development level. Syncify provides these capabilities while still respecting developer personal preferences. Below is an example of how you can leverage Syncify to use sub-directories together with pre-fixing capabilities.
+
+<!-- prettier-ignore -->
+<table>
+  <thead>
+    <tr>
+      <th>Syncify Options</th>
+      <th>Source Structure</th>
+      <th>Theme Output</th>
+    </tr>
+  </thead>
+  <tbody>
+      <td>
+
+<!-- prettier-ignore -->
+```json
+{
+  "paths": {
+    "sections": [
+      "sections/**/*.liquid"
+    ]
+  },
+  "sections": {
+    "prefix": true,
+    "prefixSeparator": "-",
+    "prefixDuplicates": true,
+    "globals": [
+      "shared",
+      "layout",
+      "product/related.liquid"
+    ]
+  }
+}
+```
+
+  </code>
+      </td>
+      <td>
+      <pre>
+      <code>ㅤ
+  source
+  │
+  └─ sections
+    ├─ collection
+    │  ├─ filter.liquid
+    │  └─ search.liquid
+    ├─ product
+    │  ├─ images.liquid
+    │  ├─ on-sale.liquid
+    │  └─ related.liquid
+    ├─ layout
+    │  ├─ header.liquid
+    │  └─ footer.liquid
+    └─ shared
+       ├─ banner.liquid
+       └─ slideshow.liquid
+      </code>
+      </pre>
+      </td>
+      <td>
+      <pre>
+      <code>
+      ㅤ
+      ㅤ
+  theme
+  │
+  └─ sections
+    ├─ banner.liquid
+    ├─ collection-filter.liquid
+    ├─ collection-search.liquid
+    ├─ footer.liquid
+    ├─ header.liquid
+    ├─ product-images.liquid
+    ├─ product-on-sale.liquid
+    ├─ related.liquid
+    └─ slideshow.liquid
+    ㅤ
+    ㅤ
+      </code>
+      </pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+Notice how we can nest sections within sub-directories and also apply prefixing to the section output filenames. We also inform Syncify that some of our sections should be considered **global** and this allows those defined there to pass through without name augmentation (prefixing). We passed a `true` value to the `prefix` option, this informed Syncify that section files that has not explicitly defined as **global** should have their output filename prefixed with their **parent** directory name.
 
 <details>
 <summary>
@@ -840,9 +966,9 @@ The `views` transform option controls how `.liquid` file types should be handled
 </summary>
 <p>
 
-**allowPrefix**
+**prefix**
 
-**onlyPrefixDuplicates**
+**prefixDuplicates**
 
 **prefixSeparator**
 
@@ -1302,6 +1428,14 @@ This project uses [pnpm](https://pnpm.js.org/en/cli/install). Fork the project, 
 # Author
 
 Created by [Nίκος Σαβίδης](https://github.com/panoply) of [Sissel ΣaaΣ](https://sissel.io).
+
+### Acknowledgements
+
+Special thanks to a couple of talented developers that helped work through ideas and edge-cases on the project.
+
+- [David Warrington](https://ellodave.dev/)
+- [Joseph Curtis](#)
+- [Mansedan](#)
 
 # Changelog
 
