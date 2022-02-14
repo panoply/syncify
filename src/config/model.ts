@@ -134,7 +134,13 @@ export class Model implements PartialDeep<IConfig> {
   /* -------------------------------------------- */
 
   private getEnv (cli: ICLIOptions) {
-    return (cli.prod || cli.env === 'prod' || cli.env === 'production');
+
+    return (
+      cli.prod ||
+      cli.env === 'prod' ||
+      cli.env === 'production'
+    );
+
   }
 
   private setModes (cli: ICLIOptions) {

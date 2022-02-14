@@ -4,7 +4,8 @@ import * as ansi from 'cli/ansi';
 import * as c from 'cli/colors';
 import { IConfig, ILog } from 'types';
 import { queue } from 'requests/queue';
-import { clean } from 'src/modes/clean';
+import { clean } from 'modes/clean';
+import { vsc } from 'modes/vsc';
 import stringify from 'fast-safe-stringify';
 
 /* -------------------------------------------- */
@@ -138,6 +139,16 @@ const stdout = (config: IConfig) => {
 export const create = async (config: IConfig) => {
 
   const pipe = stdout(config);
+
+  if (config.mode.vsc) {
+    log.vscode = pipe('schemas').print;
+    try {
+      return vsc(config, log.vscode);
+    } catch (e) {
+      throw console.error(e);
+    }
+  }
+
   const labels = (config.mode.build || config.mode.download) ? [
     'assets',
     'config',
@@ -156,14 +167,15 @@ export const create = async (config: IConfig) => {
     'files'
   ];
 
-  if (config.mode.clean) labels.push('clean');
-
   for (const script of labels) {
     nodes[script] = nil;
     log[script] = pipe(script).print;
   }
 
-  if (config.mode.clean) await clean(config, log.clean);
+  if (config.mode.clean) {
+    log.clean = pipe('clean').print;
+    await clean(config, log.clean);
+  }
 
   if (config.resource !== 'upload') {
     for (const process in config.spawns) {

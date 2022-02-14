@@ -279,6 +279,8 @@ async function runtime (cli: ICLIOptions, pkg: IPackage) {
 
   await create(config as any);
 
+  if (config.mode.vsc) return;
+
   return caches(config, cli, pkg);
 
 };

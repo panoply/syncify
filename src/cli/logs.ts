@@ -272,7 +272,9 @@ export const sassWarn = (message: string, options: {
 
 export const finish = (timer: string) => {
 
-  return log.print(tui.footer(c.bold(`Generated Theme ${c.gray('in')} ${time.stop(timer)}`)));
+  return log.print(
+    tui.footer(c.bold(`Generated Theme ${c.gray('in')} ${time.stop(timer)}`))
+  );
 
 };
 

@@ -1,9 +1,9 @@
 import { has } from 'rambdax';
 import { ICLIOptions, Syncify } from 'types';
-import { upload } from 'src/modes/upload';
-import { download } from 'src/modes/download';
-import { build } from 'src/modes/build';
-import { watch } from 'src/modes/watch';
+import { upload } from 'modes/upload';
+import { download } from 'modes/download';
+import { build } from 'modes/build';
+import { watch } from 'modes/watch';
 import { prompt } from 'cli/prompts';
 import { readConfig } from 'config/config';
 import { help } from 'cli/help';

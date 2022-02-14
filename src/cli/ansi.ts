@@ -68,6 +68,7 @@ export const header = ({ sync, spawns, env, mode }: IConfig) => {
 
   let running: string;
 
+  if (mode.vsc) running = 'vscode generation';
   if (mode.build) running = 'build';
   if (mode.watch) running = 'watch';
   if (mode.upload) running = 'upload';
@@ -86,7 +87,7 @@ export const header = ({ sync, spawns, env, mode }: IConfig) => {
     heading += c.line('│ ') + 'Spawned ' + spawned + '\n' + c.line('│\n');
   }
 
-  return (mode.build || mode.clean) ? heading : heading + (
+  return (mode.build || mode.clean || mode.vsc) ? heading : heading + (
     c.line('│ ') + 'Previews:' + c.line('\n│\n') + preview + '\n' +
     c.line('│ ') + '\n'
   );

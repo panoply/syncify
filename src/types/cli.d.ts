@@ -42,6 +42,7 @@ export interface IBuildLog {
 export interface ILog extends IBuildLog {
   tracked?: string;
   files?: Log,
+  vscode?: Log,
   clean?: Log,
   throw?: Log,
   error?: Log,

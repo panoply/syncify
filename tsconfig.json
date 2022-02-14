@@ -34,7 +34,7 @@
     "paths": {
       "types": ["src/types/index.d.ts"],
       "cli/*": ["src/cli/*"],
-      "sync/*": ["src/modes/*"],
+      "modes/*": ["src/modes/*"],
       "shared/*": ["src/shared/*"],
       "config/*": ["src/config/*"],
       "logs/*": ["src/logs/*"],
