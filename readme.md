@@ -888,7 +888,7 @@ Grouping section into sub-directories results is far better consideration, organ
 {
   "paths": {
     "sections": [
-      "sections/**/*.liquid"
+      "sections/**/*"
     ]
   },
   "sections": {
@@ -898,7 +898,7 @@ Grouping section into sub-directories results is far better consideration, organ
     "globals": [
       "shared",
       "layout",
-      "product/related.liquid"
+      "related.liquid"
     ]
   }
 }
@@ -954,7 +954,7 @@ Grouping section into sub-directories results is far better consideration, organ
   </tbody>
 </table>
 
-Notice how we can nest sections within sub-directories and also apply prefixing to the section output filenames. We also inform Syncify that some of our sections should be considered **global** and this allows those defined there to pass through without name augmentation (prefixing). We passed a `true` value to the `prefix` option, this informed Syncify that section files that has not explicitly defined as **global** should have their output filename prefixed with their **parent** directory name.
+Notice how we can nest sections within sub-directories and also apply prefixing to the section output filenames. We also inform Syncify that some of our sections should be considered **global** and this allows those defined there to pass through without name augmentation (prefixing). We passed a `true` value to the `prefix` option, this informed Syncify that section files which are not explicitly defined as **global** should have their output filename prefixed with the **parent** directory name they are contained within.
 
 <details>
 <summary>
