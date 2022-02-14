@@ -28,6 +28,95 @@ let logBuild: boolean = false;
 export const presets = (config: IConfig['mode']) => { logBuild = config.build; };
 
 /* -------------------------------------------- */
+/* METAFIELD LOGGERS                            */
+/* -------------------------------------------- */
+
+/**
+ * Metafield Change
+ *
+ * Metafield file source was changed
+ */
+export const metafieldChange = (file: IFile) => {
+
+  if (hasError) hasError = false;
+
+  if (logBuild) {
+    time.start('cm');
+    time.start(file.path);
+    hasMarks = true;
+  }
+
+  log.metafields(
+    tui.task(
+      c.cyan(`${c.bold('+')} modified ${c.bold(file.path)} metafield`)
+    )
+  );
+
+};
+
+/**
+ * Metafield Remove
+ *
+ * Removed metafield from directory or namespace directory deleted
+ */
+export const metafieldRemove = (file: IFile) => {
+
+  log.metafields(
+    tui.task(
+      c.orange('⌧ deleted ' + file.key)
+    )
+  );
+
+};
+
+/**
+ * Metafield Merge
+ *
+ * Merged an existing metafield in worskpace with remote
+ */
+export const metafieldMerge = (file: IFile) => {
+
+  time.start(file.key);
+
+  log.metafields(
+    tui.task(
+      c.orange('≡ merged ' + file.key + ' with remote version ')
+    )
+  );
+
+};
+
+/**
+ * Metafield Merge
+ *
+ * Downloaded (pulled) metafield from store
+ */
+export const metafieldPull = (field: string, output: string) => {
+
+  log.print(
+    tui.task(
+      c.greenBright(`↕ downloaded ${c.bold(field)} ${c.gray('to')} ${output}`)
+    )
+  );
+
+};
+
+/**
+ * Metafield Merge
+ *
+ * Removed metafield from directory
+ */
+export const metafieldSync = (file: IFile, store: string) => {
+
+  const shop = `${c.gray('to')} ${c.blue(store)} ${c.gray('in')} ${time.stop('cm')}`;
+
+  log.metafields(
+    tui.task(c.greenBright(`✓ uploaded ${file.key} ${shop}`))
+  );
+
+};
+
+/* -------------------------------------------- */
 /* FILE LOGGERS                                 */
 /* -------------------------------------------- */
 

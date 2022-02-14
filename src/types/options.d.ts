@@ -22,6 +22,7 @@ export interface IOptions {
     customers?: string[];
     config?: string[];
     locales?: string[];
+    metafields?: string[];
   };
   spawn?: {
     watch?: {

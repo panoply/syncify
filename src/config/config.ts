@@ -102,6 +102,8 @@ async function shops (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPack
     // Set store endpoints
     config.sync.stores.push(store);
 
+    if (config.mode.metafields) continue;
+
     const themes = has('theme', cli)
       ? cli.theme
       : has(field.domain, cli)
@@ -341,7 +343,8 @@ function command (options: ICLIOptions) {
     options.help,
     options.upload,
     options.vsc,
-    options.watch
+    options.watch,
+    options.metafields
   );
 
   if (is(options._.length, 0)) {

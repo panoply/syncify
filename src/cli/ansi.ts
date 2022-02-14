@@ -62,6 +62,8 @@ export const indent = (message: string) => message.replace(/^/gm, c.line('│  '
  */
 export const header = ({ sync, spawns, env, mode }: IConfig) => {
 
+  if (mode.metafields) return '';
+
   const stores = c.cyan.bold(String(sync.stores.length)) + (sync.stores.length > 1 ? ' stores' : ' store');
   const themes = c.cyan.bold(String(sync.themes.length)) + (sync.themes.length > 1 ? ' themes' : ' theme');
   const preview = alignment(sync.themes);

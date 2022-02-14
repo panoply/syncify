@@ -107,6 +107,18 @@ export interface ICLIOptions {
    */
   download?: boolean;
   /**
+   *  Metafields resource mode
+   */
+  metafields?: boolean;
+  /**
+   *  Pull data reference, can be `metafields`, `settings_data.json` or `locales`
+   */
+  pull?: boolean;
+  /**
+   *  Merges data with remote, can be `metafields`, `settings_data.json` or `locales`
+   */
+  merge?: boolean;
+  /**
    * Generate VS Code JSON schema spec
    */
   vsc?: boolean;

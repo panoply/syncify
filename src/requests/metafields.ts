@@ -1,4 +1,4 @@
-import { delay, has } from 'rambdax';
+import { delay, has, isNil } from 'rambdax';
 import { IFile, IMetafield, IStore } from 'types';
 import * as log from 'cli/logs';
 import { error } from 'cli/errors';
@@ -22,12 +22,15 @@ let wait: boolean = false;
  */
 export const list = async (store: IStore) => {
 
-  if (wait) {
-    await delay(500);
-    wait = false;
+  const config = { headers: {} };
+
+  if (isNil(store.token)) {
+    if (has('X-Shopify-Access-Token', config.headers)) delete config.headers['X-Shopify-Access-Token'];
+  } else {
+    config.headers['X-Shopify-Access-Token'] = store.token;
   }
 
-  return axios.get<{ metafields: IMetafield[] }>(store.url.metafields).then(({ data }) => {
+  return axios.get<{ metafields: IMetafield[] }>(store.url.metafields, config).then(({ data }) => {
 
     return data.metafields;
 
@@ -35,7 +38,6 @@ export const list = async (store: IStore) => {
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       queue.add(() => list(store), { priority: 1000 });
-      wait = !wait;
     } else {
       if (!queue.isPaused) {
         queue.pause();

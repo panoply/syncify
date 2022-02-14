@@ -4,6 +4,7 @@ import { upload } from 'modes/upload';
 import { download } from 'modes/download';
 import { build } from 'modes/build';
 import { watch } from 'modes/watch';
+import { metafields } from 'modes/metafields';
 import { prompt } from 'cli/prompts';
 import { readConfig } from 'config/config';
 import { help } from 'cli/help';
@@ -22,6 +23,8 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
 
   const config = await readConfig(options);
 
+  //  console.log(config);
+
   if (config) {
 
     try {
@@ -38,6 +41,8 @@ export async function client (options: ICLIOptions, callback?: typeof Syncify.ho
         return upload(config, callback);
       } else if (config.mode.download) {
         return download(config, callback);
+      } else if (config.mode.metafields) {
+        return metafields(config);
       } else if (config.mode.help) {
         return process.stdout.write(help);
       }

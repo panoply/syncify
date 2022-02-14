@@ -1,4 +1,4 @@
-import { IConfig, IFile, IThemes } from 'types';
+import { IConfig } from 'types';
 import { request } from 'requests/request';
 import { get } from 'requests/assets';
 

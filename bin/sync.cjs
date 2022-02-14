@@ -12,6 +12,9 @@ const argv = require('minimist')(process.argv.slice(1), {
     clean: false,
     upload: false,
     download: false,
+    metafields: false,
+    pull: false,
+    merge: false,
     help: false,
     env: 'dev',
     cwd: process.cwd()
@@ -24,7 +27,9 @@ const argv = require('minimist')(process.argv.slice(1), {
     'watch',
     'upload',
     'download',
-    'help'
+    'help',
+    'pull',
+    'merge'
   ],
   string: [
     'store',
@@ -41,7 +46,8 @@ const argv = require('minimist')(process.argv.slice(1), {
     store: 's',
     theme: 't',
     output: 'o',
-    help: 'h'
+    help: 'h',
+    metafields: 'm'
   }
 });
 

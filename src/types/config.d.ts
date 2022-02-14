@@ -39,6 +39,18 @@ export interface IModes {
    * Generates VSC Schema spec file
    */
   vsc: boolean;
+  /**
+   * Execute metafields action, `-m`
+   */
+  metafields: boolean
+  /**
+   * Pull data from remote store, `--pull`
+   */
+  pull: boolean
+  /**
+   * merge data from remote store, `--merge`
+   */
+  merge: boolean
 }
 
 /* -------------------------------------------- */
@@ -420,9 +432,13 @@ export interface IConfig {
    */
   config: string;
   /**
+   * The resolved `metafields` directory path
+   */
+  metafields: string
+  /**
    * The operation to run
    */
-  mode: IModes
+  mode: IModes;
   /**
    * Directory structure paths
    */
@@ -509,15 +525,6 @@ export interface IConfig {
    * can run concurrently.
    */
   sync: {
-    /**
-     * Metafield synchronization options
-     */
-    metafields: {
-      /**
-       * Whether or not to bind remote and local metafields
-       */
-      bind: boolean;
-    };
     /**
      * Theme synchronization options
      */

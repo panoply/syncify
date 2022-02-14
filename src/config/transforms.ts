@@ -114,11 +114,9 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
         uri = [];
 
       } else {
-        if (hasPath('metafields.input', this.syncify)) {
-          uri = [ join(path(this.syncify.metafields.input), '**/*.json') ];
-        } else {
-          uri = [ join(path('metafields'), '**/*.json') ];
-        }
+
+        uri = [ join(path(config.metafields), '**/*.json') ];
+
       }
 
       // Special handling for customers path

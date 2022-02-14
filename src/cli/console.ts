@@ -167,6 +167,8 @@ export const create = async (config: IConfig) => {
     'files'
   ];
 
+  if (config.mode.metafields) labels.push('metafields');
+
   for (const script of labels) {
     nodes[script] = nil;
     log[script] = pipe(script).print;

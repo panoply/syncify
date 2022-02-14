@@ -74,7 +74,8 @@
     "minimist": "^1.2.5",
     "p-queue": "^7.2.0",
     "prompts": "^2.4.2",
-    "rambdax": "^8.0.1"
+    "rambdax": "^8.0.1",
+    "tiny-spinner": "^1.1.0"
   },
   "devDependencies": {
     "@brixtol/eslint-config": "^1.2.1",

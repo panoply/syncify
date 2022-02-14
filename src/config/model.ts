@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { anyTrue } from 'rambdax';
 import { PartialDeep } from 'type-fest';
 import { ICLIOptions, IConfig, IModes, IRedirect } from 'types';
 
@@ -32,6 +33,7 @@ export class Model implements PartialDeep<IConfig> {
   public export = 'export';
   public import = 'import';
   public output = 'theme';
+  public metafields = 'source/metafields';
   public watch = [];
 
   public sync = {
@@ -148,12 +150,36 @@ export class Model implements PartialDeep<IConfig> {
     return {
       help: cli.help,
       vsc: cli.vsc,
-      clean: cli.upload ? false : cli.clean,
-      build: (cli.watch || cli.upload || cli.download) ? false : cli.build,
-      watch: (cli.upload || cli.download) ? false : cli.watch,
-      upload: (cli.download || cli.watch) ? false : cli.upload,
-      download: (cli.upload || cli.watch || cli.build) ? false : cli.download,
-      prompt: cli.prompt
+      metafields: cli.metafields,
+      prompt: cli.prompt,
+      merge: cli.merge,
+      pull: cli.pull,
+      clean: anyTrue(
+        cli.metafields,
+        cli.upload
+      ) ? false : cli.clean,
+      build: anyTrue(
+        cli.metafields,
+        cli.upload,
+        cli.watch,
+        cli.download
+      ) ? false : cli.build,
+      watch: anyTrue(
+        cli.metafields,
+        cli.upload,
+        cli.download
+      ) ? false : cli.watch,
+      upload: anyTrue(
+        cli.metafields,
+        cli.download,
+        cli.watch
+      ) ? false : cli.upload,
+      download: anyTrue(
+        cli.metafields,
+        cli.upload,
+        cli.watch,
+        cli.build
+      ) ? false : cli.download
     };
 
   }
