@@ -78,7 +78,7 @@ export const get = async (store: IStore, field: IMetafield) => {
 
   }).catch(e => {
 
-    if (!store.queue) return error(store.store, e.response);
+    if (!queue) return error(store.store, e.response);
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
       queue.add(() => get(store, field), { priority: 1000 });

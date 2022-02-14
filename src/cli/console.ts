@@ -4,7 +4,7 @@ import * as ansi from 'cli/ansi';
 import * as c from 'cli/colors';
 import { IConfig, ILog } from 'types';
 import { queue } from 'requests/queue';
-import { clean } from 'sync/clean';
+import { clean } from 'src/modes/clean';
 import stringify from 'fast-safe-stringify';
 
 /* -------------------------------------------- */

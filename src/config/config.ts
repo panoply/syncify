@@ -314,7 +314,7 @@ async function readPackage (options: ICLIOptions) {
  */
 function getPackage (options: ICLIOptions) {
 
-  if (has('cwd', options)) options.cwd = process.cwd();
+  if (!has('cwd', options)) options.cwd = process.cwd();
 
   options.pkg = resolve(options.cwd, 'package.json');
 
@@ -332,48 +332,27 @@ function getPackage (options: ICLIOptions) {
  */
 function command (options: ICLIOptions) {
 
+  const mode = allFalse(
+    options.build,
+    options.clean,
+    options.download,
+    options.help,
+    options.upload,
+    options.vsc,
+    options.watch
+  );
+
   if (is(options._.length, 0)) {
-
-    options.prompt = allFalse(
-      options.build,
-      options.clean,
-      options.download,
-      options.help,
-      options.upload,
-      options.vsc,
-      options.watch
-    );
-
+    options.prompt = mode;
     return getPackage(options);
   }
 
   options.store = options._[0].split(',');
 
-  if (has('theme', options)) {
-    options.theme = (options.theme as any).split(',');
-  }
+  if (mode) options.build = true;
+  if (has('theme', options)) options.theme = (options.theme as any).split(',');
 
-  if (has('theme', options)) {
-    if (options.store.includes('store')) {
-      throw new Error('Theme name "store" is reserved, use a different name.');
-    }
-    if (options.store.includes('theme')) {
-      throw new Error('Theme name, "theme" is reserved, use a different name.');
-    }
-    if (options.store.includes('vsc')) {
-      throw new Error('Theme name, "vsc" is reserved, use a different name.');
-    }
-  }
-
-  if (has('cwd', options)) options.cwd = process.cwd();
-
-  options.pkg = resolve(options.cwd, 'package.json');
-
-  if (pathExistsSync(options.pkg)) {
-    return readPackage(options);
-  }
-
-  throw new Error('Missing "package.json" file');
+  return getPackage(options);
 
 };
 
