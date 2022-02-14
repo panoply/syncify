@@ -22,7 +22,7 @@ A blazing fast, extensible and superior alternative Shopify [theme kit](https://
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit and other tools in this nexus fail to achieve fluidity imp. Syncify is how I handle theme creation, development and maintenance, it's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit and other tools in this nexus fail to achieve fluidity (imo). Syncify is how I handle theme creation, development and maintenance, it's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
 
 # Install
 
@@ -841,8 +841,6 @@ Processing `.liquid` and `.json` files are handled using built-in capabilities s
 
 Syncify provides partial processing of `.scss` and `.sass` file types using [Dart SASS](#). If you require transform support for these files you need to install Dart module as a development dependency in your project.
 
-**PNPM**
-
 ```
 pnpm add sass -D
 ```
@@ -851,25 +849,23 @@ pnpm add sass -D
 
 In addition to SASS transformation, Syncify also support CSS processing using [PostCSS](#). If you wish have Syncify handle CSS transforms then you need to install **PostCSS** as a development dependency and also include a `postcss.config.js` file in your project. Syncify expects you will inform upon how CSS files are to be handled within a `postcss.config.js` file and look for the existence of one within your workspace. Provide PostCSS plugins and any specific settings within the `postcss.config.js` file.
 
-**PNPM**
-
 ```
 pnpm add postcss -D
 ```
 
 > **Please note:** If you are using Syncify to compile SASS files, then by default the transformed CSS will be passed to PostCSS. Use the available Syncify `style` options to disable this behavior.
 
-### Views
+## Views
 
 The `views` transform option controls how `.liquid` file types should be handled. Snippets, Templates, Sections and Layout paths are typically where liquid files are used. Options defined here will be used when Syncify is processing such types.
 
-#### Sections
+### Sections
 
 Syncify provides sub-directory grouping and rename prefixing capabilities when handling theme sections. You might be accustom to storing sections within a single directory and despite Shopify using this approach in their Dawn theme, it is restrictive and rather chaotic to the developer experience. A far better approach is to take advantage of the sub-directory grouping feature which Syncify provides.
 
-#### Grouping Sub-directories
+### Grouping Sub-directories
 
-Shopify shipped "sections everywhere" capabilities in Online Store 2.0 and while this is a great feature to have it opens the door to inconsistent structures. The logic of Shopify here has been to provide store developers "freedom" but it is a double edged sword. Sections everywhere has consequently resulted in developers indirectly facilitating merchants the ability to leverage sections on pages where they should otherwise be avoided. For instance, enabling merchants to add a featured-collection, featured-blog or full-screen hero image to product pages is not necessarily a good idea. Developers may be more inclined to provide such section types when working from within a single directory structure the lacks clear and organized order.
+Shopify shipped "sections everywhere" capabilities in Online Store 2.0 and while this is a great feature to have it opens the door to inconsistent structures. The logic of Shopify here has been to provide store developers "freedom" but it is a double edged sword. Sections everywhere has consequently resulted in developers indirectly facilitating merchants the ability to leverage sections on pages where they should otherwise be avoided. For instance, enabling merchants to add a featured-collection, featured-blog or full-screen hero image to product pages is not necessarily a good idea. Developers may be more inclined to provide such section types when working from within a single directory structure that is without organized order.
 
 Shopify tends to push a DRY infrastructure approach for the theme development wherein store sections _should_ be capable of appropriation within any template. This is great in theory but in order to achieve aesthetic fluidity it is not realistic when we go beyond a Dawn structure and even there we find the utter chaos. Approaching things in a compartmentalized manner is just better approach but this is difficult when working from a single level structured directory.
 
