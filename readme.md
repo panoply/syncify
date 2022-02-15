@@ -962,7 +962,7 @@ In the below example we are generating multiple stylesheets and compiling both S
 > **Please Note** You will need to remove the comments from the code example if you are copy and pasting it into your `package.json` file. JSON with Comments is not supported in `package.json` files.
 
 <!-- prettier-ignore-->
-```json
+```jsonc
 {
   "syncify": {
     "transform": {
