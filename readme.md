@@ -1410,24 +1410,75 @@ Commands:
   syncify                   Starts interactive CLI command prompt
   syncify <store> --flags   Store name or comma separated list of stores and flags
 
-Flags:
-  -b, --build            Triggers a build, use with upload to run build before uploading
-  -w, --watch            Starts watching for changes of files building when they occur
-  -u, --upload           Triggers a build, use with upload to run build before uploading
-  -d, --download         Downloads themes/s from specified stores
-  -s, --store            A comma separated list of stores
-  -t, --theme            A comma separated list of themes
-  -o, --output  <path>   A path value (used in download and build mode only)
-  -h, --help,            Prints command list and some help information
-  -c, --clean,           Removes all output files, use with --build to clean before bundling
-  --vsc                  Generates JSON schema spec for vscode users
-  --dev                  Run in development mode (default)
-  --prod                 Run in production mode
+Resource Flags:
+  -t, --theme   <filter>   A comma separated list of theme targets
+  -b, --build              Triggers a build, use with upload to run build before uploading
+  -w, --watch              Starts watching for changes of files building when they occur
+  -u, --upload             Uploads theme to online store, use with -t to target theme
+  -d, --download           Downloads themes/s from specified stores
+  -p, --package            Package theme and export a .zip
+  -m, --metafields         Metafields resource mode
+  -l, --locales            Locales resource mode
+  -s, --settings           Settings resource mode
+  -o, --output  <path>     A path value (used in download and build mode only)
+  -h, --help,              Prints command list and some help information
+  -c, --clean,             Removes all output files, use with --build to clean before bundling
+  -q, --query  <filter>    Query online store data API, eg: themes, metafields assets
+
+Operation Flags:
+  --status                 Checks development environment and connections are valid.
+  --pull                   Pull data from online store
+  --merge                  Merge online data with local references
+
+Generator Flags:
+  --vsc                    Generates JSON schema spec for vscode users
+
+Environment Flags:
+  --dev, --development     Run in development mode (default)
+  --prod, --production     Run in production mode
 ```
 
 ### Example
 
 CLI usage aims to be as simple as possible. A typical project will be targeting a single Shopify theme but you can target multiple themes and stores in seamless and productive manner. When targeting multiple stores or themes the CLI employs a flag based naming approach.
+
+**Generate theme targets**
+
+```cli
+$ syncify store-name -q themes
+```
+
+Prompt interface will be initialized
+
+1. Target **store-name**
+2. Initialize Query resource
+3. Inform query we want the "themes" endpoint
+
+**Generate local metafields**
+
+```cli
+$ syncify store-name -m --pull
+```
+
+Prompt interface will be initialized
+
+1. Target **store-name**
+2. Initialize Metafields resource
+3. Pull data from online-store
+
+**Upload theme to online store**
+
+```cli
+$ syncify store-name -t theme-1,theme-2 -c -b -u --prod
+```
+
+Exchange interface will be initialized
+
+1. Target **store-name**
+2. Theme targets are **theme-1** and **theme-2**
+3. Trigger Clean
+4. Trigger Build (production build because of --prod flag)
+5. Trigger Upload
 
 **Watching 1 store and 1 theme**
 
