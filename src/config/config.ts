@@ -8,6 +8,7 @@ import * as transforms from 'config/transforms';
 import { ICLIOptions, IConfig, IModes, IPackage, IStore } from 'types';
 import { Model } from 'config/model';
 import dotenv from 'dotenv';
+import { AxiosRequestConfig } from 'axios';
 
 /**
  * Store Authorization URL
@@ -15,27 +16,19 @@ import dotenv from 'dotenv';
  * Generate the the authorization URL to
  * be used for requests.
  */
-function getURL (domain: string, env: object): { token: string; base: string; } {
+function getURL (domain: string, env: object): AxiosRequestConfig {
 
   let api_token = domain + '_api_token';
 
-  if (has(api_token, env)) {
-    return {
-      token: env[api_token],
-      base: `https://${domain}.myshopify.com`
-    };
-  }
-
-  api_token = api_token.toUpperCase();
+  if (!has(api_token, env)) api_token = api_token.toUpperCase();
 
   if (has(api_token, env)) {
     return {
-      token: env[api_token],
-      base: `https://${domain}.myshopify.com`
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      responseType: 'json',
+      headers: { 'X-Shopify-Access-Token': env[api_token] }
     };
   }
-
-  api_token = undefined;
 
   let api_key = domain + '_api_key';
   let api_secret = domain + '_api_secret';
@@ -44,8 +37,12 @@ function getURL (domain: string, env: object): { token: string; base: string; } 
   if (!has(api_secret, env)) api_secret = api_secret.toUpperCase();
   if (has(api_key, env) && has(api_secret, env)) {
     return {
-      token: null,
-      base: `https://${env[api_key]}:${env[api_secret]}@${domain}.myshopify.com`
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      responseType: 'json',
+      auth: {
+        username: env[api_key],
+        password: env[api_secret]
+      }
     };
   }
 
@@ -64,15 +61,18 @@ async function shops (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPack
 
   const file = dotenv.config({ path: join(config.cwd, '.env') });
 
-  if (config.mode.build || config.mode.clean) {
-    return transforms.paths.call(pkg, config);
-  }
+  if (config.mode.build || config.mode.clean) return transforms.paths.call(pkg, config);
 
   const stores = pkg.syncify.stores.filter(({ domain }) => includes(domain, cli.store));
+  const queue = stores.length > 1;
 
-  for (const field of stores) {
+  for (let i = 0; i < stores.length; i++) {
 
-    const store: PartialDeep<IStore> = {};
+    // The store
+    const field = stores[i];
+
+    // The store client modal
+    const store: PartialDeep<IStore> = { queue };
 
     // Upcase the store name for logs, eg: sissel > Sissel
     store.store = field.domain;
@@ -84,25 +84,12 @@ async function shops (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPack
     const env = file.error ? process.env : file.parsed;
 
     // Get authorization url for the store
-    const { base, token } = getURL(field.domain, env);
-
-    // Set token (if defined)
-    store.token = token;
-
-    // Set URLs
-    store.url = {
-      themes: `${base}/admin/themes.json`,
-      redirects: `${base}/admin/redirects.json`,
-      metafields: `${base}/admin/metafields.json`,
-      pages: `${base}/admin/pages.json`
-    };
-
-    if (isNil(token)) store.token = token;
+    store.client = getURL(field.domain, env);
 
     // Set store endpoints
     config.sync.stores.push(store);
 
-    if (config.mode.metafields) continue;
+    if (config.mode.metafields || config.mode.pages) continue;
 
     const themes = has('theme', cli)
       ? cli.theme
@@ -144,11 +131,10 @@ async function shops (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPack
 
       config.sync.themes.push({
         target,
-        store: store.store,
-        token: store.token,
+        store: i,
         domain: store.domain,
         id: field.themes[target],
-        url: `${base}/admin/themes/${field.themes[target]}/assets.json`
+        url: `/themes/${field.themes[target]}/assets.json`
       });
     }
   }
@@ -199,13 +185,13 @@ function dirs (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
 
 async function caches (config: PartialDeep<IConfig>, cli: ICLIOptions, pkg: IPackage) {
 
-  const cache = join(cli.cwd, 'node_modules/.cache');
+  const cache = join(cli.cwd, 'node_modules/.syncify');
 
   if (!pathExistsSync(cache)) {
     try {
       await mkdir(cache);
     } catch (e) {
-      log.throw('Failed to create a ".cache" directory');
+      log.throw('Failed to create a ".syncify" cache directory');
     }
   }
 
@@ -328,13 +314,21 @@ function getPackage (options: ICLIOptions) {
 
 };
 
+/* -------------------------------------------- */
+/* EXPORTED METHOD                              */
+/* -------------------------------------------- */
+
 /**
- * Parse Command
+ * Read Configuration
  *
- * Determines what commands were passed via the
- * CLI and constructs a workable configuration.
+ * Acquires the necessary configurations
+ * from the workspace. Parses the `package.json`
+ * file and the `.env` file, returning the
+ * credentials of store connection data.
  */
-function command (options: ICLIOptions) {
+export async function readConfig (options: ICLIOptions) {
+
+  if (!options.cli) return options as any as IConfig;
 
   const mode = allFalse(
     options.build,
@@ -358,25 +352,5 @@ function command (options: ICLIOptions) {
   if (has('theme', options)) options.theme = (options.theme as any).split(',');
 
   return getPackage(options);
-
-};
-
-/* -------------------------------------------- */
-/* EXPORTED METHOD                              */
-/* -------------------------------------------- */
-
-/**
- * Read Configuration
- *
- * Acquires the necessary configurations
- * from the workspace. Parses the `package.json`
- * file and the `.env` file, returning the
- * credentials of store connection data.
- */
-export async function readConfig (options: ICLIOptions) {
-
-  if (!options.cli) return options as any as IConfig;
-
-  return command(options) as unknown as IConfig;
 
 };

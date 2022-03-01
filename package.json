@@ -48,6 +48,9 @@
   "prettier": "@brixtol/prettier-config",
   "eslintConfig": {
     "extends": "@brixtol/eslint-config",
+    "ignorePatterns": [
+      "docs"
+    ],
     "rules": {
       "object-curly-newline": "off",
       "no-import-assign": "off"
@@ -58,29 +61,44 @@
     "build": "rollup -c --environment prod",
     "syncify": "./bin/sync",
     "types": "tsc --noEmit --emitDeclarationOnly false",
-    "test": "ava ./test/transform/minify.js --watch"
+    "test": "ava ./test/transform/minify.js --watch",
+    "postinstall": "node ./scripts/post-install.cjs"
   },
   "dependencies": {
+    "@web/config-loader": "^0.1.3",
     "ansis": "^1.3.4",
     "anymatch": "^3.1.2",
     "axios": "^0.25.0",
     "chokidar": "^3.5.3",
+    "clean-stack": "^4.1.0",
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.0.0",
     "fast-safe-stringify": "^2.1.1",
+    "fastq": "^1.13.0",
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
+    "gray-matter": "^4.0.3",
+    "highlight.js": "^11.4.0",
     "html-minifier-terser": "^7.0.0-alpha.1",
+    "joplin-turndown-plugin-gfm": "^1.0.12",
+    "linewrap": "^0.2.1",
+    "marked": "^4.0.12",
+    "mergerino": "^0.4.0",
     "minimist": "^1.2.5",
     "p-queue": "^7.2.0",
     "prompts": "^2.4.2",
     "rambdax": "^8.0.1",
-    "tiny-spinner": "^1.1.0"
+    "strip-ansi": "^7.0.1",
+    "tiny-spinner": "^1.1.0",
+    "turndown": "^7.1.1",
+    "turndown-plugin-gfm": "^1.0.2",
+    "wrap-ansi": "^8.0.1"
   },
   "devDependencies": {
     "@brixtol/eslint-config": "^1.2.1",
     "@brixtol/prettier-config": "^1.2.1",
     "@brixtol/rollup-config": "^1.5.1",
+    "@types/minimist": "^1.2.2",
     "ava": "^4.0.1",
     "esbuild": "^0.14.21",
     "eslint": "^8.8.0",

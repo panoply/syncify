@@ -11,6 +11,7 @@ test/custom
 test/cases/*
 .tmp
 dump.rdb
+docs/
 
 lib-cov
 *.seed

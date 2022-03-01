@@ -39,3 +39,5 @@ export const {
   white,
   bold
 } = ansis;
+
+export const reset = ansis.reset;

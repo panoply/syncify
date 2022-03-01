@@ -23,4 +23,5 @@ export async function pipedScope (...input: Function[]) {
   }
 
   return args;
+
 }

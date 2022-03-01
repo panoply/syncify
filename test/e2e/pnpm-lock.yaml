@@ -13,10 +13,10 @@ specifiers:
   webpack-cli: ^4.9.1
 
 dependencies:
-  '@liquify/syncify': link:../..
   bootstrap: 4.6.0
 
 devDependencies:
+  '@liquify/syncify': link:../..
   esbuild: 0.14.18
   gulp: 4.0.2
   postcss: 8.4.6

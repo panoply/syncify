@@ -1,8 +1,5 @@
 {
   "example": {
-    "one": 2,
-    "three": {
-      "foo": 1
-    }
+    "one": 1
   }
 }

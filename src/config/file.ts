@@ -18,13 +18,14 @@ export const enum Type {
   Config,
   Locale,
   Metafield,
+  Page,
+  PageHTML,
   Style,
   CSS,
   SASS,
   Icon,
   Sprite,
-  Asset,
-  Redirect,
+  Asset
 }
 
 const setProps = (path: string, output: string) => {
@@ -128,20 +129,28 @@ export const parseFile = (paths: IConfig['paths'], output: string) => (path: str
       return merge('templates/customers', Type.Template);
     }
 
+  } else if (/\.(?:md|html)/.test(file.ext)) {
+
+    return merge(lastPath(file.dir), Type.Page);
+
   } else if (file.ext === '.json') {
 
     if (paths.metafields(path)) {
       return merge(lastPath(file.dir), Type.Metafield);
     }
+
     if (paths.templates(path)) {
       return merge('templates', Type.Template);
     }
+
     if (paths.config(path)) {
       return merge('config', Type.Config);
     }
+
     if (paths.locales(path)) {
       return merge('locales', Type.Locale);
     }
+
     if (paths.customers(path)) {
       return merge('templates/customers', Type.Template);
     }

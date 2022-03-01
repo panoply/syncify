@@ -14,13 +14,20 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "**/node_modules": true
+    "**/Thumbs.db": true
+    //"**/node_modules": true,
+    // "**/node_modules/.syncify": false,
+    //"**/example": true
   },
+  "html.customData": [".vscode/icon.html-data.json"],
   "json.schemas": [
     {
       "fileMatch": ["package.json"],
-      "url": "/schema.json"
+      "url": "/schema/syncify.json"
+    },
+    {
+      "fileMatch": [".syncifyrc", ".syncifyrc.json"],
+      "url": "/schema/syncifyrc.json"
     }
   ],
   "vsicons.associations.files": [
@@ -38,7 +45,16 @@
     },
     {
       "icon": "liquid",
-      "extensions": ["syncify.config.js"],
+      "extensions": [
+        "syncify.config.js",
+        "syncify.config.mjs",
+        "syncify.json",
+        ".syncifyrc.json",
+        ".syncify",
+        ".syncifyrc",
+        ".liquifyrc",
+        ".env.syncify"
+      ],
       "filename": true,
       "format": "liquid"
     }

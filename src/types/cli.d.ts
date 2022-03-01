@@ -47,6 +47,7 @@ export interface ILog extends IBuildLog {
   throw?: Log,
   error?: Log,
   print?: Log,
+  warning?: Log,
 }
 
 /* -------------------------------------------- */
@@ -66,6 +67,10 @@ export interface ICLIOptions {
    * The `package.json` url path
    */
   pkg?: string;
+  /**
+   * An optional config file path
+   */
+  config?: string;
   /**
    * The current working directory
    */
@@ -110,6 +115,10 @@ export interface ICLIOptions {
    *  Metafields resource mode
    */
   metafields?: boolean;
+  /**
+   *  Pages resource mode
+   */
+  pages?: boolean;
   /**
    *  Pull data reference, can be `metafields`, `settings_data.json` or `locales`
    */

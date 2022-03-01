@@ -1,68 +1,96 @@
+import { Merge, PartialDeep } from 'type-fest';
+import { IHTML, ILiquid } from './config';
+
 export interface IOptions {
-  stores: Array<{
+  input?: string;
+  output?: string;
+  import?: string;
+  export?: string;
+  config?: string;
+  stores:Array<{
     domain: string;
-    themes: {
-      [label: string]: number
-    }
+    themes: { [label: string]: number }
   }>
-  terminal?: 'dashboard' | 'minimal' | 'default'
-  dirs?: {
-    source?: string;
-    output?: string;
-    import?: string;
-    export?: string;
-    config?: string;
-  };
   paths?: {
-    assets?: string[];
-    snippets?: string[];
-    sections?: string[];
-    layout?: string[];
-    templates?: string[];
-    customers?: string[];
-    config?: string[];
-    locales?: string[];
-    metafields?: string[];
+    assets?: string | string[];
+    snippets?: string | string[];
+    sections?: string | string[];
+    layout?: string | string[];
+    templates?: string | string[];
+    customers?: string | string[];
+    config?: string | string[];
+    locales?: string | string[];
+    metafields?: string | string[];
+    pages?: string | string[];
   };
   spawn?: {
     watch?: {
       [label: string]: string;
     },
-    upload?: {
+    build?: {
       [label: string]: string;
     }
   };
-  redirects?: {
-    populate?: boolean;
-    cache?: boolean;
-  };
-  metafields?: {
-    input?: string;
-    bind?: boolean;
+  terser?: {
+    json?: 'always' | 'dev' | 'prod' | 'never';
+    html?: 'always' | 'dev' | 'prod' | 'never';
+    pages?: 'always' | 'dev' | 'prod' | 'never';
+    rules?: PartialDeep<Merge<ILiquid, IHTML>>
   }
-  transform?: {
+  transforms?: {
+    json?: {
+      indent?: number;
+      useTabs?: boolean;
+      exclude?: string[]
+    };
+    sections?: {
+      directoryPrefixing?: boolean;
+      onlyPrefixDuplicates?: boolean;
+      prefixSeparator?: string;
+      global?: string[] | string
+    };
+    pages?: {
+      importAs?: 'markdown' | 'html',
+      liquidWarnings?: boolean;
+      fallbackAuthor?: string;
+      markdown?: {
+        breaks?: boolean;
+        headerIds?: boolean;
+        headerPrefix?: string;
+        highlight?: boolean;
+        mangle?: boolean;
+        silent?: boolean;
+        smartypants?: boolean;
+      }
+    };
     styles?: Array<{
-      input: any;
-      postcss?: string;
+      input: string | string[];
+      postcss?: boolean;
+      rename?: string;
+      snippet?: boolean;
+      watch?: string[];
       sass?: {
         style?: 'expanded' | 'compressed';
         sourcemap?: boolean;
         warnings?: boolean;
+        include?: string[];
       };
-      rename?: string | {
-        prefix?: string;
-        prefixDir?: boolean;
-        separator?: string;
-      } | any;
-      snippet?: boolean;
-      watch?: string[];
-      include?: string[]
     }>;
     icons?: {
-      snippets?: string[];
+      replacer?: boolean;
+      replacerTag?: string;
+      vscodeCustomData?: boolean;
+      inlined?: Array<{
+        input?: string | string[];
+        rename?: string;
+        snippet?: boolean;
+        svgo?: boolean;
+      }>
       sprites?: Array<{
-        input?: string[];
-        output?: string;
+        input?: string | string[];
+        rename?: string;
+        snippet?: boolean;
+        svgo?: boolean;
         options?: {
           dimensionAttributes?: boolean;
           namespaceClassnames?: boolean;
@@ -73,36 +101,6 @@ export interface IOptions {
         }
       }>;
     };
-    json?: {
-      spaces?: number;
-      minify?: {
-        env?: 'dev' | 'prod' | 'any' | 'never';
-        removeSchemaRefs?: boolean;
-        exclude?: string[]
-      }
-    },
-    views?: {
-      sections?: {
-        allowPrefix?: boolean;
-        onlyPrefixDuplicates?: boolean;
-        prefixSeparator?: boolean;
-        globals?: string[];
-      },
-      minify?: {
-        env?: 'dev' | 'prod' | 'any' | 'never';
-        minifyJS?: boolean;
-        minifyCSS?: boolean;
-        removeComments?: boolean;
-        collapseWhitespace?: boolean;
-        trimCustomFragments?: boolean;
-        ignoreCustomFragments?: string[];
-        minifySectionSchema?: boolean;
-        removeLiquidComments?: boolean;
-        ignoredLiquidTags?: string[];
-        exclude?: string[];
-      }
-    }
-
   }
 }
 
@@ -112,4 +110,5 @@ export interface IPackage {
   dependencies?: { [module: string]: string; };
   devDependencies?: { [module: string]: string };
   peerDependencies?: { [module: string]: string };
+  reject?: (message: string) => void
 }

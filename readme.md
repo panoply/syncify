@@ -249,13 +249,18 @@ Syncify configuration options can be defined on the `syncify` property in a proj
       "sections": [],
       "snippets": [],
       "templates": [],
-      "customers": []
+      "customers": [],
+      "pages": []
     },
     "spawn": {
       "watch": {},
       "build": {}
     },
     "transform": {
+      "pages": {
+
+
+      },
       "styles": [
         {
           "input": null,
@@ -1411,19 +1416,25 @@ Commands:
   syncify <store> --flags   Store name or comma separated list of stores and flags
 
 Resource Flags:
-  -t, --theme   <filter>   A comma separated list of theme targets
-  -b, --build              Triggers a build, use with upload to run build before uploading
-  -w, --watch              Starts watching for changes of files building when they occur
-  -u, --upload             Uploads theme to online store, use with -t to target theme
-  -d, --download           Downloads themes/s from specified stores
-  -p, --package            Package theme and export a .zip
-  -m, --metafields         Metafields resource mode
-  -l, --locales            Locales resource mode
-  -s, --settings           Settings resource mode
-  -o, --output  <path>     A path value (used in download and build mode only)
-  -h, --help,              Prints command list and some help information
-  -c, --clean,             Removes all output files, use with --build to clean before bundling
-  -q, --query  <filter>    Query online store data API, eg: themes, metafields assets
+  -t, --theme   <targets>    A comma separated list of theme targets
+  -b, --build               Triggers a build, use with upload to run build before uploading
+  -w, --watch               Starts watching for changes of files building when they occur
+  -u, --upload              Uploads theme to online store, use with -t to target theme
+  -d, --download            Downloads themes/s from specified stores
+  -p, --package             Package theme and export a .zip
+  -m, --metafields          Metafields resource mode
+  -l, --locales             Locales resource mode
+  -s, --settings            Settings resource mode
+  -o, --output  <path>      A path value (used in download and build mode only)
+  -h, --help,               Prints command list and some help information
+  -c, --clean,              Removes all output files, use with --build to clean before bundling
+  -q, --query   <filter>    Query online store data API, eg: themes, metafields assets
+  -v, --version <action>    Version control resource mode (see version arguments)
+
+Version Arguments:
+  patch                    Increments the package.json version patch, eg: 1.0.0 > 1.0.1
+  minor                    Increments the package.json version minor, eg: 1.0.0 > 1.1.0
+  major                    Increments the package.json version major, eg: 1.0.0 > 2.0.0
 
 Operation Flags:
   --status                 Checks development environment and connections are valid.

@@ -1,4 +1,3 @@
-import { has, isNil } from 'rambdax';
 import { IRequest, IThemes, IFile } from 'types';
 import { queue, axios } from 'requests/queue';
 import { is } from 'shared/native';
@@ -29,6 +28,8 @@ export async function get (url: string, config: IRequest) {
 
 };
 
+let limit: number;
+
 /**
  * Request Handler
  *
@@ -38,34 +39,31 @@ export async function get (url: string, config: IRequest) {
  */
 export async function assets (sync: IThemes, file: IFile, config: IRequest) {
 
-  config.url = sync.url;
-
-  if (isNil(sync.token)) {
-    if (has('X-Shopify-Access-Token', config.headers)) delete config.headers['X-Shopify-Access-Token'];
-  } else {
-    config.headers['X-Shopify-Access-Token'] = sync.token;
+  if (queue.concurrency > 1) {
+    if (limit >= 20) queue.concurrency--;
+    if (limit >= 35) queue.concurrency--;
+  } else if (queue.concurrency < 3 && limit < 30) {
+    queue.concurrency++;
   }
 
   return axios(config).then(({ headers, data }) => {
 
     if (config.method === 'delete') {
-      log.fileDelete(sync.store, sync.target);
+      log.fileDelete(sync.domain, sync.target);
     } else if (config.method === 'get') {
       return data;
     } else {
-      log.fileSync(file, sync.store, sync.target);
+      log.fileSync(file, sync.domain, sync.target);
     }
 
-    const limit = Number(headers['x-shopify-shop-api-call-limit'].slice(0, 2));
-
-    if (is(limit, 39)) queue.concurrency = 1;
+    limit = parseInt(headers['x-shopify-shop-api-call-limit'].slice(0, 2), 10);
 
   }).catch((e: AxiosError) => {
 
     // if (!sync.queue) return error(file.key, e.response);
 
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
-      queue.add(() => assets(sync, file, config), { priority: 1000 });
+      queue.add(() => assets(sync, file, config));
     } else {
       error(file.key, e.response);
     }

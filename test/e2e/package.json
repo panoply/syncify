@@ -10,14 +10,14 @@
     "test:export": "syncify export",
     "test:build": "syncify --build",
     "test:build:prod": "syncify -b --prod",
-    "test:watch": "syncify watch -s syncify -t test,dev --prod",
-    "test:watch:multi": "syncify watch -s syncify,boefje --syncify dev,prod,stage,test --boefje dev,prod",
+    "test:watch": "sync syncify -t test,dev -w --prod",
+    "test:watch:multi": "syncify syncify,boefje --prod -w --syncify dev,prod,stage,test --boefje dev,prod",
     "test:upload": "sync syncify -t test -u",
     "test:upload:multi": "syncify upload --store syncify,boefje --syncify dev --boefje dev,prod",
     "test:download": "sync syncify -d -t dev",
     "test:download:multi": "sync watch --store syncify,boefje --syncify dev --boefje dev,prod -o downloads/"
   },
-  "syncify": {
+  "$syncify": {
     "stores": [
       {
         "domain": "syncify",
@@ -36,8 +36,17 @@
         }
       }
     ],
+    "dirs": {
+      "source": "source",
+      "output": "theme",
+      "import": "import",
+      "export": "export",
+      "config": "config"
+    },
     "paths": {
-      "assets": [],
+      "assets": [
+        "theme/assets/*.js"
+      ],
       "config": [
         "json/config/*.json"
       ],
@@ -61,14 +70,14 @@
       "customers": [
         "views/customers/*.liquid",
         "views/customers/*.json"
+      ],
+      "metafields": [
+        "metafields"
+      ],
+      "pages": [
+        "pages/*.md",
+        "pages/*.html"
       ]
-    },
-    "dirs": {
-      "source": "source",
-      "output": "theme",
-      "import": "import",
-      "export": "export",
-      "config": "config"
     },
     "spawn": {
       "watch": {
@@ -79,10 +88,6 @@
         "rollup": "rollup -c config/rollup.config.js",
         "webpack": "webpack --config config/webpack.config.js --color"
       }
-    },
-    "metafields": {
-      "input": "metafields",
-      "bind": false
     },
     "transform": {
       "icons": {
@@ -105,6 +110,15 @@
             }
           }
         ]
+      },
+      "markdown": {
+        "minify": "prod",
+        "headerIds": true,
+        "headerPrefix": "",
+        "highlight": true,
+        "mangle": true,
+        "silent": false,
+        "smartypants": false
       },
       "views": {
         "sections": {
@@ -146,8 +160,10 @@
         {
           "input": "styles/stylesheet.scss",
           "snippet": false,
-          "postcss": "production",
           "rename": "stylesheet.min.css",
+          "postcss": {
+            "env": "prod"
+          },
           "include": [
             "node_modules/"
           ],
@@ -203,10 +219,10 @@
     }
   },
   "dependencies": {
-    "@liquify/syncify": "link:../..",
     "bootstrap": "4.6.0"
   },
   "devDependencies": {
+    "@liquify/syncify": "link:../..",
     "esbuild": "^0.14.11",
     "gulp": "^4.0.2",
     "postcss": "^8.4.5",

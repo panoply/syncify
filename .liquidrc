@@ -17,11 +17,23 @@
     }
   ],
   "html": {
-    "correct": false,
+    "correct": true,
     "force_attribute": false,
     "braces": false,
-    "preserve": 2,
-    "unformatted": false
+    "preserve": 1,
+    "wrap": 85,
+    "preserve_text": true,
+    "content": true,
+    "space_close": true,
+    "tags": [
+      {
+        "tag": "source",
+        "rules": {
+          "force_attribute": true,
+          "space_close": true
+        }
+      }
+    ]
   },
   "js": {
     "preserve": 1,
@@ -47,8 +59,8 @@
   },
   "json": {
     "preserve": 0,
-    "braces": false,
-    "brace_block": true,
+    "braces": true,
+    "brace_block": false,
     "no_semicolon": true
   }
 }

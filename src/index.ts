@@ -1,4 +1,4 @@
-import { client } from 'config/client';
+import { cli } from './src/client/cli';
 import { Resource, APIOptions, IOptions, Callback } from 'types';
 
 /* -------------------------------------------- */
@@ -14,7 +14,7 @@ function sync <R extends Resource> (
 ): any {
 
   // Initialized via CLI
-  if (typeof resource === 'object' && resource?.cli === true) return client(resource);
+  if (typeof resource === 'object' && resource?.cli === true) return cli(resource);
 
   // Initialized via API
   // if (!resource) return log.issue('The resource option is missing!');

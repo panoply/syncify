@@ -1,20 +1,17 @@
-import { OptimizeOptions } from 'svgo';
+/* eslint-disable no-use-before-define */
+// import { OptimizeOptions } from 'svgo';
 import { Tester } from 'anymatch';
-import { Options } from 'html-minifier-terser';
+import { Options as IHTML } from 'html-minifier-terser';
+import { AxiosRequestConfig } from 'axios';
+import { PartialDeep } from 'type-fest';
 
-/* -------------------------------------------- */
-/* MODES                                        */
-/* -------------------------------------------- */
+export { IHTML };
 
 export interface IModes {
   /**
    * Run the command prompt
    */
   prompt: boolean;
-  /**
-   * Shows help information, alias: `-h`
-   */
-  help: boolean;
   /**
    * Execute a build, alias: `-b`
    */
@@ -44,32 +41,244 @@ export interface IModes {
    */
   metafields: boolean
   /**
+   * Execute redirects resource, `-r`
+   */
+  redirects: boolean;
+  /**
+   * Execute pagess action, `-p`
+   */
+  pages: boolean
+  /**
    * Pull data from remote store, `--pull`
    */
   pull: boolean
   /**
    * merge data from remote store, `--merge`
    */
-  merge: boolean
+  push: boolean
+  /**
+   * Trigger export, alias: `-e`
+   */
+  export: boolean;
+  /**
+   * whether or not to run browser-sync: `--server`
+   */
+  server: boolean;
 }
 
-/* -------------------------------------------- */
-/* THEMES                                       */
-/* -------------------------------------------- */
+export interface IDirs {
+  /**
+   * The resolve cache directory path
+   *
+   * @default 'node_modules/.syncify'
+   */
+  cache: string;
+  /**
+   * The resolved `input` directory path
+   *
+   * @default 'source'
+   */
+  input: string;
+  /**
+   * The resolved `output` directory path
+   *
+   * @default 'theme'
+   */
+  output: string;
+  /**
+   * The resolved `import` directory path for downloaded themes
+   *
+   * @default 'import'
+   */
+  import: string;
+  /**
+   * The resolved `export` directory path for packaged `.zip` themes
+   *
+   * @default 'export'
+   */
+  export: string;
+  /**
+   * The resolved `config` directory path for build tool files
+   *
+   * @default '/'
+   */
+  config: string;
+  /**
+   * The resolved `metafields` directory path, if multiple paths
+   * are defined the value will be an array list.
+   *
+   * @default '/source/metafields'
+   */
+  metafields: string | string[]
+  /**
+   * The resolved `pages` directory path, if multiple paths
+   * are defined the value will be an array list.
+   *
+   * @default '/source/pages'
+   */
+  pages: string
+}
+
+export interface IPaths {
+  /**
+   * An array list of files to be uploaded as assets
+   *
+   * @default 'source/assets'
+   */
+  assets: Tester;
+  /**
+   * An array list of files to be uploaded as snippets
+   *
+   * @default 'source/snippets'
+   */
+  snippets: Tester;
+  /**
+   * An array list of files to be uploaded as sections
+   *
+   * @default 'source/sections'
+   */
+  sections: Tester;
+  /**
+   * An array list of files to be uploaded as layouts
+   *
+   * @default 'source/layout'
+   */
+  layout: Tester;
+  /**
+   * An array list of files to be uploaded as templates
+   *
+   * @default 'source/templates'
+   */
+  templates: Tester;
+  /**
+   * An array list of files to be uploads as template/customers
+   *
+   * @default 'source/templates/customers'
+   */
+  customers: Tester;
+  /**
+   * An array list of files to be uploaded as configs
+   *
+   * @default 'source/config'
+   */
+  config: Tester;
+  /**
+   * An array list of files to be uploaded as locales
+   *
+   * @default 'source/locales'
+   */
+  locales: Tester;
+  /**
+   * The resolved `metafields` directory path
+   *
+   * @default 'source/metafields'
+   */
+  metafields: Tester;
+  /**
+   * The resolved `pages` directory path
+   *
+   * @default 'source/pages'
+   */
+  pages: Tester;
+  /**
+   * The resolved `redirects` yaml file
+   *
+   * @default 'redirects.yaml'
+   */
+  redirects: Tester;
+}
+
+export interface ICache {
+  /**
+   * The last time cache was updated at (timestamp)
+   */
+  updated: number;
+  /**
+   * When the cache was created (timestamp)
+   */
+  created: number;
+  /**
+   * Stylesheet related cache records, typically source maps
+   */
+  styles: {
+    /**
+     * The URI cache map location
+     *
+     * @default 'node_modules/.syncify/styles'
+     */
+    uri: string;
+  },
+  /**
+   * Metafields related cache records. Metafield source maps
+   * are `path > id` object references. Metafield ids are
+   * cached for lookup when changes occur. The `map` object
+   * holds the references and applied to model on initialization.
+   */
+  metafields: {
+   /**
+     * The URI cache reference location
+     *
+     * @default 'node_modules/.syncify/metafields'
+     */
+    uri: string,
+    /**
+     * Metafield pathname > id cache references.
+     */
+    map: { [path: string]: number }
+  },
+  /**
+   * Page related cache records, this reference typically
+   * holds `path > id` object references. Page ids are
+   * cached for lookup when changes occur. The `map` object
+   * holds the references and applied to model on initialization.
+   */
+  pages: {
+   /**
+     * The URI cache reference location
+     *
+     * @default 'node_modules/.syncify/pages'
+     */
+    uri: string
+    /**
+     * Page pathname > id cache references.
+     */
+    map: { [path: string]: number }
+  };
+  /**
+   * Section related cache records, this reference typically
+   * holds output filename reference and used to prevent
+   * duplicated sections from being written.
+   */
+  sections: {
+   /**
+    * The URI cache reference location
+    *
+    * @default 'node_modules/.syncify/sections'
+    */
+    uri: string
+  },
+  /**
+   * Specification JSON for vscode
+   */
+   vscode: {
+    /**
+     * The URI vscode reference location
+     *
+     * @default 'node_modules/.syncify/vscode'
+     */
+     uri: string;
+     /**
+      * vscode file maps
+      */
+     maps: { icons?: string; }
+   }
+}
 
 export interface IThemes {
   /**
-   * The store domain name in Upcase (without `myshopify.com`)
+   * The store index reference
    */
   store: string;
-  /**
-   * The store token (returns `null` is using API key and secret)
-   */
-  token: string;
-  /**
-   * The store myshopify domain, eg: `store.myshopify.com`
-   */
-  domain: string;
   /**
    * The theme target name
    */
@@ -84,122 +293,154 @@ export interface IThemes {
   url: string;
 }
 
-/* -------------------------------------------- */
-/* JSON FILES                                   */
-/* -------------------------------------------- */
-
 export interface IJson {
   /**
-   * Whether or not JSON files accept comments
+   * Indentation level for imported JSON
    */
-  spaces: number;
+  indent: number;
   /**
-   * JSON file minification options
+   * Whether to indent with tabs or spaces
    */
-  minify: {
-    /**
-     * Whether or not minification should be applied to JSON files.
-     * This is dependant upon the `env` provided in configuration.
-     */
-    apply: boolean;
-    /**
-     * Whether or not to remove `$schema` store spec references
-     */
-    removeSchemaRefs: boolean;
-    /**
-     * A list of files and directories to exclude from JSON minification.
-     */
-    exclude: string[]
+  useTabs: boolean;
+  /**
+   * A list of files and directories to exclude from JSON minification.
+   */
+  exclude: Tester | null
+}
+
+export interface IPages {
+  /**
+   * Whether the pulled page content should be written
+   * as HTML or have the HTML converted to Markdown.
+   */
+  importAs: 'markdown' | 'html',
+  /**
+   * Whether to show warnings of Liquid tag existence
+   * in pages. Liquid is not supported in pages, only static HTML
+   */
+  liquidWarnings: boolean,
+  /**
+   * Fallback author name, defaults to `null`
+   */
+  fallbackAuthor: string,
+  /**
+   * Options passed to marked parser
+   */
+  markdown: {
+    gfm: boolean;
+    breaks: boolean;
+    baseUrl: string;
+    headerIds: boolean;
+    headerPrefix: string;
+    langPrefix: string;
+    highlight?: (
+        code: string,
+        lang: string,
+        callback?: (error: any, code?: string) => void,
+    ) =>string | void
+    mangle: boolean;
+    silent: boolean;
+    smartypants: boolean;
   }
-
 }
 
-/* -------------------------------------------- */
-/* VIEW FILES                                   */
-/* -------------------------------------------- */
-
-export interface ITerser extends Options {
-  minifyJS?: boolean;
-  minifyCSS?: boolean;
-  removeComments?: boolean;
-  collapseWhitespace?: boolean;
-  trimCustomFragments?: boolean;
-  ignoreCustomFragments?: RegExp[];
+export interface IMinify {
+  /**
+   * Whether or not minification should be applied to JSON files.
+   */
+  json: boolean;
+  /**
+   * Whether or not minification should be applied to HTML files.
+   */
+  html: boolean;
+  /**
+   * Whether or not minification should be applied to Page HTML
+   */
+  pages: boolean;
 }
 
-export interface ILiquidMinifyOptions {
+export interface ILiquid {
   /**
    * Minifies JSON contained within schema sections
    */
-  minifySectionSchema?: boolean;
+  minifyLiquidSectionSchema: boolean;
+   /**
+    * A List of Liquid tags to ignore from minification
+    */
+  ignoreLiquidTags: RegExp;
+   /**
+    * A List of Liquid tags to ignore from minification
+    */
+  ignoreLiquidObjects: RegExp;
+   /**
+    * Remove all occurances of Liquid comments
+    */
+  removeLiquidComments: boolean;
+   /**
+    * Removes and strips Liquid syntax contained within HTML
+    * Attributes that span newlines or apply extraneous whitespace.
+    */
+  removeLiquidNewlineAttributes: boolean;
+   /**
+    * Removes redundant whitespace Liquid dash trims from Liquid
+    * tags and objects.
+    */
+  stripRedundantWhitespaceDashes: boolean;
+   /**
+    * Removes Liquid tag extrenous whitespaces
+    */
+  stripInnerTagWhitespace: boolean;
+   /**
+    * Removes and strips Liquid syntax contained within HTML
+    * Attributes that span newlines or apply extraneous whitespace.
+    */
+  stripAttributesContainingNewlines: boolean;
   /**
-   * A List of Liquid tags to ignore from minification
+   * Excluded files from minification
    */
-  ignoredLiquidTags?: string[];
-  /**
-   * Remove all occurances of Liquid comments
-   */
-  removeLiquidComments?: boolean;
-  /**
-   * Removes and strips Liquid syntax contained within HTML
-   * Attributes that span newlines or apply extraneous whitespace.
-   */
-  removeLiquidNewlineAttributes?: boolean;
-  /**
-   * Removes redundant whitespace Liquid dash trims from Liquid
-   * tags and objects.
-   */
-  removeRedundantWhitespaceDashes: boolean;
+  external: Tester | null;
 }
 
-export interface IViews {
+export interface ITerser {
+  html: IHTML;
+  liquid: ILiquid;
   /**
-   * Section specific view handling options
+   * Minification Conditions
    */
-  sections: {
-    /**
-     * Whether sections allow prefixing
-     */
-    allowPrefix: boolean;
-    /**
-     * Whether section prefixes are only applied to duplicate names files
-     */
-    onlyPrefixDuplicates: boolean;
-    /**
-     * Prefix separator character
-     */
-    prefixSeparator: string;
-    /**
-     * A list directories or files that should never be prefixed
-     */
-    globals: RegExp;
-  },
+  minify: {
   /**
-   * Liquid + HTML minifier options
+   * Whether or not minification should be applied to JSON files.
    */
-  minify?: {
-    /**
-     * Whether or not we should apply formatting
-     */
-    apply: boolean;
-    /**
-     * HTML minification options to be passed to terser
-     */
-    terser: ITerser;
-    /**
-     * Liquid specific minification options
-     */
-    liquid: ILiquidMinifyOptions;
-    /**
-     * A list of files or directories to exclude from minification
-     */
-    exclude: string[];
+   json: boolean;
+   /**
+    * Whether or not minification should be applied to HTML files.
+    */
+   html: boolean;
+   /**
+    * Whether or not minification should be applied to Page HTML
+    */
+   pages: boolean;
   }
 }
 
-/* -------------------------------------------- */
-/* STYLE OPTIONS                                */
-/* -------------------------------------------- */
+export interface ISections {
+  /**
+   * Whether sections allow prefixing
+   */
+  directoryPrefixing: boolean;
+  /**
+   * Whether section prefixes are only applied to duplicate names files
+   */
+  onlyPrefixDuplicates: boolean;
+  /**
+   * Prefix separator character
+   */
+  prefixSeparator: string;
+  /**
+   * A list directories or files that should never be prefixed
+   */
+  global: Tester | null
+}
 
 export interface IStyle {
   /**
@@ -207,9 +448,9 @@ export interface IStyle {
    */
   input: string;
   /**
-   * Output Path
+   * Rename the stylesheet
    */
-  output: string;
+  rename: string;
   /**
    * Optionally write the stylesheet inline
    * as a snippet, this will transform the
@@ -222,10 +463,6 @@ export interface IStyle {
    * are applied files will be processed.
    */
   watch: Tester;
-  /**
-   * Path location to the sass map cache
-   */
-  cache: string;
   /**
    * Run PostCSS
    */
@@ -246,16 +483,12 @@ export interface IStyle {
      * Whether or not to print warnings to CLI
      */
     warnings: boolean;
+    /**
+     * A list of paths to include, ie: node_modules.
+     */
+    include: string[];
   };
-  /**
-   * A list of paths to include, ie: node_modules.
-   */
-  include: string[];
 }
-
-/* -------------------------------------------- */
-/* STORES TO SYNC                               */
-/* -------------------------------------------- */
 
 export interface IStore {
   /**
@@ -267,46 +500,67 @@ export interface IStore {
    */
   domain: string;
   /**
-   * The store token (returns `null` is using API key and secret)
+   * Client instances
    */
-  token: string;
+  client: AxiosRequestConfig
   /**
-   * Preset API endpoint URLs
+   * Queue
    */
-  url: {
-    /**
-     * The authorized URL for pages
-     */
-    pages: string;
-    /**
-     * The authorized URL for themes
-     */
-    themes: string;
-    /**
-     * The authorized URL for redirects
-     */
-    redirects: string;
-    /**
-     * The authorized URL for metafields
-     */
-    metafields: string
-  }
+  queue: boolean;
 }
 
-/* -------------------------------------------- */
-/* ICONS TRANSFORMS                             */
-/* -------------------------------------------- */
-
 export interface IIcons {
-  /**
-   * SVGO transform options provided in a `svgo.config.js` file,
-   * when no svgo file is present this will be `null`
+   /**
+   * Whether or not to enable inlined replacements for icons.
+   * When `true` you can reference SVG icons using a HTML tag
+   * with a `name=""` property and Syncify will replace all
+   * occurances with the embedded SVG. For example:
+   *
+   * ```html
+   * <!-- In your HTML you can reference the SVG -->
+   * <i name="name-of-icon" from="sprite-id"></i>
+   *
+   * <!-- Syncify will replace this with the raw data -->
+   * <svg id="name-of-icon"><path>...</path></svg>
+   * ```
+   *
+   * This approach will likely improve render times of your webshop.
+   * Using Snippets to render inline SVGs is costly and a performance
+   * bottleneck. Just because Shopify does this in Dawn, does not mean
+   * it is a good idea.
+   *
    */
-  svgo: OptimizeOptions
+  replacer: boolean;
   /**
-   * Inline SVG files to generated as snippets
+   * Replacer HTML tag to look for occurances within
    */
-  snippets: string[];
+  replacerTag: string;
+  /**
+   * A vscode user specific option which will auto-generate
+   * icon name completions for you and link them to your worksapce settings.
+   */
+  vscodeCustomData?: boolean;
+  /**
+   * Inlined SVG file types
+   */
+  inlined?: Array<{
+    /**
+     * Paths to SVG files to be converted to sprite
+     */
+     input: string[];
+     /**
+      * The output filename to snippets
+      */
+     rename: string;
+      /**
+      * Pass contents through to SVGO
+      */
+     svgo: boolean;
+     /**
+      * Whether to generate spite as snippet or asset
+      */
+     snippet: boolean;
+  }>
   /**
    * Sprites Config
    */
@@ -318,7 +572,15 @@ export interface IIcons {
     /**
      * The output filename to snippets
      */
-    output: string;
+    rename: string;
+     /**
+     * Pass contents through to SVGO
+     */
+    svgo: boolean;
+    /**
+     * Whether to generate spite as snippet or asset
+     */
+    snippet: boolean;
     /**
      * Options to be passed into svg-sprite
      */
@@ -333,9 +595,117 @@ export interface IIcons {
   }>
 }
 
-/* -------------------------------------------- */
-/* FILE CONFIG                                  */
-/* -------------------------------------------- */
+export interface ITransform {
+  /**
+   * Section transforms
+   */
+  sections: ISections;
+   /**
+    * Page transform options
+    */
+  pages: IPages;
+  /**
+   * Stylesheet transforms, supports CSS/SASS
+   */
+  styles: IStyle[];
+  /**
+   * Iconset transforms, sprites and inline snippets
+   */
+  icons: IIcons;
+  /**
+   * JSON file transformation options
+   */
+  json: IJson
+}
+
+export interface ISync {
+  /**
+   * Theme synchronization options
+   */
+  themes: Array<IThemes>;
+  /**
+   * Store synchronization options
+   */
+  stores: Array<IStore>;
+}
+
+export interface IBundle {
+  /**
+   * The version defined in the package.json
+   */
+   version: string;
+   /**
+    * Building for development (default)
+    */
+   dev: boolean;
+  /**
+    * Building for production
+    */
+   prod: boolean;
+   /**
+    * CLI Initialized, when `false` syncify was called from JavaScript API.
+    */
+   cli: boolean;
+   /**
+    * Logging should be silent, only show errors or warnings.
+    */
+   silent: boolean;
+   /**
+    * The current working directory
+    */
+   cwd: string;
+   /**
+    * Directory structure paths
+    */
+   paths: IPaths;
+   /**
+    * Base directory path references
+    */
+   dirs: IDirs;
+   /**
+    * The sync data model. Multiple stores and themes
+    * can run concurrently.
+    */
+   sync: ISync;
+   /**
+    * Passed commands that may be of importance in
+    * the transform or build processes.
+    */
+   cmd: {
+     /**
+      * An input overwrite was passed
+      */
+     input: string;
+     /**
+      * An output overwrite was passed
+      */
+     output: string;
+     /**
+      * Filters were passed in the command
+      */
+     filter: string;
+     /**
+      * Deletions were passed in the command
+      */
+     delete: string;
+   };
+   /**
+    * The list of spawned child proccesses running
+    */
+   spawn: { [name: string]: string };
+   /**
+    * List of paths to watch or build from
+    */
+   watch: string[];
+   /**
+    * Cache references
+    */
+   cache: PartialDeep<ICache>
+   /**
+    * The operation to run
+    */
+   mode: IModes;
+}
 
 /* -------------------------------------------- */
 /* CONSTRUCTED CONFIGURATION                    */
@@ -347,191 +717,86 @@ export interface IConfig {
    */
   version: string;
   /**
-   * The environment we are running
+   * Building for development (default)
    */
-  env: 'dev' | 'prod';
+  dev: boolean;
+ /**
+   * Building for production
+   */
+  prod: boolean;
   /**
-   * The mode from which Syncify was intialized.
+   * CLI Initialized, when `false` syncify was called from JavaScript API.
    */
   cli: boolean;
   /**
-   * The resource to execute, eg: 'watch', 'upload' or 'download'
+   * Logging should be silent, only show errors or warnings.
    */
-  resource: string;
+  silent: boolean;
   /**
    * The current working directory
    */
   cwd: string;
   /**
-   * Path to node_modules directory relative from root path.
+   * Directory structure paths
    */
-  node_modules: string;
+  paths: IPaths;
+  /**
+   * Base directory path references
+   */
+  dirs: IDirs;
+  /**
+   * The sync data model. Multiple stores and themes
+   * can run concurrently.
+   */
+  sync: ISync;
+  /**
+   * Passed commands that may be of importance in
+   * the transform or build processes.
+   */
+  cmd: {
+    /**
+     * An input overwrite was passed
+     */
+    input: string;
+    /**
+     * An output overwrite was passed
+     */
+    output: string;
+    /**
+     * Filters were passed in the command
+     */
+    filter: string;
+    /**
+     * Deletions were passed in the command
+     */
+    delete: string;
+  };
   /**
    * The list of spawned child proccesses running
    */
-  spawns: { [name: string]: string };
+  spawn: { [name: string]: string };
   /**
    * List of paths to watch or build from
    */
   watch: string[];
   /**
-   * The resolved `.cache/syncify` directory path. This directory
-   * is written into `node_modules` and files contained
-   * within are JSON reference files used for various operations.
+   * Cache references
    */
-  cache: string;
-  /**
-   * The resolved `input` directory path
-   *
-   * @default 'source'
-   */
-  source: string;
-  /**
-   * Redirect Sync
-   */
-  redirects: {
-
-    [store: IStore['domain']]: {
-      /**
-       * The redirect id, this is optional and applied
-       * only when redirect exists.
-       */
-      id?: number;
-      /**
-       * The redirect pathname
-       */
-      path?: string;
-      /**
-       * The redirect target path
-       */
-      target?: string;
-    }
-  };
-  /**
-   * The resolved `output` directory path
-   *
-   * @default 'theme'
-   */
-  output: string;
-  /**
-   * The resolved `import` (downloads) directory path
-   *
-   * @default 'import'
-   */
-  import: string;
-  /**
-   * The resolved `export` (packaged .zip) directory path
-   *
-   * @default 'export'
-   */
-  export: string;
-  /**
-   * The resolved `config` directory path for build tool files
-   *
-   * @default '.' // defaults to root directory
-   */
-  config: string;
-  /**
-   * The resolved `metafields` directory path
-   */
-  metafields: string
+  cache: PartialDeep<ICache>
   /**
    * The operation to run
    */
   mode: IModes;
   /**
-   * Directory structure paths
-   */
-  paths: {
-    /**
-     * An array list of files to be uploaded as assets
-     *
-     * @default 'source/assets'
-     */
-    assets: Tester;
-    /**
-     * An array list of files to be uploaded as snippets
-     *
-     * @default 'source/snippets'
-     */
-    snippets: Tester;
-    /**
-     * An array list of files to be uploaded as sections
-     *
-     * @default 'source/sections'
-     */
-    sections: Tester;
-    /**
-     * An array list of files to be uploaded as layouts
-     *
-     * @default 'source/layout'
-     */
-    layout: Tester;
-    /**
-     * An array list of files to be uploaded as templates
-     *
-     * @default 'source/templates'
-     */
-    templates: Tester;
-    /**
-     * An array list of files to be uploads as template/customers
-     *
-     * @default 'source/templates/customers'
-     */
-    customers: Tester;
-    /**
-     * An array list of files to be uploaded as configs
-     *
-     * @default 'source/config'
-     */
-    config: Tester;
-    /**
-     * An array list of files to be uploaded as locales
-     *
-     * @default 'source/locales'
-     */
-    locales: Tester;
-    /**
-     * The resolved `metafields` directory path
-     *
-     * @default 'source/metafields'
-     */
-    metafields: Tester;
-  };
-  /**
    * The build configuration
    */
-  transform: {
-    /**
-     * Stylesheet transforms, supports CSS/SASS
-     */
-    styles: IStyle[];
-    /**
-     * Iconset transforms, sprites and inline snippets
-     */
-    icons: IIcons;
-    /**
-     * View specific tranform options
-     */
-    views: IViews
-    /**
-     * JSON file transformation options
-     */
-    json: IJson
-
-  };
+  transform: ITransform;
   /**
-   * The sync data model. Multiple stores and themes
-   * can run concurrently.
+   * Minification executions
    */
-  sync: {
-    /**
-     * Theme synchronization options
-     */
-    themes: Array<IThemes>;
-    /**
-     * Store synchronization options
-     */
-    stores: Array<IStore>;
-  }
+  minify: IMinify;
+  /**
+   * Minification executions
+   */
+  terser: ITerser;
 }

@@ -102,6 +102,22 @@
             "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
             "type": "string"
           }
+        },
+        "metafields": {
+          "description": "The directory path to global shop metafields. Syncify provides a elegant approach to metafield synchronization using a directory > file based structure.",
+          "type": "array",
+          "items": {
+            "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
+            "type": "string"
+          }
+        },
+        "pages": {
+          "description": "The directory path to markdown or html files. Shopify does not support Liquid code in Page body content. Syncify supports page body html content synchronization be written in markdown using frontmatter attribution.\n\nPlease note, page html content cannot contain or reference Liquid objects and/or tags, Shopify will omit or escape them if they are found present. Syncify will validate the contents of your markdown pages are warn you when Liquid syntax is encountered.",
+          "type": "array",
+          "items": {
+            "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$",
+            "type": "string"
+          }
         }
       }
     },
@@ -139,11 +155,6 @@
           "default": "config",
           "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
           "description": "Syncify will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. You can optionally place these config files within a sub-directory (relative to root) and Syncify will look for any spawned of config files from within this directory (opposed to root). \n\nTypically this is named \"scripts\" in most node projects, you can place config files like you \"rollup.config.js\" or \"postcss.config.js\" files within."
-        },
-        "metafields": {
-          "description": "The directory path to global shop metafields. Syncify provides a elegant approach to metafield synchronization using a directory > file based structure.",
-          "type": "string",
-          "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$"
         }
       }
     },
@@ -159,6 +170,72 @@
         "build": {
           "type": "object",
           "description": "Supply the script commands you wish to spawn in build mode. Build mode will trigger spawns in resource modes such as \"upload\" and \"build\". The \"key\" value will be used as the group reference in the CLI logs.\n\nBuild spawns will execute only once."
+        }
+      }
+    },
+    "markdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Parse options applied to \".md\" markdown files. Syncify enables HTML content be written in Github flavored markdown. Shopify does not support Liquid code in Page or Legal body content.  The options will passed to the marked parser module which is what Syncify uses under the hood.",
+      "properties": {
+        "minify": {
+          "type": "string",
+          "default": "prod",
+          "description": "Should compiled HTML should be be minified",
+          "oneOf": [
+            {
+              "enum": ["always"],
+              "description": "Always apply minification."
+            },
+            {
+              "enum": ["prod"],
+              "description": "Only apply minification when the production or prod flag is present."
+            },
+            {
+              "enum": ["never"],
+              "description": "Minification is never applied."
+            }
+          ]
+        },
+        "baseUrl": {
+          "type": "string",
+          "default": null,
+          "description": "A prefix url for any relative link. You can also provide this within YAML frontmatter using the \"base_url\" key. Frontmatter references will take precedence."
+        },
+        "breaks": {
+          "type": "boolean",
+          "default": false,
+          "description": "If `true`, add `<br>? on a single line break (copies GitHub behavior on comments, but not on rendered markdown files)."
+        },
+        "headerIds": {
+          "type": "boolean",
+          "default": true,
+          "description": "If \"true\", include an id attribute when emitting headings (h1, h2, h3, etc). You can also provide this within YAML frontmatter using the \"header_ids\" key. Frontmatter references will take precedence."
+        },
+        "headerPrefix": {
+          "type": "string",
+          "default": "",
+          "description": "A string to prefix the id attribute when emitting headings (h1, h2, h3, etc). You can also provide this within YAML frontmatter using the \"header_prefix\" key. Frontmatter references will take precedence."
+        },
+        "highlight": {
+          "type": "boolean",
+          "default": true,
+          "description": "If \"true\", then \"```language\" code blocks are highlighted using the \"pygmentize.js\" library."
+        },
+        "mangle": {
+          "type": "boolean",
+          "default": true,
+          "description": "If \"true\", autolinked email address is escaped with HTML character references."
+        },
+        "silent": {
+          "type": "boolean",
+          "default": false,
+          "description": "If \"true\", the parser does not throw any exception and HTML validation will be triggered upon upload."
+        },
+        "smartypants": {
+          "type": "boolean",
+          "default": false,
+          "description": "If \"true\", use \"smart\" typographic punctuation for things like quotes and dashes."
         }
       }
     },
@@ -227,16 +304,45 @@
             }
           },
           "postcss": {
-            "default": "development",
-            "description": "Control PostCSS execution when bundling SASS/SCSS. If you setup PostCSS within your workspace then by default Syncify will pass your compiled SASS to PostCSS for post-processing. This might not always be ideal as larger stylesheets will take longer to transform as they will need to pass through both the Dart SASS and PostCSS compilers.\n\nYou can optionally execute PostCSS to run only when transforms are running in \"production\" mode.",
-            "oneOf": [
-              {
-                "enum": ["development"]
+            "type": "object",
+            "properties": {
+              "env": {
+                "type": "string",
+                "default": "dev",
+                "description": "Control PostCSS execution when bundling SASS/SCSS. If you setup PostCSS within your workspace then by default Syncify will pass your compiled SASS to PostCSS for post-processing. This might not always be ideal as larger stylesheets will take longer to transform as they will need to pass through both the Dart SASS and PostCSS compilers.\n\nYou can optionally execute PostCSS to run only when transforms are running in \"production\" mode.",
+                "oneOf": [
+                  {
+                    "enum": ["none"],
+                    "description": "Prevents CSS from being processed using PostCSS"
+                  },
+                  {
+                    "enum": ["all"],
+                    "description": "Runs PostCSS in all environments."
+                  },
+                  {
+                    "enum": ["development"],
+                    "description": "Alias of \"dev\""
+                  },
+                  {
+                    "enum": ["dev"],
+                    "description": "Alias of \"development\""
+                  },
+                  {
+                    "enum": ["production"],
+                    "description": "Alias of \"prod\""
+                  },
+                  {
+                    "enum": ["prod"],
+                    "description": "Alias of \"production\""
+                  }
+                ]
               },
-              {
-                "enum": ["production"]
+              "configFile": {
+                "type": "string",
+                "default": "postcss.config.js",
+                "description": "An optional file path to your postcss configuration file. By default, Syncify will look for the following:\n\n- postcss.config.js\n- postcss.config.mjs\n- postcss.config.cjs\n\nPlease note that Syncify requires you provide such a file when using it to process CSS files."
               }
-            ]
+            }
           }
         },
         "if": {
@@ -605,23 +711,6 @@
         "spawn": {
           "$ref": "#/definitions/spawn"
         },
-        "metafields": {
-          "type": "object",
-          "description": "Metafields configuration settings to be applied to the metafield sync feature. Syncify uses a directory based JSON file approach for publishing metafields to and from stores.",
-          "properties": {
-            "input": {
-              "description": "The input directory path relative to the root directory which syncify should sync metafields.",
-              "type": ["object", "string"],
-              "pattern": "^[/a-zA-Z0-9_-]+$"
-            },
-            "bind": {
-              "type": "boolean",
-              "default": false,
-              "readOnly": true,
-              "description": "NOT YET AVAILABLE\n\nWhether or not to bind metafields. When \"true\" the local metafields will be validated against the stores remote metafields. If your store metafield is determined to be updated more recently than you local version Syncify will update the source."
-            }
-          }
-        },
         "transform": {
           "description": "Transform configuration options for processing in the asset and file pipeline.",
           "type": "object",
@@ -635,6 +724,9 @@
             },
             "icons": {
               "$ref": "#/definitions/icons"
+            },
+            "markdown": {
+              "$ref": "#/definitions/markdown"
             },
             "views": {
               "$ref": "#/definitions/views"

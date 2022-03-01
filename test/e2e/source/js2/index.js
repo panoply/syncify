@@ -1,6 +1,6 @@
 import bar from './dir/bar';
 import foo from './dir/foo';
 
-console.log('foo');
+console.log('foggo');
 
 export { bar, foo };

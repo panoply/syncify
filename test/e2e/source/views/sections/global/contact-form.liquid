@@ -1,6 +1,4 @@
-{{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
-
-{%- style -%}
+{{ 'section-contact-form.css' | asset_url | stylesheet_tag }} {%- style -%}
 
 .section-{{section.id}}-padding {
   padding-top: {{section.settings.padding_top | times: 0.75 | round: 0}}
@@ -29,7 +27,11 @@
           {{ 'templates.contact.form.post_success' | t }}</div>
       {%- elsif form.errors -%}
         <div class="form__message">
-          <h2 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus>{% render 'icon-error' %}
+          <h2
+            class="form-status caption-large text-body"
+            role="alert"
+            tabindex="-1"
+            autofocus>{% render 'icon-error' %}
             {{ 'templates.contact.form.error_heading' | t }}</h2>
         </div>
         <ul class="form-status-list caption-large" role="list">
@@ -80,7 +82,6 @@
 </div>
 
 {% schema %}
-
 {
   "name": "t:sections.contact-form.name",
   "tag": "section",
@@ -91,33 +92,40 @@
       "id": "heading",
       "default": "Contact form",
       "label": "Heading"
-    }, {
+    },
+    {
       "type": "select",
       "id": "color_scheme",
       "options": [
         {
           "value": "accent-1",
           "label": "t:sections.all.colors.accent_1.label"
-        }, {
+        },
+        {
           "value": "accent-2",
           "label": "t:sections.all.colors.accent_2.label"
-        }, {
+        },
+        {
           "value": "background-1",
           "label": "t:sections.all.colors.background_1.label"
-        }, {
+        },
+        {
           "value": "background-2",
           "label": "t:sections.all.colors.background_2.label"
-        }, {
+        },
+        {
           "value": "inverse",
           "label": "t:sections.all.colors.inverse.label"
         }
       ],
       "default": "background-1",
       "label": "t:sections.all.colors.label"
-    }, {
+    },
+    {
       "type": "header",
       "content": "t:sections.all.padding.section_padding_heading"
-    }, {
+    },
+    {
       "type": "range",
       "id": "padding_top",
       "min": 0,
@@ -126,7 +134,8 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_top",
       "default": 36
-    }, {
+    },
+    {
       "type": "range",
       "id": "padding_bottom",
       "min": 0,
@@ -143,5 +152,4 @@
     }
   ]
 }
-
 {% endschema %}

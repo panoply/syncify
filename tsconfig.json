@@ -1,6 +1,11 @@
 {
-  "exclude": ["node_modules/**", "package", "test"],
-  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules/**", "package", "test", "docs"],
+  "include": [
+    "src/**/*.ts",
+    "package/@types",
+    "test/cases/index.ts",
+    "test/e2e/source/js/transform.ts"
+  ],
   "typeAcquisition": {
     "enable": true,
     "include": ["node"]
@@ -8,28 +13,27 @@
   "compilerOptions": {
     "types": ["node"],
     "incremental": true,
-    "declaration": true,
     "outDir": "package",
     "target": "ES6",
     "removeComments": true,
     "lib": ["es2020"],
-    "module": "ES6",
+    "module": "CommonJS",
     "alwaysStrict": true,
     "allowUmdGlobalAccess": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "remove",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "preserveSymlinks": true,
     "skipDefaultLibCheck": false,
     "moduleResolution": "node",
     "noEmitOnError": false,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "pretty": true,
     "rootDir": "src",
     "typeRoots": ["node_modules/@types", "src/types/*"],
-    "declarationDir": "package/@types",
     "baseUrl": ".",
     "paths": {
       "types": ["src/types/index.d.ts"],

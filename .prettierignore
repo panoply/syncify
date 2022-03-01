@@ -5,3 +5,4 @@ bin
 package
 *.js
 *.mjs
+*.cjs

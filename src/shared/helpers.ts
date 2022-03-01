@@ -1,9 +1,9 @@
-import { has } from 'rambdax';
-import { IConfig, IPackage } from 'types';
-import { join } from 'path';
-import { is, isArray, isString } from 'shared/native';
+import { has, last } from 'rambdax';
+import { IPackage } from 'types';
+import { join, basename, extname } from 'path';
+import { is, isArray, isString, isUndefined } from 'shared/native';
 import { bold } from 'cli/colors';
-import { pathExists } from 'fs-extra';
+import { AxiosRequestConfig } from 'axios';
 
 /**
  * Environment
@@ -30,7 +30,15 @@ export const toUpcase = <T extends string> (value: T) => value.charAt(0).toUpper
  * the path does not not contain forward slashes it
  * returns the passed string.
  */
-export const lastPath = (path: string) => is(path.indexOf('/'), -1) ? path : path.match(/[^/]+(?:\/$|$)/)[0];
+export const lastPath = (path: string | string[]) => {
+
+  if (isArray(path)) return path.map(lastPath);
+
+  return is(path.indexOf('/'), -1)
+    ? path
+    : path.match(/[^/]+(?:\/$|$)/)[0];
+
+};
 
 /**
  * Parent Path
@@ -38,7 +46,9 @@ export const lastPath = (path: string) => is(path.indexOf('/'), -1) ? path : pat
  * Will return the parent path of a URL, ie: that of which
  * omits the file name. Omits any glob patterns.
  */
-export const parentPath = (path: string) => {
+export const parentPath = (path: string | string[]) => {
+
+  if (isArray(path)) return path.map(parentPath);
 
   const last = path.lastIndexOf('/');
 
@@ -83,22 +93,116 @@ export const normalPath = (input: string) => {
   };
 };
 
-/**
- * Load module
- */
-export const loadModule = (moduleId: string) => {
+export const basePath = (cwd: string) => (path: string) => {
 
-  try {
+  // path directory starts with . character
+  if (is(path.charCodeAt(0), 46)) {
 
-    return require(moduleId);
+    // path define is root (dot)
+    if (is(path.length, 1)) return cwd + '/';
 
-  } catch {
+    // path directory next character is not forard slash
+    // for example, ".folder" this will be invalid
+    if (is(path.charCodeAt(1), 47)) {
+      path = path.slice(1);
+    } else {
+      console.error('Directory path is invalid at: "' + path + '"');
+      process.exit(1);
+    }
 
-    // Ignore error
   }
 
+  // path directory starts with / character
+  if (is(path.charCodeAt(0), 47)) path = path.slice(1);
+
+  // path directory is valid, eg: path
+  // dirs cannot reference sub directorys, eg: path/sub
+  if (/^[a-zA-Z0-9_-]+/.test(path)) {
+    path = join(cwd, path);
+    return is(last(path).charCodeAt(0), 47) ? path : path + '/';
+  } else {
+    throw new Error('Directory path is invalid at: "' + path + '"');
+  }
 };
 
+export const renameFile = (src: string, rename?: string) => {
+
+  // Get the filename (remember we flattened this earlier)
+  const dir = parentPath(src);
+
+  // file input extension
+  const ext = extname(src);
+
+  // Get the filename (remember we flattened this earlier)
+  const file = basename(src, ext);
+
+  if (isUndefined(rename)) {
+    return {
+      dir,
+      ext,
+      file,
+      newName: file + '.css'
+    };
+  }
+
+  if (/({dir})/.test(rename)) {
+    rename = rename.replace('{dir}', dir);
+  }
+
+  if (/({file})/.test(rename)) {
+    rename = rename.replace('{file}', file);
+  }
+
+  if (/({ext})/.test(rename)) {
+    rename = rename.replace('.{ext}', ext);
+  }
+
+  return {
+    ext,
+    file,
+    dir,
+    newName: rename
+
+  };
+};
+
+/**
+ * Store Authorization URL
+ *
+ * Generate the the authorization URL to
+ * be used for requests.
+ */
+export function authURL (domain: string, env: object): AxiosRequestConfig {
+
+  let api_token = domain + '_api_token';
+
+  if (!has(api_token, env)) api_token = api_token.toUpperCase();
+
+  if (has(api_token, env)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      headers: { 'X-Shopify-Access-Token': env[api_token] }
+    };
+  }
+
+  let api_key = domain + '_api_key';
+  let api_secret = domain + '_api_secret';
+
+  if (!has(api_key, env)) api_key = api_key.toUpperCase();
+  if (!has(api_secret, env)) api_secret = api_secret.toUpperCase();
+  if (has(api_key, env) && has(api_secret, env)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      auth: {
+        username: env[api_key],
+        password: env[api_secret]
+      }
+    };
+  }
+
+  throw new Error(`Missing "${domain}" credentials`);
+
+};
 /**
  * Returns the byte size of a string value
  */
@@ -124,29 +228,6 @@ export const byteConvert = (bytes: number): string => {
   return size === 0
     ? `${bold(String(bytes))}${unit[size]}`
     : `${bold((bytes / 1024 ** size).toFixed(1))}${unit[size]}`;
-};
-
-/**
- * Get Configs
- *
- * Returns path locations of config files like
- * postcss.config.js and svgo.config.js.
- */
-export const getConfigs = async (config: IConfig, files: string[]) => {
-
-  const file = files.shift();
-
-  const path = (file.endsWith('.yaml') || file.endsWith('.yml'))
-    ? join(config.cwd, file)
-    : join(config.cwd, config.config, file);
-
-  const exists = await pathExists(path);
-
-  if (exists) return path;
-  if (is(file.length, 0)) return null;
-
-  return getConfigs(config, files);
-
 };
 
 export const convertTimer = (ms: number) => {

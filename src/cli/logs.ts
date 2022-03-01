@@ -8,6 +8,7 @@ import { has, hasPath } from 'rambdax';
 import { is } from 'shared/native';
 import { byteConvert } from 'shared/helpers';
 import * as time from 'cli/timer';
+import Spinner from 'tiny-spinner';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -18,6 +19,8 @@ export * as time from 'cli/timer';
 let hasError: boolean = false;
 let hasMarks: boolean = false;
 let logBuild: boolean = false;
+
+export const spinner = new Spinner();
 
 /**
  * Define Preset
@@ -30,6 +33,15 @@ export const presets = (config: IConfig['mode']) => { logBuild = config.build; }
 /* -------------------------------------------- */
 /* METAFIELD LOGGERS                            */
 /* -------------------------------------------- */
+
+export const metafieldError = (message: string) => {
+
+  log.metafields(
+    tui.task(
+      c.bold(`! ${message}`)
+    )
+  );
+};
 
 /**
  * Metafield Change
@@ -326,7 +338,7 @@ export const sassError = (error: Exception) => {
 
   const title = `⨯ sass error starting ${c.gray('on')} line ${error.span.start.line}${c.white(':')}`;
 
-  log.files(tui.task(c.redBright(title)), tui.indent(parse.sassError(error)));
+  log.print(tui.task(c.redBright(title)), tui.indent(parse.sassError(error)));
   time.clear();
 
 };

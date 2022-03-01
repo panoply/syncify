@@ -1,54 +1,66 @@
 #!/usr/bin/env node
 
-const fn = require('../package/index.js').default;
-const argv = require('minimist')(process.argv.slice(1), {
+require('../package/index.js').default(require('minimist')(process.argv.slice(1), {
+  alias: {
+    config: 'c',
+    build: 'b',
+    watch: 'w',
+    upload: 'u',
+    download: 'd',
+    theme: 't',
+    input: 'i',
+    output: 'o',
+    help: 'h',
+    metafields: 'm',
+    pages: 'p',
+    redirects: 'r',
+    filter: 'f',
+    spawn: 's',
+    delete: 'del'
+  },
   default: {
+    cwd: process.cwd(),
+    config: '.',
+    input: 'source',
+    output: 'theme',
     cli: true,
     dev: true,
-    prompt: false,
-    build: false,
     prod: false,
-    watch: false,
-    clean: false,
-    upload: false,
-    download: false,
-    metafields: false,
-    pull: false,
-    merge: false,
     help: false,
-    env: 'dev',
-    cwd: process.cwd()
+    setup: false,
+    strap: false,
+    silent: false,
+    server: false
   },
   boolean: [
     'vsc',
     'dev',
     'prod',
     'build',
+    'prompt',
     'watch',
     'upload',
+    'setup',
+    'server',
+    'metafields',
+    'pages',
+    'redirects',
     'download',
+    'clean',
+    'silent',
     'help',
     'pull',
-    'merge'
+    'push'
   ],
   string: [
-    'store',
     'theme',
+    'del',
+    'config',
+    'input',
     'output',
-    'env'
-  ],
-  alias: {
-    build: 'b',
-    watch: 'w',
-    clean: 'c',
-    upload: 'u',
-    download: 'd',
-    store: 's',
-    theme: 't',
-    output: 'o',
-    help: 'h',
-    metafields: 'm'
-  }
-});
+    'strap',
+    'filter',
+    'spawn'
+  ]
 
-fn(argv);
+}));

@@ -95,32 +95,17 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
 
   // Path normalize,
   // When mode is upload we reference output directory
-  const path = normalPath(config.mode.upload ? config.output : config.source);
+  const path = normalPath(lastPath(config.mode.upload ? config.output : config.input));
   const dirs = directories(config.mode as IModes, config.output);
 
   let valid: number = 8;
 
-  // iterate over the define path mappings
+  // iterate over the defined path mappings
   for (const key in config.paths) {
 
     let uri: string[];
 
-    if (key === 'metafields') {
-
-      // Skip metafields in build mode, we are constructing
-      // the imposed theme and this directory is not part of it
-      if (config.mode.build) {
-
-        uri = [];
-
-      } else {
-
-        uri = [ join(path(config.metafields), '**/*.json') ];
-
-      }
-
-      // Special handling for customers path
-    } else if (key === 'customers') {
+    if (key === 'customers') {
 
       // customers directory lives with the templates directory
       const dir = await dirs('templates/customers');
@@ -129,19 +114,26 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
 
       uri = has(key, this.syncify.paths)
         ? isArray(this.syncify.paths[key])
-          ? this.syncify.paths[key].map(path)
+          ? (this.syncify.paths[key] as string[]).map(path)
           : [ path(this.syncify.paths[key]) ]
         : [ path('templates/customers') ];
 
     } else if (has(key, this.syncify.paths)) {
 
-      const dir = await dirs(key);
-
-      if (is(dir, 0) || is(dir, 3)) valid--;
-
       uri = isArray(this.syncify.paths[key])
         ? this.syncify.paths[key].map(path)
         : [ path(this.syncify.paths[key]) ];
+
+      if (key === 'metafields' || key === 'pages') {
+        if (config.mode.build) {
+          uri = [];
+        } else {
+          uri = uri.map(p => join(p, '**/*.json'));
+        }
+      } else {
+        const dir = await dirs(key);
+        if (is(dir, 0) || is(dir, 3)) valid--;
+      }
 
     } else {
 
@@ -176,7 +168,7 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
     }
   }
 
-  return views.call(this, config);
+  return config; // views.call(this, config);
 
 }
 
@@ -187,6 +179,15 @@ export async function paths (this: IPackage, config: PartialDeep<IConfig>) {
  * postcss.config.js and svgo.config.js.
  */
 export function views (this: IPackage, config: PartialDeep<IConfig>) {
+
+  if (this.syncify.transform.markdown.highlight) {
+
+    config.transform.markdown.highlight = function (code, lang) {
+      const hljs = require('highlight.js');
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    };
+  }
 
   if (isUndefined(this.syncify.transform) || !has('views', this.syncify.transform)) {
     return minifier.call(this, config);

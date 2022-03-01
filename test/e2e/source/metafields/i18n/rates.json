@@ -14,7 +14,7 @@
       "type_body_font": "assistant_n4",
       "sections": {
         "announcement-bar": {
-          "type": "announcement-sssbar",
+          "type": "announcement-bar",
           "blocks": {
             "announcement-bar-0": {
               "type": "announcement",
@@ -24,7 +24,7 @@
             }
           },
           "block_order": [
-            "announcement-banjj"
+            "announcement-ba"
           ]
         }
       }

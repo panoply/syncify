@@ -8,20 +8,27 @@ export default rollup(
       'anymatch',
       'axios',
       'chokidar',
+      '@web/config-loader',
       'cross-spawn',
       'dotenv',
+      'gray-matter',
       'fast-safe-stringify',
       'fs-extra',
       'glob',
+      'highlight.js',
       'html-minifier-terser',
       'minimist',
+      'marked',
       'prompts',
       'yamljs',
       'browser-sync',
       'postcss',
       'sass',
       'svg-sprite',
-      'svgo'
+      'svgo',
+      'turndown',
+      'turndown-plugin-gfm'
+
     ],
     output: [
       {
@@ -32,7 +39,7 @@ export default rollup(
         esModule: true,
         exports: 'named',
         chunkFileNames: '[name].js',
-
+        inlineDynamicImports: true,
         plugins: env.is('prod', [
           plugin.esminify(),
           plugin.filesize(
@@ -51,6 +58,7 @@ export default rollup(
         esModule: false,
         exports: 'named',
         chunkFileNames: '[name].js',
+        inlineDynamicImports: true,
         plugins: env.is('prod', [
           plugin.esminify(),
           plugin.filesize(

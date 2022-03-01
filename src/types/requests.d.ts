@@ -107,6 +107,29 @@ export interface IAsset {
 }
 
 /* -------------------------------------------- */
+/* PAGES                                        */
+/* -------------------------------------------- */
+
+export interface IPage {
+  author?: string;
+  body_html?: string;
+  created_at?: string;
+  handle?: string;
+  id?: number;
+  metafield?: {
+    key: string;
+    type: string;
+    value: string;
+    namespace:string;
+  },
+  published_at?:string;
+  shop_id?: number
+  template_suffix?: string;
+  title?: string;
+  updated_at?: string;
+
+}
+/* -------------------------------------------- */
 /* METAFIELDS                                   */
 /* -------------------------------------------- */
 
@@ -137,8 +160,11 @@ export interface IMetafield {
   /**
    * Value Type (this is legacy but we assert it anyway)
    */
-  value_type?: 'json_string'
-
+  value_type?: 'json_string';
+  /**
+   * Last updated date
+   */
+  updated_at?: string;
 }
 
 /* -------------------------------------------- */

@@ -14,7 +14,8 @@ export class Model implements PartialDeep<IConfig> {
     'snippets',
     'templates',
     'templates/customers',
-    'metafields'
+    'metafields',
+    'pages'
   ];
 
   public cwd: string;
@@ -34,6 +35,7 @@ export class Model implements PartialDeep<IConfig> {
   public import = 'import';
   public output = 'theme';
   public metafields = 'source/metafields';
+  public pages = 'source/pages';
   public watch = [];
 
   public sync = {
@@ -50,7 +52,21 @@ export class Model implements PartialDeep<IConfig> {
     sections: null,
     snippets: null,
     templates: null,
-    metafields: null
+    metafields: null,
+    pages: null
+  };
+
+  public caching = {
+    styles: {
+      uri: null
+    },
+    metafields: {
+      uri: null,
+      map: {}
+    },
+    sections: {
+      uri: null
+    }
   };
 
   public transform = {
@@ -67,6 +83,18 @@ export class Model implements PartialDeep<IConfig> {
         exclude: null,
         removeSchemaRefs: true
       }
+    },
+    markdown: {
+      minify: false,
+      breaks: false,
+      gfm: true,
+      headerIds: true,
+      headerPrefix: '',
+      langPrefix: 'hljs language-',
+      highlight: null,
+      mangle: true,
+      silent: false,
+      smartypants: false
     },
     views: {
       sections: {
@@ -93,22 +121,9 @@ export class Model implements PartialDeep<IConfig> {
           trimCustomFragments: true,
           continueOnParseError: true,
           ignoreCustomFragments: [
-            // Ignore all Liquid
-            /({%|{{)-?[\s\S]*?-?(}}|%})/g,
-
-            // Ignore Inline Style
             /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
-
-            // Ignore <style></style>
             /<style[\s\S]*?<\/style>/,
-
-            // Ignore Liquid tag blocks
             /{%-?\s{0,}liquid[\s\S]*?-?%}/,
-
-            // Ignore content for header
-            /{{-?\s*content_header[\s\S]*?}}/,
-
-            // Ignore content for header
             /(?<={%-?\s{0,}style\s{0,}-?%})[\s\S]*?(?={%-?\s{0,}endstyle\s{0,}-?%})/
           ]
         }
@@ -119,7 +134,7 @@ export class Model implements PartialDeep<IConfig> {
   constructor (cli: ICLIOptions) {
 
     this.cwd = cli.cwd;
-    this.cache = join(this.cwd, 'node_modules', '.cache', 'syncify');
+    this.cache = join(this.cwd, 'node_modules', '.syncify');
     this.config = this.cwd;
     this.cli = true;
     this.dev = this.getEnv(cli);
@@ -128,6 +143,7 @@ export class Model implements PartialDeep<IConfig> {
     this.node_modules = join(this.cwd, 'node_modules');
     this.transform.json.minify.apply = this.dev;
     this.transform.views.minify.apply = this.dev;
+    this.transform.markdown.minify = this.dev;
 
   }
 
@@ -147,35 +163,38 @@ export class Model implements PartialDeep<IConfig> {
 
   private setModes (cli: ICLIOptions) {
 
+    const resource = anyTrue(cli.pages, cli.metafields);
+
     return {
       help: cli.help,
       vsc: cli.vsc,
       metafields: cli.metafields,
+      pages: cli.pages,
       prompt: cli.prompt,
       merge: cli.merge,
       pull: cli.pull,
       clean: anyTrue(
-        cli.metafields,
+        resource,
         cli.upload
       ) ? false : cli.clean,
       build: anyTrue(
-        cli.metafields,
+        resource,
         cli.upload,
         cli.watch,
         cli.download
       ) ? false : cli.build,
       watch: anyTrue(
-        cli.metafields,
+        resource,
         cli.upload,
         cli.download
       ) ? false : cli.watch,
       upload: anyTrue(
-        cli.metafields,
+        resource,
         cli.download,
         cli.watch
       ) ? false : cli.upload,
       download: anyTrue(
-        cli.metafields,
+        resource,
         cli.upload,
         cli.watch,
         cli.build
