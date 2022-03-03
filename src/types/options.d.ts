@@ -110,5 +110,5 @@ export interface IPackage {
   dependencies?: { [module: string]: string; };
   devDependencies?: { [module: string]: string };
   peerDependencies?: { [module: string]: string };
-  reject?: (message: string) => void
+  optionalDependencies?: { [module: string]: string };
 }

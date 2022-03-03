@@ -1,6 +1,7 @@
-import { runtime } from '../options/config/config';
+import { runtime } from '../options/config/bundle';
 import { has } from 'rambdax';
 import { ICLICommands, IConfig, Syncify } from 'types';
+import * as bundle from '../options/config/conf';
 
 /**
  * Client
@@ -13,8 +14,9 @@ export async function cli (options: ICLICommands, callback?: typeof Syncify.hook
 
   if (has('_', options)) options._ = options._.slice(1);
 
-  const config: IConfig = await runtime(options);
+  await runtime(options);
 
+  // console.log(bundle.bundle, bundle.transform, bundle.terser);
   /* if (config) {
 
     try {

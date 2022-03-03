@@ -1,7 +1,7 @@
 import type { Options } from 'browser-sync';
 import { ICLICommands, IConfig, IMinify, ITerser, ITransform } from 'types';
 import merge from 'mergerino';
-import { assign } from '../shared/native';
+import { assign } from '../utils/native';
 
 export class Model implements IConfig {
 

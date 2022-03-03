@@ -1,8 +1,7 @@
-import { ICache, IOptions, IPackage } from 'types';
+import { IOptions, IPackage } from 'types';
 import { join } from 'path';
 import { pathExists, readJson } from 'fs-extra';
 import { readConfig } from '@web/config-loader';
-import { cacheDirs } from './dirs';
 
 /**
  * Config Files
@@ -57,30 +56,6 @@ export async function pkgJson (cwd: string): Promise<IPackage> {
   } catch (e) {
     throw new Error(e);
   }
-
-};
-
-/**
- * Cache Maps
- *
- * Resolves the cache mapping records, which should
- * exist within the `node_modules/.syncify` directory.
- * This file holds important information about the users
- * project. If no maps are found, they will be generated.
- *
- * > The cache maps are generated via `postinstall` and
- * should exists, if they don't, this function will simply
- * trigger that construction.
- */
-export async function cacheMap (cwd: string): Promise<ICache> {
-
-  const dir = join(cwd, 'node_modules/.syncify');
-  const map = join(dir, 'store.map');
-  const has = await pathExists(map);
-
-  if (!has) return cacheDirs(dir);
-
-  return readJson(map);
 
 };
 

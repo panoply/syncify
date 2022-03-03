@@ -9,6 +9,40 @@ import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
 
 /**
+ * Theme Previews
+ *
+ * Generate an aligned list of theme preview urls
+ * when we are in watch mode.
+ */
+function previews (sync: PartialDeep<ISync>) {
+
+  if (sync.themes.length === 0) return '';
+
+  const width = sync.themes.reduce((size, { target }) => (
+    target.length > size
+      ? target.length
+      : size
+  ), 0);
+
+  const urls = sync.themes.map(({
+    id,
+    store,
+    target
+  }) => (
+    c.line('│ ') + ' '.repeat(width - target.length) + c.pink.bold(target) + ': ' +
+    c.gray('https://' + store + '?preview_theme_id=' + id)
+  ));
+
+  return (
+    c.line('│') +
+    ' Previews:\n' +
+    c.line('│') + '\n' +
+    urls.join('\n') + '\n'
+  );
+
+};
+
+/**
  * Header - Prints a small overview of runing resource
  *
  * ```
@@ -37,19 +71,16 @@ export function header () {
 
   const stores = c.cyan.bold(String(SL)) + (SL > 1 ? ' stores' : ' store');
   const themes = c.cyan.bold(String(TL)) + (TL > 1 ? ' themes' : ' theme');
-  const preview = themePreviews(bundle.sync);
-  const env = bundle.dev
-    ? c.cyan.bold('Development Environment')
-    : c.cyan.bold('Production Environment');
+  const env = bundle.dev ? c.cyan.bold('Development') : c.cyan.bold('Production');
 
   let running: string;
   let heading: string;
 
-  if (bundle.mode.vsc) running = 'vscode generation';
-  else if (bundle.mode.build) running = 'build';
+  if (bundle.mode.build) running = 'build';
   else if (bundle.mode.watch) running = 'watch';
   else if (bundle.mode.upload) running = 'upload';
   else if (bundle.mode.download) running = 'download';
+  else if (bundle.mode.vsc) running = 'vscode generation';
 
   heading = '\n' + (
     c.line('┌─ ') + c.pink.bold('Syncify ') + c.gray('<!version!>') + '\n' +
@@ -59,18 +90,20 @@ export function header () {
   );
 
   if (SL > 0 && TL > 0) {
-    heading += c.line('│ ') + 'Syncing to ' + stores + '  and ' + themes + '\n';
+    heading += c.line('│ ') + 'Syncing to ' + stores + ' and ' + themes + '\n';
   }
 
   if (!isNil(bundle.spawn)) {
     const size = keys(bundle.spawn).length;
     const spawned = c.cyan.bold(String(size)) + (size > 1 ? ' child processes' : ' child process');
-    heading += c.line('│ ') + 'Spawned ' + spawned + '\n' + c.line('│\n');
+    heading += c.line('│') + ' Spawned ' + spawned + '\n' + c.line('│') + '\n';
   }
 
-  return (bundle.mode.build || bundle.mode.clean || bundle.mode.vsc) ? heading : heading + (
-    preview
-  );
+  return (
+    bundle.mode.build ||
+    bundle.mode.clean ||
+    bundle.mode.vsc
+  ) ? heading : heading + previews(bundle.sync);
 
 };
 
@@ -204,34 +237,3 @@ export function footer (stdout: string) {
   return `${c.line('│')}\n${c.line('└─')} ${c.pink.bold(stdout)} \n\n`;
 
 }
-
-/* -------------------------------------------- */
-/* PRIVATES                                     */
-/* -------------------------------------------- */
-
-/**
- * Theme Previews
- *
- * Generate an aligned list of theme preview urls
- * when we are in watch mode.
- */
-function themePreviews (sync: PartialDeep<ISync>) {
-
-  if (sync.themes.length === 0) return '';
-
-  const width = sync.themes.reduce((size, { target }) => {
-    if (target.length > size) size = target.length;
-    return size;
-  }, 0);
-
-  const previews = sync.themes.map(({ id, store, target }) => {
-    const offset = width - target.length;
-    return (
-      c.line('│ ') + ' '.repeat((offset)) + c.pink.bold(target) + ': ' +
-      c.gray('https://' + sync.stores[store].domain + '?preview_theme_id=' + id)
-    );
-  });
-
-  return c.line('│ ') + 'Previews:' + c.line('\n│\n') + previews.join('\n') + '\n';
-
-};

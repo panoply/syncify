@@ -14,6 +14,11 @@ export { default as strip } from 'strip-ansi';
  */
 export const clear = '\x1B[H\x1B[2J';
 
+/**
+ * Clear console and history
+ */
+export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
+
 /* -------------------------------------------- */
 /* FONT STYLE                                   */
 /* -------------------------------------------- */
@@ -29,9 +34,14 @@ export const underline = ansis.underline;
 export const bold = ansis.bold;
 
 /**
-  * Reset
-  */
+ * Reset
+ */
 export const reset = ansis.reset;
+
+/**
+ * Reset
+ */
+export const italic = ansis.italic.open;
 
 /* -------------------------------------------- */
 /* CUSTOM COLORS                                */

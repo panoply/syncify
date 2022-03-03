@@ -1,10 +1,8 @@
-import { ICache, IConfig, IOptions } from 'types';
+import { IConfig } from 'types';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'path';
 import { PartialDeep } from 'type-fest';
-import { basePath } from 'shared/helpers';
-import { isArray } from '../../shared/native';
-import { has } from 'rambdax';
+import { isArray } from '../../utils/native';
 import { bundle } from './conf';
 
 /**
@@ -15,7 +13,7 @@ import { bundle } from './conf';
  * fallback function and only runs is `postinstall`
  * was not triggered.
  */
-export async function cacheDirs (path: string, options = { purge: false }): Promise<ICache> {
+export async function cacheDirs (path: string, options = { purge: false }) {
 
   const hasBase = await pathExists(path);
 
@@ -26,8 +24,6 @@ export async function cacheDirs (path: string, options = { purge: false }): Prom
       throw new Error(e);
     }
   }
-
-  const refs: PartialDeep<ICache> = {};
 
   for (const dir of [
     'styles',
@@ -52,19 +48,17 @@ export async function cacheDirs (path: string, options = { purge: false }): Prom
       if (options.purge) await emptyDir(uri);
     }
 
-    refs[dir] = {
+    bundle.cache[dir] = {
       uri,
       maps: {}
     };
   }
 
-  try {
-    await writeJson(join(path, 'store.map'), refs, { spaces: 0 });
-  } catch (e) {
-    throw new Error(e);
-  }
+  writeJson(join(path, 'store.map'), bundle.cache, { spaces: 0 }, (e) => {
 
-  return refs as ICache;
+    if (e) throw e;
+
+  });
 
 };
 
@@ -75,15 +69,17 @@ export async function cacheDirs (path: string, options = { purge: false }): Prom
  * provided `basePath` uri location. Optionally purge
  * by passing `true` as second parameter.
  */
-export async function themeDirs (basePath: string, clean = false) {
+export async function themeDirs (basePath: string) {
 
   const hasBase = await pathExists(basePath);
 
-  if (hasBase && clean) {
-    try {
-      await emptyDir(basePath);
-    } catch (e) {
-      console.error(e);
+  if (hasBase) {
+    if (bundle.mode.clean) {
+      try {
+        await emptyDir(basePath);
+      } catch (e) {
+        console.error(e);
+      }
     }
   } else {
     try {
@@ -128,6 +124,8 @@ export async function themeDirs (basePath: string, clean = false) {
  * are purged and then recreated.
  */
 export async function importDirs ({ dirs, sync, mode }: PartialDeep<IConfig>) {
+
+  if (!mode.download) return;
 
   const hasBase = await pathExists(dirs.import);
 

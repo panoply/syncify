@@ -276,7 +276,7 @@ export interface ICache {
 
 export interface IThemes {
   /**
-   * The store index reference
+   * The store domain name
    */
   store: string;
   /**

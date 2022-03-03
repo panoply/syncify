@@ -91,10 +91,7 @@ export let bundle: PartialDeep<IBundle> = ({
     push: false,
     vsc: false
   },
-  spawn: {
-    build: null,
-    watch: null
-  },
+  spawn: {},
   watch: [],
   paths: {},
   sync: {
