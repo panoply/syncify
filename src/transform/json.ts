@@ -1,13 +1,14 @@
 import { has, isNil, isType } from 'rambdax';
 import c from 'ansis';
-import { IFile, Syncify, IJson } from 'types';
-import * as log from 'cli/logs';
+import { IFile, Syncify } from 'types';
 import { join } from 'path';
 import { readJson, writeFile } from 'fs-extra';
-import { is } from 'shared/native';
-import { Type } from 'config/file';
+import { is } from 'utils/native';
+import { Type } from 'utils/files';
+import { byteSize } from 'utils/shared';
 import stringify from 'fast-safe-stringify';
-import { byteSize } from 'shared/helpers';
+import { log } from 'cli/stdout';
+import { terser, transform } from 'options';
 
 /**
  * Parse JSON
@@ -22,7 +23,7 @@ export function $schema (file: IFile, data: { $schema?: string }) {
 
   delete json.$schema;
 
-  log.fileTask(file, `stripped ${c.bold.yellow('$schema')} field removed from JSON`);
+  log.print(`stripped ${c.bold.yellow('$schema')} field removed from JSON`);
 
   return json;
 
@@ -41,7 +42,7 @@ export function parse (data: string) {
 
   } catch (e) {
 
-    log.throws(e);
+    log.throw(e);
 
     return null;
 
@@ -65,7 +66,7 @@ export function minify (data: string, space = 0): any {
 
   } catch (e) {
 
-    log.throws(e);
+    log.throw(e);
 
     return null;
 
@@ -80,24 +81,25 @@ export function minify (data: string, space = 0): any {
  * passed in file and contents. We do not publish
  * metafield file types to output directory.
  */
-export function transform (file: IFile, data: string, space = 0): any {
+export function jsonCompile (file: IFile, data: string, space = 0): any {
 
   const minified = minify(data, space);
 
   if (isNil(minified)) return minified;
 
   if (is(space, 0)) {
-    log.fileTask(file, 'minified json file');
+    log.json('minified json file');
   } else {
-    log.fileTask(file, 'processed json file');
+    log.json('processed json file');
   }
 
-  log.fileSize(file.size, byteSize(minified));
+  // file.size,
+  log.print(`${byteSize(minified)}`);
 
   if (is(file.type, Type.Metafield)) {
     return minified;
   } else {
-    writeFile(join(file.output, file.key), minified, (e) => e ? log.errors(e) : null);
+    writeFile(join(file.output, file.key), minified, (e) => e ? log.error(e.message) : null);
     return minified;
   }
 
@@ -110,37 +112,37 @@ export function transform (file: IFile, data: string, space = 0): any {
  * cb that one can optionally execute
  * from within scripts.
  */
-export async function compile (file: IFile, options: IJson, cb: typeof Syncify.hook): Promise<string> {
+export async function compile (file: IFile, cb: typeof Syncify.hook): Promise<string> {
 
   const data = await readJson(file.path);
 
   file.size = byteSize(data);
 
-  const space = options.minify.apply ? 0 : options.spaces;
-  const refs = options.minify.removeSchemaRefs ? $schema(file, data) : data;
+  const space = terser.minify.json ? 0 : transform.json.indent;
+  const refs = terser.liquid.removeSchemaRefs ? $schema(file, data) : data;
 
-  if (!isType('Function', cb)) return transform(file, refs, space);
+  if (!isType('Function', cb)) return jsonCompile(file, refs, space);
 
   const update = cb.apply({ ...file }, refs);
 
   if (isType('Undefined', update)) {
 
-    return transform(file, refs, space);
+    return jsonCompile(file, refs, space);
 
   } else if (isType('Array', update) || isType('Object', update)) {
 
-    return transform(file, update, space);
+    return jsonCompile(file, update, space);
 
   } else if (isType('String', update)) {
 
-    return transform(file, parse(update), space);
+    return jsonCompile(file, parse(update), space);
 
   } else if (Buffer.isBuffer(update)) {
 
-    return transform(file, parse(update.toString()), space);
+    return jsonCompile(file, parse(update.toString()), space);
 
   }
 
-  return transform(file, refs, space);
+  return jsonCompile(file, refs, space);
 
 };

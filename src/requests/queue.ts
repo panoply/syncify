@@ -2,7 +2,7 @@ import Queue from 'p-queue';
 import connect from 'axios';
 import https from 'https';
 import http from 'http';
-import { is } from 'shared/native';
+import { is } from 'utils/native';
 
 /**
  * Axios Request

@@ -1,11 +1,9 @@
-import { cli } from './src/client/cli';
-import { Resource, APIOptions, IOptions, Callback } from 'types';
+import { cli } from './cli';
+import { Resource } from 'types';
 
 /* -------------------------------------------- */
 /* EXPORTS                                      */
 /* -------------------------------------------- */
-
-export { env } from 'shared/helpers';
 
 function sync <R extends Resource> (
   resource: R | IOptions,

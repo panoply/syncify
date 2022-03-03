@@ -1,4 +1,4 @@
-import * as log from 'cli/logs';
+import * as log from './tui';
 
 /**
  * Error Handler

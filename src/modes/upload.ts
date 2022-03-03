@@ -1,10 +1,10 @@
 import glob from 'glob';
+import { readFile } from 'fs-extra';
+import { mapFastAsync } from 'rambdax';
 import { IConfig, Syncify } from 'types';
 import { client, queue } from 'requests/client';
-import { outputFile } from 'config/file';
-import { readFile } from 'fs-extra';
+import { outputFile } from 'utils/files';
 import * as log from 'cli/logs';
-import { mapFastAsync } from 'rambdax';
 
 export const upload = async (config: IConfig, cb?: typeof Syncify.hook): Promise<void> => {
 

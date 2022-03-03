@@ -43,7 +43,7 @@ export default {
       'views/templates/*.liquid'
     ],
     snippets: [
-      'views/snippets',
+      'views/snippets/*.liquid',
       'scripts/vars.js.liquid',
       'styles/vars.css.liquid'
     ]

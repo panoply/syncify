@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import { ParsedPath } from 'path';
-import { Type } from 'config/file';
+import { Type } from 'utils/files';
 
 /**
  * File context generated when passed to a sync

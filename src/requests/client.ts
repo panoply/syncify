@@ -4,7 +4,7 @@ import { IRequest, IStore, IFile, IThemes, Methods, IMetafield, IConfig, IPage }
 import { assets } from 'requests/assets';
 import * as metafields from 'requests/metafields';
 import * as pages from 'requests/pages';
-import { assign, isUndefined } from 'shared/native';
+import { assign, isUndefined } from 'utils/native';
 
 /* -------------------------------------------- */
 /* EXPORTED                                     */

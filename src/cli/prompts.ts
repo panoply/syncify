@@ -1,212 +1,85 @@
-import prompts from 'prompts';
-import { IConfig } from 'types';
-import { toLower } from 'rambdax';
-import { toUpcase } from 'shared/helpers';
+import { PromptObject } from 'prompts';
 
-import * as metafields from 'requests/metafields';
-
-async function resource (config: IConfig) {
-
-  const prompt = await prompts([
-    {
-      type: 'select',
-      name: 'resource',
-      message: 'Resource',
-      instructions: false,
-      initial: 0,
-      choices: [
-        {
-          title: 'watch',
-          description: 'Start watching for changes',
-          value: 'watch'
-        },
-        {
-          title: 'download',
-          description: 'Download themes from a store',
-          value: 'download'
-        },
-        {
-          title: 'upload',
-          description: 'Upload theme to a stores',
-          value: 'upload'
-        },
-        {
-          title: 'stores',
-          description: 'List the defined stores',
-          value: 'stores'
-        },
-        {
-          title: 'queries',
-          description: 'Query store data and information',
-          value: 'query'
-        }
-      ]
-    },
-    {
-      name: 'stores',
-      message: 'Stores',
-      instructions: false,
-      type: config.resource === 'interactive'
-        ? 'select'
-        : 'multiselect',
-      choices: config.sync.stores.map(
-        (
-          {
-            store,
-            domain
-          }
-        ) => ({
-          title: toLower(store),
-          value: toLower(store),
-          description: domain
-        })
-      )
-    }
-  ], {
-    onSubmit (prompt, answer) {
-
-      if (prompt.name === 'resource') {
-
-        switch (answer) {
-          case 'clean':
-          case 'watch':
-          case 'upload':
-          case 'build':
-          case 'download': config.resource = answer; break;
-        }
-
-      } else if (prompt.name === 'stores') {
-
-        const { stores } = config.sync;
-
-        if (prompt.type === 'select') {
-          config.sync.stores = stores.filter(v => toLower(v.store) === answer);
-        } else {
-          if (stores.length !== answer.length) {
-            config.sync.stores = stores.filter(v => answer.includes(toLower(v.store)));
-          }
-        }
+export const page = (domain: string): PromptObject<string>[] => ([
+  {
+    type: 'select',
+    name: 'resource',
+    message: 'Page Resources',
+    instructions: false,
+    initial: 0,
+    choices: [
+      {
+        title: 'Push',
+        description: `Upload pages to ${domain}`,
+        value: 'p'
+      },
+      {
+        title: 'Pull',
+        description: `Download pages from ${domain}`,
+        value: 'p'
+      },
+      {
+        title: 'Merge',
+        description: 'Merge remote pages with local records',
+        value: 'm'
+      },
+      {
+        title: 'Delete',
+        description: `Delete pages from ${domain}`,
+        value: 'p'
+      },
+      {
+        title: 'Query',
+        description: `Browse and search pages in ${domain}`,
+        value: 'q'
+      },
+      {
+        title: 'Publish',
+        description: `Publish pages on ${domain}`,
+        value: 'p'
+      },
+      {
+        title: 'Unpublish',
+        description: `Unpublish pages on ${domain}`,
+        value: 'p'
       }
-    }
-  });
-
-  switch (prompt.resource) {
-    case 'query':
-      return query(config, prompt);
-    default:
-      return themes(config, prompt);
+    ]
   }
+]);
 
-}
-
-async function query (
-  config: IConfig,
-  options: {
-    resource: string,
-    stores: string[]
+export const metafield = (domain: string): PromptObject<string>[] => ([
+  {
+    type: 'select',
+    name: 'resource',
+    message: 'Metafield Resources',
+    instructions: false,
+    initial: 0,
+    choices: [
+      {
+        title: 'Push',
+        description: `Upload metafields to ${domain}`,
+        value: 'p'
+      },
+      {
+        title: 'Pull',
+        description: `Download metafields from ${domain}`,
+        value: 'p'
+      },
+      {
+        title: 'Merge',
+        description: 'Merge remote metafields with local records',
+        value: 'm'
+      },
+      {
+        title: 'Delete',
+        description: `Delete metafields from ${domain}`,
+        value: 'p'
+      },
+      {
+        title: 'Query',
+        description: `Browse and search metafields in ${domain}`,
+        value: 'q'
+      }
+    ]
   }
-) {
-
-  // eslint-disable-next-line
-  const prompt = await prompts([
-    {
-      type: 'select',
-      name: 'endpoint',
-      message: 'Endpoint',
-      instructions: false,
-      initial: 0,
-      choices: [
-        {
-          title: 'metafields',
-          description: 'Search the shop metafields',
-          value: 'metafields'
-        },
-        {
-          title: 'products',
-          description: 'Search products in the shop',
-          value: 'products'
-        },
-        {
-          title: 'pages',
-          description: 'Search pages in the shop',
-          value: 'pages'
-        },
-        {
-          title: 'redirects',
-          description: 'Search redirects in the shop',
-          value: 'redirects'
-        },
-        {
-          title: 'themes',
-          description: 'search themes in the shop',
-          value: 'themes'
-        }
-      ]
-    }
-  ]);
-
-  const q = await metafields.list(config.sync.stores[0]);
-
-  if (!q) return;
-
-  return await prompts([
-    {
-      type: 'select',
-      name: 'metafields',
-      message: 'Metafields',
-      instructions: false,
-      initial: 0,
-      choices: q.map(
-        meta => ({
-          title: meta.namespace + '.' + meta.key,
-          description: 'Metafield id is' + meta.id,
-          value: meta.value
-        })
-      )
-    }
-  ]);
-
-}
-
-async function themes (
-  config: IConfig,
-  options: {
-    resource: string,
-    stores: string[]
-  }
-) {
-
-  const { themes } = config.sync;
-  const prompt = await prompts(options.stores.map(
-    (
-      store
-    ) => ({
-      type: 'multiselect',
-      name: store,
-      message: toUpcase(store) + ' Themes',
-      instructions: false,
-      choices: themes.filter(v => toLower(v.store) === store).map(
-        (
-          {
-            id,
-            target
-          }
-        ) => ({
-          title: target,
-          value: target,
-          description: 'Theme id is ' + id
-        })
-      )
-    })
-  ));
-
-  config.sync.themes = themes.filter(v => prompt[toLower(v.store)].includes(v.target));
-
-  return prompt;
-
-}
-
-/**
- * Target
- */
-export const prompt = async (config: IConfig): Promise<any> => resource(config);
+]);

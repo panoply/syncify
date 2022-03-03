@@ -1,14 +1,14 @@
-import { compile, Logger } from 'sass';
-import c from 'ansis';
-import * as log from 'cli/logs';
-import * as parse from 'cli/parse';
-import { is } from 'shared/native';
-import { IFile, IStyle } from 'types';
-import { readFile, writeFile } from 'fs-extra';
 import type { Processor } from 'postcss';
-import { isNil, pipeAsync } from 'rambdax';
-import { Type } from 'config/file';
+import { IFile, IStyle } from 'types';
+import { compile, Logger } from 'sass';
 import stringify from 'fast-safe-stringify';
+import { readFile, writeFile } from 'fs-extra';
+import { isNil, pipeAsync } from 'rambdax';
+import { Type } from 'utils/files';
+import { is } from 'utils/native';
+import * as c from 'cli/ansi';
+import * as parse from 'cli/parse';
+import { log } from 'cli/stdout';
 
 /**
  * PostCSS Module
@@ -50,7 +50,7 @@ const sass = async (file: IFile<IStyle>) => {
         style: config.sass.style,
         quietDeps: config.sass.warnings,
         sourceMap: config.sass.sourcemap,
-        loadPaths: config.include,
+        loadPaths: config.sass.include,
         logger: config.sass.warnings ? {
           debug: log.sassDebug,
           warn: log.sassWarn
@@ -85,7 +85,7 @@ const sass = async (file: IFile<IStyle>) => {
 
   } catch (e) {
 
-    log.throws(e);
+    log.throw(e);
   }
 
 };

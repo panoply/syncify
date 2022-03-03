@@ -3,13 +3,13 @@ import { IConfig, IMetafield, IStore } from 'types';
 import { join } from 'path';
 import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
-import * as log from 'cli/logs';
 import { error } from 'cli/errors';
 import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
-import { assign, is } from 'shared/native';
+import { assign, is } from 'utils/native';
 import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
-import * as c from 'cli/colors';
+import * as c from 'cli/ansi';
+import * as log from 'cli/logs';
 
 /**
  * Write Metafields

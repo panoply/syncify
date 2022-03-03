@@ -1,12 +1,9 @@
-// import { readFile } from 'fs-extra';
-import { client } from 'requests/client';
-import { join } from 'path';
-// import { importFile } from 'config/file';
-// import * as log from 'cli/logs';
 import { IConfig, Syncify } from 'types';
+import { join } from 'path';
 import { isNil, has } from 'rambdax';
 import { writeFile } from 'fs-extra';
-import * as log from 'cli/logs';
+import { client } from 'requests/client';
+// import * as log from 'cli/logs';
 
 export const download = async (config: IConfig, cb?: typeof Syncify.hook): Promise<void> => {
 

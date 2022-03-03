@@ -6,10 +6,10 @@ import Spinner from 'tiny-spinner';
 import { stringify } from 'gray-matter';
 import { error } from 'cli/errors';
 import { pathExistsSync, stat, writeFile } from 'fs-extra';
-import { assign, is } from 'shared/native';
+import { assign, is } from 'utils/native';
 import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
-import * as c from 'cli/colors';
+import * as c from 'cli/ansi';
 import Turndown from 'turndown';
 import { gfm } from 'joplin-turndown-plugin-gfm';
 

@@ -1,127 +1,137 @@
-import * as c from 'cli/colors';
-import { isNil } from 'rambdax';
-import { toUpcase } from 'shared/helpers';
-import { keys } from 'shared/native';
-import { IConfig, IThemes } from 'types';
-
-/**
- * Alignment - Returns aligned themes previews upon initialization
- */
-const alignment = (themes: IThemes[]) => {
-
-  const width = themes.reduce((size, { target }) => {
-    if (target.length > size) size = target.length;
-    return size;
-  }, 0);
-
-  const previews = themes.map(({ id, domain, target }) => {
-    const offset = width - target.length;
-    return (
-      c.line('│ ') + ' '.repeat((offset)) + c.pink.bold(target) + ': ' +
-      c.gray('https://' + domain + '?preview_theme_id=' + id)
-    );
-  });
-
-  return previews.join('\n');
-
-};
+import ansis from 'ansis';
 
 /* -------------------------------------------- */
-/* PUBLIC                                       */
+/* HELPER UTILITIES                             */
 /* -------------------------------------------- */
 
 /**
- * Prepend - Prepends vertical line to texts
- *
- * ```
- * │ lorem ipsum lorem ipsum
- * │ lorem ipsum lorem ipsum
- * │ lorem ipsum lorem ipsum
- * ```
+ * Strip ANSI Characters from string
  */
-export const indent = (message: string) => message.replace(/^/gm, c.line('│  ')) + '\n';
+export { default as strip } from 'strip-ansi';
 
 /**
- * Header - Prints a small overview of runing resource
- *
- * ```
- * ┌── Syncify v0.1.0.beta
- * │
- * │ Running in watch mode (production)
- * │ Syncing to 2 stores and 6 themes
- * │ Spawned 1 process in the asset pipline
- * │
- * │ Theme previews:
- * │
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │
- * ```
+ * Clear console but preserve history
  */
-export const header = ({ sync, spawns, env, mode }: IConfig) => {
-
-  if (mode.metafields) return '';
-
-  const stores = c.cyan.bold(String(sync.stores.length)) + (sync.stores.length > 1 ? ' stores' : ' store');
-  const themes = c.cyan.bold(String(sync.themes.length)) + (sync.themes.length > 1 ? ' themes' : ' theme');
-  const preview = alignment(sync.themes);
-
-  let running: string;
-
-  if (mode.vsc) running = 'vscode generation';
-  if (mode.build) running = 'build';
-  if (mode.watch) running = 'watch';
-  if (mode.upload) running = 'upload';
-  if (mode.download) running = 'download';
-
-  let heading: string = '\n' + (
-    c.line('┌─ ') + c.cyan.bold('Syncify ') + c.gray('<!version!>') + '\n' +
-    c.line('│ ') + '\n' +
-    c.line('│ ') + 'Running ' + c.cyan.bold(running) + ' mode in ' + c.cyan.bold(env) + '\n' +
-    c.line('│ ') + 'Syncing to ' + stores + '  and ' + themes + '\n'
-  );
-
-  if (!isNil(spawns)) {
-    const size = keys(spawns).length;
-    const spawned = c.cyan.bold(String(size)) + (size > 1 ? ' child processes' : ' child process');
-    heading += c.line('│ ') + 'Spawned ' + spawned + '\n' + c.line('│\n');
-  }
-
-  return (mode.build || mode.clean || mode.vsc) ? heading : heading + (
-    c.line('│ ') + 'Previews:' + c.line('\n│\n') + preview + '\n' +
-    c.line('│ ') + '\n'
-  );
-
-};
+export const clear = '\x1B[H\x1B[2J';
 
 /**
- * Group - Printed first upon running resource
- *
- * `├─ title`
+ * Clear console and history
  */
-export const group = (title: string) => (
-  c.line('│\n├─ ') + c.bold.doubleUnderline(toUpcase(title)) + c.line('\n│\n')
-);
+export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
+
+/* -------------------------------------------- */
+/* FONT STYLE                                   */
+/* -------------------------------------------- */
 
 /**
- * Task - Prints the executed task/operation
- *
- * `│`
+ * Underline
  */
-export const newline = (amount = 1) => c.line('│\n'.repeat(amount));
+export const underline = ansis.underline;
 
 /**
- * Task - Prints the executed task/operation
- *
- * `│`
- */
-export const task = (message: string) => c.line('├ ') + message + '\n';
+  * Bold
+  */
+export const bold = ansis.bold;
 
 /**
- * Footer - Printed as the very bottom
- *
- * `└── message`
+ * Reset
  */
-export const footer = (message: string) => c.line('│\n└── ') + c.cyan(message) + '\n\n';
+export const reset = ansis.reset;
+
+/**
+ * Reset
+ */
+export const italic = ansis.italic.open;
+
+/* -------------------------------------------- */
+/* CUSTOM COLORS                                */
+/* -------------------------------------------- */
+
+/**
+ * Line Color (gray)
+ */
+export const line = ansis.hex('#2a2a2e');
+
+/**
+ * Pink
+ */
+export const pink = ansis.hex('#ff75d1');
+
+/**
+ * Orange
+ */
+export const orange = ansis.hex('#f59c5b');
+
+/* -------------------------------------------- */
+/* STANDARD COLORS                              */
+/* -------------------------------------------- */
+
+/**
+ * Cyan
+ */
+export const cyan = ansis.cyanBright;
+
+/**
+ * Red
+ */
+export const red = ansis.red;
+
+/**
+ * Red Bright
+ */
+export const redBright = ansis.redBright;
+
+/**
+ * Green
+ */
+export const green = ansis.green;
+
+/**
+ * Green Bright
+ */
+export const greenBright = ansis.greenBright;
+
+/**
+ * Yellow
+ */
+export const yellow = ansis.yellow;
+
+/**
+ * Yellow Bright
+ */
+export const yellowBright = ansis.yellowBright;
+
+/**
+ * Magenta
+ */
+export const magenta = ansis.magenta;
+
+/**
+ * Magenta Bright
+ */
+export const magentaBright = ansis.magentaBright;
+
+/**
+ * Blue
+ */
+export const blue = ansis.blue;
+
+/**
+ * Blue Bright
+ */
+export const blueBright = ansis.blueBright;
+
+/**
+ * White
+ */
+export const white = ansis.white;
+
+/**
+ * White Bright
+ */
+export const whiteBright = ansis.whiteBright;
+
+/**
+ * Gray
+ */
+export const gray = ansis.gray;

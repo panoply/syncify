@@ -2,14 +2,14 @@
 
 import chokidar from 'chokidar';
 import { Syncify, IConfig, IFile, IStyle } from 'types';
-import { parseFile, Type, isStyle, isMetafield, isSection, isAsset } from 'config/file';
+import { readFile } from 'fs-extra';
 import { client, queue } from 'requests/client';
 import { compile as liquid } from 'transform/liquid';
 import { transform as styles } from 'transform/styles';
 import { compile as json } from 'transform/json';
 import { compile as pages } from 'transform/pages';
-import { is } from 'shared/native';
-import { readFile } from 'fs-extra';
+import { is } from 'utils/native';
+import { parseFile, Type, isStyle, isMetafield, isSection, isAsset } from 'utils/files';
 import * as log from 'cli/logs';
 
 /**

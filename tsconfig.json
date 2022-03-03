@@ -39,9 +39,9 @@
       "types": ["src/types/index.d.ts"],
       "cli/*": ["src/cli/*"],
       "modes/*": ["src/modes/*"],
-      "shared/*": ["src/shared/*"],
-      "config/*": ["src/config/*"],
-      "logs/*": ["src/logs/*"],
+      "options/*": ["src/options/*"],
+      "options": ["src/options/index.ts"],
+      "utils/*": ["src/utils/*"],
       "requests/*": ["src/requests/*"],
       "transform/*": ["src/transform/*"]
     }

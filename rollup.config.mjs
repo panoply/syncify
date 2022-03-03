@@ -85,9 +85,8 @@ export default rollup(
           }),
           entries: config.alias([
             'cli',
-            'config',
-            'logs',
-            'shared',
+            'options',
+            'utils',
             'requests',
             'modes',
             'transform'

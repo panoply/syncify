@@ -1,13 +1,14 @@
 import { minify } from 'html-minifier-terser';
 import stringify from 'fast-safe-stringify';
-import { IFile, ILiquidMinifyOptions, IViews, Syncify, ITerser } from 'types';
+import { IFile, Syncify, IHTML } from 'types';
 import { join } from 'path';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
-import { Type } from 'config/file';
-import { is, nil } from 'shared/native';
-import { byteSize } from 'shared/helpers';
-import * as log from 'cli/logs';
+import { Type } from 'utils/files';
+import { is, nil } from 'utils/native';
+import { byteSize } from 'utils/shared';
+import { log } from 'cli/stdout';
+import { terser } from 'options';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -63,9 +64,9 @@ const TouchingAttributes = /(?<=[%}]})\s(?={[{%])/g;
  * Strips Liquid comments from file content.
  * This is executed before passing to HTML terser.
  */
-const removeAttrNewline = (content: string, options: ILiquidMinifyOptions) => {
+const removeAttrNewline = (content: string) => {
 
-  if (!options.removeLiquidNewlineAttributes) return content;
+  if (!terser.liquid.removeLiquidNewlineAttributes) return content;
 
   return content.replace(HTMLAttributeValues, match => (
 
@@ -84,13 +85,13 @@ const removeAttrNewline = (content: string, options: ILiquidMinifyOptions) => {
  * Strips Liquid comments from file content.
  * This is executed before passing to HTML terser.
  */
-const removeComments = (content: string, options: ILiquidMinifyOptions) => {
+const removeComments = (content: string) => {
 
-  if (!options.removeLiquidComments) return removeAttrNewline(content, options);
+  if (!terser.liquid.removeLiquidComments) return removeAttrNewline(content);
 
   const remove = content.replace(LiquidComments, nil);
 
-  return removeAttrNewline(remove, options);
+  return removeAttrNewline(remove);
 
 };
 
@@ -100,9 +101,9 @@ const removeComments = (content: string, options: ILiquidMinifyOptions) => {
  * Minfies the contents of a `{% schema %}` tag
  * from within sections.
  */
-const minifySchema = (file: IFile, content: string, options: ILiquidMinifyOptions) => {
+const minifySchema = (_file: IFile, content: string) => {
 
-  if (!options.minifySectionSchema) return removeComments(content, options);
+  if (!terser.liquid.minifyLiquidSectionSchema) return removeComments(content);
 
   const minified = content.replace(LiquidSchemaTag, data => {
 
@@ -111,13 +112,13 @@ const minifySchema = (file: IFile, content: string, options: ILiquidMinifyOption
       const parsed = JSON.parse(data);
       const minified = stringify(parsed, null, 0);
 
-      log.fileTask(file, 'minified JSON section schema');
+      log.print('minified JSON section schema');
 
       return minified;
 
     } catch (e) {
 
-      log.fileError(e);
+      log.error(e);
 
       return data;
 
@@ -125,7 +126,7 @@ const minifySchema = (file: IFile, content: string, options: ILiquidMinifyOption
 
   });
 
-  return removeComments(minified, options);
+  return removeComments(minified);
 
 };
 
@@ -136,9 +137,9 @@ const minifySchema = (file: IFile, content: string, options: ILiquidMinifyOption
  * are of not whitespace. this is executed in the post-minify
  * cycle and will help reduce the render times imposed by Liquid.
  */
-const removeDashes = (content: string, options: ILiquidMinifyOptions) => {
+const removeDashes = (content: string) => {
 
-  if (!options.removeRedundantWhitespaceDashes) return content;
+  if (!terser.liquid.stripRedundantWhitespaceDashes) return content;
 
   return content
     .replace(HTMLStripDashSpace, nil)
@@ -152,7 +153,7 @@ const removeDashes = (content: string, options: ILiquidMinifyOptions) => {
  * Executes html terser on remaining document contents
  * and applied rules that were previously setup in config.
  */
-const htmlMinify = async (content: string, terser: ITerser) => {
+const htmlMinify = async (content: string, terser: IHTML) => {
 
   try {
 
@@ -162,7 +163,7 @@ const htmlMinify = async (content: string, terser: ITerser) => {
 
   } catch (error) {
 
-    log.errors(error);
+    log.error(error);
 
     return null;
 
@@ -176,24 +177,21 @@ const htmlMinify = async (content: string, terser: ITerser) => {
  * Applies minification and handles `.liquid` files.
  * Determines what action should take place.
  */
-const transform = (file: IFile, config: IViews['minify']) => async (data: string) => {
+const transform = (file: IFile) => async (data: string) => {
 
-  if (!config.apply) return data;
+  if (!terser.minify.html) return data;
 
-  const content = is(file.type, Type.Section)
-    ? minifySchema(file, data, config.liquid)
-    : removeComments(data, config.liquid);
-
-  const htmlmin = await htmlMinify(content, config.terser);
+  const content = is(file.type, Type.Section) ? minifySchema(file, data) : removeComments(data);
+  const htmlmin = await htmlMinify(content, terser.html);
 
   if (isNil(htmlmin)) return data;
 
-  const postmin = removeDashes(htmlmin, config.liquid);
+  const postmin = removeDashes(htmlmin);
 
-  writeFile(join(file.output, file.key), postmin, (e) => e ? log.errors(e) : null);
+  writeFile(join(file.output, file.key), postmin, (e) => e ? log.error(e.message) : null);
 
-  log.fileTask(file, 'minified liquid + html');
-  log.fileSize(file.size, byteSize(postmin));
+  log.print('minified liquid + html');
+  log.print(`${byteSize(postmin)}`);
 
   return postmin;
 
@@ -209,14 +207,16 @@ const transform = (file: IFile, config: IViews['minify']) => async (data: string
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export const compile = async (file: IFile, config: IViews['minify'], cb: typeof Syncify.hook) => {
+export async function compile (file: IFile, cb: typeof Syncify.hook) {
 
   const read = await readFile(file.path);
 
   file.size = byteSize(read);
 
-  const edit = transform(file, config);
+  const edit = transform(file);
   const data = read.toString();
+
+  log[file.namespace](`${file.key} transformed`);
 
   if (!isType('Function', cb)) return edit(data);
 

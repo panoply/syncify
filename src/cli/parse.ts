@@ -1,8 +1,8 @@
-import c from 'ansis';
-import type { Warning } from 'postcss';
-import { is, isArray, nil } from 'shared/native';
 import type { Exception, SourceSpan } from 'sass';
+import type { Warning } from 'postcss';
 import { range } from 'rambdax';
+import * as c from 'cli/ansi';
+import { is, isArray, nil } from 'utils/native';
 
 /* -------------------------------------------- */
 /* EXPRESSIONS                                  */
@@ -89,9 +89,9 @@ export const postcss = (data: Warning) => {
 
   return c.yellow.bold(data.text) + '\n\n' +
   c.yellow(data.node.toString()) + '\n\n' +
-  c.dim('Lines:  ') + data.line + ' > ' + data.endLine + '\n' +
-  c.dim('Column: ') + data.column + '\n' +
-  c.dim('Plugin: ') + data.plugin + '\n';
+  c.gray('Lines:  ') + data.line + ' > ' + data.endLine + '\n' +
+  c.gray('Column: ') + data.column + '\n' +
+  c.gray('Plugin: ') + data.plugin + '\n';
 
 };
 
@@ -103,8 +103,8 @@ export const postcss = (data: Warning) => {
 export const sassStack = (stack: string) => {
 
   return (
-    c.dim('Stack Trace') + ':\n' +
-    stack.replace(SassStack, `  $1 ${c.bold('$2')}$3${c.bold('$4')}${c.dim('$5')}`) + '\n'
+    c.gray('Stack Trace') + ':\n' +
+    stack.replace(SassStack, `  $1 ${c.bold('$2')}$3${c.bold('$4')}${c.gray('$5')}`) + '\n'
   );
 
 };
@@ -173,7 +173,7 @@ export const sassPetty = (message: string, span: SourceSpan, stack: string) => {
     c.yellowBright(message.slice(0, at)) + '\n\n' +
     sassStack(stack) +
     message.slice(at)
-      .replace(SassMessage, `${c.dim('$1')}$2` + '\n  ' + c.white('$4') + '\n')
+      .replace(SassMessage, `${c.gray('$1')}$2` + '\n  ' + c.white('$4') + '\n')
       .replace(RegExpURLs, c.white.underline('$1')) + '\n'
   );
 

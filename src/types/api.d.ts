@@ -1,5 +1,5 @@
 import { PartialDeep } from 'type-fest';
-import { IOptions } from './options';
+import { IConfig } from './config';
 import { Resource } from './requests';
 
 /**
@@ -96,7 +96,7 @@ export namespace Syncify {
    */
   export function hook(
     resource: Resource,
-    options?: PartialDeep<IOptions>
+    options?: PartialDeep<IConfig>
   ): (this: IFileScope, content: Buffer) => string | Buffer | void | object
 
 }

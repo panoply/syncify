@@ -1,6 +1,6 @@
 import { IRequest, IThemes, IFile } from 'types';
 import { queue, axios } from 'requests/queue';
-import { is } from 'shared/native';
+import { is } from 'utils/native';
 import * as log from 'cli/logs';
 import { error } from 'cli/errors';
 import { AxiosError } from 'axios';

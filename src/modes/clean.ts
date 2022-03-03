@@ -2,10 +2,10 @@ import { unlink } from 'fs-extra';
 import { glob } from 'glob';
 import { IConfig } from 'types';
 import { mapFastAsync } from 'rambdax';
-import * as tui from 'cli/ansi';
-import * as c from 'cli/colors';
-import * as timer from 'cli/timer';
-import { is } from 'shared/native';
+import { is } from 'utils/native';
+import * as timer from 'utils/timer';
+import * as tui from 'cli/tui';
+import * as c from 'cli/ansi';
 
 /**
  * Cleans Output directory
