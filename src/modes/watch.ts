@@ -5,32 +5,29 @@ import { Syncify, IConfig, IFile, IStyle } from 'types';
 import { readFile } from 'fs-extra';
 import { client, queue } from 'requests/client';
 import { compile as liquid } from 'transform/liquid';
-import { transform as styles } from 'transform/styles';
+import { styles } from 'transform/styles';
 import { compile as json } from 'transform/json';
 import { compile as pages } from 'transform/pages';
-import { is } from 'utils/native';
-import { parseFile, Type, isStyle, isMetafield, isSection, isAsset } from 'utils/files';
-import * as log from 'cli/logs';
+import { is } from 'shared/native';
+import { parseFile, Type } from 'process/files';
+import { bundle } from 'options';
 
 /**
  * Watch Function
  *
  * Sync in watch mode
  */
-export function watch (config: IConfig, cb: typeof Syncify.hook) {
+export function watch (callback: typeof Syncify.hook) {
 
-  const request = client(config);
-  const parse = parseFile(config.paths, config.output);
-  const watcher = chokidar.watch(config.watch, {
+  const request = client(bundle.sync);
+  const parse = parseFile(bundle.paths, bundle.dirs.output);
+  const watcher = chokidar.watch(bundle.watch, {
     persistent: true,
     ignoreInitial: true,
     usePolling: true,
     interval: 50,
     binaryInterval: 100,
-    cwd: config.cwd,
-    ignored: [
-      '*.map'
-    ]
+    ignored: [ '*.map' ]
   });
 
   watcher.on('all', async (event, path) => {
@@ -39,114 +36,42 @@ export function watch (config: IConfig, cb: typeof Syncify.hook) {
 
     if (is(event, 'change') || is(event, 'add')) {
 
-      log.fileChange(file);
+      switch (file.type) {
+        case Type.Style:
 
-      if (is(file.type, Type.Style)) {
+          await styles(file as IFile<IStyle>);
 
-        /* -------------------------------------------- */
-        /* STYLES                                       */
-        /* -------------------------------------------- */
+          break;
 
-        const style = isStyle(file as IFile<IStyle>, config.transform.styles);
-        const data = await styles(style);
+        case Type.Section:
+        case Type.Layout:
+        case Type.Snippet:
 
-        if (!data) return;
+          await liquid(file, callback);
 
-        await request.assets('put', style, data);
+          break;
 
-      } else if (is(file.type, Type.Page)) {
+        case Type.Locale:
+        case Type.Config:
+        case Type.Metafield:
 
-        /* -------------------------------------------- */
-        /* PAGES                                        */
-        /* -------------------------------------------- */
+          await json(file, callback);
 
-        if (queue.isPaused) queue.start();
+          break;
 
-        const data = await pages(file, config.transform.markdown, cb);
+        case Type.Template:
 
-        await request.pages('put', data);
+          if (file.ext === '.json') {
+            await json(file, callback);
+          } else {
+            await liquid(file, callback);
+          }
 
-      } else if (is(file.type, Type.Metafield)) {
+          break;
 
-        /* -------------------------------------------- */
-        /* METAFIELDS                                   */
-        /* -------------------------------------------- */
+        case Type.Asset:
 
-        if (queue.isPaused) queue.start();
-
-        const metafield = isMetafield(file);
-        const data = await json(metafield, config.transform.json, cb);
-
-        await request.metafields('put', {
-          namespace: file.namespace,
-          key: file.key,
-          value: data
-        });
-
-      } else if (is(file.type, Type.Section)) {
-
-        /* -------------------------------------------- */
-        /* SECTIONS                                     */
-        /* -------------------------------------------- */
-
-        const section = isSection(file, config.transform.views.sections);
-        const data = await liquid(section, config.transform.views.minify, cb);
-
-        if (!data) return;
-
-        await request.assets('put', section, data);
-
-      } else if (is(file.type, Type.Layout) || is(file.type, Type.Snippet)) {
-
-        /* -------------------------------------------- */
-        /* LAYOUTS AND SNIPPETS                         */
-        /* -------------------------------------------- */
-
-        const data = await liquid(file, config.transform.views.minify, cb);
-
-        if (!data) return;
-
-        await request.assets('put', file, data);
-
-      } else if (is(file.type, Type.Config) || is(file.type, Type.Locale)) {
-
-        /* -------------------------------------------- */
-        /* CONFIG AND LOCALES                           */
-        /* -------------------------------------------- */
-
-        const data = await json(file, config.transform.json, cb);
-
-        if (!data) return;
-
-        await request.assets('put', file, data);
-
-      } else if (is(file.type, Type.Template)) {
-
-        /* -------------------------------------------- */
-        /* TEMPLATES                                    */
-        /* -------------------------------------------- */
-
-        const data = file.ext === '.json'
-          ? await json(file, config.transform.json, cb)
-          : await liquid(file, config.transform.views.minify, cb);
-
-        if (!data) return;
-
-        await request.assets('put', file, data);
-
-      } else if (is(file.type, Type.Asset)) {
-
-        /* -------------------------------------------- */
-        /* ASSETS                                       */
-        /* -------------------------------------------- */
-
-        const read = await readFile(file.path);
-        const data = isAsset(file, read, cb);
-
-        if (!data) return;
-
-        await request.assets('put', file, data);
-
+          break;
       }
 
     } else if (is(event, 'delete')) {
@@ -155,7 +80,7 @@ export function watch (config: IConfig, cb: typeof Syncify.hook) {
       /* DELETED FILE                                 */
       /* -------------------------------------------- */
 
-      log.fileRemove(file);
+      // log.pr(file);
 
       await request.assets('delete', file);
 

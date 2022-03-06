@@ -2,7 +2,7 @@ import type { Exception, SourceSpan } from 'sass';
 import type { Warning } from 'postcss';
 import { range } from 'rambdax';
 import * as c from 'cli/ansi';
-import { is, isArray, nil } from 'utils/native';
+import { is, isArray, nil } from 'shared/native';
 
 /* -------------------------------------------- */
 /* EXPRESSIONS                                  */

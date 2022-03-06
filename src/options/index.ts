@@ -2,7 +2,15 @@
 import merge from 'mergerino';
 import { mergeDeepRight } from 'rambdax';
 import { PartialDeep } from 'type-fest';
-import { IBundle, IConfig, ITerser, ITransform } from 'types';
+import { IBundle, ICache, IConfig, ITerser, ITransform } from 'types';
+
+/**
+ * Cache Configuration
+ *
+ * This model represents cache references stores
+ * within the `node_modules/.syncify` directory.
+ */
+export const cache = <PartialDeep<ICache>>({ /* DYNAMICALLY POPULATED */}) as ICache;
 
 /**
  * Preset Configuration
@@ -69,7 +77,7 @@ export const defaults = mergeDeepRight<IConfig>(<IConfig>{
  * options and settings. This is typically merged with
  * the CLI defined options.
  */
-export let bundle = (<PartialDeep<IBundle>>{
+export let bundle = <PartialDeep<IBundle>>({
   version: null,
   cli: false,
   cwd: null,
@@ -77,7 +85,6 @@ export let bundle = (<PartialDeep<IBundle>>{
   prod: false,
   dev: true,
   dirs: {},
-  cache: {},
   mode: {
     build: false,
     prompt: false,

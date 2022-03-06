@@ -88,102 +88,128 @@ export interface IGetAssets {
   value?: string;
 }
 
-/**
- * The request body for Shopify theme assets
- */
-export interface IAsset {
-  /**
-   * The asset path
-   */
-  key?: string,
-  /**
-   * Base64 Encoded File
-   */
-  attachment?: string
-  /**
-   * Value file string
-   */
-  value?: string
-}
+export namespace Requests {
 
-/* -------------------------------------------- */
-/* PAGES                                        */
-/* -------------------------------------------- */
+  /**
+   * The request body for Shopify theme assets
+   */
+  export interface IAsset {
+    /**
+     * The asset path
+     */
+    key?: string,
+    /**
+     * Base64 Encoded File
+     */
+    attachment?: string
+    /**
+     * Value file string
+     */
+    value?: string
+  }
 
-export interface IPage {
-  author?: string;
-  body_html?: string;
-  created_at?: string;
-  handle?: string;
-  id?: number;
-  metafield?: {
-    key: string;
-    type: string;
-    value: string;
-    namespace:string;
-  },
-  published_at?:string;
-  shop_id?: number
-  template_suffix?: string;
-  title?: string;
-  updated_at?: string;
+  /* -------------------------------------------- */
+  /* PAGES                                        */
+  /* -------------------------------------------- */
 
-}
-/* -------------------------------------------- */
-/* METAFIELDS                                   */
-/* -------------------------------------------- */
+  export interface IPage {
+    author?: string;
+    body_html?: string;
+    created_at?: string;
+    handle?: string;
+    id?: number;
+    metafield?: {
+      key: string;
+      type: string;
+      value: string;
+      namespace:string;
+    },
+    published_at?:string;
+    shop_id?: number
+    template_suffix?: string;
+    title?: string;
+    updated_at?: string;
 
-/**
- * The request body for Shopify metafields
- */
-export interface IMetafield {
-  /**
-   * The metafield ID
-   */
-  id?: number;
-  /**
-   * The parent directory name
-   */
-  namespace?: string;
-  /**
-   * The JSON file name with extension
-   */
-  key?: string;
-  /**
-   * The stringified JSON value
-   */
-  value?: string;
-  /**
-   * Type is JSON
-   */
-  type?: 'json';
-  /**
-   * Value Type (this is legacy but we assert it anyway)
-   */
-  value_type?: 'json_string';
-  /**
-   * Last updated date
-   */
-  updated_at?: string;
-}
+  }
+  /* -------------------------------------------- */
+  /* METAFIELDS                                   */
+  /* -------------------------------------------- */
 
-/* -------------------------------------------- */
-/* REDIRECTS                                    */
-/* -------------------------------------------- */
+  /**
+   * The request body for Shopify metafields
+   */
+  export interface IMetafield {
+    /**
+     * The metafield ID
+     */
+    id?: number;
+    /**
+     * The parent directory name
+     */
+    namespace?: string;
+    /**
+     * The JSON file name with extension
+     */
+    key?: string;
+    /**
+     * The stringified JSON value
+     */
+    value?: string;
+    /**
+     * Type is JSON
+     */
+    type?: 'json';
+    /**
+     * Value Type (this is legacy but we assert it anyway)
+     */
+    value_type?: 'json_string';
+    /**
+     * Last updated date
+     */
+    updated_at?: string;
+  }
 
-export interface IRedirect {
-  /**
-   * Redirect ID
-   */
-  id?: number;
-  /**
-   * The redirect from path
-   */
-  path?: string;
-  /**
-   * The redirect to path
-   */
-  target?: string;
+  /* -------------------------------------------- */
+  /* REDIRECTS                                    */
+  /* -------------------------------------------- */
+
+  export interface IRedirect {
+    /**
+     * Redirect ID
+     */
+    id?: number;
+    /**
+     * The redirect from path
+     */
+    path?: string;
+    /**
+     * The redirect to path
+     */
+    target?: string;
+  }
+
+  export interface IFile {
+    /**
+     * File ID
+     */
+    id?: number;
+    /**
+     * The filename
+     */
+    filename?: string;
+    /**
+     * The mimeType of the file
+     */
+    mimeType?: string;
+    /**
+     * The file content type.
+     */
+    contentType?: string;
+    /**
+     * An external URL or a signed upload URL of the file object.
+     */
+    originalSource?: string;
+  }
 }
 
 /**
@@ -195,7 +221,11 @@ export interface IRequest extends AxiosRequestConfig {
   url?: string;
   method?: Methods;
   responseType?: 'json',
-  data?: { asset?: IAsset } | { metafield?: IMetafield } | { redirect?: IRedirect }
+  data?: (
+    { asset?: Requests.IAsset } |
+    { metafield?: Requests.IMetafield } |
+    { redirect?: Requests.IRedirect }
+  )
   params?: {
     'asset[key]'?: string;
     fields?: string

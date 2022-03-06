@@ -16,7 +16,7 @@
           "type": "announcement-bar",
           "blocks": {
             "announcement-bar-0": {
-              "type": "announcement",
+              "type": "announcements",
               "settings": {
                 "color_scheme": "background-1"
               }

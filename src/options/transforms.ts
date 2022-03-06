@@ -6,12 +6,12 @@ import { join, extname } from 'path';
 import { existsSync, mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { log } from 'cli/stdout';
 import { createVSCodeDir } from 'modes/vsc';
-import { getModules, renameFile, readConfigFile } from 'utils/options';
-import { lastPath, normalPath } from 'utils/paths';
-import * as u from 'utils/native';
+import { getModules, renameFile, readConfigFile } from 'shared/options';
+import { lastPath, normalPath } from 'shared/paths';
+import * as u from 'shared/native';
 import * as style from 'transform/styles';
 import { typeError, unknownError, invalidError } from './validate';
-import { transform, bundle } from '.';
+import { transform, bundle, cache } from 'options';
 
 /**
  * Section Options
@@ -70,13 +70,12 @@ export function sectionOptions (config: IConfig) {
       const globals = u.isString(sections[option]) ? [ sections[option] ] : sections[option];
 
       if (u.isArray(globals)) {
-        transform.sections[option] = anymatch(globals as string[]);
+        transform.sections[option] = new RegExp(`${globals.join('|')}`);
         continue;
       } else {
         typeError('sections', option, sections[option], 'string | string[]');
       }
     }
-
   }
 
 }
@@ -220,7 +219,7 @@ export function jsonOptions (config: IConfig) {
 export async function styleOptions (config: IConfig, pkg: IPackage) {
 
   // Find postcss configuration files
-  const postcssconfig = await readConfigFile(join(bundle.dirs.config, 'postcss.config'));
+  const postcssconfig = await readConfigFile('postcss.config', null, bundle.dirs.config); ;
 
   // Ensure postcss config exists
   if (!isNil(postcssconfig)) {
@@ -245,15 +244,21 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
   if (!u.isArray(styles)) unknownError('styles', styles);
 
   // Path normalizer
-  const path = normalPath(lastPath(config.input));
+  const path = normalPath(config.input);
 
   // Process defined stylesheet inputs
   // For every stylesheet defined we we create an individual config
   const list = styles.flatMap((style: any) => {
     // Flatten and glob array type inputs
     return u.isArray(style.input)
-      ? style.input.flatMap((input: any) => glob.sync(path(input)).map(input => ({ ...style, input })))
-      : glob.sync(path(style.input)).map(input => ({ ...style, input }));
+      ? style.input.flatMap((input: any) => glob.sync(path(input)).map(input => ({
+        ...style,
+        input: join(bundle.cwd, input)
+      })))
+      : glob.sync(path(style.input)).map(input => ({
+        ...style,
+        input: join(bundle.cwd, input)
+      }));
   });
 
   // Lets construct the configurations
@@ -263,7 +268,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
     const compile: Partial<IStyle> = {};
 
     // input path
-    compile.input = path(style.input);
+    compile.input = style.input;
 
     // Default Dart SASS options
     compile.sass = {
@@ -442,7 +447,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
       // We need to add stylesheets being written to assets
       // as ignored files to prevent repeat uploads.
-      bundle.watch.push('!' + join(lastPath(config.output), rename.name));
+      bundle.watch.push('!' + rename.name);
     }
 
     // Lets populate the style model
@@ -513,7 +518,7 @@ export async function iconOptions (config: IConfig, pkg: IPackage) {
       rename: has('rename', sprite) ? sprite.rename : null,
       snippet: has('snippet', sprite) ? sprite.snippet : true,
       svgo: !isNil(svgoconfig),
-      options: has('options', sprite) ? sprite.options : {}
+      options: has('config/options', sprite) ? sprite.options : {}
     });
   }
 
@@ -533,9 +538,9 @@ export async function iconOptions (config: IConfig, pkg: IPackage) {
 
     if (transform.icons.replacer && icons.vscodeCustomData) {
 
-      if (!existsSync(bundle.cache.vscode.uri)) {
+      if (!existsSync(cache.vscode.uri)) {
         try {
-          await mkdir(bundle.cache.vscode.uri);
+          await mkdir(cache.vscode.uri);
         } catch (e) {
           throw new Error(e);
         }
@@ -591,15 +596,15 @@ export async function iconOptions (config: IConfig, pkg: IPackage) {
         ]
       };
 
-      await writeJson(bundle.cache.vscode.maps.icons, schema, { spaces: 0 });
+      await writeJson(cache.vscode.data.icons, schema, { spaces: 0 });
 
       const file = await createVSCodeDir(bundle as IBundle);
       const settings = pathExistsSync(file) ? await readJson(file) : {};
 
       if (!settings['html.customData']) settings['html.customData'] = [];
 
-      if (!includes(bundle.cache.vscode.maps.icons, settings['html.customData'])) {
-        settings['html.customData'].push(bundle.cache.vscode.maps.icons);
+      if (!includes(cache.vscode.data.icons, settings['html.customData'])) {
+        settings['html.customData'].push(cache.vscode.data.icons);
         await writeJson(file, settings, { spaces: transform.json.indent });
       }
 

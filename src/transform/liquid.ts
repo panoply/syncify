@@ -1,12 +1,12 @@
 import { minify } from 'html-minifier-terser';
 import stringify from 'fast-safe-stringify';
 import { IFile, Syncify, IHTML } from 'types';
-import { join } from 'path';
+import * as c from 'cli/ansi';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
-import { Type } from 'utils/files';
-import { is, nil } from 'utils/native';
-import { byteSize } from 'utils/shared';
+import { Type } from 'process/files';
+import { is, nil } from 'shared/native';
+import { byteSize } from 'shared/shared';
 import { log } from 'cli/stdout';
 import { terser } from 'options';
 
@@ -179,16 +179,18 @@ const htmlMinify = async (content: string, terser: IHTML) => {
  */
 const transform = (file: IFile) => async (data: string) => {
 
-  if (!terser.minify.html) return data;
+  if (!terser.minify.html) return writeFile(file.output, data);
 
   const content = is(file.type, Type.Section) ? minifySchema(file, data) : removeComments(data);
   const htmlmin = await htmlMinify(content, terser.html);
 
-  if (isNil(htmlmin)) return data;
+  if (isNil(htmlmin)) {
+    return writeFile(file.output, data);
+  }
 
   const postmin = removeDashes(htmlmin);
 
-  writeFile(join(file.output, file.key), postmin, (e) => e ? log.error(e.message) : null);
+  await writeFile(file.output, postmin);
 
   log.print('minified liquid + html');
   log.print(`${byteSize(postmin)}`);
@@ -209,14 +211,14 @@ const transform = (file: IFile) => async (data: string) => {
  */
 export async function compile (file: IFile, cb: typeof Syncify.hook) {
 
-  const read = await readFile(file.path);
+  const read = await readFile(file.input);
 
   file.size = byteSize(read);
 
   const edit = transform(file);
   const data = read.toString();
 
-  log[file.namespace](`${file.key} transformed`);
+  log[file.namespace](`${c.cyan(file.key)}`);
 
   if (!isType('Function', cb)) return edit(data);
 

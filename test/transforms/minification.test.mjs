@@ -1,5 +1,5 @@
-const minify = require('html-minifier-terser');
-const test = require('ava');
+import minify from 'html-minifier-terser';
+import test from 'ava';
 
 const str = `
 {% comment %}
@@ -76,7 +76,7 @@ const str = `
 
 `;
 
-test('html minifier', async t => {
+test.skip('html minifier', async t => {
 
   const response = await minify.minify(str, {
     minifyJS: true,

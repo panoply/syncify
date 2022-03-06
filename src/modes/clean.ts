@@ -1,25 +1,25 @@
 import { unlink } from 'fs-extra';
 import { glob } from 'glob';
-import { IConfig } from 'types';
+import { dirname } from 'path';
 import { mapFastAsync } from 'rambdax';
-import { is } from 'utils/native';
-import * as timer from 'utils/timer';
+import { is } from 'shared/native';
+import { log } from 'cli/stdout';
 import * as tui from 'cli/tui';
 import * as c from 'cli/ansi';
+import { themeDirs } from 'options/dirs';
+import { bundle } from 'options';
 
 /**
  * Cleans Output directory
  */
-export async function clean (config: IConfig, log: (...messsage: string[]) => void) {
+export async function clean () {
 
-  const files = glob.sync(`${config.output}/**`, { nodir: true, cwd: config.cwd });
+  const files = glob.sync(`${bundle.dirs.output}/**`, { nodir: true });
   const size = files.length;
 
-  if (is(size, 0)) return log(tui.task(c.yellowBright('✓ output directory is clean')));
+  if (is(size, 0)) return log.clean(tui.task(c.yellowBright('✓ output directory is clean')));
 
-  timer.start('clean');
-
-  log(tui.task(c.yellowBright(`${c.bold('+')} cleaning ${c.bold(String(size))} files from output`)));
+  log.clean(c.yellowBright(`${c.bold('+')} cleaning ${c.bold(String(size))} files from output`));
 
   const deleted = await mapFastAsync(async path => {
 
@@ -39,14 +39,12 @@ export async function clean (config: IConfig, log: (...messsage: string[]) => vo
 
   }, files);
 
-  log(
-    tui.task(
-      c.greenBright(`✓ removed ${c.bold(String(deleted.length))} of ${c.bold(String(size))} files`)
-    ),
-    tui.task(
-      c.greenBright(`✓ cleaned ${c.bold(config.output + '/**')} ${c.gray('in')} ${timer.stop('clean')}`)
-    )
+  log.clean(
+    c.greenBright(`✓ removed ${c.bold(String(deleted.length))} of ${c.bold(String(size))} files`),
+    c.greenBright(`✓ cleaned ${c.bold(dirname(bundle.dirs.output) + '/**')}`)
   );
+
+  await themeDirs(bundle.cwd);
 
   return true;
 

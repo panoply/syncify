@@ -4,7 +4,7 @@ export default {
   output: 'theme',
   export: 'export',
   import: 'import',
-  config: '.',
+  config: 'config',
   stores: [
     {
       domain: 'syncify',
@@ -25,8 +25,8 @@ export default {
   ],
   paths: {
     assets: 'assets/**/*',
-    config: 'schema/config/*.json',
-    locales: 'schema/locales/*.json',
+    config: 'json/config/*.json',
+    locales: 'json/locales/*.json',
     layout: 'views/theme.liquid',
     sections: 'views/sections/**/*.liquid',
     metafields: 'metafields/**/*.json',
@@ -56,7 +56,7 @@ export default {
     watch: {
       rollup: 'rollup -c config/rollup.config.js -w',
       webpack: 'webpack --watch --color --config config/webpack.config.js',
-      esbuild: 'esbuild source/js/dir/foo.js --outfile=themes/assets/out.js --bundle --watch --color=true'
+      esbuild: 'esbuild source/js/dir/foo.js --outfile=theme/assets/out.js --bundle --watch --color=true'
     }
   },
   transforms: {
@@ -70,7 +70,7 @@ export default {
       onlyPrefixDuplicates: false,
       prefixSeparator: '-',
       global: [
-        'layout'
+        'global'
       ]
     },
     pages: {

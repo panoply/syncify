@@ -1,9 +1,41 @@
-import { readFile } from 'fs-extra';
-import { marked } from 'marked';
-import matter from 'gray-matter';
 import { IFile, Syncify } from 'types';
+import { readFile } from 'fs-extra';
+import matter from 'gray-matter';
 import { has } from 'rambdax';
+import { unified } from 'unified';
+import rehypeStringify from 'rehype-stringify';
+import rehypeParse from 'rehype-parse';
+import rehypeRemark from 'rehype-remark';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import remarkStringify from 'remark-stringify';
 import { transform } from 'options';
+
+export async function toMarkdown (content: string) {
+
+  const remark = unified()
+    .use(rehypeParse) // Parse HTML to a syntax tree
+    .use(rehypeRemark) // Turn HTML syntax tree to markdown syntax tree
+    .use(remarkStringify) // Serialize HTML syntax tree
+    .process(content)
+    .catch((error) => {
+      throw error;
+    });
+
+}
+
+export async function toHTML (content: string) {
+
+  const remark = unified()
+    .use(remarkParse)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeStringify, { allowDangerousHtml: true });
+
+  return remark.process(content).catch((error) => {
+    throw error;
+  });
+
+}
 
 export async function compile (file: IFile, cb: typeof Syncify.hook) {
 

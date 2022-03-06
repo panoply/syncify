@@ -1,14 +1,15 @@
 import { has } from 'rambdax';
-import { ICLICommands, IConfig, Syncify } from 'types';
+import { ICLICommands, Syncify } from 'types';
 // import { upload } from 'modes/upload';
 // import { download } from 'modes/download';
 import { build } from 'modes/build';
-// import { watch } from 'modes/watch';
+import { watch } from 'modes/watch';
 // import { resource } from 'modes/resource';
 // import { readConfig } from 'config/config';
 import { help } from 'cli/help';
 import { define } from 'options/define';
 import { log } from 'cli/stdout';
+import { bundle } from 'options';
 // import * as log from 'cli/logs';
 
 /**
@@ -31,7 +32,11 @@ export async function cli (options: ICLICommands, callback?: typeof Syncify.hook
 
   try {
 
-    return build(callback);
+    if (bundle.mode.build) {
+      return build(callback);
+    } else if (bundle.mode.watch) {
+      return watch(callback);
+    }
 
     /* if (config.mode.vsc) {
         return null;

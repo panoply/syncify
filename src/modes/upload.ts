@@ -3,7 +3,7 @@ import { readFile } from 'fs-extra';
 import { mapFastAsync } from 'rambdax';
 import { IConfig, Syncify } from 'types';
 import { client, queue } from 'requests/client';
-import { outputFile } from 'utils/files';
+import { outputFile } from 'process/files';
 import * as log from 'cli/logs';
 
 export const upload = async (config: IConfig, cb?: typeof Syncify.hook): Promise<void> => {

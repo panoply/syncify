@@ -6,6 +6,14 @@ type Log = (...message: string[]) => void
 
 export interface IBuildLog {
   /**
+   * Styles Group
+   */
+  styles?: Log,
+  /**
+   * Pages Group
+   */
+  pages?: Log,
+  /**
    * Assets Group
    */
   assets?: Log,

@@ -37,11 +37,12 @@
     "baseUrl": ".",
     "paths": {
       "types": ["src/types/index.d.ts"],
-      "cli/*": ["src/cli/*"],
-      "modes/*": ["src/modes/*"],
       "options/*": ["src/options/*"],
       "options": ["src/options/index.ts"],
-      "utils/*": ["src/utils/*"],
+      "cli/*": ["src/cli/*"],
+      "modes/*": ["src/modes/*"],
+      "process/*": ["src/process/*"],
+      "shared/*": ["src/shared/*"],
       "requests/*": ["src/requests/*"],
       "transform/*": ["src/transform/*"]
     }

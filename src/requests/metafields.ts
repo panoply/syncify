@@ -5,11 +5,11 @@ import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
 import { error } from 'cli/errors';
 import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
-import { assign, is } from 'utils/native';
+import { assign, is } from 'shared/native';
 import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
 import * as c from 'cli/ansi';
-import * as log from 'cli/logs';
+import { log } from 'cli/stdout';
 
 /**
  * Write Metafields

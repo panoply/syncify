@@ -78,11 +78,11 @@ export const getModules = (pkg: IPackage, name: string) => {
  * Load the syncify config file for node projects.
  * Supports loading config as es module or common js module,
  */
-export const readConfigFile = async (path: string): Promise<any> => {
+export const readConfigFile = async (path: string, customPath?: string, basedir?: string): Promise<any> => {
 
   try {
 
-    return readConfig(path);
+    return readConfig(path, customPath, basedir);
 
   } catch (e) {
 
@@ -99,7 +99,7 @@ export const renameFile = (src: string, rename?: string) => {
   let name = rename;
 
   // Get the filename (remember we flattened this earlier)
-  const dir = lastPath(src);
+  const dir = lastPath(src).slice(1);
 
   // file input extension
   const ext = extname(src);
@@ -107,11 +107,11 @@ export const renameFile = (src: string, rename?: string) => {
   // Get the filename (remember we flattened this earlier)
   const file = basename(src, ext);
 
-  if (isUndefined(rename)) return { dir, ext, file, name: file };
+  if (isUndefined(rename)) return { dir, ext, file, name: file + '.css' };
 
-  if (/({dir})/.test(rename)) name = name.replace('{dir}', dir);
-  if (/({file})/.test(rename)) name = name.replace('{file}', file);
-  if (/({ext})/.test(rename)) name = name.replace('.{ext}', ext);
+  if (/({dir})/.test(name)) name = name.replace('{dir}', dir);
+  if (/({file})/.test(name)) name = name.replace('{file}', file);
+  if (/({ext})/.test(name)) name = name.replace('.{ext}', ext);
 
-  return { ext, file, dir, name };
+  return { ext, file, dir, name: rename.replace(rename, name) };
 };

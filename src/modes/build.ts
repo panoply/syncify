@@ -1,146 +1,77 @@
-/* eslint-disable brace-style */
-import { ChildProcessWithoutNullStreams as ChildProcess } from 'child_process';
-import { IFile, IStyle, Syncify } from 'types';
 import anymatch from 'anymatch';
-import { last } from 'rambdax';
+import { IFile, IStyle, Syncify } from 'types';
 import { glob } from 'glob';
 import { compile as liquid } from 'transform/liquid';
-// import { transform as styles } from 'transform/styles';
 import { compile as json } from 'transform/json';
-import { from, is } from 'utils/native';
-import { isMetafield, isSection, isStyle, parseFile, Type } from 'utils/files';
-import { spawns } from 'cli/spawn';
-import * as time from 'utils/timer';
-import { footer } from 'cli/tui';
+import { styles } from 'transform/styles';
+import { isUndefined } from 'shared/native';
+import { parseFile, Type } from 'process/files';
 import { bundle } from 'options';
+import { logger } from 'cli/stdout';
+import { clean } from './clean';
 
 /**
  * Build Function
  *
  * Triggers a compile of the project
  */
-const trigger = (callback: typeof Syncify.hook) => {
+export async function build (callback?: typeof Syncify.hook) {
 
-  time.start('build');
+  if (bundle.mode.clean) {
+    await clean();
+  }
 
   const parse = parseFile(bundle.paths, bundle.dirs.output);
   const match = anymatch(bundle.watch);
-  const paths = glob.sync(bundle.dirs.input + '/**', { cwd: bundle.cwd }).sort();
-  const source = paths.filter(match);
+  const paths = glob.sync(bundle.dirs.input + '/**');
+  const source = paths.filter(match).sort();
 
-  console.log(source);
+  for (const path of source) {
 
-  return async () => {
+    const file: IFile = parse(path);
 
-    for (const path of source) {
+    if (isUndefined(file)) continue;
 
-      const file: IFile = parse(path);
+    switch (file.type) {
+      case Type.Style:
 
-      /* -------------------------------------------- */
-      /* STYLES                                       */
-      /* -------------------------------------------- */
+        await styles(file as IFile<IStyle>);
 
-      if (is(file.type, Type.Style)) {
+        break;
 
-        // await styles(isStyle(file as IFile<IStyle>));
-
-      }
-
-      /* -------------------------------------------- */
-      /* METAFIELDS                                   */
-      /* -------------------------------------------- */
-
-      else if (is(file.type, Type.Metafield)) {
-
-        await json(isMetafield(file), callback);
-
-      }
-
-      /* -------------------------------------------- */
-      /* SECTIONS                                     */
-      /* -------------------------------------------- */
-
-      else if (is(file.type, Type.Section)) {
-
-        await liquid(isSection(file), callback);
-
-      }
-
-      /* -------------------------------------------- */
-      /* LAYOUTS AND SNIPPETS                         */
-      /* -------------------------------------------- */
-
-      else if (is(file.type, Type.Layout)) {
+      case Type.Section:
+      case Type.Layout:
+      case Type.Snippet:
 
         await liquid(file, callback);
 
-      }
+        break;
 
-      else if (is(file.type, Type.Snippet)) {
-
-        await liquid(file, callback);
-
-      }
-
-      /* -------------------------------------------- */
-      /* CONFIG AND LOCALES                           */
-      /* -------------------------------------------- */
-
-      else if (is(file.type, Type.Config)) {
+      case Type.Locale:
+      case Type.Config:
+      case Type.Metafield:
 
         await json(file, callback);
 
-      }
+        break;
 
-      else if (is(file.type, Type.Locale)) {
+      case Type.Template:
 
-        await json(file, callback);
-
-      }
-
-      /* -------------------------------------------- */
-      /* TEMPLATES                                    */
-      /* -------------------------------------------- */
-
-      else if (is(file.type, Type.Template)) {
         if (file.ext === '.json') {
           await json(file, callback);
         } else {
           await liquid(file, callback);
         }
-      }
 
-      /* -------------------------------------------- */
-      /* ASSETS                                       */
-      /* -------------------------------------------- */
+        break;
 
-      else if (is(file.type, Type.Asset)) {
+      case Type.Asset:
 
         continue;
-
-      }
-
     }
 
-    footer('build');
+  }
 
-  };
-};
-
-/**
- * Build Function
- *
- * Triggers a compile of the project
- */
-export const build = (cb?: typeof Syncify.hook) => {
-
-  const compile = trigger(cb);
-
-  if (is(spawns.size, 0)) return compile();
-
-  const child = from(spawns);
-  const spawn = last(child)[1] as ChildProcess;
-
-  return spawn.on('close', compile);
+  await logger(bundle.spawn, { clear: true });
 
 };

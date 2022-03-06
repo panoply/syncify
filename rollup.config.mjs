@@ -4,7 +4,6 @@ export default rollup(
   {
     input: 'src/index.ts',
     external: [
-      'ansis',
       'anymatch',
       'axios',
       'chokidar',
@@ -27,8 +26,11 @@ export default rollup(
       'svg-sprite',
       'svgo',
       'turndown',
-      'turndown-plugin-gfm'
-
+      'turndown-plugin-gfm',
+      'remark-parse',
+      'rehype-stringify',
+      'remark-rehype',
+      'unified'
     ],
     output: [
       {
@@ -86,7 +88,8 @@ export default rollup(
           entries: config.alias([
             'cli',
             'options',
-            'utils',
+            'shared',
+            'process',
             'requests',
             'modes',
             'transform'

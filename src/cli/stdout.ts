@@ -1,11 +1,12 @@
 import { ILog } from 'types';
 import { queue } from 'requests/queue';
 import stringify from 'fast-safe-stringify';
-import { isObject, isArray, isUndefined, nil } from 'utils/native';
+import { isObject, isArray, isUndefined, nil } from 'shared/native';
 import { spawned, spawns } from 'cli/spawn';
 import { kill } from 'cli/exit';
 import * as tui from 'cli/tui';
 import * as c from 'cli/ansi';
+import { toUpcase } from 'shared/shared';
 
 /**
  * Tracker
@@ -40,7 +41,11 @@ export function stdout (name: string, indent = false) {
 
   return (...message: string[]) => {
 
-    if (track !== name) process.stdout.write(group);
+    if (track !== name) {
+      process.stderr.write(tui.footer(`Completed ${toUpcase(track)}`));
+      process.stdout.write(c.clear);
+      process.stdout.write(tui.fixed(name));
+    }
 
     track = name;
 

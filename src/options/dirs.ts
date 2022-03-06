@@ -2,8 +2,8 @@ import { IBundle } from 'types';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'path';
 import { PartialDeep } from 'type-fest';
-import { isArray } from 'utils/native';
-import { bundle } from '.';
+import { assign, isArray } from 'shared/native';
+import { bundle, cache } from 'options';
 
 /**
  * Create Cache Directories
@@ -14,6 +14,8 @@ import { bundle } from '.';
  * was not triggered.
  */
 export async function cacheDirs (path: string, options = { purge: false }) {
+
+  bundle.dirs.cache = `${path}/`;
 
   const hasBase = await pathExists(path);
 
@@ -35,26 +37,35 @@ export async function cacheDirs (path: string, options = { purge: false }) {
     'vscode'
   ]) {
 
-    const uri = join(path, dir);
-    const has = await pathExists(uri);
-
-    if (!has) {
-      try {
-        await mkdir(uri);
-      } catch (e) {
-        throw new Error(e);
-      }
+    if (dir === 'sections') {
+      cache[dir] = [];
+    } else if (dir === 'pages') {
+      cache[dir] = {};
     } else {
-      if (options.purge) await emptyDir(uri);
+
+      const uri = join(path, dir);
+      const has = await pathExists(uri);
+
+      if (!has) {
+
+        try {
+          await mkdir(uri);
+        } catch (e) {
+          throw new Error(e);
+        }
+
+        assign(cache[dir], { uri, data: {} });
+
+      } else {
+        if (options.purge) await emptyDir(uri);
+      }
+
+      assign(cache[dir], { uri, data: {} });
     }
 
-    bundle.cache[dir] = {
-      uri,
-      maps: {}
-    };
   }
 
-  writeJson(join(path, 'store.map'), bundle.cache, { spaces: 0 }, (e) => {
+  writeJson(join(path, 'store.map'), cache, { spaces: 0 }, (e) => {
 
     if (e) throw e;
 
@@ -95,14 +106,13 @@ export async function themeDirs (basePath: string) {
     'assets',
     'config',
     'layout',
-    'customers',
     'locales',
     'sections',
     'snippets'
   ]) {
 
     const uri = join(basePath, dir);
-    const has = pathExists(uri);
+    const has = await pathExists(uri);
 
     if (!has) {
       try {

@@ -1,18 +1,19 @@
+
 import { anyTrue, isNil, has, uniq, includes } from 'rambdax';
 import { join } from 'path';
 import { ICLICommands, IConfig, IPackage } from 'types';
 import { pathExists, readJson } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { isArray, keys, is } from 'utils/native';
-import { basePath, normalPath, parentPath } from 'utils/paths';
-import { authURL } from 'utils/options';
+import { isArray, keys, is, assign } from 'shared/native';
+import { basePath, normalPath, parentPath } from 'shared/paths';
+import { authURL } from 'shared/options';
 import { logger } from 'cli/stdout';
-import { bundle, update, defaults } from '.';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
 import { iconOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
 import { terserOptions } from './terser';
+import { bundle, update, defaults, cache } from 'options';
 
 /**
  * Resolve Paths
@@ -48,8 +49,11 @@ export async function define (cli: ICLICommands) {
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
   logger([
+    'clean',
     'metafields',
-    'json',
+    'pages',
+    'styles',
+    'locales',
     'print',
     'snippets',
     'sections',
@@ -125,7 +129,10 @@ async function caches (cwd: string) {
 
   if (!has) return cacheDirs(dir);
 
-  bundle.cache = await readJson(map);
+  bundle.dirs.cache = `${dir}/`;
+  const read = await readJson(map);
+
+  assign(cache, read);
 
 };
 
@@ -255,8 +262,6 @@ function baseDirs (config: IConfig) {
     }
   }
 
-  logger(bundle.spawn, { clear: true });
-
 };
 
 /**
@@ -275,6 +280,7 @@ export async function getPaths (config: IConfig) {
   // iterate over the define path mappings
   for (const key of [
     'assets',
+    'styles',
     'config',
     'layout',
     'customers',

@@ -70,7 +70,7 @@ export interface IDirs {
   /**
    * The resolve cache directory path
    *
-   * @default 'node_modules/.syncify'
+   * @default 'node_modules/.syncify/'
    */
   cache: string;
   /**
@@ -82,13 +82,13 @@ export interface IDirs {
   /**
    * The resolved `output` directory path
    *
-   * @default 'theme'
+   * @default 'theme/'
    */
   output: string;
   /**
    * The resolved `import` directory path for downloaded themes
    *
-   * @default 'import'
+   * @default 'import/'
    */
   import: string;
   /**
@@ -107,14 +107,14 @@ export interface IDirs {
    * The resolved `metafields` directory path, if multiple paths
    * are defined the value will be an array list.
    *
-   * @default '/source/metafields'
+   * @default '/source/metafields/'
    */
   metafields: string | string[]
   /**
    * The resolved `pages` directory path, if multiple paths
    * are defined the value will be an array list.
    *
-   * @default '/source/pages'
+   * @default '/source/pages/'
    */
   pages: string
 }
@@ -198,6 +198,19 @@ export interface ICache {
    */
   created: number;
   /**
+   * Page related cache records, this reference typically
+   * holds `path > id` object references. Page ids are
+   * cached for lookup when changes occur. The `map` object
+   * holds the references and applied to model on initialization.
+   */
+  pages: { [path: string]: number }
+   /**
+    * Section related cache records, this reference typically
+    * holds output filename reference and used to prevent
+    * duplicated sections from being written.
+    */
+  sections: string[];
+  /**
    * Stylesheet related cache records, typically source maps
    */
   styles: {
@@ -207,6 +220,10 @@ export interface ICache {
      * @default 'node_modules/.syncify/styles'
      */
     uri: string;
+    /**
+     * Metafield pathname > id cache references.
+     */
+    data: { [path: string]: number }
   },
   /**
    * Metafields related cache records. Metafield source maps
@@ -224,38 +241,7 @@ export interface ICache {
     /**
      * Metafield pathname > id cache references.
      */
-    map: { [path: string]: number }
-  },
-  /**
-   * Page related cache records, this reference typically
-   * holds `path > id` object references. Page ids are
-   * cached for lookup when changes occur. The `map` object
-   * holds the references and applied to model on initialization.
-   */
-  pages: {
-   /**
-     * The URI cache reference location
-     *
-     * @default 'node_modules/.syncify/pages'
-     */
-    uri: string
-    /**
-     * Page pathname > id cache references.
-     */
-    map: { [path: string]: number }
-  };
-  /**
-   * Section related cache records, this reference typically
-   * holds output filename reference and used to prevent
-   * duplicated sections from being written.
-   */
-  sections: {
-   /**
-    * The URI cache reference location
-    *
-    * @default 'node_modules/.syncify/sections'
-    */
-    uri: string
+    data: { [path: string]: number }
   },
   /**
    * Specification JSON for vscode
@@ -270,7 +256,7 @@ export interface ICache {
      /**
       * vscode file maps
       */
-     maps: { icons?: string; }
+     data: { icons?: string; }
    }
 }
 
@@ -421,7 +407,7 @@ export interface ISections {
   /**
    * A list directories or files that should never be prefixed
    */
-  global: Tester | null
+  global: RegExp;
 }
 
 export interface IStyle {
@@ -660,10 +646,6 @@ export interface IBundle {
     * List of paths to watch or build from
     */
   watch: string[];
-   /**
-    * Cache references
-    */
-  cache: PartialDeep<ICache>
    /**
     * The operation to run
     */

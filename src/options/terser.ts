@@ -1,7 +1,7 @@
 import { has, hasPath } from 'rambdax';
 import { IConfig } from 'types';
-import { isArray, isRegex } from 'utils/native';
-import { terser } from '.';
+import { isArray, isRegex } from 'shared/native';
+import { terser } from 'options';
 
 /**
  * Minification Options

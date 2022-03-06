@@ -25,6 +25,7 @@ export interface IConfig {
     locales?: string | string[];
     metafields?: string | string[];
     pages?: string | string[];
+    files?: string | string[];
   };
   spawn?: {
     watch?: {

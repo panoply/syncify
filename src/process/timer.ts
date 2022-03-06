@@ -5,7 +5,9 @@ import { performance } from 'perf_hooks';
  *
  * Holds reference to different running timers
  */
-const mark: { [id: string]: number } = {};
+const mark = [];
+
+let active: string;
 
 /**
  * Start timer
@@ -13,11 +15,9 @@ const mark: { [id: string]: number } = {};
  * Captures the current timestamp and applies it
  * to the mark model, Returns the timestamp.
  */
-export function start (id: string) {
+export function start () {
 
-  mark[id] = performance.now();
-
-  return mark[id];
+  mark.push(performance.now());
 
 };
 
@@ -30,7 +30,7 @@ export function start (id: string) {
 export function clear () {
 
   for (const id in mark) delete mark[id];
-
+  active = undefined;
 };
 
 /**
@@ -43,9 +43,9 @@ export function clear () {
  * - Seconds and Miliseconds: `2s 45ms`
  * - Minutes, Seconds and Miliseconds: `2m 35sec 33ms`
  */
-export function stop (id: string) {
+export function stop (id: string = active) {
 
-  const ms = (performance.now() - mark[id]);
+  const ms = (performance.now() - mark.pop());
 
   delete mark[id];
 

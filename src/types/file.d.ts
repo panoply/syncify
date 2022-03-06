@@ -1,14 +1,89 @@
 /* eslint-disable no-unused-vars */
 
 import { ParsedPath } from 'path';
-import { Type } from 'utils/files';
+import type { Type as Types, Kind as Kinds } from 'process/files';
+import { Requests } from './requests';
 
 /**
  * File context generated when passed to a sync
  * resource and used to dispatch to correct transform
  * process.
  */
-interface IFile<T = unknown> extends ParsedPath {
+interface IFile<T = unknown, Type = Types> extends ParsedPath {
+  /**
+   * The file type that was intercepted. This is an
+   * enum number value. The number value will infer
+   * on how the file should be handled.
+   *
+   * @example
+   *
+   * 1
+   */
+  type: Type;
+  /**
+   * The resource label reference
+   *
+   * @example
+   *
+   * 'resource'
+   */
+  resource: string;
+  /**
+   * The filename extension including the dot, eg: `.liquid`
+   *
+   * @example
+   *
+   * '.liquid'
+   */
+  ext: string;
+  /**
+   * The input filename including the file extension.
+   *
+   * @example
+   *
+   * 'filename.ext'
+   */
+  base: string;
+  /**
+   * The input filename without the extension.
+   *
+   * @example
+   *
+   * 'filename'
+   */
+  stem: string;
+  /**
+   * The chokidar passed path.
+   * This is full URI file URI path.
+   *
+   * @example
+   *
+   * 'User/name/project/source/dir/file.liquid'
+   */
+  input: string;
+  /**
+   * The output path location which files will be written.
+   * Only theme specific files have an output path location,
+   * when a file write from source (like metafield) this will
+   * have a `null` value.
+   *
+   * @example
+   *
+   * // When file is theme specific
+   * 'User/name/project/theme/dir/filename.liquid'
+   *
+   * // When file is not theme specific
+   * null
+   */
+  output: string;
+  /**
+   * The file size in bytes.
+   *
+   * @example
+   *
+   * 1024 // => 1.24kb
+   */
+  size?: number;
   /**
    * Configuration reference. This will hold a reference
    * to any form of additional reference required in the
@@ -19,47 +94,22 @@ interface IFile<T = unknown> extends ParsedPath {
    */
   config: T
   /**
-   * The file type that was intercepted. This is an
-   * enum number value.
-   */
-  type: Type;
-  /**
-   * The filename extension including the dot, eg: `.liquid`
-   */
-  ext: string;
-  /**
-   * The filename including the file extension.
-   */
-  base: string;
-  /**
-   * The filename without the extension.
-   */
-  name: string;
-  /**
-   * The parent directory of the file.
-   */
-  parent: string;
-  /**
-   * The chokidar passed path.
-   */
-  path: string;
-  /**
-   * The output path location which files will be written.
-   */
-  output: string;
-  /**
-   * When `metafield` is `true` this value will be the
-   * parent directory name of the changed file, else this
-   * is `null` when file changed is not metafield.
-   */
-  namespace: string;
-  /**
-   * The `key` value passed into the sync request.
+   * The `key` value will be passed into the sync request. This
+   * will contain the namespace and base name
+   *
+   * @example
+   *
+   * 'namespace/file.liquid'
    */
   key: string;
   /**
-   * The file size before and after transformation.
+   * The `namespace` value will typically refelect the output
+   * parent directory name reference, but sometimes this might
+   * be a unique value depending on the file type we are handling.
+   *
+   * @example
+   *
+   * 'snippets'
    */
-  size?:number;
-
+  namespace: string;
 }

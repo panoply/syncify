@@ -1,11 +1,10 @@
 import { has, isNil, isType } from 'rambdax';
-import c from 'ansis';
+import * as c from 'cli/ansi';
 import { IFile, Syncify } from 'types';
-import { join } from 'path';
 import { readJson, writeFile } from 'fs-extra';
-import { is } from 'utils/native';
-import { Type } from 'utils/files';
-import { byteSize } from 'utils/shared';
+import { is } from 'shared/native';
+import { Type } from 'process/files';
+import { byteSize } from 'shared/shared';
 import stringify from 'fast-safe-stringify';
 import { log } from 'cli/stdout';
 import { terser, transform } from 'options';
@@ -88,18 +87,18 @@ export function jsonCompile (file: IFile, data: string, space = 0): any {
   if (isNil(minified)) return minified;
 
   if (is(space, 0)) {
-    log.json('minified json file');
-  } else {
-    log.json('processed json file');
-  }
+    log[file.namespace]('minified json file');
+    // file.size,
+    log.print(`${byteSize(minified)}`);
 
-  // file.size,
-  log.print(`${byteSize(minified)}`);
+  } else {
+    log[file.namespace](`${c.cyan(file.key)}`);
+  }
 
   if (is(file.type, Type.Metafield)) {
     return minified;
   } else {
-    writeFile(join(file.output, file.key), minified, (e) => e ? log.error(e.message) : null);
+    writeFile(file.output, minified, (e) => e ? log.error(e.message) : null);
     return minified;
   }
 
@@ -114,7 +113,7 @@ export function jsonCompile (file: IFile, data: string, space = 0): any {
  */
 export async function compile (file: IFile, cb: typeof Syncify.hook): Promise<string> {
 
-  const data = await readJson(file.path);
+  const data = await readJson(file.input);
 
   file.size = byteSize(data);
 

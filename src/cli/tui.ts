@@ -4,9 +4,10 @@ import { isEmpty, isNil, last } from 'rambdax';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
 import * as c from 'cli/ansi';
-import { toUpcase } from 'utils/shared';
-import { keys, nil, is } from 'utils/native';
+import { toUpcase } from 'shared/shared';
+import { keys, nil, is } from 'shared/native';
 import { bundle } from 'options';
+import * as timer from 'process/timer';
 
 /**
  * Theme Previews
@@ -107,6 +108,24 @@ export function header () {
 
 };
 
+let tracer: string = '';
+
+export function fixed (group: string) {
+
+  tracer += (
+    c.line('│ ') +
+    c.greenBright('✓ ') +
+    `${c.bold(toUpcase(group))} ${c.white('in')} ${c.bold(timer.stop())}\n`
+  );
+
+  return '\n' + (
+    c.line('┌─ ') + c.pink.bold('Building ' + toUpcase(group)) + c.gray(' syncify <!version!>') + '\n' +
+    c.line('│ ') + '\n' + tracer +
+    c.line('│ ') + '\n'
+  );
+
+}
+
 /**
  * Prepend Line to stdout
  *
@@ -188,7 +207,9 @@ export function spawn (message: string) {
  */
 export function title (title: string) {
 
-  return `${c.line('│')}\n${c.line('├─')} ${c.pink.bold(toUpcase(title))}\n${c.line('│')}\n`;
+  timer.start();
+
+  return `${c.line('│')}\n${c.line('├─')} ${c.bold(toUpcase(title))}\n${c.line('│')}\n`;
 
 };
 
@@ -210,7 +231,7 @@ export function newline (amount = 1) {
  */
 export function task (stdout: string) {
 
-  return `${c.line('├')} ${stdout}\n`;
+  return `${c.line('├─')} ${stdout}\n`;
 
 }
 
@@ -223,7 +244,7 @@ export function task (stdout: string) {
  */
 export function message (stdout: string, { indent = false, ender = false }) {
 
-  return `${c.line(indent && ender ? ' └ ' : indent ? ' ├ ' : '├ ')}${stdout}\n`;
+  return `${c.line(indent && ender ? '│  └─ ' : indent ? '│  ├─ ' : '├─  ')}${stdout}\n`;
 
 }
 

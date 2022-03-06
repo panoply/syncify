@@ -15,7 +15,13 @@
     "cli:upload": "sync upload syncify -t dev",
     "cli:upload:multi": "sync upload --store syncify,boefje --syncify dev --boefje dev,prod",
     "cli:download": "sync watch syncify -t dev -o downloads",
-    "cli:download:multi": "sync watch --store syncify,boefje --syncify dev --boefje dev,prod -o downloads/multi"
+    "cli:download:multi": "sync watch --store syncify,boefje --syncify dev --boefje dev,prod -o downloads/multi",
+    "test": "ava"
+  },
+  "ava": {
+    "files": [
+			"transforms/**/*"
+		]
   },
   "syncify": {
     "stores": [
@@ -77,8 +83,12 @@
           "input": "styles/style.scss",
           "snippet": false,
           "rename": "style.min.css",
-          "watch": ["styles/**/*.scss"],
-          "include": ["node_modules/"]
+          "watch": [
+            "styles/**/*.scss"
+          ],
+          "include": [
+            "node_modules/"
+          ]
         }
       ],
       "icons": {
@@ -87,7 +97,9 @@
         ],
         "sprites": [
           {
-            "input": ["icons/default/*.svg"],
+            "input": [
+              "icons/default/*.svg"
+            ],
             "output": "icons.liquid",
             "options": {
               "dimensionAttributes": true,
@@ -138,6 +150,7 @@
   "devDependencies": {
     "@csstools/postcss-sass": "^4.0.0",
     "autoprefixer": "^10.4.2",
+    "ava": "^4.0.1",
     "cssnano": "^5.0.15",
     "postcss": "^8.4.5",
     "postcss-assets": "^6.0.0",

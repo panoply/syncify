@@ -4,7 +4,7 @@ import { allTrue, has } from 'rambdax';
 import { IBundle } from 'types';
 import * as tui from 'cli/tui';
 import * as c from 'cli/ansi';
-import * as timer from 'utils/timer';
+import * as timer from 'process/timer';
 
 /**
  * Create `.vscode` directory

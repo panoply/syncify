@@ -11,6 +11,11 @@ export const nil = '';
 export const assign = Object.assign;
 
 /**
+ * Native Object Define Property
+ */
+export const defineProperty = Object.defineProperty;
+
+/**
  * Native Object keys
  */
 export const keys = Object.keys;
