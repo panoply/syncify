@@ -8,6 +8,11 @@ export const nil = '';
 /**
  * Native Object assign
  */
+export const create = Object.create;
+
+/**
+ * Native Object assign
+ */
 export const assign = Object.assign;
 
 /**

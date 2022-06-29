@@ -1,28 +1,44 @@
 import glob from 'glob';
 import { readFile } from 'fs-extra';
 import { mapFastAsync } from 'rambdax';
-import { IConfig, Syncify } from 'types';
-import { client, queue } from 'requests/client';
+import { Syncify } from 'types';
+import { client, queue } from '../requests/client';
 import { outputFile } from 'process/files';
-import * as log from 'cli/logs';
+import { log } from 'cli/stdout';
+import { bundle } from 'options';
+import * as timer from 'process/timer';
+import { isFunction, isUndefined, isString, isBuffer } from 'shared/native';
 
-export const upload = async (config: IConfig, cb?: typeof Syncify.hook): Promise<void> => {
+export const upload = async (cb?: typeof Syncify.hook): Promise<void> => {
 
-  log.time.start('upload');
+  timer.start();
 
-  const parse = outputFile(config.output);
-  const files = glob.sync(`${config.output}/**`, { nodir: true, cwd: config.cwd }).sort();
-  const request = client(config);
+  const parse = outputFile(bundle.dirs.output);
+  const files = glob.sync(`${bundle.dirs.output}/**`, { nodir: true, mark: true }).sort();
+  const request = client(bundle.sync);
+  const hashook = isFunction(cb);
 
   await mapFastAsync(async (path) => {
 
     const file = parse(path);
     const read = await readFile(path);
 
-    await request.assets('put', file, read.toString());
+    if (!hashook) return request.assets('put', file, read.toString());
+
+    const update = cb.apply({ ...file }, read.toString());
+
+    if (isUndefined(update) || update === false) {
+      return request.assets('put', file, read.toString());
+    } else if (isString(update)) {
+      return request.assets('put', file, update);
+    } else if (isBuffer(update)) {
+      return request.assets('put', file, update.toString());
+    }
+
+    return request.assets('put', file, read.toString());
 
   }, files);
 
-  return queue.onIdle().then(() => log.finish('upload'));
+  return queue.onIdle().then(() => log.print('Completed Upload'));
 
 };

@@ -31,8 +31,8 @@ export default {
     sections: 'views/sections/**/*.liquid',
     metafields: 'metafields/**/*.json',
     customers: [
-      'views/templates/customers/*.json',
-      'views/templates/customers/*.liquid'
+      'views/customers/*.json',
+      'views/customers/*.liquid'
     ],
     pages: [
       'pages/*.md',
@@ -51,7 +51,6 @@ export default {
   spawn: {
     build: {
       rollup: 'rollup -c config/rollup.config.js'
-
     },
     watch: {
       rollup: 'rollup -c config/rollup.config.js -w',
@@ -93,7 +92,7 @@ export default {
       inlined: [
         {
           input: [ 'svg/inline/*.svg' ],
-          rename: 'icon.{file}',
+          rename: 'icon.[file]',
           snippet: true,
           svgo: true
         }
@@ -119,7 +118,7 @@ export default {
       {
         input: 'styles/stylesheet.scss',
         snippet: false,
-        rename: '{file}.min.css',
+        rename: '[file].min.css',
         postcss: true,
         watch: [
           'styles/**/*.scss'
@@ -146,7 +145,7 @@ export default {
         input: 'scss/bootstrap.scss',
         snippet: false,
         sass: {
-          warnings: false,
+          warnings: true,
           sourcemap: true,
           style: 'compressed',
           include: [
@@ -156,7 +155,7 @@ export default {
       },
       {
         input: 'css/styles/one.css',
-        rename: 'example.{ext}',
+        rename: 'example.[ext]',
         snippet: false,
         watch: [
           'css/**/*.css'
@@ -167,7 +166,7 @@ export default {
           'scss/base/*.scss',
           'scss/independent/*.scss'
         ],
-        rename: '{dir}-{file}'
+        rename: '[dir]-[file]'
       }
     ]
   },

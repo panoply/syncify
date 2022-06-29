@@ -379,8 +379,8 @@ export function client (store: IStore) {
     create: create.apply(null, store),
     update: update.apply(null, store),
     delete: remove.apply(null, store),
-    merge: merge,
-    pull: pull
+    merge,
+    pull
   };
 
 };

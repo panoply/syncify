@@ -6,7 +6,7 @@ import { join, extname } from 'path';
 import { existsSync, mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { log } from 'cli/stdout';
 import { createVSCodeDir } from 'modes/vsc';
-import { getModules, renameFile, readConfigFile } from 'shared/options';
+import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { lastPath, normalPath } from 'shared/paths';
 import * as u from 'shared/native';
 import * as style from 'transform/styles';
@@ -139,7 +139,9 @@ export function pageOptions (config: IConfig) {
   }
 
   if (hasPath('markdown.highlight', pages)) {
+
     if (pages.markdown.highlight === true) {
+
       transform.pages.markdown.highlight = function (code, lang) {
         const hljs = require('highlight.js');
         const language = hljs.getLanguage(lang) ? lang : 'plaintext';
@@ -247,7 +249,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
   const path = normalPath(config.input);
 
   // Process defined stylesheet inputs
-  // For every stylesheet defined we we create an individual config
+  // For every stylesheet defined we create an individual config
   const list = styles.flatMap((style: any) => {
     // Flatten and glob array type inputs
     return u.isArray(style.input)
@@ -299,7 +301,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
         log.warning(`Input ${compile.input} is not a sass file. Consider processing it with PostCSS.`);
       }
 
-      // iterate of user defined options and u.assign to defaults
+      // iterate of user defined options and assign to defaults
       for (const option in style.sass) {
 
         // Throw if an undefined property is detected
@@ -415,11 +417,8 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
       }
 
     } else {
-
-      watch = [ compile.input ];
-      compile.watch = anymatch(watch);
+      compile.watch = anymatch([ compile.input ]);
       bundle.watch.push(compile.input);
-
     }
 
     // Apply includes (for Dart SASS)
@@ -440,7 +439,9 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
     // Based on the snippet condition, we rename the export or not
     if (compile.snippet) {
+
       compile.rename = rename.name + '.liquid';
+
     } else {
 
       compile.rename = rename.name;

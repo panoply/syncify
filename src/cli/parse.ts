@@ -47,7 +47,7 @@ const LiquidObjects = /({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g;
 /**
  * Captures SASS Variable names
  */
-const SassMessage = /\n?\b([a-zA-Z\s]+)(:)(\s+)([^\n]+)/g;
+const SassMessage = /\b([a-zA-Z\s]+)(:)(\s+)([^\n]+)/g;
 
 /**
  * Captures SASS Numbers
@@ -103,8 +103,8 @@ export const postcss = (data: Warning) => {
 export const sassStack = (stack: string) => {
 
   return (
-    c.gray('Stack Trace') + ':\n' +
-    stack.replace(SassStack, `  $1 ${c.bold('$2')}$3${c.bold('$4')}${c.gray('$5')}`) + '\n'
+    c.gray('Stack Trace:') + '\n' +
+    stack.replace(SassStack, `$1${c.bold('$2')}$3${c.bold('$4')}${c.gray('$5')}`) + '\n'
   );
 
 };
@@ -147,36 +147,36 @@ export const sassSplit = (stack: string) => {
  */
 export const sassPetty = (message: string, span: SourceSpan, stack: string) => {
 
+  if (span === undefined) return;
+
   const loc = message.search(SassMessage);
   const at = is(loc, -1) ? 0 : loc;
 
   let code: string;
 
-  if (is(span.start.line, span.end.line)) {
+  if (is(span?.start?.line, span?.end?.line)) {
 
     code = (
-      `${span.start.line - 1}${c.gray(':')}\n` +
-      `${span.start.line}${c.gray(':')}  ${span.context}` +
-      `${span.end.line + 1}${c.gray(':')}\n`
+      `${c.blue(`${span.start.line - 1}`)}${c.gray(':')}\n` +
+      `${c.blue(`${span.start.line}`)}${c.gray(':')} ${span.context}` +
+      `${c.blue(`${span.end.line + 1}`)}${c.gray(':')}\n`
     );
 
   } else {
 
     const lines = range(span.start.line, span.end.line);
     const split = span.context.split(/\n/);
-    code = split.map((v, i) => `${lines[i]}${c.gray(':')}  ${v}`).join('\n');
+    code = split.map((v, i) => `${lines[i]}${c.gray(':')}${v}`).join('\n');
 
   }
 
-  return '\n' + (
-    c.gray(code) + '\n\n' +
-    c.yellowBright(message.slice(0, at)) + '\n\n' +
-    sassStack(stack) +
-    message.slice(at)
-      .replace(SassMessage, `${c.gray('$1')}$2` + '\n  ' + c.white('$4') + '\n')
-      .replace(RegExpURLs, c.white.underline('$1')) + '\n'
-  );
+  const res = c.line('│ ') + '\n' + (
+    c.yellowBright(`${message.slice(0, at)}`) +
+    c.gray(`${code}\n`) +
+    sassStack(stack)
+  ).replace(/^/gm, c.line('│ '));
 
+  return res;
 };
 
 /**

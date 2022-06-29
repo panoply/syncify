@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import anymatch from 'anymatch';
 import { isArray, keys, is, assign } from 'shared/native';
 import { basePath, normalPath, parentPath } from 'shared/paths';
-import { authURL } from 'shared/options';
+import { authURL } from '../shared/options';
 import { logger } from 'cli/stdout';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
@@ -29,13 +29,13 @@ export async function define (cli: ICLICommands) {
   const config = await getConfig(pkg);
 
   update.bundle({
+    mode,
     version: pkg.version,
     cli: cli.cli,
     cwd: cli.cwd,
     silent: cli.silent,
     prod: cli.prod,
     dev: cli.dev && !cli.prod,
-    mode: mode,
     spawn: config.spawn[mode.build ? 'build' : 'watch'],
     dirs: {
       input: cli.input,
@@ -49,6 +49,7 @@ export async function define (cli: ICLICommands) {
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
   logger([
+    'assets',
     'clean',
     'metafields',
     'pages',
@@ -60,6 +61,7 @@ export async function define (cli: ICLICommands) {
     'layout',
     'config',
     'templates',
+    'templates/customers',
     'throw',
     'error'
   ]);
@@ -79,8 +81,6 @@ export async function define (cli: ICLICommands) {
       terserOptions(config)
     ]
   );
-
-  // await dirs.themeDirs(config.dirs.input);
 
 };
 
@@ -141,11 +141,12 @@ async function getConfig (pkg: IPackage) {
   const config = await configFile(bundle.dirs.config);
 
   if (!isNil(config)) return defaults(config);
+
   if (has('syncify', pkg)) return defaults(pkg.syncify);
 
-  const rcfg = await rcFile(bundle.cwd);
+  const rccfg = await rcFile(bundle.cwd);
 
-  if (!isNil(rcfg)) return defaults(config);
+  if (!isNil(rccfg)) return defaults(config);
 
   throw new Error('Missing Configuration');
 
@@ -193,7 +194,7 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
 
     // Lets parse the theme target names
     const themes: string[] = has('theme', cli)
-      ? cli.theme
+      ? [ cli.theme ]
       : has(store.domain, cli)
         ? cli[store.domain].split(',')
         : keys(store.themes);
@@ -205,12 +206,12 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
       }
 
       // Let populate the model with theme
-      bundle.sync.themes.push({
+      bundle.sync.themes[domain] = {
         target,
         store: domain,
         id: store.themes[target],
         url: `/themes/${store.themes[target]}/assets.json`
-      });
+      };
     }
   }
 
@@ -305,13 +306,9 @@ export async function getPaths (config: IConfig) {
 
     } else if (has(key, config.paths)) {
 
-      uri = isArray(config.paths[key])
-        ? config.paths[key].map(path)
-        : [ path(config.paths[key]) ];
+      uri = isArray(config.paths[key]) ? config.paths[key].map(path) : [ path(config.paths[key]) ];
 
-      if (key === 'assets') {
-        uri.push(join(bundle.dirs.output, 'assets/*'));
-      }
+      if (key === 'assets') uri.push(join(bundle.dirs.output, 'assets/*'));
 
     } else {
 

@@ -16,6 +16,8 @@ import { cache } from 'options';
  */
 let pcss: Processor = null;
 
+export const warnings = [];
+
 /**
  * Loads PostCSS
  *
@@ -28,23 +30,31 @@ export const processer = (config: any) => {
 
 };
 
-const write = (path: string) => (data: string) => {
+const write = (path: string) => {
 
-  if (isNil(data)) return null;
+  return (data: string) => {
 
-  writeFile(path, data, (e) => e ? console.log(e) : null);
+    if (isNil(data)) return null;
 
-  process.stdout.write(
-    message(`${c.cyan(basename(path))}`, {
-      indent: true,
-      ender: true
-    })
-  );
+    writeFile(path, data, (e) => e ? console.log(e) : null);
 
-  process.stdout.write(newline());
+    process.stdout.write(
+      message(`${c.cyan(basename(path))}`, {
+        indent: true,
+        ender: true
+      })
+    );
 
-  return data;
+    if (warnings.length > 0) {
+      process.stdout.write(warnings.join('\n'));
+      warnings.length = 0;
+    }
 
+    process.stdout.write(newline());
+
+    return data;
+
+  };
 };
 
 async function sass ({ config, ext, base }: IFile<IStyle>) {
@@ -59,10 +69,12 @@ async function sass ({ config, ext, base }: IFile<IStyle>) {
         quietDeps: config.sass.warnings,
         sourceMap: config.sass.sourcemap,
         loadPaths: config.sass.include,
-        logger: config.sass.warnings ? {
-          debug: log.error,
-          warn: log.error
-        } : Logger.silent
+        logger: config.sass.warnings ? Logger.silent : {
+          debug: msg => console.log(msg),
+          warn: (msg, opts) => {
+            warnings.push(parse.sassPetty(msg, opts.span, opts.stack));
+          }
+        }
       });
 
       if (config.sass.sourcemap) {
@@ -74,6 +86,15 @@ async function sass ({ config, ext, base }: IFile<IStyle>) {
           indent: true
         })
       );
+
+      if (warnings.length > 0) {
+        const plural = warnings.length > 1 ? 'warnings' : 'warning';
+        process.stdout.write(
+          message(`${c.yellowBright(`${warnings.length} SASS ${plural}`)}`, {
+            indent: true
+          })
+        );
+      }
 
       return [
         css,
@@ -134,7 +155,17 @@ async function postcss (params:[ string, any, IStyle]) {
     map: map ? { prev: map, inline: false } : null
   });
 
-  result.warnings().forEach(warning => log.warning(parse.postcss(warning)));
+  const postcssWarnings = result.warnings();
+
+  if (postcssWarnings.length > 0) {
+    warnings.push(postcssWarnings.map(parse.postcss).join('\n'));
+    const plural = postcssWarnings.length > 1 ? 'warnings' : 'warning';
+    process.stdout.write(
+      message(`${c.yellowBright(`${warnings.length} PostCSS ${plural}`)}`, {
+        indent: true
+      })
+    );
+  }
 
   process.stdout.write(
     message(`${c.gray('processed CSS with PostCSS')}`, {
@@ -167,11 +198,6 @@ export async function styles (file: IFile<IStyle>): Promise<string> {
 
   log.styles(`${c.pink(file.base)}`);
 
-  return pipeAsync<string>(
-    sass,
-    postcss,
-    snippet,
-    output
-  )(file);
+  return pipeAsync<string>(sass, postcss, snippet, output)(file);
 
 };

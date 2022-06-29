@@ -7,8 +7,6 @@ import { performance } from 'perf_hooks';
  */
 const mark = [];
 
-let active: string;
-
 /**
  * Start timer
  *
@@ -21,6 +19,8 @@ export function start () {
 
 };
 
+let active: string;
+
 /**
  * Clear timers
  *
@@ -30,7 +30,9 @@ export function start () {
 export function clear () {
 
   for (const id in mark) delete mark[id];
+
   active = undefined;
+
 };
 
 /**

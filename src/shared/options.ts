@@ -12,7 +12,7 @@ import { isUndefined } from './native';
  * Generate the the authorization URL to
  * be used for requests.
  */
-export const authURL = (domain: string, env: object): AxiosRequestConfig => {
+export function authURL (domain: string, env: object): AxiosRequestConfig {
 
   let api_token = domain + '_api_token';
 
@@ -50,7 +50,7 @@ export const authURL = (domain: string, env: object): AxiosRequestConfig => {
  * Ensures that peer dependencies exists for
  * the transform processors.
  */
-export const getModules = (pkg: IPackage, name: string) => {
+export function getModules (pkg: IPackage, name: string) {
 
   if (has('devDependencies', pkg)) {
     if (has(name, pkg.devDependencies)) return true;
@@ -78,7 +78,7 @@ export const getModules = (pkg: IPackage, name: string) => {
  * Load the syncify config file for node projects.
  * Supports loading config as es module or common js module,
  */
-export const readConfigFile = async (path: string, customPath?: string, basedir?: string): Promise<any> => {
+export async function readConfigFile (path: string, customPath?: string, basedir?: string): Promise<any> {
 
   try {
 
@@ -94,7 +94,7 @@ export const readConfigFile = async (path: string, customPath?: string, basedir?
 
 };
 
-export const renameFile = (src: string, rename?: string) => {
+export function renameFile (src: string, rename?: string) {
 
   let name = rename;
 
@@ -109,9 +109,13 @@ export const renameFile = (src: string, rename?: string) => {
 
   if (isUndefined(rename)) return { dir, ext, file, name: file + '.css' };
 
-  if (/({dir})/.test(name)) name = name.replace('{dir}', dir);
-  if (/({file})/.test(name)) name = name.replace('{file}', file);
-  if (/({ext})/.test(name)) name = name.replace('.{ext}', ext);
+  if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);
+  if (/(\[file\])/.test(name)) name = name.replace('[file]', file);
+  if (/(\[ext\])/.test(name)) name = name.replace('.[ext]', ext);
 
-  return { ext, file, dir, name: rename.replace(rename, name) };
+  return {
+    ext,
+    file,
+    dir,
+    name: rename.replace(rename, name) };
 };

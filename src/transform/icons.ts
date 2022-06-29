@@ -11,7 +11,7 @@ let sprite: SVGSpriter = null;
 /**
  * SVGO Module
  */
-let svgo: OptimizedSvg = null;
+let svgo: OptimizedSvg = null; // eslint-disable-line
 
 /**
   * Loads PostCSS
@@ -24,7 +24,7 @@ export function processers (module: 'svg-sprite' | 'svgo', path: string) {
   if (module === 'svg-sprite') {
     sprite = require('svg-sprite')(require(path));
   } else {
-    svgo = require('svg-sprite')(require(path));
+    svgo = require('svgo')(require(path));
   }
 }
 

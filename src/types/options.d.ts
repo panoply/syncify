@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
 // import { OptimizeOptions } from 'svgo';
 import { Tester } from 'anymatch';
@@ -567,7 +568,9 @@ export interface ISync {
   /**
    * Theme synchronization options
    */
-  themes: Array<IThemes>;
+  themes: {
+   [K in IStore['domain']]: IThemes
+  };
   /**
    * Store synchronization options
    */

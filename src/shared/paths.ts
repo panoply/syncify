@@ -13,25 +13,20 @@ import { is, isArray } from './native';
  * @example
  *
  * // File name is excluded
- * '/some/path/to/file.ext' => '/to'
+ * '/some/path/to/file.ext' => 'to'
  *
  * // last directory name
- * '/some/path/foo/bar/baz' => '/baz'
+ * '/some/path/foo/bar/baz' => 'baz'
  */
 export const lastPath = (path: string | string[]) => {
 
   if (isArray(path)) return path.map(lastPath);
   if (is(path.indexOf('/'), -1)) return path;
 
-  const ender = path.lastIndexOf('/');
+  const ender = path.lastIndexOf('/') + 1;
   const file = path.slice(ender);
 
-  if (!/(?:[/*]{1,}|(\w|[/*]{1,})\.[a-z]+)$/.test(file)) return file;
-
-  const trim = path.slice(0, ender);
-
-  return trim.slice(trim.lastIndexOf('/'));
-
+  return file;
 };
 
 /**

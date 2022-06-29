@@ -147,7 +147,9 @@ export async function importDirs ({ dirs, sync, mode }: PartialDeep<IBundle>) {
     }
   }
 
-  for (const { store, target } of sync.themes) {
+  for (const theme in sync.themes) {
+
+    const { store, target } = sync.themes[theme];
 
     const dir = join(dirs.import, store);
     const has = await pathExists(dir);

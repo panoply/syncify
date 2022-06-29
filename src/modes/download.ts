@@ -1,35 +1,41 @@
-import { IConfig, Syncify } from 'types';
+import { Syncify } from 'types';
 import { join } from 'path';
 import { isNil, has } from 'rambdax';
 import { writeFile } from 'fs-extra';
-import { client } from 'requests/client';
-// import * as log from 'cli/logs';
+import * as request from 'requests/assets';
+import { isFunction } from 'shared/native';
+import * as timer from 'process/timer';
+import { bundle } from 'options';
 
-export const download = async (config: IConfig, cb?: typeof Syncify.hook): Promise<void> => {
+export const download = async (cb?: typeof Syncify.hook): Promise<void> => {
 
-  log.time.start('download');
+  timer.start();
 
-  const request = client(config);
+  const hashook = isFunction(cb);
 
-  for (const theme of config.sync.themes) {
+  for (const store of bundle.sync.stores) {
 
-    const req = !isNil(theme.token) ? { headers: { 'X-Shopify-Access-Token': theme.token } } : {};
+    const theme = bundle.sync.themes[store.domain];
 
-    const { assets } = await request.assets.get(theme.url, req);
+    const req = !isNil(store) ? { headers: { 'X-Shopify-Access-Token': theme.token } } : {};
+
+    const { assets } = await request.get(theme.url, req);
 
     for (const asset of assets) {
 
       try {
 
-        const item = await request.assets.get(theme.url, { ...req, params: { 'asset[key]': asset.key } });
-        const path = join(config.cwd, config.import, theme.domain, theme.target, asset.key);
+        const item = await request.assets('get', { 'asset[key]': asset.key });
+
+        const path = join(bundle.dirs.import, theme.domain, theme.target, asset.key);
+
         const buffer = has('attachment', item.asset)
           ? Buffer.from(item.asset.attachment, 'base64')
           : Buffer.from(item.asset.value || null, 'utf8');
 
         await writeFile(path, buffer);
 
-        log.fileTouch(`${asset.key} (${theme.domain})`);
+        console.log(`${asset.key} (${theme.domain})`);
 
       } catch (e) {
 

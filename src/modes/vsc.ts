@@ -25,7 +25,7 @@ export async function createVSCodeDir (config: IBundle) {
 
 export const vsc = async (config: IBundle, log: (...messsage: string[]) => void) => {
 
-  timer.start('clean');
+  timer.start();
 
   const file = await createVSCodeDir(config);
 

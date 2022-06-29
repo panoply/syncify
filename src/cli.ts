@@ -1,6 +1,6 @@
 import { has } from 'rambdax';
 import { ICLICommands, Syncify } from 'types';
-// import { upload } from 'modes/upload';
+import { upload } from 'modes/upload';
 // import { download } from 'modes/download';
 import { build } from 'modes/build';
 import { watch } from 'modes/watch';
@@ -26,9 +26,9 @@ export async function cli (options: ICLICommands, callback?: typeof Syncify.hook
 
   await define(options);
 
-  // console.log(config.sync);
-
   // const host = server('https://' + config.sync.stores[0].domain + '?preview_theme_id=' + config.sync.themes[0].id, config);
+
+  // console.log(callback);
 
   try {
 
@@ -36,6 +36,8 @@ export async function cli (options: ICLICommands, callback?: typeof Syncify.hook
       return build(callback);
     } else if (bundle.mode.watch) {
       return watch(callback);
+    } else if (bundle.mode.upload) {
+      return upload(callback);
     }
 
     /* if (config.mode.vsc) {

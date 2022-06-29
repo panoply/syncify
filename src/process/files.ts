@@ -1,11 +1,10 @@
 /* eslint-disable no-unused-vars */
 
 import { join, parse } from 'path';
-import { Syncify, IFile, IBundle, IStyle, ISections, IPaths, Requests } from 'types';
-import { assign, isRegex, isUndefined, is } from 'shared/native';
+import { Syncify, IFile, IPaths } from 'types';
+import { assign, isUndefined, is } from 'shared/native';
 import { lastPath } from 'shared/paths';
-import { bundle, transform } from 'config/';
-import { anyTrue, isNil, Partial } from 'rambdax';
+import { Partial } from 'rambdax';
 import * as context from 'process/context';
 
 /**
@@ -65,7 +64,7 @@ export function setFile (file: Partial<IFile>, input: string, output: string) {
       output = join(output, key);
     }
 
-    return assign(file as IFile, {
+    return assign({}, file as IFile, {
       type,
       input,
       output,
@@ -93,6 +92,7 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
   const merge = setFile(file, path, output);
 
   if (file.ext === '.liquid') {
+
     if (paths.sections(path)) {
       return context.section(merge('sections', Type.Section));
     } else if (paths.snippets(path)) {
@@ -104,9 +104,13 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
     } else if (paths.customers(path)) {
       return merge('templates/customers', Type.Template);
     }
+
   } else if (/\.(?:md|html)/.test(file.ext)) {
+
     return merge('pages', Type.Page);
+
   } else if (file.ext === '.json') {
+
     if (paths.metafields(path)) {
       return merge('metafields', Type.Metafield);
     } else if (paths.templates(path)) {
@@ -119,10 +123,12 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
       return merge('templates/customers', Type.Template);
     }
   } else if (/\.(?:css|scss|sass)/.test(file.ext)) {
-    return context.style(merge<IStyle>('assets', Type.Style));
+    return context.style(merge('assets', Type.Style));
   } else if (paths.assets(path)) {
-    return context.asset(merge('assets', Type.Asset));
+    return merge('assets', Type.Asset);
   }
+
+  return undefined;
 
 };
 
@@ -162,22 +168,14 @@ export const outputFile = (output: string) => (path: string) => {
   const merge = setFile(file, path, output);
 
   switch (lastPath(file.dir)) {
-    case 'sections':
-      return merge('sections', Type.Section);
-    case 'snippets':
-      return merge('snippets', Type.Snippet);
-    case 'layout':
-      return merge('layout', Type.Layout);
-    case 'templates':
-      return merge('templates', Type.Template);
-    case 'customers':
-      return merge('templates/customers', Type.Template);
-    case 'config':
-      return merge('config', Type.Config);
-    case 'locales':
-      return merge('locales', Type.Locale);
-    case 'assets':
-      return merge('assets', Type.Asset);
+    case 'sections': return merge('sections', Type.Section);
+    case 'snippets': return merge('snippets', Type.Snippet);
+    case 'layout': return merge('layout', Type.Layout);
+    case 'templates': return merge('templates', Type.Template);
+    case 'customers': return merge('templates/customers', Type.Template);
+    case 'config': return merge('config', Type.Config);
+    case 'locales': return merge('locales', Type.Locale);
+    case 'assets': return merge('assets', Type.Asset);
   }
 
 };

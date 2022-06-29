@@ -1,4 +1,4 @@
-import * as log from './tui';
+import { log } from 'cli/stdout';
 
 /**
  * Error Handler
@@ -24,7 +24,7 @@ export function error (file: string, e: {
   switch (e.status) {
     case 422:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -35,7 +35,7 @@ export function error (file: string, e: {
       break;
     case 404:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: '404 ' + e.statusText,
@@ -46,7 +46,7 @@ export function error (file: string, e: {
       break;
     case 400:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -57,7 +57,7 @@ export function error (file: string, e: {
       break;
     case 303:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: '404 ' + e.statusText,
@@ -68,7 +68,7 @@ export function error (file: string, e: {
 
     case 401:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -80,7 +80,7 @@ export function error (file: string, e: {
 
     case 402:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -91,7 +91,7 @@ export function error (file: string, e: {
       break;
     case 406:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -102,7 +102,7 @@ export function error (file: string, e: {
       break;
     case 423:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -113,7 +113,7 @@ export function error (file: string, e: {
       break;
     case 403:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -124,7 +124,7 @@ export function error (file: string, e: {
       break;
     case 501:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -135,7 +135,7 @@ export function error (file: string, e: {
       break;
     case 503:
 
-      log.fileError(
+      log.error(
         {
           file,
           message: e.statusText,
@@ -144,7 +144,7 @@ export function error (file: string, e: {
       );
 
       break;
-    default: log.fileError(
+    default: log.error(
       {
         file,
         message: e.statusText,

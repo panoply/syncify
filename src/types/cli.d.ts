@@ -34,6 +34,10 @@ export interface IBuildLog {
    */
   templates?: Log,
   /**
+   * Template Customers Group
+   */
+  'templates/customers'?: Log,
+  /**
    * Config Group
    */
   config?: Log,

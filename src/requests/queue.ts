@@ -1,7 +1,5 @@
 import Queue from 'p-queue';
 import connect from 'axios';
-import https from 'https';
-import http from 'http';
 import { is } from 'shared/native';
 
 /**
@@ -12,17 +10,7 @@ import { is } from 'shared/native';
 export const axios = connect.create(
   {
     responseType: 'json',
-    headers: {},
-    httpAgent: new http.Agent(
-      {
-        keepAlive: true
-      }
-    ),
-    httpsAgent: new https.Agent(
-      {
-        keepAlive: true
-      }
-    )
+    headers: {}
   }
 );
 
@@ -35,9 +23,9 @@ export const axios = connect.create(
  */
 export const queue = new Queue(
   {
-    concurrency: 3,
+    concurrency: 5,
     interval: 500,
-    intervalCap: 2
+    intervalCap: 5
   }
 );
 

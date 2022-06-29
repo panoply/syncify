@@ -1,4 +1,4 @@
 export default function () {
 
-  return 'bars';
+  return 'bar';
 }

@@ -1,14 +1,15 @@
 /* eslint-disable brace-style */
 
 import chokidar from 'chokidar';
-import { Syncify, IConfig, IFile, IStyle } from 'types';
-import { readFile } from 'fs-extra';
-import { client, queue } from 'requests/client';
+import { Syncify, IFile, IStyle } from 'types';
+import { client } from '../requests/client';
 import { compile as liquid } from 'transform/liquid';
 import { styles } from 'transform/styles';
+import { compile as asset } from 'transform/asset';
 import { compile as json } from 'transform/json';
 import { compile as pages } from 'transform/pages';
-import { is } from 'shared/native';
+import { logger } from '../cli/stdout';
+import { is, isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
 import { bundle } from 'options';
 
@@ -30,48 +31,67 @@ export function watch (callback: typeof Syncify.hook) {
     ignored: [ '*.map' ]
   });
 
-  watcher.on('all', async (event, path) => {
+  logger(bundle.spawn);
+
+  watcher.on('all', async function (event, path) {
 
     const file: IFile = parse(path);
 
+    if (isUndefined(file)) return;
+
     if (is(event, 'change') || is(event, 'add')) {
 
-      switch (file.type) {
-        case Type.Style:
+      try {
 
-          await styles(file as IFile<IStyle>);
+        let value: string | void | { title: any; body_html: any; } = null;
 
-          break;
+        if (file.type === Type.Style) {
 
-        case Type.Section:
-        case Type.Layout:
-        case Type.Snippet:
+          value = await styles(file as IFile<IStyle>);
 
-          await liquid(file, callback);
+        } else if (file.type === Type.Section || file.type === Type.Layout || file.type === Type.Snippet) {
 
-          break;
+          value = await liquid(file, callback);
 
-        case Type.Locale:
-        case Type.Config:
-        case Type.Metafield:
+        } else if (file.type === Type.Locale || file.type === Type.Config) {
 
-          await json(file, callback);
+          value = await json(file, callback);
 
-          break;
+        } else if (file.type === Type.Metafield) {
 
-        case Type.Template:
+          value = await json(file, callback);
+
+          return request.metafields('put', { value, namespace: file.namespace, key: file.key });
+
+        } else if (file.type === Type.Template) {
 
           if (file.ext === '.json') {
-            await json(file, callback);
+            value = await json(file, callback);
           } else {
-            await liquid(file, callback);
+            value = await liquid(file, callback);
           }
 
-          break;
+        } else if (file.type === Type.Asset) {
 
-        case Type.Asset:
+          value = await asset(file, callback);
 
-          break;
+        } else if (file.type === Type.Page) {
+
+          value = await pages(file, callback);
+
+          return request.pages('put', value);
+        }
+
+        if (value !== null) {
+
+          return request.assets('put', file, value);
+
+        }
+
+      } catch (error) {
+
+        throw new Error(error);
+
       }
 
     } else if (is(event, 'delete')) {
@@ -80,9 +100,7 @@ export function watch (callback: typeof Syncify.hook) {
       /* DELETED FILE                                 */
       /* -------------------------------------------- */
 
-      // log.pr(file);
-
-      await request.assets('delete', file);
+      return request.assets('delete', file);
 
     }
 

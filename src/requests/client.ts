@@ -1,10 +1,10 @@
 import { queue } from 'requests/queue';
 import { mapFastAsync } from 'rambdax';
-import { IRequest, IStore, IFile, IThemes, Methods, IPage, ISync } from 'types';
+import { IRequest, IStore, IFile, Methods, ISync, Requests } from 'types';
 import { assets } from 'requests/assets';
 import * as metafields from 'requests/metafields';
 import * as pages from 'requests/pages';
-import { assign, isUndefined } from 'shared/native';
+import { assign, isUndefined, create } from 'shared/native';
 
 /* -------------------------------------------- */
 /* EXPORTED                                     */
@@ -15,42 +15,36 @@ export function client ({ stores, themes }: ISync) {
 
   return {
 
-    assets: async (method: Methods, file: IFile, content?: any) => {
+    assets: (method: Methods, file: IFile, content?: any) => {
 
-      const payload: IRequest = isUndefined(content) ? {
-        method,
-        params: {
-          'asset[key]': file.key
-        }
-      } : {
-        method,
-        data: {
-          asset: {
-            key: file.key,
-            value: content
-          }
-        }
-      };
+      const payload: IRequest = create(null);
 
-      queue.add(async () => await mapFastAsync<IThemes, any>(theme => {
+      payload.method = method;
 
-        return assets(theme, file, assign<any, any, IRequest>(
-          { url: theme.url },
-          stores[theme.store].client,
-          payload
-        ));
+      if (isUndefined(content)) {
+        payload.params = create(null);
+        payload.params['asset[key]'] = file.key;
+      } else {
+        payload.data = create(null);
+        payload.data = { asset: { key: file.key, value: content } };
+      }
 
-      }, themes));
+      return queue.add(() => mapFastAsync<IStore, any>(store => {
+        payload.url = themes[store.domain].url;
+        return assets(themes[store.domain], file, assign(create(null), store.client, payload));
+      }, stores));
 
     },
 
-    pages: async (_method: Methods, content?: IPage) => {
+    pages: (_method: Methods, content?: Requests.IPage) => {
 
-      await queue.add(() => mapFastAsync<IStore, any>(store => (pages.sync(store, content)), stores));
+      return queue.add(() => mapFastAsync<IStore, any>(store => {
+        return pages.sync(store, content);
+      }, stores));
 
     },
 
-    metafields: async (_method: Methods, content?: IMetafield) => {
+    metafields: async (_method: Methods, content?: Requests.IMetafield) => {
 
       await queue.add(() => mapFastAsync<IStore, any>(store => (metafields.sync(store, content)), stores));
 

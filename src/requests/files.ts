@@ -24,7 +24,7 @@ const stage = (file: )stage ({
       }
     }
   }
-}) {
+}) => {
 
   const form = new FormData();
 

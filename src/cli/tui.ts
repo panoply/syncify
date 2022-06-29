@@ -5,7 +5,7 @@ import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
 import * as c from 'cli/ansi';
 import { toUpcase } from 'shared/shared';
-import { keys, nil, is } from 'shared/native';
+import { keys, nil, is, values } from 'shared/native';
 import { bundle } from 'options';
 import * as timer from 'process/timer';
 
@@ -19,13 +19,14 @@ function previews (sync: PartialDeep<ISync>) {
 
   if (sync.themes.length === 0) return '';
 
-  const width = sync.themes.reduce((size, { target }) => (
+  const themes = values(sync.themes);
+  const width = themes.reduce((size, { target }) => (
     target.length > size
       ? target.length
       : size
   ), 0);
 
-  const urls = sync.themes.map(({
+  const urls = themes.map(({
     id,
     store,
     target
@@ -94,13 +95,19 @@ export function header () {
     heading += c.line('│ ') + 'Syncing to ' + stores + ' and ' + themes + '\n';
   }
 
-  if (!isNil(bundle.spawn)) {
-    const size = keys(bundle.spawn).length;
-    const spawned = c.cyan.bold(String(size)) + (size > 1 ? ' child processes' : ' child process');
-    heading += c.line('│') + ' Spawned ' + spawned + '\n' + c.line('│') + '\n';
+  if (!bundle.mode.upload) {
+    if (!isNil(bundle.spawn)) {
+      const size = keys(bundle.spawn).length;
+      const spawned = c.cyan.bold(String(size)) + (size > 1 ? ' child processes' : ' child process');
+      heading += c.line('│') + ' Spawned ' + spawned + '\n' + c.line('│') + '\n';
+    }
+  } else {
+    heading += newline();
   }
 
   return (
+    bundle.mode.upload ||
+    bundle.mode.download ||
     bundle.mode.build ||
     bundle.mode.clean ||
     bundle.mode.vsc
@@ -112,15 +119,23 @@ let tracer: string = '';
 
 export function fixed (group: string) {
 
-  tracer += (
-    c.line('│ ') +
-    c.greenBright('✓ ') +
-    `${c.bold(toUpcase(group))} ${c.white('in')} ${c.bold(timer.stop())}\n`
-  );
+  if (bundle.mode.build) {
+
+    tracer += (
+      c.line('│ ') +
+      c.greenBright('✓ ') +
+     `${c.bold(toUpcase(group))} ${c.white('in')} ${c.bold(timer.stop())}\n`
+    );
+
+    return '\n' + (
+      c.line('┌─ ') + c.pink.bold('Building ' + toUpcase(group)) + c.gray(' syncify <!version!>') + '\n' +
+      c.line('│ ') + '\n' + tracer +
+      c.line('│ ') + '\n'
+    );
+  }
 
   return '\n' + (
     c.line('┌─ ') + c.pink.bold('Building ' + toUpcase(group)) + c.gray(' syncify <!version!>') + '\n' +
-    c.line('│ ') + '\n' + tracer +
     c.line('│ ') + '\n'
   );
 
@@ -240,7 +255,7 @@ export function task (stdout: string) {
  *
  * - ` ├ ` When passing `indent` option a `true` value (a single space before is applied)
  * - ` └ ` When passing `indent` and `ender` options a `true` value
- *  - `├ ` When passing no options (the default)
+ * - ` ├ ` When passing no options (the default)
  */
 export function message (stdout: string, { indent = false, ender = false }) {
 

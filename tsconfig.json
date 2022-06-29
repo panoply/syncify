@@ -33,7 +33,6 @@
     "noUnusedParameters": true,
     "pretty": true,
     "rootDir": "src",
-    "typeRoots": ["node_modules/@types", "src/types/*"],
     "baseUrl": ".",
     "paths": {
       "types": ["src/types/index.d.ts"],

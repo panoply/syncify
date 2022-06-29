@@ -21,7 +21,7 @@ export const cache = <PartialDeep<ICache>>({ /* DYNAMICALLY POPULATED */}) as IC
  *
  * **Notes:**
  *
- * This model will assert defaults and be merged with
+ * This model will assert defaults to be merged with
  * the `bundle`, `transform` and `terser` models.
  *
  * The defined settings will hold reference to the user
@@ -102,7 +102,7 @@ export let bundle = <PartialDeep<IBundle>>({
   watch: [],
   paths: {},
   sync: {
-    themes: [],
+    themes: {},
     stores: []
   }
 }) as IBundle;
@@ -224,9 +224,8 @@ export const terser: ITerser = ({
  */
 export const update = ({
   bundle: (patch: PartialDeep<IBundle>) => {
-    bundle = merge(
-      bundle,
-      patch
-    );
+
+    bundle = merge(bundle, patch);
+
   }
 });

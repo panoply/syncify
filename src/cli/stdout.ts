@@ -25,6 +25,13 @@ let track: string;
 export const log: ILog = {};
 
 /**
+ * STDOUT Write
+ *
+ * Cached `process.stdout.write` constants
+ */
+export const print = (buffer: string | Uint8Array) => process.stdout.write(buffer);
+
+/**
  * Logger
  *
  * Applies the logging to output. Determines whether
@@ -32,7 +39,7 @@ export const log: ILog = {};
  */
 export function stdout (name: string, indent = false) {
 
-  const group = tui.title(name);
+  tui.title(name);
 
   if (isUndefined(track)) {
     process.stdout.write(tui.header());
@@ -62,9 +69,9 @@ export function stdout (name: string, indent = false) {
       }
 
       if (indent) {
-        process.stdout.write(tui.spawn(text));
+        print(tui.spawn(text));
       } else {
-        process.stdout.write(tui.task(text));
+        print(tui.task(text));
       }
 
     }
@@ -87,22 +94,6 @@ export async function logger (logs: { [spawn: string]: string } | string[], opti
   } else {
     for (const spawn in logs) spawned(spawn, stdout);
   }
-
-  kill(() => {
-
-    process.stdout.write(tui.footer('Process Ended'));
-
-    spawns.forEach(([ name, child ]) => {
-      child.kill();
-      console.log('- ' + c.gray.italic(name + '(' + child.pid + ')' + ' process exited'));
-    });
-
-    queue.pause();
-    queue.clear();
-    spawns.clear();
-    process.exit(0);
-
-  });
 
 };
 
