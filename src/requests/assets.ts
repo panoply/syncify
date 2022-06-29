@@ -2,6 +2,7 @@ import { IRequest, IThemes, IFile } from 'types';
 import { queue, axios } from 'requests/queue';
 import { is } from 'shared/native';
 import { log, print } from 'cli/stdout';
+import { liquidPretty } from 'cli/parse';
 import * as tui from 'cli/tui';
 import * as c from 'cli/ansi';
 import { AxiosError } from 'axios';
@@ -72,6 +73,7 @@ export async function assets (sync: IThemes, file: IFile, config: IRequest) {
       queue.add(() => assets(sync, file, config));
     } else {
       print(tui.task(`${c.red('𐄂')} ${c.redBright(file.key)}`));
+      console.log(e.response.data);
     //  error(file.key, e.response);
     }
 

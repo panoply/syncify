@@ -7,7 +7,7 @@ import { compile as liquid } from 'transform/liquid';
 import { styles } from 'transform/styles';
 import { compile as asset } from 'transform/asset';
 import { compile as json } from 'transform/json';
-import { compile as pages } from 'transform/pages';
+// import { compile as pages } from 'transform/pages';
 import { logger } from '../cli/stdout';
 import { is, isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
@@ -31,7 +31,7 @@ export function watch (callback: typeof Syncify.hook) {
     ignored: [ '*.map' ]
   });
 
-  logger(bundle.spawn);
+  // logger(bundle.spawn);
 
   watcher.on('all', async function (event, path) {
 
@@ -77,9 +77,9 @@ export function watch (callback: typeof Syncify.hook) {
 
         } else if (file.type === Type.Page) {
 
-          value = await pages(file, callback);
+          //  value = await pages(file, callback);
 
-          return request.pages('put', value);
+          // return request.pages('put', value);
         }
 
         if (value !== null) {

@@ -194,7 +194,7 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
 
     // Lets parse the theme target names
     const themes: string[] = has('theme', cli)
-      ? [ cli.theme ]
+      ? (cli.theme as any).split(',')
       : has(store.domain, cli)
         ? cli[store.domain].split(',')
         : keys(store.themes);
@@ -213,6 +213,7 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
         url: `/themes/${store.themes[target]}/assets.json`
       };
     }
+
   }
 
   if (is(bundle.sync.stores.length, 0)) {

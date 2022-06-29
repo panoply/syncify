@@ -22,7 +22,7 @@
         &ndash; tagged "{{ current_tags | join: ',   ' }}"
       {% endif -%}
       {%- if current_page != 1 %}
-        &ndash; Page {{ current_page }}
+        &ndash; Page {{  current_page }}
       {% endif -%}
       {%- unless page_title contains shop.name %}
         &ndash; {{ shop.name }}
@@ -36,88 +36,18 @@
     {% render 'meta-tags' %}
 
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
-    {{ content_for_header }}
 
-    {%- liquid
-      assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
-      assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
-      assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
-    %}
+    {{content_for_header}}
 
-    {{ 'stylesheet.min.css' | asset_url | stylesheet_tag }}
-
-    {%- unless settings.type_body_font.system? -%}
-      <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
-    {%- endunless -%}
-    {%- unless settings.type_header_font.system? -%}
-      <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
-    {%- endunless -%}
-
-    {%- if settings.predictive_search_enabled -%}
-      <link rel="stylesheet" href="{{ 'component-predictive-search.css' | asset_url }}" media="print" onload="this.media='all'">
-    {%- endif -%}
-
-    <script>
-      document.documentElement.className = document
-        .documentElement
-        .className
-        .replace("no-js", "js");
-      if (Shopify.designMode) {
-        document
-          .documentElement
-          .classList
-          .add("shopify-design-mode");
-      }
-    </script>
   </head>
 
   <body class="gradient">
 
     <main id="MainContent" class="container" role="main" tabindex="-1">
       <div class="col-6">
-        {{ content_for_layout }}
+        {{content_for_layout}}
       </div>
     </main>
-
-    {% section 'footer' %}
-
-    <ul hidden>
-      <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
-    </ul>
-
-    <script>
-      window.shopUrl = "{{ shop.url }}";
-      window.routes = {
-        cart_add_url: "{{ routes.cart_add_url }}",
-        cart_change_url: "{{ routes.cart_change_url }}",
-        cart_update_url: "{{ routes.cart_update_url }}",
-        predictive_search_url: "{{ routes.predictive_search_url }}"
-      };
-
-      window.cartStrings = {
-        error: `{{ 'sections.cart.cart_error' | t }}`,
-        quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`
-      };
-
-      window.variantStrings = {
-        addToCart: `{{ 'products.product.add_to_cart' | t }}`,
-        soldOut: `{{ 'products.product.sold_out' | t }}`,
-        unavailable: `{{ 'products.product.unavailable' | t }}`
-      };
-
-      window.accessibilityStrings = {
-        imageAvailable: `{{ 'products.product.media.image_available' | t: index: '[index]' }}`,
-        shareSuccess: `{{ 'general.share.success_message' | t }}`,
-        pauseSlideshow: `{{ 'sections.slideshow.pause_slideshow' | t }}`,
-        playSlideshow: `{{ 'sections.slideshow.play_slideshow' | t }}`
-      };
-
-      document.querySelectorAll("iframe[");
-    </script>
-
-    {%- if settings.predictive_search_enabled -%}
-      <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
-    {%- endif -%}
 
   </body>
 </html>

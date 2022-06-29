@@ -179,13 +179,17 @@ const htmlMinify = async (content: string, terser: IHTML) => {
  */
 const transform = (file: IFile) => async (data: string) => {
 
-  if (!terser.minify.html) return writeFile(file.output, data);
+  if (!terser.minify.html) {
+    await writeFile(file.output, data);
+    return data;
+  }
 
   const content = is(file.type, Type.Section) ? minifySchema(file, data) : removeComments(data);
   const htmlmin = await htmlMinify(content, terser.html);
 
   if (isNil(htmlmin)) {
-    return writeFile(file.output, data);
+    await writeFile(file.output, data);
+    return data;
   }
 
   const postmin = removeDashes(htmlmin);
