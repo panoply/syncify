@@ -138,18 +138,6 @@ export function pageOptions (config: IConfig) {
     }
   }
 
-  if (hasPath('markdown.highlight', pages)) {
-
-    if (pages.markdown.highlight === true) {
-
-      transform.pages.markdown.highlight = function (code, lang) {
-        const hljs = require('highlight.js');
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-        return hljs.highlight(code, { language }).value;
-      };
-    }
-  }
-
 }
 
 /**

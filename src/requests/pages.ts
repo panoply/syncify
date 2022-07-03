@@ -12,36 +12,6 @@ import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
 import * as c from 'cli/ansi';
 
-function markdown (options: Turndown.Options = {}) {
-
-  const md = new Turndown(options);
-
-  md.use(gfm);
-  md.addRule('codeblock', {
-    filter: [
-      'pre',
-      'code'
-    ],
-    replacement (content, rule) {
-
-      if (rule.nodeName === 'PRE') {
-
-        const langName = rule.firstElementChild.className.match(/(?<=language-)(.*)/);
-        const language = (isNil(langName) ? '' : langName[0]) + '\n';
-
-        return '```' + language + content + '```' + '\n';
-
-      }
-
-      return content;
-
-    }
-  });
-
-  return (content: string) => md.turndown(content);
-
-}
-
 /**
  * Merge Pages
  *
@@ -383,33 +353,5 @@ export function client (store: IStore) {
     merge,
     pull
   };
-
-};
-
-/**
- * Metafields
- *
- * Metafield handler function. This is used in the
- * resource modes and will query, create or update
- * metafields.
- */
-export async function sync (store: IStore, field?: IMetafield) {
-
-  if (is(arguments.length, 1)) return (_field: IMetafield) => sync(store, _field);
-
-  const data = await find(store, field);
-
-  if (!data) return create(store, field);
-
-  return update(store, data.id, assign(field, { id: data.id, type: 'json' })).catch(e => {
-
-    if (!store.queue) return error(field.namespace, e.response);
-
-    if (requeue(e.response.status)) {
-      queue.add(() => sync(store, field));
-    } else {
-      return error(store.store, e.response);
-    }
-  });
 
 };

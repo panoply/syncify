@@ -76,6 +76,7 @@
     "fast-safe-stringify": "^2.1.1",
     "fs-extra": "^10.1.0",
     "glob": "^8.0.3",
+    "gray-matter": "^4.0.3",
     "html-minifier-terser": "7.0.0-beta.0",
     "markdown-it": "^13.0.1",
     "mergerino": "^0.4.0",
@@ -88,6 +89,7 @@
     "tiny-spinner": "^2.0.0",
     "tsup": "^6.1.2",
     "turndown": "^7.1.1",
+    "turndown-plugin-gfm": "^1.0.2",
     "wrap-ansi": "^8.0.1"
   },
   "devDependencies": {

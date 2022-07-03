@@ -131,16 +131,25 @@ export const transform: ITransform = ({
     importAs: 'markdown',
     liquidWarnings: true,
     fallbackAuthor: null,
+    turndown: {
+      codeBlockStyle: 'fenced',
+      emDelimiter: '_',
+      fence: '```',
+      headingStyle: 'atx',
+      hr: '***',
+      linkReferenceStyle: 'full',
+      linkStyle: 'inlined',
+      strongDelimiter: '**',
+      bulletListMarker: '-'
+    },
     markdown: {
-      baseUrl: '',
+      quotes: '“”‘’',
+      html: true,
+      linkify: false,
+      typographer: false,
+      xhtmlOut: false,
       breaks: false,
-      gfm: true,
-      langPrefix: 'hljs language-',
-      headerIds: true,
-      headerPrefix: '',
-      mangle: true,
-      silent: false,
-      smartypants: false
+      langPrefix: 'language-'
     }
   },
   icons: {

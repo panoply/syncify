@@ -1,9 +1,10 @@
 import anymatch from 'anymatch';
-import { IFile, IStyle, Syncify } from 'types';
+import { IFile, IPages, IStyle, Syncify } from 'types';
 import { glob } from 'glob';
 import { compile as assets } from 'transform/asset';
 import { compile as liquid } from 'transform/liquid';
 import { compile as json } from 'transform/json';
+import { compile as pages } from 'transform/pages';
 import { styles } from 'transform/styles';
 import { isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
@@ -45,6 +46,8 @@ export async function build (callback?: Syncify) {
         acc.config.push(file); break;
       case Type.Template:
         acc.template.push(file); break;
+      case Type.Page:
+        acc.page.push(file); break;
       case Type.Asset:
         acc.asset.push(file); break;
       case Type.Metafield:
@@ -59,6 +62,7 @@ export async function build (callback?: Syncify) {
     layout: [],
     snippet: [],
     locale: [],
+    page: [],
     config: [],
     metafield: [],
     template: [],
@@ -148,6 +152,18 @@ export async function build (callback?: Syncify) {
   for (const file of source.config) {
     try {
       await json(file as IFile<IStyle>, callback);
+    } catch (error) {
+      console.error('ERROR', error);
+    }
+  }
+
+  /* -------------------------------------------- */
+  /* METAFIELDS                                   */
+  /* -------------------------------------------- */
+
+  for (const file of source.page) {
+    try {
+      await pages(file as IFile<IPages>, callback);
     } catch (error) {
       console.error('ERROR', error);
     }

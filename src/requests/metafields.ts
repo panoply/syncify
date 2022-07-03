@@ -10,6 +10,7 @@ import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
 import * as c from 'cli/ansi';
 import { log } from 'cli/log';
+import { bundle, transform } from '../options/index';
 
 /**
  * Write Metafields
@@ -19,8 +20,8 @@ import { log } from 'cli/log';
  */
 function write (config: IConfig) {
 
-  const base = join(config.cwd, config.metafields);
-  const { spaces } = config.transform.json;
+  const base = join(bundle.cwd, config.metafields);
+  const { indent } = transform.json;
 
   return async (field: { dir: string; key: string; data: object; name: string; }) => {
 
@@ -30,7 +31,7 @@ function write (config: IConfig) {
 
     if (!mdir) await mkdir(path);
 
-    await writeJson(file, field.data, { spaces });
+    await writeJson(file, field.data, { spaces: indent });
 
     return join(config.metafields, field.dir, field.name);
 
@@ -360,9 +361,9 @@ export function client (store: IStore) {
  * resource modes and will query, create or update
  * metafields.
  */
-export async function sync (store: IStore, field?: Requests.IMetafield) {
+export async function sync (store: IStore, field?: Requests.Metafield) {
 
-  if (is(arguments.length, 1)) return (_field: Requests.IMetafield) => sync(store, _field);
+  if (is(arguments.length, 1)) return (_field: Requests.Metafield) => sync(store, _field);
 
   const data = await find(store, field);
 

@@ -219,6 +219,7 @@
     }
   },
   "dependencies": {
+    "@syncify/cli": "link:../..",
     "bootstrap": "4.6.0"
   },
   "devDependencies": {

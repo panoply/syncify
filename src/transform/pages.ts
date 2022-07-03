@@ -1,63 +1,52 @@
-import { IFile, Syncify } from 'types';
-import { readFile } from 'fs-extra';
+import { IFile, IPages, Syncify } from 'types';
+import { readFile, writeFile } from 'fs-extra';
+import { join } from 'path';
 import matter from 'gray-matter';
 import { has } from 'rambdax';
-import { unified } from 'unified';
-import rehypeStringify from 'rehype-stringify';
-import rehypeParse from 'rehype-parse';
-import rehypeRemark from 'rehype-remark';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
-import remarkStringify from 'remark-stringify';
-import { transform } from 'options';
+import Turndown from 'turndown';
+import gfm from 'turndown-plugin-gfm';
+import Markdown from 'markdown-it';
+import { transform, bundle } from '../options/index';
+import { log, c } from '../cli/log';
 
 export async function toMarkdown (content: string) {
 
-  const remark = unified()
-    .use(rehypeParse) // Parse HTML to a syntax tree
-    .use(rehypeRemark) // Turn HTML syntax tree to markdown syntax tree
-    .use(remarkStringify) // Serialize HTML syntax tree
-    .process(content)
-    .catch((error) => {
-      throw error;
-    });
+  const td = new Turndown(transform.pages.turndown);
+
+  td.use(gfm);
+
+  return td.turndown(content);
 
 }
 
-export async function toHTML (content: string) {
+export async function compile (file: IFile<IPages>, cb: Syncify) {
 
-  const remark = unified()
-    .use(remarkParse)
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeStringify, { allowDangerousHtml: true });
+  log(file.namespace, c.cyan(file.key));
 
-  return remark.process(content).catch((error) => {
-    throw error;
-  });
-
-}
-
-export async function compile (file: IFile, cb: Syncify) {
-
-  const read = await readFile(file.path);
-
+  const read = await readFile(file.input);
   const { data, content } = matter(read);
 
-  if (!has('title', data)) throw console.log('Missing Title');
+  if (!has('title', data)) {
 
-  transform.pages.markdown.baseUrl = has('base_url', data) ? data.base_url : null;
-  transform.pages.markdown.headerIds = has('header_ids', data) ? data.header_ids : true;
-  transform.pages.markdown.headerPrefix = has('header_prefix', data) ? data.header_prefix : '';
+    throw log.error('Missing Title');
 
-  marked.setOptions({ renderer: new marked.Renderer(), ...transform.pages.markdown });
+  }
 
-  const body_html = marked.parse(content, (e, html) => {
+  if (has('html', data)) {
+    transform.pages.markdown.html = data.html;
+  }
 
-    if (e) throw console.log(e);
+  if (has('linkify', data)) {
+    transform.pages.markdown.linkify = data.linkify;
+  }
 
-    return html;
+  if (has('breaks', data)) {
+    transform.pages.markdown.breaks = data.breaks;
+  }
 
-  });
+  const body_html = Markdown(transform.pages.markdown).render(content);
+
+  await writeFile(join(bundle.dirs.cache, 'pages', file.base), body_html);
 
   return {
     title: data.title,

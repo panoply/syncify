@@ -1,13 +1,13 @@
 /* eslint-disable brace-style */
 
 import chokidar from 'chokidar';
-import { Syncify, IFile, IStyle } from 'types';
+import { Syncify, IFile, IStyle, IPages } from 'types';
 import { client } from '../requests/client';
 import { compile as liquid } from 'transform/liquid';
 import { styles } from 'transform/styles';
 import { compile as asset } from 'transform/asset';
 import { compile as json } from 'transform/json';
-// import { compile as pages } from 'transform/pages';
+import { compile as pages } from 'transform/pages';
 import { is, isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
 import { bundle } from '../options/index';
@@ -74,9 +74,9 @@ export function watch (callback: Syncify) {
 
         } else if (file.type === Type.Page) {
 
-          //  value = await pages(file, callback);
+          value = await pages(file as IFile<IPages>, callback);
 
-          // return request.pages('put', value);
+          return request.pages(value);
         }
 
         if (value !== null) {

@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@liquify/syncify': link:../..
+  '@syncify/cli': link:../..
   bootstrap: 4.6.0
   esbuild: ^0.14.11
   gulp: ^4.0.2
@@ -13,6 +14,7 @@ specifiers:
   webpack-cli: ^4.9.1
 
 dependencies:
+  '@syncify/cli': link:../..
   bootstrap: 4.6.0
 
 devDependencies:
