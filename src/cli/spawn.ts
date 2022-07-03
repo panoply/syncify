@@ -1,6 +1,6 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import spawn from 'cross-spawn';
-import { bundle } from 'options';
+import { bundle } from '../options/index';
 
 /* -------------------------------------------- */
 /* EXPORTS                                      */

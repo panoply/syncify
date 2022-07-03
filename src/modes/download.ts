@@ -1,13 +1,13 @@
-import { Syncify } from 'types';
+import { Syncify, Requests } from 'types';
 import { join } from 'path';
-import { isNil, has } from 'rambdax';
+import { has } from 'rambdax';
 import { writeFile } from 'fs-extra';
 import * as request from 'requests/assets';
-import { isFunction } from 'shared/native';
+import { isFunction, assign, isUndefined, isString, isBuffer } from 'shared/native';
 import * as timer from 'process/timer';
-import { bundle } from 'options';
+import { bundle } from '../options/index';
 
-export const download = async (cb?: typeof Syncify.hook): Promise<void> => {
+export const download = async (cb?: Syncify): Promise<void> => {
 
   timer.start();
 
@@ -16,36 +16,47 @@ export const download = async (cb?: typeof Syncify.hook): Promise<void> => {
   for (const store of bundle.sync.stores) {
 
     const theme = bundle.sync.themes[store.domain];
+    const { assets } = await request.get<Requests.Assets>(theme.url, store.client);
 
-    const req = !isNil(store) ? { headers: { 'X-Shopify-Access-Token': theme.token } } : {};
-
-    const { assets } = await request.get(theme.url, req);
-
-    for (const asset of assets) {
+    for (const { key } of assets) {
 
       try {
 
-        const item = await request.assets('get', { 'asset[key]': asset.key });
+        const data = assign({}, store.client, { params: { 'asset[key]': key } });
+        const { asset } = await request.get<Requests.Asset>(theme.url, data);
+        const output = join(bundle.dirs.import, store.domain, theme.target, key);
+        const buffer = has('attachment', asset)
+          ? Buffer.from(asset.attachment, 'base64')
+          : Buffer.from(asset.value || null, 'utf8');
 
-        const path = join(bundle.dirs.import, theme.domain, theme.target, asset.key);
+        if (hashook) {
 
-        const buffer = has('attachment', item.asset)
-          ? Buffer.from(item.asset.attachment, 'base64')
-          : Buffer.from(item.asset.value || null, 'utf8');
+          const update = cb.apply({ asset, output }, buffer);
 
-        await writeFile(path, buffer);
+          if (isUndefined(update) || update === false) {
+            await writeFile(output, buffer);
+          } else if (isString(update) || isBuffer(update)) {
+            await writeFile(output, update);
+          } else {
+            await writeFile(output, buffer);
+          }
 
-        console.log(`${asset.key} (${theme.domain})`);
+        } else {
+
+          await writeFile(output, buffer);
+
+        }
 
       } catch (e) {
 
         console.log(e);
+
       }
 
     }
 
   }
 
-  log.finish('download');
+  // log.finish('download');
 
 };

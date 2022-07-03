@@ -2,7 +2,8 @@ import { IFile, Syncify } from 'types';
 import * as c from 'cli/ansi';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
-import { log } from 'cli/stdout';
+import { log } from 'cli/log';
+import { isFunction, isBuffer, isUndefined } from 'shared/native';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */
@@ -28,31 +29,24 @@ const passthrough = (file: IFile) => async (data: string) => {
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export async function compile (file: IFile, cb: typeof Syncify.hook) {
+export async function compile (file: IFile, cb: Syncify) {
+
+  log(file.namespace, c.cyan(file.key));
 
   const copy = passthrough(file);
   const read = await readFile(file.input);
-
   const data = read.toString();
 
-  log[file.namespace](`${c.cyan(file.key)}`);
-
-  if (!isType('Function', cb)) return copy(data);
+  if (!isFunction(cb)) return copy(data);
 
   const update = cb.apply({ ...file }, data);
 
-  if (isType('Undefined', update) || update === false) {
-
+  if (isUndefined(update) || update === false) {
     return copy(data);
-
-  } else if (isType('String', update)) {
-
+  } else if (isType(update)) {
     return copy(update);
-
-  } else if (Buffer.isBuffer(update)) {
-
+  } else if (isBuffer(update)) {
     return copy(update.toString());
-
   }
 
   return copy(data);

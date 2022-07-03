@@ -4,17 +4,18 @@
 
 # @liquify/syncify
 
-A blazing fast, extensible and superior alternative Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI that can spawn child processes (compiler coupling). Supports multiple storefront theme synchronization with watch, upload, download and metafield capabilities included.
+Fast, extensible and superior alternative Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI, supports multiple storefront theme synchronization with watch, upload, download and metafield capabilities included.
 
 **Syncify exists as part of the [Liquify](https://liquify.dev) project**
 
 ### Key Features
 
 - Upload, download and watch multiple storefronts and/or themes.
-- Clear, concise and informative CLI logging.
+- Clear, concise, informative and beautiful CLI logging.
 - Supports HTML + Liquid and JSON minification.
 - An elegant directory based metafields sync approach using JSON files.
-- Built-in support for SCSS and CSS transpilation using SASS Dart and [PostCSS](https://postcss.org/).
+- TypeScript/JavaScript transpilation using [TSUP](https://tsup.egoist.sh/) and [ESBuild](https://esbuild.github.io/)
+- SCSS/CSS transpilation using SASS Dart and [PostCSS](https://postcss.org/).
 - SVG Sprite and inlined SVG snippet generation using [SVGO](https://github.com/svg/svgo).
 - Intelligent path mapping capabilities for custom theme directory structures.
 - Digests existing build tool configurations for asset transformations.
@@ -22,11 +23,11 @@ A blazing fast, extensible and superior alternative Shopify [theme kit](https://
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit and other tools in this nexus fail to achieve fluidity. Syncify is how I handle theme creation, development and maintenance, it's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit and other tools in this nexus fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
 
 # Install
 
-Install as development dependency in your project. Syncify will run a script on post-install which writes default configuration options to your `package.json` file.
+Install as development dependency in your project.
 
 **PNPM**
 
@@ -48,7 +49,7 @@ yarn add @liquify/syncify --dev
 
 # Overview
 
-The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store. It ships with build, watch, build download, upload, merge and pull capabilities. Together with a prompt based execution model the tool provides developers with theme control that aims to exceed expectations.
+The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store. It ships with build, watch, download, upload, merge and pull capabilities for interfacing with your remote Shopify webshop. Together with a prompt based execution model, Syncify provides developers with theme control that aims to exceed expectations.
 
 ### Theme Files
 
@@ -56,11 +57,11 @@ Syncify uses built-in capabilities when handling snippets, templates, layouts, l
 
 ### Asset Pipeline
 
-Syncify does not want to re-create or impede on developer preferences and tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify `build` and `watch` instances.
+Syncify does not want to re-create or impede on developer preferences and tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify `build` and `watch` instances. Optionally, users can leverage built-in wrappers that Syncify exposes for handling assets files.
 
 ### Asset Support
 
-Syncify provides wrapper support for handling SCSS, CSS and SVG files. These assets types can be transformed into theme snippets and processed together with build tools like [PostCSS](#) and [SVGO](#). When a `postcss.config.js` or `svgo.config.js` exists within a project, Syncify will consume them and generate output using their configurations.
+Syncify provides wrapper support for handling TypeScript, JavaScript, CSS, SCSS and SVG file types. When a `postcss.config.js` or `svgo.config.js` exists within a project, Syncify will consume them and generate output using their configurations.
 
 # Setup
 
@@ -221,7 +222,7 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 
 # Configuration
 
-Syncify configuration options can be defined on the `syncify` property in a projects `package.json` file. The default options Syncify uses will be automatically applied to your `package.json` file after installing the module. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference if you haven't already. Below is the default settings that are applied.
+Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file, use a `syncify` property. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference if you haven't already. Below is the default settings that are applied.
 
 <!-- prettier-ignore -->
 ```jsonc
@@ -261,6 +262,11 @@ Syncify configuration options can be defined on the `syncify` property in a proj
 
 
       },
+      "scripts": [
+        {
+          ""
+        }
+      ],
       "styles": [
         {
           "input": null,
@@ -413,7 +419,7 @@ The `themes` option refers to theme ids the store contains. This option is an ob
 
 ## Dirs
 
-The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to a directory name which is relative to the root of your project. You cannot define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). This option accepts string values only.
+The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to a directory name which is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). This option accepts string values only.
 
 ```json
 {
@@ -431,11 +437,11 @@ The `dirs` option allows you to define custom base directories. In Syncify, `dir
 
 ### Input > Output
 
-Syncify expects project to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you add the output directory to your `.gitignore` file because it can rebuilt from input. If you used to working from a single directory (eg: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
+Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can rebuilt from input. If you are used to working from a single directory (eg: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
 
 ### Metafields
 
-The `metafields` directory path reference is where you can provide **global** JSON metafield files that can synced to your Shopify store. Metafield sync capabilities provided by Syncify use a simple **directory** > **file** based approach. Sub-directory names represent a metafield `namespace` value and JSON file names contained within represent metafield `key` values.
+The `metafields` directory path reference is where you can provide **global** JSON metafield files that can be synced to your Shopify store. Metafield sync capabilities provided by Syncify use a simple **directory** > **file** based approach. The sub-directory names represent a metafield `namespace` value and JSON file names contained within represent metafield `key` values.
 
 > Syncify will keep your remote and local metafield references aligned with one another and warn you when local versions do not match remote versions. This will help prevent you from overwriting changes that may have been applied by third-party apps or online within your store.
 
@@ -927,24 +933,30 @@ Though it is unlikely you'd ever need to include 2 different JavaScript bundlers
 
 # Transform
 
-In Syncify, `input` files can be transformed and augmented before being written to your define `output` path location. The `transform` option allows you to control how your **input** files are processed. Syncify supports built-in and partial processing for the following file types:
+In Syncify, `input` files can be transformed and augmented before being written to the defined `output` directory. The `transform` option allows you to control how your **input** files are processed. Syncify supports built-in and partial processing for the following file types:
 
 - `.liquid`
 - `.json`
+- `.js`
+- `.ts`
 - `.css`
 - `.svg`
 - `.scss`
 - `.sass`
 
-Processing `.liquid` and `.json` files are handled using built-in capabilities support by Syncify. Handling of `.css`, `.sass`, `scss` and `.svg` file types requires you install additional tooling which Syncify uses in their transform process. By default, Syncify assumes that it should only handle `.liquid` and `.json` files.
+Processing `.liquid` and `.json` files are handled using built-in capabilities support by Syncify. Handling of `.css`, `.sass`, `scss` and `.svg` file types require you install additional tooling which Syncify will uses in their transform process. By default, Syncify assumes that it should only handle `.liquid` and `.json` files.
+
+## Scripts
+
+Syncify exposes a `scripts` transform option which can be used as a convenience wrapped around the [tsup](https://tsup.egoist.sh/#what-can-it-bundle) bundler. TSUP uses the powerful [ESBuild](https://esbuild.github.io/) under the hood for processing TypeScript and JavaScript file types.
 
 ## Styles
 
-Syncify exposes a `styles` transform option which can be used as a convenience wrapper for handling `.css`, `.scss` or `.scss` asset files types. The **styles** option accepts an **array** list of style specific configurations that are used together with compilers like [Dart SASS](#) and [PostCSS](#). Style transforms help alleviate developers easily process and generate asset specific stylesheets that you can optionally export inlined as a **snippet** file.
+Syncify exposes a `styles` transform option which can be used as a convenience wrapper for handling `.css`, `.scss` or `.scss` asset files types. The **styles** option accepts an **array** list of style specific configurations that are used together with compilers like [Dart SASS](#) and [PostCSS](#). Style transforms help alleviate the complexities sometimes involved in setting up these tools so you can easily process and generate asset specific stylesheets that can be optionally inlined as a **snippet** file.
 
 ### SASS Support
 
-Syncify provides partial processing of `.scss` and `.sass` file types using [Dart SASS](#). If you require transform support for these files you need to install Dart module as a development dependency in your project.
+Syncify provides partial processing of `.scss` and `.sass` file types using [Dart SASS](#). If you require transform support for these files you need to install the Dart module as a development dependency in your project.
 
 ```
 pnpm add sass -D
@@ -952,13 +964,15 @@ pnpm add sass -D
 
 ### CSS Support
 
-In addition to SASS transformation, Syncify also support CSS processing using [PostCSS](#). If you wish have Syncify handle CSS transforms then you need to install **PostCSS** as a development dependency and also include a `postcss.config.js` file in your project. Syncify expects you will inform upon how CSS files are to be handled within a `postcss.config.js` file and look for the existence of one within your workspace. Provide PostCSS plugins and any specific settings within the `postcss.config.js` file.
+In addition to SASS transformation, Syncify also support CSS processing using [PostCSS](#). If you wish have Syncify handle CSS transforms then you need to install **PostCSS** as a development dependency and also include a `postcss.config.js` file in your project. Syncify expects you will inform upon how CSS files are to be handled within a `postcss.config.js` file and it will look for the existence of one within your workspace.
+
+> Provide PostCSS plugins and any specific settings within the `postcss.config.js` file.
 
 ```
 pnpm add postcss -D
 ```
 
-> **Please note:** If you are using Syncify to compile SASS files, then by default the transformed CSS will be passed to PostCSS. Use the available Syncify `style` options to disable this behavior.
+**Please note:** If you are using Syncify to compile SASS files, then by default the transformed CSS will be passed to PostCSS. Use the available Syncify `style` options to disable this behavior.
 
 ### Usage
 

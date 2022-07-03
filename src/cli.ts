@@ -1,15 +1,16 @@
 import { has } from 'rambdax';
 import { ICLICommands, Syncify } from 'types';
 import { upload } from 'modes/upload';
-// import { download } from 'modes/download';
+import { download } from 'modes/download';
+import { clean } from 'modes/clean';
 import { build } from 'modes/build';
 import { watch } from 'modes/watch';
 // import { resource } from 'modes/resource';
 // import { readConfig } from 'config/config';
 import { help } from 'cli/help';
-import { define } from 'options/define';
-import { log } from 'cli/stdout';
-import { bundle } from 'options';
+import { define } from './options/define';
+import { log } from 'cli/log';
+import { bundle } from './options/index';
 // import * as log from 'cli/logs';
 
 /**
@@ -19,16 +20,20 @@ import { bundle } from 'options';
  * It will dispatch and construct the correct
  * configuration model accordingly.
  */
-export async function cli (options: ICLICommands, callback?: typeof Syncify.hook) {
+export async function cli (options: ICLICommands, callback?: Syncify) {
 
   if (has('_', options)) options._ = options._.slice(1);
   if (options.help) return console.info(help);
 
   await define(options);
 
-  // const host = server('https://' + config.sync.stores[0].domain + '?preview_theme_id=' + config.sync.themes[0].id, config);
-
-  // console.log(callback);
+  if (bundle.mode.clean) {
+    try {
+      await clean();
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
   try {
 
@@ -38,6 +43,8 @@ export async function cli (options: ICLICommands, callback?: typeof Syncify.hook
       return watch(callback);
     } else if (bundle.mode.upload) {
       return upload(callback);
+    } else if (bundle.mode.download) {
+      return download(callback);
     }
 
     /* if (config.mode.vsc) {

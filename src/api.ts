@@ -1,39 +1,16 @@
-import { IOptions } from 'types';
+import { IConfig, Resources, Resource, Syncify } from 'types';
+import { cli } from './cli';
+import { vsc } from 'modes/vsc';
 
-// Build hook
-export function build (options?: IOptions) {
+const syncify: Syncify = function syncify (resource: Resource, options?: IConfig) {
 
-}
+  return async function (callback: (content?: Buffer) => void) {
 
-// Build hook
-export function watch (options?: IOptions) {
+    const state = (await promise);
 
-}
+    callback(state);
 
-// Build hook
-export function upload (options?: IOptions) {
-
-}
-
-// Build hook
-export function download (options?: IOptions) {
-
-}
-
-export default function (options?: IOptions) {
-
-  return {
-    async build (content?: Buffer): Promise<Buffer|string|void|false> {
-
-    },
-    async watch (content?: Buffer): Promise<Buffer|string|void|false> {
-
-    },
-    async upload (content?: Buffer): Promise<Buffer|string|void|false> {
-
-    },
-    async download (content?: Buffer): Promise<Buffer|string|void|false> {
-
-    }
+    log(Errors.INFO, 'Connection Established ⚡');
   };
-}
+
+};

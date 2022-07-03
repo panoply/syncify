@@ -4,14 +4,14 @@ import anymatch from 'anymatch';
 import { has, hasPath, includes, isNil, last } from 'rambdax';
 import { join, extname } from 'path';
 import { existsSync, mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
-import { log } from 'cli/stdout';
+import { log, c } from 'cli/log';
 import { createVSCodeDir } from 'modes/vsc';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { lastPath, normalPath } from 'shared/paths';
 import * as u from 'shared/native';
 import * as style from 'transform/styles';
 import { typeError, unknownError, invalidError } from './validate';
-import { transform, bundle, cache } from 'options';
+import { transform, bundle, cache } from './index';
 
 /**
  * Section Options
@@ -298,7 +298,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
       // Warn if input is not using sass or scss extension
       if (!/\.s[ac]ss/.test(extname(compile.input))) {
-        log.warning(`Input ${compile.input} is not a sass file. Consider processing it with PostCSS.`);
+        log(c.bold.yellow(`Input ${compile.input} is not a sass file. Consider processing it with PostCSS.`));
       }
 
       // iterate of user defined options and assign to defaults
@@ -327,7 +327,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
               // Warn when using expanded
               if (style.sass[option] === 'expanded') {
-                log.warning('Consider using compressed sass style for faster requests');
+                log(c.yellow.bold('Consider using compressed sass style for faster requests'));
               }
 
               continue;

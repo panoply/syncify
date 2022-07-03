@@ -45,3 +45,14 @@ export const convertTimer = (ms: number) => {
   const s = ((ms % 60000) / 1000).toFixed(0);
   return m > 0 ? (m + 'min' + (Number(s) < 10 ? '0' : '') + s) : s;
 };
+
+/**
+ * Returns the byte size of a string value
+ */
+export const getSize = (string: string | Buffer): number => {
+
+  return isString(string)
+    ? Buffer.from(string).toString().length
+    : string.toString().length;
+
+};

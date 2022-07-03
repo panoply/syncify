@@ -1,7 +1,7 @@
-import { IFile, IStyle, Syncify } from 'types';
+import { IFile, IStyle } from 'types';
 import { join, dirname, basename } from 'path';
 import { defineProperty, isRegex, isUndefined } from 'shared/native';
-import { transform } from 'options';
+import { transform } from '../options/index';
 import { parentPath } from 'shared/paths';
 
 /**
@@ -51,28 +51,5 @@ export function section (file: IFile) {
   }
 
   return file;
-
-};
-
-/**
- * Asset Modifier
- *
- * Handler function for a content modifier
- * callback that one can optionally execute
- * from within scripts.
- */
-export function asset (file: IFile, data: Buffer | string | object | any[], cb?: typeof Syncify.hook) {
-
-  if (typeof cb !== 'function') return data.toString();
-
-  const update = cb.call({ ...file }, data);
-
-  if (isUndefined(update)) return data;
-
-  if (/\.(liquid|html|json|js|css|scss|sass|txt|svg)/.test(file.ext)) {
-    return update.toString();
-  }
-
-  return data.toString();
 
 };

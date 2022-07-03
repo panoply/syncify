@@ -180,7 +180,7 @@ export const terser: ITerser = ({
   },
   html: {
     minifyJS: false,
-    minifyCSS: true,
+    minifyCSS: false,
     caseSensitive: false,
     collapseBooleanAttributes: false,
     collapseInlineTagWhitespace: false,
@@ -194,7 +194,7 @@ export const terser: ITerser = ({
     removeRedundantAttributes: true,
     removeScriptTypeAttributes: true,
     removeStyleLinkTypeAttributes: true,
-    sortAttributes: true,
+    sortAttributes: false,
     sortClassName: false,
     useShortDoctype: true,
     collapseWhitespace: true,
@@ -204,8 +204,8 @@ export const terser: ITerser = ({
     ignoreCustomFragments: [
       /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
       /<style[\s\S]*?<\/style>/,
-      /{%-?\s{0,}liquid[\s\S]*?-?%}/,
-      /(?<={%-?\s{0,}(style|javascript)\s{0,}-?%})[\s\S]*?(?={%-?\s{0,}end(style|javascript)\s{0,}-?%})/
+      /{%[\s\S]*?%}/,
+      /{{[\s\S]*?}}/
     ]
   }
 });

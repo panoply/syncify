@@ -1,4 +1,4 @@
-import { log } from 'cli/stdout';
+import { log } from 'cli/log';
 
 /**
  * Error Handler

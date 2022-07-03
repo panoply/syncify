@@ -1,5 +1,5 @@
 import { last } from 'rambdax';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { is, isArray } from './native';
 
 /**
@@ -21,12 +21,12 @@ import { is, isArray } from './native';
 export const lastPath = (path: string | string[]) => {
 
   if (isArray(path)) return path.map(lastPath);
-  if (is(path.indexOf('/'), -1)) return path;
+  if (path.indexOf('/') === -1) return path;
 
-  const ender = path.lastIndexOf('/') + 1;
-  const file = path.slice(ender);
+  const dir = dirname(path);
+  const ender = dir.lastIndexOf('/') + 1;
 
-  return file;
+  return dir.slice(ender);
 };
 
 /**

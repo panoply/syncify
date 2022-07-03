@@ -1,0 +1,908 @@
+{%- comment -%}
+  BUTTON STYLE  - Applied inline to the style attribute
+{%- endcomment -%}
+{%- capture buttons_style -%}
+  color:{{- section.settings.btn_text_color | default: 'inherit' }};
+  background-color:{{- section.settings.btn_bg_color | default: 'inherit' }};
+{%- endcapture -%}
+
+{%- comment -%}
+  BUTTON CLASS - Applied to each button link element
+{%- endcomment -%}
+{%- if section.settings.btn_radius -%}
+  {%- assign button_class = button_class | append: ' btn-radius ' -%}
+{%- endif -%}
+
+{%- if section.settings.btn_shadow -%}
+  {%- assign button_class = button_class | append: ' btn-shadow' -%}
+{%- endif -%}
+
+<div class="col-12 image_cover {{ slide_class }}">
+
+  {%- if section.settings.title != blank -%}
+
+    {%- capture cover_class -%}
+      {{ section.settings.flex_align }} px-2 py-4 p-sm-{{ section.settings.gutter }}
+    {%- endcapture -%}
+
+    <div class="image_cover-caption d-flex {{ cover_class }}">
+
+      <div
+        class="text-{{- section.settings.align }} py-1 px-5"
+        style="max-width:{{- section.settings.caption_width }}px;">
+
+        {%- capture spacing -%}
+          mb-{{- section.settings.spacing -}}
+        {%- endcapture -%}
+
+        {%- comment -%}
+          SUBTITLE TEXT - First text heading
+        {%- endcomment -%}
+        {%- if section.settings.subtitle != blank -%}
+          <span
+            class="d-block h{{- section.settings.subfs_title }} {{ spacing }}"
+            style="color: {{ section.settings.subtitle_color | default: 'inherit' }};">
+            {{- section.settings.subtitle -}}
+          </span>
+        {%- endif -%}
+
+        {%- comment -%}
+          TITLE TEXT - Second text heading
+        {%- endcomment -%}
+        {%- if section.settings.title != blank -%}
+          <span
+            class="d-block fw-bold h{{- section.settings.fs_title }} {{ spacing }}"
+            style="color:{{ section.settings.title_color | default: 'inherit' }};">
+            {{- section.settings.title -}}
+          </span>
+        {%- endif -%}
+
+        {%- comment -%}
+          CAPTION TEXT - Optional addition paragraph text block
+        {%- endcomment -%}
+        {%- if section.settings.caption != blank -%}
+
+          <span
+            class="d-block fs-{{ section.settings.caption_size }} {{ spacing }}"
+            style="color:{{- section.settings.caption_color | default: 'inherit' -}};">
+            {{- section.settings.caption -}}
+          </span>
+        {%- endif -%}
+
+        {%- comment -%}
+          CTA BUTTONS
+        {%- endcomment -%}
+        {%- if section.settings.buttons == 'show_buttons' -%}
+
+          {%- capture wrap_class -%}
+            row mx-0 mt-{{- section.settings.btn_offset }}
+            {{ section.settings.btn_align | split: ' ' | first }}
+          {%- endcapture -%}
+
+          {%- capture button_class -%}
+            {{ button_class | append: ' ' }}
+            {%- if section.settings.btn_width == 0 -%}
+              col
+            {%- else -%}
+              col-{{ section.settings.btn_width }}
+            {%- endif -%}
+          {%- endcapture -%}
+
+          <div class="{{ wrap_class }}">
+
+            {%- if section.settings.btn_url_1 != blank -%}
+              <a
+                href=" {{- section.settings.btn_url_1 }}"
+                title=" {{- section.settings.btn_label_1 }}"
+                style=" {{- buttons_style }}"
+                class="btn btn-line {{ section.settings.btn_size }} {{ button_class }} mr-1">
+                {{- section.settings.btn_label_1 }}
+              </a>
+            {%- endif -%}
+
+            {%- if section.settings.btn_url_2 != blank -%}
+              <a
+                href=" {{- section.settings.btn_url_2 }}"
+                title=" {{- section.settings.btn_label_2 }}"
+                style=" {{- buttons_style }}"
+                class="btn btn-line {{ section.settings.btn_size }} {{ button_class }} ml-1">
+                {{- section.settings.btn_label_2 }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="aspect-ratio {{ section.settings.aspect_ratio }}">
+    {%- if section.settings.desktop_image != blank and section.settings.mobile_image != blank -%}
+      <picture class="image">
+        <source
+          media="lg"
+          data-srcset=" {{- section.settings.desktop_image | img_url: '1440x' | format: 'pjpg' }}" />
+        <source
+          media="md"
+          data-srcset=" {{- section.settings.desktop_image | img_url: '1240x' | format: 'pjpg' }}" />
+        <source
+          media="sm"
+          data-srcset=" {{- section.settings.mobile_image | img_url: '1024x' | format: 'pjpg' }}" />
+        <source
+          media="xs"
+          data-srcset=" {{- section.settings.mobile_image | img_url: '1024x' | format: 'pjpg' }}" />
+        <noscript>
+          <img
+            class="img-fluid lazy"
+            src=" {{- section.settings.desktop_image | img_url: '1440x' | format: 'pjpg' }}">
+        </noscript>
+        <img
+          class="img-fluid lazy"
+          data-src=" {{- section.settings.desktop_image | img_url: '1440x' | format: 'pjpg' }}">
+      </picture>
+    {%- else -%}
+      <picture class="image">
+        <source
+          media="lg"
+          srcset="https://dummyimage.com/1240{{ section.settings.aspect_ratio }}/f5f5f5/ddd" />
+        <source
+          media="md"
+          srcset="https://dummyimage.com/1240{{ section.settings.aspect_ratio }}/f5f5f5/ddd" />
+        <source
+          media="sm"
+          srcset="https://dummyimage.com/1024x1024/f5f5f5/ddd" />
+        <source
+          media="xs"
+          data-srcset="https://dummyimage.com/1024x1024/f5f5f5/ddd" />
+        <noscript>
+          <img
+            class="img-fluid lazy"
+            src="https://dummyimage.com/1240{{ section.settings.aspect_ratio }}/f5f5f5/ddd">
+        </noscript>
+      </picture>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Image",
+  "class": "row jc-center ai-center py-2",
+  "templates": ["index"],
+  "blocks": [
+    {
+      "name": "Image with Buttons",
+      "type": "image",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Visibility",
+          "info": "Control the responsive visibility of the image at different screen sizes"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile",
+          "label": "Mobile",
+          "info": "Visible upto 540px",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "tablet",
+          "label": "Tablet",
+          "info": "Visible between 540px and 720px",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "desktop",
+          "label": "Desktop",
+          "info": "Visible from 720px ",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Layout and Structure",
+          "info": "Control the text content position, alignment and structure"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "label": "Content Width",
+          "info": "The maximum width which contains text and button elements.",
+          "unit": "px",
+          "min": 0,
+          "max": 1000,
+          "step": 50,
+          "default": 300
+        },
+        {
+          "type": "range",
+          "id": "gutter",
+          "label": "Spacing Gutters",
+          "info": "The X and Y spacing gutters surrounding the content",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "spacing",
+          "label": "Text Spacing",
+          "info": "The inner Y spacing between each text element",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "select",
+          "id": "position",
+          "label": "Position",
+          "default": "jc-center ai-center",
+          "options": [
+            {
+              "value": "jc-start ai-start",
+              "label": "Top Left"
+            },
+            {
+              "value": "jc-center ai-start",
+              "label": "Top Center"
+            },
+            {
+              "value": "jc-end ai-start",
+              "label": "Top Right"
+            },
+            {
+              "value": "jc-start ai-center",
+              "label": "Middle Left"
+            },
+            {
+              "value": "jc-center ai-center",
+              "label": "Middle Center"
+            },
+            {
+              "value": "jc-end ai-center",
+              "label": "Middle Right"
+            },
+            {
+              "value": "jc-start ai-end",
+              "label": "Bottom Left"
+            },
+            {
+              "value": "jc-center ai-end",
+              "label": "Bottom Center"
+            },
+            {
+              "value": "jc-end ai-end",
+              "label": "Bottom Right"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "label": "Text Alignment",
+          "default": "center",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Label 1"
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "title_color"
+        },
+        {
+          "type": "radio",
+          "id": "fw_title",
+          "label": "Font Weight",
+          "default": "fw-300",
+          "options": [
+            {
+              "value": "fw-100",
+              "label": "Light"
+            },
+            {
+              "value": "fw-300",
+              "label": "Normal"
+            },
+            {
+              "value": "fw-600",
+              "label": "Strong"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "fs_title",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "header",
+          "content": "Subtitle"
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "subtitle_color"
+        },
+        {
+          "type": "range",
+          "id": "subfs_title",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "radio",
+          "id": "subfw_title",
+          "label": "Font Weight",
+          "default": "fw-300",
+          "options": [
+            {
+              "value": "fw-100",
+              "label": "Light"
+            },
+            {
+              "value": "fw-300",
+              "label": "Normal"
+            },
+            {
+              "value": "fw-600",
+              "label": "Strong"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Caption"
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "caption_color"
+        },
+        {
+          "type": "range",
+          "id": "caption_size",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15
+        },
+        {
+          "type": "richtext",
+          "id": "caption",
+          "label": "Description"
+        },
+        {
+          "type": "header",
+          "content": "Buttons"
+        },
+        {
+          "type": "color",
+          "label": "Text Colour",
+          "id": "btn_text_color"
+        },
+        {
+          "type": "color",
+          "label": "Button Background",
+          "id": "btn_bg_color"
+        },
+        {
+          "type": "checkbox",
+          "id": "btn_shadow",
+          "label": "Button Shadow",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "btn_radius",
+          "label": "Button Radius",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "btn_size",
+          "label": "Button Size",
+          "default": "btn-md",
+          "options": [
+            {
+              "value": "btn-xs",
+              "label": "X Small"
+            },
+            {
+              "value": "btn-sm",
+              "label": "Small"
+            },
+            {
+              "value": "btn-md",
+              "label": "Medium"
+            },
+            {
+              "value": "btn-lg",
+              "label": "Large"
+            },
+            {
+              "value": "btn-xl",
+              "label": "X Large"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "btn_label_1",
+          "label": "Button Label 1"
+        },
+        {
+          "type": "url",
+          "id": "btn_url_1",
+          "label": "Button Link 1"
+        },
+        {
+          "type": "text",
+          "id": "btn_label_2",
+          "label": "Button Label 2"
+        },
+        {
+          "type": "url",
+          "id": "btn_url_2",
+          "label": "Button 2"
+        },
+        {
+          "type": "header",
+          "content": "Images",
+          "info": "Upload or choose desktop and mobile images."
+        },
+        {
+          "type": "select",
+          "id": "aspect_ratio",
+          "label": "Aspect Ratio",
+          "default": "x840",
+          "options": [
+            {
+              "value": "x920",
+              "label": "x920"
+            },
+            {
+              "value": "x840",
+              "label": "x840"
+            },
+            {
+              "value": "x820",
+              "label": "x820"
+            },
+            {
+              "value": "x780",
+              "label": "x780"
+            },
+            {
+              "value": "x740",
+              "label": "x740"
+            },
+            {
+              "value": "x720",
+              "label": "x720"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "desktop_image",
+          "label": "Desktop Image",
+          "info": "Dimensions: 1440x"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile Image",
+          "info": "Dimensions: 1024x1024"
+        }
+      ]
+    },
+    {
+      "name": "Image with Content",
+      "type": "image_with_content",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Visibility",
+          "info": "Control the visibility of the image in different screen sizes"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile",
+          "label": "Mobile",
+          "info": "Visible upto 540px",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "tablet",
+          "label": "Tablet",
+          "info": "Visible between 540px and 720px",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "desktop",
+          "label": "Desktop",
+          "info": "Visible from 720px ",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Layout and Structure",
+          "info": "Control the text content position, alignment and structure"
+        },
+        {
+          "type": "select",
+          "id": "position",
+          "label": "Content Position",
+          "default": "jc-center ai-center",
+          "options": [
+            {
+              "value": "jc-start ai-start",
+              "label": "Top Left"
+            },
+            {
+              "value": "jc-center ai-start",
+              "label": "Top Center"
+            },
+            {
+              "value": "jc-end ai-start",
+              "label": "Top Right"
+            },
+            {
+              "value": "jc-start ai-center",
+              "label": "Middle Left"
+            },
+            {
+              "value": "jc-center ai-center",
+              "label": "Middle Center"
+            },
+            {
+              "value": "jc-end ai-center",
+              "label": "Middle Right"
+            },
+            {
+              "value": "jc-start ai-end",
+              "label": "Bottom Left"
+            },
+            {
+              "value": "jc-center ai-end",
+              "label": "Bottom Center"
+            },
+            {
+              "value": "jc-end ai-end",
+              "label": "Bottom Right"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "label": "Text Alignment",
+          "default": "center",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "label": "Width",
+          "info": "The maximum width which contains text and button elements.",
+          "unit": "px",
+          "min": 0,
+          "max": 1000,
+          "step": 50,
+          "default": 300
+        },
+        {
+          "type": "range",
+          "id": "gutter",
+          "label": "Gutter",
+          "info": "The X and Y spacing gutters surrounding the content",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "spacing",
+          "label": "Text Gutter",
+          "info": "The inner Y spacing between each text element",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "header",
+          "content": "Title"
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "title_color"
+        },
+        {
+          "type": "range",
+          "id": "fs_title",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "checkbox",
+          "id": "title_bold",
+          "label": "Bold",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Subtitle"
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "subtitle_color"
+        },
+        {
+          "type": "range",
+          "id": "subfs_title",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "checkbox",
+          "id": "subtitle_bold",
+          "label": "Bold",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Caption"
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "caption_color"
+        },
+        {
+          "type": "range",
+          "id": "caption_size",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15
+        },
+        {
+          "type": "richtext",
+          "id": "caption",
+          "label": "Description"
+        },
+        {
+          "type": "header",
+          "content": "Link",
+          "info": "The href link location to visit when image is clicked"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "header",
+          "content": "Images",
+          "info": "Upload or choose desktop and mobile images."
+        },
+        {
+          "type": "select",
+          "id": "aspect_ratio",
+          "label": "Aspect Ratio",
+          "default": "x840",
+          "options": [
+            {
+              "value": "x920",
+              "label": "x920"
+            },
+            {
+              "value": "x840",
+              "label": "x840"
+            },
+            {
+              "value": "x820",
+              "label": "x820"
+            },
+            {
+              "value": "x780",
+              "label": "x780"
+            },
+            {
+              "value": "x740",
+              "label": "x740"
+            },
+            {
+              "value": "x720",
+              "label": "x720"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "desktop_image",
+          "label": "Desktop Image",
+          "info": "Dimensions: 1440x"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile Image",
+          "info": "Dimensions: 1024x1024"
+        }
+      ]
+    },
+    {
+      "name": "Image with Link",
+      "type": "image_link",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Visibility",
+          "info": "Control the visibility of the image in different screen sizes"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile",
+          "label": "Mobile",
+          "info": "Visible upto 540px",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "tablet",
+          "label": "Tablet",
+          "info": "Visible between 540px and 720px",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "desktop",
+          "label": "Desktop",
+          "info": "Visible from 720px ",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Link",
+          "info": "The href link location to visit when image is clicked"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "header",
+          "content": "Images",
+          "info": "Upload or choose desktop and mobile images."
+        },
+        {
+          "type": "select",
+          "id": "aspect_ratio",
+          "label": "Aspect Ratio",
+          "default": "x840",
+          "options": [
+            {
+              "value": "x920",
+              "label": "x920"
+            },
+            {
+              "value": "x840",
+              "label": "x840"
+            },
+            {
+              "value": "x820",
+              "label": "x820"
+            },
+            {
+              "value": "x780",
+              "label": "x780"
+            },
+            {
+              "value": "x740",
+              "label": "x740"
+            },
+            {
+              "value": "x720",
+              "label": "x720"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "desktop_image",
+          "label": "Desktop Image",
+          "info": "Dimensions: 1440x"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile Image",
+          "info": "Dimensions: 1024x1024"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Images",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}

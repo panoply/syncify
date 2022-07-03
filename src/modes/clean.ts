@@ -3,11 +3,11 @@ import { glob } from 'glob';
 import { dirname } from 'path';
 import { mapFastAsync } from 'rambdax';
 import { is } from 'shared/native';
-import { log } from 'cli/stdout';
+import { log } from 'cli/log';
 import * as tui from 'cli/tui';
 import * as c from 'cli/ansi';
-import { themeDirs } from 'options/dirs';
-import { bundle } from 'options';
+import { themeDirs } from '../options/dirs';
+import { bundle } from '../options/index';
 
 /**
  * Cleans Output directory
@@ -17,7 +17,10 @@ export async function clean () {
   const files = glob.sync(`${bundle.dirs.output}/**`, { nodir: true });
   const size = files.length;
 
-  if (is(size, 0)) return log.clean(tui.task(c.yellowBright('✓ output directory is clean')));
+  if (is(size, 0)) {
+
+    return log.clean(tui.task(c.yellowBright('✓ output directory is clean')));
+  }
 
   log.clean(c.yellowBright(`${c.bold('+')} cleaning ${c.bold(String(size))} files from output`));
 
@@ -40,8 +43,11 @@ export async function clean () {
   }, files);
 
   log.clean(
-    c.greenBright(`✓ removed ${c.bold(String(deleted.length))} of ${c.bold(String(size))} files`),
-    c.greenBright(`✓ cleaned ${c.bold(dirname(bundle.dirs.output) + '/**')}`)
+    `✓ removed ${c.bold(String(deleted.length))} of ${c.bold(String(size))} files`,
+    `✓ cleaned ${c.bold(dirname(bundle.dirs.output) + '/**')}`,
+    {
+      color: 'greenBright'
+    }
   );
 
   await themeDirs(bundle.cwd);

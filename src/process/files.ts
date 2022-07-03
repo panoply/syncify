@@ -57,7 +57,7 @@ export function setFile (file: Partial<IFile>, input: string, output: string) {
     let key: string;
 
     if (is(type, Type.Metafield) || is(type, Type.Page)) {
-      key = join(lastPath(file.dir).slice(1), file.base);
+      key = join(lastPath(file.dir), file.base);
       output = null;
     } else {
       key = join(namespace, file.base);
@@ -177,28 +177,5 @@ export const outputFile = (output: string) => (path: string) => {
     case 'locales': return merge('locales', Type.Locale);
     case 'assets': return merge('assets', Type.Asset);
   }
-
-};
-
-/**
- * Asset Modifier
- *
- * Handler function for a content modifier
- * callback that one can optionally execute
- * from within scripts.
- */
-export const isAsset = (file: IFile, data: Buffer | string | object | any[], cb: typeof Syncify.hook) => {
-
-  if (typeof cb !== 'function') return data.toString();
-
-  const update = cb.call({ ...file }, data);
-
-  if (isUndefined(update)) return data;
-
-  if (/\.(liquid|html|json|js|css|scss|sass|txt|svg)/.test(file.ext)) {
-    return update.toString();
-  }
-
-  return data.toString();
 
 };

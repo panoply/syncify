@@ -2,7 +2,108 @@
 /* LOGGER                                       */
 /* -------------------------------------------- */
 
-type Log = (...message: string[]) => void
+import { LiteralUnion } from 'type-fest';
+
+/**
+ * TUI Tree
+ */
+export type Logger = [
+  /**
+   * `0` TUI Crown
+   *
+   * `┌─`
+   *
+   * Prints an opening log line
+   */
+  (message: string) => void,
+  /**
+   * `1` TUI Trunk
+   *
+   * `│`
+   *
+   * Prints a single level line
+   */
+  (message: string) => void,
+  /**
+   * `2` TUI Branch
+   *
+   * `├─`
+   *
+   * Prints a task line
+   */
+  (message: string, space?: number) => void,
+  /**
+   * `3` TUI Twig
+   *
+   * `│ ├─`
+   *
+   * Prints a task operation idented 1 level
+   */
+  (message: string) => void,
+  /**
+   * `4` TUI Leaf
+   *
+   * `│ └─`
+   *
+   * Prints a task operation completion indent 1 level
+   */
+  (message: string) => void,
+  /**
+   * `5` TUI Root
+   *
+   * `│ └─`
+   *
+   * Prints a closing log line
+   */
+   (message: string) => void
+]
+
+interface LogOptions {
+  /**
+   * Tree level indents:
+   *
+   * 1. `┌─`
+   * 2. `│`
+   * 3. `├─`
+   * 4. `│ ├─`
+   * 5. `│ └─ `
+   * 6. `└─`
+   */
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
+  /**
+   * Whether this is the last log to be written to the
+   * tree (level 5). This is not definite, level might be
+   * changed depending on running mode.
+   */
+  last?: boolean;
+  /**
+   * Whether or not to invoke timer
+   */
+  timer?: boolean;
+  /**
+   * Log stores for later usage
+   */
+  store?: 'errors' | 'warnings';
+  /**
+   * Group title
+   */
+  group?: LiteralUnion<
+  | 'styles'
+  | 'pages'
+  | 'assets'
+  | 'sections'
+  | 'snippets'
+  | 'layout'
+  | 'template'
+  | 'customers'
+  | 'config'
+  | 'locales'
+  | 'metafields'
+  | 'redirect'
+  | 'files', string>
+}
+
+type Log = (message: string, options?: LogOptions) => void
 
 export interface IBuildLog {
   /**
@@ -51,15 +152,17 @@ export interface IBuildLog {
   metafields?: Log,
 }
 
-export interface ILog extends IBuildLog {
-  tracked?: string;
-  files?: Log,
-  vscode?: Log,
-  clean?: Log,
-  throw?: Log,
-  error?: Log,
-  print?: Log,
-  warning?: Log,
+export interface ILog {
+  (group: string, message: string): void;
+  (message: string, end?: boolean): void;
+  (...message: string[]): void;
+  stack?: { group: string; warnings: { [file: string]: Set<string>} };
+  group?: string;
+  last?: number;
+  spawn?: (...message: string[]) => void;
+  throw?: (...message: string[]) => void;
+  error?: (...message: string[]) => void;
+  warn?: (filename: string, message: string) => void;
 }
 
 /* -------------------------------------------- */

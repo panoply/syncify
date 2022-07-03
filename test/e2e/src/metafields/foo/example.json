@@ -1,0 +1,10 @@
+{
+  "example": {
+    "id": 1,
+    "names": ["foo", "bar", "baz"],
+    "quux": "example",
+    "object": {
+      "x": "xxx"
+    }
+  }
+}

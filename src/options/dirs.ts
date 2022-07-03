@@ -3,7 +3,7 @@ import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'path';
 import { PartialDeep } from 'type-fest';
 import { assign, isArray } from 'shared/native';
-import { bundle, cache } from 'options';
+import { bundle, cache } from './index';
 
 /**
  * Create Cache Directories

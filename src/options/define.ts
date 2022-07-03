@@ -8,12 +8,12 @@ import anymatch from 'anymatch';
 import { isArray, keys, is, assign } from 'shared/native';
 import { basePath, normalPath, parentPath } from 'shared/paths';
 import { authURL } from '../shared/options';
-import { logger } from 'cli/stdout';
+import { logger } from 'cli/log';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
 import { iconOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
 import { terserOptions } from './terser';
-import { bundle, update, defaults, cache } from 'options';
+import { bundle, update, defaults, cache } from './index';
 
 /**
  * Resolve Paths
@@ -48,28 +48,11 @@ export async function define (cli: ICLICommands) {
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
-  logger([
-    'assets',
-    'clean',
-    'metafields',
-    'pages',
-    'styles',
-    'locales',
-    'print',
-    'snippets',
-    'sections',
-    'layout',
-    'config',
-    'templates',
-    'templates/customers',
-    'throw',
-    'error'
-  ]);
-
   return Promise.allSettled(
     [
       caches(cli.cwd),
       getStores(cli, config),
+      logger(),
       baseDirs(config),
       themeDirs(bundle.dirs.output),
       importDirs(bundle),
@@ -86,11 +69,7 @@ export async function define (cli: ICLICommands) {
 
 function modes (cli: ICLICommands) {
 
-  const resource = anyTrue(
-    cli.pages,
-    cli.metafields,
-    cli.redirects
-  );
+  const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
 
   return {
     vsc: cli.vsc,
@@ -101,11 +80,32 @@ function modes (cli: ICLICommands) {
     prompt: cli.prompt,
     pull: cli.pull,
     push: cli.push,
-    clean: anyTrue(resource, cli.upload) ? false : cli.clean,
-    build: anyTrue(resource, cli.upload, cli.watch, cli.download) ? false : cli.build,
-    watch: anyTrue(resource, cli.upload, cli.download) ? false : cli.watch,
-    upload: anyTrue(resource, cli.download, cli.watch) ? false : cli.upload,
-    download: anyTrue(resource, cli.upload, cli.watch, cli.build) ? false : cli.download
+    clean: anyTrue(
+      resource,
+      cli.upload
+    ) ? false : cli.clean,
+    build: anyTrue(
+      resource,
+      cli.upload,
+      cli.watch,
+      cli.download
+    ) ? false : cli.build,
+    watch: anyTrue(
+      resource,
+      cli.upload,
+      cli.download
+    ) ? false : cli.watch,
+    upload: anyTrue(
+      resource,
+      cli.download,
+      cli.watch
+    ) ? false : cli.upload,
+    download: anyTrue(
+      resource,
+      cli.upload,
+      cli.watch,
+      cli.build
+    ) ? false : cli.download
   };
 }
 
@@ -299,11 +299,14 @@ export async function getPaths (config: IConfig) {
 
     if (key === 'customers') {
 
-      uri = has(key, config.paths)
-        ? isArray(config.paths[key])
-          ? (config.paths[key] as string[]).map(path)
-          : [ path(config.paths[key]) ]
-        : [ path('templates/customers') ];
+      uri = has(key, config.paths) ? isArray(config.paths[key])
+        ? (config.paths[key] as string[]).map(path)
+        : [
+          path(config.paths[key])
+        ]
+        : [
+          path('templates/customers')
+        ];
 
     } else if (has(key, config.paths)) {
 

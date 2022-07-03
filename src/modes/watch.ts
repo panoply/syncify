@@ -8,17 +8,16 @@ import { styles } from 'transform/styles';
 import { compile as asset } from 'transform/asset';
 import { compile as json } from 'transform/json';
 // import { compile as pages } from 'transform/pages';
-import { logger } from '../cli/stdout';
 import { is, isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
-import { bundle } from 'options';
+import { bundle } from '../options/index';
 
 /**
  * Watch Function
  *
  * Sync in watch mode
  */
-export function watch (callback: typeof Syncify.hook) {
+export function watch (callback: Syncify) {
 
   const request = client(bundle.sync);
   const parse = parseFile(bundle.paths, bundle.dirs.output);
@@ -30,8 +29,6 @@ export function watch (callback: typeof Syncify.hook) {
     binaryInterval: 100,
     ignored: [ '*.map' ]
   });
-
-  // logger(bundle.spawn);
 
   watcher.on('all', async function (event, path) {
 
@@ -47,7 +44,7 @@ export function watch (callback: typeof Syncify.hook) {
 
         if (file.type === Type.Style) {
 
-          value = await styles(file as IFile<IStyle>);
+          value = await styles(file as IFile<IStyle>, callback);
 
         } else if (file.type === Type.Section || file.type === Type.Layout || file.type === Type.Snippet) {
 
@@ -61,7 +58,7 @@ export function watch (callback: typeof Syncify.hook) {
 
           value = await json(file, callback);
 
-          return request.metafields('put', { value, namespace: file.namespace, key: file.key });
+          return request.metafields({ value, namespace: file.namespace, key: file.key });
 
         } else if (file.type === Type.Template) {
 
@@ -90,7 +87,7 @@ export function watch (callback: typeof Syncify.hook) {
 
       } catch (error) {
 
-        throw new Error(error);
+        console.error(error);
 
       }
 

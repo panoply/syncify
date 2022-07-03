@@ -1,11 +1,10 @@
-import { IRequest, IThemes, IFile } from 'types';
+import { Request, IThemes, IFile } from 'types';
 import { queue, axios } from 'requests/queue';
 import { is } from 'shared/native';
-import { log, print } from 'cli/stdout';
-import { liquidPretty } from 'cli/parse';
-import * as tui from 'cli/tui';
-import * as c from 'cli/ansi';
-import { AxiosError } from 'axios';
+import { log, c } from 'cli/log';
+// import { liquidPretty } from 'cli/parse';
+
+import { AxiosError, AxiosRequestConfig } from 'axios';
 
 /* -------------------------------------------- */
 /* PRIVATE                                      */
@@ -18,7 +17,7 @@ import { AxiosError } from 'axios';
  * REST endpoint. When request rates are exceeded
  * the handler will re-queue them.
  */
-export async function get (url: string, config: IRequest) {
+export async function get <T> (url: string, config: AxiosRequestConfig<Request>): Promise<T> {
 
   return axios.get(url, config).then(({ data }) => {
 
@@ -41,7 +40,7 @@ let limit: number;
  * REST endpoint. When request rates are exceeded
  * the handler will re-queue them.
  */
-export async function assets (sync: IThemes, file: IFile, config: IRequest) {
+export async function sync (theme: IThemes, file: IFile, config: Request) {
 
   if (queue.concurrency > 1) {
 
@@ -58,9 +57,9 @@ export async function assets (sync: IThemes, file: IFile, config: IRequest) {
 
     if (config.method === 'get') return data;
     if (config.method === 'delete') {
-      log.print(sync.store, sync.target);
+      log(theme.store, { level: 2 });
     } else {
-      print(tui.task(`${c.green('✓')} ${c.greenBright(file.key)}`));
+      log(file.base, { level: 5 });
     }
 
     limit = parseInt(headers['x-shopify-shop-api-call-limit'].slice(0, 2), 10);
@@ -69,10 +68,10 @@ export async function assets (sync: IThemes, file: IFile, config: IRequest) {
 
     // if (!sync.queue) return error(file.key, e.response);
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
-      print(tui.task(`${c.orange('↻')} ${c.orange(file.key)}`));
-      queue.add(() => assets(sync, file, config));
+      log(`${c.orange('↻')} ${c.orange(file.key)}`, { level: 5 });
+      queue.add(() => sync(theme, file, config));
     } else {
-      print(tui.task(`${c.red('𐄂')} ${c.redBright(file.key)}`));
+      log(`${c.red('𐄂')} ${c.redBright(file.key)}`, { level: 5 });
       console.log(e.response.data);
     //  error(file.key, e.response);
     }

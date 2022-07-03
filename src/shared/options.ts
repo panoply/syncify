@@ -99,7 +99,7 @@ export function renameFile (src: string, rename?: string) {
   let name = rename;
 
   // Get the filename (remember we flattened this earlier)
-  const dir = lastPath(src).slice(1);
+  const dir = lastPath(src);
 
   // file input extension
   const ext = extname(src);
@@ -107,6 +107,8 @@ export function renameFile (src: string, rename?: string) {
   // Get the filename (remember we flattened this earlier)
   const file = basename(src, ext);
 
+  // TODO
+  // FIX THE .css EXTENSION HARDCODE
   if (isUndefined(rename)) return { dir, ext, file, name: file + '.css' };
 
   if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);

@@ -170,13 +170,14 @@ export const sassPetty = (message: string, span: SourceSpan, stack: string) => {
 
   }
 
-  const res = c.line('│ ') + '\n' + (
+  const res = (
     c.yellowBright(`${message.slice(0, at)}`) +
     c.gray(`${code}\n`) +
     sassStack(stack)
-  ).replace(/^/gm, c.line('│ '));
+  ).replace(/^(?!\s*│)/gm, c.line('│ '));
 
   return res;
+
 };
 
 /**

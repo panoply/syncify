@@ -51,3 +51,7 @@ $ pnpm test:gulp            Tests gulp in watch mode using syncify spawned child
 ### Utilities Test
 
 Within spawned config files Syncify utility helpers are applied. Each command
+
+# Directories
+
+Contained within the `source` directory exists multiple sub-directories, each of which contains basic files that syncify understands and can build with.

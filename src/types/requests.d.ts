@@ -14,7 +14,7 @@ export type Client = (method: Methods, file: IFile, content?: string) => Promise
 /**
  * Resources
  */
-export type Resource = 'build' | 'watch' | 'upload' |'download' | 'interactive'
+export type Resource = 'build' | 'watch' | 'upload' |'download'
 
 /**
  * Chokidor Event Names
@@ -43,7 +43,7 @@ export type GetAsset = (
 /**
  * Return response for Shopify theme assets
  */
-export interface IGetAssets {
+export interface IAssetResource {
   /**
    * The asset path
    */
@@ -88,31 +88,77 @@ export interface IGetAssets {
   value?: string;
 }
 
+export interface IAsset {
+  /**
+   * The asset path
+   */
+  key?: string;
+  /**
+   * Base64 Encoded File
+   */
+  attachment?: string;
+  /**
+   * Value file string
+   */
+  value?: string;
+  /**
+   * The date and time (ISO 8601 format) when the
+   * asset was created.
+   */
+  created_at?: string;
+   /**
+    * The date and time (ISO 8601 format) when an
+    * asset was last updated.
+    */
+  updated_at?: string;
+  /**
+   * The MIME representation of the content, consisting
+   * of the type and subtype of the asset.
+   */
+  content_type?: string;
+  /**
+   * The asset size in bytes.
+   */
+  size?: number;
+  /**
+   * The MD5 representation of the content, consisting of a
+   * string of 32 hexadecimal digits. May be null if an asset
+   * has not been updated recently.
+   */
+  checksum?: string;
+  /**
+   * The ID for the theme that an asset belongs to.
+   */
+  theme_id?: number;
+}
+
 export namespace Requests {
+
+  /**
+   * Return response for Shopify theme asset resources
+   */
+  export interface Assets {
+    /**
+     * The assets resource
+     */
+    assets: IAssetResource[]
+  }
 
   /**
    * The request body for Shopify theme assets
    */
-  export interface IAsset {
+  export interface Asset {
     /**
-     * The asset path
+     * The theme asset
      */
-    key?: string,
-    /**
-     * Base64 Encoded File
-     */
-    attachment?: string
-    /**
-     * Value file string
-     */
-    value?: string
+    asset: IAsset
   }
 
   /* -------------------------------------------- */
   /* PAGES                                        */
   /* -------------------------------------------- */
 
-  export interface IPage {
+  export interface Page {
     author?: string;
     body_html?: string;
     created_at?: string;
@@ -138,7 +184,7 @@ export namespace Requests {
   /**
    * The request body for Shopify metafields
    */
-  export interface IMetafield {
+  export interface Metafield {
     /**
      * The metafield ID
      */
@@ -173,7 +219,7 @@ export namespace Requests {
   /* REDIRECTS                                    */
   /* -------------------------------------------- */
 
-  export interface IRedirect {
+  export interface Redirect {
     /**
      * Redirect ID
      */
@@ -188,7 +234,7 @@ export namespace Requests {
     target?: string;
   }
 
-  export interface IFile {
+  export interface File {
     /**
      * File ID
      */
@@ -217,14 +263,14 @@ export namespace Requests {
  * uploading, downloading or interfacing with the Shopify
  * API themes, metafields or other endpoints.
  */
-export interface IRequest extends AxiosRequestConfig {
+export interface Request extends AxiosRequestConfig {
   url?: string;
   method?: Methods;
   responseType?: 'json',
   data?: (
-    { asset?: Requests.IAsset } |
-    { metafield?: Requests.IMetafield } |
-    { redirect?: Requests.IRedirect }
+    Requests.Asset |
+    { metafield?: Requests.Metafield } |
+    { redirect?: Requests.Redirect }
   )
   params?: {
     'asset[key]'?: string;

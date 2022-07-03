@@ -1,6 +1,6 @@
 
 export default {
-  input: 'source',
+  input: 'src',
   output: 'theme',
   export: 'export',
   import: 'import',
@@ -25,10 +25,15 @@ export default {
   ],
   paths: {
     assets: 'assets/**/*',
-    config: 'json/config/*.json',
-    locales: 'json/locales/*.json',
-    layout: 'views/theme.liquid',
-    sections: 'views/sections/**/*.liquid',
+    config: 'config/*.json',
+    locales: 'locales/*.json',
+    layout: [
+      'views/theme.liquid',
+      'views/layouts/*.liquid'
+    ],
+    sections: [
+      'views/sections/**/*.liquid'
+    ],
     metafields: 'metafields/**/*.json',
     customers: [
       'views/customers/*.json',
@@ -44,8 +49,7 @@ export default {
     ],
     snippets: [
       'views/snippets/*.liquid',
-      'scripts/vars.js.liquid',
-      'styles/vars.css.liquid'
+      'styles/snippet.css.liquid' // LETS TEST AN EXTERNAL LINKED FILE
     ]
   },
   spawn: {
@@ -55,7 +59,7 @@ export default {
     watch: {
       rollup: 'rollup -c config/rollup.config.js -w',
       webpack: 'webpack --watch --color --config config/webpack.config.js',
-      esbuild: 'esbuild source/js/dir/foo.js --outfile=theme/assets/out.js --bundle --watch --color=true'
+      esbuild: 'esbuild src/ts/dir/foo.js --outfile=theme/assets/esbuild-bundle.js --bundle --watch --color=true'
     }
   },
   transforms: {
@@ -91,7 +95,7 @@ export default {
       vscodeCustomData: false,
       inlined: [
         {
-          input: [ 'svg/inline/*.svg' ],
+          input: [ 'icons/inlined/*.svg' ],
           rename: 'icon.[file]',
           snippet: true,
           svgo: true
@@ -99,8 +103,22 @@ export default {
       ],
       sprites: [
         {
-          input: 'svg/sprite/*.svg',
+          input: 'icons/sprites/feather/*.svg',
           rename: 'icons.liquid',
+          svgo: true,
+          snippet: true,
+          options: {
+            dimensionAttributes: true,
+            namespaceClassnames: true,
+            namespaceIDS: false,
+            rootAttributes: {
+              id: 'foo'
+            }
+          }
+        },
+        {
+          input: 'icons/sprites/social/*.svg',
+          rename: 'social-icons.liquid',
           svgo: true,
           snippet: true,
           options: {
@@ -114,35 +132,35 @@ export default {
         }
       ]
     },
+    scripts: [
+
+    ],
     styles: [
       {
-        input: 'styles/stylesheet.scss',
-        snippet: false,
-        rename: '[file].min.css',
+        input: 'styles/scss/snippet.scss',
+        snippet: true,
+        rename: '[file]-[dir].min.css', // TEST dir RENAME
         postcss: true,
         watch: [
-          'styles/**/*.scss'
+          'styles/**/*.scss' // COMPILE ON ANY CHANGES
         ],
         sass: {
-          warnings: false,
+          warnings: false, // NO WARNINGS
           sourcemap: true,
-          style: 'compressed',
-          include: [
-            'node_modules/'
-          ]
+          style: 'compressed'
         }
       },
       {
-        input: 'scss/index.scss',
+        input: 'styles/scss/index.scss',
         snippet: false,
         rename: 'main.min.css',
         watch: [
-          '!scss/bootstrap.scss',
-          'scss/dir/*.scss'
+          '!scss/bootstrap.scss', // EXCLUDE TEST
+          'scss/dir/*.scss' // COMPILE ON CHANGES IN dir FOLDER
         ]
       },
       {
-        input: 'scss/bootstrap.scss',
+        input: 'styles/scss/bootstrap.scss', // BOOTSTRAP FRAMEWORK
         snippet: false,
         sass: {
           warnings: true,
@@ -154,17 +172,17 @@ export default {
         }
       },
       {
-        input: 'css/styles/one.css',
-        rename: 'example.[ext]',
-        snippet: false,
+        input: 'styles/css/snippet.css', // COMPILE THIS FILE ONLY
+        rename: 'example-[file].[ext]', // RENAME TEST
+        snippet: true, // WE WILL GENERATE A SNIPPET
         watch: [
-          'css/**/*.css'
+          'styles/css/**/*.css' // COMPILE ON ANY CHANGE
         ]
       },
       {
         input: [
-          'scss/base/*.scss',
-          'scss/independent/*.scss'
+          'styles/css/*.css', // COMPILES base.css AND stylesheet.css
+          '!styles/css/snippet.css' // EXCLUDE TEST
         ],
         rename: '[dir]-[file]'
       }
@@ -175,8 +193,10 @@ export default {
     html: 'prod',
     pages: 'prod',
     rules: {
-      minifyJS: false,
-      minifyCSS: true,
+      minifyJS: false, // MUST BE FALSE - A WARNING WILL SHOW
+      minifyCSS: false, // MUST BE FALSE - A WARNING WILL SHOW
+      sortAttributes: false, // MUST BE FALSE - A WARNING WILL SHOW
+      sortClassName: false, // MUST BE FALSE - A WARNING WILL SHOW
       caseSensitive: false,
       collapseBooleanAttributes: false,
       collapseInlineTagWhitespace: false,
@@ -190,8 +210,6 @@ export default {
       removeRedundantAttributes: true,
       removeScriptTypeAttributes: true,
       removeStyleLinkTypeAttributes: true,
-      sortAttributes: true,
-      sortClassName: false,
       useShortDoctype: true,
       collapseWhitespace: true,
       continueOnParseError: true,

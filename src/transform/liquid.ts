@@ -1,14 +1,13 @@
 import { minify } from 'html-minifier-terser';
 import stringify from 'fast-safe-stringify';
 import { IFile, Syncify, IHTML } from 'types';
-import * as c from 'cli/ansi';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
 import { Type } from 'process/files';
 import { is, nil } from 'shared/native';
-import { byteSize } from 'shared/shared';
-import { log } from 'cli/stdout';
-import { terser } from 'options';
+import { byteSize, byteConvert } from 'shared/shared';
+import { log, c } from 'cli/log';
+import { terser } from '../options/index';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -101,7 +100,7 @@ const removeComments = (content: string) => {
  * Minfies the contents of a `{% schema %}` tag
  * from within sections.
  */
-const minifySchema = (_file: IFile, content: string) => {
+const minifySchema = (content: string) => {
 
   if (!terser.liquid.minifyLiquidSectionSchema) return removeComments(content);
 
@@ -111,8 +110,6 @@ const minifySchema = (_file: IFile, content: string) => {
 
       const parsed = JSON.parse(data);
       const minified = stringify(parsed, null, 0);
-
-      log.print('minified JSON section schema');
 
       return minified;
 
@@ -184,7 +181,10 @@ const transform = (file: IFile) => async (data: string) => {
     return data;
   }
 
-  const content = is(file.type, Type.Section) ? minifySchema(file, data) : removeComments(data);
+  const content = is(file.type, Type.Section)
+    ? minifySchema(data)
+    : removeComments(data);
+
   const htmlmin = await htmlMinify(content, terser.html);
 
   if (isNil(htmlmin)) {
@@ -192,12 +192,14 @@ const transform = (file: IFile) => async (data: string) => {
     return data;
   }
 
-  const postmin = removeDashes(htmlmin);
+  const postmin = removeDashes(htmlmin).replace(/^\s+/gm, nil);
 
   await writeFile(file.output, postmin);
 
-  log.print('minified liquid + html');
-  log.print(`${byteSize(postmin)}`);
+  const size = byteSize(postmin);
+
+  log(c.gray('Minified Liquid and HTML'));
+  log(c.gray(`${byteConvert(size)} (saved ${byteConvert(file.size - size)})`), true);
 
   return postmin;
 
@@ -213,7 +215,7 @@ const transform = (file: IFile) => async (data: string) => {
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export async function compile (file: IFile, cb: typeof Syncify.hook) {
+export async function compile (file: IFile, cb: Syncify) {
 
   const read = await readFile(file.input);
 
@@ -222,7 +224,7 @@ export async function compile (file: IFile, cb: typeof Syncify.hook) {
   const edit = transform(file);
   const data = read.toString();
 
-  log[file.namespace](`${c.cyan(file.key)}`);
+  log(file.namespace, c.cyan(file.key));
 
   if (!isType('Function', cb)) return edit(data);
 

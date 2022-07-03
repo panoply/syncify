@@ -37,7 +37,7 @@ export async function toHTML (content: string) {
 
 }
 
-export async function compile (file: IFile, cb: typeof Syncify.hook) {
+export async function compile (file: IFile, cb: Syncify) {
 
   const read = await readFile(file.path);
 

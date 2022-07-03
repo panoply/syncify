@@ -1,51 +1,66 @@
 import { PartialDeep } from 'type-fest';
-import { ISync } from 'types';
+import { ISync, Logger } from 'types';
 import { isEmpty, isNil, last } from 'rambdax';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
 import * as c from 'cli/ansi';
 import { toUpcase } from 'shared/shared';
 import { keys, nil, is, values } from 'shared/native';
-import { bundle } from 'options';
+import { bundle } from '../options/index';
 import * as timer from 'process/timer';
 
 /**
- * Theme Previews
- *
- * Generate an aligned list of theme preview urls
- * when we are in watch mode.
+ * Shortcut to console log
  */
-function previews (sync: PartialDeep<ISync>) {
+const { log } = console;
 
-  if (sync.themes.length === 0) return '';
-
-  const themes = values(sync.themes);
-  const width = themes.reduce((size, { target }) => (
-    target.length > size
-      ? target.length
-      : size
-  ), 0);
-
-  const urls = themes.map(({
-    id,
-    store,
-    target
-  }) => (
-    c.line('│ ') + ' '.repeat(width - target.length) + c.pink.bold(target) + ': ' +
-    c.gray('https://' + store + '?preview_theme_id=' + id)
-  ));
-
-  return (
-    c.line('│') +
-    ' Previews:\n' +
-    c.line('│') + '\n' +
-    urls.join('\n') + '\n'
-  );
-
-};
+const crown = c.line('┌─ ');
+const trunk = c.line('│ ');
+const branch = c.line('├─ ');
+const twig = c.line('│  ├─ ');
+const leaf = c.line('│  └─ ');
+const root = c.line('└─ ');
+/**
+ * TUI Tree
+ *
+ * Tree line logging generator. This array list of
+ * functions are used print information to the console
+ *
+ * Branches:
+ *
+ * - `0` `┌─`
+ * - `1` `│`
+ * - `2` `├─`
+ * - `3` `│ ├─`
+ * - `4` `│ └─ `
+ * - `5` `└─`
+ */
+export const tree: Logger = [
+  (message: string) => {
+    log('\n' + crown + c.pink.bold(toUpcase(message)));
+  },
+  (message: string) => {
+    log(trunk + message);
+  },
+  (message: string, space: number) => {
+    space !== 2 ? log(trunk + '\n' + branch + message) : log(branch + message);
+  },
+  (message: string) => {
+    log(twig + message);
+  },
+  (message: string) => {
+    log(leaf + message);
+  },
+  (message: string) => {
+    log(trunk + '\n' + root + c.pink.bold(toUpcase(message)));
+  }
+];
 
 /**
- * Header - Prints a small overview of runing resource
+ * Header
+ *
+ * Prints a small overview of runing resource, all operations
+ * initialize with the header.
  *
  * ```
  * ┌─ Syncify v0.1.0.beta
@@ -73,36 +88,41 @@ export function header () {
 
   const stores = c.cyan.bold(String(SL)) + (SL > 1 ? ' stores' : ' store');
   const themes = c.cyan.bold(String(TL)) + (TL > 1 ? ' themes' : ' theme');
-  const env = bundle.dev ? c.cyan.bold('Development') : c.cyan.bold('Production');
+  const env = c.reset.gray(`(${c.gray(bundle.dev ? 'development' : 'production')})`);
 
   let running: string;
   let heading: string;
 
-  if (bundle.mode.build) running = 'build';
-  else if (bundle.mode.watch) running = 'watch';
-  else if (bundle.mode.upload) running = 'upload';
-  else if (bundle.mode.download) running = 'download';
-  else if (bundle.mode.vsc) running = 'vscode generation';
+  if (bundle.mode.build) {
+    running = c.bold(`Build Mode ${env}`);
+  } else if (bundle.mode.watch) {
+    running = c.bold(`Watch Mode ${env}`);
+  } else if (bundle.mode.upload) {
+    running = c.bold('Uploading');
+  } else if (bundle.mode.download) {
+    running = c.bold('Download');
+  } else if (bundle.mode.vsc) {
+    running = c.bold(`VSCode (${c.bold.gray('generation')})`);
+  } else if (bundle.mode.clean) {
+    running = c.bold('Cleaning');
+  } else if (bundle.mode.export) {
+    running = c.bold('Exporting');
+  }
 
-  heading = '\n' + (
-    c.line('┌─ ') + c.pink.bold('Syncify ') + c.gray('<!version!>') + '\n' +
-    c.line('│ ') + '\n' +
-    c.line('│ ') + env + c.line('\n│\n') +
-    c.line('│ ') + 'Running ' + c.cyan.bold(running) + ' mode' + '\n'
+  heading = (
+    `${crown + c.pink.bold('Syncify')} ${c.gray('v<!version!>')}\n${trunk}\n` +
+    `${trunk}${running}\n${trunk}\n`
   );
 
-  if (SL > 0 && TL > 0) {
-    heading += c.line('│ ') + 'Syncing to ' + stores + ' and ' + themes + '\n';
-  }
+  if (SL > 0 && TL > 0) heading += `${trunk}Syncing ${themes} to ${stores}\n`;
 
   if (!bundle.mode.upload) {
     if (!isNil(bundle.spawn)) {
-      const size = keys(bundle.spawn).length;
-      const spawned = c.cyan.bold(String(size)) + (size > 1 ? ' child processes' : ' child process');
-      heading += c.line('│') + ' Spawned ' + spawned + '\n' + c.line('│') + '\n';
+      const s = keys(bundle.spawn).length;
+      heading += `${trunk}Spawned ${c.cyan.bold(`${s}`)} child ${s > 1 ? 'processes' : 'process'}\n${trunk}`;
     }
   } else {
-    heading += newline();
+    heading += trunk;
   }
 
   return (
@@ -115,9 +135,36 @@ export function header () {
 
 };
 
+/**
+ * Theme Previews
+ *
+ * Generate an aligned list of theme preview urls
+ * when we are in watch mode.
+ */
+function previews (sync: PartialDeep<ISync>) {
+
+  if (sync.themes.length === 0) return nil;
+
+  const themes = values(sync.themes);
+  const width = themes.reduce((size, { target }) => (target.length > size ? target.length : size), 0);
+  const urls = themes.map(({ id, store, target }) => (
+    trunk + ' '.repeat(width - target.length) + c.whiteBright(toUpcase(target)) + ': ' +
+    c.underline.gray('https://' + store + '?preview_theme_id=' + id)
+  ));
+
+  return `${trunk}\n${trunk}${c.bold('Theme Previews:')}\n${trunk}\n${urls.join('\n')}\n${trunk}`;
+
+};
+
 let tracer: string = '';
 
-export function fixed (group: string) {
+/**
+ * Summary Report
+ *
+ * Generates a small summary after a build has completed
+ * that prints execution time and resource
+ */
+export function summary (group: string) {
 
   if (bundle.mode.build) {
 
@@ -128,21 +175,24 @@ export function fixed (group: string) {
     );
 
     return '\n' + (
-      c.line('┌─ ') + c.pink.bold('Building ' + toUpcase(group)) + c.gray(' syncify <!version!>') + '\n' +
+      c.line('┌─ ') + c.pink.bold(toUpcase(group)) + c.gray(' syncify <!version!>') + '\n' +
       c.line('│ ') + '\n' + tracer +
       c.line('│ ') + '\n'
     );
   }
 
   return '\n' + (
-    c.line('┌─ ') + c.pink.bold('Building ' + toUpcase(group)) + c.gray(' syncify <!version!>') + '\n' +
+    c.line('┌─ ') + c.pink.bold(toUpcase(group)) + c.gray(' syncify <!version!>') + '\n' +
     c.line('│ ') + '\n'
   );
 
 }
 
 /**
- * Prepend Line to stdout
+ * Spawned Processes
+ *
+ * Logging interface for spawned running operations. Syncify
+ * attempts to normalize the output of spawned processes (to some degree).
  *
  * ```
  * │ lorem ipsum lorem ipsum
@@ -222,7 +272,7 @@ export function spawn (message: string) {
  */
 export function title (title: string) {
 
-  timer.start();
+  if (title !== 'warning' && title !== 'error') timer.start();
 
   return `${c.line('│')}\n${c.line('├─')} ${c.bold(toUpcase(title))}\n${c.line('│')}\n`;
 
@@ -235,7 +285,7 @@ export function title (title: string) {
  */
 export function newline (amount = 1) {
 
-  return `${c.line('│')}\n`.repeat(amount);
+  return log(`${c.line('│')}`.repeat(amount));
 
 }
 
@@ -250,26 +300,8 @@ export function task (stdout: string) {
 
 }
 
-/**
- * Message - Prints the executed task/operation
- *
- * - ` ├ ` When passing `indent` option a `true` value (a single space before is applied)
- * - ` └ ` When passing `indent` and `ender` options a `true` value
- * - ` ├ ` When passing no options (the default)
- */
-export function message (stdout: string, { indent = false, ender = false }) {
+export function warn (stdout: string) {
 
-  return `${c.line(indent && ender ? '│  └─ ' : indent ? '│  ├─ ' : '├─  ')}${stdout}\n`;
-
-}
-
-/**
- * Footer - Printed as the very bottom
- *
- * `└─ message`
- */
-export function footer (stdout: string) {
-
-  return `${c.line('│')}\n${c.line('└─')} ${c.pink.bold(stdout)} \n\n`;
+  return log(`${trunk}${c.yellowBright.bold('(!) ' + stdout)}`);
 
 }

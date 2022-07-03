@@ -9,7 +9,7 @@ import { assign, is } from 'shared/native';
 import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
 import * as c from 'cli/ansi';
-import { log } from 'cli/stdout';
+import { log } from 'cli/log';
 
 /**
  * Write Metafields
