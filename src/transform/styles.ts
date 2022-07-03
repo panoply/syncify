@@ -27,31 +27,28 @@ export const processer = (config: any) => {
 
 };
 
-function write (file: IFile, cb: Syncify) {
+function write (file: IFile<IStyle>, cb: Syncify) {
 
   const scope = isFunction(cb) ? { ...file } : false;
 
-  return function (data: string) {
+  return async function (data: string) {
 
     if (isNil(data)) return null;
 
     let content: string;
 
     if (scope !== false) {
-
       const update = cb.apply({ ...file }, Buffer.from(data));
-
       if (isUndefined(update) || update === false) {
-        writeFile(file.output, data, (e) => e ? console.log(e) : null);
         content = data;
       } else if (isString(update) || isBuffer(update)) {
-        writeFile(file.output, update, (e) => e ? console.log(e) : null);
         content = update;
       }
     } else {
-      writeFile(file.output, data, (e) => e ? console.log(e) : null);
       content = data;
     }
+
+    writeFile(file.output, data, (e) => e ? console.log(e) : null);
 
     log(c.white(basename(file.output)), true);
 

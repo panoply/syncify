@@ -1,8 +1,8 @@
 import { IFile, IStyle } from 'types';
 import { join, dirname, basename } from 'path';
 import { defineProperty, isRegex, isUndefined } from 'shared/native';
-import { transform } from '../options/index';
-import { parentPath } from 'shared/paths';
+import { transform, bundle } from '../options/index';
+import { lastPath, parentPath } from 'shared/paths';
 
 /**
  * Style Context
@@ -26,7 +26,11 @@ export function style (file: IFile<IStyle>) {
   }
 
   if (file.config.rename !== basename(file.output)) {
-    file.output = join(parentPath(file.output), file.config.rename);
+    if (config.snippet) {
+      file.output = join(bundle.dirs.output, file.key);
+    } else {
+      file.output = join(parentPath(file.output), file.config.rename);
+    }
   }
 
   return file;
@@ -45,7 +49,8 @@ export function section (file: IFile) {
       if (transform.sections.global.test(file.input)) return file;
     }
 
-    const rename = file.namespace + transform.sections.prefixSeparator + file.base;
+    const rename = lastPath(file.input) + transform.sections.prefixSeparator + file.base;
+
     file.key = join(file.namespace, rename);
     file.output = join(dirname(file.output), rename);
   }
