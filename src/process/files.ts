@@ -105,7 +105,7 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
       return merge('templates/customers', Type.Template);
     }
 
-  } else if (/\.(?:md|html)/.test(file.ext)) {
+  } else if (file.ext === '.md' || file.ext === '.html') {
 
     return merge('pages', Type.Page);
 
@@ -122,7 +122,7 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
     } else if (paths.customers(path)) {
       return merge('templates/customers', Type.Template);
     }
-  } else if (/\.(?:css|scss|sass)/.test(file.ext)) {
+  } else if (file.ext === '.css' || file.ext === '.scss' || file.ext === '.scss') {
     return context.style(merge('assets', Type.Style));
   } else if (paths.assets(path)) {
     return merge('assets', Type.Asset);

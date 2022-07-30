@@ -1,18 +1,19 @@
 
 import { anyTrue, isNil, has, uniq, includes } from 'rambdax';
 import { join } from 'path';
-import { ICLICommands, IConfig, IPackage } from 'types';
+import { ICLICommands, IConfig, IPackage, IBundle } from 'types';
 import { pathExists, readJson } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
 import { isArray, keys, is, assign } from 'shared/native';
 import { basePath, normalPath, parentPath } from 'shared/paths';
 import { authURL } from '../shared/options';
-import { logger } from 'cli/log';
+import { log } from 'cli/logger';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
 import { iconOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
 import { terserOptions } from './terser';
+import { spawned } from 'cli/spawn';
 import { bundle, update, defaults, cache } from './index';
 
 /**
@@ -23,6 +24,8 @@ import { bundle, update, defaults, cache } from './index';
  * directory.
  */
 export async function define (cli: ICLICommands) {
+
+  log.clear();
 
   const mode = modes(cli);
   const pkg = await pkgJson(cli.cwd);
@@ -52,9 +55,10 @@ export async function define (cli: ICLICommands) {
     [
       caches(cli.cwd),
       getStores(cli, config),
-      logger(),
       baseDirs(config),
+      log.open(),
       themeDirs(bundle.dirs.output),
+      setSpawns(bundle.spawn),
       importDirs(bundle),
       getPaths(config),
       sectionOptions(config),
@@ -67,6 +71,13 @@ export async function define (cli: ICLICommands) {
 
 };
 
+/**
+ * Define Mode
+ *
+ * Identifies the execution modes which Syncify should
+ * invoke. Validates the CLI flags and options to determine
+ * the actions to be run.
+ */
 function modes (cli: ICLICommands) {
 
   const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
@@ -112,14 +123,12 @@ function modes (cli: ICLICommands) {
 /**
  * Cache Maps
  *
- * Resolves the cache mapping records, which should
+ * Resolves the cache mapping records, which will
  * exist within the `node_modules/.syncify` directory.
  * This file holds important information about the users
  * project. If no maps are found, they will be generated.
  *
- * > The cache maps are generated via `postinstall` and
- * should exists, if they don't, this function will simply
- * trigger that construction.
+ * > The cache maps are generated via `postinstall`
  */
 async function caches (cwd: string) {
 
@@ -156,7 +165,7 @@ async function getConfig (pkg: IPackage) {
  * Resolve Stores
  *
  * Resolves Shopify stores and themes from the `package.json`
- * file and the `.env` file locations relative to the current
+ * and `.env` file locations relative to the current
  * working directory.
  */
 export async function getStores (cli: ICLICommands, config: IConfig) {
@@ -226,7 +235,7 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
  * Base Directories
  *
  * Generates the base directory paths. The function
- * also normalizes paths to ensure the mapping are
+ * also normalizes paths to ensure the mapping is
  * correct.
  */
 function baseDirs (config: IConfig) {
@@ -299,18 +308,17 @@ export async function getPaths (config: IConfig) {
 
     if (key === 'customers') {
 
-      uri = has(key, config.paths) ? isArray(config.paths[key])
-        ? (config.paths[key] as string[]).map(path)
-        : [
-          path(config.paths[key])
-        ]
-        : [
-          path('templates/customers')
-        ];
+      uri = has(key, config.paths)
+        ? isArray(config.paths[key])
+          ? (config.paths[key] as string[]).map(path)
+          : [ path(config.paths[key]) ]
+        : [ path('templates/customers') ];
 
     } else if (has(key, config.paths)) {
 
-      uri = isArray(config.paths[key]) ? config.paths[key].map(path) : [ path(config.paths[key]) ];
+      uri = isArray(config.paths[key])
+        ? config.paths[key].map(path)
+        : [ path(config.paths[key]) ];
 
       if (key === 'assets') uri.push(join(bundle.dirs.output, 'assets/*'));
 
@@ -323,6 +331,15 @@ export async function getPaths (config: IConfig) {
     bundle.watch.push(...uri);
     bundle.paths[key] = anymatch(uri);
 
+  }
+
+}
+
+export function setSpawns (cmds: IBundle['spawn']) {
+
+  for (const spawn in cmds) {
+    const child = log.spawn(spawn);
+    spawned(spawn, child);
   }
 
 }

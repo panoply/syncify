@@ -1,25 +1,50 @@
 import { PartialDeep } from 'type-fest';
 import { ISync, Logger } from 'types';
-import { isEmpty, isNil, last } from 'rambdax';
+import { isEmpty, isNil } from 'rambdax';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
-import * as c from 'cli/ansi';
+import * as c from 'cli/colors';
 import { toUpcase } from 'shared/shared';
 import { keys, nil, is, values } from 'shared/native';
 import { bundle } from '../options/index';
 import * as timer from 'process/timer';
+import { kill } from 'cli/exit';
+import { queue } from 'requests/queue';
+import { spawns } from 'cli/spawn';
 
 /**
  * Shortcut to console log
  */
 const { log } = console;
 
+/**
+ * TUI Tree - Crown
+ *
+ * `┌─`
+ */
 const crown = c.line('┌─ ');
+
+/**
+ * TUI Tree - Trunk
+ *
+ * `│`
+ */
 const trunk = c.line('│ ');
-const branch = c.line('├─ ');
-const twig = c.line('│  ├─ ');
-const leaf = c.line('│  └─ ');
+
+/**
+ * TUI Tree - Branch
+ *
+ * `├ `
+ */
+const branch = c.line('├ ');
+
+/**
+ * TUI Tree - Root
+ *
+ * `└─`
+ */
 const root = c.line('└─ ');
+
 /**
  * TUI Tree
  *
@@ -30,31 +55,39 @@ const root = c.line('└─ ');
  *
  * - `0` `┌─`
  * - `1` `│`
- * - `2` `├─`
- * - `3` `│ ├─`
- * - `4` `│ └─ `
- * - `5` `└─`
+ * - `2` `├ `
+ * - `3` `└─`
  */
 export const tree: Logger = [
-  (message: string) => {
-    log('\n' + crown + c.pink.bold(toUpcase(message)));
-  },
-  (message: string) => {
-    log(trunk + message);
-  },
-  (message: string, space: number) => {
-    space !== 2 ? log(trunk + '\n' + branch + message) : log(branch + message);
-  },
-  (message: string) => {
-    log(twig + message);
-  },
-  (message: string) => {
-    log(leaf + message);
-  },
-  (message: string) => {
-    log(trunk + '\n' + root + c.pink.bold(toUpcase(message)));
-  }
+  (message: string) => log('\n' + crown + c.pink.bold(toUpcase(message))),
+  (message: string) => log(trunk + message),
+  (message: string) => log(branch + message),
+  (message: string) => log(trunk + '\n' + root + c.pink.bold(toUpcase(message)))
 ];
+
+kill(() => {
+
+  log('\n\n');
+
+  spawns.forEach(function (child, name) {
+    log('- ' + c.gray('pid: #' + child.pid + ' (' + name + ')' + ' process exited'));
+    child.kill();
+  });
+
+  log('\n');
+
+  queue.pause();
+  queue.clear();
+  spawns.clear();
+  process.exit(0);
+
+});
+
+export const changes = (message: string) => {
+
+  log(trunk + '\n' + root + message);
+
+};
 
 /**
  * Header
@@ -83,8 +116,19 @@ export function header () {
 
   if (bundle.mode.metafields) return '';
 
+  /**
+   * Plural Store/s
+   */
   const SL = bundle.sync.stores.length;
+
+  /**
+   * Plural Theme/s
+   */
   const TL = bundle.sync.stores.length;
+
+  /* -------------------------------------------- */
+  /* BEGIN                                        */
+  /* -------------------------------------------- */
 
   const stores = c.cyan.bold(String(SL)) + (SL > 1 ? ' stores' : ' store');
   const themes = c.cyan.bold(String(TL)) + (TL > 1 ? ' themes' : ' theme');
@@ -119,19 +163,21 @@ export function header () {
   if (!bundle.mode.upload) {
     if (!isNil(bundle.spawn)) {
       const s = keys(bundle.spawn).length;
-      heading += `${trunk}Spawned ${c.cyan.bold(`${s}`)} child ${s > 1 ? 'processes' : 'process'}\n${trunk}`;
+      heading += `${trunk}Spawned ${c.cyan.bold(`${s}`)} child ${s > 1 ? 'processes' : 'process'}\n`;
     }
   } else {
     heading += trunk;
   }
 
-  return (
+  const message = (
     bundle.mode.upload ||
     bundle.mode.download ||
     bundle.mode.build ||
     bundle.mode.clean ||
     bundle.mode.vsc
   ) ? heading : heading + previews(bundle.sync);
+
+  log(message);
 
 };
 
@@ -207,7 +253,7 @@ export function spawn (message: string) {
 
   let lines: string[];
   let stderr: string = nil;
-  let stdout: string = nil;
+  const stdout: string[] = [];
 
   if (error > 0) {
 
@@ -217,7 +263,7 @@ export function spawn (message: string) {
       basePath: bundle.cwd
     });
 
-    stderr = wrap(stderr, limit).replace(/\n/g, `\n${c.line('│')} `);
+    stderr = wrap(stderr, limit).replace(/^\s+/g, `\n${c.line('│')} `);
 
   } else {
 
@@ -227,9 +273,6 @@ export function spawn (message: string) {
 
   const size = lines.length - 1;
 
-  // remove the last line if its an empty string
-  if (isEmpty(last(lines))) lines.pop();
-
   for (let i = 0; i < size; i++) {
 
     // reset ansi syntax and ensure clean logs
@@ -237,12 +280,6 @@ export function spawn (message: string) {
 
     // break if last line is an empty string
     if (is(size, i) && isEmpty(lines[i])) break;
-
-    // strip ansi from string
-    const strip = c.strip(line);
-
-    // when spawn is rollup, omit the version title from logs
-    if (/rollup\sv[0-9.]+/.test(strip)) continue;
 
     // if line start with a single whitespace character
     if (is(line.charCodeAt(0), 32)) line = line.trimStart();
@@ -253,11 +290,11 @@ export function spawn (message: string) {
     line = wrap(line, limit).replace(/\n/g, `\n${c.line('│')} `);
 
     // prepend the dash
-    stdout += `${c.line('│')} ${line}\n`;
+    stdout.push(`${c.line('│')} ${line}`);
 
   }
 
-  return stdout + stderr + c.line('│') + '\n';
+  return `${c.line('│')}\n${stdout.join('\n')}${stderr}${c.line('│')}\n`;
 
 }
 
@@ -279,24 +316,13 @@ export function title (title: string) {
 };
 
 /**
- * Newline
+ * Logs a Newline
  *
  * `│`
  */
-export function newline (amount = 1) {
+export function newline () {
 
-  return log(`${c.line('│')}`.repeat(amount));
-
-}
-
-/**
- * Task - Prints the executed task/operation
- *
- * `├`
- */
-export function task (stdout: string) {
-
-  return `${c.line('├─')} ${stdout}\n`;
+  return log(trunk);
 
 }
 

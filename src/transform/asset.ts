@@ -1,8 +1,7 @@
 import { IFile, Syncify } from 'types';
-import * as c from 'cli/ansi';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
-import { log } from 'cli/log';
+import { log } from 'cli/logger';
 import { isFunction, isBuffer, isUndefined } from 'shared/native';
 
 /* -------------------------------------------- */
@@ -31,7 +30,7 @@ const passthrough = (file: IFile) => async (data: string) => {
  */
 export async function compile (file: IFile, cb: Syncify) {
 
-  log(file.namespace, c.cyan(file.key));
+  log.group(file.namespace).file(file.key);
 
   const copy = passthrough(file);
   const read = await readFile(file.input);

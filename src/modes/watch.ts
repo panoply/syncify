@@ -11,6 +11,7 @@ import { compile as pages } from 'transform/pages';
 import { is, isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
 import { bundle } from '../options/index';
+import { log } from 'cli/logger';
 
 /**
  * Watch Function
@@ -40,9 +41,13 @@ export function watch (callback: Syncify) {
 
       try {
 
+        log.watch();
+
         let value: string | void | { title: any; body_html: any; } = null;
 
         if (file.type === Type.Style) {
+
+          log.group('styles').file(file.base);
 
           value = await styles(file as IFile<IStyle>, callback);
 
@@ -58,15 +63,17 @@ export function watch (callback: Syncify) {
 
           value = await json(file, callback);
 
+          log.unwatch();
+
           return request.metafields({ value, namespace: file.namespace, key: file.key });
 
-        } else if (file.type === Type.Template) {
+        } else if (file.type === Type.Template && file.ext === '.json') {
 
-          if (file.ext === '.json') {
-            value = await json(file, callback);
-          } else {
-            value = await liquid(file, callback);
-          }
+          value = await json(file, callback);
+
+        } else if (file.type === Type.Template && file.ext === '.liquid') {
+
+          value = await liquid(file, callback);
 
         } else if (file.type === Type.Asset) {
 
@@ -74,9 +81,16 @@ export function watch (callback: Syncify) {
 
         } else if (file.type === Type.Page) {
 
+          log.group('pages').file(file.base);
+
           value = await pages(file as IFile<IPages>, callback);
 
-          return request.pages(value);
+          console.log(value);
+          //  log.unwatch();
+
+          return;
+
+          // return request.pages(value);
         }
 
         if (value !== null) {
@@ -85,7 +99,11 @@ export function watch (callback: Syncify) {
 
         }
 
+        log.unwatch();
+
       } catch (error) {
+
+        log.unwatch();
 
         console.error(error);
 

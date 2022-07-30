@@ -10,7 +10,7 @@ import { IBundle, ICache, IConfig, ITerser, ITransform } from 'types';
  * This model represents cache references stores
  * within the `node_modules/.syncify` directory.
  */
-export const cache = <PartialDeep<ICache>>({ /* DYNAMICALLY POPULATED */}) as ICache;
+export const cache = <PartialDeep<ICache>>({ /* DYNAMICALLY POPULATED */ }) as ICache;
 
 /**
  * Preset Configuration
@@ -226,13 +226,13 @@ export const terser: ITerser = ({
 /**
  * Patch Updates
  *
- * Merges as a reducer and patches are fed into a function
+ * Merge as a reducer and patches are fed into a function
  * and then applied to export model references. This approach
  * allows us to access configuration across the project and
  * still have update capabilities.
  */
 export const update = ({
-  bundle: (patch: PartialDeep<IBundle>) => {
+  bundle (patch: PartialDeep<IBundle>) {
 
     bundle = merge(bundle, patch);
 

@@ -4,14 +4,14 @@ import anymatch from 'anymatch';
 import { has, hasPath, includes, isNil, last } from 'rambdax';
 import { join, extname } from 'path';
 import { existsSync, mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
-import { log, c } from 'cli/log';
+import { log } from 'cli/logger';
 import { createVSCodeDir } from 'modes/vsc';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { lastPath, normalPath } from 'shared/paths';
-import * as u from 'shared/native';
-import * as style from 'transform/styles';
 import { typeError, unknownError, invalidError } from './validate';
 import { transform, bundle, cache } from './index';
+import * as u from 'shared/native';
+import * as style from 'transform/styles';
 
 /**
  * Section Options
@@ -218,7 +218,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
     if (getModules(pkg, 'postcss')) {
       style.processer(postcssconfig);
     } else {
-      log.throw('Missing "postcss" dependency');
+      log.error('Missing "postcss" dependency');
     }
   }
 
@@ -286,7 +286,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
       // Warn if input is not using sass or scss extension
       if (!/\.s[ac]ss/.test(extname(compile.input))) {
-        log(c.bold.yellow(`Input ${compile.input} is not a sass file. Consider processing it with PostCSS.`));
+        log.warn(`Input ${compile.input} is not a sass file. Consider processing it with PostCSS.`);
       }
 
       // iterate of user defined options and assign to defaults
@@ -315,7 +315,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
               // Warn when using expanded
               if (style.sass[option] === 'expanded') {
-                log(c.yellow.bold('Consider using compressed sass style for faster requests'));
+                log.warn('Consider using compressed sass style for faster requests');
               }
 
               continue;
@@ -358,7 +358,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
         // Validate the file new name.
         if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) {
-          log.throw('Invalid rename config defined on stylesheet: ' + style.rename);
+          log.error('Invalid rename config defined on stylesheet: ' + style.rename);
         }
 
         // We are dealing with a .css file
@@ -393,7 +393,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
       if (u.isArray(style.watch)) {
 
-        watch = style.watch.map(path);
+        watch = style.watch.map((path: string) => join(bundle.cwd, path));
         watch.push(compile.input);
         compile.watch = anymatch(watch);
         bundle.watch.push(...watch);
@@ -430,13 +430,17 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
       compile.rename = rename.name + '.liquid';
 
+      // We need to add stylesheet being written to snippets
+      // as ignored files to prevent repeat uploads.
+      bundle.watch.push('!' + join(bundle.cwd, config.output, 'snippets', compile.rename));
+
     } else {
 
       compile.rename = rename.name;
 
       // We need to add stylesheets being written to assets
       // as ignored files to prevent repeat uploads.
-      bundle.watch.push('!' + rename.name);
+      bundle.watch.push('!' + join(bundle.cwd, config.output, 'assets', rename.name));
     }
 
     // Lets populate the style model

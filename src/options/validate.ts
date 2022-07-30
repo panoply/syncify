@@ -1,5 +1,5 @@
 import { type } from 'rambdax';
-import * as c from 'cli/ansi';
+import * as c from 'cli/colors';
 
 export function typeError (option: string, name: string, value: any, expects: string) {
 

@@ -2,7 +2,7 @@ import { has, hasPath } from 'rambdax';
 import { IConfig } from 'types';
 import { isArray, isRegex } from 'shared/native';
 import { terser, bundle } from './index';
-import { c, tui } from 'cli/log';
+import { log, c } from 'cli/logger';
 
 /**
  * Minification Options
@@ -25,7 +25,7 @@ export function terserOptions (config: IConfig) {
       key === 'sortClassName'
     ) {
 
-      tui.warn(`Option is not allowed: '${c.gray(key)}'`);
+      log.warn(`Option is not allowed: '${c.gray(key)}'`);
 
       continue;
     }

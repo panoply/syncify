@@ -21,7 +21,7 @@ Syncify is an exceptionally fast, extensible and superior alternative Shopify [t
 - Clear, concise and informative CLI logging.
 - Supports HTML + Liquid and JSON minification.
 - An elegant directory based metafields sync approach using JSON files.
-- Built-in support for SCSS and CSS transpilation using SASS Dart and [PostCSS](https://postcss.org/).
+- Built-in support for SCSS and CSS transpilation using SASS Dart  and [PostCSS](https://postcss.org/).
 - SVG Sprite and inlined SVG snippet generation using [SVGO](https://github.com/svg/svgo).
 - Intelligent path mapping capabilities for custom theme directory structures.
 - Digests existing build tool configurations for asset transformations.

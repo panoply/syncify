@@ -1,4 +1,4 @@
-import { bold } from 'cli/ansi';
+import { bold } from 'cli/colors';
 import { isString } from './native';
 
 /**
@@ -44,6 +44,21 @@ export const convertTimer = (ms: number) => {
   const m = Math.floor(ms / 60000);
   const s = ((ms % 60000) / 1000).toFixed(0);
   return m > 0 ? (m + 'min' + (Number(s) < 10 ? '0' : '') + s) : s;
+};
+
+export const getTime = () => {
+
+  const now = new Date();
+
+  return (now.getDate() +
+  '-' +
+  (((now.getMonth() + 1) < 10) ? ('0' + (now.getMonth() + 1)) : ((now.getMonth() + 1))) +
+  '-' +
+  now.getFullYear() + ' ' +
+  now.getHours() + ':' +
+  ((now.getMinutes() < 10) ? ('0' + now.getMinutes()) : (now.getMinutes())) +
+  ':' +
+  ((now.getSeconds() < 10) ? ('0' + now.getSeconds()) : (now.getSeconds())));
 };
 
 /**

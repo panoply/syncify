@@ -43,7 +43,7 @@ export async function cacheDirs (path: string, options = { purge: false }) {
       cache[dir] = {};
     } else {
 
-      const uri = join(path, dir);
+      const uri = join(path, dir, '/');
       const has = await pathExists(uri);
 
       if (!has) {
@@ -77,8 +77,7 @@ export async function cacheDirs (path: string, options = { purge: false }) {
  * Create Theme Directories
  *
  * Generates a Shopify theme structure within the
- * provided `basePath` uri location. Optionally purge
- * by passing `true` as second parameter.
+ * provided `basePath` uri location.
  */
 export async function themeDirs (basePath: string) {
 

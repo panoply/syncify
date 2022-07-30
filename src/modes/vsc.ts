@@ -2,8 +2,7 @@ import { mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { join } from 'path';
 import { allTrue, has } from 'rambdax';
 import { IBundle } from 'types';
-import * as tui from 'cli/tui';
-import * as c from 'cli/ansi';
+import { log, c } from 'cli/logger';
 import * as timer from 'process/timer';
 
 /**
@@ -23,13 +22,13 @@ export async function createVSCodeDir (config: IBundle) {
 
 }
 
-export const vsc = async (config: IBundle, log: (...messsage: string[]) => void) => {
+export const vsc = async (config: IBundle) => {
 
   timer.start();
 
   const file = await createVSCodeDir(config);
 
-  log(tui.task(c.blueBright(`${c.bold('+')} created ${c.bold('.vscode')} directory`)));
+  log.info(c.blueBright(`${c.bold('+')} created ${c.bold('.vscode')} directory`));
 
   if (!pathExistsSync(file)) {
 
@@ -55,17 +54,9 @@ export const vsc = async (config: IBundle, log: (...messsage: string[]) => void)
       spaces: 2
     });
 
-    log(
-      tui.task(
-        c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`)
-      ),
-      tui.task(
-        c.greenBright(`✓ applied ${c.bold('JSON Schemas')} to ${c.bold('.vscode/settings.json')} file`)
-      ),
-      tui.footer(
-        c.gray('Completed Sucessfully')
-      )
-    );
+    log.info(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
+    log.info(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
+    log.info(c.gray('Completed Sucessfully'));
 
     return true;
 
@@ -105,10 +96,8 @@ export const vsc = async (config: IBundle, log: (...messsage: string[]) => void)
 
   if (allTrue(rcfile, schema)) {
 
-    log(
-      tui.task(c.yellowBright(`${c.bold('!')} JSON Schemas exists`)),
-      tui.footer(c.gray('Generation Skipped'))
-    );
+    log.info(c.yellowBright(`${c.bold('!')} JSON Schemas exists`));
+    log.info(c.gray('Generation Skipped'));
 
     return true;
   }
@@ -121,9 +110,8 @@ export const vsc = async (config: IBundle, log: (...messsage: string[]) => void)
       }
     );
 
-    log(
-      tui.task(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`))
-    );
+    log.info(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`));
+
   }
 
   if (!schema) {
@@ -135,24 +123,19 @@ export const vsc = async (config: IBundle, log: (...messsage: string[]) => void)
       }
     );
 
-    log(
-      tui.task(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`))
-    );
+    log.info(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`));
+
   }
 
   if (!has('file.associations')) settings['file.associations'] = {};
   if (!has('.syncifyrc', settings['file.associations'])) {
     settings['file.associations']['.syncifyrc'] = 'json';
-    log(
-      tui.task(
-        c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`)
-      )
-    );
+    log.info(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
   }
 
   await writeJson(file, settings);
 
-  log(tui.footer(c.gray('Completed Sucessfully')));
+  log.info(c.gray('Completed Sucessfully'));
 
   return true;
 

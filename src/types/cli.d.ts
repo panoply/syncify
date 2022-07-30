@@ -25,33 +25,15 @@ export type Logger = [
    */
   (message: string) => void,
   /**
-   * `2` TUI Branch
+   * TUI Tree - Branch
    *
-   * `├─`
-   *
-   * Prints a task line
-   */
-  (message: string, space?: number) => void,
-  /**
-   * `3` TUI Twig
-   *
-   * `│ ├─`
-   *
-   * Prints a task operation idented 1 level
+   * `├ `
    */
   (message: string) => void,
   /**
-   * `4` TUI Leaf
+   * `2` TUI Root
    *
-   * `│ └─`
-   *
-   * Prints a task operation completion indent 1 level
-   */
-  (message: string) => void,
-  /**
-   * `5` TUI Root
-   *
-   * `│ └─`
+   * `└─`
    *
    * Prints a closing log line
    */
@@ -62,14 +44,11 @@ interface LogOptions {
   /**
    * Tree level indents:
    *
-   * 1. `┌─`
-   * 2. `│`
-   * 3. `├─`
-   * 4. `│ ├─`
-   * 5. `│ └─ `
-   * 6. `└─`
+ * - `0` `┌─`
+ * - `1` `│`
+ * - `2` `└─`
    */
-  level?: 1 | 2 | 3 | 4 | 5 | 6;
+  level?: 1 | 2 | 3;
   /**
    * Whether this is the last log to be written to the
    * tree (level 5). This is not definite, level might be
@@ -153,9 +132,26 @@ export interface IBuildLog {
 }
 
 export interface ILog {
+  /**
+   * Prints log to the `last` known tree reference.
+   */
+  (message: string): void;
+  /**
+   * Standard `group` namespace log with `message` as
+   * second parameter.
+   */
   (group: string, message: string): void;
-  (message: string, end?: boolean): void;
-  (...message: string[]): void;
+   /**
+   * Tree level indents:
+   *
+   * 1. `┌─`
+   * 2. `│`
+   * 3. `├─`
+   * 4. `│ ├─`
+   * 5. `│ └─ `
+   * 6. `└─`
+   */
+  (message: string, tree: 1 | 2 | 3 | 4 | 5): void;
   stack?: { group: string; warnings: { [file: string]: Set<string>} };
   group?: string;
   last?: number;

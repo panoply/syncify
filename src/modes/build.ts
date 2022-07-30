@@ -10,6 +10,8 @@ import { isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
 import { bundle } from '../options/index';
 import { clean } from './clean';
+import { log, c } from 'cli/logger';
+import * as timer from 'process/timer';
 
 /**
  * Build Function
@@ -19,6 +21,8 @@ import { clean } from './clean';
  * Upload will not be invoked until the build has completed.
  */
 export async function build (callback?: Syncify) {
+
+  timer.start();
 
   if (bundle.mode.clean) await clean();
 
@@ -39,7 +43,7 @@ export async function build (callback?: Syncify) {
       case Type.Layout:
         acc.layout.push(file); break;
       case Type.Snippet:
-        acc.layout.push(file); break;
+        acc.snippet.push(file); break;
       case Type.Locale:
         acc.locale.push(file); break;
       case Type.Config:
@@ -74,10 +78,13 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.style) {
+
+    log.group('style').file(file.key);
+
     try {
       await styles(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -86,10 +93,13 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.section) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       await liquid(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -98,10 +108,13 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.layout) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       await liquid(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -110,6 +123,9 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.template) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       if (file.ext === '.json') {
         await json(file, callback);
@@ -117,7 +133,7 @@ export async function build (callback?: Syncify) {
         await liquid(file, callback);
       }
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -126,10 +142,13 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.snippet) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       await liquid(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -138,10 +157,13 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.locale) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       await json(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -150,22 +172,28 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.config) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       await json(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
   /* -------------------------------------------- */
-  /* METAFIELDS                                   */
+  /* PAGES                                        */
   /* -------------------------------------------- */
 
   for (const file of source.page) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       await pages(file as IFile<IPages>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -174,10 +202,13 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.metafield) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
       await json(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
@@ -186,13 +217,18 @@ export async function build (callback?: Syncify) {
   /* -------------------------------------------- */
 
   for (const file of source.asset) {
+
+    log.group(file.namespace).file(file.key);
+
     try {
+      log.info(c.cyan(`${file.base}`));
       await assets(file as IFile<IStyle>, callback);
     } catch (error) {
-      console.error('ERROR', error);
+      log.error(error);
     }
   }
 
+  log.info(c.greenBright.bold('Completed in ' + timer.stop()), 3);
   // await logger(bundle.spawn, { clear: true });
 
 };

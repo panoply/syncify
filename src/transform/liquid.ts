@@ -5,9 +5,11 @@ import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
 import { Type } from 'process/files';
 import { is, nil } from 'shared/native';
+import { lastPath } from 'shared/paths';
 import { byteSize, byteConvert } from 'shared/shared';
-import { log, c } from 'cli/log';
-import { terser } from '../options/index';
+import { log, c } from 'cli/logger';
+import { terser, bundle } from '../options/index';
+import * as timer from 'process/timer';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -198,8 +200,12 @@ const transform = (file: IFile) => async (data: string) => {
 
   const size = byteSize(postmin);
 
-  log(c.gray('Minified Liquid and HTML'));
-  log(c.gray(`${byteConvert(size)} (saved ${byteConvert(file.size - size)})`), true);
+  if (bundle.mode.watch) {
+    log.info(c.gray('Minified Liquid and HTML'));
+    log.info(c.gray(`${byteConvert(size)} (saved ${byteConvert(file.size - size)})`));
+  } else {
+    log.info(`${c.cyan(file.key)} ${c.bold(byteConvert(size))} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
+  }
 
   return postmin;
 
@@ -217,14 +223,17 @@ const transform = (file: IFile) => async (data: string) => {
  */
 export async function compile (file: IFile, cb: Syncify) {
 
+  if (bundle.mode.watch) {
+    timer.start();
+    log.info(c.cyan(`changed ${c.bold(lastPath(file.input) + '/' + file.base)}`));
+  }
+
   const read = await readFile(file.input);
 
   file.size = byteSize(read);
 
   const edit = transform(file);
   const data = read.toString();
-
-  log(file.namespace, c.cyan(file.key));
 
   if (!isType('Function', cb)) return edit(data);
 

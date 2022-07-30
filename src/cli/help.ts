@@ -15,7 +15,7 @@ export const help = `
 
   ${c.bold('Usage')}
   Welcome to the Syncify CLI. The command line utility assumes that
-  you have defined stores/themes and setup credentials within a ${c.dim('.env')} file.
+  you have defined stores, themes and setup credentials within a ${c.dim('.env')} file.
 
   ${c.bold('Aliases:')}
   $ sync

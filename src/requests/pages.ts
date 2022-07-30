@@ -10,7 +10,7 @@ import { pathExistsSync, stat, writeFile } from 'fs-extra';
 import { assign, is } from 'shared/native';
 import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
-import * as c from 'cli/ansi';
+import { log, c } from 'cli/logger';
 
 /**
  * Merge Pages

@@ -51,6 +51,10 @@ export function kill (fn: Function) {
 
   }
 
-  return () => exited.delete(fn);
+  return () => {
+
+    exited.delete(fn);
+
+  };
 
 };

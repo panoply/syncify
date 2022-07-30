@@ -13,7 +13,7 @@ import { bundle } from '../options/index';
  * We need to hold reference of these to kill
  * when ending the session.
  */
-export const spawns: Set<[ name: string, child: ChildProcessWithoutNullStreams ]> = new Set();
+export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
 
 /**
  * Spawned Proccesses
@@ -25,6 +25,7 @@ export const spawns: Set<[ name: string, child: ChildProcessWithoutNullStreams ]
 export function spawned (name: string, callback: any) {
 
   const command = bundle.spawn[name];
+
   const arg: string[] = /\s/g.test(command) ? command.split(' ') : [ command ];
   const cmd = arg.shift();
   const child = spawn(cmd, arg, {
@@ -37,12 +38,12 @@ export function spawned (name: string, callback: any) {
     ]
   });
 
-  child.stdio[0].on('data', callback(name, true));
-  child.stdio[1].on('data', callback(name, true));
-  child.stdio[2].on('data', callback(name, true));
-  child.stdio[3].on('data', callback(name, true));
+  child.stdio[0].on('data', callback);
+  child.stdio[1].on('data', callback);
+  child.stdio[2].on('data', callback);
+  child.stdio[3].on('data', callback);
 
-  spawns.add([ name, child ]);
+  spawns.set(name, child);
 
   return child;
 

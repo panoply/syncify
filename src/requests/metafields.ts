@@ -8,8 +8,8 @@ import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
 import { assign, is } from 'shared/native';
 import { queue, axios, requeue } from 'requests/queue';
 import { AxiosError } from 'axios';
-import * as c from 'cli/ansi';
-import { log } from 'cli/log';
+import * as c from 'cli/colors';
+import { log } from 'cli/logger';
 import { bundle, transform } from '../options/index';
 
 /**
@@ -163,7 +163,7 @@ export async function pull (store: IStore, config: IConfig) {
  * Metafields listing request, typically called
  * from the prompt to query and explore metafields.
  */
-export async function list <T extends { metafields: Requests.IMetafield[] }> (store: IStore) {
+export async function list <T extends { metafields: Requests.Metafield[] }> (store: IStore) {
 
   return axios.get<T>('metafields.json', store.client).then(({ data }) => {
 
@@ -187,7 +187,7 @@ export async function list <T extends { metafields: Requests.IMetafield[] }> (st
  * Returns a metafield by id reference. We keep a cache
  * map reference of metafield IDs in the `node_modules/.syncify/metafields.map` file.
  */
-export async function get <T extends { metafields: Requests.IMetafield[] }> (store: IStore, id?: number) {
+export async function get <T extends { metafields: Requests.Metafield[] }> (store: IStore, id?: number) {
 
   if (is(arguments.length, 1)) return (_id: number) => get(store, _id);
 
@@ -272,9 +272,9 @@ export async function find <T extends Requests.IMetafield> (store: IStore, field
  * shop. This is called when a metafield does
  * not exists.
  */
-export async function create <T extends Requests.IMetafield> (store: IStore, metafield?: T) {
+export async function create <T extends Requests.Metafield> (store: IStore, metafield?: T) {
 
-  if (is(arguments.length, 1)) return (_metafield: Requests.IMetafield) => create(store, _metafield);
+  if (is(arguments.length, 1)) return (_metafield: Requests.Metafield) => create(store, _metafield);
 
   metafield.type = 'json';
   metafield.namespace = 'email';
@@ -283,7 +283,7 @@ export async function create <T extends Requests.IMetafield> (store: IStore, met
 
   return axios.post<{ metafield: T }>('metafields.json', { metafield }, store.client).then(({ data }) => {
 
-    console.log('created');
+    console.log('created', data);
 
     return data.metafield;
 
@@ -309,9 +309,9 @@ export async function create <T extends Requests.IMetafield> (store: IStore, met
  * Updates an existing metafield using its unique `id`.
  * This is applied only when a metafield reference exists.
  */
-export async function update <T extends Requests.IMetafield> (store: IStore, id?: number, metafield?: T) {
+export async function update <T extends Requests.Metafield> (store: IStore, id?: number, metafield?: T) {
 
-  if (is(arguments.length, 1)) return (_id: number, _field: Requests.IMetafield) => update(store, _id, _field);
+  if (is(arguments.length, 1)) return (_id: number, _field: Requests.Metafield) => update(store, _id, _field);
 
   return axios.put<{ metafield: T }>(`metafields/${id}.json`, { metafield }, store.client).then(d => {
 
@@ -329,29 +329,6 @@ export async function update <T extends Requests.IMetafield> (store: IStore, id?
     }
 
   });
-};
-
-/**
- * Metafields
- *
- * Metafield handler function. This is used in the
- * resource modes and will query, create or update
- * metafields.
- */
-export function client (store: IStore) {
-
-  return {
-    sync: sync.apply(null, store),
-    list: list.apply(null, store),
-    get: get.apply(null, store),
-    find: find.apply(null, store),
-    create: create.apply(null, store),
-    update: update.apply(null, store),
-    delete: remove.apply(null, store),
-    pull,
-    merge
-  };
-
 };
 
 /**
@@ -379,5 +356,28 @@ export async function sync (store: IStore, field?: Requests.Metafield) {
       return error(store.store, e.response);
     }
   });
+
+};
+
+/**
+ * Metafields
+ *
+ * Metafield handler function. This is used in the
+ * resource modes and will query, create or update
+ * metafields.
+ */
+export function client (store: IStore) {
+
+  return {
+    sync: sync.apply(null, store),
+    list: list.apply(null, store),
+    get: get.apply(null, store),
+    find: find.apply(null, store),
+    create: create.apply(null, store),
+    update: update.apply(null, store),
+    delete: remove.apply(null, store),
+    pull,
+    merge
+  };
 
 };

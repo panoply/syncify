@@ -9,8 +9,9 @@ import { watch } from 'modes/watch';
 // import { readConfig } from 'config/config';
 import { help } from 'cli/help';
 import { define } from './options/define';
-import { log } from 'cli/log';
+import { log } from 'cli/logger';
 import { bundle } from './options/index';
+
 // import * as log from 'cli/logs';
 
 /**

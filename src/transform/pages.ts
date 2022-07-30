@@ -7,7 +7,7 @@ import Turndown from 'turndown';
 import gfm from 'turndown-plugin-gfm';
 import Markdown from 'markdown-it';
 import { transform, bundle } from '../options/index';
-import { log, c } from '../cli/log';
+import { log, c } from '../cli/logger';
 
 export async function toMarkdown (content: string) {
 
@@ -20,8 +20,6 @@ export async function toMarkdown (content: string) {
 }
 
 export async function compile (file: IFile<IPages>, cb: Syncify) {
-
-  log(file.namespace, c.cyan(file.key));
 
   const read = await readFile(file.input);
   const { data, content } = matter(read);

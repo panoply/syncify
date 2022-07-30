@@ -3,10 +3,12 @@ import { IFile, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { is, isBuffer, isArray, isObject, isUndefined, isString } from 'shared/native';
 import { Type } from 'process/files';
+import { lastPath } from 'shared/paths';
 import { byteSize, byteConvert } from 'shared/shared';
 import stringify from 'fast-safe-stringify';
-import { log, c } from 'cli/log';
-import { terser, transform } from '../options/index';
+import { log, c } from 'cli/logger';
+import { bundle, terser, transform } from '../options/index';
+import * as timer from 'process/timer';
 
 /**
  * Parse JSON
@@ -17,11 +19,13 @@ export function $schema (file: IFile, data: { $schema?: string }) {
 
   if (!has('$schema', data)) return data;
 
+  timer.start();
+
   const json = { ...data };
 
   delete json.$schema;
 
-  log(c.gray(`Stripped ${c.yellow('$schema')} from JSON`));
+  log.info(`removed ${c.bold('$schema')} ${c.gray(`µ${timer.stop()}`)}`);
 
   return json;
 
@@ -40,7 +44,7 @@ export function parse (data: string) {
 
   } catch (e) {
 
-    log.throw(e);
+    log.error(e);
 
     return null;
 
@@ -64,7 +68,7 @@ export function minify (data: string, space = 0): any {
 
   } catch (e) {
 
-    log.throw(e);
+    log.error(e);
 
     return null;
 
@@ -83,12 +87,17 @@ export function jsonCompile (file: IFile, data: string, space = 0): any {
 
   const minified = minify(data, space);
 
-  if (isNil(minified)) return minified;
-
+  if (isNil(minified)) {
+    timer.stop();
+    return minified;
+  }
   if (is(space, 0)) {
     const size = byteSize(minified);
-    log(c.gray('Minified JSON'));
-    log(c.gray(`${byteConvert(size)} (saved ${byteConvert(file.size - size)})`), true);
+    if (bundle.mode.watch) {
+      log.info(`created ${c.bold(file.key)} ${c.gray(`µ${timer.stop()}`)}`);
+    } else {
+      log.info(`${c.cyan(file.key)} ${c.bold(byteConvert(size))} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
+    }
   }
 
   if (is(file.type, Type.Metafield)) {
@@ -109,7 +118,10 @@ export function jsonCompile (file: IFile, data: string, space = 0): any {
  */
 export async function compile (file: IFile, cb: Syncify): Promise<string> {
 
-  log(file.namespace, c.cyan(file.key));
+  if (bundle.mode.watch) {
+    timer.start();
+    log.info(c.cyan(`changed ${c.bold(lastPath(file.input) + '/' + file.base)}`));
+  }
 
   const json = await readFile(file.input);
 
@@ -119,6 +131,9 @@ export async function compile (file: IFile, cb: Syncify): Promise<string> {
   const space = terser.minify.json ? 0 : transform.json.indent;
   const refs = terser.liquid.removeSchemaRefs ? $schema(file, data) : data;
 
+  if (bundle.mode.watch) {
+    log.info(`created ${c.bold(file.key)} ${c.gray(`µ${timer.stop()}`)}`);
+  }
   if (!isType('Function', cb)) return jsonCompile(file, refs, space);
 
   const update = cb.apply({ ...file }, refs);

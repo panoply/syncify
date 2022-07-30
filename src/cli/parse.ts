@@ -1,7 +1,7 @@
 import type { Exception, SourceSpan } from 'sass';
 import type { Warning } from 'postcss';
 import { range } from 'rambdax';
-import * as c from 'cli/ansi';
+import * as c from 'cli/colors';
 import { is, isArray, nil } from 'shared/native';
 
 /* -------------------------------------------- */
