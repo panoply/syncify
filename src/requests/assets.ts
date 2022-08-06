@@ -1,12 +1,9 @@
 import { Request, IThemes, IFile } from 'types';
 import { queue, axios } from 'requests/queue';
 import { is } from 'shared/native';
-import { log, c } from 'cli/logger';
+import { log, c, error } from '../logger';
 import * as timer from 'process/timer';
-// import { liquidPretty } from 'cli/parse';
-
 import { AxiosError, AxiosRequestConfig } from 'axios';
-import { getTime } from 'shared/shared';
 
 /* -------------------------------------------- */
 /* PRIVATE                                      */
@@ -59,11 +56,8 @@ export async function sync (theme: IThemes, file: IFile, config: Request) {
     if (config.method === 'delete') {
       log.info(theme.store);
     } else {
-      log.info(c.green(`updated ${c.bold(theme.target)} in ${c.bold(theme.store)} ${c.gray(`µ${timer.stop()}`)}`));
-      log.unwatch();
-
-      if (queue.size === 0) log.waiting();
-
+      log.upload(file, theme);
+      // if (queue.size === 0) log.wait();
     }
 
     limit = parseInt(headers['x-shopify-shop-api-call-limit'].slice(0, 2), 10);
@@ -72,12 +66,13 @@ export async function sync (theme: IThemes, file: IFile, config: Request) {
 
     // if (!sync.queue) return error(file.key, e.response);
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
+
       log.info(`${c.orange('↻')} ${c.orange(file.key)}`);
       queue.add(() => sync(theme, file, config));
+
     } else {
-      log.info(`${c.red('𐄂')} ${c.redBright(file.key)}`);
-      console.log(e.response.data);
-    //  error(file.key, e.response);
+      log.info(`${c.redBright('invalid')} ${c.redBright.bold(file.key)}`);
+      error(e.response);
     }
 
   });
