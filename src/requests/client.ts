@@ -1,10 +1,10 @@
 import { Request, IStore, IFile, Methods, ISync, Requests } from 'types';
-import { queue } from 'requests/queue';
 import { mapFastAsync } from 'rambdax';
-import { assign, isUndefined, create } from 'shared/native';
-import * as asset from 'requests/assets';
-import * as metafields from 'requests/metafields';
-import * as pages from 'requests/pages';
+import { queue } from '../requests/queue';
+import { assign, isUndefined, create } from '../shared/native';
+import * as asset from '../requests/assets';
+import * as metafields from '../requests/metafields';
+import * as pages from '../requests/pages';
 
 /* -------------------------------------------- */
 /* EXPORTED                                     */
