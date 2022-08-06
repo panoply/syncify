@@ -2,7 +2,7 @@ import { IBundle } from 'types';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'path';
 import { PartialDeep } from 'type-fest';
-import { assign, isArray } from 'shared/native';
+import { assign, isArray } from '../shared/native';
 import { bundle, cache } from './index';
 
 /**
@@ -42,6 +42,7 @@ export async function cacheDirs (path: string, options = { purge: false }) {
     } else if (dir === 'pages') {
       cache[dir] = {};
     } else {
+      cache[dir] = {};
 
       const uri = join(path, dir, '/');
       const has = await pathExists(uri);
@@ -61,6 +62,7 @@ export async function cacheDirs (path: string, options = { purge: false }) {
       }
 
       assign(cache[dir], { uri, data: {} });
+
     }
 
   }
