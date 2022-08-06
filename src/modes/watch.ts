@@ -3,15 +3,15 @@
 import chokidar from 'chokidar';
 import { Syncify, IFile, IStyle, IPages } from 'types';
 import { client } from '../requests/client';
-import { compile as liquid } from 'transform/liquid';
-import { styles } from 'transform/styles';
-import { compile as asset } from 'transform/asset';
-import { compile as json } from 'transform/json';
-import { compile as pages } from 'transform/pages';
-import { is, isUndefined } from 'shared/native';
-import { parseFile, Type } from 'process/files';
+import { compile as liquid } from '../transform/liquid';
+import { styles } from '../transform/styles';
+import { compile as asset } from '../transform/asset';
+import { compile as json } from '../transform/json';
+import { compile as pages } from '../transform/pages';
+import { is, isUndefined } from '../shared/native';
+import { parseFile, Type } from '../process/files';
 import { bundle } from '../options/index';
-import { log } from 'cli/logger';
+import { log } from '../logger';
 
 /**
  * Watch Function
@@ -39,15 +39,27 @@ export function watch (callback: Syncify) {
 
     if (is(event, 'change') || is(event, 'add')) {
 
+      if (bundle.build.spawn === 1) return;
+
+      log.group(file.namespace).file(file.base);
+
       try {
 
-        log.watch();
+        if (bundle.build.spawn === 3) {
+
+          log.listen();
+
+          await request.assets('put', file);
+
+          log.reset();
+
+          return;
+
+        }
 
         let value: string | void | { title: any; body_html: any; } = null;
 
         if (file.type === Type.Style) {
-
-          log.group('styles').file(file.base);
 
           value = await styles(file as IFile<IStyle>, callback);
 
@@ -63,8 +75,6 @@ export function watch (callback: Syncify) {
 
           value = await json(file, callback);
 
-          log.unwatch();
-
           return request.metafields({ value, namespace: file.namespace, key: file.key });
 
         } else if (file.type === Type.Template && file.ext === '.json') {
@@ -75,37 +85,28 @@ export function watch (callback: Syncify) {
 
           value = await liquid(file, callback);
 
-        } else if (file.type === Type.Asset) {
-
-          value = await asset(file, callback);
-
         } else if (file.type === Type.Page) {
 
-          log.group('pages').file(file.base);
-
           value = await pages(file as IFile<IPages>, callback);
-
-          console.log(value);
-          //  log.unwatch();
 
           return;
 
           // return request.pages(value);
+        } else if (file.type === Type.Asset) {
+
+          value = await asset(file, callback);
+
         }
 
         if (value !== null) {
 
-          return request.assets('put', file, value);
+          await request.assets('put', file, value);
 
         }
 
-        log.unwatch();
-
       } catch (error) {
 
-        log.unwatch();
-
-        console.error(error);
+        log.error(error);
 
       }
 
