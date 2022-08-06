@@ -1,8 +1,8 @@
 import { IFile, IStyle } from 'types';
 import { join, dirname, basename } from 'path';
-import { defineProperty, isRegex, isUndefined } from 'shared/native';
+import { defineProperty, isRegex, isUndefined } from '../shared/native';
 import { transform, bundle } from '../options/index';
-import { lastPath, parentPath } from 'shared/paths';
+import { lastPath, parentPath } from '../shared/paths';
 
 /**
  * Style Context
