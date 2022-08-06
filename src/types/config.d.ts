@@ -29,10 +29,10 @@ export interface IConfig {
   };
   spawn?: {
     watch?: {
-      [label: string]: string;
+      [label: string]: string | string[];
     },
     build?: {
-      [label: string]: string;
+      [label: string]: string | string[];
     }
   };
   terser?: {

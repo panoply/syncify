@@ -4,14 +4,14 @@ import anymatch from 'anymatch';
 import { has, hasPath, includes, isNil, last } from 'rambdax';
 import { join, extname } from 'path';
 import { existsSync, mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
-import { log } from 'cli/logger';
-import { createVSCodeDir } from 'modes/vsc';
+import { log } from '../logger';
+import { createVSCodeDir } from '../modes/vsc';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
-import { lastPath, normalPath } from 'shared/paths';
+import { lastPath, normalPath } from '../shared/paths';
 import { typeError, unknownError, invalidError } from './validate';
 import { transform, bundle, cache } from './index';
-import * as u from 'shared/native';
-import * as style from 'transform/styles';
+import * as u from '../shared/native';
+import * as style from '../transform/styles';
 
 /**
  * Section Options

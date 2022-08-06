@@ -1,6 +1,11 @@
 import { isType } from 'rambdax';
 
 /**
+ * Native Console Log
+ */
+export const log = console.log;
+
+/**
  * Empty String
  */
 export const nil = '';

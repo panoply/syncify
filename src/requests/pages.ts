@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { allFalse, has, isNil } from 'rambdax';
 import { IConfig, IMetafield, IStore, IPage } from 'types';
 import { join } from 'path';
@@ -5,12 +6,11 @@ import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
 import Turndown from 'turndown';
 import { stringify } from 'markdown-it';
-import { error } from 'cli/errors';
+import { error } from '../logger/errors';
 import { pathExistsSync, stat, writeFile } from 'fs-extra';
-import { assign, is } from 'shared/native';
-import { queue, axios, requeue } from 'requests/queue';
-import { AxiosError } from 'axios';
-import { log, c } from 'cli/logger';
+import { assign, is } from '../shared/native';
+import { queue, axios, requeue } from '../requests/queue';
+import { log, c } from '../logger';
 
 /**
  * Merge Pages

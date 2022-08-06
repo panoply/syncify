@@ -4,11 +4,11 @@ import { readFile, writeFile } from 'fs-extra';
 import { is, isBuffer, isArray, isObject, isUndefined, isString } from 'shared/native';
 import { Type } from 'process/files';
 import { lastPath } from 'shared/paths';
-import { byteSize, byteConvert } from 'shared/shared';
+import { byteSize, byteConvert } from 'shared/utils';
 import stringify from 'fast-safe-stringify';
-import { log, c } from 'cli/logger';
+import { log, c } from '../logger';
 import { bundle, terser, transform } from '../options/index';
-import * as timer from 'process/timer';
+import * as timer from '../process/timer';
 
 /**
  * Parse JSON

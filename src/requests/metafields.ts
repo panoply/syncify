@@ -1,15 +1,14 @@
 import { allFalse, has } from 'rambdax';
+import { AxiosError } from 'axios';
 import { IBundle, IConfig, IStore, Requests } from 'types';
 import { join } from 'path';
 import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
-import { error } from 'cli/errors';
+import { error } from '../logger/errors';
 import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
-import { assign, is } from 'shared/native';
-import { queue, axios, requeue } from 'requests/queue';
-import { AxiosError } from 'axios';
-import * as c from 'cli/colors';
-import { log } from 'cli/logger';
+import { assign, is } from '../shared/native';
+import { queue, axios, requeue } from '../requests/queue';
+import { log, c } from '../logger';
 import { bundle, transform } from '../options/index';
 
 /**

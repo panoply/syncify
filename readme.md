@@ -23,7 +23,7 @@ Fast, extensible and superior alternative Shopify [theme kit](https://shopify.gi
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit and other tools in this nexus fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Shopify's Theme Kit and other tools in the nexus fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
 
 # Install
 
@@ -355,9 +355,9 @@ Before going over the features Syncify provides, it is assumed that you have don
 
 ## Stores (Required)
 
-The `stores` option accepts an **array** list of items. Each item in the array will hold a settings object that contains references to your shopify stores and their themes. This information can be provided to Syncify within your `package.json` file or alternatively you can use a `.syncifyrc` or `.syncifyrc.json` file.
+The `stores` option expects an **array** list of items. Each item in the array will hold a settings object that contains references to your shopify store/s and their theme/s. This information can be provided to Syncify within your `package.json` file or alternatively you can use a `.syncifyrc` or `.syncifyrc.json` file.
 
-For each store you define, Syncify requires you provide the shop name and theme ids you wish to sync. The `themes` object uses a **key** > **value** approach. Please see theme [command](#commands) examples for more information on how this is used with the CLI.
+For each store you define, Syncify requires you provide the shop name and theme ids you wish to sync. The `themes` object uses a **key** > **value** structure. Please see theme [commands](#commands) example for more information on how this is used with the CLI.
 
 ```json
 {
@@ -379,7 +379,7 @@ For each store you define, Syncify requires you provide the shop name and theme 
 
 #### Using a `.syncifyrc` file
 
-In some situations using the `package.json` file for store and theme id references may not be the ideal. You can optionally provide these requires references within a `.syncifyrc` or `.syncifyrc.json` file. If you are using a `.syncifyrc` file to store your shop credentials then you need only add theme id references.
+In some situations using the `package.json` file for store and theme id references may not be ideal. You can optionally provide these required references within a `.syncifyrc` or `.syncifyrc.json` file. If you are using a `.syncifyrc` file to store your shop credentials then you need only add theme id references.
 
 ```json
 [
@@ -1724,8 +1724,8 @@ Created by [Nίκος Σαβίδης](https://github.com/panoply) of [Sissel Σa
 
 Special thanks to a couple of talented developers that helped work through ideas and edge-cases on the project.
 
-- [David Warrington](https://ellodave.dev/)
 - [Joseph Curtis](#)
+- [David Warrington](https://ellodave.dev/)
 - [Mansedan](#)
 
 # Changelog

@@ -39,6 +39,7 @@
       "options/*": ["src/options/*"],
       "options": ["src/options/index.ts"],
       "cli/*": ["src/cli/*"],
+      "logger/*": ["src/logger/*"],
       "modes/*": ["src/modes/*"],
       "process/*": ["src/process/*"],
       "shared/*": ["src/shared/*"],

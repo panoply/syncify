@@ -4,13 +4,12 @@ import { compile, Logger } from 'sass';
 import stringify from 'fast-safe-stringify';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
-import { lastPath } from 'shared/paths';
+import { lastPath } from '../shared/paths';
 import { isFunction, isString, isUndefined, isBuffer } from 'shared/native';
-import * as parse from 'cli/parse';
-import { log, c } from 'cli/logger';
+import { byteConvert, byteSize } from '../shared/utils';
+import { log, c, parse } from '../logger';
 import { bundle, cache } from '../options/index';
 import * as timer from '../process/timer';
-import { byteConvert, byteSize } from 'shared/shared';
 
 /**
  * PostCSS Module

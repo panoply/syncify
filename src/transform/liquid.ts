@@ -3,13 +3,13 @@ import stringify from 'fast-safe-stringify';
 import { IFile, Syncify, IHTML } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
-import { Type } from 'process/files';
-import { is, nil } from 'shared/native';
-import { lastPath } from 'shared/paths';
-import { byteSize, byteConvert } from 'shared/shared';
-import { log, c } from 'cli/logger';
+import { Type } from '../process/files';
+import { is, nil } from '../shared/native';
+import { lastPath } from '../shared/paths';
+import { byteSize, byteConvert } from '../shared/utils';
+import { log, c } from '../logger';
 import { terser, bundle } from '../options/index';
-import * as timer from 'process/timer';
+import * as timer from '../process/timer';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */

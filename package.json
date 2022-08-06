@@ -1,5 +1,5 @@
 {
-  "name": "@syncify/cli",
+  "name": "syncify-cli",
   "description": "A lightening fast build tool for developing Shopify themes.",
   "version": "0.1.0-beta",
   "homepage": "https://github.com/panoply/syncify",
@@ -22,13 +22,6 @@
       "require": "./package/index.js"
     }
   },
-  "files": [
-    "./bin/sync",
-    "./package/index.js",
-    "./package/index.mjs",
-    "./package/index.d.ts",
-    "./schema.json"
-  ],
   "license": "ISC",
   "keywords": [
     "cli",
@@ -82,12 +75,13 @@
     "mergerino": "^0.4.0",
     "mime-types": "^2.1.35",
     "minimist": "^1.2.6",
-    "p-queue": "^7.2.0",
+    "node-notifier": "^10.0.1",
+    "p-queue": "^7.3.0",
     "prompts": "^2.4.2",
-    "rambdax": "^8.0.1",
+    "rambdax": "^8.1.0",
     "strip-ansi": "^7.0.1",
     "tiny-spinner": "^2.0.0",
-    "tsup": "^6.2.0",
+    "tsup": "^6.2.1",
     "turndown": "^7.1.1",
     "turndown-plugin-gfm": "^1.0.2",
     "wrap-ansi": "^8.0.1"
@@ -99,20 +93,20 @@
     "@types/mime-types": "^2.1.1",
     "@types/minimist": "^1.2.2",
     "ava": "^4.3.1",
-    "esbuild": "^0.14.51",
-    "eslint": "^8.20.0",
+    "esbuild": "^0.14.53",
+    "eslint": "^8.21.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-promise": "^6.0.0",
     "prettier": "^2.7.1",
     "rollup": "^2.77.2",
-    "type-fest": "^2.17.0",
+    "type-fest": "^2.18.0",
     "typescript": "^4.7.4"
   },
   "optionalDependencies": {
     "browser-sync": "^2.27.10",
     "postcss": "^8.4.14",
-    "sass": "^1.54.0",
+    "sass": "^1.54.3",
     "svg-sprite": "^1.5.4",
     "svgo": "^2.8.0"
   }

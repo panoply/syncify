@@ -1,8 +1,8 @@
 import { IFile, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
-import { log } from 'cli/logger';
-import { isFunction, isBuffer, isUndefined } from 'shared/native';
+import { log } from '../logger';
+import { isFunction, isBuffer, isUndefined } from '../shared/native';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */

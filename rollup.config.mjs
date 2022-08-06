@@ -18,6 +18,7 @@ export default rollup(
       'html-minifier-terser',
       'minimist',
       'marked',
+      'node-notifier',
       'prompts',
       'yamljs',
       'browser-sync',

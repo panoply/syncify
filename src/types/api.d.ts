@@ -1,6 +1,6 @@
 import { PartialDeep } from 'type-fest';
 import { IConfig } from './config';
-import { IAsset, Resource } from './requests';
+import { IAsset } from './requests';
 import { IFile } from './file';
 
 type Download = (

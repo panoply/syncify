@@ -655,6 +655,27 @@ export interface ISync {
 
 export interface IBundle {
   /**
+   * Build specific references
+   */
+  build: {
+    /**
+     * The current process id
+     */
+    pid: 1 | 2 | 3;
+    /**
+     * Spawned process reference
+     *
+     * The passed integer values determine how a generated asset from
+     * a spawned process should be handled. This defaults to `2`
+     *
+     * - `1` skip syncing a spawned file, typically used on initialization
+     * - `2` not a spawned process, prevents invoking log interceptor
+     * - `3` spawned process was invoked, process accodingly
+     *
+     */
+    spawn: 1 | 2 | 3;
+  }
+  /**
    * The version defined in the package.json
    */
   version: string;

@@ -30,6 +30,18 @@
       "url": "/schema/syncifyrc.json"
     }
   ],
+
+  "highlight.regexes": {
+    "(\\$)([a-z:(]*\\b)": {
+      "regexFlags": "g",
+      "filterLanguageRegex": "typescript",
+      "decorations": [
+        {
+          "color": "#ffbafc"
+        }
+      ]
+    }
+  },
   "vsicons.associations.files": [
     {
       "icon": "svg",

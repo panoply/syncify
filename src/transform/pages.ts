@@ -7,7 +7,7 @@ import Turndown from 'turndown';
 import gfm from 'turndown-plugin-gfm';
 import Markdown from 'markdown-it';
 import { transform, bundle } from '../options/index';
-import { log, c } from '../cli/logger';
+import { log } from '../logger';
 
 export async function toMarkdown (content: string) {
 
