@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import spawn from 'cross-spawn';
+import { isArray } from '../shared/native';
 import { bundle } from '../options/index';
 
 /* -------------------------------------------- */
@@ -13,7 +14,10 @@ import { bundle } from '../options/index';
  * We need to hold reference of these to kill
  * when ending the session.
  */
-export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
+export const spawns: Map<string, {
+  ready: boolean;
+  child: ChildProcessWithoutNullStreams
+}> = new Map();
 
 /**
  * Spawned Proccesses
@@ -25,8 +29,12 @@ export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
 export function spawned (name: string, callback: any) {
 
   const command = bundle.spawn[name];
+  const arg: string[] = isArray(command)
+    ? command
+    : /\s/g.test(command)
+      ? command.split(' ')
+      : [ command ];
 
-  const arg: string[] = /\s/g.test(command) ? command.split(' ') : [ command ];
   const cmd = arg.shift();
   const child = spawn(cmd, arg, {
     stdio: [
@@ -43,7 +51,7 @@ export function spawned (name: string, callback: any) {
   child.stdio[2].on('data', callback);
   child.stdio[3].on('data', callback);
 
-  spawns.set(name, child);
+  spawns.set(name, { child, ready: false });
 
   return child;
 

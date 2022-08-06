@@ -7,9 +7,9 @@ import { build } from 'modes/build';
 import { watch } from 'modes/watch';
 // import { resource } from 'modes/resource';
 // import { readConfig } from 'config/config';
-import { help } from 'cli/help';
+import { help } from './logger/help';
+import { log } from './logger';
 import { define } from './options/define';
-import { log } from 'cli/logger';
 import { bundle } from './options/index';
 
 // import * as log from 'cli/logs';
@@ -35,6 +35,8 @@ export async function cli (options: ICLICommands, callback?: Syncify) {
       throw new Error(error);
     }
   }
+
+  // console.log(bundle);
 
   try {
 

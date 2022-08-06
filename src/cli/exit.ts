@@ -19,7 +19,7 @@ const exited: Set<Function> = new Set();
  * Triggers functions to run before
  * existing out of process.
  */
-function exit (manualExit: boolean, signal: number) {
+const exit = (manualExit: boolean, signal: number) => {
 
   if (triggered) return;
 
