@@ -10,7 +10,7 @@ import { isUndefined } from 'shared/native';
 import { parseFile, Type } from 'process/files';
 import { bundle } from '../options/index';
 import { clean } from './clean';
-import { log, c } from 'cli/logger';
+import { log, c } from '../logger';
 import * as timer from 'process/timer';
 
 /**
