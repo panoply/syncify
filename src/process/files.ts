@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
 
 import { join, parse } from 'path';
-import { Syncify, IFile, IPaths } from 'types';
-import { assign, isUndefined, is } from 'shared/native';
+import { IFile, IPaths } from 'types';
+import { assign } from '../shared/native';
 import { lastPath } from 'shared/paths';
 import { Partial } from 'rambdax';
-import * as context from 'process/context';
+import * as context from './context';
+import { bundle } from '../options/index';
 
 /**
  * File types are represented as numeric values.
@@ -26,6 +27,7 @@ export const enum Type {
   Asset,
   Metafield,
   Page,
+  Spawn
 }
 
 export const enum Kind {
@@ -56,13 +58,15 @@ export function setFile (file: Partial<IFile>, input: string, output: string) {
 
     let key: string;
 
-    if (is(type, Type.Metafield) || is(type, Type.Page)) {
+    if (type === Type.Metafield || type === Type.Page) {
       key = join(lastPath(file.dir), file.base);
       output = null;
     } else {
       key = join(namespace, file.base);
       output = join(output, key);
     }
+
+    if (bundle.build.spawn === 1 && type !== Type.Asset) bundle.build.spawn = 2;
 
     return assign({}, file as IFile, {
       type,
