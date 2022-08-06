@@ -3,13 +3,13 @@ import { readFile } from 'fs-extra';
 import { mapFastAsync } from 'rambdax';
 import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
-import { outputFile } from 'process/files';
-import { log } from 'cli/logger';
+import { outputFile } from '../process/files';
+import { log } from '../logger';
 import { bundle } from '../options/index';
+import { isFunction, isUndefined, isString, isBuffer } from '../shared/native';
 import * as timer from 'process/timer';
-import { isFunction, isUndefined, isString, isBuffer } from 'shared/native';
 
-export const upload = async (cb?: Syncify): Promise<void> => {
+export async function upload (cb?: Syncify): Promise<void> {
 
   timer.start();
 

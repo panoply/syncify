@@ -2,8 +2,8 @@ import { mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { join } from 'path';
 import { allTrue, has } from 'rambdax';
 import { IBundle } from 'types';
-import { log, c } from 'cli/logger';
-import * as timer from 'process/timer';
+import { log, c } from '../logger';
+import * as timer from '../process/timer';
 
 /**
  * Create `.vscode` directory

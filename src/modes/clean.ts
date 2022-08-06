@@ -2,7 +2,7 @@ import { unlink } from 'fs-extra';
 import { glob } from 'glob';
 import { dirname } from 'path';
 import { mapFastAsync } from 'rambdax';
-import { log, c } from 'cli/logger';
+import { log, c } from '../logger';
 import { themeDirs } from '../options/dirs';
 import { bundle } from '../options/index';
 

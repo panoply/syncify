@@ -8,12 +8,13 @@ import anymatch from 'anymatch';
 import { isArray, keys, is, assign } from 'shared/native';
 import { basePath, normalPath, parentPath } from 'shared/paths';
 import { authURL } from '../shared/options';
-import { log } from 'cli/logger';
+import { log } from '../logger';
+import { header, spawnsHeader } from '../cli/tui';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
 import { iconOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
 import { terserOptions } from './terser';
-import { spawned } from 'cli/spawn';
+import { spawned } from '../cli/spawn';
 import { bundle, update, defaults, cache } from './index';
 
 /**
@@ -39,7 +40,9 @@ export async function define (cli: ICLICommands) {
     silent: cli.silent,
     prod: cli.prod,
     dev: cli.dev && !cli.prod,
-    spawn: config.spawn[mode.build ? 'build' : 'watch'],
+    spawn: config.spawn[mode.build ? 'build' : 'watch'] as {
+      [command: string]: string
+    },
     dirs: {
       input: cli.input,
       output: cli.output,
@@ -56,7 +59,7 @@ export async function define (cli: ICLICommands) {
       caches(cli.cwd),
       getStores(cli, config),
       baseDirs(config),
-      log.open(),
+      header(),
       themeDirs(bundle.dirs.output),
       setSpawns(bundle.spawn),
       importDirs(bundle),
@@ -65,7 +68,8 @@ export async function define (cli: ICLICommands) {
       jsonOptions(config),
       styleOptions(config, pkg),
       iconOptions(config, pkg),
-      terserOptions(config)
+      terserOptions(config),
+      spawnsHeader()
     ]
   );
 
@@ -337,9 +341,6 @@ export async function getPaths (config: IConfig) {
 
 export function setSpawns (cmds: IBundle['spawn']) {
 
-  for (const spawn in cmds) {
-    const child = log.spawn(spawn);
-    spawned(spawn, child);
-  }
+  for (const cmd in cmds) spawned(cmd, log.spawn(cmd));
 
 }

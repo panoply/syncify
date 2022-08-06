@@ -2,12 +2,13 @@ import { Syncify, Requests } from 'types';
 import { join } from 'path';
 import { has } from 'rambdax';
 import { writeFile } from 'fs-extra';
-import * as request from 'requests/assets';
-import { isFunction, assign, isUndefined, isString, isBuffer } from 'shared/native';
-import * as timer from 'process/timer';
+import { isFunction, assign, isUndefined, isString, isBuffer } from '../shared/native';
 import { bundle } from '../options/index';
+import { log } from '../logger';
+import * as timer from '../process/timer';
+import * as request from '../requests/assets';
 
-export const download = async (cb?: Syncify): Promise<void> => {
+export async function download (cb?: Syncify): Promise<void> {
 
   timer.start();
 
@@ -49,14 +50,12 @@ export const download = async (cb?: Syncify): Promise<void> => {
 
       } catch (e) {
 
-        console.log(e);
+        log.error(e);
 
       }
 
     }
 
   }
-
-  // log.finish('download');
 
 };
