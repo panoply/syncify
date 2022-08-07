@@ -11,6 +11,11 @@ export const log = console.log;
 export const nil = '';
 
 /**
+ * Whitespace
+ */
+export const ws = ' ';
+
+/**
  * Native Object assign
  */
 export const create = Object.create;
