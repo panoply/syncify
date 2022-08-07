@@ -29,8 +29,8 @@ export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
 export const underline = ansis.underline;
 
 /**
-  * Bold
-  */
+ * Bold
+ */
 export const bold = ansis.bold;
 
 /**
@@ -39,12 +39,12 @@ export const bold = ansis.bold;
 export const reset = ansis.reset;
 
 /**
- * Reset
+ * Italic
  */
-export const italic = ansis.italic.open;
+export const italic = ansis.italic;
 
 /* -------------------------------------------- */
-/* CUSTOM COLORS                                */
+/* EXTEND COLORS                                */
 /* -------------------------------------------- */
 
 /**
@@ -60,7 +60,21 @@ export const pink = ansis.hex('#ff75d1');
 /**
  * Orange
  */
-export const orange = ansis.hex('#f59c5b');
+export const orange = ansis.hex('#FFAB40');
+
+/* -------------------------------------------- */
+/* NEON COLORS                                  */
+/* -------------------------------------------- */
+
+/**
+ * Neon Green
+ */
+export const neonGreen = ansis.hex('#56ef83');
+
+/**
+ * Neon Green
+ */
+export const neonCyan = ansis.hex('#69d5fd');
 
 /* -------------------------------------------- */
 /* STANDARD COLORS                              */
