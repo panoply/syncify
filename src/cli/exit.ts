@@ -1,17 +1,17 @@
 /**
  * Called exit hook record
  */
-let triggered = false;
+let trigger = false;
 
 /**
  * Registered exist hook record
  */
-let registers = false;
+let register = false;
 
 /**
  * Callback exist hooks
  */
-const exited: Set<Function> = new Set();
+const hooks: Set<Function> = new Set();
 
 /**
  * Exist handler
@@ -19,14 +19,14 @@ const exited: Set<Function> = new Set();
  * Triggers functions to run before
  * existing out of process.
  */
-const exit = (manualExit: boolean, signal: number) => {
+function exit (manual: boolean, signal: number) {
 
-  if (triggered) return;
+  if (trigger) return;
 
-  triggered = true;
+  trigger = true;
+  hooks.forEach(callback => callback());
 
-  for (const callback of exited) callback();
-  if (manualExit === true) process.exit(128 + signal);
+  if (manual) process.exit(128 + signal);
 
 };
 
@@ -36,25 +36,18 @@ const exit = (manualExit: boolean, signal: number) => {
  * An exit hook for killing running processes
  * when ctrl+c is executed.
  */
-export function kill (fn: Function) {
+export const kill = (callback: Function) => {
 
-  exited.add(fn);
+  hooks.add(callback);
 
-  if (!registers) {
-
-    registers = true;
-
+  if (!register) {
+    register = true;
     process.once('exit', exit);
     process.once('SIGINT', exit.bind(undefined, true, 2));
     process.once('SIGTERM', exit.bind(undefined, true, 15));
     process.on('message', message => { if (message === 'shutdown') exit(true, -128); });
-
   }
 
-  return () => {
-
-    exited.delete(fn);
-
-  };
+  return () => hooks.delete(callback);
 
 };
