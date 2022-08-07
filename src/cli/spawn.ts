@@ -1,6 +1,6 @@
-import { ChildProcessWithoutNullStreams } from 'child_process';
+import { ChildProcessWithoutNullStreams } from 'node:child_process';
 import spawn from 'cross-spawn';
-import { isArray } from '../shared/native';
+import { ws, isArray } from '../shared/native';
 import { bundle } from '../options/index';
 
 /* -------------------------------------------- */
@@ -8,31 +8,30 @@ import { bundle } from '../options/index';
 /* -------------------------------------------- */
 
 /**
- * Spawned Processes
+ * Child Processes
  *
- * Set collection of spawned child proccesses.
- * We need to hold reference of these to kill
- * when ending the session.
+ * Collection of spawned child proccesses.
+ * We need to hold reference of these to kill when
+ * ending the session.
  */
-export const spawns: Map<string, {
-  ready: boolean;
-  child: ChildProcessWithoutNullStreams
-}> = new Map();
+export const spawns: Map<string, { ready: boolean; child: ChildProcessWithoutNullStreams }> = new Map();
 
 /**
- * Spawned Proccesses
+ * Spawn Processes
  *
- * Syncify spins up a child process for
- * using spawns. The spawned process is encapsulted
- * and `stdio` is piped.
+ * Spins up a child process of the defined spawns.
+ * The spawned process is encapsulted and `stdio` is piped
+ * and then later intercepted + printed. The _spawn_ Map
+ * keeps a store of the child processes which are referencs
+ * when ending / killing a process.
  */
-export function spawned (name: string, callback: any) {
+export const spawned = (name: string, callback: (data: string) => void) => {
 
   const command = bundle.spawn[name];
   const arg: string[] = isArray(command)
     ? command
-    : /\s/g.test(command)
-      ? command.split(' ')
+    : command.trimStart().indexOf(ws) > -1
+      ? command.trimStart().split(ws)
       : [ command ];
 
   const cmd = arg.shift();
