@@ -16,6 +16,11 @@ export const nil = '';
 export const ws = ' ';
 
 /**
+ * Newline
+ */
+export const nl = '\n';
+
+/**
  * Native Object assign
  */
 export const create = Object.create;
