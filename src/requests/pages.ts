@@ -343,7 +343,7 @@ export async function update <T extends IPage> (store: IStore, id?: number, page
 export function client (store: IStore) {
 
   return {
-    sync: sync.apply(null, store),
+    sync: update.apply(null, store),
     list: list.apply(null, store),
     get: get.apply(null, store),
     find: find.apply(null, store),
