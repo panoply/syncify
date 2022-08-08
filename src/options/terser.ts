@@ -42,7 +42,7 @@ export function terserOptions (config: IConfig) {
     }
   }
 
-  log.warn(...warnings);
+  log.optionWarn(...warnings);
 
   if (has('ignoreCustomFragments', config.terser.rules)) {
 
