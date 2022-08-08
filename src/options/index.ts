@@ -35,10 +35,7 @@ export const defaults = mergeDeepRight<IConfig>(<IConfig>{
   export: 'export',
   stores: null,
   config: '.',
-  spawn: {
-    watch: {},
-    build: {}
-  },
+  spawn: {},
   paths: {
     assets: 'assets/*',
     config: 'config/*.json',
@@ -91,10 +88,6 @@ export let bundle = <PartialDeep<IBundle>>({
   prod: false,
   dev: true,
   dirs: {},
-  build: {
-    spawn: 2,
-    pid: process.pid
-  },
   mode: {
     build: false,
     prompt: false,
@@ -108,11 +101,15 @@ export let bundle = <PartialDeep<IBundle>>({
     push: false,
     vsc: false
   },
-  spawn: {},
+  spawn: {
+    paths: new Set(),
+    invoked: false,
+    commands: {}
+  },
   watch: [],
   paths: {},
   sync: {
-    themes: {},
+    themes: [],
     stores: []
   }
 }) as IBundle;
