@@ -1,5 +1,5 @@
 import { cli } from './cli';
-import { Resource } from 'types';
+import { Resource, IConfig } from 'types';
 
 /* -------------------------------------------- */
 /* EXPORTS                                      */
@@ -37,3 +37,9 @@ function sync <R extends Resource> (
 }
 
 export { sync as default };
+
+export function syncify(config: IConfig) {
+
+
+
+}
