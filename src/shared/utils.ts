@@ -1,5 +1,5 @@
 import stringify from 'fast-safe-stringify';
-import { bold, gray } from '../cli/colors';
+import { bold, gray } from '../cli/ansi';
 import { isString, isBuffer, isArray, isObject } from './native';
 
 /**
@@ -70,10 +70,32 @@ export function convertTimer (ms: number) {
  * Example:
  *
  * ```
- * 01-01-2022 1:59:20
+ * 01:59:20
  * ```
  */
 export function getTime () {
+
+  const now = new Date();
+
+  return gray(
+    ((now.getHours() < 10) ? ('0' + now.getHours()) : (now.getHours())) +
+    gray(':') +
+    ((now.getMinutes() < 10) ? ('0' + now.getMinutes()) : (now.getMinutes())) +
+    gray(':') +
+    ((now.getSeconds() < 10) ? ('0' + now.getSeconds()) : (now.getSeconds()))
+  );
+};
+
+/**
+ * Return the current time/date
+ *
+ * Example:
+ *
+ * ```
+ * 01-01-2022 1:59:20
+ * ```
+ */
+export function getDateTime () {
 
   const now = new Date();
 
