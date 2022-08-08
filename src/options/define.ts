@@ -5,17 +5,44 @@ import { ICLICommands, IConfig, IPackage, IBundle } from 'types';
 import { pathExists, readJson } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { isArray, keys, is, assign } from 'shared/native';
-import { basePath, normalPath, parentPath } from 'shared/paths';
+import { isArray, keys, is, assign, nil, log, isString, isObject, ws } from '../shared/native';
+import { basePath, normalPath, parentPath } from '../shared/paths';
 import { authURL } from '../shared/options';
-import { log } from '../logger';
-import { header, spawnsHeader } from '../cli/tui';
+import { logHeader } from '../logger/heading';
+import { spawn } from '../logger/console';
+import { spawned, spawns } from '../cli/spawn';
+import { kill } from '../cli/exit';
+import { nwl, clear } from '../cli/tui';
+import { gray } from '../cli/ansi';
+import { queue } from '../requests/queue';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
 import { iconOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
 import { terserOptions } from './terser';
-import { spawned } from '../cli/spawn';
 import { bundle, update, defaults, cache } from './index';
+import { typeError } from './validate';
+
+/* -------------------------------------------- */
+/* EXIT HANDLER                                 */
+/* -------------------------------------------- */
+
+kill(() => {
+
+  nwl(nil);
+
+  spawns.forEach((child, name) => {
+    log(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
+    child.kill();
+  });
+
+  nwl(nil);
+
+  queue.pause();
+  queue.clear();
+  spawns.clear();
+  process.exit(0);
+
+});
 
 /**
  * Resolve Paths
@@ -26,7 +53,7 @@ import { bundle, update, defaults, cache } from './index';
  */
 export async function define (cli: ICLICommands) {
 
-  log.clear();
+  clear();
 
   const mode = modes(cli);
   const pkg = await pkgJson(cli.cwd);
@@ -40,9 +67,6 @@ export async function define (cli: ICLICommands) {
     silent: cli.silent,
     prod: cli.prod,
     dev: cli.dev && !cli.prod,
-    spawn: config.spawn[mode.build ? 'build' : 'watch'] as {
-      [command: string]: string
-    },
     dirs: {
       input: cli.input,
       output: cli.output,
@@ -59,9 +83,7 @@ export async function define (cli: ICLICommands) {
       caches(cli.cwd),
       getStores(cli, config),
       baseDirs(config),
-      header(),
       themeDirs(bundle.dirs.output),
-      setSpawns(bundle.spawn),
       importDirs(bundle),
       getPaths(config),
       sectionOptions(config),
@@ -69,11 +91,70 @@ export async function define (cli: ICLICommands) {
       styleOptions(config, pkg),
       iconOptions(config, pkg),
       terserOptions(config),
-      spawnsHeader()
+      setSpawns(config.spawn, bundle),
+      logHeader(bundle)
     ]
   );
 
 };
+
+/**
+ * Define Spawn
+ *
+ * Invokes the spawned processes. The `spawn()` function
+ * parameter passed in `spawned()` returns a function located
+ * in `logger/console.ts` and will pipe the child processes output
+ * as parameter value.
+ *
+ * > See the `cli/spawn.ts` which is used to normalize the log output.
+ */
+function setSpawns (config: IConfig['spawn'], bundle: IBundle) {
+
+  if (!isObject(config)) return typeError('spawn', 'spawn', config, '{ build: {}, watch: {} }');
+
+  let mode: 'build' | 'watch' = null;
+
+  if (bundle.mode.build && has('build', config)) mode = 'build';
+  if (bundle.mode.watch && has('watch', config)) mode = 'watch';
+
+  if (isNil(mode)) return;
+
+  if (!isObject(config[mode])) return typeError('spawn', 'build', config.build, 'string | string[]');
+
+  for (const name in config[mode]) {
+
+    const command = config[mode][name];
+
+    if (isString(command)) {
+
+      // create the command model
+      bundle.spawn.commands[name] = { cmd: nil, args: [], pid: NaN };
+
+      // convert to an array
+      const cmd = (command as string).trimStart().indexOf(ws) > -1
+        ? (command as string).trimStart().split(ws) as string[]
+        : [ command ] as string[];
+
+      bundle.spawn.commands[name].cmd = cmd.shift();
+      bundle.spawn.commands[name].args = cmd;
+
+      spawned(name, bundle.spawn.commands[name], spawn(name));
+
+    } else if (isArray(command)) {
+
+      // create the command model
+      const cmd = command.shift();
+      bundle.spawn.commands[name] = { cmd, args: command, pid: NaN };
+
+      spawned(name, bundle.spawn.commands[name], spawn(name));
+
+    } else {
+      typeError('spawn', mode, config[mode], 'string | string[]');
+    }
+
+  }
+
+}
 
 /**
  * Define Mode
@@ -194,12 +275,12 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
     const client = authURL(store.domain, env);
 
     // Set store endpoints
-    bundle.sync.stores.push({
+    const sidx = bundle.sync.stores.push({
       store: store.domain,
       domain,
       client,
       queue
-    });
+    }) - 1;
 
     // skip theme reference generation if within these resource based modes
     // we do not need context of themes if such modes were initialized by cli
@@ -219,12 +300,13 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
       }
 
       // Let populate the model with theme
-      bundle.sync.themes[domain] = {
+      bundle.sync.themes.push({
         target,
+        sidx,
         store: domain,
         id: store.themes[target],
         url: `/themes/${store.themes[target]}/assets.json`
-      };
+      });
     }
 
   }
@@ -336,11 +418,5 @@ export async function getPaths (config: IConfig) {
     bundle.paths[key] = anymatch(uri);
 
   }
-
-}
-
-export function setSpawns (cmds: IBundle['spawn']) {
-
-  for (const cmd in cmds) spawned(cmd, log.spawn(cmd));
 
 }
