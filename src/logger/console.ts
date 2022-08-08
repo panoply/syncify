@@ -1,32 +1,16 @@
-import { basename } from 'path';
+import { relative } from 'node:path';
 import notifier from 'node-notifier';
-import { queue } from '../requests/queue';
-import { nil, log } from '../shared/native';
+import { lastPath } from '../shared/paths';
+import { nil } from '../shared/native';
 import { sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
-import { spawns } from '../cli/spawn';
 import { bundle } from '../options/index';
-import { kill } from '../cli/exit';
 import * as tui from '../cli/tui';
-import * as c from '../cli/colors';
-import { IFile, IThemes } from 'types';
+import * as c from '../cli/ansi';
+import { Group, IFile, IThemes } from 'types';
 import * as timer from '../process/timer';
 
-kill(() => {
-
-  spawns.forEach(function ({ child }, name) {
-    log('- ' + c.gray('pid: #' + child.pid + ' (' + name + ')' + ' process exited'));
-    child.kill();
-  });
-
-  log('\n');
-
-  queue.pause();
-  queue.clear();
-  spawns.clear();
-  process.exit(0);
-
-});
+export { syncing, deleted, updated, warning } from '../cli/tui';
 
 /**
  * Warning stacks, maintains a store of log messages
@@ -37,31 +21,22 @@ const warnings: { [filename: string]: Set<string>; } = {};
  * Stdout/Stderr Interception
  */
 let $intercept: () => void = null;
-/**
- * Current Group Label
- */
-let pid: number = -1;
-/**
- * Current Group Label
- */
-let $group: string = 'Syncify';
+
 /**
  * Current Filename
  */
-let $filename: string = '';
+let group: Group = 'syncify';
 
 /**
- * Clear console
+ * Current Filename
  */
-export function clear (purge?: boolean) {
+let title: string = nil;
+/**
+ * Current Filename
+ */
+let $filename: string = nil;
 
-  if (purge) {
-    process.stdout.write(c.purge);
-  } else {
-    process.stdout.write(c.clear);
-  }
-
-};
+export const active: 1 | 2 | 3 = 1;
 
 /**
  * Enabled interceptor
@@ -85,28 +60,23 @@ export function listen () {
  */
 export function reset () {
 
-  if (bundle.build.spawn === 3) {
+  $intercept();
 
-    $intercept();
+  if ($filename in warnings && warnings[$filename].size > 0) {
 
-    if ($filename in warnings && warnings[$filename].size > 0) {
+    tui.nwl();
+    tui.write(c.yellow.bold('(!) Warnings'));
+    tui.nwl();
 
-      tui.newline();
-      tui.tree[1](c.yellow.bold('(!) Warnings'));
-      tui.newline();
-
-      for (const warn of warnings[$filename]) {
-        if (!warn) {
-          const text = warn.split('\n');
-          while (text.length !== 0) tui.tree[1](c.yellowBright(text.shift().trimStart()));
-        }
+    for (const warn of warnings[$filename]) {
+      if (!warn) {
+        const text = warn.split('\n');
+        while (text.length !== 0) tui.warning(text.shift().trimStart());
       }
-
-      warnings[$filename].clear();
-
     }
 
-    bundle.build.spawn = 2;
+    warnings[$filename].clear();
+
   }
 
 };
@@ -114,81 +84,49 @@ export function reset () {
 /**
  * Set current file
  */
-export function file (filename: string) {
+export function changed (file: IFile) {
+
+  tui.closed(group);
+
+  // do not clear if first run
+  if (group !== 'syncify') tui.clear();
+
+  group = file.namespace;
+
+  tui.opened(group);
+  tui.title(relative(bundle.dirs.input, file.input));
+
+  const filename = lastPath(file.input) + '/' + file.base;
 
   // Create stack reference model
-  if (!(filename in warnings)) warnings[filename] = new Set();
+  if (!(file.base in warnings)) warnings[filename] = new Set();
+  if ($filename !== filename) $filename = filename; // Update the current records
 
   if (bundle.mode.watch) {
-    tui.newline();
-    if ($filename !== filename) {
-      tui.tree[1](c.gray(filename));
-      tui.newline();
-      $filename = filename; // Update the current records
-    }
-
-  } else {
-    $filename = filename; // Update the current records
+    tui.changed(c.bold(filename));
   }
-};
-
-/**
- * Set logger group
- */
-export function group (label: string) {
-
-  if (label === 'assets' && (
-    bundle.build.spawn === 3 ||
-    bundle.build.spawn === 1
-  )) return { file };
-
-  if ($group !== label) {
-
-    if ($group !== nil) {
-      if ($group === 'Syncify') tui.newline();
-      tui.tree[3]($group); // Close the current log group
-      clear();
-    }
-
-    // Log the new group
-    tui.tree[0](label);
-
-    if (bundle.mode.build) {
-      tui.newline();
-    }
-
-    // Update the current records
-    $group = label;
-
-  }
-
-  return { file };
 
 };
 
-export function upload (file: IFile, theme: IThemes) {
+export function upload (theme: IThemes) {
 
-  const isSpawn = bundle.build.spawn === 3;
+  tui.updated(`${c.bold(theme.target)} → ${theme.store} ${c.gray('~ ' + timer.stop())}`);
 
-  if (isSpawn) tui.newline();
+}
 
-  info(c.whiteBright(`syncing ${c.bold(basename(file.key))}`));
-  info(c.green(`updated ${c.bold(theme.target)} in ${c.bold(theme.store)} ${c.gray(`µ${timer.stop()}`)}`));
+export function compile (message: string) {
 
-  if (isSpawn) tui.newline();
+  tui.compile(message);
+
 }
 
 /**
  * Log Information
  *
- * - `0` `┌─`
- * - `1` `│`
- * - `2` `├ `
- * - `3` `└─`
  */
-export function info (message: string, branch: 0 | 1 | 2 | 3 = 2) {
+export function info (message: string) {
 
-  tui.tree[branch](message);
+  tui.message(message);
 
 };
 
@@ -207,17 +145,36 @@ export function error (...message: string[]) {
 
     const text = sanitize(message.shift());
 
-    tui.newline();
+    tui.nwl();
 
     for (const warn of text.split('\n')) {
       if (warn) {
         const text = warn.split('\n');
-        while (text.length !== 0) tui.tree[1](c.redBright(text.shift().trimStart()));
+        while (text.length !== 0) tui.write(text.shift());
       }
     }
   }
 
 };
+
+export function optionWarn (...message: string[]) {
+
+  while (message.length !== 0) {
+
+    let text: string[] | string = sanitize(message.shift());
+
+    if (/\n/.test(text)) {
+      text = text.split('\n');
+      while (text.length !== 0) tui.write(c.yellow(text.shift()));
+    } else {
+
+      tui.write(c.yellow.bold('(!) ' + text));
+
+    }
+  }
+
+  tui.nwl();
+}
 
 /**
  * Log Warning
@@ -230,54 +187,42 @@ export function warn (...message: string[]) {
 
     if (/\n/.test(text)) {
       text = text.split('\n');
-      while (text.length !== 0) tui.tree[1](c.yellow(text.shift()));
+      while (text.length !== 0) tui.warning(text.shift());
     } else {
-      if ($group === 'Syncify') {
-        tui.tree[1](c.yellow.bold('(!) ' + text));
-      } else {
-        tui.newline();
-        tui.tree[1](c.yellow(text));
-        tui.newline();
-      }
+
+      tui.warning(text);
 
     }
   }
 
-  if ($group === 'Syncify') tui.newline();
 };
 
 /**
  * Spawn log
  */
-export function spawn (spawn: string) {
+export const spawn = (name: string) => (...message: string[]) => {
 
-  return (...message: string[]) => {
+  if (!bundle.spawn.invoked) bundle.spawn.invoked = true;
 
-    const spwn = spawns.get(spawn);
-    const { ready, child } = spwn;
+  if (group !== 'spawns') {
 
-    if (!ready) {
-      spwn.ready = true;
-      bundle.build.spawn = 1;
-      tui.spawnsReady(spawn, child.pid);
-      return;
-    }
+    tui.closed(group);
 
-    if (bundle.build.spawn === 1) bundle.build.spawn = 2;
-    if (spawn !== $group && ready) group(spawn);
+    // do not clear if first run
+    if (group !== 'syncify') tui.clear();
 
-    if (child.pid !== pid) {
-      tui.newline();
-      tui.tree[1](c.gray(`pid: ${child.pid}`));
-      tui.newline();
-      pid = child.pid;
-    }
+    // update name reference
+    tui.opened('spawns');
+    group = 'spawns';
+  }
 
-    while (message.length !== 0) {
-      const stdout = sanitize(message.shift());
-      process.stdout.write(tui.spawn(stdout));
-    }
+  if (title !== name) {
+    // update spawn process title
+    tui.title(name);
+    title = name;
 
-  };
+  }
+
+  tui.spawn(sanitize(message.shift()));
 
 };
