@@ -1,8 +1,8 @@
 import { IFile, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
-import { log } from '../logger';
 import { isFunction, isBuffer, isUndefined } from '../shared/native';
+import { Type } from '../process/files';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */
@@ -16,7 +16,9 @@ import { isFunction, isBuffer, isUndefined } from '../shared/native';
  */
 const passthrough = (file: IFile) => async (data: string) => {
 
-  await writeFile(file.output, data);
+  if (file.type !== Type.Spawn) {
+    await writeFile(file.output, data);
+  }
 
   return data;
 
@@ -29,8 +31,6 @@ const passthrough = (file: IFile) => async (data: string) => {
  * returning the base64 processed string.
  */
 export async function compile (file: IFile, cb: Syncify) {
-
-  log.group(file.namespace).file(file.key);
 
   const copy = passthrough(file);
   const read = await readFile(file.input);
