@@ -19,6 +19,7 @@ export async function configFile (uri: string): Promise<IConfig> {
   try {
 
     const jsconfig = await readConfig('syncify.config', null, uri);
+
     return jsconfig;
 
   } catch (e) {
