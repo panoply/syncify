@@ -58,7 +58,7 @@ export default {
     },
     watch: {
       rollup: 'rollup -c config/rollup.config.js -w',
-      webpack: 'webpack --watch --color --config config/webpack.config.js',
+      // webpack: 'webpack --watch --color --config config/webpack.config.js',
       esbuild: 'esbuild src/ts/dir/foo.js --outfile=theme/assets/esbuild-bundle.js --bundle --watch --color=true'
     }
   },

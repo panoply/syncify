@@ -11,8 +11,8 @@ const bundle = {
     filename: 'webpack-bundle.js'
   },
   infrastructureLogging: {
-    // colors: true,
-    // level: 'verbose'
+    level: 'verbose',
+    colors: true // NOTE: need to inform the docs about this
   }
 };
 
