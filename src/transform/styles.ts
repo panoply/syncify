@@ -54,7 +54,7 @@ function write (file: IFile<IStyle>, cb: Syncify) {
     writeFile(file.output, data, (e) => e ? console.log(e) : null);
 
     if (bundle.mode.watch) {
-      log.info(`created ${c.bold(file.key)} ${c.gray(`µ${timer.stop()}`)}`);
+      // log.info(`${c.white('created')} ${c.white.bold(file.key)} in ${c.white.bold(`${timer.stop()}`)}`);
     } else {
       log.info(`${c.cyan(file.key)} ${c.bold(byteConvert(byteSize(data)))}`);
 
@@ -71,9 +71,7 @@ async function sass (file: IFile<IStyle>) {
 
   if (file.ext === '.scss' || file.ext === '.sass') {
 
-    if (bundle.mode.watch) {
-      timer.start();
-    }
+    if (bundle.mode.watch) timer.start();
 
     try {
 
@@ -88,8 +86,8 @@ async function sass (file: IFile<IStyle>) {
         logger: config.sass.warnings ? Logger.silent : {
           debug: msg => console.log('DEBUG', msg),
           warn: (msg, opts) => {
-            log.warn(parse.sassPetty(msg, opts.span, opts.stack));
             warn = warn + 1;
+            if (config.sass.warnings) log.warn(parse.sassPetty(msg, opts.span, opts.stack));
           }
         }
       });
@@ -99,10 +97,10 @@ async function sass (file: IFile<IStyle>) {
       }
 
       if (bundle.mode.watch) {
-        log.info(`compile ${c.bold('sass')} ${c.gray(`µ${timer.stop()}`)}`);
+        log.info(`${c.bold('sass')} to ${c.bold('css')} ${c.gray('~ ' + timer.stop())}`);
       }
 
-      if (warn > 0) log.warn(`${warn} sass ${warn > 1 ? 'warnings' : 'warning'}`);
+      if (warn > 0) log.warn(`${c.bold('sass')} → ${c.bold(String(warn))} ${warn > 1 ? 'warnings' : 'warning'}`);
 
       return {
         css,
@@ -151,7 +149,7 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
   try {
 
     if (bundle.mode.watch) {
-      timer.start();
+      // timer.start();
     }
 
     const result = await pcss.process(css, {
@@ -161,12 +159,12 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
     });
 
     if (bundle.mode.watch) {
-      log.info(`compile ${c.bold('postcss')} ${c.gray(`µ${timer.stop()}`)}`);
+      log.info(`${c.bold('postcss')} ${c.gray(`~ ${timer.stop()}`)}`);
     }
     const warn = result.warnings();
 
     if (warn.length > 0) {
-      log.warn(`${warn.length} postcss ${warn.length > 1 ? 'warnings' : 'warning'}`);
+      log.warn(`${c.bold('postcss')} → ${c.bold(String(warn))} ${warn.length > 1 ? 'warnings' : 'warning'}`);
       log.warn(warn.join('\n'));
     }
 
@@ -175,7 +173,7 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
   } catch (e) {
 
     timer.clear();
-    log.info(c.red.bold(`postcss error in ${file.base}`));
+    log.error(c.red.bold(`postcss error in ${file.base}`));
     log.error(e);
 
     return null;
@@ -198,10 +196,7 @@ function snippet (css: string) {
  */
 export async function styles (file: IFile<IStyle>, cb: Syncify): Promise<string> {
 
-  if (bundle.mode.watch) {
-    timer.start();
-    log.info(c.cyan(`changed ${c.bold(lastPath(file.input) + '/' + file.base)}`));
-  }
+  if (bundle.mode.watch) timer.start();
 
   const output = write(file, cb);
 
@@ -217,6 +212,7 @@ export async function styles (file: IFile<IStyle>, cb: Syncify): Promise<string>
 
     if (file.config.postcss) {
       const post = await postcss(file, out.css, out.map);
+      if (post === null) return null;
       if (file.config.snippet) return output(snippet(post));
     }
 

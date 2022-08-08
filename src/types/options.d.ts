@@ -152,7 +152,7 @@ export interface IPaths {
    */
   templates: Tester;
   /**
-   * An array list of files to be uploads as template/customers
+   * An array list of files to be uploaded as template/customers
    *
    * @default 'source/templates/customers'
    */
@@ -262,6 +262,10 @@ export interface ICache {
 }
 
 export interface IThemes {
+  /**
+   * The store index reference
+   */
+  sidx: number;
   /**
    * The store domain name
    */
@@ -640,13 +644,58 @@ export interface ISync {
   /**
    * Theme synchronization options
    */
-  themes: {
-   [K in IStore['domain']]: IThemes
-  };
+  themes: Array<IThemes>;
   /**
    * Store synchronization options
    */
   stores: Array<IStore>;
+}
+
+export interface ISpawn {
+  /**
+   * Dynamically populated `Set` of file paths
+   * that were generated from a spawned process.
+   * Each item in the set will be matched against
+   * in modes like `watch` from the chokidar instance.
+   */
+  paths: Set<string>;
+  /**
+   * Whether or not a spawn process ran. This is used
+   * to determine what action took place in the build
+   * cycles. When this value is `true` it infers a spawn
+   * process was fired, when `false` it infers the opposite.
+   *
+   * > _Spawned invocation uses the `stdio` stream to determine
+   * whether or not a change was fired by a child running process_
+   */
+  invoked: boolean;
+  /**
+   * Commands that were spawned.
+   */
+  commands: {
+    /**
+     * The name of the process that will run, eg: `esbuild`
+     */
+    [name: string]: {
+      /**
+       * The base command, For example `esbuild` would be the
+       * _base_ command in `esbuild src/file.js --watch`. If an
+       * array command was provided in config then this value would
+       * represent the first item in that array.
+       */
+      cmd: string;
+      /**
+       * The command arguments. For example, all commands following
+       * the base command. The value here will be passed to spawn.
+       */
+      args: string[];
+      /**
+       * The process id (pid) assigned to the spawn. This is dynamically
+       * assigned and will be `NaN` until spawn has been invoked.
+       */
+      pid: number;
+    }
+  }
 }
 
 /* -------------------------------------------- */
@@ -654,27 +703,6 @@ export interface ISync {
 /* -------------------------------------------- */
 
 export interface IBundle {
-  /**
-   * Build specific references
-   */
-  build: {
-    /**
-     * The current process id
-     */
-    pid: 1 | 2 | 3;
-    /**
-     * Spawned process reference
-     *
-     * The passed integer values determine how a generated asset from
-     * a spawned process should be handled. This defaults to `2`
-     *
-     * - `1` skip syncing a spawned file, typically used on initialization
-     * - `2` not a spawned process, prevents invoking log interceptor
-     * - `3` spawned process was invoked, process accodingly
-     *
-     */
-    spawn: 1 | 2 | 3;
-  }
   /**
    * The version defined in the package.json
    */
@@ -735,9 +763,9 @@ export interface IBundle {
     delete: string;
   };
    /**
-    * The list of spawned child proccesses running
+    * Spawn related configuration operations
     */
-  spawn: { [name: string]: string };
+  spawn: ISpawn
    /**
     * List of paths to watch or build from
     */
