@@ -1,244 +1,179 @@
-import { Logger } from 'types';
 import { isNil } from 'rambdax';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
-import { toUpcase } from '../shared/utils';
-import { log, keys, nil, values } from '../shared/native';
-import { bold, cyan, reset, gray, pink, underline, whiteBright } from './colors';
-import { trunk, crown, branch, root } from './chars';
-import { bundle } from '../options/index';
+import { getTime } from '../shared/utils';
+import { log, nl } from '../shared/native';
+import * as c from './ansi';
+
+/* -------------------------------------------- */
+/* WRITE LOGS                                   */
+/* -------------------------------------------- */
 
 /**
- * TUI Tree
- *
- * Tree line logging generator. This array list of
- * functions are used print information to the console
- *
- * Branches:
- *
- * - `0` `┌─`
- * - `1` `│`
- * - `2` `├ `
- * - `3` `└─`
+ * close
  */
-export const tree: Logger = [
-  (message: string) => log('\n' + crown + pink.bold(toUpcase(message))),
-  (message: string) => log(trunk + message),
-  (message: string) => log(branch + message),
-  (message: string) => log(root + pink.bold(toUpcase(message)))
-];
+export const opened = (name: string) => {
+
+  log(`${nl}${c.open}${c.pink.bold(name)} ${c.gray('~')} ${c.gray(getTime())}`);
+
+};
+
+/**
+ * close
+ */
+export const closed = (name: string) => {
+
+  log(`${c.line}${nl}${c.close}${c.pink.bold(name)} ${c.gray('~')} ${c.gray(getTime())}`);
+
+};
+
+/**
+ * Contained Title
+ */
+export const title = (name: string) => {
+
+  log(`${c.line}${nl}${c.line}${c.bold.blueBright.italic(name)}${nl}${c.line}`);
+
+};
+
+/**
+ * Changed `cyan`
+ *
+ * `├ changed ...`
+ */
+export const changed = (message: string) => log(c.item + c.cyan(`changed ${message}`));
+
+/**
+ * Syncing `neonCyan`
+ *
+ * `├ syncing ...`
+ */
+export const syncing = (message: string) => log(c.item + c.neonCyan(`syncing ${message}`));
+
+/**
+ * Process `whiteBright`
+ *
+ * `├ process ...`
+ */
+export const message = (message: string) => log(c.item + c.whiteBright(`process ${message}`));
+
+/**
+ * Compile `whiteBright`
+ *
+ *  `├ compile ...`
+ */
+export const compile = (message: string) => log(c.item + c.whiteBright(`compile ${message}`));
+
+/**
+ * Process `orange`
+ *
+ * `├ deleted ...`
+ */
+export const deleted = (message: string) => log(c.item + c.orange(`deleted ${message}`));
+
+/**
+ * Updated `neonGreen`
+ *
+ * `├ updated ...`
+ */
+export const updated = (message: string) => log(c.item + c.neonGreen(`updated ${message}`));
+
+/**
+ * Ignored `gray`
+ *
+ * `├ ignored ...`
+ */
+export const ignored = (message: string) => log(c.item + c.gray(`ignored ${message}`));
+
+/**
+ * Warning `yellowBright`
+ *
+ * `├ warning ...`
+ */
+export const warning = (message: string) => log(c.line + c.yellowBright(`warning ${message}`));
+
+/* -------------------------------------------- */
+/* UTILITIES                                    */
+/* -------------------------------------------- */
+
+/**
+ * TUI Clear
+ *
+ * Clears the console messages. Optionally pass
+ * a `boolean` value of `true` to execute a purge
+ * and clean the logs.
+ */
+export const clear = (purge?: boolean) => process.stdout.write(purge ? c.purge : c.clear);
 
 /**
  * TUI Newline
  *
- * Inserts a newline _trunk_ character
+ * Inserts a newline _trunk_ character. Optionally pass
+ * an empty string (ie: `''`) to insert a newline without
+ * without c.line character
  *
  * `│`
  */
-export const newline = () => log(trunk);
+export const nwl = (blank?: '' | undefined) => isNil(blank) ? log(c.line) : log(nl);
 
 /**
- * TUI Waiting
+ * TUI Print
  *
- * Prints a waiting text reference
- *
- * ```
- * │
- * └─ [2029 5:21:29] waiting for changes...
- * ```
+ * Logs a message with the _trunk_ prepended.
  */
-export const waiting = (message: string) => log(trunk + message);
+export const write = (message: string) => log(c.line + message);
+
+/* -------------------------------------------- */
+/* PRINTED MESSAGES                             */
+/* -------------------------------------------- */
 
 /**
- * Header
+ * Spawned Logging
  *
- * Prints a small overview of runing resource, all operations
- * initialize with the header.
+ * Logging interface for spawned running operations. This
+ * function will normalize the output and keep it aligned
+ * with the TUI. This is invoked by the return function of
+ * `log.spawn()` in `logger/console.ts` which has _stdout_
+ * passed via `spawned()` in `cli/spawned.ts` and assigned
+ * by the `setSpawn()` call in `options/define.ts`
  *
  * ```
- * ┌─ Syncify v0.1.0.beta
- * │
- * │ Watch (production)
- * │
- * │ Syncing 2 stores and 6 themes
- * │ Spawned 1 process in the asset pipline
- * │
- * │ Theme previews:
- * │
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │  - https://shop.myshopify.com?preview_theme_id=123456789
- * │
+ * │ lorem ipsum lorem ipsum
+ * │ lorem ipsum lorem ipsum
+ * │ lorem ipsum lorem ipsum
  * ```
  */
-export function header () {
+export const spawn = (data: string) => {
 
-  if (bundle.mode.metafields) return '';
+  const limit = process.stdout.columns - 5;
+  const stdout: string[] = [];
+  const stderr: string[] = [ c.reset(c.line) ];
+  const error = data.search(/(?:\n {4}at .*)/);
 
-  /**
-   * Plural Store/s
-   */
-  const SL = bundle.sync.stores.length;
+  let message: string[] = [];
 
-  /**
-   * Plural Theme/s
-   */
-  const TL = keys(bundle.sync.themes).length;
+  if (/\berror\b:?/i.test(data) && error > 0) {
 
-  /* -------------------------------------------- */
-  /* BEGIN                                        */
-  /* -------------------------------------------- */
+    message = data.slice(0, error).split(nl);
 
-  const stores = cyan.bold(String(SL)) + (SL > 1 ? ' stores' : ' store');
-  const themes = cyan.bold(String(TL)) + (TL > 1 ? ' themes' : ' theme');
-  const env = reset.gray(`(${gray(bundle.dev ? 'development' : 'production')})`);
+    const stack = cleanStack(data.slice(error), { pretty: true, basePath: process.cwd() });
+    const lines = wrap(stack, limit).split(nl);
 
-  let running: string;
-  let heading: string;
+    stderr.push(nl);
 
-  if (bundle.mode.build) {
-    running = bold(`Build Mode ${env}`);
-  } else if (bundle.mode.watch) {
-    running = bold(`Watch Mode ${env}`);
-  } else if (bundle.mode.upload) {
-    running = bold('Uploading');
-  } else if (bundle.mode.download) {
-    running = bold('Download');
-  } else if (bundle.mode.vsc) {
-    running = bold(`VSCode (${bold.gray('generation')})`);
-  } else if (bundle.mode.clean) {
-    running = bold('Cleaning');
-  } else if (bundle.mode.export) {
-    running = bold('Exporting');
-  }
-
-  heading = (
-    `${crown + pink.bold('Syncify')} ${gray('v<!version!>')}\n${trunk}\n` +
-    `${trunk}${running}\n${trunk}\n`
-  );
-
-  if (SL > 0 && TL > 0) heading += `${trunk}Syncing ${themes} to ${stores}\n`;
-
-  if (!bundle.mode.upload) {
-    if (!isNil(bundle.spawn)) {
-      const s = keys(bundle.spawn).length;
-      heading += `${trunk}Spawning ${cyan.bold(`${s}`)} child ${s > 1 ? 'processes' : 'process'}\n`;
+    while (lines.length !== 0) {
+      const line = lines.shift();
+      if (line.trim().length > 0) stderr.push(c.reset(c.item + line));
     }
-  } else {
-    heading += trunk;
   }
 
-  if (
-    bundle.mode.upload ||
-    bundle.mode.download ||
-    bundle.mode.build ||
-    bundle.mode.clean ||
-    bundle.mode.vsc) {
+  if (message.length === 0) message = data.split(nl);
 
-    log(heading);
-
-  } else {
-
-    if (TL > 0) {
-
-      const themes = values(bundle.sync.themes);
-
-      const width = themes.reduce((size, { target }) => (
-        target.length > size ? target.length : size
-      ), 0);
-
-      const urls = themes.map(({ id, store, target }) => (
-        trunk + ' '.repeat(width - target.length) + whiteBright(toUpcase(target)) + ': ' +
-        underline.gray('https://' + store + '?preview_theme_id=' + id)
-      )).join('\n');
-
-      log(`${heading}${trunk}\n${trunk}${bold('Theme Previews:')}\n${trunk}\n${urls}\n${trunk}`);
-
-    } else {
-
-      log(heading);
-
-    }
-
+  while (message.length !== 0) {
+    const line = message.shift();
+    if (line.trim().length > 0) stdout.push(c.reset(c.line) + line);
   }
+
+  log(`${stdout.join(nl)}${stderr.join(nl)}`);
 
 };
-
-export function spawnsHeader () {
-
-  if (!bundle.mode.upload) {
-    if (!isNil(bundle.spawn)) {
-      log(`${trunk}${bold('Spawn Processes:')}\n${trunk}`);
-    }
-  }
-
-}
-
-export function spawnsReady (name: string, pid: number) {
-
-  tree[1](`${gray('PID')} ${pid}: ${pink(name)}`);
-
-}
-
-/**
- * Spawned Processes
- *
- * Logging interface for spawned running operations. Syncify
- * attempts to normalize the output of spawned processes (to some degree).
- *
- * ```
- * │ lorem ipsum lorem ipsum
- * │ lorem ipsum lorem ipsum
- * │ lorem ipsum lorem ipsum
- * ```
- */
-export function spawn (message: string) {
-
-  const stdout: string[] = [];
-  const limit = process.stdout.columns - 5;
-  const error = message.search(/(?:\n {4}at .*)/);
-
-  let lines: string[];
-  let stderr: string = nil;
-
-  if (error > 0) {
-
-    lines = message.slice(0, error).split('\n');
-    lines.push(trunk);
-
-    stderr = cleanStack(message.slice(error), {
-      pretty: true,
-      basePath: bundle.cwd
-    });
-
-    const temp = [ trunk ];
-
-    for (const err of wrap(stderr, limit).split('\n')) temp.push(trunk + err);
-
-    temp.push('\n', trunk);
-    stderr = temp.join('\n');
-
-  } else {
-
-    lines = message.split('\n');
-
-  }
-
-  const size = lines.length - 1;
-
-  for (let i = 0; i < size; i++) {
-
-    // reset ansi syntax and ensure clean logs
-    const line = lines[i];
-
-    // prepend the dash
-    stdout.push(trunk + line);
-
-  }
-
-  bundle.build.spawn = 3;
-
-  return `${stdout.join('\n')}${stderr}\n`;
-
-}
