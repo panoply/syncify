@@ -56,7 +56,7 @@ export async function sync (theme: IThemes, file: IFile, config: Request) {
     if (config.method === 'delete') {
       log.info(theme.store);
     } else {
-      log.upload(file, theme);
+      log.upload(theme);
       // if (queue.size === 0) log.wait();
     }
 
