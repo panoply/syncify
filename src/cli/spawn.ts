@@ -1,7 +1,15 @@
 import { ChildProcessWithoutNullStreams } from 'node:child_process';
 import spawn from 'cross-spawn';
-import { ws, isArray } from '../shared/native';
-import { bundle } from '../options/index';
+import { ISpawn } from 'types';
+
+/* -------------------------------------------- */
+/* TYPES                                        */
+/* -------------------------------------------- */
+
+/**
+ * Callback function method
+ */
+type Callback = (...data: string[]) => void
 
 /* -------------------------------------------- */
 /* EXPORTS                                      */
@@ -14,7 +22,7 @@ import { bundle } from '../options/index';
  * We need to hold reference of these to kill when
  * ending the session.
  */
-export const spawns: Map<string, { ready: boolean; child: ChildProcessWithoutNullStreams }> = new Map();
+export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
 
 /**
  * Spawn Processes
@@ -24,34 +32,28 @@ export const spawns: Map<string, { ready: boolean; child: ChildProcessWithoutNul
  * and then later intercepted + printed. The _spawn_ Map
  * keeps a store of the child processes which are referencs
  * when ending / killing a process.
+ *
+ * The `callback` function parameter will pass _stdout_ and _stderr_
+ * to returning function of `log.spawn()` located in the
+ * `logger/console.ts` file. The `log.spawn()` function is responsible
+ * for parsing and normalizing the log messages.
+ *
+ * Also see the `tui.spawn()` export located in `tui.ts` which
+ * is used to augment the messages and `define.setSpawns()` in
+ * the `options/define.ts` file.
+ *
+ * > The `kill()` hook is also located in `options/define.ts`
  */
-export const spawned = (name: string, callback: (data: string) => void) => {
+export const spawned = (name: string, command: ISpawn['commands'][string], callback: Callback) => {
 
-  const command = bundle.spawn[name];
-  const arg: string[] = isArray(command)
-    ? command
-    : command.trimStart().indexOf(ws) > -1
-      ? command.trimStart().split(ws)
-      : [ command ];
-
-  const cmd = arg.shift();
-  const child = spawn(cmd, arg, {
-    stdio: [
-      'pipe',
-      'pipe',
-      'pipe',
-      'pipe',
-      'pipe'
-    ]
-  });
+  const child = spawn(command.cmd, command.args, { stdio: 'pipe' });
 
   child.stdio[0].on('data', callback);
   child.stdio[1].on('data', callback);
   child.stdio[2].on('data', callback);
-  child.stdio[3].on('data', callback);
 
-  spawns.set(name, { child, ready: false });
+  command.pid = child.pid;
 
-  return child;
+  spawns.set(name, child);
 
 };
