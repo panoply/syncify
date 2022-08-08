@@ -5,7 +5,6 @@ import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
 import { Type } from '../process/files';
 import { is, nil } from '../shared/native';
-import { lastPath } from '../shared/paths';
 import { byteSize, byteConvert } from '../shared/utils';
 import { log, c } from '../logger';
 import { terser, bundle } from '../options/index';
@@ -201,8 +200,7 @@ const transform = (file: IFile) => async (data: string) => {
   const size = byteSize(postmin);
 
   if (bundle.mode.watch) {
-    log.info(c.gray('Minified Liquid and HTML'));
-    log.info(c.gray(`${byteConvert(size)} (saved ${byteConvert(file.size - size)})`));
+    log.info(c.white('compile') + ` ${byteConvert(file.size)} → ${byteConvert(size)} ${c.gray('saved ' + byteConvert(file.size - size))}`);
   } else {
     log.info(`${c.cyan(file.key)} ${c.bold(byteConvert(size))} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
   }
@@ -223,10 +221,7 @@ const transform = (file: IFile) => async (data: string) => {
  */
 export async function compile (file: IFile, cb: Syncify) {
 
-  if (bundle.mode.watch) {
-    timer.start();
-    log.info(c.cyan(`changed ${c.bold(lastPath(file.input) + '/' + file.base)}`));
-  }
+  if (bundle.mode.watch) timer.start();
 
   const read = await readFile(file.input);
 
