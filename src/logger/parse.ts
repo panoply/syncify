@@ -1,8 +1,8 @@
 import type { Exception, SourceSpan } from 'sass';
 import type { Warning } from 'postcss';
 import { range } from 'rambdax';
-import * as c from 'cli/colors';
-import { is, isArray, nil } from 'shared/native';
+import * as c from '../cli/ansi';
+import { is, isArray, nil } from '../shared/native';
 
 /* -------------------------------------------- */
 /* EXPRESSIONS                                  */
@@ -174,7 +174,7 @@ export const sassPetty = (message: string, span: SourceSpan, stack: string) => {
     c.yellowBright(`${message.slice(0, at)}`) +
     c.gray(`${code}\n`) +
     sassStack(stack)
-  ).replace(/^(?!\s*│)/gm, c.line('│ '));
+  ).replace(/^(?!\s*│)/gm, c.lightGray('│ '));
 
   return res;
 
