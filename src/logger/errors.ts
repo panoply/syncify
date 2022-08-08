@@ -1,4 +1,5 @@
-import { log, parse } from '.';
+import { liquidPretty } from './parse';
+import * as log from './console';
 
 /**
  * Error Handler
@@ -25,7 +26,7 @@ export function error (e: {
 
       log.error(
         e.statusText,
-        parse.liquidPretty(e.data.errors?.asset || e.data.error.asset)
+        liquidPretty(e.data.errors?.asset || e.data.error.asset)
       );
 
       break;
