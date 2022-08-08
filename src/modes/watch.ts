@@ -11,7 +11,7 @@ import { compile as pages } from '../transform/pages';
 import { is, isUndefined } from '../shared/native';
 import { parseFile, Type } from '../process/files';
 import { bundle } from '../options/index';
-import { log } from '../logger';
+import { c, log } from '../logger';
 
 /**
  * Watch Function
@@ -28,7 +28,7 @@ export function watch (callback: Syncify) {
     usePolling: true,
     interval: 50,
     binaryInterval: 100,
-    ignored: [ '*.map' ]
+    ignored: [ '**/*.map' ]
   });
 
   watcher.on('all', async function (event, path) {
@@ -37,25 +37,15 @@ export function watch (callback: Syncify) {
 
     if (isUndefined(file)) return;
 
+    if (file.type !== Type.Spawn) {
+      // log.reset();
+      log.changed(file);
+      // log.listen();
+    }
+
     if (is(event, 'change') || is(event, 'add')) {
 
-      if (bundle.build.spawn === 1) return;
-
-      log.group(file.namespace).file(file.base);
-
       try {
-
-        if (bundle.build.spawn === 3) {
-
-          log.listen();
-
-          await request.assets('put', file);
-
-          log.reset();
-
-          return;
-
-        }
 
         let value: string | void | { title: any; body_html: any; } = null;
 
@@ -92,13 +82,15 @@ export function watch (callback: Syncify) {
           return;
 
           // return request.pages(value);
-        } else if (file.type === Type.Asset) {
+        } else if (file.type === Type.Asset || file.type === Type.Spawn) {
 
           value = await asset(file, callback);
 
         }
 
         if (value !== null) {
+
+          log.syncing(c.bold(`${file.key}`));
 
           await request.assets('put', file, value);
 
