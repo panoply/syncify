@@ -79,7 +79,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.style) {
 
-    log.group('style').file(file.key);
+    log.changed(file);
 
     try {
       await styles(file as IFile<IStyle>, callback);
@@ -94,7 +94,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.section) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       await liquid(file as IFile<IStyle>, callback);
@@ -109,7 +109,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.layout) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       await liquid(file as IFile<IStyle>, callback);
@@ -124,7 +124,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.template) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       if (file.ext === '.json') {
@@ -143,7 +143,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.snippet) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       await liquid(file as IFile<IStyle>, callback);
@@ -158,7 +158,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.locale) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       await json(file as IFile<IStyle>, callback);
@@ -173,7 +173,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.config) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       await json(file as IFile<IStyle>, callback);
@@ -188,7 +188,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.page) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       await pages(file as IFile<IPages>, callback);
@@ -203,7 +203,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.metafield) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       await json(file as IFile<IStyle>, callback);
@@ -218,7 +218,7 @@ export async function build (callback?: Syncify) {
 
   for (const file of source.asset) {
 
-    log.group(file.namespace).file(file.key);
+    log.changed(file);
 
     try {
       log.info(c.cyan(`${file.base}`));
@@ -228,7 +228,7 @@ export async function build (callback?: Syncify) {
     }
   }
 
-  log.info(c.greenBright.bold('Completed in ' + timer.stop()), 3);
+  log.info(c.greenBright.bold('Completed in ' + timer.stop()));
   // await logger(bundle.spawn, { clear: true });
 
 };
