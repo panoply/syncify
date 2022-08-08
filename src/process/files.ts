@@ -66,8 +66,6 @@ export function setFile (file: Partial<IFile>, input: string, output: string) {
       output = join(output, key);
     }
 
-    if (bundle.build.spawn === 1 && type !== Type.Asset) bundle.build.spawn = 2;
-
     return assign({}, file as IFile, {
       type,
       input,
@@ -129,7 +127,7 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
   } else if (file.ext === '.css' || file.ext === '.scss' || file.ext === '.scss') {
     return context.style(merge('assets', Type.Style));
   } else if (paths.assets(path)) {
-    return merge('assets', Type.Asset);
+    return merge('assets', bundle.spawn.invoked ? Type.Spawn : Type.Asset);
   }
 
   return undefined;
