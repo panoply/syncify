@@ -1,4 +1,4 @@
-import { gray, bold, green } from '../cli/colors';
+import { gray, bold, green } from '../cli/ansi';
 
 /**
  * Help Text
