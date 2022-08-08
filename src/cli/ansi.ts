@@ -1,13 +1,9 @@
 import ansis from 'ansis';
+import { nl } from '../shared/native';
 
 /* -------------------------------------------- */
 /* HELPER UTILITIES                             */
 /* -------------------------------------------- */
-
-/**
- * Strip ANSI Characters from string
- */
-export { default as strip } from 'strip-ansi';
 
 /**
  * Clear console but preserve history
@@ -48,9 +44,9 @@ export const italic = ansis.italic;
 /* -------------------------------------------- */
 
 /**
- * Line Color (gray)
+ * Light gray
  */
-export const line = ansis.hex('#2a2a2e');
+export const lightGray = ansis.hex('#2a2a2e');
 
 /**
  * Pink
@@ -72,7 +68,7 @@ export const orange = ansis.hex('#FFAB40');
 export const neonGreen = ansis.hex('#56ef83');
 
 /**
- * Neon Green
+ * Neon Cyan
  */
 export const neonCyan = ansis.hex('#69d5fd');
 
@@ -149,3 +145,64 @@ export const whiteBright = ansis.whiteBright;
  * Gray
  */
 export const gray = ansis.gray;
+
+/* -------------------------------------------- */
+/* TREE CHARACTERS                              */
+/* -------------------------------------------- */
+
+/**
+ * TUI Tree - Crown
+ *
+ * `┌─`
+ */
+export const open = lightGray('┌─ ');
+
+/**
+ * TUI Tree - line
+ *
+ * `│`
+ */
+export const line = lightGray('│  ');
+
+/**
+ * TUI Tree - newline lines, ie: `\n` are prepended and appended
+ *
+ * ```
+ *
+ * │
+ *
+ * ```
+ */
+export const newline = lightGray(`${nl}│${nl}`);
+
+/**
+ * TUI Tree - item
+ *
+ * `├ `
+ */
+export const item = lightGray('├  ');
+
+/**
+ * TUI Tree - close
+ *
+ * `└─`
+ */
+export const close = lightGray('└─ ');
+
+/* -------------------------------------------- */
+/* EXTENDED HELPERS                             */
+/* -------------------------------------------- */
+
+/**
+ * Left Parenthesis in gray
+ *
+ * `(`
+ */
+export const lpr = gray('(');
+
+/**
+ * Right Parenthesis in gray
+ *
+ * `)`
+ */
+export const rpr = gray(')');
