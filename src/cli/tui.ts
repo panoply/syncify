@@ -2,7 +2,7 @@ import { isNil } from 'rambdax';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
 import { getTime } from '../shared/utils';
-import { log, nl } from '../shared/native';
+import { log, nil, nl } from '../shared/native';
 import * as c from './ansi';
 
 /* -------------------------------------------- */
@@ -14,7 +14,7 @@ import * as c from './ansi';
  */
 export const opened = (name: string) => {
 
-  log(`${nl}${c.open}${c.pink.bold(name)} ${c.gray('~')} ${c.gray(getTime())}`);
+  log(`${nl}${c.open}${c.pink.bold(name.toUpperCase())} ${c.gray('~')} ${c.gray(getTime())}`);
 
 };
 
@@ -23,16 +23,23 @@ export const opened = (name: string) => {
  */
 export const closed = (name: string) => {
 
-  log(`${c.line}${nl}${c.close}${c.pink.bold(name)} ${c.gray('~')} ${c.gray(getTime())}`);
+  log(`${c.line}${nl}${c.close}${c.pink.bold(name.toUpperCase())} ${c.gray('~')} ${c.gray(getTime())}`);
 
 };
 
 /**
  * Contained Title
  */
-export const title = (name: string) => {
+export const title = (name: string, color: 'blueBright' | 'red' | 'yellow' = 'blueBright') => {
 
-  log(`${c.line}${nl}${c.line}${c.bold.blueBright.italic(name)}${nl}${c.line}`);
+  let str: string = nil;
+  if (color === 'blueBright') {
+    str = c.bold[color].italic(name);
+  } else {
+    str = c.bold[color](name);
+  }
+
+  log(`${c.line}${nl}${c.line}${str}${nl}${c.line}`);
 
 };
 
