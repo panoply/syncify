@@ -91,8 +91,7 @@ export async function define (cli: ICLICommands) {
       styleOptions(config, pkg),
       iconOptions(config, pkg),
       terserOptions(config),
-      setSpawns(config.spawn, bundle),
-      logHeader(bundle)
+      setSpawns(config.spawn, bundle)
     ]
   );
 
