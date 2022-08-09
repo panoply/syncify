@@ -23,7 +23,7 @@ Fast, extensible and superior alternative Shopify [theme kit](https://shopify.gi
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Shopify's Theme Kit and other tools in the nexus fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped me. Shopify's tooling tends to impede upon my productivity and alternatives like Theme Kit fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
 
 # Install
 
@@ -49,7 +49,7 @@ yarn add @liquify/syncify --dev
 
 # Overview
 
-The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store. It ships with build, watch, download, upload, merge and pull capabilities for interfacing with your remote Shopify webshop. Together with a prompt based execution model, Syncify provides developers with theme control that aims to exceed expectations.
+The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store/s. It ships with build, watch, download, upload, merge and pull capabilities for interfacing with remote Shopify webshop's. Together with a prompt based execution model, Syncify provides developers with theme control that aims to exceed expectations.
 
 ### Theme Files
 
@@ -57,7 +57,7 @@ Syncify uses built-in capabilities when handling snippets, templates, layouts, l
 
 ### Asset Pipeline
 
-Syncify does not want to re-create or impede on developer preferences and tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify `build` and `watch` instances. Optionally, users can leverage built-in wrappers that Syncify exposes for handling assets files.
+Syncify does not want to re-create or impede on developer preferences and tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify's `build` and `watch` instances. Optionally, Syncify provides elementary handling of some asset file types which users can leverage, see **asset support** below.
 
 ### Asset Support
 
@@ -65,7 +65,9 @@ Syncify provides wrapper support for handling TypeScript, JavaScript, CSS, SCSS 
 
 # Setup
 
-After installing you will need to configure a connection to your shopify store. In your `package.json` file you can define configuration within via a `syncify` property. Syncify requires you provide either an admin API access token (recommended) or API Key and secret as credentials.
+After installing you will need to configure a connection to your shopify store. Syncify requires you provide either an admin API access token (recommended) or API Key and secret as credentials.
+
+> You can define configuration within your projects `package.json` file or use a `syncify.config.js` file.
 
 <details>
 <summary>
@@ -222,117 +224,258 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 
 # Configuration
 
-Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file, use a `syncify` property. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference if you haven't already. Below is the default settings that are applied.
+Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on a `syncify` property. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference if you haven't already. Below is the default settings that are applied.
 
 <!-- prettier-ignore -->
-```jsonc
-{
-  "syncify": {
-    "stores": [
-       {
-        "domain": null,
-        "themes": {}
-      }
-    ],
-    "dirs": {
-      "input": "source",
-      "output": "theme",
-      "imports": "import",
-      "exports": "export",
-      "metafields": "source/metafields",
-      "config": ".",
-    },
-    "paths": {
-      "assets": [],
-      "config": [],
-      "locales": [],
-      "layout": [],
-      "sections": [],
-      "snippets": [],
-      "templates": [],
-      "customers": [],
-      "pages": []
-    },
-    "spawn": {
-      "watch": {},
-      "build": {}
-    },
-    "transform": {
-      "pages": {
-
-
-      },
-      "scripts": [
-        {
-          ""
-        }
-      ],
-      "styles": [
-        {
-          "input": null,
-          "rename": null,
-          "watch": [],
-          "include": [],
-          "snippet": false,
-          "postcss": {
-            "env": "all"
-          },
-          "sass": {
-            "logWarnings": true,
-            "sourcemap": true,
-            "style": "compressed"
-          }
-        }
-      ],
-      "icons": {
-        "snippets": [],
-        "sprites": [
-          {
-            "input": [],
-            "output": null,
-            "options": {
-              "dimensionAttributes": true,
-              "namespaceClassnames": false,
-              "namespaceIDS": false,
-              "rootAttributes": {}
-            }
-          }
-        ]
-      },
-      "json": {
-        "spaces": 2,
-        "minify": {
-          "env": "never",
-          "removeSchemaRefs": true,
-          "exclude": []
-        }
-      },
-      "views": {
-        "sections": {
-          "prefix": true,
-          "prefixDuplicates": false,
-          "prefixSeparator": "-",
-          "globals": []
-        },
-        "minify": {
-          "env": "never",
-          "minifyJS": true,
-          "minifyCSS": true,
-          "removeComments": true,
-          "collapseWhitespace": true,
-          "trimCustomFragments": true,
-          "ignoreCustomFragments": [],
-          "minifySectionSchema": true,
-          "removeLiquidComments": true,
-          "removeAttributeNewlines": true,
-          "removeRedundantDashTrims": false,
-          "ignoredLiquidTags": [],
-          "exclude": []
-        }
+```js
+export default {
+  // input directory path
+  input: 'source',
+  // output directory path
+  output: 'theme',
+  // export directory path
+  export: 'export',
+  // import directory path
+  import: 'import',
+  // build config directory path
+  config: 'config',
+  // shopify stores to sync
+  stores: [
+    {
+      // shopify domain (without .myshopify.com)
+      domain: '',
+      // key > value mapping of store themes
+      themes: {
+        // the name of a theme to target/sync + the theme id
+        dev: 1234567891011,
       }
     }
+  ],
+  // path mappings relative to the "input" (source) directory
+  paths: {
+    // asset files to pass through
+    assets: 'assets/**/*',
+    // config files like settings_schema.json
+    config: 'config/*.json',
+    // locale files like en.json
+    locales: 'locales/*.json',
+    // layout theme files
+    layout: [
+      'views/theme.liquid',
+      'views/layouts/*.liquid'
+    ],
+    // section theme files
+    sections: [
+      'views/sections/**/*.liquid'
+    ],
+    // metafields to sync to your store
+    metafields: 'metafields/**/*.json',
+    // templates to sync to templates/customers
+    customers: [
+      'views/customers/*.json',
+      'views/customers/*.liquid'
+    ],
+    // static pages that sync to your stores pages
+    pages: [
+      'pages/*.md',
+      'pages/*.html'
+    ],
+    // template files, ie: index.json or 404.liquid etc
+    templates: [
+      'views/templates/*.json',
+      'views/templates/*.liquid'
+    ],
+    // snippet theme files
+    snippets: [
+      'views/snippets/*.liquid'
+    ]
+  },
+  // spawn process with syncify
+  spawn: {
+    // process to run in --build mode
+    build: {
+      // example of rollup spawning
+      rollup: 'rollup -c config/rollup.config.js'
+    },
+     // processes to run in --watch mode
+    watch: {
+      // example of rollup spawning with watch
+      rollup: 'rollup -c config/rollup.config.js -w',
+      // example of esbuild spawning with watch, syncify spawn accepts arrays
+      esbuild: [
+        'esbuild',
+        'source/ts/dir/foo.js',
+        '--outfile=theme/assets/esbuild-bundle.js',
+        '--bundle',
+        '--watch',
+        '--color=true'
+      ]
+    }
+  },
+  // transform options to apply
+  transforms: {
+    // options for handling .json file types
+    json: {
+      // the indentation level to apply to imported JSON
+      indent: 2,
+      // whether or not to indent with tabs
+      useTabs: false,
+      // a list of file names to exclude
+      exclude: []
+    },
+    // options for handling shopify sections
+    sections: {
+      // whether or not to apply directory prefixing
+      directoryPrefixing: true,
+      // whether or not prefixing should only apply to duplicated file names.
+      onlyPrefixDuplicates: false,
+      // the prefix separator to using in prefixing
+      prefixSeparator: '-',
+      // string list of sub-directories contained in sections to be treated as globals
+      global: [
+        'global'
+      ]
+    },
+    pages: {
+      importAs: 'markdown',
+      liquidWarnings: true,
+      fallbackAuthor: '',
+      markdown: {
+        breaks: true,
+        headerIds: true,
+        headerPrefix: '',
+        mangle: true,
+        silent: true,
+        smartypants: false
+      }
+    },
+    icons: {
+      replacer: true,
+      replacerTag: 'i',
+      vscodeCustomData: false,
+      inlined: [
+        {
+          input: [ 'icons/inlined/*.svg' ],
+          rename: 'icon.[file]',
+          snippet: true,
+          svgo: true
+        }
+      ],
+      sprites: [
+        {
+          input: 'icons/sprites/feather/*.svg',
+          rename: 'icons.liquid',
+          svgo: true,
+          snippet: true,
+          options: {
+            dimensionAttributes: true,
+            namespaceClassnames: true,
+            namespaceIDS: false,
+            rootAttributes: {
+              id: 'foo'
+            }
+          }
+        },
+        {
+          input: 'icons/sprites/social/*.svg',
+          rename: 'social-icons.liquid',
+          svgo: true,
+          snippet: true,
+          options: {
+            dimensionAttributes: true,
+            namespaceClassnames: true,
+            namespaceIDS: false,
+            rootAttributes: {
+              id: 'foo'
+            }
+          }
+        }
+      ]
+    },
+    scripts: [
+
+    ],
+    styles: [
+      {
+        input: 'styles/scss/snippet.scss',
+        snippet: true,
+        rename: '[file]-[dir].min.css', // TEST dir RENAME
+        postcss: true,
+        sass: {
+          warnings: false, // NO WARNINGS
+          sourcemap: true,
+          style: 'compressed'
+        }
+      },
+      {
+        input: 'styles/scss/index.scss',
+        snippet: false,
+        rename: 'main.min.css',
+        watch: [
+          '!scss/bootstrap.scss', // EXCLUDE TEST
+          'styles/scss/dir/*.scss' // COMPILE ON CHANGES IN dir FOLDER
+        ]
+      },
+      {
+        input: 'styles/scss/bootstrap.scss', // BOOTSTRAP FRAMEWORK
+        snippet: false,
+        sass: {
+          warnings: true,
+          sourcemap: true,
+          style: 'compressed',
+          include: [
+            'node_modules/'
+          ]
+        }
+      },
+      {
+        input: 'styles/css/snippet.css', // COMPILE THIS FILE ONLY
+        rename: 'example-[file].[ext]', // RENAME TEST
+        snippet: true // WE WILL GENERATE A SNIPPET
+      },
+      {
+        input: [
+          'styles/css/*.css', // COMPILES base.css AND stylesheet.css
+          '!styles/css/snippet.css' // EXCLUDE TEST
+        ],
+        rename: '[dir]-[file]'
+      }
+    ]
+  },
+  terser: {
+    json: 'prod',
+    html: 'prod',
+    pages: 'prod',
+    rules: {
+      caseSensitive: false,
+      collapseBooleanAttributes: false,
+      collapseInlineTagWhitespace: false,
+      conservativeCollapse: false,
+      keepClosingSlash: false,
+      noNewlinesBeforeTagClose: false,
+      preventAttributesEscaping: false,
+      removeEmptyAttributes: false,
+      removeEmptyElements: false,
+      removeOptionalTags: false,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      useShortDoctype: true,
+      collapseWhitespace: true,
+      continueOnParseError: true,
+      removeComments: true,
+      trimCustomFragments: true,
+      minifyLiquidSectionSchema: true,
+      removeLiquidComments: true,
+      stripInnerTagWhitespace: false,
+      stripAttributesContainingNewlines: true,
+      stripRedundantWhitespaceDashes: true,
+      ignoreLiquidTags: [],
+      ignoreLiquidObjects: [],
+      ignoreCustomFragments: []
+    }
   }
-}
+};
 ```
 
 # Getting Started
