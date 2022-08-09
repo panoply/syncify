@@ -1,4 +1,4 @@
 import bar from './dir/bar';
 import foo from './dir/foo';
-// fsss
+// f
 export { bar, foo };

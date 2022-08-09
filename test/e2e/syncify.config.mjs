@@ -141,9 +141,6 @@ export default {
         snippet: true,
         rename: '[file]-[dir].min.css', // TEST dir RENAME
         postcss: true,
-        watch: [
-          'styles/**/*.scss' // COMPILE ON ANY CHANGES
-        ],
         sass: {
           warnings: false, // NO WARNINGS
           sourcemap: true,
@@ -156,7 +153,7 @@ export default {
         rename: 'main.min.css',
         watch: [
           '!scss/bootstrap.scss', // EXCLUDE TEST
-          'scss/dir/*.scss' // COMPILE ON CHANGES IN dir FOLDER
+          'styles/scss/dir/*.scss' // COMPILE ON CHANGES IN dir FOLDER
         ]
       },
       {
@@ -174,10 +171,7 @@ export default {
       {
         input: 'styles/css/snippet.css', // COMPILE THIS FILE ONLY
         rename: 'example-[file].[ext]', // RENAME TEST
-        snippet: true, // WE WILL GENERATE A SNIPPET
-        watch: [
-          'styles/css/**/*.css' // COMPILE ON ANY CHANGE
-        ]
+        snippet: true // WE WILL GENERATE A SNIPPET
       },
       {
         input: [

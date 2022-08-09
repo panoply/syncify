@@ -5,8 +5,8 @@ import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
 import { Type } from '../process/files';
 import { is, nil } from '../shared/native';
-import { byteSize, byteConvert } from '../shared/utils';
-import { log, c } from '../logger';
+import { byteSize } from '../shared/utils';
+import { log } from '../logger';
 import { terser, bundle } from '../options/index';
 import * as timer from '../process/timer';
 
@@ -197,13 +197,7 @@ const transform = (file: IFile) => async (data: string) => {
 
   await writeFile(file.output, postmin);
 
-  const size = byteSize(postmin);
-
-  if (bundle.mode.watch) {
-    log.info(c.white('compile') + ` ${byteConvert(file.size)} → ${byteConvert(size)} ${c.gray('saved ' + byteConvert(file.size - size))}`);
-  } else {
-    log.info(`${c.cyan(file.key)} ${c.bold(byteConvert(size))} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
-  }
+  log.filesize(file, postmin);
 
   return postmin;
 

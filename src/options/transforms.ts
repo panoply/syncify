@@ -96,7 +96,7 @@ export function pageOptions (config: IConfig) {
     // checks against the default model.
     if (!has(option, transform.pages)) unknownError('pages', option);
 
-    if (option === 'importAs') {
+    if (option === 'importType') {
       if (u.isString(pages[option])) {
         if (/(?:markdown|html)/.test(pages[option])) {
           transform.pages[option] = pages[option];

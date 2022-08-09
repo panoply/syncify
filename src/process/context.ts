@@ -14,6 +14,8 @@ export function style (file: IFile<IStyle>) {
 
   const config = transform.styles.find(x => x.watch(file.input));
 
+  console.log(file, config);
+
   if (isUndefined(config)) return file;
 
   defineProperty(file, 'config', { get () { return config; } });
@@ -32,6 +34,8 @@ export function style (file: IFile<IStyle>) {
       file.output = join(parentPath(file.output), file.config.rename);
     }
   }
+
+  file.input = config.input;
 
   return file;
 

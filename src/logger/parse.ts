@@ -147,7 +147,7 @@ export const sassSplit = (stack: string) => {
  */
 export const sassPetty = (message: string, span: SourceSpan, stack: string) => {
 
-  if (span === undefined) return;
+  // if (span === undefined) return;
 
   const loc = message.search(SassMessage);
   const at = is(loc, -1) ? 0 : loc;
@@ -174,7 +174,7 @@ export const sassPetty = (message: string, span: SourceSpan, stack: string) => {
     c.yellowBright(`${message.slice(0, at)}`) +
     c.gray(`${code}\n`) +
     sassStack(stack)
-  ).replace(/^(?!\s*│)/gm, c.lightGray('│ '));
+  );
 
   return res;
 

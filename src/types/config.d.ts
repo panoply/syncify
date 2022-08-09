@@ -29,10 +29,10 @@ export interface IConfig {
   };
   spawn?: {
     watch?: {
-      [label: string]: string | string[];
+      [name: string]: string | string[];
     },
     build?: {
-      [label: string]: string | string[];
+      [name: string]: string | string[];
     }
   };
   terser?: {
@@ -41,6 +41,12 @@ export interface IConfig {
     pages?: 'always' | 'dev' | 'prod' | 'never';
     rules?: PartialDeep<Merge<ILiquid, IHTML>>
   }
+  logger?: {
+    clearOnChange: boolean;
+    filesize: boolean;
+    groupLogs: boolean;
+
+  };
   transforms?: {
     json?: {
       indent?: number;
@@ -54,7 +60,7 @@ export interface IConfig {
       global?: string[] | string
     };
     pages?: {
-      importAs?: 'markdown' | 'html',
+      importType?: 'markdown' | 'html',
       liquidWarnings?: boolean;
       fallbackAuthor?: string;
       markdown?: {

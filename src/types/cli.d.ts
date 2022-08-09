@@ -5,19 +5,18 @@
 import { LiteralUnion } from 'type-fest';
 
 export type Group = LiteralUnion<
-  | 'syncify'
-  | 'asset'
-  | 'spawns'
-  | 'icon'
-  | 'snippet'
-  | 'layout'
-  | 'section'
-  | 'page'
-  | 'locale'
-  | 'config'
-  | 'template'
-  | 'template/customer'
-  | 'metafield'
+  | 'SYNCIFY'
+  | 'ASSET'
+  | 'SPAWNS'
+  | 'ICON'
+  | 'SNIPPET'
+  | 'LAYOUT'
+  | 'SECTION'
+  | 'PAGE'
+  | 'LOCALE'
+  | 'CONFIG'
+  | 'TEMPLATE'
+  | 'METAFIELD'
   , string
 >
 
