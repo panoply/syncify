@@ -4,9 +4,8 @@ import { compile, Logger } from 'sass';
 import stringify from 'fast-safe-stringify';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
-import { lastPath } from '../shared/paths';
-import { isFunction, isString, isUndefined, isBuffer } from 'shared/native';
-import { byteConvert, byteSize } from '../shared/utils';
+import { isFunction, isString, isUndefined, isBuffer, nl } from 'shared/native';
+import { byteSize } from '../shared/utils';
 import { log, c, parse } from '../logger';
 import { bundle, cache } from '../options/index';
 import * as timer from '../process/timer';
@@ -53,12 +52,7 @@ function write (file: IFile<IStyle>, cb: Syncify) {
 
     writeFile(file.output, data, (e) => e ? console.log(e) : null);
 
-    if (bundle.mode.watch) {
-      // log.info(`${c.white('created')} ${c.white.bold(file.key)} in ${c.white.bold(`${timer.stop()}`)}`);
-    } else {
-      log.info(`${c.cyan(file.key)} ${c.bold(byteConvert(byteSize(data)))}`);
-
-    }
+    log.filesize(file, data);
 
     return content;
 
@@ -75,9 +69,9 @@ async function sass (file: IFile<IStyle>) {
 
     try {
 
-      let warn: number = 0;
+      log.hook('sass');
 
-      const { css, sourceMap } = compile(config.input, {
+      const { css, sourceMap } = compile(file.input, {
         sourceMapIncludeSources: false,
         style: config.sass.style,
         quietDeps: config.sass.warnings,
@@ -86,8 +80,7 @@ async function sass (file: IFile<IStyle>) {
         logger: config.sass.warnings ? Logger.silent : {
           debug: msg => console.log('DEBUG', msg),
           warn: (msg, opts) => {
-            warn = warn + 1;
-            if (config.sass.warnings) log.warn(parse.sassPetty(msg, opts.span, opts.stack));
+            log.warn(msg + '\n\n' + opts.stack);
           }
         }
       });
@@ -100,7 +93,9 @@ async function sass (file: IFile<IStyle>) {
         log.info(`${c.bold('sass')} to ${c.bold('css')} ${c.gray('~ ' + timer.stop())}`);
       }
 
-      if (warn > 0) log.warn(`${c.bold('sass')} → ${c.bold(String(warn))} ${warn > 1 ? 'warnings' : 'warning'}`);
+      log.unhook();
+
+      file.size = byteSize(css);
 
       return {
         css,
@@ -110,6 +105,7 @@ async function sass (file: IFile<IStyle>) {
     } catch (e) {
 
       timer.clear();
+      log.unhook();
       log.info(c.red.bold(`sass error in ${file.base}`));
       log.error(e);
 
@@ -124,6 +120,8 @@ async function sass (file: IFile<IStyle>) {
     // console.log(config, config.input)
 
     const css = await readFile(config.input);
+
+    file.size = byteSize(css);
 
     return { css: css.toString(), map: null };
 
@@ -146,11 +144,9 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
 
   const { config } = file;
 
-  try {
+  log.hook('postcss');
 
-    if (bundle.mode.watch) {
-      // timer.start();
-    }
+  try {
 
     const result = await pcss.process(css, {
       from: config.rename,
@@ -163,16 +159,17 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
     }
     const warn = result.warnings();
 
-    if (warn.length > 0) {
-      log.warn(`${c.bold('postcss')} → ${c.bold(String(warn))} ${warn.length > 1 ? 'warnings' : 'warning'}`);
-      log.warn(warn.join('\n'));
-    }
+    if (warn.length > 0) log.warn(warn.join(nl));
+
+    log.unhook();
 
     return result.toString();
 
   } catch (e) {
 
     timer.clear();
+
+    log.unhook();
     log.error(c.red.bold(`postcss error in ${file.base}`));
     log.error(e);
 
