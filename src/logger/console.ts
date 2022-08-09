@@ -1,14 +1,18 @@
-import { relative } from 'node:path';
 import notifier from 'node-notifier';
+import zlib from 'node:zlib';
 import { lastPath } from '../shared/paths';
 import { nil } from '../shared/native';
-import { sanitize } from '../shared/utils';
+import { byteConvert, byteSize, sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
 import { bundle } from '../options/index';
 import * as tui from '../cli/tui';
 import * as c from '../cli/ansi';
 import { Group, IFile, IThemes } from 'types';
 import * as timer from '../process/timer';
+
+/* -------------------------------------------- */
+/* RE-EXPORTS                                   */
+/* -------------------------------------------- */
 
 export { syncing, deleted, updated, warning } from '../cli/tui';
 
@@ -18,39 +22,43 @@ export { syncing, deleted, updated, warning } from '../cli/tui';
 const warnings: { [filename: string]: Set<string>; } = {};
 
 /**
- * Stdout/Stderr Interception
+ * The interception warner
  */
-let $intercept: () => void = null;
+let warner: string = nil;
+
+/**
+ * Stdout/Stderr interception hook
+ */
+let listen: () => void = null;
 
 /**
  * Current Filename
  */
-let group: Group = 'syncify';
+let group: Group = 'SYNCIFY';
 
 /**
  * Current Filename
  */
 let title: string = nil;
+
 /**
  * Current Filename
  */
-let $filename: string = nil;
-
-export const active: 1 | 2 | 3 = 1;
+let uri: string = nil;
 
 /**
  * Enabled interceptor
  */
-export function listen () {
+export const hook = (name: string) => {
 
-  $intercept = intercept((stream, data) => {
-
+  warner = name;
+  listen = intercept((stream, data) => {
     if (data.charCodeAt(0) === 9474) {
       process[stream].write(data);
     } else {
-      warnings[$filename].add(data);
+      const text = data.split('\n');
+      while (text.length !== 0) warnings[uri].add(`${c.yellowBright(text.shift().trimStart())}`);
     }
-
   });
 
 };
@@ -58,49 +66,58 @@ export function listen () {
 /**
  * Disable interceptor
  */
-export function reset () {
+export const unhook = () => {
 
-  $intercept();
-
-  if ($filename in warnings && warnings[$filename].size > 0) {
-
-    tui.nwl();
-    tui.write(c.yellow.bold('(!) Warnings'));
-    tui.nwl();
-
-    for (const warn of warnings[$filename]) {
-      if (!warn) {
-        const text = warn.split('\n');
-        while (text.length !== 0) tui.warning(text.shift().trimStart());
-      }
-    }
-
-    warnings[$filename].clear();
-
+  if (typeof listen === 'function') {
+    listen();
+    listen = null;
   }
+
+  if (uri in warnings && warnings[uri].size === 0) return;
+
+  tui.warning(`${c.bold(`${warner}`)} ~ type ${c.bold('w')} and press ${c.bold('enter')} to view`);
+
+  process.stdin.on('data', data => {
+
+    const input = data.toString().trim().toLowerCase();
+
+    if (input === 'w') {
+
+      tui.title('Warnings:', 'yellow');
+
+      for (const message of warnings[uri].values()) {
+        if (typeof message === 'string' && message.length > 0) tui.write(message);
+      }
+
+      warner = null;
+      warnings[uri].clear();
+
+    }
+  });
 
 };
 
 /**
  * Set current file
  */
-export function changed (file: IFile) {
+export const changed = (file: IFile) => {
 
   tui.closed(group);
 
   // do not clear if first run
-  if (group !== 'syncify') tui.clear();
+  if (group !== 'SYNCIFY') tui.clear();
 
   group = file.namespace;
 
   tui.opened(group);
-  tui.title(relative(bundle.dirs.input, file.input));
+  tui.title(file.key);
+  title = file.key;
 
   const filename = lastPath(file.input) + '/' + file.base;
 
   // Create stack reference model
-  if (!(file.base in warnings)) warnings[filename] = new Set();
-  if ($filename !== filename) $filename = filename; // Update the current records
+  if (!(filename in warnings)) warnings[filename] = new Set();
+  if (uri !== filename) uri = filename; // Update the current records
 
   if (bundle.mode.watch) {
     tui.changed(c.bold(filename));
@@ -121,10 +138,26 @@ export function compile (message: string) {
 }
 
 /**
- * Log Information
- *
+ * Log file size stats, used in minification
  */
-export function info (message: string) {
+export const filesize = (file: IFile, content: string | Buffer) => {
+
+  const size = byteSize(content);
+  const before = byteConvert(file.size);
+  const after = byteConvert(size);
+
+  if ((size > file.size || (size === file.size))) {
+    const gzip = byteConvert(zlib.gzipSync(content).length);
+    tui.compile(`${before} ${c.gray(`~ gzip ${gzip}`)}`);
+  } else {
+    tui.compile(`${before} → ${after} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
+  }
+};
+
+/**
+ * Log Information
+ */
+export const info = (message: string) => {
 
   tui.message(message);
 
@@ -133,7 +166,7 @@ export function info (message: string) {
 /**
  * Log Error
  */
-export function error (...message: string[]) {
+export const error = (...message: string[]) => {
 
   // Object
   notifier.notify({
@@ -157,63 +190,44 @@ export function error (...message: string[]) {
 
 };
 
-export function optionWarn (...message: string[]) {
-
-  while (message.length !== 0) {
-
-    let text: string[] | string = sanitize(message.shift());
-
-    if (/\n/.test(text)) {
-      text = text.split('\n');
-      while (text.length !== 0) tui.write(c.yellow(text.shift()));
-    } else {
-
-      tui.write(c.yellow.bold('(!) ' + text));
-
-    }
-  }
-
-  tui.nwl();
-}
-
 /**
  * Log Warning
  */
-export function warn (...message: string[]) {
+export const warn = (message: string) => {
 
-  while (message.length !== 0) {
+  if (typeof message === 'string') {
 
-    let text: string[] | string = sanitize(message.shift());
+    const text = message.split('\n');
 
-    if (/\n/.test(text)) {
-      text = text.split('\n');
-      while (text.length !== 0) tui.warning(text.shift());
+    if (typeof listen === 'function') {
+      while (text.length !== 0) warnings[uri].add(text.shift());
     } else {
-
-      tui.warning(text);
-
+      while (text.length !== 0) tui.warning(text.shift());
     }
   }
-
 };
 
 /**
- * Spawn log
+ * Spawn Logging
+ *
+ * This function is responsible for spawned logs and also
+ * informs about invoked spawned processes, which is not ideal
+ * but suffices (for now).
  */
 export const spawn = (name: string) => (...message: string[]) => {
 
   if (!bundle.spawn.invoked) bundle.spawn.invoked = true;
 
-  if (group !== 'spawns') {
+  if (group !== 'SPAWNS') {
 
     tui.closed(group);
 
     // do not clear if first run
-    if (group !== 'syncify') tui.clear();
+    if (group !== 'SYNCIFY') tui.clear();
 
     // update name reference
-    tui.opened('spawns');
-    group = 'spawns';
+    tui.opened('SPAWNS');
+    group = 'SPAWNS';
   }
 
   if (title !== name) {
