@@ -8,7 +8,7 @@ import { log } from '../logger';
 import { createVSCodeDir } from '../modes/vsc';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { lastPath, normalPath } from '../shared/paths';
-import { typeError, unknownError, invalidError } from './validate';
+import { typeError, unknownError, invalidError, warnOption } from './validate';
 import { transform, bundle, cache } from './index';
 import * as u from '../shared/native';
 import * as style from '../transform/styles';
@@ -208,8 +208,10 @@ export function jsonOptions (config: IConfig) {
  */
 export async function styleOptions (config: IConfig, pkg: IPackage) {
 
+  const warn = warnOption('Style option');
+
   // Find postcss configuration files
-  const postcssconfig = await readConfigFile('postcss.config', null, bundle.dirs.config); ;
+  const postcssconfig = await readConfigFile('postcss.config', null, bundle.dirs.config);
 
   // Ensure postcss config exists
   if (!isNil(postcssconfig)) {
@@ -218,7 +220,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
     if (getModules(pkg, 'postcss')) {
       style.processer(postcssconfig);
     } else {
-      log.error('Missing "postcss" dependency');
+      warn('Missing dependency', 'postcss');
     }
   }
 
@@ -239,16 +241,21 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
   // Process defined stylesheet inputs
   // For every stylesheet defined we create an individual config
   const list = styles.flatMap((style: any) => {
+
     // Flatten and glob array type inputs
-    return u.isArray(style.input)
-      ? style.input.flatMap((input: any) => glob.sync(path(input)).map(input => ({
+    return u.isArray(style.input) ? style.input.flatMap(
+      (input: any) => glob.sync(path(input)).map(
+        input => ({
+          ...style,
+          input: join(bundle.cwd, input)
+        })
+      )
+    ) : glob.sync(path(style.input)).map(
+      input => ({
         ...style,
         input: join(bundle.cwd, input)
-      })))
-      : glob.sync(path(style.input)).map(input => ({
-        ...style,
-        input: join(bundle.cwd, input)
-      }));
+      })
+    );
   });
 
   // Lets construct the configurations
@@ -286,7 +293,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
       // Warn if input is not using sass or scss extension
       if (!/\.s[ac]ss/.test(extname(compile.input))) {
-        log.warn(`Input ${compile.input} is not a sass file. Consider processing it with PostCSS.`);
+        warn('Input is not a sass file', compile.input);
       }
 
       // iterate of user defined options and assign to defaults
@@ -309,13 +316,13 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
         // validate the sass style
         if (option === 'style') {
           if (u.isString(style.sass[option])) {
-            if (/(?:compressed|expanded)/.test(style.sass[option])) {
+            if (style.sass[option] === 'expanded' || style.sass[option] === 'compressed') {
 
               compile.sass[option] = style.sass[option];
 
               // Warn when using expanded
               if (style.sass[option] === 'expanded') {
-                log.warn('Consider using compressed sass style for faster requests');
+                warn('Use "compressed" sass style for faster requests', option);
               }
 
               continue;
@@ -346,7 +353,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
     let rename: ReturnType<typeof renameFile>;
 
     // Define files to watch
-    let watch: string[];
+    const watch: string[] = [];
 
     // Package options has rename value
     if (has('rename', style)) {
@@ -393,7 +400,24 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
       if (u.isArray(style.watch)) {
 
-        watch = style.watch.map((path: string) => join(bundle.cwd, path));
+        // Expands the defined watch paths and validates the uri paths
+        for (const uri of style.watch) {
+
+          const globs = glob.sync(join(bundle.cwd, path(uri)));
+
+          if (globs.length === 0 && uri[0] !== '!') {
+            warn('Cannot resolve watch glob/path uri', uri);
+          }
+
+          for (const p of globs) {
+            if (existsSync(p)) {
+              watch.push(p);
+            } else {
+              warn('No file exists in path', p);
+            }
+          }
+        }
+
         watch.push(compile.input);
         compile.watch = anymatch(watch);
         bundle.watch.push(...watch);

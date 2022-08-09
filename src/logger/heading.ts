@@ -4,6 +4,7 @@ import { getTime, toUpcase } from '../shared/utils';
 import { log, keys, nil, values, nl, ws, from } from '../shared/native';
 import { spawns } from '../cli/spawn';
 import * as c from '../cli/ansi';
+import { warnings } from '../options/validate';
 
 /**
  * Log Heading
@@ -34,6 +35,13 @@ import * as c from '../cli/ansi';
  * │ Local:    http://localhost:8080
  * │ External: http://192.168.2.8:8080
  * │
+ * │ Warnings:
+ * │
+ * │ 2 Terser rule warnings
+ * │
+ * │   Option is not allowed: minifyJS
+ * │   Option is not allowed: minifyCSS
+ * │
  * ```
  */
 export const logHeader = (bundle: IBundle) => {
@@ -45,7 +53,7 @@ export const logHeader = (bundle: IBundle) => {
 
   if (bundle.mode.metafields) return message;
 
-  message += `${c.open}${c.pink.bold('syncify')} ${c.gray('~')} ${c.gray(getTime())}`;
+  message += `${c.open}${c.pink.bold('SYNCIFY')} ${c.gray('~')} ${c.gray(getTime())}`;
   message += `${c.newline}${c.line}${c.whiteBright.bold('v<!version!>')}${c.newline}`;
 
   /**
@@ -154,6 +162,28 @@ export const logHeader = (bundle: IBundle) => {
       message += `${c.line}${nl}${c.line}${c.bold('Theme Previews:')}${c.newline}${urls.join(nl)}${nl}${c.line}`;
     }
 
+  }
+
+  /* -------------------------------------------- */
+  /* CONFIG WARNINGS                              */
+  /* -------------------------------------------- */
+
+  let hasWarning: boolean = false;
+
+  for (const prop in warnings) {
+
+    const warn = warnings[prop];
+
+    if (warn.length > 0) {
+
+      if (!hasWarning) {
+        message += `${nl}${c.line}${c.yellow.bold('Warnings:')}${nl}${c.line}`;
+        hasWarning = true;
+      }
+
+      const title = c.yellowBright(`${warn.length} ${prop} ${warn.length > 1 ? 'warnings' : 'warning'}`);
+      message += `${nl}${c.line}${title}${c.newline}${warn.join(nl)}${nl}${c.line}`;
+    }
   }
 
   log(message);

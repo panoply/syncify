@@ -78,7 +78,7 @@ export async function define (cli: ICLICommands) {
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
-  return Promise.allSettled(
+  const promise = await Promise.allSettled(
     [
       caches(cli.cwd),
       getStores(cli, config),
@@ -95,6 +95,10 @@ export async function define (cli: ICLICommands) {
       logHeader(bundle)
     ]
   );
+
+  logHeader(bundle);
+
+  return promise;
 
 };
 

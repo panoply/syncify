@@ -2,7 +2,7 @@ import { has, hasPath } from 'rambdax';
 import { IConfig } from 'types';
 import { isArray, isRegex } from 'shared/native';
 import { terser, bundle } from './index';
-import { log, c } from '../logger';
+import { warnOption } from './validate';
 
 /**
  * Minification Options
@@ -15,7 +15,7 @@ export function terserOptions (config: IConfig) {
   if (!hasPath('terser.rules', config)) return;
 
   const { rules } = config.terser;
-  const warnings = [];
+  const warn = warnOption('Terser Rule');
 
   for (const key in rules) {
 
@@ -25,9 +25,7 @@ export function terserOptions (config: IConfig) {
       key === 'sortAttributes' ||
       key === 'sortClassName'
     ) {
-
-      warnings.push(`Option is not allowed: '${c.gray(key)}'`);
-
+      warn('Option is not allowed', key);
       continue;
     }
 
@@ -41,8 +39,6 @@ export function terserOptions (config: IConfig) {
       terser.html[key] = rules[key];
     }
   }
-
-  log.optionWarn(...warnings);
 
   if (has('ignoreCustomFragments', config.terser.rules)) {
 

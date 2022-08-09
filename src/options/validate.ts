@@ -1,7 +1,50 @@
 import { type } from 'rambdax';
 import { c } from '../logger';
 
-export function typeError (option: string, name: string, value: any, expects: string) {
+/**
+ * Warning Store
+ *
+ * This object holds a reference to each option warning
+ * to be printed. The `key` values infer the config option
+ * and the values are the warning messages to be printed.
+ *
+ * Example:
+ *
+ * ```
+ * │ (!) 2 group warnings
+ * │
+ * │ Some warning: 'option'
+ * │ Some warning: 'option'
+ * ```
+ */
+export const warnings: { [group: string]: string[] } = {};
+
+/**
+ * Option Warnings
+ *
+ * Records all config option warnings. Warnings are
+ * printed to the console at the end of runtime cycle.
+ * This function merely populates the `warning` object store.
+ */
+export const warnOption = (option: string) => {
+
+  warnings[option] = [];
+
+  return (message: string, value: string) => {
+
+    warnings[option].push(`${c.line}  ${c.yellowBright(`${message}: ${c.bold(value)}`)}`);
+
+  };
+
+};
+
+/**
+ * Invalid Type
+ *
+ * Throws an error when an invalid type was provided to
+ * a config option
+ */
+export const typeError = (option: string, name: string, value: any, expects: string) => {
 
   console.error(c.red(`
     ${c.bold(`Invalid ${c.cyan(option)} configuration`)}
@@ -18,7 +61,7 @@ export function typeError (option: string, name: string, value: any, expects: st
 
   process.exit(1);
 
-}
+};
 
 /**
  * Invalid Option
@@ -26,7 +69,7 @@ export function typeError (option: string, name: string, value: any, expects: st
  * Throws an error when an invalid config option
  * was provided.
  */
-export function invalidError (option: string, name: any, value: any, expects: string) {
+export const invalidError = (option: string, name: any, value: any, expects: string) => {
 
   console.error(
     c.red(`
@@ -45,7 +88,7 @@ export function invalidError (option: string, name: any, value: any, expects: st
 
   process.exit(1);
 
-}
+};
 
 /**
  * Unknown Option
@@ -53,7 +96,7 @@ export function invalidError (option: string, name: any, value: any, expects: st
  * Throws an error when an unknown config option
  * was provided.
  */
-export function unknownError (option: string, value: any) {
+export const unknownError = (option: string, value: any) => {
 
   console.error(
     c.redBright.bold(`Unknown ${option} option\n\n`),
@@ -62,4 +105,4 @@ export function unknownError (option: string, value: any) {
 
   process.exit(1);
 
-}
+};
