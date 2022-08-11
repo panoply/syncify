@@ -24,7 +24,7 @@ export async function get <T> (url: string, config: AxiosRequestConfig<Request>)
 
   }).catch((e: AxiosError) => {
 
-    log.error(e.message);
+    log.throws(e.message);
 
   });
 
@@ -40,6 +40,8 @@ let limit: number;
  * the handler will re-queue them.
  */
 export async function sync (theme: IThemes, file: IFile, config: Request) {
+
+  if (queue.isPaused) return;
 
   if (queue.concurrency > 1) {
     if (limit >= 20) queue.concurrency--;
@@ -57,7 +59,7 @@ export async function sync (theme: IThemes, file: IFile, config: Request) {
       log.info(theme.store);
     } else {
       log.upload(theme);
-      // if (queue.size === 0) log.wait();
+      // if (queue.onIdle()) log.complete();
     }
 
     limit = parseInt(headers['x-shopify-shop-api-call-limit'].slice(0, 2), 10);

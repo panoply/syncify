@@ -45,6 +45,28 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
    */
   base: string;
   /**
+   * The input relative path location from current working directory
+   *
+   * @example
+   *
+   * 'source/views/sections/dir/file.liquid'
+   */
+  relative: string;
+  /**
+   * The file kind grouping. This is used internally and describes
+   * the type of file we are working with.
+   *
+   * @example
+   *
+   * 'json'
+   * 'liquid'
+   * 'sass'
+   * 'css'
+   *
+   * // etc etc
+   */
+  kind: string;
+  /**
    * The input filename without the extension.
    *
    * @example
@@ -53,8 +75,7 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
    */
   stem: string;
   /**
-   * The chokidar passed path.
-   * This is full URI file URI path.
+   * The chokidar passed path - this is full URI file URI path.
    *
    * @example
    *
@@ -77,7 +98,7 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
    */
   output: string;
   /**
-   * The file size in bytes.
+   * The file size in bytes before any augmentation is applied.
    *
    * @example
    *
@@ -95,7 +116,8 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
   config: T
   /**
    * The `key` value will be passed into the sync request. This
-   * will contain the namespace and base name
+   * will contain the namespace and base name and is used for
+   * uploading to Shopify stores.
    *
    * @example
    *

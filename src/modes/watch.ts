@@ -1,18 +1,16 @@
-/* eslint-disable brace-style */
-
 import chokidar from 'chokidar';
 import { Syncify, IFile, IStyle, IPages } from 'types';
-import { client } from '../requests/client';
+import { client, queue } from '../requests/client';
 import { compile as liquid } from '../transform/liquid';
 import { styles } from '../transform/styles';
 import { compile as asset } from '../transform/asset';
 import { compile as json } from '../transform/json';
 import { compile as pages } from '../transform/pages';
-import { is, isUndefined } from '../shared/native';
+import { is, isUndefined, ws } from '../shared/native';
 import { parseFile, Type } from '../process/files';
 import { bundle } from '../options/index';
 import { c, log } from '../logger';
-
+import { Server } from 'ws';
 /**
  * Watch Function
  *
@@ -31,17 +29,24 @@ export function watch (callback: Syncify) {
     ignored: [ '**/*.map' ]
   });
 
+  const wss = new Server({
+    port: 8090,
+    path: '/ws'
+
+  });
+
+  wss.on('connection', v => {
+    wss.on('style', () => v.send('style'));
+    wss.on('script', () => v.send('script'));
+  });
+
   watcher.on('all', async function (event, path) {
 
     const file: IFile = parse(path);
 
     if (isUndefined(file)) return;
 
-    if (file.type !== Type.Spawn) {
-      // log.reset();
-      log.changed(file);
-      // log.listen();
-    }
+    if (file.type !== Type.Spawn) log.changed(file);
 
     if (is(event, 'change') || is(event, 'add')) {
 
@@ -52,6 +57,8 @@ export function watch (callback: Syncify) {
         if (file.type === Type.Style) {
 
           value = await styles(file as IFile<IStyle>, callback);
+
+          wss.emit('style');
 
         } else if (file.type === Type.Section || file.type === Type.Layout || file.type === Type.Snippet) {
 
@@ -86,9 +93,13 @@ export function watch (callback: Syncify) {
 
           value = await asset(file, callback);
 
+          wss.emit('script');
+
         }
 
         if (value !== null) {
+
+          // if (queue.isPaused) queue.start();
 
           log.syncing(c.bold(`${file.key}`));
 
@@ -96,9 +107,9 @@ export function watch (callback: Syncify) {
 
         }
 
-      } catch (error) {
+      } catch (e) {
 
-        log.error(error);
+        log.throws(e);
 
       }
 

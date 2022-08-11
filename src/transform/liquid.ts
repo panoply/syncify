@@ -101,7 +101,7 @@ const removeComments = (content: string) => {
  * Minfies the contents of a `{% schema %}` tag
  * from within sections.
  */
-const minifySchema = (content: string) => {
+const minifySchema = (file: IFile, content: string) => {
 
   if (!terser.liquid.minifyLiquidSectionSchema) return removeComments(content);
 
@@ -116,7 +116,8 @@ const minifySchema = (content: string) => {
 
     } catch (e) {
 
-      log.error(e);
+      log.error('error occured minifying schema', file);
+      log.throws(e);
 
       return data;
 
@@ -151,7 +152,7 @@ const removeDashes = (content: string) => {
  * Executes html terser on remaining document contents
  * and applied rules that were previously setup in config.
  */
-const htmlMinify = async (content: string, terser: IHTML) => {
+const htmlMinify = async (file: IFile, content: string, terser: IHTML) => {
 
   try {
 
@@ -159,9 +160,10 @@ const htmlMinify = async (content: string, terser: IHTML) => {
 
     return htmlmin;
 
-  } catch (error) {
+  } catch (e) {
 
-    log.error(error);
+    log.error('error occured during minfication', file);
+    log.throws(e);
 
     return null;
 
@@ -183,10 +185,10 @@ const transform = (file: IFile) => async (data: string) => {
   }
 
   const content = is(file.type, Type.Section)
-    ? minifySchema(data)
+    ? minifySchema(file, data)
     : removeComments(data);
 
-  const htmlmin = await htmlMinify(content, terser.html);
+  const htmlmin = await htmlMinify(file, content, terser.html);
 
   if (isNil(htmlmin)) {
     await writeFile(file.output, data);

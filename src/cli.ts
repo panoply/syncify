@@ -1,10 +1,11 @@
 import { has } from 'rambdax';
 import { ICLICommands, Syncify } from 'types';
-import { upload } from 'modes/upload';
-import { download } from 'modes/download';
-import { clean } from 'modes/clean';
-import { build } from 'modes/build';
-import { watch } from 'modes/watch';
+import { upload } from './modes/upload';
+import { download } from './modes/download';
+import { clean } from './modes/clean';
+import { build } from './modes/build';
+import { watch } from './modes/watch';
+import { server } from './modes/server';
 // import { resource } from 'modes/resource';
 // import { readConfig } from 'config/config';
 import { help } from './logger/help';
@@ -35,6 +36,8 @@ export async function cli (options: ICLICommands, callback?: Syncify) {
       throw new Error(error);
     }
   }
+
+  server('https://' + bundle.sync.stores[0].domain, bundle);
 
   // console.log(bundle);
 

@@ -5,6 +5,8 @@ export default rollup(
     input: 'src/index.ts',
     external: [
       'anymatch',
+      'devcert',
+      'ws',
       'axios',
       'chokidar',
       '@web/config-loader',

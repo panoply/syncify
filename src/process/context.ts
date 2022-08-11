@@ -14,7 +14,7 @@ export function style (file: IFile<IStyle>) {
 
   const config = transform.styles.find(x => x.watch(file.input));
 
-  console.log(file, config);
+  // console.log(file, config);
 
   if (isUndefined(config)) return file;
 

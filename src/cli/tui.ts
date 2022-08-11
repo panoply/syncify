@@ -34,7 +34,7 @@ export const title = (name: string, color: 'blueBright' | 'red' | 'yellow' = 'bl
 
   let str: string = nil;
   if (color === 'blueBright') {
-    str = c.bold[color].italic(name);
+    str = c.bold[color](name);
   } else {
     str = c.bold[color](name);
   }
@@ -46,30 +46,27 @@ export const title = (name: string, color: 'blueBright' | 'red' | 'yellow' = 'bl
 /**
  * Changed `cyan`
  *
- * `├ changed ...`
+ * ```
+ * │
+ * │ source/dir/filename.ext
+ * │
+ * ```
  */
-export const changed = (message: string) => log(c.item + c.cyan(`changed ${message}`));
-
-/**
- * Syncing `neonCyan`
- *
- * `├ syncing ...`
- */
-export const syncing = (message: string) => log(c.item + c.neonCyan(`syncing ${message}`));
+export const changed = (message: string) => log(`${c.line}${nl}${c.line}${c.bold.cyan(message)}${nl}${c.line}`);
 
 /**
  * Process `whiteBright`
  *
  * `├ process ...`
  */
-export const message = (message: string) => log(c.item + c.whiteBright(`process ${message}`));
+export const message = (message: string) => log(c.item + c.whiteBright(`+ process ${message}`));
 
 /**
  * Compile `whiteBright`
  *
  *  `├ compile ...`
  */
-export const compile = (message: string) => log(c.item + c.whiteBright(`compile ${message}`));
+export const compile = (message: string) => log(c.item + c.whiteBright(`+ ${message}`));
 
 /**
  * Process `orange`
@@ -83,7 +80,7 @@ export const deleted = (message: string) => log(c.item + c.orange(`deleted ${mes
  *
  * `├ updated ...`
  */
-export const updated = (message: string) => log(c.item + c.neonGreen(`updated ${message}`));
+export const updated = (message: string) => log(c.item + c.neonGreen(`✓ updated ${message}`));
 
 /**
  * Ignored `gray`
@@ -97,7 +94,7 @@ export const ignored = (message: string) => log(c.item + c.gray(`ignored ${messa
  *
  * `├ warning ...`
  */
-export const warning = (message: string) => log(c.line + c.yellowBright(`warning ${message}`));
+export const warning = (message: string) => log(c.item + c.yellowBright(`${message}`));
 
 /* -------------------------------------------- */
 /* UTILITIES                                    */
@@ -129,6 +126,13 @@ export const nwl = (blank?: '' | undefined) => isNil(blank) ? log(c.line) : log(
  * Logs a message with the _trunk_ prepended.
  */
 export const write = (message: string) => log(c.line + message);
+
+/**
+ * TUI Print
+ *
+ * Logs a message with the _trunk_ prepended.
+ */
+export const item = (message: string) => log(c.item + message);
 
 /* -------------------------------------------- */
 /* PRINTED MESSAGES                             */

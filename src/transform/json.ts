@@ -44,7 +44,7 @@ export function parse (data: string) {
 
   } catch (e) {
 
-    log.error(e);
+    log.throws(e);
 
     return null;
 
@@ -68,7 +68,7 @@ export function minify (data: string, space = 0): any {
 
   } catch (e) {
 
-    log.error(e);
+    log.throws(e);
 
     return null;
 
@@ -103,7 +103,7 @@ export function jsonCompile (file: IFile, data: string, space = 0): any {
   if (is(file.type, Type.Metafield)) {
     return minified;
   } else {
-    writeFile(file.output, minified, (e) => e ? log.error(e.message) : null);
+    writeFile(file.output, minified, (e) => e ? log.throws(e.message) : null);
     return minified;
   }
 
@@ -120,7 +120,6 @@ export async function compile (file: IFile, cb: Syncify): Promise<string> {
 
   if (bundle.mode.watch) {
     timer.start();
-    log.info(c.cyan(`changed ${c.bold(lastPath(file.input) + '/' + file.base)}`));
   }
 
   const json = await readFile(file.input);

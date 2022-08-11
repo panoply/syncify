@@ -3,11 +3,46 @@ import { bold, gray } from '../cli/ansi';
 import { isString, isBuffer, isArray, isObject } from './native';
 
 /**
+ * Returns a grouping reference name according
+ * to file extension
+ */
+export const fileKind = (ext: string) => {
+
+  switch (ext) {
+    case 'webm':
+    case 'mpg':
+    case 'mp2':
+    case 'mpeg':
+    case 'mpe':
+    case 'mpv':
+    case 'ogg':
+    case 'm4p':
+    case 'm4v':
+    case 'avi':
+    case 'wmv':
+    case 'mov':
+    case 'qt':
+    case 'flv':
+    case 'swf':
+    case 'avchd': return 'video';
+
+    case 'm4a':
+    case '3gp':
+    case '3g2':
+    case 'aiff':
+    case 'amr':
+    case 'mp3':
+    case 'wav': return 'audio';
+  }
+
+};
+
+/**
  * Sanitize Message
  *
  * Sanatizes the log message passed
  */
-export function sanitize (message: string) {
+export const sanitize = (message: string) => {
 
   if (isBuffer(message)) return message.toString();
   if (isObject(message) || isArray(message)) return stringify(message);
@@ -22,7 +57,7 @@ export function sanitize (message: string) {
  * Will captilalize the first letter of a string. Used
  * by the console for names and various other informatives.
  */
-export function toUpcase <T extends string> (value: T) {
+export const toUpcase = <T extends string> (value: T) => {
 
   return value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -31,7 +66,7 @@ export function toUpcase <T extends string> (value: T) {
 /**
  * Returns the byte size of a string value
  */
-export function byteSize (string: string | Buffer): number {
+export const byteSize = (string: string | Buffer): number => {
 
   return isString(string)
     ? Buffer.from(string).toString().length
@@ -43,7 +78,7 @@ export function byteSize (string: string | Buffer): number {
  * Converts byte size to killobyte, megabyre,
  * gigabyte or terrabyte
  */
-export function byteConvert (bytes: number): string {
+export const byteConvert = (bytes: number): string => {
 
   if (bytes === 0) return '0b';
 
@@ -58,7 +93,7 @@ export function byteConvert (bytes: number): string {
 /**
  * Converts Time
  */
-export function convertTimer (ms: number) {
+export const convertTimer = (ms: number) => {
   const m = Math.floor(ms / 60000);
   const s = ((ms % 60000) / 1000).toFixed(0);
   return m > 0 ? (m + 'min' + (Number(s) < 10 ? '0' : '') + s) : s;

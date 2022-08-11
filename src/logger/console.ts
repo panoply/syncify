@@ -1,35 +1,46 @@
 import notifier from 'node-notifier';
 import zlib from 'node:zlib';
-import { lastPath } from '../shared/paths';
 import { nil } from '../shared/native';
 import { byteConvert, byteSize, sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
 import { bundle } from '../options/index';
 import * as tui from '../cli/tui';
 import * as c from '../cli/ansi';
+import { queue } from '../requests/queue';
 import { Group, IFile, IThemes } from 'types';
 import * as timer from '../process/timer';
+import { has } from 'rambdax';
+import Spinner from 'tiny-spinner';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
 /* -------------------------------------------- */
 
-export { syncing, deleted, updated, warning } from '../cli/tui';
+export { deleted, updated } from '../cli/tui';
 
 /**
  * Warning stacks, maintains a store of log messages
  */
-const warnings: { [filename: string]: Set<string>; } = {};
+export const warning: {
+  current: string;
+  count: number;
+  process: { [id: string]: Set<string> }
+} = {
+  current: null,
+  count: 0,
+  process: {}
+};
 
-/**
- * The interception warner
- */
-let warner: string = nil;
+const uploads: Set<string> = new Set();
 
 /**
  * Stdout/Stderr interception hook
  */
 let listen: () => void = null;
+
+let idle: boolean = false;
+
+let kind: string = '';
 
 /**
  * Current Filename
@@ -46,54 +57,84 @@ let title: string = nil;
  */
 let uri: string = nil;
 
+process.stdin.on('data', data => {
+
+  const input = data.toString().trim().toLowerCase();
+
+  if (input === 'w') {
+
+    for (const prop in warning.process) {
+
+      if (warning.process[prop].size === 0) continue;
+
+      tui.title(prop, 'yellow');
+
+      for (const message of warning.process[prop].values()) {
+        if (typeof message === 'string' && message.length > 0) tui.write(message);
+      }
+
+      warning.process[prop].clear();
+    }
+
+    warning.count = 0;
+
+  }
+
+});
+
 /**
- * Enabled interceptor
+ * Listens on `stdout` and Intercepts logs
+ * messages. Maintains a reference of warning/stdout
+ * invoked by different processes.
  */
 export const hook = (name: string) => {
 
-  warner = name;
+  if (warning.current !== name) warning.current = name;
+  if (!has(name, warning.process)) {
+    warning.current = name;
+    warning.process[name] = new Set();
+  }
+
   listen = intercept((stream, data) => {
     if (data.charCodeAt(0) === 9474) {
       process[stream].write(data);
     } else {
+      warning.count += 1;
       const text = data.split('\n');
-      while (text.length !== 0) warnings[uri].add(`${c.yellowBright(text.shift().trimStart())}`);
+      while (text.length !== 0) {
+        warning.process[name].add(`${c.yellowBright(text.shift().trimStart())}`);
+      }
     }
   });
 
 };
 
+export const complete = () => {
+
+};
+
 /**
- * Disable interceptor
+ * Removes log listener and prints intercepted
+ * messages. Captured logs can be printed based on
+ * `stdin` input.
  */
 export const unhook = () => {
 
-  if (typeof listen === 'function') {
-    listen();
-    listen = null;
+  listen();
+  listen = null;
+
+};
+
+export const syncing = (message: string) => {
+
+  if (warning.count > 0) {
+    const count = c.bold(`! ${warning.count} ${warning.count > 1 ? 'warnings' : 'warning'}`);
+    tui.warning(`${count} ${c.yellowBright(`~ Type ${c.bold('w')} and press ${c.bold('enter')} to view`)}`);
   }
 
-  if (uri in warnings && warnings[uri].size === 0) return;
+  tui.item(c.magentaBright(`↻ syncing ${message}`));
 
-  tui.warning(`${c.bold(`${warner}`)} ~ type ${c.bold('w')} and press ${c.bold('enter')} to view`);
-
-  process.stdin.on('data', data => {
-
-    const input = data.toString().trim().toLowerCase();
-
-    if (input === 'w') {
-
-      tui.title('Warnings:', 'yellow');
-
-      for (const message of warnings[uri].values()) {
-        if (typeof message === 'string' && message.length > 0) tui.write(message);
-      }
-
-      warner = null;
-      warnings[uri].clear();
-
-    }
-  });
+  if (queue.pending > 0) tui.item(c.orange(`‼ waiting ${message}`));
 
 };
 
@@ -102,40 +143,59 @@ export const unhook = () => {
  */
 export const changed = (file: IFile) => {
 
-  tui.closed(group);
+  const close = title !== file.relative;
+
+  // close previous group
+  if (close) tui.closed(group);
 
   // do not clear if first run
-  if (group !== 'SYNCIFY') tui.clear();
+  if (group !== 'SYNCIFY' && close) tui.clear();
 
+  // update group
   group = file.namespace;
 
-  tui.opened(group);
-  tui.title(file.key);
-  title = file.key;
-
-  const filename = lastPath(file.input) + '/' + file.base;
+  // open new group
+  if (close) {
+    tui.opened(group);
+    tui.title(file.kind.toUpperCase() + ' TRANSFORM');
+    kind = file.kind;
+    title = file.relative;
+  }
 
   // Create stack reference model
-  if (!(filename in warnings)) warnings[filename] = new Set();
-  if (uri !== filename) uri = filename; // Update the current records
+  if (!(file.relative in warning)) warning[file.relative] = new Set();
+  if (uri !== file.relative) uri = file.relative; // Update the current records
 
-  if (bundle.mode.watch) {
-    tui.changed(c.bold(filename));
+  if (bundle.mode.watch) tui.changed(`${file.relative}`);
+
+};
+
+export const upload = (theme: IThemes) => {
+
+  uploads.add(`${c.bold(theme.target)} → ${theme.store} ${c.gray(`~ ${timer.stop()}`)}`);
+
+  if (!idle) {
+    idle = true;
+    queue.onIdle().then(() => {
+
+      tui.nwl();
+      tui.write(c.neonGreen.bold(kind.toUpperCase() + ' UPLOADS'));
+      tui.nwl();
+
+      uploads.forEach(message => tui.updated(message));
+      uploads.clear();
+      idle = false;
+
+    });
   }
 
 };
 
-export function upload (theme: IThemes) {
-
-  tui.updated(`${c.bold(theme.target)} → ${theme.store} ${c.gray('~ ' + timer.stop())}`);
-
-}
-
-export function compile (message: string) {
+export const compile = (message: string) => {
 
   tui.compile(message);
 
-}
+};
 
 /**
  * Log file size stats, used in minification
@@ -148,9 +208,9 @@ export const filesize = (file: IFile, content: string | Buffer) => {
 
   if ((size > file.size || (size === file.size))) {
     const gzip = byteConvert(zlib.gzipSync(content).length);
-    tui.compile(`${before} ${c.gray(`~ gzip ${gzip}`)}`);
+    tui.item(`» filesize ${before} → gzip ${gzip}`);
   } else {
-    tui.compile(`${before} → ${after} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
+    tui.item(`minified ${before} → ${after} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
   }
 };
 
@@ -163,30 +223,41 @@ export const info = (message: string) => {
 
 };
 
+export const throws = (...message: string[]) => {
+
+  queue.onIdle().then(() => {
+
+    tui.nwl();
+
+    while (message.length !== 0) {
+      const text = sanitize(message.shift()).split('\n');
+      while (text.length !== 0) tui.write(text.shift());
+    }
+
+  });
+};
+
 /**
  * Log Error
  */
-export const error = (...message: string[]) => {
+export const error = (message: string, file: IFile) => {
+
+  if (queue.pending > 0) {
+    tui.item(c.orange.bold(`${queue.pending} ${queue.pending > 1 ? 'requests' : 'request'} in queue`));
+    queue.pause();
+  }
 
   // Object
   notifier.notify({
     title: 'Syncify Error',
-    sound: true
-  });
+    sound: 'Pop',
+    open: file.input,
+    subtitle: message,
+    message: file.relative
+  }).notify();
 
-  while (message.length !== 0) {
-
-    const text = sanitize(message.shift());
-
-    tui.nwl();
-
-    for (const warn of text.split('\n')) {
-      if (warn) {
-        const text = warn.split('\n');
-        while (text.length !== 0) tui.write(text.shift());
-      }
-    }
-  }
+  tui.write(c.redBright.bold(message));
+  tui.nwl();
 
 };
 
@@ -199,11 +270,10 @@ export const warn = (message: string) => {
 
     const text = message.split('\n');
 
-    if (typeof listen === 'function') {
-      while (text.length !== 0) warnings[uri].add(text.shift());
-    } else {
-      while (text.length !== 0) tui.warning(text.shift());
-    }
+    warning.count += 1;
+
+    while (text.length !== 0) warning.process[warning.current].add(text.shift());
+
   }
 };
 

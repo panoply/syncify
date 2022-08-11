@@ -6,7 +6,7 @@ import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
 import { isFunction, isString, isUndefined, isBuffer, nl } from 'shared/native';
 import { byteSize } from '../shared/utils';
-import { log, c, parse } from '../logger';
+import { log, c } from '../logger';
 import { bundle, cache } from '../options/index';
 import * as timer from '../process/timer';
 
@@ -90,7 +90,7 @@ async function sass (file: IFile<IStyle>) {
       }
 
       if (bundle.mode.watch) {
-        log.info(`${c.bold('sass')} to ${c.bold('css')} ${c.gray('~ ' + timer.stop())}`);
+        log.compile(`compiled ${c.bold('sass')} to ${c.bold('css')} ${c.gray(`~ ${timer.stop()}`)}`);
       }
 
       log.unhook();
@@ -104,10 +104,9 @@ async function sass (file: IFile<IStyle>) {
 
     } catch (e) {
 
-      timer.clear();
       log.unhook();
-      log.info(c.red.bold(`sass error in ${file.base}`));
-      log.error(e);
+      log.error('error occurred compiling sass to css', file);
+      log.throws(e);
 
       return null;
 
@@ -117,17 +116,18 @@ async function sass (file: IFile<IStyle>) {
 
   try {
 
-    // console.log(config, config.input)
-
     const css = await readFile(config.input);
-
     file.size = byteSize(css);
 
-    return { css: css.toString(), map: null };
+    return {
+      css: css.toString(),
+      map: null
+    };
 
   } catch (e) {
 
-    log.warn(e);
+    log.error('error reading css file', file);
+    log.throws(e);
 
     return null;
 
@@ -155,11 +155,15 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
     });
 
     if (bundle.mode.watch) {
-      log.info(`${c.bold('postcss')} ${c.gray(`~ ${timer.stop()}`)}`);
+      log.compile(`processed ${c.bold('css')} with ${c.bold('postcss')} ${c.gray(`~ ${timer.stop()}`)}`);
     }
+
     const warn = result.warnings();
 
-    if (warn.length > 0) log.warn(warn.join(nl));
+    if (warn.length > 0) {
+      log.warning.count += warn.length;
+      log.warn(warn.join(nl));
+    }
 
     log.unhook();
 
@@ -167,11 +171,9 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
 
   } catch (e) {
 
-    timer.clear();
-
     log.unhook();
-    log.error(c.red.bold(`postcss error in ${file.base}`));
-    log.error(e);
+    log.error('error occured processing css with postcss', file);
+    log.throws(e);
 
     return null;
 
@@ -184,7 +186,7 @@ async function postcss (file: IFile<IStyle>, css: string, map: any) {
  */
 function snippet (css: string) {
 
-  return '<style>' + css + '</style>';
+  return `<style>${css}</style>`;
 
 };
 
@@ -213,13 +215,11 @@ export async function styles (file: IFile<IStyle>, cb: Syncify): Promise<string>
       if (file.config.snippet) return output(snippet(post));
     }
 
-    return file.config.snippet
-      ? output(snippet(out.css))
-      : output(out.css);
+    return file.config.snippet ? output(snippet(out.css)) : output(out.css);
 
   } catch (e) {
 
-    log.warn(e);
+    log.throws(e);
 
     return null;
   }
