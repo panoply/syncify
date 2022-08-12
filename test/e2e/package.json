@@ -220,7 +220,8 @@
   },
   "dependencies": {
     "@syncify/cli": "link:../..",
-    "bootstrap": "5.2.0"
+    "bootstrap": "5.2.0",
+    "mithril": "^2.2.2"
   },
   "devDependencies": {
     "@liquify/syncify": "link:../..",

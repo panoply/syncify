@@ -3,7 +3,7 @@
 /* CLI OPTIONS                                  */
 /* -------------------------------------------- */
 
-export interface ICLICommands {
+export interface Commands {
   /**
    * First command is a store or comma separated list of stores. When
    * a comma list is supplied it is converted to an array. You can use

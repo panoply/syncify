@@ -1,19 +1,17 @@
 /* eslint-disable no-unused-vars */
 
 import { ParsedPath } from 'path';
-import type { Type as Types, Kind as Kinds } from 'process/files';
-import { Requests } from './requests';
+import type { Type as Types } from 'process/files';
 
 /**
  * File context generated when passed to a sync
  * resource and used to dispatch to correct transform
  * process.
  */
-interface IFile<T = unknown, Type = Types> extends ParsedPath {
+interface File<T = unknown, Type = Types> extends ParsedPath {
   /**
-   * The file type that was intercepted. This is an
-   * enum number value. The number value will infer
-   * on how the file should be handled.
+   * The file type that was intercepted. This is an enum number value.
+   * The number value will infer on how the file should be handled.
    *
    * @example
    *
@@ -33,7 +31,7 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
    *
    * @example
    *
-   * '.liquid'
+   * '.ext'
    */
   ext: string;
   /**
@@ -45,6 +43,14 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
    */
   base: string;
   /**
+   * The input filename without the extension.
+   *
+   * @example
+   *
+   * 'filename'
+   */
+  stem: string;
+  /**
    * The input relative path location from current working directory
    *
    * @example
@@ -52,6 +58,26 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
    * 'source/views/sections/dir/file.liquid'
    */
   relative: string;
+  /**
+   * The `key` value will be passed into the sync request. This
+   * will contain the namespace and base name and is used for
+   * uploading to Shopify stores.
+   *
+   * @example
+   *
+   * 'namespace/file.liquid'
+   */
+  key: string;
+  /**
+   * The `namespace` value will typically refelect the output
+   * parent directory name reference, but sometimes this might
+   * be a unique value depending on the file type we are handling.
+   *
+   * @example
+   *
+   * 'snippets'
+   */
+  namespace: string;
   /**
    * The file kind grouping. This is used internally and describes
    * the type of file we are working with.
@@ -66,14 +92,6 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
    * // etc etc
    */
   kind: string;
-  /**
-   * The input filename without the extension.
-   *
-   * @example
-   *
-   * 'filename'
-   */
-  stem: string;
   /**
    * The chokidar passed path - this is full URI file URI path.
    *
@@ -107,31 +125,10 @@ interface IFile<T = unknown, Type = Types> extends ParsedPath {
   size?: number;
   /**
    * Configuration reference. This will hold a reference
-   * to any form of additional reference required in the
-   * handling of this file. Typically, this is used for
+   * to additional data. Typically, this is used for
    * transforms, wherein it holds the indexed config.
    *
-   * @default null
+   * @default undefined // getter when required
    */
   config: T
-  /**
-   * The `key` value will be passed into the sync request. This
-   * will contain the namespace and base name and is used for
-   * uploading to Shopify stores.
-   *
-   * @example
-   *
-   * 'namespace/file.liquid'
-   */
-  key: string;
-  /**
-   * The `namespace` value will typically refelect the output
-   * parent directory name reference, but sometimes this might
-   * be a unique value depending on the file type we are handling.
-   *
-   * @example
-   *
-   * 'snippets'
-   */
-  namespace: string;
 }

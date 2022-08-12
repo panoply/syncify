@@ -1,4 +1,5 @@
 
+/** @type {import('@syncify/cli').Config} */
 export default {
   input: 'src',
   output: 'theme',
@@ -23,6 +24,12 @@ export default {
       }
     }
   ],
+  live: {
+    localhost: 3000,
+    websocket: 8089,
+    labels: true,
+    preserveScroll: true
+  },
   paths: {
     assets: 'assets/**/*',
     config: 'config/*.json',
@@ -59,15 +66,10 @@ export default {
     watch: {
       rollup: 'rollup -c config/rollup.config.js -w',
       // webpack: 'webpack --watch --color --config config/webpack.config.js',
-      esbuild: 'esbuild src/ts/dir/foo.js --outfile=theme/assets/esbuild-bundle.js --bundle --watch --color=true'
+      esbuild: 'esbuild src/scripts/ts/index.ts --outfile=theme/assets/esbuild-bundle.js --bundle --watch --color=true'
     }
   },
-  transforms: {
-    json: {
-      indent: 2,
-      useTabs: false,
-      exclude: []
-    },
+  views: {
     sections: {
       directoryPrefixing: true,
       onlyPrefixDuplicates: false,
@@ -77,65 +79,60 @@ export default {
       ]
     },
     pages: {
-      importAs: 'markdown',
-      liquidWarnings: true,
-      fallbackAuthor: '',
-      markdown: {
-        breaks: true,
-        headerIds: true,
-        headerPrefix: '',
-        mangle: true,
-        silent: true,
-        smartypants: false
-      }
+      language: 'markdown',
+      author: ''
     },
     icons: {
-      replacer: true,
-      replacerTag: 'i',
-      vscodeCustomData: false,
-      inlined: [
-        {
-          input: [ 'icons/inlined/*.svg' ],
-          rename: 'icon.[file]',
-          snippet: true,
-          svgo: true
-        }
-      ],
-      sprites: [
-        {
-          input: 'icons/sprites/feather/*.svg',
-          rename: 'icons.liquid',
-          svgo: true,
-          snippet: true,
-          options: {
-            dimensionAttributes: true,
-            namespaceClassnames: true,
-            namespaceIDS: false,
-            rootAttributes: {
-              id: 'foo'
-            }
-          }
-        },
-        {
-          input: 'icons/sprites/social/*.svg',
-          rename: 'social-icons.liquid',
-          svgo: true,
-          snippet: true,
-          options: {
-            dimensionAttributes: true,
-            namespaceClassnames: true,
-            namespaceIDS: false,
-            rootAttributes: {
-              id: 'foo'
-            }
-          }
-        }
-      ]
+      useCustomTag: false,
+      tagName: 'icon',
+      tagVoid: true,
+      vscodeCustomData: false
+    }
+  },
+  transforms: {
+    json: {
+      indent: 2,
+      useTab: false,
+      crlf: false,
+      exclude: []
     },
-    scripts: [
-
+    svg: [
+      {
+        input: [ 'icons/inlined/*.svg' ],
+        rename: 'icon.[file]',
+        snippet: true,
+        svgo: true
+      },
+      {
+        input: 'icons/sprites/feather/*.svg',
+        rename: 'icons.liquid',
+        svgo: false,
+        snippet: true,
+        sprite: {
+          dimensionAttributes: true,
+          namespaceClassnames: true,
+          namespaceIDS: false,
+          rootAttributes: {
+            id: 'foo'
+          }
+        }
+      },
+      {
+        input: 'icons/sprites/social/*.svg',
+        rename: 'social-icons.liquid',
+        svgo: false,
+        snippet: true,
+        sprite: {
+          dimensionAttributes: true,
+          namespaceClassnames: true,
+          namespaceIDS: false,
+          rootAttributes: {
+            id: 'foo'
+          }
+        }
+      }
     ],
-    styles: [
+    style: [
       {
         input: 'styles/scss/snippet.scss',
         snippet: true,
@@ -163,7 +160,7 @@ export default {
           warnings: true,
           sourcemap: true,
           style: 'compressed',
-          include: [
+          includePaths: [
             'node_modules/'
           ]
         }
@@ -182,15 +179,42 @@ export default {
       }
     ]
   },
-  terser: {
-    json: 'prod',
-    html: 'prod',
-    pages: 'prod',
-    rules: {
-      minifyJS: false, // MUST BE FALSE - A WARNING WILL SHOW
-      minifyCSS: false, // MUST BE FALSE - A WARNING WILL SHOW
-      sortAttributes: false, // MUST BE FALSE - A WARNING WILL SHOW
-      sortClassName: false, // MUST BE FALSE - A WARNING WILL SHOW
+  minify: {
+    json: {
+      assets: true,
+      config: true,
+      jsonld: true,
+      locales: true,
+      metafields: true,
+      schema: true,
+      templates: true,
+      exclude: []
+    },
+    script: {
+      legalComments: 'none',
+      mangleCache: {},
+      mangleProps: null,
+      mangleQuoted: true,
+      minifyIdentifiers: true,
+      minifySyntax: true,
+      minifyWhitespace: true
+    },
+    liquid: {
+      removeNewlineAttributes: true,
+      removeComments: true,
+      removeSchemaRefs: true,
+      minifySchemaTag: true,
+      stripAttributesNewlines: true,
+      stripInnerTagWhitespace: false,
+      stripWhitespaceDashes: true,
+      ignoreTags: null,
+      ignoreObjects: null,
+      stripAttributeNewlines: true,
+      exclude: null
+    },
+    html: {
+      minifyJS: false,
+      minifyCSS: false,
       caseSensitive: false,
       collapseBooleanAttributes: false,
       collapseInlineTagWhitespace: false,
@@ -204,19 +228,19 @@ export default {
       removeRedundantAttributes: true,
       removeScriptTypeAttributes: true,
       removeStyleLinkTypeAttributes: true,
+      sortAttributes: false,
+      sortClassName: false,
       useShortDoctype: true,
       collapseWhitespace: true,
       continueOnParseError: true,
       removeComments: true,
       trimCustomFragments: true,
-      minifyLiquidSectionSchema: true,
-      removeLiquidComments: true,
-      stripInnerTagWhitespace: false,
-      stripAttributesContainingNewlines: true,
-      stripRedundantWhitespaceDashes: true,
-      ignoreLiquidTags: [],
-      ignoreLiquidObjects: [],
-      ignoreCustomFragments: []
+      ignoreCustomFragments: [
+        /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+        /<style[\s\S]*?<\/style>/,
+        /{%[\s\S]*?%}/,
+        /{{[\s\S]*?}}/
+      ]
     }
   }
 };

@@ -8,62 +8,10 @@
     <link rel="canonical" href="{{ canonical_url }}">
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
 
-    <link id="s" rel="stylesheet" href="{{ 'bootstrap.css' | asset_url }}">
-    <script id="js" src="{{ 'rollup-bundle.js' | asset_url }}" type="module"></script>
-    <script>
-      const state = new Set();
-      const xhr = {}
-
-      /**
-       * Fetch XHR Request wrapper function
-       */
-      function request(key) {
-
-
-        return new Promise(function(resolve, reject) {
-
-          const request = xhr[key] = new XMLHttpRequest();
-
-          request.open("GET", key);
-          request.setRequestHeader("X-Syncify-Reload", "true");
-          request.setRequestHeader("Clear-Site-Data", "cache");
-          request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-
-          request.onload = function() {
-            resolve(request.responseText);
-          };
-
-          request.onloadend = function(event) {
-            delete xhr[key];
-          };
-
-          request.onerror = function() {
-            reject(this.statusText);
-          };
-
-          request.onabort = function() {
-            delete xhr[key];
-          };
-
-          request.send();
-
-        });
-
-      };
-
-      (() => {
-        const socketUrl = "ws://localhost:8090/ws";
-        let socket = new WebSocket(socketUrl);
-        socket.onmessage = function(msg) {
-          console.log(msg)
-          if (msg.data == "style") {
-            document.querySelector("#s").href = "http://localhost:3000/bootstrap.css"
-          } else {
-            window.top.location.reload(true);
-          }
-        }
-      })();
-    </script>
+    <link data-syncify-live rel="stylesheet" href="{{ 'bootstrap.css' | asset_url }}">
+    <script data-syncify-live src="{{ 'rollup-bundle.js' | asset_url }}" type="module"></script>
+    <script data-syncify-live src="{{ 'esbuild-bundle.js' | asset_url }}" type="module"></script>
+    {% render 'syncify' %}
 
     {{ content_for_header }}
 

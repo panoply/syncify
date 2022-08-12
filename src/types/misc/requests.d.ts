@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { IFile } from './file';
+import { File } from '../bundle/file';
 
 /**
  * Axios Request Methods
@@ -9,7 +9,7 @@ export type Methods = 'get' | 'post' | 'put' | 'delete'
 /**
  * Client Request
  */
-export type Client = (method: Methods, file: IFile, content?: string) => Promise<void>
+export type Client = (method: Methods, file: File, content?: string) => Promise<void>
 
 /**
  * Resources
@@ -43,7 +43,7 @@ export type GetAsset = (
 /**
  * Return response for Shopify theme assets
  */
-export interface IAssetResource {
+export interface AssetResource {
   /**
    * The asset path
    */
@@ -88,7 +88,7 @@ export interface IAssetResource {
   value?: string;
 }
 
-export interface IAsset {
+export interface Asset {
   /**
    * The asset path
    */
@@ -141,7 +141,7 @@ export namespace Requests {
     /**
      * The assets resource
      */
-    assets: IAssetResource[]
+    assets: AssetResource[]
   }
 
   /**
@@ -151,7 +151,7 @@ export namespace Requests {
     /**
      * The theme asset
      */
-    asset: IAsset
+    asset: Asset
   }
 
   /* -------------------------------------------- */
