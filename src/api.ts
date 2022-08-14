@@ -1,16 +1,60 @@
-import { IConfig, Resources, Resource, Syncify } from 'types';
-import { cli } from './cli';
-import { vsc } from 'modes/vsc';
+import { Config, Resource, Syncify } from 'types';
+import { isObject, isString, isUndefined } from './shared/native';
+import { run } from '.';
 
-const syncify: Syncify = function syncify (resource: Resource, options?: IConfig) {
+/**
+ * Define Config (named export)
+ *
+ * Used in `syncify.config.js` files and provides
+ * type completions to the export.
+ */
+export const syncify = (config: Config) => config;
 
-  return async function (callback: (content?: Buffer) => void) {
+/* -------------------------------------------- */
+/* BIN EXECUTABLE                               */
+/* -------------------------------------------- */
 
-    const state = (await promise);
+/**
+ * Syncify API (default export)
+ *
+ * For usage in programs. The default export can
+ * be imported and used in projects.
+ */
+function api (resource: Resource | Config, options?: Config) {
 
-    callback(state);
+  if (isString(resource)) {
+    if (/watch|build|download|upload/.test(resource as string)) {
+      return (cb: Syncify) => run({
+        cli: false,
+        [resource as string]: true
+      }, options, cb);
+    }
+  } else if (isObject(resource)) {
 
-    log(Errors.INFO, 'Connection Established ⚡');
-  };
+    if (!isUndefined(options)) {
+      throw new Error('You cannot provide options when running instance');
+    }
 
-};
+    return {
+      watch: (cb: Syncify) => run({
+        cli: false,
+        watch: true
+      }, options, cb),
+      build: (cb: Syncify) => run({
+        cli: false,
+        build: true
+      }, options, cb),
+      download: (cb: Syncify) => run({
+        cli: false,
+        download: true
+      }, options, cb),
+      upload: (cb: Syncify) => run({
+        cli: false,
+        upload: true
+      }, options, cb)
+    };
+  }
+
+}
+
+export default api;

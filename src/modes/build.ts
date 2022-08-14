@@ -1,17 +1,17 @@
 import anymatch from 'anymatch';
 import { IFile, IPages, IStyle, Syncify } from 'types';
 import { glob } from 'glob';
-import { compile as assets } from 'transform/asset';
-import { compile as liquid } from 'transform/liquid';
-import { compile as json } from 'transform/json';
-import { compile as pages } from 'transform/pages';
-import { styles } from 'transform/styles';
-import { isUndefined } from 'shared/native';
-import { parseFile, Type } from 'process/files';
+import { compile as assets } from '../transform/asset';
+import { compile as liquid } from '../transform/liquid';
+import { compile as json } from '../transform/json';
+import { compile as pages } from '../transform/pages';
+import { styles } from '../transform/styles';
+import { isUndefined } from '../shared/native';
+import { parseFile, Type } from '../process/files';
 import { bundle } from '../options/index';
 import { clean } from './clean';
 import { log, c } from '../logger';
-import * as timer from 'process/timer';
+import * as timer from '../process/timer';
 
 /**
  * Build Function

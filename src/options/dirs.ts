@@ -1,4 +1,4 @@
-import { IBundle } from 'types';
+import { Bundle } from 'types';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'path';
 import { PartialDeep } from 'type-fest';
@@ -134,7 +134,7 @@ export async function themeDirs (basePath: string) {
  * mode. If the `--clean` flag is passed, existing dirs
  * are purged and then recreated.
  */
-export async function importDirs ({ dirs, sync, mode }: PartialDeep<IBundle>) {
+export async function importDirs ({ dirs, sync, mode }: PartialDeep<Bundle>) {
 
   if (!mode.download) return;
 

@@ -23,11 +23,19 @@
   "json.schemas": [
     {
       "fileMatch": ["package.json"],
-      "url": "/schema/syncify.json"
+      "url": "./.vscode/schema/tsup.json"
     },
     {
-      "fileMatch": [".syncifyrc", ".syncifyrc.json"],
-      "url": "/schema/syncifyrc.json"
+      "fileMatch": ["package.json", "syncify.package.json"],
+      "url": "/schema/syncify.package.json"
+    },
+    {
+      "fileMatch": ["syncify.env.json"],
+      "url": "/schema/syncify.env.json"
+    },
+    {
+      "fileMatch": ["syncify.config.json"],
+      "url": "/schema/syncify.config.json"
     }
   ],
 
@@ -60,7 +68,8 @@
       "extensions": [
         "syncify.config.js",
         "syncify.config.mjs",
-        "syncify.json",
+        "syncify.config.json",
+        "syncify.env.json",
         ".syncifyrc.json",
         ".syncify",
         ".syncifyrc",
@@ -70,5 +79,11 @@
       "filename": true,
       "format": "liquid"
     }
+  ],
+  "cSpell.words": [
+    "gzipsize",
+    "imgmin",
+    "linkify",
+    "purgecss"
   ]
 }

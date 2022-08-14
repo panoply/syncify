@@ -1,9 +1,9 @@
 import { has } from 'rambdax';
 import { writeJson, readJson } from 'fs-extra';
-import { bundle, cache } from 'options';
-import { ICache } from 'types';
+import { bundle, cache } from '../options';
+import { Cache } from '../../types';
 
-type Files = keyof Omit<ICache, 'updated' | 'created' | 'sections' | 'pages'>
+type Files = keyof Omit<Cache, 'updated' | 'created' | 'sections' | 'pages'>
 
 export async function getCache (key?: Files) {
 

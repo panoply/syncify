@@ -1,6 +1,18 @@
-import stringify from 'fast-safe-stringify';
+import strip from 'strip-json-comments';
 import { bold, gray } from '../cli/ansi';
 import { isString, isBuffer, isArray, isObject } from './native';
+
+export function jsonc (data: string) {
+
+  try {
+
+    return strip(data).trim();
+
+  } catch {
+
+    return {};
+  }
+}
 
 /**
  * Returns a grouping reference name according
@@ -45,7 +57,7 @@ export const fileKind = (ext: string) => {
 export const sanitize = (message: string) => {
 
   if (isBuffer(message)) return message.toString();
-  if (isObject(message) || isArray(message)) return stringify(message);
+  if (isObject(message) || isArray(message)) return JSON.stringify(message);
 
   return String(message);
 

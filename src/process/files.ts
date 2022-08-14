@@ -3,7 +3,7 @@
 import { join, parse, relative } from 'path';
 import { IFile, IPaths } from 'types';
 import { assign } from '../shared/native';
-import { lastPath } from 'shared/paths';
+import { lastPath } from '../shared/paths';
 import { Partial } from 'rambdax';
 import * as context from './context';
 import { bundle } from '../options/index';

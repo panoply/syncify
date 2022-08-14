@@ -1,7 +1,7 @@
 
 import { anyTrue, isNil, has, uniq, includes } from 'rambdax';
 import { join } from 'path';
-import { ICLICommands, IConfig, IPackage, IBundle } from 'types';
+import { Commands, Config, Package, Bundle, Modes } from 'types';
 import { pathExists, readJson } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
@@ -9,6 +9,7 @@ import { isArray, keys, is, assign, nil, log, isString, isObject, ws } from '../
 import { basePath, normalPath, parentPath } from '../shared/paths';
 import { authURL } from '../shared/options';
 import { logHeader } from '../logger/heading';
+import { loadSyncifyConfig } from '../shared/load';
 import { spawn } from '../logger/console';
 import { spawned, spawns } from '../cli/spawn';
 import { kill } from '../cli/exit';
@@ -17,9 +18,9 @@ import { gray } from '../cli/ansi';
 import { queue } from '../requests/queue';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
-import { iconOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
-import { terserOptions } from './terser';
-import { bundle, update, defaults, cache } from './index';
+import { SVGOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
+import { minifyOptions } from './minify';
+import { bundle, update, defaults, cache, minify, plugins } from './index';
 import { typeError } from './validate';
 
 /* -------------------------------------------- */
@@ -28,17 +29,20 @@ import { typeError } from './validate';
 
 kill(() => {
 
+  queue.pause();
+  queue.clear();
+
   nwl(nil);
 
   spawns.forEach((child, name) => {
+
     log(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
     child.kill();
+
   });
 
   nwl(nil);
 
-  queue.pause();
-  queue.clear();
   spawns.clear();
   process.exit(0);
 
@@ -51,13 +55,14 @@ kill(() => {
  * file locations relative to the current working
  * directory.
  */
-export async function define (cli: ICLICommands) {
+export async function define (cli: Commands, options?: Config) {
 
   clear();
 
   const mode = modes(cli);
   const pkg = await pkgJson(cli.cwd);
-  const config = await getConfig(pkg);
+  const config = await (await loadSyncifyConfig(process.cwd())).data;
+  const min = anyTrue(cli.prod, cli.minify);
 
   update.bundle({
     mode,
@@ -71,6 +76,12 @@ export async function define (cli: ICLICommands) {
       input: cli.input,
       output: cli.output,
       config: cli.config
+    },
+    minify: <any>{
+      json: min ? { ...minify.json } : false,
+      html: min ? { ...minify.html } : false,
+      liquid: min ? { ...minify.liquid } : false,
+      script: min ? { ...minify.script } : false
     }
   });
 
@@ -86,12 +97,13 @@ export async function define (cli: ICLICommands) {
       themeDirs(bundle.dirs.output),
       importDirs(bundle),
       getPaths(config),
+      minifyOptions(config),
       sectionOptions(config),
       jsonOptions(config),
       styleOptions(config, pkg),
-      iconOptions(config, pkg),
-      terserOptions(config),
-      setSpawns(config.spawn, bundle)
+      SVGOptions(config, pkg),
+      setSpawns(config.spawn, bundle),
+      loadPlugins(config, bundle)
     ]
   );
 
@@ -100,6 +112,33 @@ export async function define (cli: ICLICommands) {
   return promise;
 
 };
+
+function loadPlugins (config: Config, bundle: Bundle) {
+
+  if (!has('plugins', config)) return;
+
+  if (!isArray(config.plugins)) return; // TODO: Throw error if not array
+
+  for (const plugin of config.plugins) {
+
+    const { name } = plugin;
+
+    if (has('onInit', plugin)) plugin.onInit.call({ ...bundle }, config);
+
+    if (has('onChange', plugin)) plugins.onChange.push([ name, plugin.onChange ]);
+    if (has('onTransform', plugin)) plugins.onTransform.push([ name, plugin.onTransform ]);
+
+    if (bundle.mode.watch) {
+      if (has('onWatch', plugin)) plugins.onWatch.push([ name, plugin.onWatch ]);
+      if (has('onReload', plugin)) plugins.onReload.push([ name, plugin.onReload ]);
+    }
+
+    if (bundle.mode.build) {
+      if (has('onBuild', plugin)) plugins.onBuild.push([ name, plugin.onBuild ]);
+    }
+  }
+
+}
 
 /**
  * Define Spawn
@@ -111,7 +150,7 @@ export async function define (cli: ICLICommands) {
  *
  * > See the `cli/spawn.ts` which is used to normalize the log output.
  */
-function setSpawns (config: IConfig['spawn'], bundle: IBundle) {
+function setSpawns (config: Config['spawn'], bundle: Bundle) {
 
   if (!isObject(config)) return typeError('spawn', 'spawn', config, '{ build: {}, watch: {} }');
 
@@ -166,13 +205,14 @@ function setSpawns (config: IConfig['spawn'], bundle: IBundle) {
  * invoke. Validates the CLI flags and options to determine
  * the actions to be run.
  */
-function modes (cli: ICLICommands) {
+function modes (cli: Commands) {
 
   const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
 
-  return {
+  return <Modes>{
     vsc: cli.vsc,
-    server: cli.server,
+    live: cli.watch && cli.hot,
+    export: cli.export,
     redirects: cli.redirects,
     metafields: cli.metafields,
     pages: cli.pages,
@@ -192,7 +232,8 @@ function modes (cli: ICLICommands) {
     watch: anyTrue(
       resource,
       cli.upload,
-      cli.download
+      cli.download,
+      cli.export
     ) ? false : cli.watch,
     upload: anyTrue(
       resource,
@@ -203,7 +244,8 @@ function modes (cli: ICLICommands) {
       resource,
       cli.upload,
       cli.watch,
-      cli.build
+      cli.build,
+      cli.export
     ) ? false : cli.download
   };
 }
@@ -233,7 +275,7 @@ async function caches (cwd: string) {
 
 };
 
-async function getConfig (pkg: IPackage) {
+async function getConfig (pkg: Package) {
 
   const config = await configFile(bundle.dirs.config);
 
@@ -256,7 +298,7 @@ async function getConfig (pkg: IPackage) {
  * and `.env` file locations relative to the current
  * working directory.
  */
-export async function getStores (cli: ICLICommands, config: IConfig) {
+export async function getStores (cli: Commands, config: Config) {
 
   if (is(cli._.length, 0)) return;
 
@@ -327,7 +369,7 @@ export async function getStores (cli: ICLICommands, config: IConfig) {
  * also normalizes paths to ensure the mapping is
  * correct.
  */
-function baseDirs (config: IConfig) {
+function baseDirs (config: Config) {
 
   const base = basePath(bundle.cwd);
 
@@ -372,7 +414,7 @@ function baseDirs (config: IConfig) {
  * defines the build directory input in directory paths
  * it will ensure it is formed correctly.
  */
-export async function getPaths (config: IConfig) {
+export async function getPaths (config: Config) {
 
   // Path normalize,
   const path = normalPath(bundle.dirs.input);
@@ -410,6 +452,10 @@ export async function getPaths (config: IConfig) {
         : [ path(config.paths[key]) ];
 
       if (key === 'assets') uri.push(join(bundle.dirs.output, 'assets/*'));
+
+    } else if (key === 'redirects') {
+
+      uri = [ join(bundle.cwd, config.paths[key]) ];
 
     } else {
 

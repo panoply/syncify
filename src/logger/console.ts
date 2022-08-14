@@ -1,16 +1,15 @@
 import notifier from 'node-notifier';
 import zlib from 'node:zlib';
-import { nil } from '../shared/native';
+import { log, nil } from '../shared/native';
 import { byteConvert, byteSize, sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
 import { bundle } from '../options/index';
 import * as tui from '../cli/tui';
 import * as c from '../cli/ansi';
 import { queue } from '../requests/queue';
-import { Group, IFile, IThemes } from 'types';
+import { Group, File, Theme } from 'types';
 import * as timer from '../process/timer';
 import { has } from 'rambdax';
-import Spinner from 'tiny-spinner';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -56,6 +55,27 @@ let title: string = nil;
  * Current Filename
  */
 let uri: string = nil;
+
+process.on('SIGINT', () => {
+  tui.nwl(nil);
+  log(c.gray('SIGINT'));
+  process.exit();
+});
+
+// emitted when an uncaught JavaScript exception bubbles
+process.on('uncaughtException', (e) => {
+  tui.write(`Caught exception: ${e.message}`);
+  tui.nwl();
+  tui.write(`${e.stack}`);
+});
+
+// emitted whenever a Promise is rejected and no error handler is attached to it
+process.on('unhandledRejection', (reason, p) => {
+  tui.nwl();
+  tui.write(c.redBright(`xx Unhandled Rejection at: ${p}`));
+  tui.nwl();
+  tui.write(c.gray(`${reason}`));
+});
 
 process.stdin.on('data', data => {
 
@@ -141,7 +161,7 @@ export const syncing = (message: string) => {
 /**
  * Set current file
  */
-export const changed = (file: IFile) => {
+export const changed = (file: File) => {
 
   const close = title !== file.relative;
 
@@ -170,7 +190,7 @@ export const changed = (file: IFile) => {
 
 };
 
-export const upload = (theme: IThemes) => {
+export const upload = (theme: Theme) => {
 
   uploads.add(`${c.bold(theme.target)} → ${theme.store} ${c.gray(`~ ${timer.stop()}`)}`);
 
@@ -200,7 +220,7 @@ export const compile = (message: string) => {
 /**
  * Log file size stats, used in minification
  */
-export const filesize = (file: IFile, content: string | Buffer) => {
+export const filesize = (file: File, content: string | Buffer) => {
 
   const size = byteSize(content);
   const before = byteConvert(file.size);
@@ -223,24 +243,18 @@ export const info = (message: string) => {
 
 };
 
-export const throws = (...message: string[]) => {
+export const throws = (message: string) => {
 
-  queue.onIdle().then(() => {
+  tui.nwl();
 
-    tui.nwl();
+  console.log(message);
 
-    while (message.length !== 0) {
-      const text = sanitize(message.shift()).split('\n');
-      while (text.length !== 0) tui.write(text.shift());
-    }
-
-  });
 };
 
 /**
  * Log Error
  */
-export const error = (message: string, file: IFile) => {
+export const error = (message: string, file: File) => {
 
   if (queue.pending > 0) {
     tui.item(c.orange.bold(`${queue.pending} ${queue.pending > 1 ? 'requests' : 'request'} in queue`));
@@ -308,5 +322,16 @@ export const spawn = (name: string) => (...message: string[]) => {
   }
 
   tui.spawn(sanitize(message.shift()));
+
+};
+
+export const catcher = (error: any) => {
+
+  tui.nwl();
+
+  while (error.length !== 0) {
+    const text = sanitize(error.shift()).split('\n');
+    while (text.length !== 0) tui.write(text.shift());
+  }
 
 };

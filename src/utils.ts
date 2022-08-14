@@ -1,6 +1,4 @@
-import { IOptions } from 'types';
-
-let options: IOptions;
+import { bundle } from './options/index';
 
 export const env = {
   get dev () {
@@ -13,18 +11,6 @@ export const env = {
     return process.env.SYNCIFY_WATCH === 'true';
   },
   get options () {
-    return options;
-  }
-};
-
-export const log = {
-  console (...message: string[]) {
-
-  },
-  warning (...message: string[]) {
-
-  },
-  errors (...message: string[]) {
-
+    return bundle;
   }
 };

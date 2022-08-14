@@ -4,13 +4,14 @@
 
 # @liquify/syncify
 
-Fast, extensible and superior alternative Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI, supports multiple storefront theme synchronization with watch, upload, download and metafield capabilities included.
+Fast, extensible and superior alternative Shopify [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI, hot reloading of assets and views, supports multiple storefront theme synchronization with watch, upload, download and metafield capabilities included.
 
 **Syncify exists as part of the [Liquify](https://liquify.dev) project**
 
 ### Key Features
 
 - Upload, download and watch multiple storefronts and/or themes.
+- Hot reloading support for assets and views.
 - Clear, concise, informative and beautiful CLI logging.
 - Supports HTML + Liquid and JSON minification.
 - An elegant directory based metafields sync approach using JSON files.
@@ -226,227 +227,145 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 
 Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on a `syncify` property. If you are using [VS Code](https://code.visualstudio.com/) then please add the [Package Schema](#package-schema) reference if you haven't already. Below is the default settings that are applied.
 
+- []
+
 <!-- prettier-ignore -->
-```js
-export default {
-  // input directory path
+```ts
+import { syncify, env } from '@liquify/syncify';
+
+export default syncify({
   input: 'source',
-  // output directory path
   output: 'theme',
-  // export directory path
   export: 'export',
-  // import directory path
   import: 'import',
-  // build config directory path
-  config: 'config',
-  // shopify stores to sync
-  stores: [
-    {
-      // shopify domain (without .myshopify.com)
-      domain: '',
-      // key > value mapping of store themes
-      themes: {
-        // the name of a theme to target/sync + the theme id
-        dev: 1234567891011,
-      }
-    }
-  ],
-  // path mappings relative to the "input" (source) directory
+  config: '.',
+  plugins: [],
+  stores: {
+    domain: '',
+    themes: {}
+  },
+  hot: {
+    server: 3000,
+    socket: 8089,
+    scroll: 'preserved',
+    reload: 'hot',
+  },
+  logger: {
+    timer: true,
+    sizes: true,
+    silent: false,
+    warnings: true,
+    clearing: true
+  },
   paths: {
-    // asset files to pass through
+    redirects: 'redirects.yaml',
     assets: 'assets/**/*',
-    // config files like settings_schema.json
+    files: 'files/**/*',
     config: 'config/*.json',
-    // locale files like en.json
     locales: 'locales/*.json',
-    // layout theme files
-    layout: [
-      'views/theme.liquid',
-      'views/layouts/*.liquid'
-    ],
-    // section theme files
-    sections: [
-      'views/sections/**/*.liquid'
-    ],
-    // metafields to sync to your store
+    layout: 'layouts/*.liquid',
+    sections: 'sections/*.liquid',
+    snippets: 'snippets/*.liquid',
     metafields: 'metafields/**/*.json',
-    // templates to sync to templates/customers
     customers: [
-      'views/customers/*.json',
-      'views/customers/*.liquid'
+      'templates/customers/*.json',
+      'templates/customers/*.liquid'
     ],
-    // static pages that sync to your stores pages
     pages: [
       'pages/*.md',
       'pages/*.html'
     ],
-    // template files, ie: index.json or 404.liquid etc
     templates: [
-      'views/templates/*.json',
-      'views/templates/*.liquid'
+      'templates/*.json',
+      'templates/*.liquid'
     ],
-    // snippet theme files
-    snippets: [
-      'views/snippets/*.liquid'
-    ]
   },
-  // spawn process with syncify
   spawn: {
-    // process to run in --build mode
-    build: {
-      // example of rollup spawning
-      rollup: 'rollup -c config/rollup.config.js'
-    },
-     // processes to run in --watch mode
-    watch: {
-      // example of rollup spawning with watch
-      rollup: 'rollup -c config/rollup.config.js -w',
-      // example of esbuild spawning with watch, syncify spawn accepts arrays
-      esbuild: [
-        'esbuild',
-        'source/ts/dir/foo.js',
-        '--outfile=theme/assets/esbuild-bundle.js',
-        '--bundle',
-        '--watch',
-        '--color=true'
-      ]
-    }
+    build: {},
+    watch: {},
   },
-  // transform options to apply
-  transforms: {
-    // options for handling .json file types
-    json: {
-      // the indentation level to apply to imported JSON
-      indent: 2,
-      // whether or not to indent with tabs
-      useTabs: false,
-      // a list of file names to exclude
-      exclude: []
+  views: {
+    snippets: {
+      prefixDir: false,
+      separator: '-',
+      global: []
     },
-    // options for handling shopify sections
     sections: {
-      // whether or not to apply directory prefixing
-      directoryPrefixing: true,
-      // whether or not prefixing should only apply to duplicated file names.
-      onlyPrefixDuplicates: false,
-      // the prefix separator to using in prefixing
-      prefixSeparator: '-',
-      // string list of sub-directories contained in sections to be treated as globals
-      global: [
-        'global'
-      ]
+      prefixDir: false,
+      separator: '-',
+      global: []
     },
     pages: {
-      importAs: 'markdown',
-      liquidWarnings: true,
-      fallbackAuthor: '',
-      markdown: {
-        breaks: true,
-        headerIds: true,
-        headerPrefix: '',
-        mangle: true,
-        silent: true,
-        smartypants: false
-      }
-    },
-    icons: {
-      replacer: true,
-      replacerTag: 'i',
-      vscodeCustomData: false,
-      inlined: [
-        {
-          input: [ 'icons/inlined/*.svg' ],
-          rename: 'icon.[file]',
-          snippet: true,
-          svgo: true
-        }
-      ],
-      sprites: [
-        {
-          input: 'icons/sprites/feather/*.svg',
-          rename: 'icons.liquid',
-          svgo: true,
-          snippet: true,
-          options: {
-            dimensionAttributes: true,
-            namespaceClassnames: true,
-            namespaceIDS: false,
-            rootAttributes: {
-              id: 'foo'
-            }
-          }
-        },
-        {
-          input: 'icons/sprites/social/*.svg',
-          rename: 'social-icons.liquid',
-          svgo: true,
-          snippet: true,
-          options: {
-            dimensionAttributes: true,
-            namespaceClassnames: true,
-            namespaceIDS: false,
-            rootAttributes: {
-              id: 'foo'
-            }
-          }
-        }
-      ]
-    },
-    scripts: [
-
-    ],
-    styles: [
-      {
-        input: 'styles/scss/snippet.scss',
-        snippet: true,
-        rename: '[file]-[dir].min.css', // TEST dir RENAME
-        postcss: true,
-        sass: {
-          warnings: false, // NO WARNINGS
-          sourcemap: true,
-          style: 'compressed'
-        }
-      },
-      {
-        input: 'styles/scss/index.scss',
-        snippet: false,
-        rename: 'main.min.css',
-        watch: [
-          '!scss/bootstrap.scss', // EXCLUDE TEST
-          'styles/scss/dir/*.scss' // COMPILE ON CHANGES IN dir FOLDER
-        ]
-      },
-      {
-        input: 'styles/scss/bootstrap.scss', // BOOTSTRAP FRAMEWORK
-        snippet: false,
-        sass: {
-          warnings: true,
-          sourcemap: true,
-          style: 'compressed',
-          include: [
-            'node_modules/'
-          ]
-        }
-      },
-      {
-        input: 'styles/css/snippet.css', // COMPILE THIS FILE ONLY
-        rename: 'example-[file].[ext]', // RENAME TEST
-        snippet: true // WE WILL GENERATE A SNIPPET
-      },
-      {
-        input: [
-          'styles/css/*.css', // COMPILES base.css AND stylesheet.css
-          '!styles/css/snippet.css' // EXCLUDE TEST
-        ],
-        rename: '[dir]-[file]'
-      }
-    ]
+      language: 'html',
+      author: '',
+      suffixDir: true,
+      global: []
+    }
   },
-  terser: {
-    json: 'prod',
-    html: 'prod',
-    pages: 'prod',
-    rules: {
+  transforms: {
+    json: {
+      indent: 2,
+      useTab: false,
+      crlf: false,
+      exclude: []
+    },
+    svg: {
+      input: '',
+      rename: '',
+      snippet: false,
+      svgo: false,
+      sprite: {}
+    },
+    image: {
+      input: '',
+      sharp: {}
+    },
+    style: {
+      input: '',
+      snippet: false,
+      postcss: false,
+      watch: [],
+      sass: {}
+    },
+    script: {
+      input: '',
+      snippet: false,
+      esbuild: {}
+    }
+  },
+  minify: {
+    json: {
+      assets: true,
+      config: true,
+      locales: true,
+      metafields: true,
+      templates: true,
+      exclude: []
+    },
+    script: {
+      legalComments: 'none',
+      mangleQuoted: true,
+      minifyIdentifiers: true,
+      minifySyntax: true,
+      minifyWhitespace: true,
+      mangleProps: null,
+      mangleCache: false,
+    },
+    liquid: {
+      removeNewlineAttributes: true,
+      removeComments: true,
+      removeSchemaRefs: true,
+      minifySectionSchema: true,
+      stripAttributesContainingNewlines: true,
+      stripInnerTagWhitespace: false,
+      stripRedundantWhitespaceDashes: true,
+      ignoreTags: [],
+      ignoreObjects: [],
+      exclude: []
+    },
+    html: {
+      minifyJS: false,
+      minifyCSS: false,
       caseSensitive: false,
       collapseBooleanAttributes: false,
       collapseInlineTagWhitespace: false,
@@ -460,22 +379,17 @@ export default {
       removeRedundantAttributes: true,
       removeScriptTypeAttributes: true,
       removeStyleLinkTypeAttributes: true,
+      sortAttributes: false,
+      sortClassName: false,
       useShortDoctype: true,
       collapseWhitespace: true,
       continueOnParseError: true,
       removeComments: true,
       trimCustomFragments: true,
-      minifyLiquidSectionSchema: true,
-      removeLiquidComments: true,
-      stripInnerTagWhitespace: false,
-      stripAttributesContainingNewlines: true,
-      stripRedundantWhitespaceDashes: true,
-      ignoreLiquidTags: [],
-      ignoreLiquidObjects: [],
       ignoreCustomFragments: []
     }
   }
-};
+});
 ```
 
 # Getting Started
@@ -492,9 +406,62 @@ Before going over the features Syncify provides, it is assumed that you have don
 
 ### Contents
 
+- [Directories](#dirs)
+- [Paths](#dirs)
 - [Stores](#stores-required)
-- [Dirs](#dirs)
-- [Metafields](#met)
+- [Live](#live)
+- [Spawn](#spawn)
+- [Views](#views)
+- [Transforms](#views)
+- [Minify](#views)
+
+## Directories
+
+The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to a directory name which is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). This option accepts string values only.
+
+<!-- prettier-ignore -->
+<table>
+  <thead>
+    <tr>
+      <th width="500px"> API</th>
+      <th width="500px">CLI</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr>
+      <td>
+
+<!-- prettier-ignore -->
+```json
+{
+  "input": "source",
+  "output": "theme",
+  "import": "import",
+  "export": "export",
+  "config": "."
+}
+```
+
+</td>
+<td height="200px">
+
+<!-- prettier-ignore -->
+```bash
+--input  -i   # source
+--output -o   # theme
+--config -c   # config
+
+```
+
+</td>
+</tr>
+
+  </tbody>
+</table>
+
+### Input > Output
+
+Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can rebuilt from input. If you are used to working from a single directory (eg: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
 
 ## Stores (Required)
 
@@ -560,28 +527,6 @@ The `themes` option refers to theme ids the store contains. This option is an ob
 </p>
 </details>
 
-## Dirs
-
-The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to a directory name which is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). This option accepts string values only.
-
-```json
-{
-  "syncify": {
-    "dirs": {
-      "input": "source",
-      "output": "theme",
-      "import": "import",
-      "export": "export",
-      "config": "."
-    }
-  }
-}
-```
-
-### Input > Output
-
-Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can rebuilt from input. If you are used to working from a single directory (eg: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
-
 ### Metafields
 
 The `metafields` directory path reference is where you can provide **global** JSON metafield files that can be synced to your Shopify store. Metafield sync capabilities provided by Syncify use a simple **directory** > **file** based approach. The sub-directory names represent a metafield `namespace` value and JSON file names contained within represent metafield `key` values.
@@ -611,8 +556,8 @@ In order to best illustrate how the metafield sync capabilities work it is impor
 <table>
   <thead>
     <tr>
-      <th align="left">&nbsp;&nbsp;&nbsp;&nbsp;Metafield Structure</th>
-      <th align="left">&nbsp;&nbsp;&nbsp;&nbsp;Description</th>
+      <th align="left" width="300px">&nbsp;&nbsp;&nbsp;&nbsp;Metafield Structure</th>
+      <th align="left" width="700px">&nbsp;&nbsp;&nbsp;&nbsp;Description</th>
     </tr>
   </thead>
   <tbody>
@@ -749,38 +694,44 @@ The `paths` option allows you to define a custom set of path locations which poi
 <!-- prettier-ignore -->
 ```json
 {
-  "syncify": {
-    "paths": {
-      "assets": [
-        "source/assets/**"
-      ],
-      "config": [
-        "source/config/*.json"
-      ],
-      "locales": [
-        "source/locales/*.json"
-      ],
-      "layout": [
-        "source/layout/.liquid"
-      ],
-      "metafields": [
-        "source/metafields/**/*.json",
-      ],
-      "sections": [
-        "source/sections/*.liquid"
-      ],
-      "snippets": [
-        "source/snippets/*.liquid"
-      ],
-      "templates": [
-        "source/templates/*.liquid",
-        "source/templates/*.json"
-      ],
-      "customers": [
-        "source/templates/customers/*.liquid",
-        "source/templates/customers/*.json"
-      ]
-    }
+
+  "paths": {
+    "assets": [
+      "source/assets/**"
+    ],
+    "config": [
+      "source/config/*.json"
+    ],
+    "locales": [
+      "source/locales/*.json"
+    ],
+    "layout": [
+      "source/layout/.liquid"
+    ],
+    "metafields": [
+      "source/metafields/**/*.json",
+    ],
+    "sections": [
+      "source/sections/*.liquid"
+    ],
+    "snippets": [
+      "source/snippets/*.liquid"
+    ],
+    "templates": [
+      "source/templates/*.liquid",
+      "source/templates/*.json"
+    ],
+    "customers": [
+      "source/templates/customers/*.liquid",
+      "source/templates/customers/*.json"
+    ],
+    "pages": [
+      "source/pages/*.md",
+      "source/pages/*.html"
+    ],
+    "redirects": [
+      "./redirects.yaml"
+    ],
   }
 }
 ```
@@ -792,9 +743,9 @@ Below are **2** different **input** structures and an **output** structure. The 
 <table>
   <thead>
     <tr>
-      <th>Default Structure</th>
-      <th>Customized Structure</th>
-      <th>Output Structure</th>
+      <th width="330px">Default Structure</th>
+      <th width="330px">Customized Structure</th>
+      <th width="330px">Output Structure</th>
     </tr>
   </thead>
   <tbody>
@@ -804,13 +755,13 @@ Below are **2** different **input** structures and an **output** structure. The 
       ㅤ
       ㅤ
       ㅤ
-      ㅤ
    source
    └─┐
      ├─ assets
      ├─ config
      ├─ layout
      ├─ locales
+     ├─ pages
      ├─ metafields
      │  └─ namespace
      │     └─ key.json ㅤ
@@ -819,7 +770,7 @@ Below are **2** different **input** structures and an **output** structure. The 
      └─ templates
         └─ customers
        ㅤ
-       ㅤ
+             ㅤ
        ㅤ
 </code>
       </pre>
@@ -1540,6 +1491,16 @@ PostCSS options
 
 </p>
 </details>
+
+# Minify
+
+### JSON
+
+### Script
+
+### Liquid
+
+### HTML
 
 # CLI Usage
 

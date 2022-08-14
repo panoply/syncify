@@ -1,15 +1,15 @@
 import { allFalse, has } from 'rambdax';
 import { AxiosError } from 'axios';
-import { IBundle, IConfig, IStore, Requests } from 'types';
+import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
+import { Bundle, Config, Store, Requests } from '../../types';
 import { join } from 'path';
 import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
 import { error } from '../logger/errors';
-import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
 import { assign, is } from '../shared/native';
 import { queue, axios, requeue } from '../requests/queue';
 import { log, c } from '../logger';
-import { bundle, transform } from '../options/index';
+import { bundle } from '../options/index';
 
 /**
  * Write Metafields
@@ -17,10 +17,10 @@ import { bundle, transform } from '../options/index';
  * Creates JSON metafield fields and namespace directories.
  * Executed on `--pull` and `--merge`
  */
-function write (config: IConfig) {
+function write (config: Config) {
 
   const base = join(bundle.cwd, config.metafields);
-  const { indent } = transform.json;
+  const { indent } = bundle.json;
 
   return async (field: { dir: string; key: string; data: object; name: string; }) => {
 
@@ -44,7 +44,7 @@ function write (config: IConfig) {
  * Performs a last-updated check to determine which
  * metafield to be updated.
  */
-export async function merge (store: IStore, config: IBundle): Promise<{
+export async function merge (store: Store, config: Bundle): Promise<{
   title: string;
   data: object;
   path: string;
@@ -119,7 +119,7 @@ export async function merge (store: IStore, config: IBundle): Promise<{
  * Presents a prompt list of shop global fields
  * to be written to source paths.
  */
-export async function pull (store: IStore, config: IConfig) {
+export async function pull (store: Store, config: Config) {
 
   const spins = new Spinner();
   spins.start('Fetching Metafields from ' + store.domain);
@@ -162,7 +162,7 @@ export async function pull (store: IStore, config: IConfig) {
  * Metafields listing request, typically called
  * from the prompt to query and explore metafields.
  */
-export async function list <T extends { metafields: Requests.Metafield[] }> (store: IStore) {
+export async function list <T extends { metafields: Requests.Metafield[] }> (store: Store) {
 
   return axios.get<T>('metafields.json', store.client).then(({ data }) => {
 
@@ -186,7 +186,7 @@ export async function list <T extends { metafields: Requests.Metafield[] }> (sto
  * Returns a metafield by id reference. We keep a cache
  * map reference of metafield IDs in the `node_modules/.syncify/metafields.map` file.
  */
-export async function get <T extends { metafields: Requests.Metafield[] }> (store: IStore, id?: number) {
+export async function get <T extends { metafields: Requests.Metafield[] }> (store: Store, id?: number) {
 
   if (is(arguments.length, 1)) return (_id: number) => get(store, _id);
 
@@ -213,7 +213,7 @@ export async function get <T extends { metafields: Requests.Metafield[] }> (stor
  * Returns a metafield by id reference. We keep a cache
  * map reference of metafield IDs in the `node_modules/.syncify/metafields.map` file.
  */
-export async function remove <T extends { metafields: Requests.IMetafield[] }> (store: IStore, id?: number) {
+export async function remove <T extends { metafields: Requests.IMetafield[] }> (store: Store, id?: number) {
 
   if (is(arguments.length, 1)) return (_id: number) => remove(store, _id);
 
@@ -241,7 +241,7 @@ export async function remove <T extends { metafields: Requests.IMetafield[] }> (
  * Walks through fields returning either an object or array.
  * If no match is found then `undefined` is returned
  */
-export async function find <T extends Requests.IMetafield> (store: IStore, field?: Requests.IMetafield) {
+export async function find <T extends Requests.IMetafield> (store: Store, field?: Requests.IMetafield) {
 
   if (is(arguments.length, 1)) return (_field: Requests.IMetafield) => find(store, _field);
 
@@ -271,7 +271,7 @@ export async function find <T extends Requests.IMetafield> (store: IStore, field
  * shop. This is called when a metafield does
  * not exists.
  */
-export async function create <T extends Requests.Metafield> (store: IStore, metafield?: T) {
+export async function create <T extends Requests.Metafield> (store: Store, metafield?: T) {
 
   if (is(arguments.length, 1)) return (_metafield: Requests.Metafield) => create(store, _metafield);
 
@@ -308,7 +308,7 @@ export async function create <T extends Requests.Metafield> (store: IStore, meta
  * Updates an existing metafield using its unique `id`.
  * This is applied only when a metafield reference exists.
  */
-export async function update <T extends Requests.Metafield> (store: IStore, id?: number, metafield?: T) {
+export async function update <T extends Requests.Metafield> (store: Store, id?: number, metafield?: T) {
 
   if (is(arguments.length, 1)) return (_id: number, _field: Requests.Metafield) => update(store, _id, _field);
 
@@ -337,7 +337,7 @@ export async function update <T extends Requests.Metafield> (store: IStore, id?:
  * resource modes and will query, create or update
  * metafields.
  */
-export async function sync (store: IStore, field?: Requests.Metafield) {
+export async function sync (store: Store, field?: Requests.Metafield) {
 
   if (is(arguments.length, 1)) return (_field: Requests.Metafield) => sync(store, _field);
 
@@ -365,7 +365,7 @@ export async function sync (store: IStore, field?: Requests.Metafield) {
  * resource modes and will query, create or update
  * metafields.
  */
-export function client (store: IStore) {
+export function client (store: Store) {
 
   return {
     sync: sync.apply(null, store),

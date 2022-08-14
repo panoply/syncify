@@ -1,8 +1,9 @@
 example
 test
-src
+lib
 bin
 package
+*.ts
 *.js
 *.mjs
 *.cjs

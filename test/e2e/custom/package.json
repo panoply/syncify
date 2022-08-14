@@ -1,0 +1,23 @@
+{
+  "name": "@syncify/e2e-custom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "syncify custom --watch --hot",
+    "build": "syncify custom --build --prod",
+    "upload": "syncify custom --upload",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@syncify/cli": "^0.1.0-beta",
+    "@syncify/plugin-icons": "^1.0.0",
+    "esbuild": "^0.15.1",
+    "postcss": "^8.4.16",
+    "sass": "^1.54.4",
+    "sharp": "^0.30.7"
+  }
+}

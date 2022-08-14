@@ -1,10 +1,9 @@
 import type { Processor } from 'postcss';
-import { IFile, IStyle, Syncify } from 'types';
+import { File, Style, Syncify } from 'types';
 import { compile, Logger } from 'sass';
-import stringify from 'fast-safe-stringify';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
-import { isFunction, isString, isUndefined, isBuffer, nl } from 'shared/native';
+import { isFunction, isString, isUndefined, isBuffer, nl } from '../shared/native';
 import { byteSize } from '../shared/utils';
 import { log, c } from '../logger';
 import { bundle, cache } from '../options/index';
@@ -27,7 +26,7 @@ export const processer = (config: any) => {
 
 };
 
-function write (file: IFile<IStyle>, cb: Syncify) {
+function write (file: File<Style>, cb: Syncify) {
 
   const scope = isFunction(cb) ? { ...file } : false;
 
@@ -59,7 +58,7 @@ function write (file: IFile<IStyle>, cb: Syncify) {
   };
 };
 
-async function sass (file: IFile<IStyle>) {
+async function sass (file: File<Style>) {
 
   const { config } = file;
 
@@ -69,6 +68,8 @@ async function sass (file: IFile<IStyle>) {
 
     try {
 
+      console.log(config);
+
       log.hook('sass');
 
       const { css, sourceMap } = compile(file.input, {
@@ -76,7 +77,7 @@ async function sass (file: IFile<IStyle>) {
         style: config.sass.style,
         quietDeps: config.sass.warnings,
         sourceMap: config.sass.sourcemap,
-        loadPaths: config.sass.include,
+        loadPaths: config.sass.includePaths,
         logger: config.sass.warnings ? Logger.silent : {
           debug: msg => console.log('DEBUG', msg),
           warn: (msg, opts) => {
@@ -86,7 +87,7 @@ async function sass (file: IFile<IStyle>) {
       });
 
       if (config.sass.sourcemap) {
-        writeFile(`${cache.styles.uri + file.base}.map`, stringify(sourceMap)).catch(e => log.warn(e));
+        writeFile(`${cache.styles.uri + file.base}.map`, JSON.stringify(sourceMap)).catch(e => log.warn(e));
       }
 
       if (bundle.mode.watch) {
@@ -140,7 +141,7 @@ async function sass (file: IFile<IStyle>) {
  *
  * Runs postcss on compiled SASS or CSS styles
  */
-async function postcss (file: IFile<IStyle>, css: string, map: any) {
+async function postcss (file: File<Style>, css: string, map: any) {
 
   const { config } = file;
 
@@ -193,7 +194,7 @@ function snippet (css: string) {
 /**
  * SASS and PostCSS Compiler
  */
-export async function styles (file: IFile<IStyle>, cb: Syncify): Promise<string> {
+export async function styles (file: File<Style>, cb: Syncify): Promise<string> {
 
   if (bundle.mode.watch) timer.start();
 

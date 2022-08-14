@@ -1,8 +1,8 @@
-import { Request, IThemes, IFile } from 'types';
-import { queue, axios } from 'requests/queue';
-import { is } from 'shared/native';
+import { Request, Theme, File } from 'types';
+import { queue, axios } from './queue';
+import { is } from '../shared/native';
 import { log, c, error } from '../logger';
-import * as timer from 'process/timer';
+import * as timer from '../process/timer';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 
 /* -------------------------------------------- */
@@ -39,7 +39,7 @@ let limit: number;
  * REST endpoint. When request rates are exceeded
  * the handler will re-queue them.
  */
-export async function sync (theme: IThemes, file: IFile, config: Request) {
+export async function sync (theme: Theme, file: File, config: Request) {
 
   if (queue.isPaused) return;
 

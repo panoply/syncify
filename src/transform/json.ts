@@ -1,13 +1,12 @@
 import { has, isNil, isType } from 'rambdax';
-import { IFile, Syncify } from 'types';
+import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { is, isBuffer, isArray, isObject, isUndefined, isString } from 'shared/native';
-import { Type } from 'process/files';
+import { is, isBuffer, isArray, isObject, isUndefined, isString } from '../shared/native';
+import { Type } from '../process/files';
 import { lastPath } from 'shared/paths';
-import { byteSize, byteConvert } from 'shared/utils';
-import stringify from 'fast-safe-stringify';
+import { byteSize, byteConvert } from '../shared/utils';
 import { log, c } from '../logger';
-import { bundle, terser, transform } from '../options/index';
+import { bundle } from '../options/index';
 import * as timer from '../process/timer';
 
 /**
@@ -15,7 +14,7 @@ import * as timer from '../process/timer';
  *
  * Strips `$schema` spec field from JSON
  */
-export function $schema (file: IFile, data: { $schema?: string }) {
+export function $schema (file: File, data: { $schema?: string }) {
 
   if (!has('$schema', data)) return data;
 
@@ -64,7 +63,7 @@ export function minify (data: string, space = 0): any {
 
   try {
 
-    return stringify(data, null, space);
+    return JSON.stringify(data, null, space);
 
   } catch (e) {
 
@@ -116,7 +115,7 @@ export function jsonCompile (file: IFile, data: string, space = 0): any {
  * cb that one can optionally execute
  * from within scripts.
  */
-export async function compile (file: IFile, cb: Syncify): Promise<string> {
+export async function compile (file: File, cb: Syncify): Promise<string> {
 
   if (bundle.mode.watch) {
     timer.start();
@@ -127,8 +126,8 @@ export async function compile (file: IFile, cb: Syncify): Promise<string> {
   file.size = byteSize(json);
 
   const data = parse(json.toString());
-  const space = terser.minify.json ? 0 : transform.json.indent;
-  const refs = terser.liquid.removeSchemaRefs ? $schema(file, data) : data;
+  const space = bundle.minify.json[file.namespace] ? 0 : bundle.json.indent;
+  const refs = bundle.minify.liquid.removeSchemaRefs ? $schema(file, data) : data;
 
   if (bundle.mode.watch) {
     log.info(`created ${c.bold(file.key)} ${c.gray(`µ${timer.stop()}`)}`);

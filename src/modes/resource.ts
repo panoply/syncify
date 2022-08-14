@@ -1,7 +1,7 @@
 import { IConfig } from 'types';
 import prompts from 'prompts';
-import * as pages from 'requests/pages';
-import * as metafields from 'requests/metafields';
+import * as pages from '../requests/pages';
+import * as metafields from '../requests/metafields';
 
 export async function resource (config: IConfig) {
 

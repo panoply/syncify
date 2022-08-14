@@ -1,17 +1,18 @@
-import { IBundle, IConfig, IIcons, IPackage, IStyle } from 'types';
+import { Bundle, Config, Package, SVGInline, SVGSprite, StyleTransform } from 'types';
 import glob from 'glob';
-import anymatch from 'anymatch';
+import anymatch, { Tester } from 'anymatch';
 import { has, hasPath, includes, isNil, last } from 'rambdax';
 import { join, extname } from 'path';
 import { existsSync, mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
-import { log } from '../logger';
 import { createVSCodeDir } from '../modes/vsc';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { lastPath, normalPath } from '../shared/paths';
 import { typeError, unknownError, invalidError, warnOption } from './validate';
-import { transform, bundle, cache } from './index';
+import { bundle, cache } from './index';
 import * as u from '../shared/native';
-import * as style from '../transform/styles';
+import * as preprocessor from '../transform/styles';
+import * as svgprocess from '../transform/icons';
+import { Merge } from 'type-fest';
 
 /**
  * Section Options
@@ -19,19 +20,19 @@ import * as style from '../transform/styles';
  * This is a transform option, we will pass to pages
  * in the next validate check,
  */
-export function sectionOptions (config: IConfig) {
+export function sectionOptions (config: Config) {
 
-  if (!has('sections', config.transforms)) return;
+  if (!has('sections', config.views)) return;
 
-  const { sections } = config.transforms;
+  const { sections } = config.views;
 
   // Ensure the section option is an object
-  if (!u.isObject(config.transforms.sections)) {
-    unknownError('sections', config.transforms.sections);
+  if (!u.isObject(config.views.sections)) {
+    unknownError('sections', config.views.sections);
   }
 
   // Iterate over all the properties in sections option
-  for (const option in transform.sections) {
+  for (const option in bundle.section) {
 
     // Throw if an undefined property is detected
     // checks against the default model.
@@ -40,7 +41,7 @@ export function sectionOptions (config: IConfig) {
     // Validate the boolean type values of the option
     if (option === 'directoryPrefixing' || option === 'onlyPrefixDuplicates') {
       if (u.isBoolean(sections[option])) {
-        transform.sections[option] = sections[option];
+        bundle.section[option] = sections[option];
         continue;
       } else {
         typeError('sections', option, sections[option], 'boolean');
@@ -54,7 +55,7 @@ export function sectionOptions (config: IConfig) {
 
         // Only these character can be prefixers
         if (/[$@:_-]/.test(sections[option])) {
-          transform.sections[option] = sections[option];
+          bundle.section[option] = sections[option];
           continue;
         } else {
           invalidError('sections', option, sections[option], '@ | _ | : | - | $');
@@ -70,7 +71,7 @@ export function sectionOptions (config: IConfig) {
       const globals = u.isString(sections[option]) ? [ sections[option] ] : sections[option];
 
       if (u.isArray(globals)) {
-        transform.sections[option] = new RegExp(`${globals.join('|')}`);
+        bundle.section[option] = new RegExp(`${globals.join('|')}`);
         continue;
       } else {
         typeError('sections', option, sections[option], 'string | string[]');
@@ -80,11 +81,11 @@ export function sectionOptions (config: IConfig) {
 
 }
 
-export function pageOptions (config: IConfig) {
+export function pageOptions (config: Config) {
 
-  if (has('pages', config.transforms)) return;
+  if (has('pages', config.views)) return;
 
-  const { pages } = config.transforms;
+  const { pages } = config.views;
 
   // Ensure the section option is an object
   if (!u.isObject(pages)) unknownError('pages', pages);
@@ -94,12 +95,12 @@ export function pageOptions (config: IConfig) {
 
     // Throw if an undefined property is detected
     // checks against the default model.
-    if (!has(option, transform.pages)) unknownError('pages', option);
+    if (!has(option, bundle.page)) unknownError('pages', option);
 
-    if (option === 'importType') {
+    if (option === 'language') {
       if (u.isString(pages[option])) {
-        if (/(?:markdown|html)/.test(pages[option])) {
-          transform.pages[option] = pages[option];
+        if (pages[option] === 'markdown' || pages[option] === 'html') {
+          bundle.page[option] = pages[option];
           continue;
         } else {
           invalidError('pages', option, pages[option], 'markdown | html');
@@ -110,27 +111,18 @@ export function pageOptions (config: IConfig) {
       }
     }
 
-    if (option === 'fallbackAuthor') {
+    if (option === 'author') {
       if (u.isString(pages[option])) {
-        transform.pages[option] = pages[option];
+        bundle.page[option] = pages[option];
         continue;
       } else {
         typeError('pages', option, pages[option], 'string');
       }
     }
 
-    if (option === 'liquidWarnings') {
-      if (u.isBoolean(pages[option])) {
-        transform.pages[option] = pages[option];
-        continue;
-      } else {
-        typeError('pages', option, pages[option], 'boolean');
-      }
-    }
-
     if (option === 'markdown') {
       if (u.isObject(pages[option])) {
-        u.assign(transform.pages[option], pages[option]);
+        u.assign(bundle.page[option], pages[option]);
         continue;
       } else {
         typeError('pages', option, pages[option], 'object');
@@ -146,7 +138,7 @@ export function pageOptions (config: IConfig) {
  * This is a transform option, we will pass to pages
  * in the next validate check,
  */
-export function jsonOptions (config: IConfig) {
+export function jsonOptions (config: Config) {
 
   if (!has('json', config.transforms)) return;
 
@@ -158,14 +150,10 @@ export function jsonOptions (config: IConfig) {
   // Iterate over all the properties in sections option
   for (const option in json) {
 
-    // Throw if an undefined property is detected
-    // checks against the default model.
-    if (!has(option, transform.json)) unknownError('json', option);
-
     // Validate theindent number
     if (option === 'indent') {
       if (u.isNumber(json[option])) {
-        transform.json[option] = json[option];
+        bundle.json[option] = json[option];
         continue;
       } else {
         typeError('json', option, json[option], 'number');
@@ -173,9 +161,9 @@ export function jsonOptions (config: IConfig) {
     }
 
     // Validate the useTabs options, when true we indent with tabs
-    if (option === 'useTabs') {
+    if (option === 'useTab') {
       if (u.isBoolean(json[option])) {
-        transform.json[option] = json[option];
+        bundle.json[option] = json[option];
         continue;
       } else {
         typeError('json', option, json[option], 'boolean');
@@ -188,7 +176,7 @@ export function jsonOptions (config: IConfig) {
       const exclude = u.isString(json[option]) ? [ json[option] ] : json[option];
 
       if (u.isArray(exclude)) {
-        transform.json[option] = anymatch(exclude as string[]);
+        bundle.json[option] = anymatch(exclude as string[]);
         continue;
       } else {
         typeError('exclude', option, exclude[option], 'string | string[]');
@@ -206,31 +194,33 @@ export function jsonOptions (config: IConfig) {
  * parses the `postcss.config.js` configuration file and
  * normalizes the configuration object.
  */
-export async function styleOptions (config: IConfig, pkg: IPackage) {
+export async function styleOptions (config: Config, pkg: Package) {
 
   const warn = warnOption('Style option');
 
   // Find postcss configuration files
-  const postcssconfig = await readConfigFile('postcss.config', null, bundle.dirs.config);
+  const postcssconfig = await readConfigFile('postcss.config', null, bundle.dirs.config).catch(e => {
+    throw new Error(e);
+  });
 
   // Ensure postcss config exists
   if (!isNil(postcssconfig)) {
 
     // Set the postcss processor
     if (getModules(pkg, 'postcss')) {
-      style.processer(postcssconfig);
+      preprocessor.processer(postcssconfig);
     } else {
       warn('Missing dependency', 'postcss');
     }
   }
 
-  if (!has('styles', config.transforms)) return;
+  if (!has('style', config.transforms)) return;
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const styles = u.isObject(config.transforms.styles)
-    ? [ config.transforms.styles ]
-    : config.transforms.styles;
+  const styles = u.isObject(config.transforms.style)
+    ? [ config.transforms.style ]
+    : config.transforms.style;
 
   // Throw when styles config is not an array type
   if (!u.isArray(styles)) unknownError('styles', styles);
@@ -240,7 +230,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
 
   // Process defined stylesheet inputs
   // For every stylesheet defined we create an individual config
-  const list = styles.flatMap((style: any) => {
+  const list = (styles as StyleTransform[]).flatMap((style: any) => {
 
     // Flatten and glob array type inputs
     return u.isArray(style.input) ? style.input.flatMap(
@@ -259,20 +249,20 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
   });
 
   // Lets construct the configurations
-  for (const style of list) {
-
-    // Compile model for each style
-    const compile: Partial<IStyle> = {};
-
-    // input path
-    compile.input = style.input;
+  for (const style of list as Merge<StyleTransform, { input: string, watch: Tester }>[]) {
 
     // Default Dart SASS options
-    compile.sass = {
-      sourcemap: true,
-      style: 'compressed',
-      warnings: true,
-      include: []
+    // Compile model for each style
+    const compile: typeof style = {
+      input: style.input,
+      postcss: false,
+      watch: null,
+      sass: {
+        sourcemap: true,
+        style: 'compressed',
+        warnings: true,
+        includePaths: []
+      }
     };
 
     // Options passed to PostCSS
@@ -282,7 +272,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
       if (u.isBoolean(style.postcss)) {
         compile.postcss = style.postcss;
       } else {
-        typeError('styles', 'postcss', compile.postcss, 'boolean');
+        typeError('style', 'postcss', compile.postcss, 'boolean');
       }
     } else {
       compile.postcss = !isNil(postcssconfig);
@@ -292,9 +282,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
     if (has('sass', style)) {
 
       // Warn if input is not using sass or scss extension
-      if (!/\.s[ac]ss/.test(extname(compile.input))) {
-        warn('Input is not a sass file', compile.input);
-      }
+      if (!/\.s[ac]ss/.test(extname(compile.input))) warn('Input is not a sass file', compile.input);
 
       // iterate of user defined options and assign to defaults
       for (const option in style.sass) {
@@ -364,9 +352,7 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
         rename = renameFile(compile.input, style.rename);
 
         // Validate the file new name.
-        if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) {
-          log.error('Invalid rename config defined on stylesheet: ' + style.rename);
-        }
+        if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) typeError('sass', 'rename', rename, 'Invalid name augment');
 
         // We are dealing with a .css file
         if (rename.name.endsWith('.css')) {
@@ -434,12 +420,12 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
     }
 
     // Apply includes (for Dart SASS)
-    if (hasPath('sass.include', style)) {
-      compile.sass.include = style.sass.include.map((include: string) => join(bundle.cwd, include));
+    if (hasPath('sass.includePaths', style)) {
+      compile.sass.includePaths = style.sass.includePaths.map((include: string) => join(bundle.cwd, include));
     }
 
     // Include the CWD and parent directory
-    compile.sass.include.unshift(bundle.cwd, join(bundle.cwd, rename.dir));
+    compile.sass.includePaths.unshift(bundle.cwd, join(bundle.cwd, rename.dir));
 
     if (has('snippet', style)) {
       if (u.isBoolean(style.snippet)) {
@@ -468,9 +454,11 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
     }
 
     // Lets populate the style model
-    transform.styles.push(compile as IStyle);
+    bundle.style.push(compile);
 
   }
+
+  // console.log(bundle);
 
 };
 
@@ -480,71 +468,71 @@ export async function styleOptions (config: IConfig, pkg: IPackage) {
  * Build the icons configuration for generating
  * SVG sprites and snippets.
  */
-export async function iconOptions (config: IConfig, pkg: IPackage) {
+export async function SVGOptions (config: Config, pkg: Package) {
 
   // Find svgo configuration file
   const svgoconfig = await readConfigFile(join(bundle.dirs.config, 'svgo.config'));
 
-  // Ensure postcss config exists
+  // Ensure svgo config exists
   if (!isNil(svgoconfig)) {
-
     // Set the postcss processor
     if (getModules(pkg, 'svgo')) {
-      style.processer(svgoconfig);
+      svgprocess.processers('svgo', svgoconfig);
     } else {
       throw new Error('Missing "svgo" dependency, you need to install svgo');
     }
   }
 
-  if (!has('icons', config.transforms)) return;
+  if (!has('svg', config.transforms)) return;
 
-  const { icons } = config.transforms;
+  const svgs = u.isArray(config.transforms.svg) ? config.transforms.svg : [ config.transforms.svg ];
 
-  // Throw when styles config is not an array type
-  if (!u.isObject(icons)) unknownError('icons', icons);
+  for (const svg of svgs as Merge<SVGInline, SVGSprite>[]) {
 
-  const path = normalPath(lastPath(config.input));
+    const path = normalPath(lastPath(svg.input));
+    const conf = u.isObject(svg.svgo);
 
-  if (has('inlined', icons)) {
-    if (u.isArray(icons.inlined)) {
-      for (const inline of icons.inlined) {
-        transform.icons.inlined.push({
-          input: path(inline.input),
-          rename: has('rename', inline) ? inline.rename : null,
-          snippet: has('snippet', inline) ? inline.snippet : true,
-          svgo: !isNil(svgoconfig)
-        });
-      }
-    } else {
-      typeError('icons', 'inlined', icons.inlined, '[]');
+    if (((u.isUndefined(svg.sprite) || (
+      u.isBoolean(svg.sprite) && svg.sprite === false)) && conf === true) || (
+      u.isBoolean(svg.svgo) && svg.svgo === true)
+    ) {
+
+      bundle.svg.inline.push({
+        input: path(svg.input),
+        rename: has('rename', svg) ? svg.rename : null,
+        snippet: has('snippet', svg) ? svg.snippet : true,
+        svgo: (conf && isNil(svgoconfig)) ? svg.svgo : svgoconfig
+      });
+
     }
+
+    if ((u.isUndefined(svg.svgo) ||
+      (u.isBoolean(svg.svgo) && svg.svgo === false)) ||
+      (u.isBoolean(svg.sprite) && svg.sprite === true) ||
+      (u.isObject(svg.sprite))
+    ) {
+
+      const input = path(svg.input);
+
+      bundle.svg.sprite.push({
+        input: u.isArray(input) ? input : [ input ],
+        rename: has('rename', svg) ? svg.rename : null,
+        snippet: has('snippet', svg) ? svg.snippet : true,
+        sprite: u.isObject(svg.sprite) ? svg.sprite : {}
+      });
+
+    }
+
   }
 
-  if (!has('sprites', icons)) return config;
+  if (!hasPath('views.icons', config)) return;
 
-  const sprites = (u.isObject(icons.sprites)
-    ? [ icons.sprites ]
-    : icons.sprites) as IIcons['sprites'];
+  const { icons } = config.views;
 
-  if (!u.isArray(icons.sprites)) typeError('icons', 'sprites', icons.sprites, '{} | []');
-
-  for (const sprite of sprites) {
-    const input = path(sprite.input);
-    transform.icons.sprites.push({
-      input: u.isArray(input) ? input : [ input ],
-      rename: has('rename', sprite) ? sprite.rename : null,
-      snippet: has('snippet', sprite) ? sprite.snippet : true,
-      svgo: !isNil(svgoconfig),
-      options: has('config/options', sprite) ? sprite.options : {}
-    });
-  }
-
-  if (has('replacer', icons.replacer)) {
-    if (u.isBoolean(icons.replacer)) {
-      transform.icons.replacer = icons.replacer;
-    } else {
-      typeError('icons', 'replacer', icons.replacer, 'boolean');
-    }
+  if (u.isBoolean(icons.useCustomTag)) {
+    bundle.svg.icons.useCustomTag = icons.useCustomTag;
+  } else {
+    typeError('icons', 'replacer', icons.useCustomTag, 'boolean');
   }
 
   if (has('vscodeCustomData', icons)) {
@@ -553,7 +541,7 @@ export async function iconOptions (config: IConfig, pkg: IPackage) {
       typeError('icons', 'vscodeCustomData', icons.vscodeCustomData, 'boolean');
     }
 
-    if (transform.icons.replacer && icons.vscodeCustomData) {
+    if (bundle.svg.icons.useCustomTag && icons.vscodeCustomData) {
 
       if (!existsSync(cache.vscode.uri)) {
         try {
@@ -565,18 +553,18 @@ export async function iconOptions (config: IConfig, pkg: IPackage) {
 
       let name: string = 'icon';
 
-      if (has('replacerTag', icons)) {
-        if (u.isString(icons.replacerTag)) {
+      if (has('tagName', icons)) {
+        if (u.isString(icons.tagName)) {
 
-          const test = /[a-z](?:[a-zA-Z-]+)?/.test(icons.replacerTag);
+          const test = /[a-z](?:[a-zA-Z-]+)?/.test(icons.tagName);
 
-          if (test && !u.is(last(icons.replacerTag).charCodeAt(0), 45)) {
-            name = icons.replacerTag;
+          if (test && !u.is(last(icons.tagName).charCodeAt(0), 45)) {
+            name = icons.tagName;
           } else {
-            invalidError('icons', 'replacerTag', icons.replacerTag, '[a-z] | [a-z]-[a-z]');
+            invalidError('icons', 'tagName', icons.tagName, '[a-z] | [a-z]-[a-z]');
           }
         } else {
-          typeError('icons', 'replacerTag', icons.replacerTag, 'string');
+          typeError('icons', 'tagName', icons.tagName, 'string');
         }
       }
 
@@ -615,14 +603,18 @@ export async function iconOptions (config: IConfig, pkg: IPackage) {
 
       await writeJson(cache.vscode.data.icons, schema, { spaces: 0 });
 
-      const file = await createVSCodeDir(bundle as IBundle);
+      const file = await createVSCodeDir(bundle as Bundle);
       const settings = pathExistsSync(file) ? await readJson(file) : {};
 
       if (!settings['html.customData']) settings['html.customData'] = [];
 
       if (!includes(cache.vscode.data.icons, settings['html.customData'])) {
+
         settings['html.customData'].push(cache.vscode.data.icons);
-        await writeJson(file, settings, { spaces: transform.json.indent });
+
+        await writeJson(file, settings, {
+          spaces: bundle.json.indent
+        });
       }
 
     }

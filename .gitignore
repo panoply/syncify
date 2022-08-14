@@ -6,7 +6,6 @@ yarn.lock
 .env
 node_modules
 bower_components
-misc
 test/custom
 test/cases/*
 .tmp

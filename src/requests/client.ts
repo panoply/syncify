@@ -9,7 +9,7 @@ import * as metafields from '../requests/metafields';
 /* -------------------------------------------- */
 /* EXPORTED                                     */
 /* -------------------------------------------- */
-export { queue } from 'requests/queue';
+export { queue } from '../requests/queue';
 
 export const client = ({ stores, themes }: ISync) => ({
 

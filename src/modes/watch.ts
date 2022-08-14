@@ -18,6 +18,7 @@ import { Server } from 'ws';
  */
 export function watch (callback: Syncify) {
 
+  const wss = new Server({ port: 8090, path: '/ws' });
   const request = client(bundle.sync);
   const parse = parseFile(bundle.paths, bundle.dirs.output);
   const watcher = chokidar.watch(bundle.watch, {
@@ -29,16 +30,13 @@ export function watch (callback: Syncify) {
     ignored: [ '**/*.map' ]
   });
 
-  const wss = new Server({
-    port: 8090,
-    path: '/ws'
-
-  });
-
   wss.on('connection', v => {
-    wss.on('style', () => v.send('style'));
-    wss.on('script', () => v.send('script'));
+    wss.on('assets', () => v.send('assets'));
+    wss.on('reload', () => v.send('reload'));
+    wss.on('replace', () => v.send('replace'));
   });
+
+  wss.emit('assets');
 
   watcher.on('all', async function (event, path) {
 
@@ -57,8 +55,6 @@ export function watch (callback: Syncify) {
         if (file.type === Type.Style) {
 
           value = await styles(file as IFile<IStyle>, callback);
-
-          wss.emit('style');
 
         } else if (file.type === Type.Section || file.type === Type.Layout || file.type === Type.Snippet) {
 
@@ -93,12 +89,11 @@ export function watch (callback: Syncify) {
 
           value = await asset(file, callback);
 
-          wss.emit('script');
-
         }
 
         if (value !== null) {
 
+          wss.emit('assets');
           // if (queue.isPaused) queue.start();
 
           log.syncing(c.bold(`${file.key}`));

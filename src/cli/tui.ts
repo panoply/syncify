@@ -185,6 +185,6 @@ export const spawn = (data: string) => {
     if (line.trim().length > 0) stdout.push(c.reset(c.line) + line);
   }
 
-  log(`${stdout.join(nl)}${stderr.join(nl)}`);
+  log(`${stdout.join(nl)}${stderr.length > 1 ? stderr.join(nl) : nil}`);
 
 };

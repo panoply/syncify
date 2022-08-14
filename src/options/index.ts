@@ -2,7 +2,7 @@
 import merge from 'mergerino';
 import { mergeDeepRight } from 'rambdax';
 import { PartialDeep } from 'type-fest';
-import { IBundle, ICache, IConfig, ITerser, ITransform } from 'types';
+import { Bundle, Cache, Config, Minify, Plugins } from 'types';
 
 /**
  * Cache Configuration
@@ -10,7 +10,88 @@ import { IBundle, ICache, IConfig, ITerser, ITransform } from 'types';
  * This model represents cache references stores
  * within the `node_modules/.syncify` directory.
  */
-export const cache = <PartialDeep<ICache>>({ /* DYNAMICALLY POPULATED */ }) as ICache;
+export const cache = <PartialDeep<Cache>>({ /* DYNAMICALLY POPULATED */ });
+
+/**
+ * Plugin Store
+ *
+ * This model holds reference to plugins. Entries
+ * are populated at runtime and thier hooks stored
+ * in relative Map and invoked at different cycles.
+ */
+export const plugins: Plugins = {
+  onBuild: [],
+  onChange: [],
+  onReload: [],
+  onTransform: [],
+  onWatch: []
+};
+
+/**
+ * Minify Configuration
+
+ * This model represents minification terser configuration
+ * options and settings. Terser is optional, only when a user
+ * has defined or informed they want minification processing
+ * will this model be used
+ */
+export const minify: Minify = {
+  json: {
+    assets: true,
+    config: true,
+    locales: true,
+    metafields: true,
+    templates: true,
+    exclude: []
+  },
+  script: {
+    legalComments: 'none',
+    mangleCache: {},
+    mangleProps: null,
+    mangleQuoted: true,
+    minifyIdentifiers: true,
+    minifySyntax: true,
+    minifyWhitespace: true
+  },
+  liquid: {
+    removeNewlineAttributes: true,
+    removeComments: true,
+    removeSchemaRefs: true,
+    minifySchemaTag: true,
+    stripInnerTagWhitespace: false,
+    stripWhitespaceDashes: true,
+    stripAttributeNewlines: true,
+    ignoreTags: [],
+    ignoreObjects: [],
+    exclude: []
+  },
+  html: {
+    caseSensitive: false,
+    collapseBooleanAttributes: false,
+    collapseInlineTagWhitespace: false,
+    conservativeCollapse: false,
+    keepClosingSlash: false,
+    noNewlinesBeforeTagClose: false,
+    preventAttributesEscaping: false,
+    removeEmptyAttributes: false,
+    removeEmptyElements: false,
+    removeOptionalTags: false,
+    removeRedundantAttributes: true,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
+    useShortDoctype: true,
+    collapseWhitespace: true,
+    continueOnParseError: true,
+    removeComments: true,
+    trimCustomFragments: true,
+    ignoreCustomFragments: [
+      /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+      /<style[\s\S]*?<\/style>/,
+      /{%[\s\S]*?%}/,
+      /{{[\s\S]*?}}/
+    ]
+  }
+};
 
 /**
  * Preset Configuration
@@ -28,14 +109,18 @@ export const cache = <PartialDeep<ICache>>({ /* DYNAMICALLY POPULATED */ }) as I
  * defined options, the model is immutable and as such
  * we can reference it.
  */
-export const defaults = mergeDeepRight<IConfig>(<IConfig>{
+export const defaults = mergeDeepRight<Config>(<Config>{
   input: 'source',
   output: 'theme',
   import: 'import',
   export: 'export',
   stores: null,
   config: '.',
-  spawn: {},
+  live: false,
+  spawn: {
+    build: null,
+    watch: null
+  },
   paths: {
     assets: 'assets/*',
     config: 'config/*.json',
@@ -55,21 +140,69 @@ export const defaults = mergeDeepRight<IConfig>(<IConfig>{
     customers: [
       'templates/customers/*.liquid',
       'templates/customers/*.json'
-    ]
+    ],
+    redirects: 'redirects.yaml'
   },
-  terser: {
-    json: 'never',
-    html: 'never',
-    pages: 'never'
+  views: {
+    icons: {
+      useCustomTag: false,
+      tagName: 'i',
+      tagVoid: false,
+      vscodeCustomData: false
+    },
+    sections: {
+      directoryPrefixing: true,
+      onlyPrefixDuplicates: true,
+      prefixSeparator: '-',
+      global: []
+    },
+    pages: {
+      author: '',
+      language: 'html'
+    }
   },
   transforms: {
-    icons: {},
-    json: {},
-    pages: {
-      markdown: {
-        highlight: false
+    svg: {
+      input: null,
+      rename: '',
+      snippet: false,
+      svgo: null,
+      sprite: {
+        dimensionAttributes: false,
+        namespaceClassnames: false,
+        namespaceIDS: false,
+        rootAttributes: {}
       }
+    },
+    image: {
+      input: null,
+      sharp: {}
+    },
+    style: {
+      input: null,
+      postcss: false,
+      sass: null
+    },
+    script: {
+      input: [],
+      rename: null,
+      esbuild: {
+        bundle: true,
+        format: 'esm'
+      }
+    },
+    json: {
+      indent: 2,
+      useTab: false,
+      crlf: false,
+      exclude: []
     }
+  },
+  minify: {
+    json: false,
+    html: false,
+    liquid: false,
+    script: false
   }
 });
 
@@ -80,17 +213,20 @@ export const defaults = mergeDeepRight<IConfig>(<IConfig>{
  * options and settings. This is typically merged with
  * the CLI defined options.
  */
-export let bundle = <PartialDeep<IBundle>>({
+export let bundle = <PartialDeep<Bundle>>({
+  get plugins () { return plugins; },
   version: null,
   cli: false,
   cwd: null,
   silent: false,
   prod: false,
   dev: true,
+  live: {},
   dirs: {},
   mode: {
     build: false,
     prompt: false,
+    live: false,
     watch: false,
     clean: false,
     upload: false,
@@ -108,37 +244,20 @@ export let bundle = <PartialDeep<IBundle>>({
   },
   watch: [],
   paths: {},
-  sync: {
-    themes: [],
-    stores: []
-  }
-}) as IBundle;
-
-/**
- * Transform Configuration
- *
- * This model represents transform specific configuration
- * options and settings. Transforms are optional, only when
- * transforms exists within a config file will this model be used.
- */
-export const transform: ITransform = ({
-  styles: [],
-  json: {
-    indent: 2,
-    useTabs: false,
-    exclude: null
-  },
-  sections: {
-    directoryPrefixing: false,
-    onlyPrefixDuplicates: false,
-    prefixSeparator: '-',
-    global: null
-  },
-  pages: {
-    importAs: 'markdown',
-    liquidWarnings: true,
-    fallbackAuthor: null,
-    turndown: {
+  section: {},
+  cmd: {},
+  json: {},
+  page: {
+    export: {
+      quotes: '“”‘’',
+      html: true,
+      linkify: false,
+      typographer: false,
+      xhtmlOut: false,
+      breaks: false,
+      langPrefix: 'language-'
+    },
+    import: {
       codeBlockStyle: 'fenced',
       emDelimiter: '_',
       fence: '```',
@@ -148,83 +267,22 @@ export const transform: ITransform = ({
       linkStyle: 'inlined',
       strongDelimiter: '**',
       bulletListMarker: '-'
-    },
-    markdown: {
-      quotes: '“”‘’',
-      html: true,
-      linkify: false,
-      typographer: false,
-      xhtmlOut: false,
-      breaks: false,
-      langPrefix: 'language-'
     }
   },
-  icons: {
-    replacer: false,
-    replacerTag: 'icon',
-    vscodeCustomData: false,
-    inlined: [],
-    sprites: []
-  }
-});
-
-/**
- * Terser Configuration
- *
- * This model represents minification terser configuration
- * options and settings. Terser is optional, only when a user
- * has defined or informed they want minification processing
- * will this model be used.
- */
-export const terser: ITerser = ({
+  image: [],
+  style: [],
+  svg: [],
+  sync: {
+    themes: [],
+    stores: []
+  },
   minify: {
-    json: false,
-    html: false,
-    pages: false
-  },
-  liquid: {
-    removeLiquidNewlineAttributes: true,
-    removeLiquidComments: true,
-    removeSchemaRefs: true,
-    minifyLiquidSectionSchema: true,
-    stripAttributesContainingNewlines: true,
-    stripInnerTagWhitespace: false,
-    stripRedundantWhitespaceDashes: true,
-    ignoreLiquidTags: null,
-    ignoreLiquidObjects: null,
-    external: null
-  },
-  html: {
-    minifyJS: false,
-    minifyCSS: false,
-    caseSensitive: false,
-    collapseBooleanAttributes: false,
-    collapseInlineTagWhitespace: false,
-    conservativeCollapse: false,
-    keepClosingSlash: false,
-    noNewlinesBeforeTagClose: false,
-    preventAttributesEscaping: false,
-    removeEmptyAttributes: false,
-    removeEmptyElements: false,
-    removeOptionalTags: false,
-    removeRedundantAttributes: true,
-    removeScriptTypeAttributes: true,
-    removeStyleLinkTypeAttributes: true,
-    sortAttributes: false,
-    sortClassName: false,
-    useShortDoctype: true,
-    collapseWhitespace: true,
-    continueOnParseError: true,
-    removeComments: true,
-    trimCustomFragments: true,
-    ignoreCustomFragments: [
-      /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
-      /<style[\s\S]*?<\/style>/,
-      /{%[\s\S]*?%}/,
-      /{{[\s\S]*?}}/
-    ]
+    html: {},
+    json: {},
+    liquid: {},
+    script: {}
   }
-});
+}) as Bundle;
 
 /* -------------------------------------------- */
 /* MERGE OPTIONS                                */
@@ -239,9 +297,7 @@ export const terser: ITerser = ({
  * still have update capabilities.
  */
 export const update = ({
-  bundle (patch: PartialDeep<IBundle>) {
-
+  bundle: (patch: PartialDeep<Bundle>) => {
     bundle = merge(bundle, patch);
-
   }
 });

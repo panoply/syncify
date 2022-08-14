@@ -1,0 +1,5 @@
+
+/** @type {import('')} */
+export function () {
+
+}

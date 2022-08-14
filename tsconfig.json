@@ -1,10 +1,14 @@
 {
-  "exclude": ["node_modules/**", "package", "test", "docs"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "docs"
+  ],
   "include": [
     "src/**/*.ts",
-    "package/@types",
-    "test/cases/index.ts",
-    "test/e2e/source/js/transform.ts"
+    "tests/cases/index.ts",
+    "tests/e2e/source/js/transform.ts"
   ],
   "typeAcquisition": {
     "enable": true,
@@ -16,7 +20,7 @@
     "outDir": "package",
     "target": "ES6",
     "removeComments": true,
-    "lib": ["es2020"],
+    "lib": ["es2020", "DOM"],
     "module": "CommonJS",
     "alwaysStrict": true,
     "allowUmdGlobalAccess": true,
@@ -35,16 +39,7 @@
     "rootDir": "src",
     "baseUrl": ".",
     "paths": {
-      "types": ["src/types/index.d.ts"],
-      "options/*": ["src/options/*"],
-      "options": ["src/options/index.ts"],
-      "cli/*": ["src/cli/*"],
-      "logger/*": ["src/logger/*"],
-      "modes/*": ["src/modes/*"],
-      "process/*": ["src/process/*"],
-      "shared/*": ["src/shared/*"],
-      "requests/*": ["src/requests/*"],
-      "transform/*": ["src/transform/*"]
+      "types": ["./types/index.d.ts"]
     }
   }
 }

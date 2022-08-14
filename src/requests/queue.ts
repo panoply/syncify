@@ -1,6 +1,6 @@
 import Queue from 'p-queue';
 import connect from 'axios';
-import { is } from 'shared/native';
+import { is } from '../shared/native';
 
 /**
  * Axios Request

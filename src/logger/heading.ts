@@ -1,4 +1,4 @@
-import { IBundle } from 'types';
+import { Bundle } from 'types';
 import { allFalse, anyTrue } from 'rambdax';
 import { getTime, toUpcase } from '../shared/utils';
 import { log, keys, nil, values, nl, ws, from } from '../shared/native';
@@ -44,7 +44,7 @@ import { warnings } from '../options/validate';
  * │
  * ```
  */
-export const logHeader = (bundle: IBundle) => {
+export const logHeader = (bundle: Bundle) => {
 
   /**
    * The generated log message

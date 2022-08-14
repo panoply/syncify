@@ -1,8 +1,15 @@
-import { IConfig, IPackage } from 'types';
+import { Config, ENV, Package } from 'types';
 import { join } from 'path';
 import { pathExists, readJson } from 'fs-extra';
 import { readConfig } from '@web/config-loader';
+import JoyCon from 'joycon';
 
+const joycon = new JoyCon();
+
+joycon.load([ 'package-lock.json', 'yarn.lock' ]).then(result => {
+  // result is {} when files do not exist
+  // otherwise { path, data }
+});
 /**
  * Config Files
  *
@@ -14,7 +21,7 @@ import { readConfig } from '@web/config-loader';
  * > When `null` is returned, the `package.json` file is
  * assumed to contain configuration requirements.
  */
-export async function configFile (uri: string): Promise<IConfig> {
+export async function configFile (uri: string): Promise<Config> {
 
   try {
 
@@ -41,7 +48,7 @@ export async function configFile (uri: string): Promise<IConfig> {
  * at runtime, the module requires the existence of
  * a `package.json` file.
  */
-export async function pkgJson (cwd: string): Promise<IPackage> {
+export async function pkgJson (cwd: string): Promise<Package> {
 
   // Save path reference of package
   const uri = join(cwd, 'package.json');
@@ -51,7 +58,7 @@ export async function pkgJson (cwd: string): Promise<IPackage> {
 
   try {
 
-    const pkg: IPackage = await readJson(uri);
+    const pkg: Package = await readJson(uri);
     return pkg;
 
   } catch (e) {
@@ -67,7 +74,7 @@ export async function pkgJson (cwd: string): Promise<IPackage> {
  * `.syncifyrc.json` file. This file can optionally
  * include credential information.
  */
-export async function rcFile (cwd: string) {
+export async function rcFile (cwd: string): Promise<ENV.RCFile> {
 
   let rcconfig = join(cwd, '.syncifyrc');
   let rcexists = await pathExists(rcconfig);

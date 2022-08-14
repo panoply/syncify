@@ -1,5 +1,4 @@
 import { minify } from 'html-minifier-terser';
-import stringify from 'fast-safe-stringify';
 import { IFile, Syncify, IHTML } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
@@ -7,7 +6,7 @@ import { Type } from '../process/files';
 import { is, nil } from '../shared/native';
 import { byteSize } from '../shared/utils';
 import { log } from '../logger';
-import { terser, bundle } from '../options/index';
+import { bundle } from '../options/index';
 import * as timer from '../process/timer';
 
 /* -------------------------------------------- */
@@ -66,7 +65,7 @@ const TouchingAttributes = /(?<=[%}]})\s(?={[{%])/g;
  */
 const removeAttrNewline = (content: string) => {
 
-  if (!terser.liquid.removeLiquidNewlineAttributes) return content;
+  if (!bundle.minify.liquid.removeNewlineAttributes) return content;
 
   return content.replace(HTMLAttributeValues, match => (
 
@@ -83,11 +82,11 @@ const removeAttrNewline = (content: string) => {
  * Remove Liquid Comments
  *
  * Strips Liquid comments from file content.
- * This is executed before passing to HTML terser.
+ * This is executed before passing to HTML bundle.minify.
  */
 const removeComments = (content: string) => {
 
-  if (!terser.liquid.removeLiquidComments) return removeAttrNewline(content);
+  if (!bundle.minify.liquid.removeComments) return removeAttrNewline(content);
 
   const remove = content.replace(LiquidComments, nil);
 
@@ -103,14 +102,14 @@ const removeComments = (content: string) => {
  */
 const minifySchema = (file: IFile, content: string) => {
 
-  if (!terser.liquid.minifyLiquidSectionSchema) return removeComments(content);
+  if (!bundle.minify.liquid.minifySchemaTag) return removeComments(content);
 
   const minified = content.replace(LiquidSchemaTag, data => {
 
     try {
 
       const parsed = JSON.parse(data);
-      const minified = stringify(parsed, null, 0);
+      const minified = JSON.stringify(parsed, null, 0);
 
       return minified;
 
@@ -138,7 +137,7 @@ const minifySchema = (file: IFile, content: string) => {
  */
 const removeDashes = (content: string) => {
 
-  if (!terser.liquid.stripRedundantWhitespaceDashes) return content;
+  if (!bundle.minify.liquid.stripWhitespaceDashes) return content;
 
   return content
     .replace(HTMLStripDashSpace, nil)
@@ -179,7 +178,7 @@ const htmlMinify = async (file: IFile, content: string, terser: IHTML) => {
  */
 const transform = (file: IFile) => async (data: string) => {
 
-  if (!terser.minify.html) {
+  if (!bundle.prod) {
     await writeFile(file.output, data);
     return data;
   }
@@ -188,7 +187,7 @@ const transform = (file: IFile) => async (data: string) => {
     ? minifySchema(file, data)
     : removeComments(data);
 
-  const htmlmin = await htmlMinify(file, content, terser.html);
+  const htmlmin = await htmlMinify(file, content, bundle.minify.html);
 
   if (isNil(htmlmin)) {
     await writeFile(file.output, data);

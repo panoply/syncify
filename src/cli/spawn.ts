@@ -1,6 +1,6 @@
 import { ChildProcessWithoutNullStreams } from 'node:child_process';
 import spawn from 'cross-spawn';
-import { ISpawn } from 'types';
+import { Spawn } from 'types';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -44,7 +44,7 @@ export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
  *
  * > The `kill()` hook is also located in `options/define.ts`
  */
-export const spawned = (name: string, command: ISpawn['commands'][string], callback: Callback) => {
+export const spawned = (name: string, command: Spawn['commands'][string], callback: Callback) => {
 
   const child = spawn(command.cmd, command.args, { stdio: 'pipe' });
 
