@@ -1,6 +1,6 @@
 import { Bundle } from '.';
 import { File } from './file';
-import { Config } from '../config';
+import { Config, Transforms } from '../config';
 import { WebSocketServer } from 'ws';
 import { Merge } from 'type-fest';
 
@@ -25,6 +25,10 @@ export interface PluginHooks {
    * The plugin name
    */
   name: Lowercase<string>;
+  /**
+   * Optionally infer the required transformer
+   */
+  transforms?: Array<keyof Transforms>
   /**
    * Executes at runtime in the final cycle
    * and before modes are invoked (like _watch_).

@@ -1,6 +1,4 @@
-import type { BuildOptions } from 'esbuild';
-import { SharpOptions } from 'sharp';
-import type { OptimizeOptions } from 'svgo';
+import { ScriptProcessor, ImageProcessors, SVGProcessors, StyleProcessors } from './processors';
 
 export interface SVGInline {
   /**
@@ -9,6 +7,13 @@ export interface SVGInline {
    * @default null
    */
   input: string | string[];
+  /**
+   * The export generated type. `inline` types use SVGO and will export as single file
+   * SVGs. `sprite` types use SVG Sprite and will export as such.
+   *
+   * @default 'inline'
+   */
+  type: 'inline';
   /**
    * Rename the svg file - The same name as source file will be used
    * undefined.
@@ -28,9 +33,16 @@ export interface SVGInline {
    */
   snippet?: boolean;
   /**
-   * Options to be passed to `svgo` - Requires `svgo` to be installed.
+   * SVGO Processor - Skip processing by passing boolean `false`. If SVGO
+   * is installed then this will default to `true` and use default processing
+   * options.
+   *
+   * > Optionally you can override SVGO processor configurations on a per-transform
+   * basis.
+   *
+   * @default true // false if SVGO is not installed
    */
-  svgo?: OptimizeOptions;
+  svgo?: false | SVGProcessors['svgo']
 }
 
 export interface SVGSprite {
@@ -40,6 +52,13 @@ export interface SVGSprite {
    * @default null
    */
   input: string | string[];
+  /**
+   * The export generated type. `inline` types use SVGO and will export as single file
+   * SVGs. `sprite` types use SVG Sprite and will export as such.
+   *
+   * @default 'inline'
+   */
+  type: 'sprite';
   /**
    * Rename the generated svg sprite file. By default
    * the parent input directory name is used.
@@ -61,14 +80,16 @@ export interface SVGSprite {
    */
   snippet?: boolean;
   /**
-   * Options to be passed into `svg-sprite`.
+   * SVG Sprite Processor - Skip processing by passing boolean `false`. If SVG Sprite
+   * is installed then this will default to `true` and use default processing
+   * options.
+   *
+   * > Optionally you can override SVG Sprite processor configurations on a
+   * per-transform basis.
+   *
+   * @default true // false if SVG Sprite is not installed
    */
-  sprite?: {
-    dimensionAttributes?: boolean;
-    namespaceClassnames?: boolean;
-    namespaceIDS?: boolean;
-    rootAttributes?: { [prop: string]: string }
-  }
+  sprite?: boolean | SVGProcessors['sprite']
 }
 
 /* -------------------------------------------- */
@@ -79,28 +100,6 @@ export interface SVGSprite {
  * SVG processing transforms
  */
 export type SVGTransform = SVGInline | SVGSprite | Array<SVGInline & SVGSprite>
-
-/**
- * ESBuild bundle options - cherry picked
- */
-export type ESBuildOptions = Pick<BuildOptions,
-  | 'banner'
-  | 'charset'
-  | 'external'
-  | 'footer'
-  | 'chunkNames'
-  | 'globalName'
-  | 'jsx'
-  | 'tsconfig'
-  | 'target'
-  | 'treeShaking'
-  | 'splitting'
-  | 'sourcemap'
-  | 'supported'
-  | 'define'
-  | 'format'
-  | 'inject'
->;
 
 /**
  * Image processing transforms. Requires `sharp` to be installed
@@ -123,12 +122,16 @@ export interface ImageTransform {
    */
   rename?: string;
   /**
-   * Options to be passed to Sharp. Requires `sharp` to be installed
-   * in your project.
+   * Sharp Processor - Skip processing by passing boolean `false`. If Sharp
+   * is installed then this will default to `true` and use default processing
+   * options.
    *
-   * @default null // unless sharp is installed
+   * > Optionally you can override SVG Sprite processor configurations on a
+   * per-transform basis.
+   *
+   * @default true // false if Sharp is not installed
    */
-  sharp?: SharpOptions
+  sharp?: boolean | ImageProcessors['sharp']
 }
 
 /**
@@ -157,14 +160,13 @@ export interface ScriptTransfrom {
    */
   snippet?: boolean;
   /**
-   * Options to be passed to ESBuild. Requires `esbuild` to be installed
-   * in your project.
+   * TSUP Processor - Skip processing by passing boolean `false`. If TSUP
+   * is installed then this will default to `true` and use default processing
+   * options.
    *
-   * > Please note the some options are omitted
-   *
-   * @default null // unless esbuild is installed
+   * @default true // false if tsup is not installed
    */
-  esbuild?: ESBuildOptions
+  tsup?: boolean | ScriptProcessor['tsup']
 }
 
 /**
@@ -200,50 +202,27 @@ export interface StyleTransform {
    */
   watch?: string[];
   /**
-   * Whether or not to run PostCSS. Requires `postcss` to be installed
-   * and assumes that your project contains a `postcss.config.js` file.
+   * PostCSS Processor - Skip processing by passing boolean `false`. If PostCSS
+   * is installed then this will default to `true` and use default processing
+   * options.
    *
-   * > If your project has PostCSS installed and a `postcss.config.js` was
-   * resolved then this will default to `true` otherwise `false`
+   * > Optionally you can override PostCSS processor configurations on a
+   * per-transform basis.
    *
-   * @default false // unless installed and configured, then true.
+   * @default true // false if tsup is not installed
    */
-  postcss: boolean;
+  postcss: boolean | StyleProcessors['postcss'];
   /**
-   * Options to be passed to Dart SASS. Requires `sass` to be installed
-   * in your project. Any defined `input` file which uses a `.scss` or
-   * `.sass` extension will be passed to Dart SASS.
+   * SASS Dart Processor - Skip processing by passing boolean `false`. If SASS
+   * is installed then this will default to `true` and use default processing
+   * options.
    *
-   * @default null // unless sass is installed
+   * > Optionally you can override SASS processor configurations on a
+   * per-transform basis.
+   *
+   * @default true // false if tsup is not installed
    */
-  sass: {
-    /**
-     * Whether or not to generate sourcemaps
-     *
-     * @default true
-     */
-    sourcemap?: boolean;
-    /**
-     * The style compiled CSS should be output.
-     *
-     * @default 'compressed'
-     */
-    style?: 'expanded' | 'compressed';
-    /**
-     * Whether or not to print warnings to CLI - Warnings will require
-     * an `stdin` invocation to view. Setting this to `false` will hide
-     * warnings all together.
-     *
-     * @default true
-     */
-    warnings?: boolean;
-    /**
-     * A list of paths to include, ie: node_modules.
-     *
-     * @default ['node_modules']
-     */
-    includePaths?: string[];
-  };
+  sass: boolean | StyleProcessors['sass'];
 }
 
 /**

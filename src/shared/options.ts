@@ -1,10 +1,11 @@
 import type { AxiosRequestConfig } from 'axios';
-import { IPackage } from 'types';
-import { readConfig, ConfigLoaderError } from '@web/config-loader';
+import { Package } from 'types';
+import { pathExists } from 'fs-extra';
 import { has } from 'rambdax';
 import { basename, extname } from 'path';
 import { lastPath } from './paths';
 import { isUndefined } from './native';
+import { bundleRequire } from 'bundle-require';
 
 /**
  * Store Authorization URL
@@ -50,7 +51,7 @@ export function authURL (domain: string, env: object): AxiosRequestConfig {
  * Ensures that peer dependencies exists for
  * the transform processors.
  */
-export function getModules (pkg: IPackage, name: string) {
+export function getModules (pkg: Package, name: string) {
 
   if (has('devDependencies', pkg)) {
     if (has(name, pkg.devDependencies)) return true;
@@ -72,21 +73,44 @@ export function getModules (pkg: IPackage, name: string) {
 
 };
 
+export async function getConfigFilePath (filename: string): Promise<string> {
+
+  for (const ext of [ 'js', 'cjs', 'mjs' ]) {
+
+    const filepath = `${filename}.${ext}`;
+    const fileExists = await pathExists(`${filepath}.${ext}`);
+
+    if (fileExists) return filepath;
+
+  }
+
+  return null;
+
+}
+
 /**
  * Read Config File
  *
  * Load the syncify config file for node projects.
  * Supports loading config as es module or common js module,
  */
-export async function readConfigFile (path: string, customPath?: string, basedir?: string): Promise<any> {
+export async function readConfigFile<T> (filename: string): Promise<{ config: T; path: string; }> {
 
   try {
 
-    return readConfig(path, customPath, basedir);
+    const path = await getConfigFilePath(filename);
+
+    if (path !== null) {
+      const config = await bundleRequire({ filepath: path });
+      return {
+        path,
+        config: config.mod.syncify || config.mod.default || config.mod
+      };
+    }
+
+    return null;
 
   } catch (e) {
-
-    if (e instanceof ConfigLoaderError) console.error(e.message);
 
     return null;
 
@@ -109,7 +133,7 @@ export function renameFile (src: string, rename?: string) {
 
   // TODO
   // FIX THE .css EXTENSION HARDCODE
-  if (isUndefined(rename)) return { dir, ext, file, name: file + '.css' };
+  if (isUndefined(rename)) return { dir, ext, file, name: file };
 
   if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);
   if (/(\[file\])/.test(name)) name = name.replace('[file]', file);

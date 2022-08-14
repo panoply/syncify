@@ -54,7 +54,7 @@ export const logHeader = (bundle: Bundle) => {
   if (bundle.mode.metafields) return message;
 
   message += `${c.open}${c.pink.bold('SYNCIFY')} ${c.gray('~')} ${c.gray(getTime())}`;
-  message += `${c.newline}${c.line}${c.whiteBright.bold('v<!version!>')}${c.newline}`;
+  message += `${c.newline}${c.line}${c.whiteBright.bold(`v${bundle.version}`)}${c.newline}`;
 
   /**
    * Plural Store/s
@@ -69,7 +69,7 @@ export const logHeader = (bundle: Bundle) => {
   /**
    * Plural Spawns/s
    */
-  const PL = keys(bundle.spawn).length;
+  const PL = keys(bundle.spawn.commands).length;
 
   /* -------------------------------------------- */
   /* BEGIN                                        */

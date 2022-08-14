@@ -1,15 +1,10 @@
 import { Config, ENV, Package } from 'types';
 import { join } from 'path';
-import { pathExists, readJson } from 'fs-extra';
-import { readConfig } from '@web/config-loader';
-import JoyCon from 'joycon';
+import { pathExists, readFile, readJson } from 'fs-extra';
+import { bundleRequire } from 'bundle-require';
+import { jsonc } from '../shared/utils';
+import { bundle } from '.';
 
-const joycon = new JoyCon();
-
-joycon.load([ 'package-lock.json', 'yarn.lock' ]).then(result => {
-  // result is {} when files do not exist
-  // otherwise { path, data }
-});
 /**
  * Config Files
  *
@@ -21,17 +16,48 @@ joycon.load([ 'package-lock.json', 'yarn.lock' ]).then(result => {
  * > When `null` is returned, the `package.json` file is
  * assumed to contain configuration requirements.
  */
-export async function configFile (uri: string): Promise<Config> {
+export async function configFile (cwd: string): Promise<Config> {
+
+  let path: string = null;
+
+  for (const file of [
+    'syncify.config.js',
+    'syncify.config.mjs',
+    'syncify.config.cjs',
+    'syncify.config.ts',
+    'syncify.config.json'
+  ]) {
+    path = join(cwd, file);
+    const exists = await pathExists(path);
+    if (exists) break;
+    path = null;
+  }
+
+  if (path === null) return null;
 
   try {
 
-    const jsconfig = await readConfig('syncify.config', null, uri);
+    if (path.endsWith('.json')) {
 
-    return jsconfig;
+      bundle.file = path;
+      const json = await readFile(path);
+
+      return jsonc<Config>(json.toString());
+
+    } else {
+
+      bundle.file = path;
+      const config = await bundleRequire({ filepath: path });
+
+      return config.mod.syncify || config.mod.default || config.mod;
+
+    }
 
   } catch (e) {
 
-    const jsonconfig = join(uri, 'syncify.json');
+    console.log(e);
+
+    const jsonconfig = join(cwd, 'syncify.config.json');
     const hasFile = await pathExists(jsonconfig);
 
     if (hasFile) return readJson(jsonconfig);
@@ -70,13 +96,13 @@ export async function pkgJson (cwd: string): Promise<Package> {
 /**
  * Read rcfile
  *
- * Looks for the existence of a `.syncifyrc` or
+ * Looks for the existence of a `.syncifyenv` or
  * `.syncifyrc.json` file. This file can optionally
  * include credential information.
  */
 export async function rcFile (cwd: string): Promise<ENV.RCFile> {
 
-  let rcconfig = join(cwd, '.syncifyrc');
+  let rcconfig = join(cwd, '.syncifyenv');
   let rcexists = await pathExists(rcconfig);
 
   if (!rcexists) {

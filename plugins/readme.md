@@ -32,34 +32,17 @@ Each hook method fires a different points in the bundle process.
 
 <!--prettier-ignore-->
 ```js
-export default function (options = {}) {
+export default function plugin (options = {}) {
 
   return {
-    name: 'hello-world',
-    onInit(config) {
-
-      this.log.info('onInit');
-    },
-    onBuild(file) {
-
-      this.log.info('onBuild');
-    },
-    onWatch(wss) {
-
-      this.log.info('onWatch');
-    },
-    onChange(file) {
-
-      this.log.info('onChange');
-    },
-    onTransform(file, content) {
-
-      this.log.info('onTransform');
-    },
-    onReload(dom) {
-
-      this.log.info('onReload');
-    }
+    name: 'plugin-name',
+    onInit(config) {},
+    onBuild(file) {},
+    onWatch(wss) {},
+    onChange(file) {},
+    onTransform(file, content) {},
+    onReload(dom) {}
   };
+
 }
 ```

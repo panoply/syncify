@@ -1,15 +1,14 @@
 
-import { anyTrue, isNil, has, uniq, includes } from 'rambdax';
+import { anyTrue, isNil, has, uniq, includes, forEach } from 'rambdax';
 import { join } from 'path';
-import { Commands, Config, Package, Bundle, Modes } from 'types';
+import { Commands, Config, Package, Bundle, Modes, Directories } from 'types';
 import { pathExists, readJson } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { isArray, keys, is, assign, nil, log, isString, isObject, ws } from '../shared/native';
-import { basePath, normalPath, parentPath } from '../shared/paths';
+import { isArray, keys, is, assign, nil, log, isString, isObject, ws, values } from '../shared/native';
+import { basePath, normalPath } from '../shared/paths';
 import { authURL } from '../shared/options';
 import { logHeader } from '../logger/heading';
-import { loadSyncifyConfig } from '../shared/load';
 import { spawn } from '../logger/console';
 import { spawned, spawns } from '../cli/spawn';
 import { kill } from '../cli/exit';
@@ -18,7 +17,8 @@ import { gray } from '../cli/ansi';
 import { queue } from '../requests/queue';
 import { configFile, pkgJson, rcFile } from './files';
 import { cacheDirs, importDirs, themeDirs } from './dirs';
-import { SVGOptions, jsonOptions, sectionOptions, styleOptions } from './transforms';
+import { SVGOptions, jsonOptions, sectionOptions } from './transforms';
+import { styleOptions } from './style';
 import { minifyOptions } from './minify';
 import { bundle, update, defaults, cache, minify, plugins } from './index';
 import { typeError } from './validate';
@@ -55,34 +55,26 @@ kill(() => {
  * file locations relative to the current working
  * directory.
  */
-export async function define (cli: Commands, options?: Config) {
+export async function define (cli: Commands, _options?: Config) {
 
   clear();
 
   const mode = modes(cli);
   const pkg = await pkgJson(cli.cwd);
-  const config = await (await loadSyncifyConfig(process.cwd())).data;
-  const min = anyTrue(cli.prod, cli.minify);
+  const config = await getConfig(pkg, cli);
 
   update.bundle({
     mode,
+    config: () => config,
     version: pkg.version,
     cli: cli.cli,
     cwd: cli.cwd,
     silent: cli.silent,
     prod: cli.prod,
     dev: cli.dev && !cli.prod,
-    dirs: {
-      input: cli.input,
-      output: cli.output,
-      config: cli.config
-    },
-    minify: <any>{
-      json: min ? { ...minify.json } : false,
-      html: min ? { ...minify.html } : false,
-      liquid: min ? { ...minify.liquid } : false,
-      script: min ? { ...minify.script } : false
-    }
+    minify: anyTrue(cli.prod, cli.minify)
+      ? bundle.minify
+      : minify as any
   });
 
   // env variables
@@ -91,12 +83,13 @@ export async function define (cli: Commands, options?: Config) {
 
   const promise = await Promise.allSettled(
     [
+      baseDirs(cli, config),
       caches(cli.cwd),
       getStores(cli, config),
-      baseDirs(config),
       themeDirs(bundle.dirs.output),
       importDirs(bundle),
       getPaths(config),
+      setProcessors(config, bundle),
       minifyOptions(config),
       sectionOptions(config),
       jsonOptions(config),
@@ -112,6 +105,22 @@ export async function define (cli: Commands, options?: Config) {
   return promise;
 
 };
+
+function setProcessors (config: Config, bundle: Bundle) {
+
+  forEach(processor => {
+
+    forEach((name: keyof Bundle['processor']) => {
+
+      if (has(name, bundle.processor) && name !== 'watch') {
+        bundle.processor[name].config = processor[name];
+      }
+
+    }, keys(processor));
+
+  }, values(config.processor));
+
+}
 
 function loadPlugins (config: Config, bundle: Bundle) {
 
@@ -160,10 +169,14 @@ function setSpawns (config: Config['spawn'], bundle: Bundle) {
   if (bundle.mode.watch && has('watch', config)) mode = 'watch';
 
   if (isNil(mode)) return;
-
   if (!isObject(config[mode])) return typeError('spawn', 'build', config.build, 'string | string[]');
 
-  for (const name in config[mode]) {
+  console.log(mode);
+  const props = keys(config[mode]);
+
+  if (props.length === 0) return;
+
+  for (const name of props) {
 
     const command = config[mode][name];
 
@@ -232,8 +245,7 @@ function modes (cli: Commands) {
     watch: anyTrue(
       resource,
       cli.upload,
-      cli.download,
-      cli.export
+      cli.download
     ) ? false : cli.watch,
     upload: anyTrue(
       resource,
@@ -244,8 +256,7 @@ function modes (cli: Commands) {
       resource,
       cli.upload,
       cli.watch,
-      cli.build,
-      cli.export
+      cli.build
     ) ? false : cli.download
   };
 }
@@ -275,17 +286,17 @@ async function caches (cwd: string) {
 
 };
 
-async function getConfig (pkg: Package) {
+async function getConfig (pkg: Package, cli: Commands) {
 
-  const config = await configFile(bundle.dirs.config);
+  const config = await configFile(cli.cwd);
 
-  if (!isNil(config)) return defaults(config);
+  if (config !== null) return defaults(config);
 
   if (has('syncify', pkg)) return defaults(pkg.syncify);
 
   const rccfg = await rcFile(bundle.cwd);
 
-  if (!isNil(rccfg)) return defaults(config);
+  if (rccfg !== null) return defaults(rccfg);
 
   throw new Error('Missing Configuration');
 
@@ -369,31 +380,29 @@ export async function getStores (cli: Commands, config: Config) {
  * also normalizes paths to ensure the mapping is
  * correct.
  */
-function baseDirs (config: Config) {
+function baseDirs (cli: Commands, config: Config) {
 
-  const base = basePath(bundle.cwd);
+  const base = basePath(cli.cwd);
 
-  for (const dir of [
-    'input',
-    'output',
-    'export',
-    'import',
-    'config',
-    'metafields',
-    'pages'
+  for (const [ dir, def ] of [
+    [ 'input', 'source' ],
+    [ 'output', 'theme' ],
+    [ 'export', 'export' ],
+    [ 'import', 'import' ],
+    [ 'config', '.' ]
   ]) {
 
     let path: string | string[];
 
-    if (dir === 'metafields' || dir === 'pages') {
-      path = parentPath(config.paths[dir]);
-    } else {
-      if (has(dir, config)) {
-        bundle.dirs[dir] = base(config[dir]);
+    if (cli[dir] === def) {
+      if (config[dir] === def) {
+        bundle.dirs[dir] = base(cli[dir]);
         continue;
       } else {
         path = config[dir];
       }
+    } else {
+      path = cli[dir];
     }
 
     if (isArray(path)) {
@@ -403,6 +412,9 @@ function baseDirs (config: Config) {
       bundle.dirs[dir] = base(path);
     }
   }
+
+  // add config file to watch
+  bundle.watch.push(bundle.file);
 
 };
 

@@ -1,4 +1,5 @@
 import { Config } from './config';
+import { Syncify as syncify } from './api';
 
 export * from './api';
 export * from './cli';
@@ -12,3 +13,4 @@ export * from './misc/requests';
 export * from './misc/shared';
 
 export declare function defineConfig(config: Config): void
+export default syncify;

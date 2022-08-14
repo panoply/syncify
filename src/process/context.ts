@@ -1,4 +1,4 @@
-import { File, Transforms } from 'types';
+import { File, StyleTransform } from 'types';
 import { join, dirname, basename } from 'path';
 import { defineProperty, isRegex, isUndefined } from '../shared/native';
 import { bundle } from '../options/index';
@@ -10,15 +10,17 @@ import { lastPath, parentPath } from '../shared/paths';
  * Augment the file configuration to accept
  * style types.
  */
-export function style (file: File<Transforms.Style>) {
+export function style (file: File<StyleTransform>) {
 
-  const config = bundle.style.find(x => x.watch(file.input));
-
-  // console.log(file, config);
+  const config = bundle.style.find(x => x.watch(file.input)) as StyleTransform;
 
   if (isUndefined(config)) return file;
 
-  defineProperty(file, 'config', { get () { return config; } });
+  defineProperty(file, 'config', {
+    get () {
+      return config;
+    }
+  });
 
   if (config.snippet) {
     file.namespace = 'snippets';
@@ -35,8 +37,6 @@ export function style (file: File<Transforms.Style>) {
     }
   }
 
-  file.input = config.input;
-
   return file;
 
 };
@@ -47,13 +47,13 @@ export function style (file: File<Transforms.Style>) {
  */
 export function section (file: File) {
 
-  if (bundle.section.directoryPrefixing) {
+  if (bundle.section.prefixDir) {
 
     if (isRegex(bundle.section.global)) {
       if (bundle.section.global.test(file.input)) return file;
     }
 
-    const rename = lastPath(file.input) + bundle.section.prefixSeparator + file.base;
+    const rename = lastPath(file.input) + bundle.section.separator + file.base;
 
     file.key = join(file.namespace, rename);
     file.output = join(dirname(file.output), rename);

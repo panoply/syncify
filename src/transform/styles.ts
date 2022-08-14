@@ -1,5 +1,5 @@
 import type { Processor } from 'postcss';
-import { File, Style, Syncify } from 'types';
+import { File, StyleTransform, Syncify, StyleProcessors } from 'types';
 import { compile, Logger } from 'sass';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
@@ -26,7 +26,7 @@ export const processer = (config: any) => {
 
 };
 
-function write (file: File<Style>, cb: Syncify) {
+function write (file: File<StyleTransform>, cb: Syncify) {
 
   const scope = isFunction(cb) ? { ...file } : false;
 
@@ -58,9 +58,12 @@ function write (file: File<Style>, cb: Syncify) {
   };
 };
 
-async function sass (file: File<Style>) {
+async function sass (file: File<StyleTransform>) {
 
   const { config } = file;
+  const opts = config.sass === true
+    ? bundle.processor.sass
+    : config.sass as StyleProcessors['sass'];
 
   if (file.ext === '.scss' || file.ext === '.sass') {
 
@@ -68,17 +71,15 @@ async function sass (file: File<Style>) {
 
     try {
 
-      console.log(config);
-
       log.hook('sass');
 
       const { css, sourceMap } = compile(file.input, {
         sourceMapIncludeSources: false,
-        style: config.sass.style,
-        quietDeps: config.sass.warnings,
-        sourceMap: config.sass.sourcemap,
-        loadPaths: config.sass.includePaths,
-        logger: config.sass.warnings ? Logger.silent : {
+        style: opts.style,
+        quietDeps: opts.warnings,
+        sourceMap: opts.sourcemap,
+        loadPaths: opts.includePaths,
+        logger: opts.warnings ? Logger.silent : {
           debug: msg => console.log('DEBUG', msg),
           warn: (msg, opts) => {
             log.warn(msg + '\n\n' + opts.stack);
@@ -86,7 +87,7 @@ async function sass (file: File<Style>) {
         }
       });
 
-      if (config.sass.sourcemap) {
+      if (opts.sourcemap) {
         writeFile(`${cache.styles.uri + file.base}.map`, JSON.stringify(sourceMap)).catch(e => log.warn(e));
       }
 
@@ -117,7 +118,7 @@ async function sass (file: File<Style>) {
 
   try {
 
-    const css = await readFile(config.input);
+    const css = await readFile(opts.input);
     file.size = byteSize(css);
 
     return {
@@ -141,7 +142,7 @@ async function sass (file: File<Style>) {
  *
  * Runs postcss on compiled SASS or CSS styles
  */
-async function postcss (file: File<Style>, css: string, map: any) {
+async function postcss (file: File<StyleTransform>, css: string, map: any) {
 
   const { config } = file;
 
@@ -194,11 +195,13 @@ function snippet (css: string) {
 /**
  * SASS and PostCSS Compiler
  */
-export async function styles (file: File<Style>, cb: Syncify): Promise<string> {
+export async function styles (file: File<StyleTransform>, cb: Syncify): Promise<string> {
 
   if (bundle.mode.watch) timer.start();
 
   const output = write(file, cb);
+
+  // console.log(file);
 
   try {
 

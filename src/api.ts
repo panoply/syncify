@@ -8,7 +8,7 @@ import { run } from '.';
  * Used in `syncify.config.js` files and provides
  * type completions to the export.
  */
-export const syncify = (config: Config) => config;
+export const defineConfig = (config: Config) => config;
 
 /* -------------------------------------------- */
 /* BIN EXECUTABLE                               */

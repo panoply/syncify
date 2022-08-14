@@ -2,7 +2,7 @@
 import merge from 'mergerino';
 import { mergeDeepRight } from 'rambdax';
 import { PartialDeep } from 'type-fest';
-import { Bundle, Cache, Config, Minify, Plugins } from 'types';
+import { Bundle, Cache, Config, Minify, Plugins, Processors } from 'types';
 
 /**
  * Cache Configuration
@@ -94,6 +94,55 @@ export const minify: Minify = {
 };
 
 /**
+ * Processor Configuration
+ *
+ * This model is the default options for
+ * the transform processors.
+ */
+export let processor: Processors = {
+  script: {
+    tsup: {
+      bundle: true,
+      treeshake: true,
+      platform: 'browser'
+    }
+  },
+  image: {
+    sharp: {}
+  },
+  style: {
+    sass: {
+      warnings: true,
+      style: 'compressed',
+      sourcemap: true,
+      includePaths: [ 'node_modules' ]
+    },
+    postcss: []
+  },
+  svg: {
+    svgo: {
+      multipass: true,
+      datauri: 'enc',
+      js2svg: {
+        indent: 2,
+        pretty: true
+      },
+      plugins: [
+        'preset-default',
+        'prefixIds'
+      ]
+    },
+    sprite: {
+      svg: {
+        dimensionAttributes: false,
+        namespaceClassnames: false,
+        namespaceIDs: false
+      }
+    }
+  }
+};
+
+/**
  * Preset Configuration
  *
  * This model is merged with the users config file
@@ -116,7 +165,7 @@ export const defaults = mergeDeepRight<Config>(<Config>{
   export: 'export',
   stores: null,
   config: '.',
-  live: false,
+  hot: false,
   spawn: {
     build: null,
     watch: null
@@ -144,16 +193,9 @@ export const defaults = mergeDeepRight<Config>(<Config>{
     redirects: 'redirects.yaml'
   },
   views: {
-    icons: {
-      useCustomTag: false,
-      tagName: 'i',
-      tagVoid: false,
-      vscodeCustomData: false
-    },
     sections: {
-      directoryPrefixing: true,
-      onlyPrefixDuplicates: true,
-      prefixSeparator: '-',
+      prefixDir: false,
+      separator: '-',
       global: []
     },
     pages: {
@@ -161,35 +203,69 @@ export const defaults = mergeDeepRight<Config>(<Config>{
       language: 'html'
     }
   },
-  transforms: {
-    svg: {
-      input: null,
-      rename: '',
-      snippet: false,
-      svgo: null,
-      sprite: {
-        dimensionAttributes: false,
-        namespaceClassnames: false,
-        namespaceIDS: false,
-        rootAttributes: {}
+  processor: {
+    script: {
+      tsup: {
+        bundle: true,
+        treeshake: true,
+        platform: 'browser'
       }
     },
     image: {
-      input: null,
       sharp: {}
+    },
+    style: {
+      sass: {
+        warnings: true,
+        style: 'compressed',
+        sourcemap: true,
+        includePaths: [ 'node_modules' ]
+      },
+      postcss: []
+    },
+    svg: {
+      svgo: {
+        multipass: true,
+        datauri: 'enc',
+        js2svg: {
+          indent: 2,
+          pretty: true
+        },
+        plugins: [
+          'preset-default',
+          'prefixIds'
+        ]
+      },
+      sprite: {
+        svg: {
+          dimensionAttributes: false,
+          namespaceClassnames: false,
+          namespaceIDs: false
+        }
+      }
+    }
+  },
+  transforms: {
+    svg: {
+      input: null,
+      type: null,
+      rename: '',
+      snippet: false,
+      svgo: false
+    },
+    image: {
+      input: null,
+      sharp: false
     },
     style: {
       input: null,
       postcss: false,
-      sass: null
+      sass: false
     },
     script: {
       input: [],
       rename: null,
-      esbuild: {
-        bundle: true,
-        format: 'esm'
-      }
+      tsup: false
     },
     json: {
       indent: 2,
@@ -221,7 +297,7 @@ export let bundle = <PartialDeep<Bundle>>({
   silent: false,
   prod: false,
   dev: true,
-  live: {},
+  hot: false,
   dirs: {},
   mode: {
     build: false,
@@ -277,10 +353,49 @@ export let bundle = <PartialDeep<Bundle>>({
     stores: []
   },
   minify: {
-    html: {},
-    json: {},
-    liquid: {},
-    script: {}
+    html: false,
+    json: false,
+    liquid: false,
+    script: false
+  },
+  processor: {
+    watch: null,
+    postcss: {
+      installed: false,
+      required: false,
+      configFile: false,
+      config: []
+    },
+    sass: {
+      installed: false,
+      required: false,
+      configFile: false,
+      config: {}
+    },
+    tsup: {
+      installed: false,
+      required: false,
+      configFile: false,
+      config: {}
+    },
+    sharp: {
+      installed: false,
+      required: false,
+      configFile: false,
+      config: {}
+    },
+    sprite: {
+      installed: false,
+      required: false,
+      configFile: false,
+      config: {}
+    },
+    svgo: {
+      installed: false,
+      required: false,
+      configFile: false,
+      config: {}
+    }
   }
 }) as Bundle;
 
@@ -297,7 +412,6 @@ export let bundle = <PartialDeep<Bundle>>({
  * still have update capabilities.
  */
 export const update = ({
-  bundle: (patch: PartialDeep<Bundle>) => {
-    bundle = merge(bundle, patch);
-  }
+  patch: (source: any, patch: any) => merge(source, patch),
+  bundle: (patch: PartialDeep<Bundle>) => { bundle = merge(bundle, patch); }
 });

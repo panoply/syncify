@@ -18,6 +18,7 @@ export function minifyOptions (config: Config) {
 
   for (const key in config.minify) {
 
+    if (bundle.minify[key] === false) continue;
     if (config.minify[key] === false) continue;
 
     warn = warnOption(`${key.toUpperCase()} Minify Rule`);

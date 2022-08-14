@@ -64,6 +64,30 @@ export const typeError = (option: string, name: string, value: any, expects: str
 };
 
 /**
+ * Missing Dependency
+ *
+ * Throws an error when an invalid config option
+ * was provided.
+ */
+export const missingDependency = (dep: string) => {
+
+  console.error(
+    c.red(`
+      ${c.bold(`Missing ${c.cyan(dep)} dependency`)}
+
+      You need to install ${c.cyan(dep)} to use it as a processor
+
+      ${c.white.bold('How to fix?')}
+      ${c.white('Run ' + c.bold('pnpm add ' + dep + '-D'))}
+
+    `)
+  );
+
+  process.exit(1);
+
+};
+
+/**
  * Invalid Option
  *
  * Throws an error when an invalid config option

@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 
 import type { Tester } from 'anymatch';
-import { Merge } from 'type-fest';
+import { Merge, MergeExclusive } from 'type-fest';
 import { Markdown } from '../misc/markdown';
-import { Paths, Directories, HOT, Transforms, Views, Minify } from '../config/index';
+import { Paths, Directories, HOT, Transforms, Views, Minify, Config } from '../config/index';
 import { SVGInline, SVGSprite } from '../config/transforms';
 import { AxiosRequestConfig } from 'axios';
 import { Plugins } from './plugin';
+import { ImageProcessors, SVGProcessors, ScriptProcessor, StyleProcessors } from '../config/processors';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -14,6 +15,38 @@ import { Plugins } from './plugin';
 
 export { File } from './file';
 export { Cache } from './cache';
+
+/* -------------------------------------------- */
+/* PROCESSORS                                   */
+/* -------------------------------------------- */
+
+type GetProcessorConfigs<T> = {
+  /**
+   * Whether or not the processor is required
+   */
+  required: boolean;
+  /**
+   * Whether or not the processor is installed
+   */
+  installed: boolean;
+  /**
+   * Whether or not a config file exists for the processor
+   */
+  configFile: false | string;
+  /**
+   * Getter for the processor config
+   */
+  config: T
+}
+
+export interface ProcessorConfigs {
+  postcss: GetProcessorConfigs<StyleProcessors['postcss']>;
+  sass: GetProcessorConfigs<StyleProcessors['sass']>;
+  sharp: GetProcessorConfigs<ImageProcessors['sharp']>;
+  sprite:GetProcessorConfigs<SVGProcessors['sprite']>;
+  svgo: GetProcessorConfigs<SVGProcessors['svgo']>
+  tsup: GetProcessorConfigs<ScriptProcessor['tsup']>
+}
 
 /* -------------------------------------------- */
 /* SPAWNED PROCESSES                            */
@@ -201,6 +234,10 @@ export interface Bundle {
    * The version defined in the package.json
    */
   version: string;
+  /**
+   * The configuration file name
+   */
+  file: string
    /**
     * Building for development (default)
     */
@@ -317,6 +354,19 @@ export interface Bundle {
     html: Merge<Minify['html'], { exclude: Tester }>;
     liquid: Merge<Minify['liquid'], { exclude: Tester }>;
   };
+  /**
+   * Processor Configurations
+   */
+  processor: Merge<ProcessorConfigs, {
+    /**
+     * Process external config file paths
+     */
+    watch: Tester;
+  }>
+  /**
+   * Plugins
+   */
+  config?: () => Config
   /**
    * Plugins
    */

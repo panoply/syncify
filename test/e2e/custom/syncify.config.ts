@@ -1,5 +1,6 @@
 import { defineConfig } from '@syncify/cli';
-import icons from '@syncify/plugin-icons';
+import autoprefix from 'autoprefixer';
+// import icons from '@syncify/plugin-icons';
 
 export default defineConfig({
   input: 'src',
@@ -24,6 +25,11 @@ export default defineConfig({
       'views/sections/**/*'
     ]
   },
+  spawn: {
+    watch: {
+      esbuild: 'esbuild src/scripts/bundle.ts --outfile=dist/assets/esbuild-bundle.js --bundle --watch --color=true'
+    }
+  },
   views: {
     sections: {
       prefixDir: true,
@@ -40,10 +46,29 @@ export default defineConfig({
       author: 'Syncify'
     }
   },
+  processor: {
+    style: {
+      sass: {
+        warnings: false,
+        sourcemap: true,
+        style: 'expanded'
+      },
+      postcss: [
+        autoprefix()
+      ]
+    },
+    svg: {
+      svgo: {
+      },
+      sprite: {
+      }
+    }
+  },
   transforms: {
     svg: [
       {
         input: 'icons/social/*',
+        type: 'inline',
         rename: 'icon.[file]',
         snippet: true,
         svgo: true
@@ -68,7 +93,7 @@ export default defineConfig({
     },
     style: [
       {
-        input: 'styles/snippet.scss',
+        input: 'styles/stylesheet.scss',
         snippet: false,
         rename: '[file].min.css',
         postcss: true,
@@ -84,17 +109,11 @@ export default defineConfig({
         input: 'styles/vars.css.liquid',
         snippet: true,
         postcss: false,
-        sass: null
+        sass: false
       }
     ]
   },
   plugins: [
-    icons(
-      {
-        tagName: 'icon',
-        tagVoid: true,
-        vscodeCustomData: true
-      }
-    )
+
   ]
 });

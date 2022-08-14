@@ -1,5 +1,5 @@
 import chokidar from 'chokidar';
-import { Syncify, IFile, IStyle, IPages } from 'types';
+import { Syncify, File, Style, Pages } from 'types';
 import { client, queue } from '../requests/client';
 import { compile as liquid } from '../transform/liquid';
 import { styles } from '../transform/styles';
@@ -40,9 +40,11 @@ export function watch (callback: Syncify) {
 
   watcher.on('all', async function (event, path) {
 
-    const file: IFile = parse(path);
+    const file: File = parse(path);
 
     if (isUndefined(file)) return;
+
+    // console.log(file);
 
     if (file.type !== Type.Spawn) log.changed(file);
 
@@ -54,7 +56,7 @@ export function watch (callback: Syncify) {
 
         if (file.type === Type.Style) {
 
-          value = await styles(file as IFile<IStyle>, callback);
+          value = await styles(file as File<Style>, callback);
 
         } else if (file.type === Type.Section || file.type === Type.Layout || file.type === Type.Snippet) {
 
@@ -80,7 +82,7 @@ export function watch (callback: Syncify) {
 
         } else if (file.type === Type.Page) {
 
-          value = await pages(file as IFile<IPages>, callback);
+          value = await pages(file as File<Pages>, callback);
 
           return;
 

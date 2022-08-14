@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "syncify custom --watch --hot",
+    "dev": "syncify syncify -t custom --watch --hot",
     "build": "syncify custom --build --prod",
     "upload": "syncify custom --upload",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,7 +15,9 @@
   "devDependencies": {
     "@syncify/cli": "^0.1.0-beta",
     "@syncify/plugin-icons": "^1.0.0",
-    "esbuild": "^0.15.1",
+    "autoprefixer": "^10.4.8",
+    "bootstrap": "^5.2.0",
+    "esbuild": "^0.15.3",
     "postcss": "^8.4.16",
     "sass": "^1.54.4",
     "sharp": "^0.30.7"

@@ -199,7 +199,7 @@ export namespace utils {
  * syncify.metafields()
  * syncify.pages()
  */
-export interface syncify {
+export interface Syncify {
   /**
    * Download
    *
@@ -317,5 +317,3 @@ export interface syncify {
    */
   vsc(): Promise<void>
 }
-
-export default syncify;

@@ -1,4 +1,4 @@
-import { Request, IStore, IFile, Methods, ISync, Requests, IThemes } from 'types';
+import { Request, Store, File, Methods, Sync, Requests, Theme } from 'types';
 import { mapFastAsync } from 'rambdax';
 import { queue } from '../requests/queue';
 import { assign, isUndefined } from '../shared/native';
@@ -11,9 +11,9 @@ import * as metafields from '../requests/metafields';
 /* -------------------------------------------- */
 export { queue } from '../requests/queue';
 
-export const client = ({ stores, themes }: ISync) => ({
+export const client = ({ stores, themes }: Sync) => ({
 
-  assets: (method: Methods, file: IFile, content?: any) => {
+  assets: (method: Methods, file: File, content?: any) => {
 
     const payload: Request = isUndefined(content) ? {
       method,
@@ -30,7 +30,7 @@ export const client = ({ stores, themes }: ISync) => ({
       }
     };
 
-    return queue.add(() => mapFastAsync<IThemes, any>(theme => {
+    return queue.add(() => mapFastAsync<Theme, any>(theme => {
 
       return asset.sync(theme, file, assign<any, any, Request>(
         { url: theme.url },
@@ -45,7 +45,7 @@ export const client = ({ stores, themes }: ISync) => ({
 
     return queue.add(function () {
 
-      return mapFastAsync<IStore, any>(async function (store) {
+      return mapFastAsync<Store, any>(async function (store) {
 
         //  await pages.sync(store, content);
 
@@ -59,7 +59,7 @@ export const client = ({ stores, themes }: ISync) => ({
 
     return queue.add(function () {
 
-      return mapFastAsync<IStore, any>(async function (store) {
+      return mapFastAsync<Store, any>(async function (store) {
 
         await metafields.sync(store, content);
 

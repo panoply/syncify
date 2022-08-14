@@ -2,15 +2,15 @@ import strip from 'strip-json-comments';
 import { bold, gray } from '../cli/ansi';
 import { isString, isBuffer, isArray, isObject } from './native';
 
-export function jsonc (data: string) {
+export function jsonc <T> (data: string): T {
 
   try {
 
-    return strip(data).trim();
+    return JSON.parse(strip(data).trim());
 
-  } catch {
+  } catch (e) {
 
-    return {};
+    throw new Error(e);
   }
 }
 

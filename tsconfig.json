@@ -1,15 +1,12 @@
 {
   "exclude": [
-    "node_modules",
+    "node_modules/**/*",
     "dist",
     "tests",
+    "test",
     "docs"
   ],
-  "include": [
-    "src/**/*.ts",
-    "tests/cases/index.ts",
-    "tests/e2e/source/js/transform.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "typeAcquisition": {
     "enable": true,
     "include": ["node"]
@@ -17,7 +14,6 @@
   "compilerOptions": {
     "types": ["node"],
     "incremental": true,
-    "outDir": "package",
     "target": "ES6",
     "removeComments": true,
     "lib": ["es2020", "DOM"],

@@ -1,4 +1,0 @@
-packages:
-  - "."
-  - "plugins/icons"
-  - "test/e2e/custom"

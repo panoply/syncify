@@ -2,6 +2,30 @@ import { Icons, Pages, Sections, Snippets } from './views';
 import { ImageTransform, JSONTransform, ScriptTransfrom, StyleTransform, SVGTransform } from './transforms';
 import { LiquidMinify, ESBuildMinify, HTMLMinifierTerser, JSONMinify } from './minify';
 import { PluginHooks } from '../bundle/plugin';
+import { ScriptProcessor, SVGProcessors, StyleProcessors, ImageProcessors } from './processors';
+
+/* -------------------------------------------- */
+/* PROCESSORS                                   */
+/* -------------------------------------------- */
+
+export interface Processors {
+  /**
+   * Script Processors
+   */
+  script?: ScriptProcessor;
+  /**
+   * Style Processors
+   */
+  style?: StyleProcessors
+  /**
+   * Image Processors
+   */
+  image?: ImageProcessors
+  /**
+   * SVG Processors
+   */
+  svg: SVGProcessors
+}
 
 /* -------------------------------------------- */
 /* VIEWS                                        */
@@ -372,6 +396,13 @@ export interface Config extends Directories {
    * Console log options
    */
   logger?: Logger;
+  /**
+   * Configurations for the `transform` processors. Define options
+   * for the transformers to inherit. You can override these on a
+   * per-transform basis. Optionally, you can use the default presets
+   * pre-configured for optimal use.
+   */
+  processor?: Processors;
   /**
    * Transform pipeline configurations
    */

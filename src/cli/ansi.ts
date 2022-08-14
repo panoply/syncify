@@ -61,10 +61,6 @@ export const pink = ansis.hex('#ff75d1');
  */
 export const orange = ansis.hex('#FFAB40');
 
-/* -------------------------------------------- */
-/* NEON COLORS                                  */
-/* -------------------------------------------- */
-
 /**
  * Neon Green
  */

@@ -38,7 +38,7 @@ export const run = async (options: Commands, config?: Config, callback?: Syncify
     }
   }
 
-  server(bundle);
+  // server(bundle);
 
   // console.log(bundle);
 
