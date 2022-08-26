@@ -1,7 +1,7 @@
 import { isNil } from 'rambdax';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
-import { getTime } from '../shared/utils';
+import { addSuffix, getTime } from '../shared/utils';
 import { log, nil, nl } from '../shared/native';
 import * as c from './ansi';
 
@@ -12,61 +12,117 @@ import * as c from './ansi';
 /**
  * close
  */
-export const opened = (name: string) => {
-
-  log(`${nl}${c.open}${c.pink.bold(name.toUpperCase())} ${c.gray('~')} ${c.gray(getTime())}`);
-
-};
+export const opened = (name: string) => log(`${nl}${c.open}${c.gray(`${name} ~ ${getTime()}`)}`);
 
 /**
  * close
  */
-export const closed = (name: string) => {
-
-  log(`${c.line}${nl}${c.close}${c.pink.bold(name.toUpperCase())} ${c.gray('~')} ${c.gray(getTime())}`);
-
-};
+export const closed = (name: string) => log(`${c.line}${nl}${c.close}${c.gray(`${name} ~ ${getTime()}`)}`);
 
 /**
  * Contained Title
  */
-export const title = (name: string, color: 'blueBright' | 'red' | 'yellow' = 'blueBright') => {
+export const title = (name: string, color: 'gray' | 'red' | 'yellow' = 'gray') => {
 
-  let str: string = nil;
-  if (color === 'blueBright') {
-    str = c.bold[color](name);
-  } else {
-    str = c.bold[color](name);
-  }
-
-  log(`${c.line}${nl}${c.line}${str}${nl}${c.line}`);
+  log(`${nl}${c.open}${c[color](`${name} ~ ${getTime()}`)}`);
 
 };
 
+const timer = (time: string) => time ? c.gray(` ~ ${time}`) : nil;
+const arrow = c.gray(' →  ');
+
 /**
- * Changed `cyan`
+ * Changed `neonCyan`
  *
  * ```
- * │
- * │ source/dir/filename.ext
- * │
+ * │ changed → source/dir/filename.ext
  * ```
  */
-export const changed = (message: string) => log(`${c.line}${nl}${c.line}${c.bold.cyan(message)}${nl}${c.line}`);
+export const changed = (message: string) => (
+  log(c.line + c.neonCyan('changed  ') + arrow + c.neonCyan(message) + timer(getTime()))
+);
+
+/**
+ * changed → `neonCyan`
+ * processor →
+ * transfrom →
+ * minify  →
+ * reloaded  →
+ * syncing   →
+ * queued  →
+ * uploaded  →
+ * warning   →
+ * deleted   →
+ * ignored   →
+ *
+ * ```
+ * ├ process   → esbuild ~ 500ms
+ * ```
+ */
+export const processor = (message: string, time: string) => (
+  log(c.line + c.whiteBright('processor') + arrow + c.whiteBright(message) + timer(time))
+);
+
+/**
+ * `white`
+ *
+ * ```
+ * ├ transform → source/dir/filename.ext
+ * ```
+ */
+export const transform = (message: string) => (
+  log(c.line + c.whiteBright('transform') + arrow + c.whiteBright(message))
+);
+
+/**
+ * Updated `gray`
+ *
+ * `├ syncing  → sections/filename.liquid`
+ */
+export const syncing = (file: string) => (
+  log(c.line + c.magentaBright('syncing  ') + arrow + c.magentaBright(file))
+);
+
+/**
+ * `yellowBright`
+ *
+ * `├ waiting  → sections/filename.liquid ~ 2nd in-queue`
+ */
+export const queued = (file: string, pos: number) => (
+  log(c.line + c.yellowBright('waiting  ') + arrow + c.yellowBright(`${file} ~ ${c.bold(addSuffix(pos))} in queue`))
+);
+
+/**
+ * Updated `neonGreen`
+ *
+ * `├ uploaded   → custom → syncify.myshopify.com ~ 500ms`
+ */
+export const uploaded = (theme: string, store: string, time: string) => (
+  log(c.line + c.neonGreen('uploaded ') + arrow + c.neonGreen(c.bold(theme) + ' → ' + store) + timer(time))
+);
+
+/**
+ * `orange`
+ *
+ * `├ reloaded  → asset ~ 500ms`
+ */
+export const reloaded = (type: string, time: string) => (
+  log(c.line + c.orange('reloaded ') + arrow + c.orange(type) + timer(time))
+);
 
 /**
  * Process `whiteBright`
  *
  * `├ process ...`
  */
-export const message = (message: string) => log(c.item + c.whiteBright(`+ process ${message}`));
+export const message = (message: string) => log(c.item + c.whiteBright(`${message}`));
 
 /**
  * Compile `whiteBright`
  *
  *  `├ compile ...`
  */
-export const compile = (message: string) => log(c.item + c.whiteBright(`+ ${message}`));
+export const compile = (message: string) => log(c.item + c.whiteBright(`${message}`));
 
 /**
  * Process `orange`
@@ -80,7 +136,7 @@ export const deleted = (message: string) => log(c.item + c.orange(`deleted ${mes
  *
  * `├ updated ...`
  */
-export const updated = (message: string) => log(c.item + c.neonGreen(`✓ updated ${message}`));
+export const updated = (message: string) => log(c.item + c.neonGreen(`updated ${message}`));
 
 /**
  * Ignored `gray`

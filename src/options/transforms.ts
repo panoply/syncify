@@ -1,18 +1,13 @@
-import { Bundle, Config, Package, Processors, SVGInline, SVGSprite } from 'types';
-import anymatch, { Tester } from 'anymatch';
-import { forEach, has, hasPath, includes, isNil, last } from 'rambdax';
-import { join } from 'path';
-import { existsSync, mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
+import { Config, Package, Processors, SVGInline, SVGSprite } from 'types';
+import anymatch from 'anymatch';
+import { forEach, has } from 'rambdax';
+import merge from 'mergerino';
 import { getModules, readConfigFile } from '../shared/options';
 import { lastPath, normalPath } from '../shared/paths';
-import { typeError, unknownError, invalidError, warnOption } from './validate';
-import { bundle, cache, update } from './index';
+import { typeError, unknownError, invalidError } from './validate';
+import { bundle } from './index';
 import * as u from '../shared/native';
-import * as svgprocess from '../transform/icons';
 import { Merge } from 'type-fest';
-
-type SVGOProcess = Processors['svg']['svgo']
-type SpriteProcess = Processors['svg']['sprite']
 
 /**
  * Section Options
@@ -20,7 +15,7 @@ type SpriteProcess = Processors['svg']['sprite']
  * This is a transform option, we will pass to pages
  * in the next validate check,
  */
-export function sectionOptions (config: Config) {
+export const setViewOptions = (config: Config) => {
 
   if (!has('sections', config.views)) return;
 
@@ -79,9 +74,9 @@ export function sectionOptions (config: Config) {
     }
   }
 
-}
+};
 
-export function pageOptions (config: Config) {
+export function setPageOptions (config: Config) {
 
   if (has('pages', config.views)) return;
 
@@ -138,7 +133,7 @@ export function pageOptions (config: Config) {
  * This is a transform option, we will pass to pages
  * in the next validate check,
  */
-export function jsonOptions (config: Config) {
+export function setJsonOptions (config: Config) {
 
   if (!has('json', config.transforms)) return;
 
@@ -193,18 +188,18 @@ export function jsonOptions (config: Config) {
  * Build the icons configuration for generating
  * SVG sprites and snippets.
  */
-export async function SVGOptions (config: Config, pkg: Package) {
+export async function SvgOptions (config: Config, pkg: Package) {
 
   if (!has('svg', config.transforms)) return;
 
   const { svgo, sprite } = bundle.processor;
-  const warn = warnOption('SVG Option');
+  // const warn = warnOption('SVG Option');
 
   svgo.installed = getModules(pkg, 'svgo');
   sprite.installed = getModules(pkg, 'svg-sprite');
 
   if (svgo.installed) {
-    const csvgo = await readConfigFile<SVGOProcess>('svgo.config');
+    const csvgo = await readConfigFile<Processors['svgo']>('svgo.config');
     if (csvgo !== null) {
       svgo.configFile = csvgo.path;
       svgo.config = csvgo.config;
@@ -235,7 +230,7 @@ export async function SVGOptions (config: Config, pkg: Package) {
           ? svg.snippet
           : true,
         svgo: override
-          ? update.patch(svg.svgo, svgo.config)
+          ? merge(svg.svgo as Processors['svgo'], svgo.config)
           : svg.svgo
       });
 
@@ -259,7 +254,7 @@ export async function SVGOptions (config: Config, pkg: Package) {
           ? svg.snippet
           : true,
         sprite: u.isObject(svg.sprite)
-          ? update.patch(svg.sprite, sprite.config)
+          ? merge(svg.sprite as Processors['sprite'], sprite.config)
           : svg.sprite
       });
 

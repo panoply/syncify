@@ -1,8 +1,8 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
-import merge from 'mergerino';
-import { mergeDeepRight } from 'rambdax';
 import { PartialDeep } from 'type-fest';
-import { Bundle, Cache, Config, Minify, Plugins, Processors } from 'types';
+import { Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
+import { assign } from '../shared/native';
 
 /**
  * Cache Configuration
@@ -11,21 +11,6 @@ import { Bundle, Cache, Config, Minify, Plugins, Processors } from 'types';
  * within the `node_modules/.syncify` directory.
  */
 export const cache = <PartialDeep<Cache>>({ /* DYNAMICALLY POPULATED */ });
-
-/**
- * Plugin Store
- *
- * This model holds reference to plugins. Entries
- * are populated at runtime and thier hooks stored
- * in relative Map and invoked at different cycles.
- */
-export const plugins: Plugins = {
-  onBuild: [],
-  onChange: [],
-  onReload: [],
-  onTransform: [],
-  onWatch: []
-};
 
 /**
  * Minify Configuration
@@ -45,51 +30,24 @@ export const minify: Minify = {
     exclude: []
   },
   script: {
-    legalComments: 'none',
-    mangleCache: {},
-    mangleProps: null,
-    mangleQuoted: true,
-    minifyIdentifiers: true,
     minifySyntax: true,
-    minifyWhitespace: true
+    minifyIdentifiers: true,
+    minifyWhitespace: true,
+    mangleProps: null,
+    legalComments: 'inline',
+    mangleQuoted: false,
+    keepNames: false
   },
-  liquid: {
-    removeNewlineAttributes: true,
+  views: {
+    minifyScript: true,
+    minifyStyle: true,
+    minifySchema: true,
     removeComments: true,
-    removeSchemaRefs: true,
-    minifySchemaTag: true,
-    stripInnerTagWhitespace: false,
-    stripWhitespaceDashes: true,
-    stripAttributeNewlines: true,
+    stripDashes: true,
+    collapseWhitespace: true,
     ignoreTags: [],
     ignoreObjects: [],
     exclude: []
-  },
-  html: {
-    caseSensitive: false,
-    collapseBooleanAttributes: false,
-    collapseInlineTagWhitespace: false,
-    conservativeCollapse: false,
-    keepClosingSlash: false,
-    noNewlinesBeforeTagClose: false,
-    preventAttributesEscaping: false,
-    removeEmptyAttributes: false,
-    removeEmptyElements: false,
-    removeOptionalTags: false,
-    removeRedundantAttributes: true,
-    removeScriptTypeAttributes: true,
-    removeStyleLinkTypeAttributes: true,
-    useShortDoctype: true,
-    collapseWhitespace: true,
-    continueOnParseError: true,
-    removeComments: true,
-    trimCustomFragments: true,
-    ignoreCustomFragments: [
-      /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
-      /<style[\s\S]*?<\/style>/,
-      /{%[\s\S]*?%}/,
-      /{{[\s\S]*?}}/
-    ]
   }
 };
 
@@ -99,28 +57,75 @@ export const minify: Minify = {
  * This model is the default options for
  * the transform processors.
  */
-export let processor: Processors = {
-  script: {
-    tsup: {
-      bundle: true,
-      treeshake: true,
-      platform: 'browser'
-    }
+export const processor: PartialDeep<ProcessorConfigs> = {
+  json: {
+    indent: 2,
+    useTab: false,
+    crlf: false,
+    exclude: []
   },
-  image: {
-    sharp: {}
+  postcss: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: []
   },
-  style: {
-    sass: {
+  sass: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: {
       warnings: true,
       style: 'compressed',
       sourcemap: true,
       includePaths: [ 'node_modules' ]
-    },
-    postcss: []
+    }
   },
-  svg: {
-    svgo: {
+  esbuild: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: {
+      bundle: true,
+      format: 'esm',
+      splitting: false,
+      sourcemap: true,
+      watch: false,
+      write: false,
+      incremental: true,
+      logLevel: 'silent',
+      plugins: []
+    }
+  },
+  sharp: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: {}
+  },
+  sprite: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: {
+      svg: {
+        dimensionAttributes: false,
+        namespaceClassnames: false,
+        namespaceIDs: false
+      }
+    }
+  },
+  svgo: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: {
       multipass: true,
       datauri: 'enc',
       js2svg: {
@@ -131,15 +136,9 @@ export let processor: Processors = {
         'preset-default',
         'prefixIds'
       ]
-    },
-    sprite: {
-      svg: {
-        dimensionAttributes: false,
-        namespaceClassnames: false,
-        namespaceIDs: false
-      }
     }
   }
+
 };
 
 /**
@@ -158,14 +157,20 @@ export let processor: Processors = {
  * defined options, the model is immutable and as such
  * we can reference it.
  */
-export const defaults = mergeDeepRight<Config>(<Config>{
+export const config: Config = {
   input: 'source',
   output: 'theme',
   import: 'import',
   export: 'export',
   stores: null,
   config: '.',
-  hot: false,
+  hot: {
+    inject: true,
+    layouts: [ 'theme.liquid' ],
+    server: 3000,
+    socket: 8089,
+    reload: 'hot'
+  },
   spawn: {
     build: null,
     watch: null
@@ -178,6 +183,7 @@ export const defaults = mergeDeepRight<Config>(<Config>{
     sections: 'sections/**/*.liquid',
     snippets: 'snippets/*.liquid',
     metafields: 'metafields/**/*.json',
+    redirects: 'redirects.yaml',
     pages: [
       'pages/*.html',
       'pages/*.md'
@@ -189,8 +195,7 @@ export const defaults = mergeDeepRight<Config>(<Config>{
     customers: [
       'templates/customers/*.liquid',
       'templates/customers/*.json'
-    ],
-    redirects: 'redirects.yaml'
+    ]
   },
   views: {
     sections: {
@@ -203,84 +208,33 @@ export const defaults = mergeDeepRight<Config>(<Config>{
       language: 'html'
     }
   },
-  processor: {
-    script: {
-      tsup: {
-        bundle: true,
-        treeshake: true,
-        platform: 'browser'
-      }
-    },
-    image: {
-      sharp: {}
-    },
-    style: {
-      sass: {
-        warnings: true,
-        style: 'compressed',
-        sourcemap: true,
-        includePaths: [ 'node_modules' ]
-      },
-      postcss: []
-    },
-    svg: {
-      svgo: {
-        multipass: true,
-        datauri: 'enc',
-        js2svg: {
-          indent: 2,
-          pretty: true
-        },
-        plugins: [
-          'preset-default',
-          'prefixIds'
-        ]
-      },
-      sprite: {
-        svg: {
-          dimensionAttributes: false,
-          namespaceClassnames: false,
-          namespaceIDs: false
-        }
-      }
-    }
-  },
   transforms: {
-    svg: {
-      input: null,
-      type: null,
-      rename: '',
-      snippet: false,
-      svgo: false
-    },
-    image: {
-      input: null,
-      sharp: false
-    },
-    style: {
-      input: null,
-      postcss: false,
-      sass: false
-    },
-    script: {
-      input: [],
-      rename: null,
-      tsup: false
-    },
-    json: {
-      indent: 2,
-      useTab: false,
-      crlf: false,
-      exclude: []
-    }
+    svg: null,
+    image: null,
+    style: null,
+    script: null
   },
   minify: {
     json: false,
-    html: false,
-    liquid: false,
+    views: false,
     script: false
   }
-});
+};
+
+/**
+ * Plugin Store
+ *
+ * This model holds reference to plugins. Entries
+ * are populated at runtime and thier hooks stored
+ * in relative Map and invoked at different cycles.
+ */
+export const plugins: Plugins = {
+  onBuild: [],
+  onChange: [],
+  onReload: [],
+  onTransform: [],
+  onWatch: []
+};
 
 /**
  * Bundle Configuration
@@ -289,8 +243,7 @@ export const defaults = mergeDeepRight<Config>(<Config>{
  * options and settings. This is typically merged with
  * the CLI defined options.
  */
-export let bundle = <PartialDeep<Bundle>>({
-  get plugins () { return plugins; },
+export let bundle = {
   version: null,
   cli: false,
   cwd: null,
@@ -299,10 +252,13 @@ export let bundle = <PartialDeep<Bundle>>({
   dev: true,
   hot: false,
   dirs: {},
+  sync: {
+    themes: [],
+    stores: []
+  },
   mode: {
     build: false,
     prompt: false,
-    live: false,
     watch: false,
     clean: false,
     upload: false,
@@ -311,14 +267,20 @@ export let bundle = <PartialDeep<Bundle>>({
     pages: false,
     pull: false,
     push: false,
-    vsc: false
+    vsc: false,
+    script: false,
+    image: false,
+    style: false,
+    svg: false,
+    redirects: false,
+    export: false
   },
   spawn: {
     paths: new Set(),
     invoked: false,
     commands: {}
   },
-  watch: [],
+  watch: new Set(),
   paths: {},
   section: {},
   cmd: {},
@@ -347,71 +309,13 @@ export let bundle = <PartialDeep<Bundle>>({
   },
   image: [],
   style: [],
-  svg: [],
-  sync: {
-    themes: [],
-    stores: []
+  script: [],
+  svg: {
+    sprite: [],
+    inline: []
   },
-  minify: {
-    html: false,
-    json: false,
-    liquid: false,
-    script: false
-  },
-  processor: {
-    watch: null,
-    postcss: {
-      installed: false,
-      required: false,
-      configFile: false,
-      config: []
-    },
-    sass: {
-      installed: false,
-      required: false,
-      configFile: false,
-      config: {}
-    },
-    tsup: {
-      installed: false,
-      required: false,
-      configFile: false,
-      config: {}
-    },
-    sharp: {
-      installed: false,
-      required: false,
-      configFile: false,
-      config: {}
-    },
-    sprite: {
-      installed: false,
-      required: false,
-      configFile: false,
-      config: {}
-    },
-    svgo: {
-      installed: false,
-      required: false,
-      configFile: false,
-      config: {}
-    }
-  }
-}) as Bundle;
-
-/* -------------------------------------------- */
-/* MERGE OPTIONS                                */
-/* -------------------------------------------- */
-
-/**
- * Patch Updates
- *
- * Merge as a reducer and patches are fed into a function
- * and then applied to export model references. This approach
- * allows us to access configuration across the project and
- * still have update capabilities.
- */
-export const update = ({
-  patch: (source: any, patch: any) => merge(source, patch),
-  bundle: (patch: PartialDeep<Bundle>) => { bundle = merge(bundle, patch); }
-});
+  set config (merge: Config) { assign(config, merge); },
+  get config () { return config; },
+  get processor () { return processor; },
+  get minify () { return minify; }
+} as unknown as Bundle;

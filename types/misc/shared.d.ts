@@ -1,5 +1,36 @@
 import { Config } from '../config';
 
+/**
+ * Rename Paths
+ */
+export type InferPaths = `${'assets' | 'snippets'}/[${'dir' | 'file'}]${string}[${'file' | 'dir'}]${string}`
+
+/**
+ * Rename Paths
+ */
+export type RenamePaths = `${'assets' | 'snippets'}/${string}`
+
+/**
+ * Rename input type
+ */
+export type RenameInput = {
+  [filename: string]: string | string[]
+}
+
+/**
+ * Rename input paths type
+ */
+export type RenameInputPaths = {
+  [filename: RenamePaths]: string | string[]
+}
+
+/**
+ * Rename config type
+ */
+export type RenameConfig<T> = {
+  [filename: RenamePaths]: string | string[] | T
+}
+
 export interface Package {
   version?: string;
   syncify?: Config;

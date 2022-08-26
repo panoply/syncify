@@ -1,5 +1,9 @@
-import bar from './dir/bar';
-import foo from './dir/foo';
+import bar from '@components/bar';
+import foo from '@components/foo';
+import baz from '@components/baz';
 
-// foe
-export { bar, foo };
+console.log('hssssss');
+// sssss
+bar();
+foo();
+baz();

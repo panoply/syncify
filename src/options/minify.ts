@@ -4,13 +4,40 @@ import { isArray, isRegex } from '../shared/native';
 import { bundle, minify } from './index';
 import { typeError, warnOption } from './validate';
 
+const presets = {
+  caseSensitive: false,
+  collapseBooleanAttributes: false,
+  collapseInlineTagWhitespace: false,
+  conservativeCollapse: false,
+  keepClosingSlash: false,
+  noNewlinesBeforeTagClose: false,
+  preventAttributesEscaping: false,
+  removeEmptyAttributes: false,
+  removeEmptyElements: false,
+  removeOptionalTags: false,
+  removeRedundantAttributes: true,
+  removeScriptTypeAttributes: true,
+  removeStyleLinkTypeAttributes: true,
+  useShortDoctype: true,
+  collapseWhitespace: true,
+  continueOnParseError: true,
+  removeComments: true,
+  trimCustomFragments: true,
+  ignoreCustomFragments: [
+    /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+    /<style[\s\S]*?<\/style>/,
+    /{%[\s\S]*?%}/,
+    /{{[\s\S]*?}}/
+  ]
+};
+
 /**
  * Minification Options
  *
  * Apply minification options for views. This will write
  * logic for both liquid and HTML terser minifier options.
  */
-export function minifyOptions (config: Config) {
+export const setMinifyOptions = (config: Config) => {
 
   if (!hasPath('minify', config)) return;
 
@@ -101,4 +128,4 @@ export function minifyOptions (config: Config) {
 
   return config;
 
-}
+};

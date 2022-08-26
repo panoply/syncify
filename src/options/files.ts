@@ -1,9 +1,10 @@
-import { Config, ENV, Package } from 'types';
+import { Config, ENV, Package, Tsconfig } from 'types';
 import { join } from 'path';
 import { pathExists, readFile, readJson } from 'fs-extra';
 import { bundleRequire } from 'bundle-require';
 import { jsonc } from '../shared/utils';
 import { bundle } from '.';
+import stripJsonComments from 'strip-json-comments';
 
 /**
  * Config Files
@@ -11,7 +12,7 @@ import { bundle } from '.';
  * Looks for syncify configuration files within
  * the users project. Looks for a `syncify.config.js`
  * file, if one does not exists it will look for a
- * `syncify.json` file, if none found, returns `null`.
+ * `syncify.config.json` file, if none found, returns `null`.
  *
  * > When `null` is returned, the `package.json` file is
  * assumed to contain configuration requirements.
@@ -65,7 +66,42 @@ export async function configFile (cwd: string): Promise<Config> {
     return null;
   }
 
-}
+};
+
+/**
+ * Parse tsconfig.json / jsconfig.json
+ *
+ * Resolves `tsconfig.json` or `jsconfig.json` files for usage
+ * with _script_ transforms and esbuild to support different
+ * capabilities like path aliases.
+ */
+export async function getTSConfig (cwd: string): Promise<Tsconfig> {
+
+  let uri: string;
+
+  // Save path reference of package
+  uri = join(cwd, 'tsconfig.json');
+
+  const tsconfig = await pathExists(uri);
+
+  if (!tsconfig) {
+    uri = join(cwd, 'jsconfig.json');
+    const jsconfig = await pathExists(uri);
+    if (!jsconfig) return null;
+  }
+
+  try {
+
+    const file = await readFile(uri);
+    const config = stripJsonComments(file.toString());
+
+    return JSON.parse(config);
+
+  } catch (e) {
+    throw new Error(e);
+  }
+
+};
 
 /**
  * Package.json File
@@ -74,7 +110,7 @@ export async function configFile (cwd: string): Promise<Config> {
  * at runtime, the module requires the existence of
  * a `package.json` file.
  */
-export async function pkgJson (cwd: string): Promise<Package> {
+export async function getPackageJson (cwd: string): Promise<Package> {
 
   // Save path reference of package
   const uri = join(cwd, 'package.json');

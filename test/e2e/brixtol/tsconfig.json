@@ -1,0 +1,33 @@
+{
+  "exclude": [
+    "node_modules/**/*",
+    "dist"
+  ],
+  "include": ["src/scripts/**/*.ts"],
+  "typeAcquisition": {
+    "enable": true,
+    "include": ["node"]
+  },
+  "compilerOptions": {
+    "types": ["node"],
+    "incremental": true,
+    "target": "ES6",
+    "removeComments": true,
+    "lib": ["es2020", "DOM"],
+    "module": "ESNext",
+    "alwaysStrict": true,
+    "allowUmdGlobalAccess": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "remove",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true,
+    "skipDefaultLibCheck": false,
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "pretty": true
+  }
+}

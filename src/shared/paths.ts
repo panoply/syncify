@@ -76,6 +76,10 @@ export const normalPath = (input: string) => {
 
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
 
+  /**
+   * Prepends the provided input to the path and
+   * returns a correctly formed uri.
+   */
   return function prepend (path: string | string[]) {
 
     if (isArray(path)) return path.map(prepend);

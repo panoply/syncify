@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 
 import { join, parse, relative } from 'path';
-import { IFile, IPaths } from 'types';
+import { File, Paths } from 'types';
 import { assign } from '../shared/native';
 import { lastPath } from '../shared/paths';
 import { Partial } from 'rambdax';
 import * as context from './context';
 import { bundle } from '../options/index';
+import { Tester } from 'anymatch';
 
 /**
  * File types are represented as numeric values.
@@ -20,9 +21,10 @@ export const enum Type {
   Config,
   Locale,
   Style,
+  Script,
   Redirect,
   File,
-  Icon,
+  Svg,
   Asset,
   Metafield,
   Page,
@@ -52,20 +54,24 @@ export const enum Namespace {
  * be applied.
  */
 export const enum Kind {
-  JSON = 'json',
-  CSS = 'css',
-  SASS = 'sass',
-  SCSS = 'scss',
-  Font = 'font',
-  SVG = 'svg',
-  PDF = 'pdf',
-  Image = 'image',
-  Video = 'video',
-  Liquid = 'liquid',
-  HTML = 'html',
-  Markdown = 'markdown',
-  Sprite = 'sprite',
-  Yaml = 'yaml',
+  JSON = 'JSON',
+  CSS = 'CSS',
+  SASS = 'SASS',
+  SCSS = 'SCSS',
+  JavaScript = 'JavaScript',
+  TypeScript = 'TypeScript',
+  JSX = 'JSX',
+  TSX = 'TSK',
+  Font = 'Font',
+  SVG = 'SVG',
+  PDF = 'PDF',
+  Image = 'Image',
+  Video = 'Video',
+  Liquid = 'Liquid',
+  HTML = 'HTML',
+  Markdown = 'Markdown',
+  Sprite = 'SVG Sprite',
+  Yaml = 'YAML',
 }
 
 /**
@@ -75,9 +81,9 @@ export const enum Kind {
  * an object with important information about the
  * current file being processed.
  */
-export function setFile (file: Partial<IFile>, input: string, output: string) {
+export function setFile (file: Partial<File>, input: string, output: string) {
 
-  return <T extends unknown>(namespace: string, type: Type, kind?: Kind): IFile<T> => {
+  return <T extends unknown>(namespace: string, type: Type, kind?: Kind): File<T> => {
 
     let key: string;
 
@@ -89,7 +95,7 @@ export function setFile (file: Partial<IFile>, input: string, output: string) {
       output = join(output, key);
     }
 
-    return assign({}, file as IFile, {
+    return assign({}, file as File, {
       type,
       input,
       output,
@@ -113,9 +119,9 @@ export function setFile (file: Partial<IFile>, input: string, output: string) {
  * whether or not we are working with metafield or asset
  * and vice-versa.
  */
-export const parseFile = (paths: IPaths, output: string) => (path: string) => {
+export const parseFile = (paths: Paths<Tester>, output: string) => (path: string) => {
 
-  const file: Partial<IFile> = parse(path);
+  const file: Partial<File> = parse(path);
   const merge = setFile(file, path, output);
 
   if (file.ext === '.liquid') {
@@ -133,7 +139,6 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
     }
 
   } else if (file.ext === '.md' || file.ext === '.html') {
-
     return merge('pages', Type.Page, file.ext === '.html' ? Kind.HTML : Kind.Markdown);
 
   } else if (file.ext === '.json') {
@@ -149,55 +154,36 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
     } else if (paths.customers(path)) {
       return merge('templates/customers', Type.Template, Kind.JSON);
     }
+
   } else if (file.ext === '.css') {
-
     return context.style(merge('assets', Type.Style, Kind.CSS));
-
   } else if (file.ext === '.scss') {
-
     return context.style(merge('assets', Type.Style, Kind.SCSS));
-
   } else if (file.ext === '.sass') {
-
     return context.style(merge('assets', Type.Style, Kind.SASS));
+
+  } else if (file.ext === '.js') {
+    return context.script(merge('assets', Type.Script, Kind.JavaScript));
+  } else if (file.ext === '.ts') {
+    return context.script(merge('assets', Type.Script, Kind.TypeScript));
+  } else if (file.ext === '.jsx') {
+    return context.script(merge('assets', Type.Script, Kind.JSX));
+  } else if (file.ext === '.tsx') {
+    return context.script(merge('assets', Type.Script, Kind.TSX));
 
   } else if (paths.assets(path)) {
 
     if (bundle.spawn.invoked) {
-
       return merge('assets', Type.Spawn);
-
     } else if (file.ext === '.svg') {
-
-      return merge('assets', Type.Icon, Kind.SVG);
-
-    } else if (
-      file.ext === '.jpg' ||
-      file.ext === '.png' ||
-      file.ext === '.gif' ||
-      file.ext === '.pjpg') {
-
+      return merge('assets', Type.Svg, Kind.SVG);
+    } else if (file.ext === '.jpg' || file.ext === '.png' || file.ext === '.gif' || file.ext === '.pjpg') {
       return merge('assets', Type.Asset, Kind.Image);
-
-    } else if (
-      file.ext === '.mov' ||
-      file.ext === '.mp4' ||
-      file.ext === '.webm' ||
-      file.ext === '.ogg') {
-
+    } else if (file.ext === '.mov' || file.ext === '.mp4' || file.ext === '.webm' || file.ext === '.ogg') {
       return merge('assets', Type.Asset, Kind.Video);
-
     } else if (file.ext === '.pdf') {
-
       return merge('assets', Type.Asset, Kind.PDF);
-
-    } else if (
-      file.ext === '.eot' ||
-      file.ext === '.otf' ||
-      file.ext === '.ttf' ||
-      file.ext === '.woff' ||
-      file.ext === '.woff2') {
-
+    } else if (file.ext === '.eot' || file.ext === '.ttf' || file.ext === '.woff' || file.ext === '.woff2') {
       return merge('assets', Type.Asset, Kind.Font);
     }
   }
@@ -213,7 +199,7 @@ export const parseFile = (paths: IPaths, output: string) => (path: string) => {
  */
 export const importFile = (output: string) => (path: string) => {
 
-  const file: Partial<IFile> = parse(path);
+  const file: Partial<File> = parse(path);
   const merge = setFile(file, path, output);
 
   if (path.startsWith('sections/')) {
@@ -238,7 +224,7 @@ export const importFile = (output: string) => (path: string) => {
 
 export const outputFile = (output: string) => (path: string) => {
 
-  const file: Partial<IFile> = parse(path);
+  const file: Partial<File> = parse(path);
   const merge = setFile(file, path, output);
 
   switch (lastPath(file.dir)) {

@@ -249,7 +249,6 @@ export default defineConfig({
   export: 'export',
   import: 'import',
   config: '.',
-  plugins: [],
   stores: {
     domain: '',
     themes: {}
@@ -263,9 +262,8 @@ export default defineConfig({
   logger: {
     timer: true,
     sizes: true,
-    silent: false,
-    warnings: true,
-    clearing: true
+    clear: true,
+    silent: false
   },
   paths: {
     redirects: 'redirects.yaml',
@@ -306,9 +304,9 @@ export default defineConfig({
       global: []
     },
     pages: {
-      language: 'html',
-      author: '',
       suffixDir: true,
+      language: ['html', 'markdown'],
+      author: '',
       global: []
     }
   },
@@ -327,7 +325,6 @@ export default defineConfig({
     sprite:{},
     json: {},
   },
-  plugins: [],
   minify: {
     json: {
       assets: true,
@@ -346,42 +343,19 @@ export default defineConfig({
       mangleProps: null,
       mangleCache: false,
     },
-    liquid: {
-      removeNewlineAttributes: true,
+    views: {
+      minifyScript: true,
+      minifyStyle: true,
+      minifySchema: true,
       removeComments: true,
-      removeSchemaRefs: true,
-      minifySectionSchema: true,
-      stripAttributesContainingNewlines: true,
-      stripInnerTagWhitespace: false,
-      stripRedundantWhitespaceDashes: true,
+      collapseWhitespace: true,
+      stripDashes: true,
       ignoreTags: [],
       ignoreObjects: [],
       exclude: []
-    },
-    html: {
-      caseSensitive: false,
-      collapseBooleanAttributes: false,
-      collapseInlineTagWhitespace: false,
-      conservativeCollapse: false,
-      keepClosingSlash: false,
-      noNewlinesBeforeTagClose: false,
-      preventAttributesEscaping: false,
-      removeEmptyAttributes: false,
-      removeEmptyElements: false,
-      removeOptionalTags: false,
-      removeRedundantAttributes: true,
-      removeScriptTypeAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      sortAttributes: false,
-      sortClassName: false,
-      useShortDoctype: true,
-      collapseWhitespace: true,
-      continueOnParseError: true,
-      removeComments: true,
-      trimCustomFragments: true,
-      ignoreCustomFragments: []
     }
-  }
+  },
+  plugins: [],
 });
 ```
 

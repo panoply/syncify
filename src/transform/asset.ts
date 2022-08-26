@@ -1,4 +1,4 @@
-import { IFile, Syncify } from 'types';
+import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
 import { isFunction, isBuffer, isUndefined } from '../shared/native';
@@ -9,16 +9,14 @@ import { Type } from '../process/files';
 /* -------------------------------------------- */
 
 /**
- * Liquid File Transforms
+ * Pass~through
  *
- * Applies minification and handles `.liquid` files.
- * Determines what action should take place.
+ * Catches spawned generated files and determines whether
+ * the file should be written or just fall through.
  */
-const passthrough = (file: IFile) => async (data: string) => {
+const passthrough = (file: File) => async (data: string) => {
 
-  if (file.type !== Type.Spawn) {
-    await writeFile(file.output, data);
-  }
+  if (file.type !== Type.Spawn) await writeFile(file.output, data);
 
   return data;
 
@@ -30,7 +28,7 @@ const passthrough = (file: IFile) => async (data: string) => {
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export async function compile (file: IFile, cb: Syncify) {
+export async function compile (file: File, cb: Syncify) {
 
   const copy = passthrough(file);
   const read = await readFile(file.input);

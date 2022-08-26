@@ -12,11 +12,20 @@ Official plugins for the Shopify theme development tool [Syncify](#).
     </tr>
   </thead>
   <tbody>
+    <tr>
       <td>
-      <a href="#">@syncify/plugin-icons</a>
+        <a href="#">@syncify/plugin-icons</a>
       </td>
       <td>
-      Extended features for working with SVG's. Inline icons using custom HTML tags and more!
+        Extended features for working with SVG's. Inline icons using custom HTML tags and more!
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="#">@syncify/obfuscss</a>
+      </td>
+      <td>
+        Obfuscate CSS class names in stylesheets and views across your project
       </td>
     </tr>
   </tbody>

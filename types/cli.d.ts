@@ -5,18 +5,18 @@
 import { LiteralUnion } from 'type-fest';
 
 export type Group = LiteralUnion<
-  | 'SYNCIFY'
-  | 'ASSET'
-  | 'SPAWNS'
-  | 'ICON'
-  | 'SNIPPET'
-  | 'LAYOUT'
-  | 'SECTION'
-  | 'PAGE'
-  | 'LOCALE'
-  | 'CONFIG'
-  | 'TEMPLATE'
-  | 'METAFIELD'
+  | 'Syncify'
+  | 'Asset'
+  | 'Spawn'
+  | 'SVG'
+  | 'Snippet'
+  | 'Layout'
+  | 'Section'
+  | 'Page'
+  | 'Locale'
+  | 'Config'
+  | 'Template'
+  | 'Metafield'
   , string
 >
 
@@ -458,8 +458,66 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --clean -b -i some/directory
+   * $ syncify --bump major
+   * $ syncify --bump minor
+   * $ syncify --bump patch
    * ```
    */
   bump?: string;
+  /**
+   * Runs the script transform only
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify --script          # executes build
+   * $ syncify -w --script       # executes in watch mode
+   * $ syncify --script --prod   # executes build with minify
+   * $ syncify --script --minify # executes build with minify
+   * ```
+   */
+  script?: boolean;
+  /**
+   * Runs the style transform only
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify --style           # executes build
+   * $ syncify -w --style        # executes in watch mode
+   * $ syncify --style --prod    # executes build with minify
+   * $ syncify --style --minify  # executes build with minify
+   * ```
+   */
+  style?: boolean;
+  /**
+   * Runs the svg transform only
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify --svg           # executes build
+   * $ syncify -w --svg        # executes in watch mode
+   * $ syncify --svg --prod    # executes build with minify
+   * $ syncify --svg --minify  # executes build with minify
+   * ```
+   */
+  svg?: boolean;
+  /**
+   * Runs the image transform only
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify --image           # executes build
+   * $ syncify -w --image        # executes in watch mode
+   * $ syncify --image --prod    # executes build with minify
+   * $ syncify --image --minify  # executes build with minify
+   * ```
+   */
+  image?: boolean;
 }

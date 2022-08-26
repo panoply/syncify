@@ -1,33 +1,37 @@
+import { Merge } from 'type-fest';
 import { Config, Package, StyleTransform, Processors } from 'types';
 import glob from 'glob';
+import merge from 'mergerino';
 import anymatch, { Tester } from 'anymatch';
-import { forEach, has, hasPath, isNil } from 'rambdax';
+import { has, hasPath, isNil, uniq } from 'rambdax';
 import { join, extname } from 'path';
 import { existsSync } from 'fs-extra';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { normalPath } from '../shared/paths';
-import { typeError, unknownError, invalidError, warnOption, missingDependency } from './validate';
-import { bundle, update } from './index';
+import { typeError, invalidError, warnOption, missingDependency } from './validate';
+import { bundle, processor } from '.';
+import { getTransform } from './utilities';
 import * as u from '../shared/native';
-import { Merge } from 'type-fest';
-import { keys } from '../shared/native';
-
-type PostCSSProcess = Processors['style']['postcss']
-type SassDartProcess = Processors['style']['sass']
+import { c } from '../logger';
+type PostCSSProcess = Processors['postcss']
+type SassDartProcess = Processors['sass']
+type StylesFlattened = Merge<StyleTransform, {
+  input: string;
+  watch: Tester
+}>
 
 /**
- * Styles
  *
  * Applies defaults to stylesheets defined in config,
  * parses the `postcss.config.js` configuration file and
  * normalizes the configuration object.
  */
-export async function styleOptions (config: Config, pkg: Package) {
+export async function setStyleConfig (config: Config, pkg: Package) {
 
   if (!has('style', config.transforms)) return;
 
-  const { postcss, sass } = bundle.processor;
-  const warn = warnOption('Style option');
+  const { postcss, sass } = processor;
+  const warn = warnOption('style transform option');
 
   sass.installed = getModules(pkg, 'sass');
   postcss.installed = getModules(pkg, 'postcss');
@@ -35,43 +39,19 @@ export async function styleOptions (config: Config, pkg: Package) {
   if (postcss.installed) {
     const pcss = await readConfigFile<PostCSSProcess>('postcss.config');
     if (pcss !== null) {
-      postcss.configFile = pcss.path;
+      postcss.file = pcss.path;
       postcss.config = pcss.config;
     }
   }
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const styles = u.isObject(config.transforms.style)
-    ? [ config.transforms.style ]
-    : config.transforms.style;
-
-  // Throw when styles config is not an array type
-  if (!u.isArray(styles)) unknownError('styles', styles);
+  const styles = getTransform<StylesFlattened[]>(config.transforms.style, true);
 
   // Path normalizer
   const path = normalPath(config.input);
-  const list = (styles as StyleTransform[]).flatMap((style: any) => {
 
-    if (u.isArray(style.input)) {
-      return style.input.flatMap((item: any) => {
-
-        const match = glob.sync(path(item));
-        if (match.length === 0) warn('Input could not be resolved', item);
-
-        return match.map(input => ({ ...style, input: join(bundle.cwd, input) }));
-      });
-    }
-
-    const match = glob.sync(path(style.input));
-    if (match.length === 0) warn('Input could not be resolved', style.input);
-
-    // Flatten and glob array type inputs
-    return match.map(input => ({ ...style, input: join(bundle.cwd, input) }));
-
-  });
-
-  forEach(style => {
+  for (const style of styles) {
 
     // Default Dart SASS options  compile model for each style
     const compile: typeof style = {
@@ -92,8 +72,8 @@ export async function styleOptions (config: Config, pkg: Package) {
           if (!postcss.required) postcss.required = true;
 
           compile.postcss = override
-            ? update.patch(postcss.config, style.postcss)
-            : true;
+            ? merge(postcss.config, style.postcss as Processors['postcss'])
+            : true as unknown as any;
 
         }
       } else {
@@ -101,7 +81,7 @@ export async function styleOptions (config: Config, pkg: Package) {
       }
     }
 
-    if (has('sass', style)) {
+    if ((has('sass', style) && style.sass !== false) || sass.installed === true) {
 
       const override = u.isObject(style.sass);
 
@@ -109,13 +89,15 @@ export async function styleOptions (config: Config, pkg: Package) {
         if (!sass.installed) missingDependency('sass');
         if (!sass.required) sass.required = true;
         if (!override) {
-          compile.sass = style.sass;
+
+          u.defineProperty(compile, 'sass', { get () { return style.sass; } });
+
         } else {
 
           // console.log(sass.config);
-          compile.sass = update.patch(sass.config, style.sass);
+          compile.sass = u.assign(sass.config, style.sass);
 
-          forEach(option => {
+          for (const option in style.sass as StyleTransform) {
 
             // Validate the boolean options
             if (option === 'sourcemap' || option === 'warnings') {
@@ -139,13 +121,14 @@ export async function styleOptions (config: Config, pkg: Package) {
             } else if (option === 'includePaths') {
 
               if (u.isArray(style.sass[option])) {
-                compile.sass[option] = style.sass[option];
+                // Full path relative to CWD
+                compile.sass[option] = uniq<string>(style.sass[option]).map(p => join(bundle.cwd, p));
               } else {
                 typeError('sass', option, style.sass[option], 'string[]');
               }
             }
 
-          }, keys(style.sass));
+          };
         }
       } else {
         typeError('style', 'sass', style.sass, 'boolean | {}');
@@ -159,7 +142,7 @@ export async function styleOptions (config: Config, pkg: Package) {
     }
 
     // Rename file
-    let rename: ReturnType<typeof renameFile> = renameFile(compile.input); ;
+    let rename: ReturnType<typeof renameFile> = renameFile(style.rename);
 
     // Package options has rename value
     if (has('rename', style) && !isNil(style)) {
@@ -170,7 +153,7 @@ export async function styleOptions (config: Config, pkg: Package) {
       rename = renameFile(compile.input, style.rename);
 
       // Validate the file new name.
-      if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) typeError('sass', 'rename', rename, 'Invalid name augment');
+      if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) typeError('sass', 'rename', rename, 'Invalid rename augment');
 
       // We are dealing with a .css file
       if (rename.name.endsWith('.css')) {
@@ -190,27 +173,32 @@ export async function styleOptions (config: Config, pkg: Package) {
     const watch: string[] = [];
 
     if (bundle.mode.watch && has('watch', style)) {
+
       if (!u.isArray(style.watch)) typeError('styles', 'watch', style.watch, 'string[]');
 
-      forEach(uri => {
+      for (const uri of style.watch as unknown as string[]) {
 
         const globs = glob.sync(join(bundle.cwd, path(uri)));
 
         if (globs.length === 0 && uri[0] !== '!') warn('Cannot resolve watch glob/path uri', uri);
 
-        forEach(p => existsSync(p)
-          ? watch.push(p)
-          : warn('No file exists in path', p), globs);
+        for (const p of globs) {
+          if (existsSync(p)) {
+            watch.push(p);
+          } else {
+            warn('No file exists in path', p);
+          }
+        }
 
-      }, style.watch as unknown as string[]);
+      };
 
       watch.push(compile.input);
+      watch.forEach(p => bundle.watch.add(p));
       compile.watch = anymatch(watch);
-      bundle.watch.push(...watch);
 
     } else {
       compile.watch = anymatch([ compile.input ]);
-      bundle.watch.push(compile.input);
+      bundle.watch.add(compile.input);
     }
 
     if (typeof compile.sass === 'object') {
@@ -231,23 +219,20 @@ export async function styleOptions (config: Config, pkg: Package) {
 
     // Based on the snippet condition, we rename the export or not
     if (compile.snippet) {
-      if (!rename.name.endsWith('.liquid')) compile.rename = rename.name + '.liquid';
-      bundle.watch.push('!' + join(bundle.cwd, config.output, 'snippets', compile.rename));
+
+      if (!has('rename', compile)) compile.rename = rename.name;
+      if (!rename.name.endsWith('.liquid') || !compile.rename.endsWith('.liquid')) {
+        compile.rename = rename.name + '.liquid';
+      }
+
+      bundle.watch.add(`!${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
     } else {
       compile.rename = rename.name;
-      bundle.watch.push('!' + join(bundle.cwd, config.output, 'assets', rename.name));
+      bundle.watch.add(`!${join(bundle.cwd, config.output, 'assets', rename.name)}`);
     }
-
-    // console.log(bundle.watch);
 
     bundle.style.push(compile as any);
 
-  }, list as Array<Merge<StyleTransform, {
-      input: string,
-      watch: Tester
-    }>
-  >);
-
-  // console.log(bundle);
+  };
 
 };

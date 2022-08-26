@@ -1,21 +1,21 @@
 import notifier from 'node-notifier';
 import zlib from 'node:zlib';
-import { log, nil } from '../shared/native';
+import { has } from 'rambdax';
+import { nil } from '../shared/native';
 import { byteConvert, byteSize, sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
 import { bundle } from '../options/index';
-import * as tui from '../cli/tui';
-import * as c from '../cli/ansi';
 import { queue } from '../requests/queue';
 import { Group, File, Theme } from 'types';
 import * as timer from '../process/timer';
-import { has } from 'rambdax';
+import * as tui from '../cli/tui';
+import * as c from '../cli/ansi';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
 /* -------------------------------------------- */
 
-export { deleted, updated } from '../cli/tui';
+export { deleted, updated, processor as process, uploaded, transform } from '../cli/tui';
 
 /**
  * Warning stacks, maintains a store of log messages
@@ -30,21 +30,27 @@ export const warning: {
   process: {}
 };
 
-const uploads: Set<string> = new Set();
+const uploads: Set<[string, string, string]> = new Set();
 
 /**
  * Stdout/Stderr interception hook
  */
 let listen: () => void = null;
 
+/**
+ * Whether or not we are in idle
+ */
 let idle: boolean = false;
 
+/**
+ * File Kind
+ */
 let kind: string = '';
 
 /**
  * Current Filename
  */
-let group: Group = 'SYNCIFY';
+let group: Group = 'Syncify';
 
 /**
  * Current Filename
@@ -55,27 +61,6 @@ let title: string = nil;
  * Current Filename
  */
 let uri: string = nil;
-
-process.on('SIGINT', () => {
-  tui.nwl(nil);
-  log(c.gray('SIGINT'));
-  process.exit();
-});
-
-// emitted when an uncaught JavaScript exception bubbles
-process.on('uncaughtException', (e) => {
-  tui.write(`Caught exception: ${e.message}`);
-  tui.nwl();
-  tui.write(`${e.stack}`);
-});
-
-// emitted whenever a Promise is rejected and no error handler is attached to it
-process.on('unhandledRejection', (reason, p) => {
-  tui.nwl();
-  tui.write(c.redBright(`xx Unhandled Rejection at: ${p}`));
-  tui.nwl();
-  tui.write(c.gray(`${reason}`));
-});
 
 process.stdin.on('data', data => {
 
@@ -152,9 +137,11 @@ export const syncing = (message: string) => {
     tui.warning(`${count} ${c.yellowBright(`~ Type ${c.bold('w')} and press ${c.bold('enter')} to view`)}`);
   }
 
-  tui.item(c.magentaBright(`↻ syncing ${message}`));
+  tui.reloaded(c.bold('HOT ASSET'), timer.now());
 
-  if (queue.pending > 0) tui.item(c.orange(`‼ waiting ${message}`));
+  tui.syncing(message);
+
+  if (queue.pending > 0) tui.queued(message, queue.pending);
 
 };
 
@@ -165,19 +152,21 @@ export const changed = (file: File) => {
 
   const close = title !== file.relative;
 
+  timer.start();
+
   // close previous group
   if (close) tui.closed(group);
 
   // do not clear if first run
-  if (group !== 'SYNCIFY' && close) tui.clear();
+  if (group !== 'Syncify' && close) tui.clear();
 
   // update group
   group = file.namespace;
 
   // open new group
   if (close) {
-    tui.opened(group);
-    tui.title(file.kind.toUpperCase() + ' TRANSFORM');
+    tui.clear();
+    tui.title(file.kind);
     kind = file.kind;
     title = file.relative;
   }
@@ -186,34 +175,24 @@ export const changed = (file: File) => {
   if (!(file.relative in warning)) warning[file.relative] = new Set();
   if (uri !== file.relative) uri = file.relative; // Update the current records
 
-  if (bundle.mode.watch) tui.changed(`${file.relative}`);
-
+  if (bundle.mode.watch) {
+    tui.nwl();
+    tui.changed(file.relative);
+  }
 };
 
 export const upload = (theme: Theme) => {
 
-  uploads.add(`${c.bold(theme.target)} → ${theme.store} ${c.gray(`~ ${timer.stop()}`)}`);
+  uploads.add([ theme.target, theme.store, timer.stop() ]);
 
   if (!idle) {
     idle = true;
     queue.onIdle().then(() => {
-
-      tui.nwl();
-      tui.write(c.neonGreen.bold(kind.toUpperCase() + ' UPLOADS'));
-      tui.nwl();
-
-      uploads.forEach(message => tui.updated(message));
+      uploads.forEach(([ target, store, time ]) => tui.uploaded(target, store, time));
       uploads.clear();
       idle = false;
-
     });
   }
-
-};
-
-export const compile = (message: string) => {
-
-  tui.compile(message);
 
 };
 
@@ -228,7 +207,7 @@ export const filesize = (file: File, content: string | Buffer) => {
 
   if ((size > file.size || (size === file.size))) {
     const gzip = byteConvert(zlib.gzipSync(content).length);
-    tui.item(`» filesize ${before} → gzip ${gzip}`);
+    tui.transform(`filesize ${before} → gzip ${gzip}`);
   } else {
     tui.item(`minified ${before} → ${after} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
   }

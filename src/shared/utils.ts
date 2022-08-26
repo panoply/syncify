@@ -1,7 +1,18 @@
 import strip from 'strip-json-comments';
 import { bold, gray } from '../cli/ansi';
 import { isString, isBuffer, isArray, isObject } from './native';
+import { EventEmitter } from 'node:events';
+import zlib from 'node:zlib';
+import { UNITS } from '../constants';
 
+/**
+ * Event emitter instance
+ */
+export const event = new EventEmitter();
+
+/**
+ * Strip JSON Comments
+ */
 export function jsonc <T> (data: string): T {
 
   try {
@@ -95,11 +106,27 @@ export const byteConvert = (bytes: number): string => {
   if (bytes === 0) return '0b';
 
   const size = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
-  const unit = [ 'b', 'kb', 'mb', 'gb', 'tb' ];
 
   return size === 0
-    ? `${bold(String(bytes))}${unit[size]}`
-    : `${bold((bytes / 1024 ** size).toFixed(1))}${unit[size]}`;
+    ? `${bold(String(bytes))}${(UNITS[size])}`
+    : `${bold((bytes / 1024 ** size).toFixed(1))}${(UNITS[size])}`;
+};
+
+export const fileSize = (content: string | Buffer, beforeSize: number) => {
+
+  const size = byteSize(content);
+  const gzip = byteConvert(zlib.gzipSync(content).length);
+  const before = byteConvert(beforeSize);
+  const after = byteConvert(size);
+  const saved = byteConvert(beforeSize - size);
+
+  return {
+    isSmaller: (size > beforeSize || (size === beforeSize)),
+    gzip,
+    before,
+    after,
+    saved
+  };
 };
 
 /**
@@ -158,6 +185,18 @@ export function getDateTime () {
     ((now.getSeconds() < 10) ? ('0' + now.getSeconds()) : (now.getSeconds()))
   );
 };
+
+export function addSuffix (i: number) {
+
+  const a = i % 10;
+  const b = i % 100;
+
+  if (a === 1 && b !== 11) return i + 'st';
+  else if (a === 2 && b !== 12) return i + 'nd';
+  else if (a === 3 && b !== 13) return i + 'rd';
+  else return i + 'th';
+
+}
 
 /**
  * Returns the byte size of a string value

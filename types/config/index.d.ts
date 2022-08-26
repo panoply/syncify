@@ -1,31 +1,15 @@
-import { Icons, Pages, Sections, Snippets } from './views';
-import { ImageTransform, JSONTransform, ScriptTransfrom, StyleTransform, SVGTransform } from './transforms';
-import { LiquidMinify, ESBuildMinify, HTMLMinifierTerser, JSONMinify } from './minify';
+/* eslint-disable no-unused-vars */
+import { Pages, Sections, Snippets } from './views';
+import { ImageTransform, ScriptTransform, StyleTransform, SVGTransform } from './transforms';
+import { ESBuildMinify, JSONMinify, ViewMinify } from './minify';
 import { PluginHooks } from '../bundle/plugin';
-import { ScriptProcessor, SVGProcessors, StyleProcessors, ImageProcessors } from './processors';
+import { Processors } from './processors';
+import { InferPaths, RenamePaths } from '../misc/shared';
+import { MergeExclusive, RequireAllOrNone } from 'type-fest';
 
 /* -------------------------------------------- */
 /* PROCESSORS                                   */
 /* -------------------------------------------- */
-
-export interface Processors {
-  /**
-   * Script Processors
-   */
-  script?: ScriptProcessor;
-  /**
-   * Style Processors
-   */
-  style?: StyleProcessors
-  /**
-   * Image Processors
-   */
-  image?: ImageProcessors
-  /**
-   * SVG Processors
-   */
-  svg: SVGProcessors
-}
 
 /* -------------------------------------------- */
 /* VIEWS                                        */
@@ -44,10 +28,6 @@ export interface Views {
    * Section file handling (ie: sub-directory grouping)
    */
   sections?: Sections;
-  /**
-   * Extended icons handling support, (used together `svg` _transforms_ )
-   */
-  icons?: Icons
 }
 
 /* -------------------------------------------- */
@@ -56,25 +36,179 @@ export interface Views {
 
 export interface Transforms {
   /**
-   * JSON File transforms
-   */
-  json?: JSONTransform;
-  /**
    * Image File transforms
    */
-  image?: ImageTransform | ImageTransform[];
+  image?:
+  string
+  | string[]
+  | ImageTransform
+  | ImageTransform[]
+  | {
+    [output: `assets/${string}`]:
+    string
+    | string[]
+    | ImageTransform
+  }
   /**
    * Style File transforms
+   *
+   * @example
+   *
+   * // OPTION 1 - Rename with single input
+   * {
+   *   style: {
+   *    'assets/stylesheet.css': 'path/to/file.scss', // write to assets dir and compile with sass
+   *    'snippets/style.liquid': 'path/to/foo.css' // write as snippet
+   *   }
+   * }
+   * // OPTION 2 - Rename with multiple inputs
+   * {
+   *   style: {
+   *    'assets/stylesheet.css': [
+   *      'path/to/source/file-1.scss',
+   *      'path/to/source/file-2.scss',
+   *    ]
+   *   }
+   * }
+   * // OPTION 3 - Rename with overrides
+   * {
+   *   style: {
+   *    'assets/filename.min.css': {
+   *       input: 'path/to/source/file.scss',
+   *       includePaths: ['node_modules'],
+   *       watch: []
+   *    }
+   *   }
+   * }
+   * // OPTION 4 - Single config
+   * {
+   *   style: {
+   *     input: 'path/to/source/file.scss',
+   *     rename: 'filename.min.css',
+   *     postcss: [ plugin() ] // use some postcss plugin with this file
+   *     sass: {
+   *       includePaths: [
+   *        'node_modules/bootstrap' // include this path
+   *       ]
+   *     }
+   *   }
+   * }
+   * // OPTION 5 - Multiple configs
+   * {
+   *   style: [
+   *    {
+   *      input: 'path/to/source/file-1.css',
+   *      snippet: true,
+   *      rename: 'some-name.liquid',
+   *      postcss: [ plugin() ], // use some plugin with this file
+   *      sass: false // do not process with sass
+   *    },
+   *    {
+   *      input: 'path/to/source/file-2.scss',
+   *      postcss: false, // do not process with postcss
+   *      sass: true, // use processor defined settings
+   *      watch: [
+   *       'path/to/files/*.scss'
+   *      ]
+   *    }
+   *   ]
+   * }
    */
-  style?: StyleTransform | StyleTransform[];
+  style?:
+  string
+  | string[]
+  | StyleTransform
+  | StyleTransform[]
+  | { [K in RenamePaths]: string | string[] | Pick<StyleTransform, 'postcss' | 'sass' | 'input' | 'watch'> }
   /**
-   * JS/TS File transforms
+   * JavaScript/TypeScript Transforms - _Requires [ESBuild](https://esbuild.github.io)_
+   *
+   * Script inputs can be defined a few different ways depending on your preference.
+   * You can also override ESBuild `processor` defined options on a per-file basis.
+   * Options 1, 2 and 3 are typically the preferred structures.
+   *
+   *
+   * @example
+   *
+   * // OPTION 1 - Rename with single input
+   * {
+   *   script: {
+   *    'assets/filename.min.js': 'path/to/source/file.ts', // write to assets dir
+   *    'snippets/js-file.liquid': 'path/to/source/foo.ts' // write as snippet
+   *   }
+   * }
+   * // OPTION 2 - Rename with multiple inputs
+   * {
+   *   script: {
+   *    'assets/[file].min.[ext]': [
+   *      'path/to/source/file-1.ts', // outputs assets/file-1.min.js
+   *      'path/to/source/file-2.ts', // outputs assets/file-2.min.js
+   *    ]
+   *   }
+   * }
+   * // OPTION 3 - Rename with overrides
+   * {
+   *   script: {
+   *    'assets/filename.min.js': {
+   *       input: 'path/to/source/file.ts',
+   *       splitting: true,
+   *       treeShaking: false
+   *    }
+   *   }
+   * }
+   * // OPTION 4 - Single config
+   * {
+   *   script: {
+   *     input: 'path/to/source/file.ts',
+   *     rename: 'filename.min.js',
+   *     esbuild: {}
+   *   }
+   * }
+   * // OPTION 5 - Multiple configs
+   * {
+   *   script: [
+   *    {
+   *      input: 'path/to/source/file-1.ts',
+   *      rename: 'filename.min.js',
+   *      esbuild: {}
+   *    },
+   *    {
+   *      input: 'path/to/source/file-2.ts',
+   *      snippet: true
+   *    }
+   *   ]
+   * }
    */
-  script?: ScriptTransfrom | ScriptTransfrom[];
+  script?:
+  string
+  | string[]
+  | ScriptTransform
+  | StyleTransform[]
+  | { [K in InferPaths]: string | string[] | MergeExclusive<
+      Pick<ScriptTransform, 'input' | 'watch'>,
+      ScriptTransform['esbuild']
+    >
+  }
+  | { [K in RenamePaths]: string | MergeExclusive<
+      Pick<ScriptTransform, 'input' | 'watch'>,
+      ScriptTransform['esbuild']
+    >
+  }
+
   /**
    * SVG File transforms
    */
-  svg?: SVGTransform;
+  svg?:
+  string
+  | string[]
+  | SVGTransform
+  | SVGTransform[]
+  | {
+    [output: `${'assets' | 'snippets'}/${string}`]:
+    string
+    | string[]
+    | SVGTransform
+  }
 }
 
 /* -------------------------------------------- */
@@ -87,15 +221,11 @@ export interface Minify {
    */
   json?: false | JSONMinify;
   /**
-   * Liquid Minification
-   */
-  liquid?: false | LiquidMinify;
-  /**
-   * HTML (Markup) Minification
+   * View (Liquid/HTML) Minification
    *
    * > Uses [html-minifier-terser](https://github.com/terser/html-minifier-terser)
    */
-  html?: false | HTMLMinifierTerser;
+  views?: false | ViewMinify;
   /**
    * JS/TS Minification
    *
@@ -148,7 +278,24 @@ export interface HOT {
    *
    * @default true
    */
-  labels?: boolean,
+  labels?: boolean;
+  /**
+   * Whether or not Syncify should inject the required HOT snippet
+   * at runtime to the defined layouts. When `false` you will need
+   * to manually place the `hot.liquid` snippet into your theme.
+   *
+   * _Please note that by default when running `--hot` Syncify will
+   * upload layouts upon initializing_
+   *
+   * @default true
+   */
+  inject?: boolean;
+  /**
+   * A string list of Liquid template layouts used in your theme.
+   *
+   * @default ['theme.liquid']
+   */
+  layouts?: string[];
   /**
    * The static server for assets
    *
@@ -255,67 +402,67 @@ export interface Directories {
 /* SOURCE PATHS                                 */
 /* -------------------------------------------- */
 
-export interface Paths {
+export interface Paths<T = string | string[]> {
   /**
    * An array list of files to be uploaded as assets
    *
    * @default 'source/assets'
    */
-  assets?: string | string[];
+  assets?: T;
   /**
    * An array list of files to be uploaded as snippets
    *
    * @default 'source/snippets'
    */
-  snippets?: string | string[];
+  snippets?: T
   /**
    * An array list of files to be uploaded as sections
    *
    * @default 'source/sections'
    */
-  sections?: string | string[];
+  sections?: T
   /**
    * An array list of files to be uploaded as layouts
    *
    * @default 'source/layout'
    */
-  layout?: string | string[];
+  layout?: T
   /**
    * An array list of files to be uploaded as templates
    *
    * @default 'source/templates'
    */
-  templates?: string | string[];
+  templates?: T
   /**
    * An array list of files to be uploaded as template/customers
    *
    * @default 'source/templates/customers'
    */
-  customers?: string | string[];
+  customers?: T
   /**
    * An array list of files to be uploaded as configs
    *
    * @default 'source/config'
    */
-  config?: string | string[];
+  config?: T
   /**
    * An array list of files to be uploaded as locales
    *
    * @default 'source/locales'
    */
-  locales?: string | string[];
+  locales?: T
   /**
    * The resolved `metafields` directory path
    *
    * @default 'source/metafields'
    */
-  metafields?: string | string[];
+  metafields?: T
   /**
    * The resolved `pages` directory path
    *
    * @default 'source/pages'
    */
-  pages?: string | string[];
+  pages?: T
   /**
    * The resolved `redirects` yaml file
    *
@@ -341,6 +488,10 @@ export interface Config extends Directories {
    */
   paths?: Paths;
   /**
+   * Whether of not Syncify should clean output before building.
+   */
+  clean?: boolean;
+  /**
    * Hot reloading options. Passing boolean `true` will use defaults.
    * Set to `false` to disable live reloads. Optionally configure
    * reloads by passing configuration _object_.
@@ -349,7 +500,7 @@ export interface Config extends Directories {
    *
    * @default false
    */
-  hot?: false | HOT;
+  hot?: boolean | HOT;
   /**
    * Syncify Plugins
    */
@@ -402,7 +553,7 @@ export interface Config extends Directories {
    * per-transform basis. Optionally, you can use the default presets
    * pre-configured for optimal use.
    */
-  processor?: Processors;
+  processors?: Processors;
   /**
    * Transform pipeline configurations
    */

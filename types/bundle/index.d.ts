@@ -1,13 +1,15 @@
 /* eslint-disable no-unused-vars */
 
 import type { Tester } from 'anymatch';
-import { Merge, MergeExclusive } from 'type-fest';
-import { Markdown } from '../misc/markdown';
-import { Paths, Directories, HOT, Transforms, Views, Minify, Config } from '../config/index';
-import { SVGInline, SVGSprite } from '../config/transforms';
-import { AxiosRequestConfig } from 'axios';
-import { Plugins } from './plugin';
-import { ImageProcessors, SVGProcessors, ScriptProcessor, StyleProcessors } from '../config/processors';
+import type { BuildOptions as ESBuildConfig } from 'esbuild';
+import type { Merge, MergeExclusive, PartialDeep } from 'type-fest';
+import type { Markdown } from '../misc/markdown';
+import type { Paths, Directories, HOT, Transforms, Views, Minify, Config } from '../config/index';
+import type { ScriptTransform, StyleTransform, SVGInline, SVGSprite } from '../config/transforms';
+import type { AxiosRequestConfig } from 'axios';
+import type { Plugins } from './plugin';
+import type { Processors } from '../config/processors';
+import type { Tsconfig } from 'tsconfig-type';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -30,22 +32,30 @@ type GetProcessorConfigs<T> = {
    */
   installed: boolean;
   /**
-   * Whether or not a config file exists for the processor
+   * Whether or not the module was loaded, ie: imported.
+   * This will be `false` until the the import was loaded.
    */
-  configFile: false | string;
+  loaded: boolean;
   /**
-   * Getter for the processor config
+   * Whether or not a config file exists for the processor,
+   * When one exists the URI path location to the file will
+   * applied as the value.
    */
-  config: T
+  file: false | string;
+  /**
+   * Configuration of the processor, Initialized with defaults
+   */
+  config: T;
 }
 
 export interface ProcessorConfigs {
-  postcss: GetProcessorConfigs<StyleProcessors['postcss']>;
-  sass: GetProcessorConfigs<StyleProcessors['sass']>;
-  sharp: GetProcessorConfigs<ImageProcessors['sharp']>;
-  sprite:GetProcessorConfigs<SVGProcessors['sprite']>;
-  svgo: GetProcessorConfigs<SVGProcessors['svgo']>
-  tsup: GetProcessorConfigs<ScriptProcessor['tsup']>
+  json: Processors['json'];
+  postcss: GetProcessorConfigs<Processors['postcss']>;
+  sass: GetProcessorConfigs<Processors['sass']>;
+  sharp: GetProcessorConfigs<Processors['sharp']>;
+  sprite:GetProcessorConfigs<Processors['sprite']>;
+  svgo: GetProcessorConfigs<Processors['svgo']>
+  esbuild: Merge<GetProcessorConfigs<ESBuildConfig>, { get tsconfig(): Tsconfig }>
 }
 
 /* -------------------------------------------- */
@@ -216,7 +226,23 @@ export interface Modes {
   /**
    * merge data from remote store, `--merge`
    */
-  push: boolean
+  push: boolean;
+  /**
+   * Run the style transform, `--style`
+   */
+  style: boolean;
+  /**
+   * Run the script transform, `--script`
+   */
+  script: boolean;
+  /**
+   * Run the svg transform, `--svg`
+   */
+  svg: boolean;
+  /**
+   * Run the image transform, `--image`
+   */
+  image: boolean;
   /**
    * Trigger export, alias: `-e`
    */
@@ -229,7 +255,7 @@ export interface Modes {
 
 export declare type Style = Merge<Transforms['style'], { input: string; watch: Tester; }>
 
-export interface Bundle {
+export interface Bundle<T = unknown> {
   /**
    * The version defined in the package.json
    */
@@ -261,11 +287,11 @@ export interface Bundle {
   /**
    * Hot reload mode options
    */
-  hot: HOT;
+  hot: T extends HOT ? T : false | Merge<HOT, { alive: boolean }>;
    /**
     * Directory structure paths
     */
-  paths: { [K in keyof Paths]: Tester };
+  paths: Paths<Tester>
    /**
     * Base directory path references
     */
@@ -308,7 +334,7 @@ export interface Bundle {
    /**
     * List of paths to watch or build from
     */
-  watch: string[];
+  watch: Set<string>
   /**
    * Section handling
    */
@@ -325,9 +351,19 @@ export interface Bundle {
     export: Markdown.Export
   }>
   /**
-   * Page handling
+   * Script handling
    */
-  style: Merge<Transforms['style'], { input: string; watch: Tester; }>[];
+  script: Merge<ScriptTransform, {
+    input: string;
+    watch: Tester;
+  }>[];
+  /**
+   * Style handling
+   */
+  style: Merge<StyleTransform, {
+    input: string;
+    watch: Tester;
+  }>[];
   /**
    * Image handling
    */
@@ -340,35 +376,23 @@ export interface Bundle {
     inline: Merge<SVGInline, { input: Tester; }>[]
   };
   /**
-   * JSON handling
-   */
-  json: Merge<Transforms['json'], {
-    exclude: Tester
-  }>;
-  /**
    * Minify Options
    */
-  minify: {
-    script: Minify['script'];
-    json: Merge<Minify['json'], { exclude: Tester }>;
-    html: Merge<Minify['html'], { exclude: Tester }>;
-    liquid: Merge<Minify['liquid'], { exclude: Tester }>;
-  };
+  get minify(): Minify
   /**
    * Processor Configurations
    */
-  processor: Merge<ProcessorConfigs, {
-    /**
-     * Process external config file paths
-     */
-    watch: Tester;
-  }>
+  get processor(): Processors
+  /**
+   * Merge users configuration with default
+   */
+  set config(config: Config)
+  /**
+   * Returns the merged configuration
+   */
+  get config(): Config;
   /**
    * Plugins
    */
-  config?: () => Config
-  /**
-   * Plugins
-   */
-  get plugins(): Plugins
+  get plugins(): Plugins;
 }

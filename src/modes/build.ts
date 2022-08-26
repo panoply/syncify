@@ -1,5 +1,5 @@
 import anymatch from 'anymatch';
-import { IFile, IPages, IStyle, Syncify } from 'types';
+import { File, Pages, StyleTransform, Syncify } from 'types';
 import { glob } from 'glob';
 import { compile as assets } from '../transform/asset';
 import { compile as liquid } from '../transform/liquid';
@@ -82,9 +82,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await styles(file as IFile<IStyle>, callback);
+      await styles(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -97,9 +97,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await liquid(file as IFile<IStyle>, callback);
+      await liquid(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -112,9 +112,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await liquid(file as IFile<IStyle>, callback);
+      await liquid(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -133,7 +133,7 @@ export async function build (callback?: Syncify) {
         await liquid(file, callback);
       }
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -146,9 +146,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await liquid(file as IFile<IStyle>, callback);
+      await liquid(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -161,9 +161,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await json(file as IFile<IStyle>, callback);
+      await json(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -176,9 +176,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await json(file as IFile<IStyle>, callback);
+      await json(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -191,9 +191,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await pages(file as IFile<IPages>, callback);
+      await pages(file as File<Pages>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -206,9 +206,9 @@ export async function build (callback?: Syncify) {
     log.changed(file);
 
     try {
-      await json(file as IFile<IStyle>, callback);
+      await json(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 
@@ -222,9 +222,9 @@ export async function build (callback?: Syncify) {
 
     try {
       log.info(c.cyan(`${file.base}`));
-      await assets(file as IFile<IStyle>, callback);
+      await assets(file as File<StyleTransform>, callback);
     } catch (error) {
-      log.error(error);
+      log.error(error, file);
     }
   }
 

@@ -1,4 +1,5 @@
 {
+  "explorer.fileNesting.enabled": false,
   "eslint.packageManager": "pnpm",
   "files.associations": {
     "*.liquid": "html",
@@ -16,8 +17,9 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     "tests": true
-    //**/node_modules": true,
-    // "**/node_modules/.syncify": false,
+    // "test": true
+    //"**/node_modules": true,
+    // "**/node_modules/.syncify": false
     //"**/example": true
   },
   "html.customData": [".vscode/icon.html-data.json"],
@@ -85,6 +87,7 @@
     "gzipsize",
     "imgmin",
     "linkify",
-    "purgecss"
+    "purgecss",
+    "Spriter"
   ]
 }

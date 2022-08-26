@@ -3,7 +3,7 @@ import { glob } from 'glob';
 import { dirname } from 'path';
 import { mapFastAsync } from 'rambdax';
 import { log, c } from '../logger';
-import { themeDirs } from '../options/dirs';
+import { setThemeDirs } from '../options/dirs';
 import { bundle } from '../options/index';
 
 /**
@@ -39,7 +39,7 @@ export async function clean () {
   log.info(`✓ removed ${c.bold(String(deleted.length))} of ${c.bold(String(size))} files`);
   log.info(`✓ cleaned ${c.bold(dirname(bundle.dirs.output) + '/**')}`);
 
-  await themeDirs(bundle.cwd);
+  await setThemeDirs(bundle.cwd);
 
   return true;
 

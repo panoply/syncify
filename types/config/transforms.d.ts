@@ -1,4 +1,4 @@
-import { ScriptProcessor, ImageProcessors, SVGProcessors, StyleProcessors } from './processors';
+import { Processors } from './processors';
 
 export interface SVGInline {
   /**
@@ -16,7 +16,7 @@ export interface SVGInline {
   type: 'inline';
   /**
    * Rename the svg file - The same name as source file will be used
-   * undefined.
+   * when undefined.
    *
    * @default null
    *
@@ -42,7 +42,7 @@ export interface SVGInline {
    *
    * @default true // false if SVGO is not installed
    */
-  svgo?: false | SVGProcessors['svgo']
+  svgo?: false | Processors['svgo']
 }
 
 export interface SVGSprite {
@@ -69,7 +69,7 @@ export interface SVGSprite {
    * 'source/svgs/sprite/*.svg' => 'sprite.svg' // if snippet is false
    * 'source/svgs/sprite/*.svg' => 'sprite.liquid' // if snippet is true
    */
-  rename: string;
+  rename?: string;
   /**
    * Whether to generate sprite as snippet or write
    * as an `.svg` file to `theme/assets`.
@@ -89,7 +89,7 @@ export interface SVGSprite {
    *
    * @default true // false if SVG Sprite is not installed
    */
-  sprite?: boolean | SVGProcessors['sprite']
+  sprite?: boolean | Processors['sprite']
 }
 
 /* -------------------------------------------- */
@@ -131,13 +131,10 @@ export interface ImageTransform {
    *
    * @default true // false if Sharp is not installed
    */
-  sharp?: boolean | ImageProcessors['sharp']
+  sharp?: boolean | Processors['sharp']
 }
 
-/**
- * ESBuild processing transform
- */
-export interface ScriptTransfrom {
+export interface ScriptTransform {
   /**
    * JS/TS inputs source paths - Must be defined!
    *
@@ -145,8 +142,7 @@ export interface ScriptTransfrom {
    */
   input: string | string[];
   /**
-   * Rename the input file - This will be passed to esbuilds `entryNames`
-   * option, so `[dir]/[name]-[hash]` placeholders are supported.
+   * Rename the script file
    *
    * @default null
    */
@@ -160,13 +156,21 @@ export interface ScriptTransfrom {
    */
   snippet?: boolean;
   /**
-   * TSUP Processor - Skip processing by passing boolean `false`. If TSUP
+   * Entry points (paths/files) to watch that will trigger a rebuilds of
+   * the define _input_ file. By default, Syncify will watch all import entries
+   * included in the _input_.
+   *
+   * @default []
+   */
+  watch?: string[];
+  /**
+   * ESBuild Processor - Skip processing by passing boolean `false`. If ESBuild
    * is installed then this will default to `true` and use default processing
    * options.
    *
-   * @default true // false if tsup is not installed
+   * @default false // true if esbuild is installed
    */
-  tsup?: boolean | ScriptProcessor['tsup']
+  esbuild?: boolean | Processors['esbuild'];
 }
 
 /**
@@ -209,9 +213,9 @@ export interface StyleTransform {
    * > Optionally you can override PostCSS processor configurations on a
    * per-transform basis.
    *
-   * @default true // false if tsup is not installed
+   * @default false // true if postcss is installed
    */
-  postcss: boolean | StyleProcessors['postcss'];
+  postcss: boolean | Processors['postcss'];
   /**
    * SASS Dart Processor - Skip processing by passing boolean `false`. If SASS
    * is installed then this will default to `true` and use default processing
@@ -220,44 +224,7 @@ export interface StyleTransform {
    * > Optionally you can override SASS processor configurations on a
    * per-transform basis.
    *
-   * @default true // false if tsup is not installed
+   * @default false // true if sass is installed
    */
-  sass: boolean | StyleProcessors['sass'];
-}
-
-/**
- * JSON File processing - Options defined here are used when
- * writing to the file system. Typically in operations like
- * `--merge`, `--pull` and `--download`.
- *
- * > The options will also be used in **development** (`dev`)
- * mode when uploading `.json` files to stores/themes.
- */
-export interface JSONTransform {
-  /**
-   * The indentation level
-   *
-   * @default 2
-   */
-  indent?: number;
-  /**
-   * Whether to use `\t` identation characters.
-   *
-   * @default false
-   */
-  useTab?: boolean;
-  /**
-   * If line termination should be Windows (CRLF) format.
-   * Unix (LF) format is the default.
-   *
-   * @default false
-   */
-  crlf?: boolean;
-  /**
-   * An optional string list of paths/filenames to exclude
-   * from processing, ie: pass through
-   *
-   * @default false
-   */
-  exclude?: string[]
+  sass: boolean | Processors['sass'];
 }

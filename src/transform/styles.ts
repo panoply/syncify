@@ -1,12 +1,12 @@
 import type { Processor } from 'postcss';
-import { File, StyleTransform, Syncify, StyleProcessors } from 'types';
+import { File, StyleTransform, Syncify, Processors } from 'types';
 import { compile, Logger } from 'sass';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
 import { isFunction, isString, isUndefined, isBuffer, nl } from '../shared/native';
-import { byteSize } from '../shared/utils';
+import { byteSize, fileSize } from '../shared/utils';
 import { log, c } from '../logger';
-import { bundle, cache } from '../options/index';
+import { bundle, cache, processor } from '../options/index';
 import * as timer from '../process/timer';
 
 /**
@@ -51,7 +51,13 @@ function write (file: File<StyleTransform>, cb: Syncify) {
 
     writeFile(file.output, data, (e) => e ? console.log(e) : null);
 
-    log.filesize(file, data);
+    const { isSmaller, after, before, gzip, saved } = fileSize(data, file.size);
+
+    if (isSmaller) {
+      log.transform(`${c.bold('CSS')} ${before} → gzip ${gzip}`);
+    } else {
+      log.transform(`${c.bold('CSS')} minified ${before} to ${after} ${c.gray(`~ saved ${saved}`)}`);
+    }
 
     return content;
 
@@ -62,8 +68,10 @@ async function sass (file: File<StyleTransform>) {
 
   const { config } = file;
   const opts = config.sass === true
-    ? bundle.processor.sass
-    : config.sass as StyleProcessors['sass'];
+    ? processor.sass.config
+    : config.sass as Processors['sass'];
+
+  // console.log(opts);
 
   if (file.ext === '.scss' || file.ext === '.sass') {
 
@@ -74,11 +82,9 @@ async function sass (file: File<StyleTransform>) {
       log.hook('sass');
 
       const { css, sourceMap } = compile(file.input, {
-        sourceMapIncludeSources: false,
-        style: opts.style,
-        quietDeps: opts.warnings,
-        sourceMap: opts.sourcemap,
+        ...opts,
         loadPaths: opts.includePaths,
+        sourceMapIncludeSources: false,
         logger: opts.warnings ? Logger.silent : {
           debug: msg => console.log('DEBUG', msg),
           warn: (msg, opts) => {
@@ -91,9 +97,7 @@ async function sass (file: File<StyleTransform>) {
         writeFile(`${cache.styles.uri + file.base}.map`, JSON.stringify(sourceMap)).catch(e => log.warn(e));
       }
 
-      if (bundle.mode.watch) {
-        log.compile(`compiled ${c.bold('sass')} to ${c.bold('css')} ${c.gray(`~ ${timer.stop()}`)}`);
-      }
+      if (bundle.mode.watch) log.process(`${c.bold('SASS Dart')}`, timer.stop());
 
       log.unhook();
 
@@ -118,7 +122,7 @@ async function sass (file: File<StyleTransform>) {
 
   try {
 
-    const css = await readFile(opts.input);
+    const css = await readFile(file.input);
     file.size = byteSize(css);
 
     return {
@@ -156,9 +160,7 @@ async function postcss (file: File<StyleTransform>, css: string, map: any) {
       map: map ? { prev: map, inline: false } : null
     });
 
-    if (bundle.mode.watch) {
-      log.compile(`processed ${c.bold('css')} with ${c.bold('postcss')} ${c.gray(`~ ${timer.stop()}`)}`);
-    }
+    if (bundle.mode.watch) log.process(`${c.bold('PostCSS')}`, timer.stop());
 
     const warn = result.warnings();
 
@@ -201,7 +203,7 @@ export async function styles (file: File<StyleTransform>, cb: Syncify): Promise<
 
   const output = write(file, cb);
 
-  // console.log(file);
+  // console.log(file.config, bundle.processors.sass);
 
   try {
 

@@ -55,6 +55,11 @@ export const is = Object.is;
 export const from = Array.from;
 
 /**
+ * To Buffer
+ */
+export const toBuffer = Buffer.from;
+
+/**
  * Native isArray Methods
  */
 export const isArray = Array.isArray;

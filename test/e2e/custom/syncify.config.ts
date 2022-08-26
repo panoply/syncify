@@ -3,13 +3,21 @@ import autoprefix from 'autoprefixer';
 // import icons from '@syncify/plugin-icons';
 
 export default defineConfig({
+  clean: false,
   input: 'src',
   output: 'dist',
   stores: {
     domain: 'syncify',
-    themes: { custom: 129457717489 }
+    themes: {
+      custom: 129457717489
+    }
   },
-  hot: { hidePreview: true },
+  hot: {
+    labels: true,
+    reload: 'hot',
+    inject: true,
+    layouts: ['layout.liquid']
+  },
   paths: {
     assets: 'assets/images/*',
     config: 'data/settings/*',
@@ -20,51 +28,48 @@ export default defineConfig({
     customers: 'views/customer/*',
     templates: 'views/*.liquid',
     snippets: 'views/include/*',
-    sections: [
-      'views/layout/*',
-      'views/sections/**/*'
-    ]
-  },
-  spawn: {
-    watch: {
-      esbuild: 'esbuild src/scripts/bundle.ts --outfile=dist/assets/esbuild-bundle.js --bundle --watch --color=true'
-    }
+    sections: ['views/layout/*', 'views/sections/**/*']
   },
   views: {
     sections: {
       prefixDir: true,
       separator: '-',
-      global: [
-        'layout',
-        'collection',
-        'product',
-        'index'
-      ]
+      global: ['layout', 'collection', 'product', 'index']
     },
     pages: {
       language: 'markdown',
       author: 'Syncify'
     }
   },
-  processor: {
-    style: {
-      sass: {
-        warnings: false,
-        sourcemap: true,
-        style: 'expanded'
-      },
-      postcss: [
-        autoprefix()
-      ]
-    },
-    svg: {
-      svgo: {
-      },
-      sprite: {
-      }
-    }
-  },
   transforms: {
+    script: {
+      'assets/bundle.min.js': 'scripts/bundle.ts',
+      'assets/lazysizes.min.js': 'scripts/modules/lazysizes.ts',
+      'assets/[file]-[dir].min': ['scripts/components/*.ts'],
+      'snippets/[dir]-[file]': ['scripts/globs/*.ts'],
+      'assets/globs.min.js': {
+        input: 'scripts/globs.ts',
+        format: 'iife'
+      }
+    },
+    style: {
+      'assets/stylesheet.min.css': {
+        input: 'styles/stylesheet.scss',
+        watch: ['styles/sections/*'],
+        postcss: true,
+        sass: true
+      },
+      'snippets/css.liquid': {
+        input: 'styles/vars.css.liquid',
+        postcss: true,
+        sass: true
+      },
+      'snippets/testing.css': {
+        input: 'styles/snippet.css',
+        postcss: true,
+        sass: false
+      }
+    },
     svg: [
       {
         input: 'icons/social/*',
@@ -90,30 +95,27 @@ export default defineConfig({
     ],
     image: {
       input: 'assets/images/*'
-    },
-    style: [
-      {
-        input: 'styles/stylesheet.scss',
-        snippet: false,
-        rename: '[file].min.css',
-        postcss: true,
-        watch: [ 'styles/**', '!styles/vars.css.liquid' ],
-        sass: {
-          warnings: false,
-          sourcemap: true,
-          style: 'compressed',
-          includePaths: [ 'node_modules' ]
-        }
-      },
-      {
-        input: 'styles/vars.css.liquid',
-        snippet: true,
-        postcss: false,
-        sass: false
-      }
-    ]
+    }
   },
-  plugins: [
-
-  ]
+  processors: {
+    esbuild: {},
+    sprite: {
+      svg: {
+        dimensionAttributes: true,
+        namespaceClassnames: true,
+        namespaceIDs: true,
+        rootAttributes: {
+          id: 'icons',
+          class: 'd-none'
+        }
+      }
+    },
+    sass: {
+      sourcemap: true,
+      style: 'compressed',
+      includePaths: ['node_modules/']
+    },
+    postcss: [autoprefix()]
+  },
+  plugins: []
 });

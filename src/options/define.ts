@@ -1,12 +1,12 @@
-
-import { anyTrue, isNil, has, uniq, includes, forEach } from 'rambdax';
+import { Commands, Config, Package, Bundle, Modes, HOT } from 'types';
+import { anyTrue, isNil, has, includes, forEach } from 'rambdax';
+import merge from 'mergerino';
 import { join } from 'path';
-import { Commands, Config, Package, Bundle, Modes, Directories } from 'types';
-import { pathExists, readJson } from 'fs-extra';
+import { pathExists, readFile, readJson, writeFile } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { isArray, keys, is, assign, nil, log, isString, isObject, ws, values } from '../shared/native';
-import { basePath, normalPath } from '../shared/paths';
+import { isArray, keys, is, assign, nil, log, isString, isObject, ws, nl } from '../shared/native';
+import { normalPath } from '../shared/paths';
 import { authURL } from '../shared/options';
 import { logHeader } from '../logger/heading';
 import { spawn } from '../logger/console';
@@ -15,13 +15,18 @@ import { kill } from '../cli/exit';
 import { nwl, clear } from '../cli/tui';
 import { gray } from '../cli/ansi';
 import { queue } from '../requests/queue';
-import { configFile, pkgJson, rcFile } from './files';
-import { cacheDirs, importDirs, themeDirs } from './dirs';
-import { SVGOptions, jsonOptions, sectionOptions } from './transforms';
-import { styleOptions } from './style';
-import { minifyOptions } from './minify';
-import { bundle, update, defaults, cache, minify, plugins } from './index';
-import { typeError } from './validate';
+import { configFile, getPackageJson } from './files';
+import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from './dirs';
+import { setJsonOptions, setViewOptions } from './transforms';
+import { setScriptOptions } from './script';
+import { setStyleConfig } from './style';
+import { setMinifyOptions } from './minify';
+import { bundle, cache, processor, plugins, config } from '.';
+import { typeError, invalidError, missingConfig, throwError } from './validate';
+import { PATH_KEYS } from '../constants';
+import { inject } from '../hot/inject';
+import { glob } from 'glob';
+import { getResolvedPaths } from './utilities';
 
 /* -------------------------------------------- */
 /* EXIT HANDLER                                 */
@@ -59,98 +64,160 @@ export async function define (cli: Commands, _options?: Config) {
 
   clear();
 
-  const mode = modes(cli);
-  const pkg = await pkgJson(cli.cwd);
-  const config = await getConfig(pkg, cli);
+  const pkg = await getPackageJson(cli.cwd);
 
-  update.bundle({
-    mode,
-    config: () => config,
-    version: pkg.version,
-    cli: cli.cli,
-    cwd: cli.cwd,
-    silent: cli.silent,
-    prod: cli.prod,
-    dev: cli.dev && !cli.prod,
-    minify: anyTrue(cli.prod, cli.minify)
-      ? bundle.minify
-      : minify as any
-  });
+  bundle.config = await getConfig(pkg, cli);
+  bundle.mode = setModes(cli);
+  bundle.cli = cli.cli;
+  bundle.version = pkg.version;
+  bundle.cwd = cli.cwd;
+  bundle.silent = cli.silent;
+  bundle.prod = cli.prod;
+  bundle.dev = cli.dev && !cli.prod;
 
   // env variables
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
-  const promise = await Promise.allSettled(
-    [
-      baseDirs(cli, config),
-      caches(cli.cwd),
-      getStores(cli, config),
-      themeDirs(bundle.dirs.output),
-      importDirs(bundle),
-      getPaths(config),
-      setProcessors(config, bundle),
-      minifyOptions(config),
-      sectionOptions(config),
-      jsonOptions(config),
-      styleOptions(config, pkg),
-      SVGOptions(config, pkg),
-      setSpawns(config.spawn, bundle),
-      loadPlugins(config, bundle)
-    ]
-  );
+  const promise = await Promise.all([
+    setBaseDirs(cli, config),
+    setCaches(bundle.cwd),
+    setThemeDirs(bundle.dirs.output),
+    setImportDirs(bundle),
+    setStores(cli, config),
+    setPaths(config),
+    setProcessors(config),
+    setMinifyOptions(config),
+    setViewOptions(config),
+    setJsonOptions(config),
+    setScriptOptions(config, pkg),
+    setStyleConfig(config, pkg),
+    setSpawns(config, bundle),
+    setHotReloads(cli, config),
+    setPlugins(config, bundle)
+  ]);
 
-  logHeader(bundle);
+  log(logHeader(bundle));
 
   return promise;
 
 };
 
-function setProcessors (config: Config, bundle: Bundle) {
+async function setHotReloads (cli: Commands, config: Config) {
 
-  forEach(processor => {
+  if (anyTrue(cli.hot, config.hot, isObject(config.hot))) {
+    bundle.hot = config.hot;
+  }
 
-    forEach((name: keyof Bundle['processor']) => {
+  const file = await readFile(join(bundle.cwd, 'node_modules/@syncify/cli/hot.txt'));
 
-      if (has(name, bundle.processor) && name !== 'watch') {
-        bundle.processor[name].config = processor[name];
-      }
+  if (typeof config.hot === 'object') {
 
-    }, keys(processor));
+    const snippet = [
+      '<script>',
+      inject(config.hot.server || 3000, config.hot.socket || 8089),
+      file.toString() + '</script>'
+    ].join(nl);
 
-  }, values(config.processor));
+    const paths: { snippet: string; layouts: string[] } = {
+      snippet: join(bundle.dirs.output, 'snippets', 'hot.liquid'),
+      layouts: []
+    };
 
+    const loc = getResolvedPaths(bundle.hot.layouts);
+
+    for (const layout of loc) {
+
+      const read = await readFile(layout);
+      const dom = read.toString();
+      const idx = dom.indexOf('<head>') + 6;
+      const inject = dom.slice(0, idx) + '\n{%- render "hot" -%}\n' + dom.slice(idx);
+
+      // await writeFile(layout, inject);
+    }
+
+    // await writeFile(join(config.paths.snippets, 'hot.liquid'), snippet);
+
+  }
 }
 
-function loadPlugins (config: Config, bundle: Bundle) {
+/**
+ * Set Processors
+ *
+ * Merges processor defaults with defaults provided
+ * in configuration.
+ */
+function setProcessors (config: Config) {
+
+  for (const prop in config.processors) {
+    processor[prop].config = isArray(config.processors[prop])
+      ? config.processors[prop]
+      : assign(processor[prop].config, config.processors[prop]);
+  }
+
+};
+
+/**
+ * Set Plugins
+ *
+ * Sets and constructs the Syncify plugin model of all
+ * plugins defined in the configuration.
+ */
+function setPlugins (config: Config, bundle: Bundle) {
 
   if (!has('plugins', config)) return;
-
   if (!isArray(config.plugins)) return; // TODO: Throw error if not array
 
   for (const plugin of config.plugins) {
 
-    const { name } = plugin;
-
     if (has('onInit', plugin)) plugin.onInit.call({ ...bundle }, config);
 
-    if (has('onChange', plugin)) plugins.onChange.push([ name, plugin.onChange ]);
-    if (has('onTransform', plugin)) plugins.onTransform.push([ name, plugin.onTransform ]);
+    if (has('onChange', plugin)) {
+      plugins.onChange.push([
+        plugin.name,
+        plugin.onChange
+      ]);
+    }
+
+    if (has('onTransform', plugin)) {
+      plugins.onTransform.push([
+        plugin.name,
+        plugin.onTransform
+      ]);
+    }
 
     if (bundle.mode.watch) {
-      if (has('onWatch', plugin)) plugins.onWatch.push([ name, plugin.onWatch ]);
-      if (has('onReload', plugin)) plugins.onReload.push([ name, plugin.onReload ]);
+
+      if (has('onWatch', plugin)) {
+        plugins.onWatch.push([
+          plugin.name,
+          plugin.onWatch
+        ]);
+      }
+
+      if (has('onReload', plugin)) {
+        plugins.onReload.push([
+          plugin.name,
+          plugin.onReload
+        ]);
+      }
     }
 
     if (bundle.mode.build) {
-      if (has('onBuild', plugin)) plugins.onBuild.push([ name, plugin.onBuild ]);
+      if (has('onBuild', plugin)) {
+        plugins.onBuild.push([
+          plugin.name,
+          plugin.onBuild
+        ]);
+      }
     }
+
   }
 
-}
+};
 
 /**
- * Define Spawn
+ * Set Spawns
  *
  * Invokes the spawned processes. The `spawn()` function
  * parameter passed in `spawned()` returns a function located
@@ -159,31 +226,40 @@ function loadPlugins (config: Config, bundle: Bundle) {
  *
  * > See the `cli/spawn.ts` which is used to normalize the log output.
  */
-function setSpawns (config: Config['spawn'], bundle: Bundle) {
+function setSpawns (config: Config, bundle: Bundle) {
 
-  if (!isObject(config)) return typeError('spawn', 'spawn', config, '{ build: {}, watch: {} }');
+  if (!has('spawn', config) || isNil(config.spawn)) return;
+
+  if (!isObject(config.spawn)) {
+    typeError('config', 'spawn', config.spawn, '{ build: {}, watch: {} }');
+  }
 
   let mode: 'build' | 'watch' = null;
 
-  if (bundle.mode.build && has('build', config)) mode = 'build';
-  if (bundle.mode.watch && has('watch', config)) mode = 'watch';
+  if (bundle.mode.build && has('build', config.spawn)) mode = 'build';
+  if (bundle.mode.watch && has('watch', config.spawn)) mode = 'watch';
+  if (isNil(mode) || isNil(config.spawn[mode])) return;
 
-  if (isNil(mode)) return;
-  if (!isObject(config[mode])) return typeError('spawn', 'build', config.build, 'string | string[]');
+  if (!isObject(config.spawn[mode])) {
+    typeError('spawn', mode, config.spawn.build, 'string | string[]');
+  }
 
-  console.log(mode);
-  const props = keys(config[mode]);
+  const props = keys(config.spawn[mode]);
 
   if (props.length === 0) return;
 
-  for (const name of props) {
+  forEach(name => {
 
-    const command = config[mode][name];
+    const command = config.spawn[mode][name];
 
     if (isString(command)) {
 
       // create the command model
-      bundle.spawn.commands[name] = { cmd: nil, args: [], pid: NaN };
+      bundle.spawn.commands[name] = {
+        cmd: nil,
+        args: [],
+        pid: NaN
+      };
 
       // convert to an array
       const cmd = (command as string).trimStart().indexOf(ws) > -1
@@ -204,23 +280,24 @@ function setSpawns (config: Config['spawn'], bundle: Bundle) {
       spawned(name, bundle.spawn.commands[name], spawn(name));
 
     } else {
-      typeError('spawn', mode, config[mode], 'string | string[]');
+      typeError('spawn', mode, config.spawn[mode], 'string | string[]');
     }
 
-  }
+  }, keys(config.spawn[mode]));
 
-}
+};
 
 /**
- * Define Mode
+ * Set Mode
  *
  * Identifies the execution modes which Syncify should
  * invoke. Validates the CLI flags and options to determine
  * the actions to be run.
  */
-function modes (cli: Commands) {
+function setModes (cli: Commands) {
 
   const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
+  const transfrom = anyTrue(cli.style, cli.script, cli.image, cli.svg);
 
   return <Modes>{
     vsc: cli.vsc,
@@ -232,12 +309,26 @@ function modes (cli: Commands) {
     prompt: cli.prompt,
     pull: cli.pull,
     push: cli.push,
+    script: transfrom
+      ? cli.script
+      : false,
+    style: transfrom
+      ? cli.style
+      : false,
+    image: transfrom
+      ? cli.image
+      : false,
+    svg: transfrom
+      ? cli.svg
+      : false,
     clean: anyTrue(
       resource,
+      transfrom,
       cli.upload
     ) ? false : cli.clean,
     build: anyTrue(
       resource,
+      transfrom,
       cli.upload,
       cli.watch,
       cli.download
@@ -249,35 +340,35 @@ function modes (cli: Commands) {
     ) ? false : cli.watch,
     upload: anyTrue(
       resource,
+      transfrom,
       cli.download,
       cli.watch
     ) ? false : cli.upload,
     download: anyTrue(
       resource,
+      transfrom,
       cli.upload,
       cli.watch,
       cli.build
     ) ? false : cli.download
   };
-}
+};
 
 /**
- * Cache Maps
+ * Set Cache
  *
- * Resolves the cache mapping records, which will
- * exist within the `node_modules/.syncify` directory.
- * This file holds important information about the users
- * project. If no maps are found, they will be generated.
- *
- * > The cache maps are generated via `postinstall`
+ * Resolves the cache mapping records, which will exist within
+ * the `node_modules/.syncify` directory. This file holds important
+ * information about the users project. If no maps are found, they
+ * will be generated.
  */
-async function caches (cwd: string) {
+async function setCaches (cwd: string) {
 
   const dir = join(cwd, 'node_modules/.syncify');
   const map = join(dir, 'store.map');
   const has = await pathExists(map);
 
-  if (!has) return cacheDirs(dir);
+  if (!has) return setCacheDirs(dir);
 
   bundle.dirs.cache = `${dir}/`;
   const read = await readJson(map);
@@ -286,21 +377,22 @@ async function caches (cwd: string) {
 
 };
 
+/**
+ * Get Config
+ *
+ * Resolves the `syncify.config.js` file or configuration
+ * property contained in the _package.json_ file.
+ */
 async function getConfig (pkg: Package, cli: Commands) {
 
-  const config = await configFile(cli.cwd);
+  const options = await configFile(cli.cwd);
 
-  if (config !== null) return defaults(config);
+  if (options !== null) return merge(config, options);
+  if (has('syncify', pkg)) return merge(config, pkg.syncify);
 
-  if (has('syncify', pkg)) return defaults(pkg.syncify);
+  missingConfig(cli.cwd);
 
-  const rccfg = await rcFile(bundle.cwd);
-
-  if (rccfg !== null) return defaults(rccfg);
-
-  throw new Error('Missing Configuration');
-
-}
+};
 
 /**
  * Resolve Stores
@@ -309,7 +401,7 @@ async function getConfig (pkg: Package, cli: Commands) {
  * and `.env` file locations relative to the current
  * working directory.
  */
-export async function getStores (cli: Commands, config: Config) {
+export function setStores (cli: Commands, config: Config) {
 
   if (is(cli._.length, 0)) return;
 
@@ -319,7 +411,7 @@ export async function getStores (cli: Commands, config: Config) {
   const items = array.filter(({ domain }) => includes(domain, stores));
   const queue = items.length > 1;
 
-  for (const store of items) {
+  forEach(store => {
 
     // The myshopify store domain
     const domain = `${store.domain}.myshopify.com`.toLowerCase();
@@ -340,7 +432,7 @@ export async function getStores (cli: Commands, config: Config) {
 
     // skip theme reference generation if within these resource based modes
     // we do not need context of themes if such modes were initialized by cli
-    if (bundle.mode.metafields || bundle.mode.pages) continue;
+    if (bundle.mode.metafields || bundle.mode.pages) return;
 
     // Lets parse the theme target names
     const themes: string[] = has('theme', cli)
@@ -349,11 +441,9 @@ export async function getStores (cli: Commands, config: Config) {
         ? cli[store.domain].split(',')
         : keys(store.themes);
 
-    for (const target of themes) {
+    forEach(target => {
 
-      if (!has(target, store.themes)) {
-        throw new Error(`Missing theme target "${target}" in ${store.domain} store.`);
-      }
+      if (!has(target, store.themes)) invalidError('theme', 'target', target, 'string');
 
       // Let populate the model with theme
       bundle.sync.themes.push({
@@ -363,58 +453,17 @@ export async function getStores (cli: Commands, config: Config) {
         id: store.themes[target],
         url: `/themes/${store.themes[target]}/assets.json`
       });
-    }
 
+    }, themes);
+
+  }, items);
+
+  if (bundle.sync.stores.length === 0) {
+    throwError(
+      'Unknown, missing or invalid store/theme targets',
+      'Check your store config'
+    );
   }
-
-  if (is(bundle.sync.stores.length, 0)) {
-    throw new Error('Unknown, missing or invalid store/theme targets');
-  }
-
-};
-
-/**
- * Base Directories
- *
- * Generates the base directory paths. The function
- * also normalizes paths to ensure the mapping is
- * correct.
- */
-function baseDirs (cli: Commands, config: Config) {
-
-  const base = basePath(cli.cwd);
-
-  for (const [ dir, def ] of [
-    [ 'input', 'source' ],
-    [ 'output', 'theme' ],
-    [ 'export', 'export' ],
-    [ 'import', 'import' ],
-    [ 'config', '.' ]
-  ]) {
-
-    let path: string | string[];
-
-    if (cli[dir] === def) {
-      if (config[dir] === def) {
-        bundle.dirs[dir] = base(cli[dir]);
-        continue;
-      } else {
-        path = config[dir];
-      }
-    } else {
-      path = cli[dir];
-    }
-
-    if (isArray(path)) {
-      const roots = uniq(path.map(base));
-      bundle.dirs[dir] = is(roots.length, 1) ? roots[0] : roots;
-    } else {
-      bundle.dirs[dir] = base(path);
-    }
-  }
-
-  // add config file to watch
-  bundle.watch.push(bundle.file);
 
 };
 
@@ -426,26 +475,13 @@ function baseDirs (cli: Commands, config: Config) {
  * defines the build directory input in directory paths
  * it will ensure it is formed correctly.
  */
-export async function getPaths (config: Config) {
+export async function setPaths (config: Config) {
 
   // Path normalize,
   const path = normalPath(bundle.dirs.input);
 
-  // iterate over the define path mappings
-  for (const key of [
-    'assets',
-    'styles',
-    'config',
-    'layout',
-    'customers',
-    'locales',
-    'sections',
-    'snippets',
-    'templates',
-    'metafields',
-    'pages',
-    'redirects'
-  ]) {
+  // iterate over the defined path mappings
+  for (const key of PATH_KEYS) {
 
     let uri: string[];
 
@@ -475,7 +511,7 @@ export async function getPaths (config: Config) {
 
     }
 
-    bundle.watch.push(...uri);
+    uri.forEach(p => bundle.watch.add(p));
     bundle.paths[key] = anymatch(uri);
 
   }

@@ -238,7 +238,7 @@ export interface Syncify {
    * **NOT YET AVAILABLE**
    */
   (options?: PartialDeep<Config>): Resources
- /**
+  /**
    * Theme resource
    *
    * **NOT YET AVAILABLE**

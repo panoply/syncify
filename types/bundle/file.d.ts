@@ -2,7 +2,28 @@
 
 import { ParsedPath } from 'path';
 import { LiteralUnion } from 'type-fest';
-import type { Type as Types } from '../../lib/process/files';
+
+/**
+ * File types are represented as numeric values.
+ * The infer the following:
+ */
+export enum Types {
+  Template = 1,
+  Layout,
+  Snippet,
+  Section,
+  Config,
+  Locale,
+  Style,
+  Script,
+  Redirect,
+  File,
+  Svg,
+  Asset,
+  Metafield,
+  Page,
+  Spawn
+}
 
 /**
  * File Kinds - Applied to `file.kind` context.
@@ -84,7 +105,7 @@ export type FileResources = LiteralUnion<
  * resource and used to dispatch to correct transform
  * process.
  */
-interface File<T = unknown, Type = Types> extends ParsedPath {
+interface File<T = unknown> extends ParsedPath {
   /**
    * The file type that was intercepted. This is an enum number value.
    * The number value will infer on how the file should be handled.
@@ -93,7 +114,7 @@ interface File<T = unknown, Type = Types> extends ParsedPath {
    *
    * 1
    */
-  type: Type;
+  type: number;
   /**
    * The resource endpoint to which the file will be published
    *

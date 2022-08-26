@@ -1,7 +1,8 @@
 import { Bundle } from 'types';
+import { basename } from 'node:path';
 import { allFalse, anyTrue } from 'rambdax';
 import { getTime, toUpcase } from '../shared/utils';
-import { log, keys, nil, values, nl, ws, from } from '../shared/native';
+import { keys, nil, values, nl, ws, from } from '../shared/native';
 import { spawns } from '../cli/spawn';
 import * as c from '../cli/ansi';
 import { warnings } from '../options/validate';
@@ -25,14 +26,19 @@ import { warnings } from '../options/validate';
  * │ esbuild:  12345 (pid)
  * │ tailwind: 12345 (pid)
  * │
+ * │ Theme Editor:
+ * │
+ * │ dev:  https://shop.myshopify.com/admin/themes/123456789/editor
+ * │ prod: https://shop.myshopify.com/admin/themes/123456789/editor
+ * │
  * │ Theme Previews:
  * │
- * │ Dev:  https://shop.myshopify.com?preview_theme_id=123456789
- * │ Prod: https://shop.myshopify.com?preview_theme_id=123456789
+ * │ dev:  https://shop.myshopify.com?preview_theme_id=123456789
+ * │ prod: https://shop.myshopify.com?preview_theme_id=123456789
  * │
- * │ Asset Reloading:
+ * │ Live Reloading:
  * │
- * │ Local:    http://localhost:8080
+ * │ Assets:   http://localhost:8080
  * │ External: http://192.168.2.8:8080
  * │
  * │ Warnings:
@@ -44,32 +50,27 @@ import { warnings } from '../options/validate';
  * │
  * ```
  */
-export const logHeader = (bundle: Bundle) => {
+export function logHeader (bundle: Bundle) {
 
-  /**
-   * The generated log message
-   */
-  let message = nil;
+  const text: string[] = [];
 
-  if (bundle.mode.metafields) return message;
+  if (bundle.mode.metafields) return nil;
 
-  message += `${c.open}${c.pink.bold('SYNCIFY')} ${c.gray('~')} ${c.gray(getTime())}`;
-  message += `${c.newline}${c.line}${c.whiteBright.bold(`v${bundle.version}`)}${c.newline}`;
+  text.push(
+    `${c.open}${c.gray('Syncify')} ${c.gray('~')} ${c.gray(getTime())}`,
+    `${c.line}`,
+    `${c.line}${c.whiteBright.bold(`v${bundle.version}`)}`,
+    `${c.line}`
+  );
 
-  /**
-   * Plural Store/s
-   */
-  const SL = bundle.sync.stores.length;
+  /** Plural store/s length */
+  const _st = bundle.sync.stores.length;
 
-  /**
-   * Plural Theme/s
-   */
-  const TL = keys(bundle.sync.themes).length;
+  /** Plural theme/s length */
+  const _th = keys(bundle.sync.themes).length;
 
-  /**
-   * Plural Spawns/s
-   */
-  const PL = keys(bundle.spawn.commands).length;
+  /** Plural spawns/s length */
+  const _ss = keys(bundle.spawn.commands).length;
 
   /* -------------------------------------------- */
   /* BEGIN                                        */
@@ -77,43 +78,37 @@ export const logHeader = (bundle: Bundle) => {
 
   const { mode } = bundle;
 
-  /**
-   * Prints store, eg: `1 store` or `2 stores`
-   */
-  const stores = c.cyan.bold(String(SL)) + (SL > 1 ? ' stores' : ' store');
+  /** Prints store, eg: `1 store` or `2 stores` */
+  const stores = c.cyan.bold(String(_st)) + (_st > 1 ? ' stores' : ' store');
 
-  /**
-   * Prints theme, eg: `1 theme` or `2 themes`
-   */
-  const themes = c.cyan.bold(String(TL)) + (TL > 1 ? ' themes' : ' theme');
+  /** Prints theme, eg: `1 theme` or `2 themes` */
+  const themes = c.cyan.bold(String(_th)) + (_th > 1 ? ' themes' : ' theme');
 
-  /**
-   * Prints Environment, eg: `(development)` or `(production)`
-   */
+  /** Prints Environment, eg: `(development)` or `(production)` */
   const env = c.cyan.bold(`${bundle.dev ? 'development' : 'production'}`);
 
   if (mode.build) {
-    message += `${c.line}Running ${c.cyan.bold('build')} in ${env}`;
+    text.push(`${c.line}Running ${c.cyan.bold('build')} in ${env}`);
   } else if (mode.watch) {
-    message += `${c.line}Running ${c.cyan.bold('watch')} in ${env}`;
+    text.push(`${c.line}Running ${c.cyan.bold('watch')} in ${env}`);
   } else if (mode.upload) {
-    message += `${c.line}Running ${c.cyan.bold('upload')} mode`;
+    text.push(`${c.line}Running ${c.cyan.bold('upload')} mode`);
   } else if (mode.download) {
-    message += `${c.line}Running ${c.cyan.bold('download')} mode`;
+    text.push(`${c.line}Running ${c.cyan.bold('download')} mode`);
   } else if (mode.vsc) {
-    message += `${c.line}Generate ${c.cyan.bold('vscode')} schemas`;
+    text.push(`${c.line}Generate ${c.cyan.bold('vscode')} schema`);
   } else if (mode.clean) {
-    message += `${c.line}Running ${c.cyan.bold('clean')} mode`;
+    text.push(`${c.line}Running ${c.cyan.bold('clean')} mode`);
   } else if (mode.export) {
-    message += `${c.line}Running ${c.cyan.bold('export')} mode`;
+    text.push(`${c.line}Running ${c.cyan.bold('export')} mode`);
   }
 
-  message += `${nl}${(SL > 0 && TL > 0 ? c.line + `Syncing ${themes} to ${stores}${nl}` : nil)}`;
+  text.push(`${c.line}${(_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : nil)}`);
 
-  if (anyTrue(mode.build, mode.watch) && PL > 0) {
-    message += `${c.line}Spawned ${c.cyan.bold(`${PL}`)} child ${PL > 1 ? 'processes' : 'process'}${nl}`;
+  if (anyTrue(mode.build, mode.watch) && _ss > 0) {
+    text.push(`Spawned ${c.cyan.bold(`${_ss}`)} child ${_ss > 1 ? 'processes' : 'process'}${nl}`);
   } else {
-    message += c.line;
+    text.push(c.line);
   }
 
   if (allFalse(
@@ -128,7 +123,7 @@ export const logHeader = (bundle: Bundle) => {
     /* CHILD PROCESSES                              */
     /* -------------------------------------------- */
 
-    if (PL > 0) {
+    if (_ss > 0) {
 
       const spwns = from(spawns);
       const width = spwns.reduce((size, [ name ]) => (name.length > size ? name.length : size), 0);
@@ -140,26 +135,44 @@ export const logHeader = (bundle: Bundle) => {
         c.pink(`${child.pid}`)
       ));
 
-      message += `${c.line}${nl}${c.line}${c.bold('Processes:')}${c.newline}${pids.join(nl)}${TL > 0 ? nl : nil}`;
+      text.push(`${c.line}${c.bold('Processes:')}${c.newline}${pids.join(nl)}${_th > 0 ? nl : nil}`);
 
+    }
+
+    /* -------------------------------------------- */
+    /* THEME EDITOR                                 */
+    /* -------------------------------------------- */
+
+    if (_th > 0) {
+
+      const themes = values(bundle.sync.themes);
+      const width = themes.reduce((size, { target }) => (target.length > size ? target.length : size), 0);
+      const urls = themes.map(({ id, store, target }) => (
+        ws.repeat(width - target.length) + c.newline + c.line +
+        c.pink(`${store.slice(0, store.indexOf('.'))} → `) +
+        c.pink.bold(target) + c.pink(' → ') +
+        c.gray.underline(`https://${store}/admin/themes/${id}/editor`)
+      ));
+
+      text.push(`${c.line}${c.bold('Theme Editors:')}${urls.join(nl)}${nl}${c.line}`);
     }
 
     /* -------------------------------------------- */
     /* THEME PREVIEWS                               */
     /* -------------------------------------------- */
 
-    if (TL > 0) {
+    if (_th > 0) {
 
       const themes = values(bundle.sync.themes);
       const width = themes.reduce((size, { target }) => (target.length > size ? target.length : size), 0);
       const urls = themes.map(({ id, store, target }) => (
-        c.line +
-        ws.repeat(width - target.length) +
-        c.neonGreen(target) + ':' + ws +
-        c.underline.gray('https://' + store + '?preview_theme_id=' + id)
+        ws.repeat(width - target.length) + c.newline + c.line +
+        c.pink(`${store.slice(0, store.indexOf('.'))} → `) +
+        c.pink.bold(target) + c.pink(' → ') +
+        c.gray.underline('https://' + store + '?preview_theme_id=' + id)
       ));
 
-      message += `${c.line}${nl}${c.line}${c.bold('Theme Previews:')}${c.newline}${urls.join(nl)}${nl}${c.line}`;
+      text.push(`${c.line}${c.bold('Theme Previews:')}${urls.join(nl)}${nl}${c.line}`);
     }
 
   }
@@ -170,6 +183,8 @@ export const logHeader = (bundle: Bundle) => {
 
   let hasWarning: boolean = false;
 
+  const cf = basename(bundle.file);
+
   for (const prop in warnings) {
 
     const warn = warnings[prop];
@@ -177,15 +192,15 @@ export const logHeader = (bundle: Bundle) => {
     if (warn.length > 0) {
 
       if (!hasWarning) {
-        message += `${nl}${c.line}${c.yellow.bold('Warnings:')}${nl}${c.line}`;
+        text.push(`${c.line}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`)}:${nl}${c.line}`);
         hasWarning = true;
       }
 
-      const title = c.yellowBright(`${warn.length} ${prop} ${warn.length > 1 ? 'warnings' : 'warning'}`);
-      message += `${nl}${c.line}${title}${c.newline}${warn.join(nl)}${nl}${c.line}`;
+      const title = c.yellowBright(`${c.bold(`${warn.length}`)} ${prop} ${warn.length > 1 ? 'warnings' : 'warning'}`);
+      text.push(`${c.line}${title}${c.newline}${warn.join(nl)}${nl}${c.line}`);
     }
   }
 
-  log(message);
+  return text.join(`${nl}`);
 
 };

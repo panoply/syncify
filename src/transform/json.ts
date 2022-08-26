@@ -1,34 +1,12 @@
-import { has, isNil, isType } from 'rambdax';
+import { isNil, isType } from 'rambdax';
 import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { is, isBuffer, isArray, isObject, isUndefined, isString } from '../shared/native';
 import { Type } from '../process/files';
-import { lastPath } from 'shared/paths';
 import { byteSize, byteConvert } from '../shared/utils';
 import { log, c } from '../logger';
 import { bundle } from '../options/index';
 import * as timer from '../process/timer';
-
-/**
- * Parse JSON
- *
- * Strips `$schema` spec field from JSON
- */
-export function $schema (file: File, data: { $schema?: string }) {
-
-  if (!has('$schema', data)) return data;
-
-  timer.start();
-
-  const json = { ...data };
-
-  delete json.$schema;
-
-  log.info(`removed ${c.bold('$schema')} ${c.gray(`µ${timer.stop()}`)}`);
-
-  return json;
-
-};
 
 /**
  * Parse JSON
@@ -82,7 +60,7 @@ export function minify (data: string, space = 0): any {
  * passed in file and contents. We do not publish
  * metafield file types to output directory.
  */
-export function jsonCompile (file: IFile, data: string, space = 0): any {
+export function jsonCompile (file: File, data: string, space = 0): any {
 
   const minified = minify(data, space);
 
@@ -117,9 +95,7 @@ export function jsonCompile (file: IFile, data: string, space = 0): any {
  */
 export async function compile (file: File, cb: Syncify): Promise<string> {
 
-  if (bundle.mode.watch) {
-    timer.start();
-  }
+  if (bundle.mode.watch) timer.start();
 
   const json = await readFile(file.input);
 
@@ -127,17 +103,16 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
 
   const data = parse(json.toString());
   const space = bundle.minify.json[file.namespace] ? 0 : bundle.json.indent;
-  const refs = bundle.minify.liquid.removeSchemaRefs ? $schema(file, data) : data;
 
   if (bundle.mode.watch) {
     log.info(`created ${c.bold(file.key)} ${c.gray(`µ${timer.stop()}`)}`);
   }
-  if (!isType('Function', cb)) return jsonCompile(file, refs, space);
+  if (!isType('Function', cb)) return jsonCompile(file, data, space);
 
-  const update = cb.apply({ ...file }, refs);
+  const update = cb.apply({ ...file }, data);
 
   if (isUndefined(update)) {
-    return jsonCompile(file, refs, space);
+    return jsonCompile(file, data, space);
   } else if (isArray(update) || isObject(update)) {
     return jsonCompile(file, update, space);
   } else if (isString(update)) {
@@ -146,6 +121,6 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
     return jsonCompile(file, parse(update.toString()), space);
   }
 
-  return jsonCompile(file, refs, space);
+  return jsonCompile(file, data, space);
 
 };

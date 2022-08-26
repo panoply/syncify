@@ -1,47 +1,112 @@
+import type { Tester } from 'anymatch';
 import type { Plugin as PostCSSPlugin, Transformer, TransformCallback } from 'postcss';
-import type { OptimizeOptions } from 'svgo';
-import type { Config as SVGSpriteConfig } from 'svg-sprite';
+import type { Options as SASSOptions } from 'sass';
+import type { OptimizeOptions as SVGOOptions } from 'svgo';
+import type { Config as SVGSpriteOptions } from 'svg-sprite';
 import type { SharpOptions } from 'sharp';
-import type { Options as TSUPOptions } from 'tsup';
+import type { BuildOptions as ESBuildOptions } from 'esbuild';
+import type { Merge } from 'type-fest';
 
-export interface ScriptProcessor {
+/* -------------------------------------------- */
+/* PROCESSORS                                   */
+/* -------------------------------------------- */
+
+export type PostCSSConfig = (PostCSSPlugin | Transformer | TransformCallback)[];
+export type ESBuildConfig = Merge<ESBuildOptions, { format?: 'esm' | 'iife' }>
+
+export interface Processors {
   /**
-   * [TSUP](https://tsup.egoist.sh) Options
+   * JSON File processing - Options defined here are used when
+   * writing to the file system. Typically in operations like
+   * `--merge`, `--pull` and `--download`.
+   *
+   * > The options will also be used in **development** (`dev`)
+   * mode when uploading `.json` files to stores/themes.
    */
-  tsup?: Pick<TSUPOptions,
-    | 'banner'
-    | 'define'
-    | 'dts'
-    | 'esbuildOptions'
-    | 'esbuildPlugins'
+  json: {
+    /**
+     * The indentation level
+     *
+     * @default 2
+     */
+    indent?: number;
+    /**
+     * Whether to use `\t` identation characters.
+     *
+     * @default false
+     */
+    useTab?: boolean;
+    /**
+     * If line termination should be Windows (CRLF) format.
+     * Unix (LF) format is the default.
+     *
+     * @default false
+     */
+    crlf?: boolean;
+    /**
+     * An optional string list of paths/filenames to exclude
+     * from processing, ie: pass through
+     *
+     * @default false
+     */
+    exclude?: string[]
+  };
+  /**
+   * [ESBuild](https://esbuild.github.io/) Config
+   *
+   * Syncify uses ESBuild under the hood for JS/TS transpilation.
+   * Some native ESBuild options are omitted from processing and
+   * handled internally by Syncify.
+   */
+  esbuild?: Merge<Pick<ESBuildOptions,
+    | 'bundle'
+    | 'treeShaking'
     | 'tsconfig'
-    | 'treeshake'
+    | 'target'
     | 'splitting'
-    | 'sourcemap'
     | 'pure'
-    | 'plugins'
-    | 'platform'
-    | 'noExternal'
-    | 'external'
-    | 'metafile'
-    | 'legacyOutput'
-    | 'footer'
-    | 'loader'
+    | 'define'
     | 'format'
-    | 'globalName'
-    | 'inject'
-    | 'injectStyle'
+    | 'banner'
+    | 'footer'
+    | 'charset'
+    | 'chunkNames'
+    | 'drop'
+    | 'ignoreAnnotations'
+    | 'jsx'
+    | 'jsxDev'
     | 'jsxFactory'
     | 'jsxFragment'
-    | 'keepNames'
-    | 'target'
-    | 'bundle'
-  >;
-}
-
-export interface StyleProcessors {
+    | 'jsxImportSource'
+    | 'mainFields'
+    | 'metafile'
+    | 'resolveExtensions'
+    | 'supported'
+    | 'plugins'
+    >, {
+    /**
+     * The format to be generated. Because we are targeting
+     * browser environments, Syncify does not allow for CJS (commonjs)
+     * bundles to be produced.
+     *
+     * @default 'esm'
+     */
+    format?: 'esm' | 'iife';
+    /**
+     * Whether or not sourcemaps should be generated.
+     * Syncify will process sourcemap generation internally,
+     * so this option only accepts a boolean value.
+     *
+     * @default true
+     */
+    sourcemap?: boolean;
+  }>;
   /**
-   * [SASS Dart](https://sass-lang.com/documentation/js-api/) Options
+   * [PostCSS](https://postcss.org/) Plugins
+   */
+  postcss?: PostCSSConfig[]
+  /**
+   * [SASS Dart](https://sass-lang.com/documentation/js-api/) Config
    */
   sass?: {
     /**
@@ -72,35 +137,62 @@ export interface StyleProcessors {
     includePaths?: string[];
   };
   /**
-   * [PostCSS](https://postcss.org/) Plugins
+   * [Sharp](https://sharp.pixelplumbing.com) Config
    */
-  postcss?:(PostCSSPlugin | Transformer | TransformCallback)[]
-
-}
-
-export interface ImageProcessors {
+  sharp?: SharpOptions;
   /**
-   * [Sharp](https://sharp.pixelplumbing.com) Options
-   */
-  sharp?: SharpOptions
-
-}
-
-export interface SVGProcessors {
-  /**
-   * [SVGO](https://github.com/svg/svgo) Options
+   * [SVGO](https://github.com/svg/svgo) Config
    *
    */
-  svgo?: OptimizeOptions
+  svgo?: SVGOOptions
   /**
-   * [SVG Sprite](https://github.com/svg-sprite) Options
+   * [SVG Sprite](https://github.com/svg-sprite) Config
    */
   sprite?: Pick<
-    SVGSpriteConfig,
+    SVGSpriteOptions,
     | 'mode'
     | 'shape'
     | 'svg'
     | 'variables'
   >
+}
 
+type GetProcessorConfigs<T> = {
+  /**
+   * Whether or not the processor is required
+   */
+  required: boolean;
+  /**
+   * Whether or not the processor is installed
+   */
+  installed: boolean;
+  /**
+   * Whether or not the module was loaded, ie: imported.
+   * This will be `false` until the the import was loaded.
+   */
+  loaded: boolean;
+  /**
+   * Whether or not a config file exists for the processor,
+   * When one exists the URI path location to the file will
+   * applied as the value.
+   */
+  file: false | string;
+  /**
+   * Configuration of the processor, Initialized with defaults
+   */
+  config: T;
+}
+
+export interface ProcessorConfig {
+  json: Merge<Processors['json'], { exclude: Tester }>;
+  postcss: GetProcessorConfigs<PostCSSConfig[]>;
+  sass: GetProcessorConfigs<SASSOptions<'sync'>>;
+  sharp: GetProcessorConfigs<SharpOptions>;
+  sprite:GetProcessorConfigs<SVGSpriteOptions>;
+  svgo: GetProcessorConfigs<SVGOOptions>
+  esbuild: GetProcessorConfigs<
+    Merge<ESBuildOptions, {
+      format: 'esm' | 'iife'
+    }>
+  >
 }

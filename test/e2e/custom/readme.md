@@ -13,6 +13,7 @@ pnpm build             # Runs Syncify in build mode and applied minification
 pnpm upload            # Runs Syncify in upload mode and publishes it online
 pnpm bump              # Runs version control manager and launches the prompt
 ```
+
 ### Structure
 
 Consult the `syncify.config.ts` file located in the root of this directory to review how the configuration model is composed. The below structure is a recommended architecture for developing with Syncify and it's what the official strap ([silk](#)) implements.

@@ -21,6 +21,21 @@ export interface Cache {
     */
   sections: string[];
   /**
+   * JavaScript related cache records, typically source maps
+   */
+  script: {
+    /**
+     * The URI cache map location
+     *
+     * @default 'node_modules/.syncify/script'
+     */
+    uri: string;
+    /**
+     * Metafield pathname > id cache references.
+     */
+    data: { [outputName: string]: Buffer }
+  },
+  /**
    * Stylesheet related cache records, typically source maps
    */
   styles: {
@@ -31,9 +46,9 @@ export interface Cache {
      */
     uri: string;
     /**
-     * Metafield pathname > id cache references.
+     * Stylesheet output name and Buffer
      */
-    data: { [path: string]: number }
+    data: { [outputName: string]: Buffer }
   },
   /**
    * Metafields related cache records. Metafield source maps
@@ -56,7 +71,7 @@ export interface Cache {
   /**
    * Specification JSON for vscode
    */
-   vscode: {
+  vscode: {
     /**
      * The URI vscode reference location
      *

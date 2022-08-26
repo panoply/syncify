@@ -1,4 +1,4 @@
-import { type } from 'rambdax';
+import { type, has } from 'rambdax';
 import { c } from '../logger';
 
 /**
@@ -26,16 +26,15 @@ export const warnings: { [group: string]: string[] } = {};
  * printed to the console at the end of runtime cycle.
  * This function merely populates the `warning` object store.
  */
-export const warnOption = (option: string) => {
+export function warnOption (group: string) {
 
-  warnings[option] = [];
+  if (!has(group, warnings)) warnings[group] = [];
 
   return (message: string, value: string) => {
-
-    warnings[option].push(`${c.line}  ${c.yellowBright(`${message}: ${c.bold(value)}`)}`);
-
+    warnings[group].push(
+      `${c.line}  ${c.yellowBright(`${message}${c.whiteBright(':')} ${c.bold(value)}`)}`
+    );
   };
-
 };
 
 /**
@@ -44,7 +43,7 @@ export const warnOption = (option: string) => {
  * Throws an error when an invalid type was provided to
  * a config option
  */
-export const typeError = (option: string, name: string, value: any, expects: string) => {
+export function typeError (option: string, name: string, value: any, expects: string) {
 
   console.error(c.red(`
     ${c.bold(`Invalid ${c.cyan(option)} configuration`)}
@@ -69,7 +68,7 @@ export const typeError = (option: string, name: string, value: any, expects: str
  * Throws an error when an invalid config option
  * was provided.
  */
-export const missingDependency = (dep: string) => {
+export function missingDependency (dep: string) {
 
   console.error(
     c.red(`
@@ -93,13 +92,13 @@ export const missingDependency = (dep: string) => {
  * Throws an error when an invalid config option
  * was provided.
  */
-export const invalidError = (option: string, name: any, value: any, expects: string) => {
+export function invalidError (option: string, name: any, value: any, expects: string) {
 
   console.error(
     c.red(`
       ${c.bold(`Invalid ${c.cyan(option)} configuration`)}
 
-      The ${c.cyan(name)} option has an invalid value defined.
+      The ${c.cyan(name)} option has an invalid or missing value.
 
       Provided${c.gray(':')} ${c.yellow.bold(value)}
       Expected${c.gray(':')} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}
@@ -115,12 +114,59 @@ export const invalidError = (option: string, name: any, value: any, expects: str
 };
 
 /**
+ * Missing Configuration
+ *
+ * Throws when the `syncify.config` file cannot be resolved
+ * or found in the workspace.
+ */
+export function missingConfig (cwd: string) {
+
+  console.error(
+    c.red(`
+      ${c.bold(`Missing ${c.cyan('syncify.config.js')} configuration`)}
+
+      Unable to resolve a configuration file in the workspace.
+
+      Directory${c.gray(':')} ${c.gray.underline(cwd)}
+
+      ${c.white.bold('How to fix?')}
+      ${c.white('Add one of the following files to your workspace:')}
+        ${c.gray('-')} ${c.white('syncify.config.ts')}
+        ${c.gray('-')} ${c.white('syncify.config.js')}
+        ${c.gray('-')} ${c.white('syncify.config.mjs')}
+        ${c.gray('-')} ${c.white('syncify.config.cjs')}
+        ${c.gray('-')} ${c.white('syncify.config.json')}
+    `)
+  );
+
+  process.exit(1);
+
+};
+
+/**
  * Unknown Option
  *
  * Throws an error when an unknown config option
  * was provided.
  */
-export const unknownError = (option: string, value: any) => {
+export function throwError (message: string, solution: string) {
+
+  console.error(
+    c.redBright.bold(`Error ${message} option\n\n`),
+    c.gray(`${solution}`)
+  );
+
+  process.exit(1);
+
+};
+
+/**
+ * Unknown Option
+ *
+ * Throws an error when an unknown config option
+ * was provided.
+ */
+export function unknownError (option: string, value: any) {
 
   console.error(
     c.redBright.bold(`Unknown ${option} option\n\n`),

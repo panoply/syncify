@@ -5,14 +5,14 @@ import type { BuildOptions } from 'esbuild';
  * ESBuild minification options
  */
 export type ESBuildMinify = Pick<BuildOptions,
+  | 'keepNames'
+  | 'legalComments'
+  | 'mangleProps'
   | 'minifyIdentifiers'
+  | 'minifySyntax'
   | 'minifyWhitespace'
   | 'mangleQuoted'
-  | 'mangleCache'
-  | 'mangleProps'
-  | 'minifySyntax'
-  | 'legalComments'
->
+  >
 
 /**
  * HTML Minification (html-minifer-terser)
@@ -65,6 +65,68 @@ export interface JSONMinify {
    */
   exclude?: string[]
 }
+
+/**
+ * Liquid Minification
+ */
+export interface ViewMinify {
+  /**
+   * Minifies inner contents of `<script>` tags
+   *
+   * @default true
+   */
+  minifyScript: boolean;
+  /**
+   * Minifies inner contents of `<style>` tags
+   *
+   * @default true
+   */
+  minifyStyle: boolean;
+  /**
+   * Minifies JSON contained within schema tags, ie: `{% schema %}`
+   *
+   * @default true
+   */
+  minifySchema: boolean;
+  /**
+   * Remove all occurances of Liquid/HTML comments
+   *
+   * @default true
+   */
+  removeComments: boolean;
+  /**
+   * Collpase all whitespace
+   *
+   * @default true
+   */
+  collapseWhitespace: boolean;
+  /**
+   * Removes redundant whitespace Liquid dash trims from Liquid
+   * tags and objects.
+   *
+   * @default true
+   */
+  stripDashes: boolean;
+  /**
+   * A List of Liquid tags to ignore from minification
+   *
+   * @default null
+   */
+  ignoreTags: RegExp[];
+  /**
+   * A List of Liquid tags to ignore from minification
+   *
+   * @default null
+   */
+  ignoreObjects: RegExp[];
+  /**
+   * Excluded files from minification
+   *
+   * @default null
+   */
+  exclude: string[]
+}
+
 /**
  * Liquid Minification
  */
@@ -76,55 +138,55 @@ export interface LiquidMinify {
    */
   minifySchemaTag: boolean;
   /**
-    * Remove all occurances of Liquid comments
-    *
-    * @default true
-    */
+   * Remove all occurances of Liquid comments
+   *
+   * @default true
+   */
   removeComments: boolean;
   /**
-    * Remove `$schema` props from JSON objects
-    *
-    * @default true
-    */
+   * Remove `$schema` props from JSON objects
+   *
+   * @default true
+   */
   removeSchemaRefs: boolean;
   /**
-    * Removes and strips Liquid syntax contained within HTML
-    * Attributes that span newlines or apply extraneous whitespace.
-    *
-    * @default true
-    */
+   * Removes and strips Liquid syntax contained within HTML
+   * Attributes that span newlines or apply extraneous whitespace.
+   *
+   * @default true
+   */
   removeNewlineAttributes: boolean;
   /**
-    * Removes redundant whitespace Liquid dash trims from Liquid
-    * tags and objects.
-    *
-    * @default true
-    */
+   * Removes redundant whitespace Liquid dash trims from Liquid
+   * tags and objects.
+   *
+   * @default true
+   */
   stripWhitespaceDashes: boolean;
   /**
-    * Removes Liquid tag extrenous whitespaces
-    *
-    * @default true
-    */
+   * Removes Liquid tag extrenous whitespaces
+   *
+   * @default true
+   */
   stripInnerTagWhitespace: boolean;
   /**
-    * Removes and strips Liquid syntax contained within HTML
-    * Attributes that span newlines or apply extraneous whitespace.
-    *
-    * @default true
-    */
+   * Removes and strips Liquid syntax contained within HTML
+   * Attributes that span newlines or apply extraneous whitespace.
+   *
+   * @default true
+   */
   stripAttributeNewlines: boolean;
   /**
-    * A List of Liquid tags to ignore from minification
-    *
-    * @default null
-    */
+   * A List of Liquid tags to ignore from minification
+   *
+   * @default null
+   */
   ignoreTags: RegExp[];
   /**
-    * A List of Liquid tags to ignore from minification
-    *
-    * @default null
-    */
+   * A List of Liquid tags to ignore from minification
+   *
+   * @default null
+   */
   ignoreObjects: RegExp[];
   /**
    * Excluded files from minification

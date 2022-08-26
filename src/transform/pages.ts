@@ -25,9 +25,7 @@ export async function compile (file: IFile<IPages>, cb: Syncify) {
   const { data, content } = matter(read);
 
   if (!has('title', data)) {
-
     throw log.error('Missing Title', file);
-
   }
 
   if (has('html', data)) {

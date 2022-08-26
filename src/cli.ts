@@ -37,7 +37,11 @@ run(mm(process.argv.slice(1), {
     setup: false,
     strap: false,
     silent: false,
-    minify: false
+    minify: false,
+    script: false,
+    style: false,
+    svg: false,
+    image: false
   },
   boolean: [
     'vsc',
@@ -59,7 +63,11 @@ run(mm(process.argv.slice(1), {
     'help',
     'pull',
     'push',
-    'minify'
+    'minify',
+    'script',
+    'style',
+    'svg',
+    'image'
   ],
   string: [
     'theme',
@@ -71,6 +79,7 @@ run(mm(process.argv.slice(1), {
     'strap',
     'filter',
     'spawn',
-    'del'
+    'del',
+    'bump'
   ]
 })).catch(throws);

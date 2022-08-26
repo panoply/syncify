@@ -31,12 +31,12 @@ function exit (manual: boolean, signal: number) {
 };
 
 /**
- * Exist Hook
+ * Exit Hook
  *
  * An exit hook for killing running processes
  * when ctrl+c is executed.
  */
-export const kill = (callback: Function) => {
+export function kill (callback: Function) {
 
   hooks.add(callback);
 

@@ -2,6 +2,8 @@
   "name": "@syncify/e2e-custom",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "author": "",
   "main": "index.js",
   "scripts": {
     "dev": "syncify syncify -t custom --watch --hot",
@@ -9,17 +11,37 @@
     "upload": "syncify custom --upload",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
+  "prettier": "@sissel/prettier-config",
+  "eslintConfig": {
+    "extends": "@sissel/eslint-config",
+    "ignorePatterns": [
+      "docs",
+      "dist",
+      "test/e2e/theme"
+    ],
+    "rules": {
+      "object-curly-newline": "off",
+      "no-import-assign": "off"
+    }
+  },
   "devDependencies": {
-    "@syncify/cli": "^0.1.0-beta",
-    "@syncify/plugin-icons": "^1.0.0",
+    "@sissel/eslint-config": "^1.1.0",
+    "@sissel/prettier-config": "^1.1.0",
+    "@syncify/cli": "link:../../..",
     "autoprefixer": "^10.4.8",
     "bootstrap": "^5.2.0",
     "esbuild": "^0.15.3",
+    "eslint": "^8.22.0",
     "postcss": "^8.4.16",
+    "prettier": "^2.7.1",
     "sass": "^1.54.4",
-    "sharp": "^0.30.7"
+    "sharp": "^0.30.7",
+    "tsup": "^6.2.2"
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.1.0",
+    "lazysizes": "^5.3.2",
+    "mithril": "^2.2.2"
   }
 }

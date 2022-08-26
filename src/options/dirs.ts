@@ -1,9 +1,11 @@
-import { Bundle } from 'types';
+import { Bundle, Commands, Config } from 'types';
+import { uniq } from 'rambdax';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
-import { join } from 'path';
-import { PartialDeep } from 'type-fest';
+import { join } from 'node:path';
 import { assign, isArray } from '../shared/native';
-import { bundle, cache } from './index';
+import { basePath } from '../shared/paths';
+import { bundle, cache } from '.';
+import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '../constants';
 
 /**
  * Create Cache Directories
@@ -13,7 +15,7 @@ import { bundle, cache } from './index';
  * fallback function and only runs is `postinstall`
  * was not triggered.
  */
-export async function cacheDirs (path: string, options = { purge: false }) {
+export async function setCacheDirs (path: string, options = { purge: false }) {
 
   bundle.dirs.cache = `${path}/`;
 
@@ -27,15 +29,7 @@ export async function cacheDirs (path: string, options = { purge: false }) {
     }
   }
 
-  for (const dir of [
-    'styles',
-    'icons',
-    'metafields',
-    'pages',
-    'sections',
-    'redirects',
-    'vscode'
-  ]) {
+  for (const dir of CACHE_DIRS) {
 
     if (dir === 'sections') {
       cache[dir] = [];
@@ -81,7 +75,7 @@ export async function cacheDirs (path: string, options = { purge: false }) {
  * Generates a Shopify theme structure within the
  * provided `basePath` uri location.
  */
-export async function themeDirs (basePath: string) {
+export async function setThemeDirs (basePath: string) {
 
   const hasBase = await pathExists(basePath);
 
@@ -101,16 +95,7 @@ export async function themeDirs (basePath: string) {
     }
   }
 
-  for (const dir of [
-    'templates',
-    'templates/customers',
-    'assets',
-    'config',
-    'layout',
-    'locales',
-    'sections',
-    'snippets'
-  ]) {
+  for (const dir of THEME_DIRS) {
 
     const uri = join(basePath, dir);
     const has = await pathExists(uri);
@@ -128,13 +113,51 @@ export async function themeDirs (basePath: string) {
 };
 
 /**
+ * Set Base Directories
+ *
+ * Generates the base directory paths. The function
+ * also normalizes paths to ensure the mapping is
+ * correct.
+ */
+export function setBaseDirs (cli: Commands, config: Config) {
+
+  const base = basePath(cli.cwd);
+
+  for (const [ dir, def ] of BASE_DIRS) {
+
+    let path: string | string[];
+
+    if (cli[dir] === def) {
+      if (config[dir] === def) {
+        bundle.dirs[dir] = base(cli[dir]);
+        return;
+      } else {
+        path = config[dir];
+      }
+    } else {
+      path = cli[dir];
+    }
+
+    if (isArray(path)) {
+      const roots = uniq(path.map(base));
+      bundle.dirs[dir] = roots.length === 1 ? roots[0] : roots;
+    } else {
+      bundle.dirs[dir] = base(path);
+    }
+  }
+
+  bundle.watch.add(bundle.file); // add config file to watch
+
+};
+
+/**
  * Create Imports
  *
  * Generates import directories when running `download`
  * mode. If the `--clean` flag is passed, existing dirs
  * are purged and then recreated.
  */
-export async function importDirs ({ dirs, sync, mode }: PartialDeep<Bundle>) {
+export async function setImportDirs ({ dirs, sync, mode }: Bundle) {
 
   if (!mode.download) return;
 
@@ -171,7 +194,7 @@ export async function importDirs ({ dirs, sync, mode }: PartialDeep<Bundle>) {
       }
     }
 
-    await themeDirs(join(dir, target));
+    await setThemeDirs(join(dir, target));
 
   }
 

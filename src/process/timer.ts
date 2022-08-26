@@ -36,6 +36,27 @@ export function clear () {
 };
 
 /**
+ * Get Current measurement
+ *
+ * Returns the current timer without augmentation
+ */
+export function now () {
+
+  const ms = (performance.now() - mark[mark.length - 1]);
+
+  if (ms < 1000) return `${ms.toFixed(0)}ms`;
+
+  const s = ms / 1000;
+
+  if (s < 60) return `${s.toFixed(0)}s ${+ms.toFixed(0).slice(1)}ms`;
+
+  const m = (s / 60).toFixed(0);
+
+  return `${m}m ${(s - (60 * Number(m)))}s ${+ms.toFixed(0).slice(1)}ms`;
+
+}
+
+/**
  * Stop timer
  *
  * Stops the timer and returns the execution
