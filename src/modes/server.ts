@@ -38,14 +38,20 @@ export function socket (bundle: Bundle<HOT>) {
   });
 
   wss.on('connection', v => {
+    wss.on('scripts', () => v.send('script'));
+    wss.on('styles', () => v.send('style'));
     wss.on('assets', () => v.send('assets'));
     wss.on('reload', () => v.send('reload'));
     wss.on('replace', () => v.send('replace'));
+    wss.on('hydrate', (selector) => v.send(selector));
   });
 
   return {
+    scripts: () => wss.emit('scripts'),
+    styles: () => wss.emit('styles'),
     assets: () => wss.emit('assets'),
     reload: () => wss.emit('reload'),
-    replace: () => wss.emit('replace')
+    replace: () => wss.emit('replace'),
+    hydrate: (element: string) => wss.emit('hydrate', element)
   };
 };

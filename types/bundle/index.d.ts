@@ -287,7 +287,11 @@ export interface Bundle<T = unknown> {
   /**
    * Hot reload mode options
    */
-  hot: T extends HOT ? T : false | Merge<HOT, { alive: boolean }>;
+  hot: Merge<HOT, {
+    alive?: boolean;
+    code?: string;
+    output?: string;
+  }>;
    /**
     * Directory structure paths
     */

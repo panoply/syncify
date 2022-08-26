@@ -78,6 +78,8 @@ export async function define (cli: Commands, _options?: Config) {
   // env variables
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
+  process.env.SYNCIFY_SERVER = String(bundle.hot.server);
+  process.env.SYNCIFY_SOCKET = String(bundle.hot.socket);
 
   const promise = await Promise.all([
     setBaseDirs(cli, config),
@@ -105,40 +107,20 @@ export async function define (cli: Commands, _options?: Config) {
 
 async function setHotReloads (cli: Commands, config: Config) {
 
-  if (anyTrue(cli.hot, config.hot, isObject(config.hot))) {
-    bundle.hot = config.hot;
-  }
+  if (anyTrue(cli.hot, config.hot, isObject(config.hot))) bundle.hot = config.hot;
 
-  const file = await readFile(join(bundle.cwd, 'node_modules/@syncify/cli/hot.txt'));
+  const { build } = await import('esbuild');
 
-  if (typeof config.hot === 'object') {
+  bundle.hot.output = join(bundle.dirs.output, 'snippets', 'hot.liquid');
 
-    const snippet = [
-      '<script>',
-      inject(config.hot.server || 3000, config.hot.socket || 8089),
-      file.toString() + '</script>'
-    ].join(nl);
+  build({
+    entryPoints: [ join(bundle.dirs.output, 'snippets', 'hot.liquid') ]
+  });
 
-    const paths: { snippet: string; layouts: string[] } = {
-      snippet: join(bundle.dirs.output, 'snippets', 'hot.liquid'),
-      layouts: []
-    };
+  bundle.hot.code = join(bundle.cwd, 'node_modules/@syncify/cli/dist/hot/script.txt');
+  bundle.hot.output = join(bundle.dirs.output, 'snippets', 'hot.liquid');
 
-    const loc = getResolvedPaths(bundle.hot.layouts);
-
-    for (const layout of loc) {
-
-      const read = await readFile(layout);
-      const dom = read.toString();
-      const idx = dom.indexOf('<head>') + 6;
-      const inject = dom.slice(0, idx) + '\n{%- render "hot" -%}\n' + dom.slice(idx);
-
-      // await writeFile(layout, inject);
-    }
-
-    // await writeFile(join(config.paths.snippets, 'hot.liquid'), snippet);
-
-  }
+  bundle.watch.add(bundle.hot.output);
 }
 
 /**

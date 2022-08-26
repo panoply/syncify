@@ -53,15 +53,17 @@ const external = [
   'svgo'
 ];
 
-export default defineConfig({
-  entry: [
-    './src/cli.ts',
-    './src/api.ts',
-    './src/index.ts'
-  ],
-  splitting: true,
-  treeshake: 'smallest',
-  clean: [ 'dist/hot.liquid', 'dist/*.js' ],
-  noExternal,
-  external
-});
+export default defineConfig([
+  {
+    entry: [
+      './src/cli.ts',
+      './src/api.ts',
+      './src/index.ts'
+    ],
+    splitting: true,
+    treeshake: 'smallest',
+    clean: [ 'dist', '!dist/hot' ],
+    noExternal,
+    external
+  }
+]);

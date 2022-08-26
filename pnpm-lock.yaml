@@ -44,6 +44,7 @@ importers:
       mergerino: ^0.4.0
       mime-types: ^2.1.35
       minimist: ^1.2.6
+      mithril: ^2.2.2
       node-notifier: ^10.0.1
       p-queue: ^7.3.0
       postcss: ^8.4.16
@@ -87,6 +88,7 @@ importers:
       mergerino: 0.4.0
       mime-types: 2.1.35
       minimist: 1.2.6
+      mithril: 2.2.2
       node-notifier: 10.0.1
       p-queue: 7.3.0
       prompts: 2.4.2
@@ -3458,6 +3460,13 @@ packages:
   /minimist/1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
 
+  /mithril/2.2.2:
+    resolution: {integrity: sha512-YRm6eLv2UUaWaWHdH8L+desW9+DN7+oM34CxJv6tT2e1lNVue8bxQlknQeDRn9aKlO8sIujm2wqUHwM+Hb1wGQ==}
+    hasBin: true
+    dependencies:
+      ospec: 4.0.0
+    dev: false
+
   /mkdirp-classic/0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
@@ -3644,6 +3653,13 @@ packages:
       type-check: 0.4.0
       word-wrap: 1.2.3
     dev: true
+
+  /ospec/4.0.0:
+    resolution: {integrity: sha512-MpDtkpscOxHYb4w71v7GB4LBsRuzxZnM+HdwjhzJQzu+5EJvA80yxTaKw+wp5Dmf5RV2/Bg3Uvz2vlI/PhW9Ow==}
+    hasBin: true
+    dependencies:
+      glob: 7.2.3
+    dev: false
 
   /p-defer/1.0.0:
     resolution: {integrity: sha512-wB3wfAxZpk2AzOfUMJNL+d36xothRSyj8EXOa4f6GMqYDN9BJaaSISbsk+wS9abmnebVw95C2Kb5t85UmpCxuw==}

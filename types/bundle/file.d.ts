@@ -141,14 +141,6 @@ interface File<T = unknown> extends ParsedPath {
    */
   base: string;
   /**
-   * The input base filename without the extension.
-   *
-   * @example
-   *
-   * 'filename'
-   */
-  stem: string;
-  /**
    * The input relative path location from current _root_ working directory
    *
    * @example
