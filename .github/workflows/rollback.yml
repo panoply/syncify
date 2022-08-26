@@ -29,6 +29,6 @@ jobs:
         cache: 'npm'
     - run: pnpm instal
     - run: pnpm run build
-    - run: pnpx pr-release rollback --verbose --target main --source next --verbose --ignore 'package*' --ignore changelog.md
+    - run: pnpx pr-release rollback --verbose --target master --source next --verbose --ignore 'package*' --ignore changelog.md
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
