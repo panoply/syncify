@@ -76,3 +76,27 @@ export const UNITS = [
   'gb',
   'tb'
 ];
+
+/**
+ * Console Methods for intercepting spawned processes
+ */
+export const CONSOLE_METHODS = [
+  'assert',
+  'count',
+  'countReset',
+  'debug',
+  'dir',
+  'dirxml',
+  'error',
+  'group',
+  'groupCollapsed',
+  'groupEnd',
+  'info',
+  'log',
+  'table',
+  'time',
+  'timeEnd',
+  'timeLog',
+  'trace',
+  'warn'
+];

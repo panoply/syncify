@@ -282,7 +282,7 @@ export interface HOT {
   /**
    * Whether or not Syncify should inject the required HOT snippet
    * at runtime to the defined layouts. When `false` you will need
-   * to manually place the `hot.liquid` snippet into your theme.
+   * to manually place the `hot.js.liquid` snippet into your theme.
    *
    * _Please note that by default when running `--hot` Syncify will
    * upload layouts upon initializing_
@@ -328,6 +328,27 @@ export interface HOT {
    * @default true
    */
   hidePreview?: boolean;
+  /**
+   * The Liquid render tag written to Layouts.
+   *
+   * @default
+   * {% render 'hot.js.liquid', server: 3000, socket: 8089 %}
+   */
+  render?: string;
+  /**
+   * The hot reload inline snippet script URI location
+   *
+   * @default
+   * 'node_modules/@syncify/syncify/hot.js.liquid'
+   */
+  snippet?: string;
+  /**
+   * The resolved output uri the snippet will be written.
+   *
+   * @default
+   * 'theme/snippets/hot.js.liquid'
+   */
+  output?: string;
 }
 
 /* -------------------------------------------- */

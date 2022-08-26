@@ -1,11 +1,11 @@
-import { Commands, Config, Package, Bundle, Modes, HOT } from 'types';
+import { Commands, Config, Package, Bundle, Modes } from 'types';
 import { anyTrue, isNil, has, includes, forEach } from 'rambdax';
 import merge from 'mergerino';
-import { join } from 'path';
-import { pathExists, readFile, readJson, writeFile } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { isArray, keys, is, assign, nil, log, isString, isObject, ws, nl } from '../shared/native';
+import { join } from 'node:path';
+import { pathExists, readJson } from 'fs-extra';
+import { isArray, keys, is, assign, nil, log, isString, isObject, ws, defineProperty } from '../shared/native';
 import { normalPath } from '../shared/paths';
 import { authURL } from '../shared/options';
 import { logHeader } from '../logger/heading';
@@ -21,12 +21,9 @@ import { setJsonOptions, setViewOptions } from './transforms';
 import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
 import { setMinifyOptions } from './minify';
-import { bundle, cache, processor, plugins, config } from '.';
+import { bundle, cache, processor, plugins, config, hot } from '.';
 import { typeError, invalidError, missingConfig, throwError } from './validate';
 import { PATH_KEYS } from '../constants';
-import { inject } from '../hot/inject';
-import { glob } from 'glob';
-import { getResolvedPaths } from './utilities';
 
 /* -------------------------------------------- */
 /* EXIT HANDLER                                 */
@@ -66,6 +63,8 @@ export async function define (cli: Commands, _options?: Config) {
 
   const pkg = await getPackageJson(cli.cwd);
 
+  defineProperty(bundle, 'pkg', { get () { return pkg; } });
+
   bundle.config = await getConfig(pkg, cli);
   bundle.mode = setModes(cli);
   bundle.cli = cli.cli;
@@ -75,7 +74,6 @@ export async function define (cli: Commands, _options?: Config) {
   bundle.prod = cli.prod;
   bundle.dev = cli.dev && !cli.prod;
 
-  // env variables
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
   process.env.SYNCIFY_SERVER = String(bundle.hot.server);
@@ -107,18 +105,21 @@ export async function define (cli: Commands, _options?: Config) {
 
 async function setHotReloads (cli: Commands, config: Config) {
 
-  if (anyTrue(cli.hot, config.hot, isObject(config.hot))) bundle.hot = config.hot;
+  if (bundle.mode.watch) {
+    if ((cli.hot === true || config.hot === true)) {
+      bundle.hot = true;
+      hot.render = `{% render 'hot.js.liquid', server: ${hot.server}, socket: ${hot.socket} %}`;
+    } else if (isObject(config.hot)) {
+      const { server, socket } = assign(hot, config.hot);
+      bundle.hot = true;
+      hot.render = `{% render 'hot.js.liquid', server: ${server}, socket: ${socket} %}`;
+    }
+  }
 
-  const { build } = await import('esbuild');
+  if (!bundle.hot) return;
 
-  bundle.hot.output = join(bundle.dirs.output, 'snippets', 'hot.liquid');
-
-  build({
-    entryPoints: [ join(bundle.dirs.output, 'snippets', 'hot.liquid') ]
-  });
-
-  bundle.hot.code = join(bundle.cwd, 'node_modules/@syncify/cli/dist/hot/script.txt');
-  bundle.hot.output = join(bundle.dirs.output, 'snippets', 'hot.liquid');
+  hot.snippet = join(bundle.cwd, 'node_modules', '@syncify/cli', 'hot.js.liquid');
+  hot.output = join(bundle.dirs.output, 'snippets', 'hot.js.liquid');
 
   bundle.watch.add(bundle.hot.output);
 }
@@ -230,7 +231,7 @@ function setSpawns (config: Config, bundle: Bundle) {
 
   if (props.length === 0) return;
 
-  forEach(name => {
+  for (const name in config.spawn[mode]) {
 
     const command = config.spawn[mode][name];
 
@@ -265,7 +266,7 @@ function setSpawns (config: Config, bundle: Bundle) {
       typeError('spawn', mode, config.spawn[mode], 'string | string[]');
     }
 
-  }, keys(config.spawn[mode]));
+  }
 
 };
 

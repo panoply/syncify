@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
 import { PartialDeep } from 'type-fest';
-import { Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
+import { Bundle, Cache, Config, HOT, Minify, Plugins, ProcessorConfigs } from 'types';
 import { assign } from '../shared/native';
 
 /**
@@ -138,7 +138,25 @@ export const processor: PartialDeep<ProcessorConfigs> = {
       ]
     }
   }
+};
 
+/**
+ * HOT~Reload Configuration
+ *
+ * This model is used for HOT Reloading assets, views and
+ * other content. HOT Reloads are only available in `--watch`
+ * mode. The `bundle` config will use a boolean value to indicate
+ * whether or not we should enable the feature.
+ */
+export const hot: HOT = {
+  inject: true,
+  server: 3000,
+  socket: 8089,
+  reload: 'hot',
+  scroll: 'preserved',
+  layouts: [
+    'theme.liquid'
+  ]
 };
 
 /**
@@ -243,7 +261,7 @@ export const plugins: Plugins = {
  * options and settings. This is typically merged with
  * the CLI defined options.
  */
-export let bundle = {
+export const bundle = {
   version: null,
   cli: false,
   cwd: null,

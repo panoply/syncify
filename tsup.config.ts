@@ -72,7 +72,7 @@ export default defineConfig(options => [
     async onSuccess () {
 
       await build({
-        entryPoints: [ 'src/hot/embed.ts' ],
+        entryPoints: [ 'src/hot/snippet.ts' ],
         bundle: true,
         minify: true,
         format: 'iife',

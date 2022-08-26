@@ -35,19 +35,19 @@ Install as development dependency in your project.
 **PNPM**
 
 ```cli
-pnpm add @liquify/syncify -D
+pnpm add @syncify/syncify -D
 ```
 
 **NPM**
 
 ```cli
-npm i @liquify/syncify --save-dev
+npm i @syncify/syncify --save-dev
 ```
 
 **Yarn**
 
 ```cli
-yarn add @liquify/syncify --dev
+yarn add @syncify/syncify --dev
 ```
 
 # Overview
@@ -241,7 +241,7 @@ Syncify supports `syncify.config.js` and `package.json` configurations. Dependin
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@liquify/syncify';
+import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
   input: 'source',
@@ -311,10 +311,10 @@ export default defineConfig({
     }
   },
   transforms: {
+    script: {},
+    style: {},
     svg: {},
     image: {},
-    style: {},
-    script: {}
   },
   processors: {
     esbuild: {},
@@ -444,7 +444,7 @@ The `stores` option accepts an **object** or **array** list. Each item will hold
 ### API
 
 ```ts
-import { defineConfig } from '@syncify/cli';
+import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
   stores: [
@@ -653,7 +653,7 @@ By default, Syncify assumes you are using the basic-bitch (default) structure as
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/cli';
+import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
   input: 'source',
@@ -893,7 +893,7 @@ The Syncify **build** mode re-builds the entire theme and you might choose to ru
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/cli';
+import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
     spawn: {
@@ -914,7 +914,7 @@ If you are processing JavaScript asset files using the [Rollup](https://rollupjs
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/cli';
+import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
     spawn: {
@@ -937,7 +937,7 @@ If you are processing JavaScript asset files using the [Webpack](https://webpack
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/cli';
+import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
     spawn: {
@@ -960,7 +960,7 @@ Though it is unlikely you'd ever need to include 2 different JavaScript bundlers
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/cli';
+import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
     spawn: {

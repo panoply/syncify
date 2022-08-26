@@ -1,6 +1,5 @@
 import { Syncify, File, Pages, StyleTransform, ScriptTransform } from 'types';
 import chokidar from 'chokidar';
-import { readFile, writeFile } from 'fs-extra';
 import { client, queue } from '../requests/client';
 import { compile as liquid } from '../transform/liquid';
 import { styles } from '../transform/styles';
@@ -31,22 +30,19 @@ export function watch (callback: Syncify) {
     persistent: true,
     ignoreInitial: true,
     usePolling: true,
-    interval: 50,
+    cwd: bundle.cwd,
+    interval: 75,
     binaryInterval: 100,
     ignored: [ '**/*.map' ]
   });
 
   event.on('script:watch', (d) => { });
 
-  // console.log(bundle.watch);
-
   watcher.on('all', async function (event, path) {
 
     const file: File = parse(path);
 
     if (isUndefined(file)) return;
-
-    // console.log(file);
 
     if (file.type !== Type.Spawn) log.changed(file);
 
@@ -55,7 +51,7 @@ export function watch (callback: Syncify) {
       try {
 
         let value: string | void | { title: any; body_html: any; } = null;
-        let hydrate: string = null;
+
 
         if (file.type === Type.Script) {
 
@@ -72,7 +68,6 @@ export function watch (callback: Syncify) {
         } else if (file.type === Type.Section) {
 
           value = await liquid(file, callback);
-          hydrate = 'shopify-section-' + file.name;
 
         } else if (file.type === Type.Layout || file.type === Type.Snippet) {
 
@@ -118,8 +113,8 @@ export function watch (callback: Syncify) {
           await request.assets('put', file, value);
 
           if (file.type !== Type.Script && file.type !== Type.Style) {
-            if (hydrate !== null) {
-              wss.hydrate(hydrate);
+            if (file.type === Type.Section) {
+              wss.hydrate(`shopify-section-${file.name}`);
             } else {
               await queue.onIdle().then(() => wss.replace());
             }
