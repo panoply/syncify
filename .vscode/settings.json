@@ -1,5 +1,6 @@
 {
   "explorer.fileNesting.enabled": false,
+  "npm.packageManager": "pnpm",
   "eslint.packageManager": "pnpm",
   "files.associations": {
     "*.liquid": "html",
