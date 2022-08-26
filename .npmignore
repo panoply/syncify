@@ -2,7 +2,10 @@
 
 example/
 test/
+tests/
 lib/
+docs/
+plugins/
 src/
 versions/
 .vscode/
@@ -15,14 +18,12 @@ versions/
 .eslintignore
 .prettierrc.js
 .prettierignore
-.shopifysync.json
-.eslintignore
 .pnpm-debug.log
 
 # BUILD FILES
 
 tsconfig.json
-rollup.config.mjs
+tsup.config.ts
 
 # MARKDOWN
 

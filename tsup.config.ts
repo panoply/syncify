@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { build } from 'esbuild';
 
 const noExternal = [
   'ansis',
@@ -9,9 +10,7 @@ const noExternal = [
   'strip-json-comments',
   'tiny-spinner',
   'wrap-ansi',
-  'log-update',
-  'boxen',
-  'log-groups'
+  'log-update'
 ];
 
 const external = [
@@ -53,17 +52,37 @@ const external = [
   'svgo'
 ];
 
-export default defineConfig([
+export default defineConfig(options => [
   {
     entry: [
-      './src/cli.ts',
-      './src/api.ts',
-      './src/index.ts'
+      'src/cli.ts',
+      'src/api.ts',
+      'src/index.ts'
+    ],
+    clean: [
+      'dist'
     ],
     splitting: true,
     treeshake: 'smallest',
-    clean: [ 'dist', '!dist/hot' ],
     noExternal,
-    external
+    external,
+    esbuildOptions(options, context) {
+      options.chunkNames = context.format
+    },
+    async onSuccess () {
+
+      await build({
+        entryPoints: [ 'src/hot/embed.ts' ],
+        bundle: true,
+        minify: true,
+        format: 'iife',
+        watch: options.watch === true,
+        banner: { js: '<script>' },
+        footer: { js: '</script>' },
+        treeShaking: true,
+        outfile: 'hot.js.liquid'
+      });
+
+    }
   }
 ]);

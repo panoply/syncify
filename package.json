@@ -1,6 +1,6 @@
 {
   "name": "@syncify/cli",
-  "description": "The next generation build tool for Shopify theme development",
+  "description": "The next generation build tool for Shopify theme development.",
   "version": "0.1.0-beta",
   "license": "MIT",
   "homepage": "https://github.com/panoply/syncify",
@@ -14,6 +14,15 @@
     "url": "https://github.com/panoply",
     "email": "n.savvidis@gmx.com"
   },
+  "files": [
+    "dist",
+    "types",
+    "schema",
+    "hot.js.liquid",
+    "LICENCE",
+    "package.json",
+    "pnpm-lock.yaml"
+  ],
   "keywords": [
     "cli",
     "command line",
@@ -26,7 +35,9 @@
     "shopify sync"
   ],
   "engines": {
-    "node": ">=14"
+    "pnpm": ">=7",
+    "node": ">=14",
+    "vscode": "^1.22.0"
   },
   "types": "types/index.d.ts",
   "main": "dist/index.js",
@@ -35,8 +46,8 @@
     "sync": "dist/cli.js"
   },
   "scripts": {
-    "dev": "tsup --watch --onSuccess \"pnpm run hot\"",
-    "hot": "node esbuild.config.cjs",
+    "dev": "tsup --watch",
+    "hot": "node ./esbuild.config.cjs",
     "build": "tsup --minify",
     "syncify": "dist/cli.js"
   },
@@ -54,71 +65,72 @@
     }
   },
   "dependencies": {
-    "ansi-diff": "^1.1.1",
-    "ansis": "^1.4.0",
     "anymatch": "^3.1.2",
     "axios": "^0.27.2",
-    "boxen": "^7.0.0",
-    "bundle-require": "^3.0.4",
+    "bundle-require": "^3.1.0",
     "chokidar": "^3.5.3",
-    "clean-stack": "^4.2.0",
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.0.1",
     "finalhandler": "^1.2.0",
     "fs-extra": "^10.1.0",
     "glob": "^8.0.3",
     "gray-matter": "^4.0.3",
-    "html-minifier-terser": "7.0.0-beta.0",
-    "log-groups": "^3.0.0",
-    "log-update": "^5.0.1",
+    "html-minifier-terser": "7.0.0",
     "markdown-it": "^13.0.1",
-    "mergerino": "^0.4.0",
     "mime-types": "^2.1.35",
     "minimist": "^1.2.6",
-    "mithril": "^2.2.2",
     "node-notifier": "^10.0.1",
-    "p-queue": "^7.3.0",
     "prompts": "^2.4.2",
-    "rambdax": "^8.1.0",
     "serve-static": "^1.15.0",
-    "strip-json-comments": "^5.0.0",
-    "tiny-spinner": "^2.0.0",
     "turndown": "^7.1.1",
     "turndown-plugin-gfm": "^1.0.2",
-    "wrap-ansi": "^8.0.1",
     "ws": "^8.8.1"
   },
   "devDependencies": {
     "@sissel/eslint-config": "^1.1.0",
     "@sissel/prettier-config": "^1.1.0",
-    "@types/blessed": "^0.1.19",
-    "@types/file-entry-cache": "^5.0.2",
     "@types/finalhandler": "^1.1.1",
     "@types/fs-extra": "^9.0.13",
     "@types/glob": "^7.2.0",
-    "@types/livereload": "^0.9.2",
     "@types/mergerino": "^0.4.0",
     "@types/mime-types": "^2.1.1",
     "@types/minimist": "^1.2.2",
     "@types/serve-static": "^1.15.0",
     "@types/sharp": "^0.30.5",
     "@types/svg-sprite": "^0.0.33",
-    "@types/svgo": "^2.6.3",
+    "@types/svgo": "^2.6.4",
     "@types/ws": "^8.5.3",
-    "ava": "^4.3.1",
-    "eslint": "^8.22.0",
-    "prettier": "^2.7.1",
-    "tsconfig-type": "^1.25.0",
-    "type-fest": "^2.18.0",
-    "typescript": "^4.7.4"
-  },
-  "optionalDependencies": {
+    "ansis": "^1.4.0",
+    "ava": "^4.3.3",
+    "clean-stack": "^4.2.0",
     "esbuild": "^0.15.5",
+    "eslint": "^8.22.0",
+    "log-update": "^5.0.1",
+    "mergerino": "^0.4.0",
+    "mithril": "^2.2.2",
+    "p-queue": "^7.3.0",
     "postcss": "^8.4.16",
-    "sass": "^1.54.4",
-    "sharp": "^0.30.7",
+    "prettier": "^2.7.1",
+    "rambdax": "^8.1.0",
+    "sass": "^1.54.5",
+    "strip-json-comments": "^5.0.0",
     "svg-sprite": "^1.5.4",
     "svgo": "^2.8.0",
-    "tsup": "^6.2.2"
+    "tiny-spinner": "^2.0.0",
+    "tsconfig-type": "^1.25.0",
+    "tsup": "^6.2.3",
+    "type-fest": "^2.19.0",
+    "typescript": "^4.8.2",
+    "wrap-ansi": "^8.0.1"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.30.7"
+  },
+  "peerDependencies": {
+    "esbuild": "^0.15.5",
+    "postcss": "^8.4.16",
+    "sass": "^1.54.5",
+    "svg-sprite": "^1.5.4",
+    "svgo": "^2.8.0"
   }
 }
