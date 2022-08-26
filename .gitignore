@@ -1,5 +1,4 @@
 config/local.js
-logs*
 _site
 sync.config.json
 yarn.lock
@@ -7,10 +6,11 @@ yarn.lock
 .env
 node_modules
 bower_components
-misc
-
+test/custom
+test/cases/*
 .tmp
 dump.rdb
+docs/
 
 lib-cov
 *.seed

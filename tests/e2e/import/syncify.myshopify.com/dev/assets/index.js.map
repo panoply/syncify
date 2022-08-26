@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sources":["../../plugins/script.js"],"sourcesContent":["export default function () {\n\n  return 'foo';\n\n}\n"],"names":[],"mappings":"AAAe,eAAQ,IAAI;AAC3B;AACA,EAAE,OAAO,KAAK,CAAC;AACf;AACA;;;;"}

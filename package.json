@@ -1,102 +1,145 @@
 {
-  "name": "shopify-sync",
-  "description": "A lightening fast shopify theme store synchronizer that watches a directory and uploads changed files.",
-  "version": "1.0.0-beta.2",
-  "homepage": "https://github.com/panoply/shopify-sync",
-  "author": {
-    "name": "Nikolas Savvidis",
-    "url": "https://github.com/panoply"
-  },
+  "name": "@syncify/cli",
+  "description": "The next generation build tool for Shopify theme development.",
+  "version": "0.1.0-beta",
+  "license": "MIT",
+  "homepage": "https://github.com/panoply/syncify",
+  "bugs": "https://github.com/panoply/syncify/issues",
   "repository": {
     "type": "git",
-    "url": "git://github.com/panoply/shopify-sync.git"
+    "url": "git://github.com/panoply/syncify.git"
   },
-  "bugs": {
-    "url": "https://github.com/panoply/shopify-sync/issues"
+  "author": {
+    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
+    "url": "https://github.com/panoply",
+    "email": "n.savvidis@gmx.com"
   },
-  "license": "ISC",
+  "files": [
+    "dist",
+    "types",
+    "schema",
+    "hot.js.liquid",
+    "LICENCE",
+    "package.json",
+    "pnpm-lock.yaml"
+  ],
   "keywords": [
     "cli",
     "command line",
+    "themekit",
+    "syncify",
     "shopify",
+    "shopify theme",
     "shopify node",
     "shopify theme",
-    "shopify themekit node"
+    "shopify sync"
   ],
+  "engines": {
+    "pnpm": ">=7",
+    "node": ">=14",
+    "vscode": "^1.22.0"
+  },
+  "types": "types/index.d.ts",
+  "main": "dist/index.js",
   "bin": {
-    "sync": "./bin/sync"
-  },
-  "types": "./package/@types",
-  "main": "./package/index.js",
-  "shopifysync": {
-    "dir": "example",
-    "targets": [
-      {
-        "domain": "boefje",
-        "target_name": "development",
-        "theme_name": "Development",
-        "theme_id": 43989205050
-      },
-      {
-        "domain": "boefje",
-        "target_name": "production",
-        "theme_name": "Production",
-        "theme_id": 43989205050
-      }
-    ]
-  },
-  "eslintConfig": {
-    "extends": ["@liquify/eslint-config-ts"]
+    "syncify": "dist/cli.js",
+    "sync": "dist/cli.js"
   },
   "scripts": {
-    "dev": "rollup -c -w",
-    "build": "rollup -c --environment prod",
-    "sync": "./bin/sync",
-    "test-watch": "node test/theme-watch.js",
-    "test-download": "node test/theme-download.js",
-    "test-upload": "node test/theme-upload.js"
+    "dev": "tsup --watch",
+    "hot": "node ./esbuild.config.cjs",
+    "build": "tsup --minify",
+    "syncify": "dist/cli.js"
+  },
+  "prettier": "@sissel/prettier-config",
+  "eslintConfig": {
+    "extends": "@sissel/eslint-config",
+    "ignorePatterns": [
+      "docs",
+      "dist",
+      "test/e2e/theme"
+    ],
+    "rules": {
+      "object-curly-newline": "off",
+      "no-import-assign": "off"
+    }
   },
   "dependencies": {
     "anymatch": "^3.1.2",
-    "axios": "^0.21.1",
-    "bluebird": "^3.7.2",
-    "boxen": "^5.0.1",
-    "chalk": "^4.1.2",
-    "chokidar": "^3.5.2",
-    "dotenv": "^10.0.0",
-    "fancy-log": "^1.3.3",
-    "fs-extra": "^10.0.0",
-    "glob": "^7.1.7",
-    "inquirer": "^8.1.2",
-    "lodash.drop": "^4.1.1",
-    "lodash.indexof": "^4.0.5",
-    "lodash.lastindexof": "^4.0.5",
-    "lodash.omit": "^4.5.0",
-    "log-update": "^4.0.0",
-    "minimist": "^1.2.5",
-    "mkdirp": "^1.0.4"
+    "axios": "^0.27.2",
+    "bundle-require": "^3.1.0",
+    "chokidar": "^3.5.3",
+    "cross-spawn": "^7.0.3",
+    "dotenv": "^16.0.1",
+    "finalhandler": "^1.2.0",
+    "fs-extra": "^10.1.0",
+    "glob": "^8.0.3",
+    "gray-matter": "^4.0.3",
+    "html-minifier-terser": "7.0.0",
+    "markdown-it": "^13.0.1",
+    "mime-types": "^2.1.35",
+    "minimist": "^1.2.6",
+    "node-notifier": "^10.0.1",
+    "prompts": "^2.4.2",
+    "serve-static": "^1.15.0",
+    "turndown": "^7.1.1",
+    "turndown-plugin-gfm": "^1.0.2",
+    "ws": "^8.8.1"
   },
   "devDependencies": {
-    "@liquify/eslint-config-ts": "^1.0.1",
-    "@rollup/plugin-beep": "^0.2.0",
-    "@rollup/plugin-commonjs": "^20.0.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^13.0.4",
-    "eslint": "^7.32.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-promise": "^5.1.0",
-    "prettier": "^2.3.2",
-    "rollup": "^2.55.1",
-    "rollup-plugin-delete": "^2.0.0",
-    "rollup-plugin-filesize": "^9.1.1",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "typescript": "^4.3.5"
+    "@sissel/eslint-config": "^1.1.0",
+    "@sissel/prettier-config": "^1.1.0",
+    "@types/finalhandler": "^1.1.1",
+    "@types/fs-extra": "^9.0.13",
+    "@types/glob": "^7.2.0",
+    "@types/mergerino": "^0.4.0",
+    "@types/mime-types": "^2.1.1",
+    "@types/minimist": "^1.2.2",
+    "@types/serve-static": "^1.15.0",
+    "@types/sharp": "^0.30.5",
+    "@types/svg-sprite": "^0.0.33",
+    "@types/svgo": "^2.6.4",
+    "@types/ws": "^8.5.3",
+    "ansis": "^1.4.0",
+    "ava": "^4.3.3",
+    "clean-stack": "^4.2.0",
+    "esbuild": "^0.15.5",
+    "eslint": "^8.22.0",
+    "log-update": "^5.0.1",
+    "mergerino": "^0.4.0",
+    "mithril": "^2.2.2",
+    "p-queue": "^7.3.0",
+    "postcss": "^8.4.16",
+    "prettier": "^2.7.1",
+    "rambdax": "^8.1.0",
+    "sass": "^1.54.5",
+    "strip-json-comments": "^5.0.0",
+    "svg-sprite": "^1.5.4",
+    "svgo": "^2.8.0",
+    "tiny-spinner": "^2.0.0",
+    "tsconfig-type": "^1.25.0",
+    "tsup": "^6.2.3",
+    "type-fest": "^2.19.0",
+    "typescript": "^4.8.2",
+    "wrap-ansi": "^8.0.1"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.30.7"
   },
   "peerDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-promise": "^5.1.0",
-    "rollup": "^2.55.1"
+    "esbuild": "^0.15.5",
+    "postcss": "^8.4.16",
+    "sass": "^1.54.5",
+    "svg-sprite": "^1.5.4",
+    "svgo": "^2.8.0"
+  },
+  "pnpm": {
+    "packageExtensions": {
+      "pr-release": {
+        "dependencies": {
+          "node-gyp": "7"
+        }
+      }
+    }
   }
 }

@@ -1,3 +1,93 @@
 {
-  "eslint.packageManager": "pnpm"
+  "explorer.fileNesting.enabled": false,
+  "eslint.packageManager": "pnpm",
+  "files.associations": {
+    "*.liquid": "html",
+    "*.scss.liquid": "scss",
+    "*.css.liquid": "css",
+    "*i18n.js.liquid": "javascript",
+    "*shop.js.liquid": "javascript",
+    "*config.js.liquid": "javascript"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "tests": true
+    // "test": true
+    //"**/node_modules": true,
+    // "**/node_modules/.syncify": false
+    //"**/example": true
+  },
+  "html.customData": [".vscode/icon.html-data.json"],
+  "json.schemas": [
+    {
+      "fileMatch": ["package.json"],
+      "url": "./.vscode/schema/tsup.json"
+    },
+    {
+      "fileMatch": ["package.json", "syncify.package.json"],
+      "url": "/schema/syncify.package.json"
+    },
+    {
+      "fileMatch": ["syncify.env.json"],
+      "url": "/schema/syncify.env.json"
+    },
+    {
+      "fileMatch": ["syncify.config.json"],
+      "url": "/schema/syncify.config.json"
+    }
+  ],
+
+  "highlight.regexes": {
+    "(\\$)([a-z:(]*\\b)": {
+      "regexFlags": "g",
+      "filterLanguageRegex": "typescript",
+      "decorations": [
+        {
+          "color": "#ffbafc"
+        }
+      ]
+    }
+  },
+  "vsicons.associations.files": [
+    {
+      "icon": "svg",
+      "extensions": ["svgo.config.js", "svgo.config.cjs"],
+      "filename": true,
+      "format": "svg"
+    },
+    {
+      "icon": "sass",
+      "extensions": ["sass.config.js", "sass.config.cjs"],
+      "filename": true,
+      "format": "svg"
+    },
+    {
+      "icon": "liquid",
+      "extensions": [
+        "syncify.config.js",
+        "syncify.config.mjs",
+        "syncify.config.json",
+        "syncify.env.json",
+        ".syncifyrc.json",
+        ".syncify",
+        ".syncifyrc",
+        ".liquifyrc",
+        ".env.syncify"
+      ],
+      "filename": true,
+      "format": "liquid"
+    }
+  ],
+  "cSpell.words": [
+    "gzipsize",
+    "imgmin",
+    "linkify",
+    "purgecss",
+    "Spriter"
+  ]
 }

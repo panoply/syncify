@@ -1,0 +1,37 @@
+{
+  "name": "@syncify/brixtol",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": "https://github.com/brixtol/webshop",
+  "bugs": "https://github.com/brixtol/webshop/issues",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/brixtol/webshop.git"
+  },
+  "author": {
+    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
+    "url": "https://github.com/brixtol",
+    "email": "n@brixtol.com"
+  },
+  "scripts": {
+    "dev": "syncify syncify -t custom --watch --hot",
+    "build": "syncify custom --build --prod",
+    "upload": "syncify custom --upload",
+    "script": "syncify --script",
+    "style": "syncify --style",
+    "svg": "syncify --svg",
+    "image": "syncify --image",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "devDependencies": {
+    "@syncify/cli": "link:../../..",
+    "autoprefixer": "^10.4.8",
+    "postcss": "^8.4.16",
+    "sass": "^1.54.4",
+    "sharp": "^0.30.7",
+    "svg-sprite": "^1.5.4",
+    "tsup": "^6.2.2"
+  }
+}

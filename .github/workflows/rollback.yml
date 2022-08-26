@@ -1,0 +1,34 @@
+name: rollback
+
+on:
+  workflow_dispatch:
+
+concurrency: prr:deploy
+
+jobs:
+  rollback:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: 'next'
+        fetch-depth: 0
+    - uses: pnpm/action-setup@v2.0.1
+      with:
+        version: 7
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: pnpm instal
+    - run: pnpm run build --if-present
+    - run: pnpx pr-release rollback --verbose --target main --source next --verbose --ignore 'package*' --ignore changelog.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

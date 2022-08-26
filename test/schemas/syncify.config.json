@@ -1,0 +1,110 @@
+{
+  "input": "source",
+  "export": "export",
+  "import": "import",
+  "output": "theme",
+  "config": ".",
+  "stores": {
+    "domain": "",
+    "themes": {
+      "dev": 123456789
+    }
+  },
+  "paths": {
+    "assets": "dir/path/*",
+    "config": ["ddd/*"],
+    "customers": "templates/customers/*",
+    "layout": "layouts/*",
+    "locales": "locales/*",
+    "pages": "pages/*",
+    "sections": "sections/*",
+    "snippets": "snippets/*",
+    "templates": "templates/*",
+    "redirects": "redirects.yaml",
+    "metafields": [
+      "metafields/foo/*.json",
+      "metafields/bar/*.json"
+    ]
+  },
+  "spawn": {
+    "build": {},
+    "watch": {}
+  },
+  "views": {
+    "sections": {
+      "prefixDir": false,
+      "separator": "-",
+      "globals": []
+    },
+    "snippets": {
+      "prefixDir": false,
+      "separator": "-",
+      "globals": []
+    },
+    "pages": {
+      "language": "all",
+      "suffixDir": false,
+      "author": "",
+      "globals": []
+    }
+  },
+  "transforms": {
+    "json": {
+      "indent": 2,
+      "crlf": false,
+      "useTab": false,
+      "exclude": []
+    },
+    "svg": {
+      "input": "",
+      "rename": "",
+      "snippet": false,
+      "sprite": {
+        "dimensionAttributes": true,
+        "namespaceClassnames": false,
+        "namespaceIDS": false,
+        "rootAttributes": {}
+      }
+    },
+    "style": {
+      "input": "",
+      "postcss": false,
+      "sass": {
+        "sourcemap": true,
+        "warnings": true,
+        "style": "compressed",
+        "includePaths": ["node_modules"]
+      }
+    }
+  },
+  "minify": {
+    "json": {
+      "assets": true,
+      "config": true,
+      "locales": true,
+      "metafields": true,
+      "templates": true,
+      "exclude": []
+    },
+    "liquid": {
+      "removeWhitespaceDashes": false,
+      "removeNewlineAttributes": true,
+      "removeComments": false,
+      "minifySchemaTag": true,
+      "ignoreTags": [],
+      "ignoreObjects": [],
+      "exclude": []
+    },
+    "html": {
+      "caseSensitive": false,
+      "collapseWhitespace": true,
+      "keepClosingSlash": false,
+      "omitBooleanValues": false,
+      "removeComments": true,
+      "sortAttributes": false,
+      "trimCustomFragments": true,
+      "ignoreCustomFragments": [],
+      "exclude": []
+    }
+  }
+}

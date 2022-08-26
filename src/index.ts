@@ -1,37 +1,87 @@
-import log from 'fancy-log';
-import chalk from 'chalk';
-import { client } from './config/client';
-import { Resource, APIOptions, CLIOptions, Callback } from './typings';
+import { has } from 'rambdax';
+import { Commands, Syncify, Config } from 'types';
+import { exception, rejection, signal } from './cli/emitters';
+import { upload } from './modes/upload';
+import { download } from './modes/download';
+import { clean } from './modes/clean';
+import { build } from './modes/build';
+import { watch } from './modes/watch';
+import { server } from './modes/server';
+// import { resource } from 'modes/resource';
+// import { readConfig } from 'config/config';
+import { help } from './logger/help';
+import { log } from './logger';
+import { define } from './options/define';
+import { bundle } from './options/index';
 
-function sync (
-  resource: Resource | CLIOptions,
-  options?: APIOptions,
-  callback?: typeof Callback
-): any {
+/* -------------------------------------------- */
+/* RE-EXPORTS                                   */
+/* -------------------------------------------- */
 
-  if (typeof resource === 'object') return client(resource);
+export * from './api';
+export * as utils from './utils';
 
-  if (!resource) {
-    return log(chalk`{red Error! The {bold resource} option is missing}!`);
+/**
+ * Run Syncify
+ *
+ * Determines how Syncify was initialized.
+ * It will dispatch and construct the correct
+ * configuration model accordingly.
+ */
+export async function run (options: Commands, config?: Config, callback?: Syncify) {
+
+  /* -------------------------------------------- */
+  /* PROCESS LISTENERS                            */
+  /* -------------------------------------------- */
+
+  process.on('SIGINT', signal);
+  process.on('uncaughtException', exception);
+  process.on('unhandledRejection', rejection);
+
+  /* -------------------------------------------- */
+  /* LAUNCH SYNCIFY                               */
+  /* -------------------------------------------- */
+
+  if (has('_', options)) options._ = options._.slice(1);
+  if (options.help) return console.info(help);
+
+  await define(options, config);
+
+  /* -------------------------------------------- */
+  /* CLEAN MODE                                   */
+  /* -------------------------------------------- */
+
+  if (bundle.mode.clean) {
+    try {
+      await clean();
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  if (!options.target) {
-    return log(chalk`{red Error! Please define a {bold theme target}!}`);
+  server(bundle);
+
+  // console.log(bundle);
+
+  /* -------------------------------------------- */
+  /* EXECUTE MODE                                 */
+  /* -------------------------------------------- */
+
+  try {
+
+    if (bundle.mode.build) {
+      return build(callback);
+    } else if (bundle.mode.watch) {
+      return watch(callback);
+    } else if (bundle.mode.upload) {
+      return upload(callback);
+    } else if (bundle.mode.download) {
+      return download(callback);
+    }
+
+  } catch (e) {
+
+    log.warn(e);
+
   }
-
-  const defaults = {
-    resource,
-    target: '',
-    concurrency: 20,
-    dir: 'theme',
-    files: [],
-    forceIgnore: false,
-    ignore: []
-  };
-
-  const config = Object.assign(defaults, options);
-
-  return client(config, callback);
-}
-
-export { sync as default };
+};
