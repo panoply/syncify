@@ -29,7 +29,7 @@ jobs:
         cache: 'pnpm'
     - run: pnpm install
     - run: pnpm run build
-    - run: pnpx pr-release pr --verbose --target main --source next --compact --verbose
+    - run: pnpx pr-release pr --verbose --target master --source next --compact --verbose
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     # The following will publish a prerelease to npm
