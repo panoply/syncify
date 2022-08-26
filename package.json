@@ -132,14 +132,5 @@
     "sass": "^1.54.5",
     "svg-sprite": "^1.5.4",
     "svgo": "^2.8.0"
-  },
-  "pnpm": {
-    "packageExtensions": {
-      "pr-release": {
-        "dependencies": {
-          "node-gyp": "7"
-        }
-      }
-    }
   }
 }
