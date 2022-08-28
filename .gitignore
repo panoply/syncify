@@ -8,6 +8,7 @@ node_modules
 bower_components
 test/custom
 test/cases/*
+test/e2e/custom/dist
 .tmp
 dump.rdb
 docs/
@@ -39,6 +40,5 @@ nbproject
 example
 package
 theme
-dist
 yarn.lock
 versions
