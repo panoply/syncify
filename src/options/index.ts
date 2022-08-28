@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
 import { PartialDeep } from 'type-fest';
-import { Bundle, Cache, Config, HOT, Minify, Plugins, ProcessorConfigs } from 'types';
+import { HOT, Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
 import { assign } from '../shared/native';
 
 /**
@@ -152,11 +152,19 @@ export const hot: HOT = {
   inject: true,
   server: 3000,
   socket: 8089,
-  reload: 'hot',
+  method: 'hot',
   scroll: 'preserved',
-  layouts: [
-    'theme.liquid'
-  ]
+  layouts: [ 'theme.liquid' ],
+  label: 'visible',
+  output: null,
+  renderer: '{% render \'hot.js.liquid\', server: 3000, socket: 8089 %}',
+  snippet: null,
+  alive: {},
+  assets: {
+    js: new Set(),
+    css: new Set(),
+    svg: new Set()
+  }
 };
 
 /**
@@ -182,13 +190,7 @@ export const config: Config = {
   export: 'export',
   stores: null,
   config: '.',
-  hot: {
-    inject: true,
-    layouts: [ 'theme.liquid' ],
-    server: 3000,
-    socket: 8089,
-    reload: 'hot'
-  },
+  hot: false,
   spawn: {
     build: null,
     watch: null
