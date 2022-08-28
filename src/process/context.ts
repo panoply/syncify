@@ -84,6 +84,7 @@ export function section (file: File) {
 
     const rename = lastPath(file.input) + bundle.section.separator + file.base;
 
+    file.name = rename;
     file.key = join(file.namespace, rename);
     file.output = join(dirname(file.output), rename);
   }
