@@ -12,6 +12,7 @@ export default defineConfig({
       custom: 129457717489
     }
   },
+  hot: true,
   paths: {
     assets: 'assets/images/*',
     config: 'data/settings/*',

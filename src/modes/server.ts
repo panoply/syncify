@@ -14,7 +14,7 @@ async function injection () {
 
   update(`${c.line}${c.italic.gray('validating snippet injection')}`);
 
-  const snippet = await injectSnippet(hot.snippet);
+  const snippet = await injectSnippet();
 
   if (snippet) {
 

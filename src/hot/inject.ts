@@ -15,7 +15,7 @@ const EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET}['"][,\\slablsockvet
  * Checks whether or not the theme contains
  * the HOT reload snippet both locally and remote.
  */
-export async function injectSnippet (path: string) {
+export async function injectSnippet () {
 
   const key = `snippets/${HOT_SNIPPET}`;
   const [ theme ] = bundle.sync.themes;

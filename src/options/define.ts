@@ -91,8 +91,8 @@ export async function define (cli: Commands, _options?: Config) {
     setScriptOptions(config, pkg),
     setStyleConfig(config, pkg),
     setSpawns(config, bundle),
-    setHotReloads(cli, config),
-    setPlugins(config, bundle)
+    setPlugins(config, bundle),
+    setHotReloads(cli, config)
   ]);
 
   log(logHeader(bundle));
