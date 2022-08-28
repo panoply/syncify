@@ -13,10 +13,10 @@ export default defineConfig({
     }
   },
   hot: {
-    labels: true,
-    reload: 'hot',
+    label: 'visible',
+    method: 'hot',
     inject: true,
-    layouts: ['layout.liquid']
+    layouts: ['theme.liquid']
   },
   paths: {
     assets: 'assets/images/*',
@@ -45,7 +45,6 @@ export default defineConfig({
     script: {
       'assets/bundle.min.js': 'scripts/bundle.ts',
       'assets/lazysizes.min.js': 'scripts/modules/lazysizes.ts',
-      'assets/[file]-[dir].min': ['scripts/components/*.ts'],
       'snippets/[dir]-[file]': ['scripts/globs/*.ts'],
       'assets/globs.min.js': {
         input: 'scripts/globs.ts',

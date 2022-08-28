@@ -1,4 +1,9 @@
 /**
+ * HOT reload snippet filename
+ */
+export const HOT_SNIPPET = 'hot.js.liquid';
+
+/**
  * Syncify configuration files
  */
 export const CONFIG_FILES = [
@@ -75,4 +80,28 @@ export const UNITS = [
   'mb',
   'gb',
   'tb'
+];
+
+/**
+ * Console Methods for intercepting spawned processes
+ */
+export const CONSOLE_METHODS = [
+  'assert',
+  'count',
+  'countReset',
+  'debug',
+  'dir',
+  'dirxml',
+  'error',
+  'group',
+  'groupCollapsed',
+  'groupEnd',
+  'info',
+  'log',
+  'table',
+  'time',
+  'timeEnd',
+  'timeLog',
+  'trace',
+  'warn'
 ];

@@ -65,6 +65,7 @@
     }
   },
   "dependencies": {
+    "ansis": "^1.4.0",
     "anymatch": "^3.1.2",
     "axios": "^0.27.2",
     "bundle-require": "^3.1.0",
@@ -100,7 +101,6 @@
     "@types/svg-sprite": "^0.0.33",
     "@types/svgo": "^2.6.4",
     "@types/ws": "^8.5.3",
-    "ansis": "^1.4.0",
     "ava": "^4.3.3",
     "clean-stack": "^4.2.0",
     "esbuild": "^0.15.5",
@@ -132,14 +132,5 @@
     "sass": "^1.54.5",
     "svg-sprite": "^1.5.4",
     "svgo": "^2.8.0"
-  },
-  "pnpm": {
-    "packageExtensions": {
-      "pr-release": {
-        "dependencies": {
-          "node-gyp": "7"
-        }
-      }
-    }
   }
 }

@@ -59,7 +59,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
     }
   }
 
-  server(bundle);
+  await server(bundle);
 
   // console.log(bundle);
 

@@ -1,13 +1,71 @@
-import { Request, Theme, File } from 'types';
+import { Request, Theme, File, FileKeys } from 'types';
 import { queue, axios } from './queue';
-import { is } from '../shared/native';
+import { assign, is } from '../shared/native';
 import { log, c, error } from '../logger';
 import * as timer from '../process/timer';
 import { AxiosError, AxiosRequestConfig } from 'axios';
-
+import { bundle } from '../options';
 /* -------------------------------------------- */
 /* PRIVATE                                      */
 /* -------------------------------------------- */
+
+/**
+ * Has Asset
+ *
+ * Checks for the existence of an asset
+ */
+export async function has (asset: FileKeys, theme: Theme): Promise<boolean> {
+
+  return axios({
+    ...bundle.sync.stores[theme.sidx].client,
+    method: 'get',
+    url: theme.url,
+    params: {
+      'asset[key]': asset
+    }
+  }).then(() => true).catch(() => false);
+
+};
+
+/**
+ * Find Asset
+ *
+ * Same as `has` but returns the asset data
+ */
+export async function find (asset: FileKeys, theme: Theme): Promise<string> {
+
+  return axios({
+    ...bundle.sync.stores[theme.sidx].client,
+    method: 'get',
+    url: theme.url,
+    params: {
+      'asset[key]': asset
+    }
+  }).then(({ data }) => data.asset).catch(() => false);
+
+};
+
+/**
+ * Upload Asset
+ *
+ * Uploads a single asset
+ */
+export async function upload (asset: string, config: { theme: Theme, key: FileKeys }): Promise<boolean> {
+
+  const request = assign({}, bundle.sync.stores[config.theme.sidx].client, {
+    method: 'put',
+    url: config.theme.url,
+    data: {
+      asset: {
+        key: config.key,
+        value: asset
+      }
+    }
+  });
+
+  return axios(request).then(() => true).catch(() => false);
+
+};
 
 /**
  * Request Handler

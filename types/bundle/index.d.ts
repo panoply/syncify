@@ -2,7 +2,7 @@
 
 import type { Tester } from 'anymatch';
 import type { BuildOptions as ESBuildConfig } from 'esbuild';
-import type { Merge, MergeExclusive, PartialDeep } from 'type-fest';
+import type { Merge, MergeExclusive, PackageJson, PartialDeep } from 'type-fest';
 import type { Markdown } from '../misc/markdown';
 import type { Paths, Directories, HOT, Transforms, Views, Minify, Config } from '../config/index';
 import type { ScriptTransform, StyleTransform, SVGInline, SVGSprite } from '../config/transforms';
@@ -287,11 +287,7 @@ export interface Bundle<T = unknown> {
   /**
    * Hot reload mode options
    */
-  hot: Merge<HOT, {
-    alive?: boolean;
-    code?: string;
-    output?: string;
-  }>;
+  hot: boolean;
    /**
     * Directory structure paths
     */
@@ -395,6 +391,10 @@ export interface Bundle<T = unknown> {
    * Returns the merged configuration
    */
   get config(): Config;
+  /**
+   * Returns the `package.json` contents
+   */
+  get pkg(): PackageJson;
   /**
    * Plugins
    */
