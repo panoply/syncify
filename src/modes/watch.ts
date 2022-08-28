@@ -1,5 +1,6 @@
 import { Syncify, File, Pages, StyleTransform, ScriptTransform } from 'types';
 import chokidar from 'chokidar';
+import { inject } from '../hot/inject';
 import { client, queue } from '../requests/client';
 import { compile as liquid } from '../transform/liquid';
 import { styles } from '../transform/styles';
@@ -7,11 +8,11 @@ import { script } from '../transform/script';
 import { compile as asset } from '../transform/asset';
 import { compile as json } from '../transform/json';
 import { compile as pages } from '../transform/pages';
-import { is, isUndefined, from, nl } from '../shared/native';
+import { is, isUndefined, from, ws } from '../shared/native';
 import { Kind, parseFile, Type } from '../process/files';
 import { bundle } from '../options/index';
-import { c, log } from '../logger';
-import { socket, server } from './server';
+import { log } from '../logger';
+import { socket } from './server';
 import { event } from '../shared/utils';
 
 /**
@@ -21,16 +22,13 @@ import { event } from '../shared/utils';
  */
 export function watch (callback: Syncify) {
 
-  server(bundle);
-
-  const wss = socket(bundle);
+  const wss = socket();
   const request = client(bundle.sync);
   const parse = parseFile(bundle.paths, bundle.dirs.output);
   const watcher = chokidar.watch(from(bundle.watch.values()), {
     persistent: true,
     ignoreInitial: true,
     usePolling: true,
-    cwd: bundle.cwd,
     interval: 75,
     binaryInterval: 100,
     ignored: [ '**/*.map' ]
@@ -52,24 +50,29 @@ export function watch (callback: Syncify) {
 
         let value: string | void | { title: any; body_html: any; } = null;
 
-
         if (file.type === Type.Script) {
 
           value = await script(file as File<ScriptTransform>, callback);
 
-          wss.scripts();
+          wss.script(file.key);
 
         } else if (file.type === Type.Style) {
 
           value = await styles(file as File<StyleTransform>, callback);
 
-          wss.styles();
+          wss.stylesheet(file.key);
 
         } else if (file.type === Type.Section) {
 
           value = await liquid(file, callback);
 
-        } else if (file.type === Type.Layout || file.type === Type.Snippet) {
+        } else if (file.type === Type.Layout) {
+
+          value = await liquid(file, callback);
+
+          if (bundle.hot) value = inject(value);
+
+        } else if (file.type === Type.Snippet) {
 
           value = await liquid(file, callback);
 
@@ -102,7 +105,7 @@ export function watch (callback: Syncify) {
 
           value = await asset(file, callback);
 
-          wss.assets();
+          // wss.assets(file.key);
 
         }
 
@@ -112,12 +115,10 @@ export function watch (callback: Syncify) {
 
           await request.assets('put', file, value);
 
-          if (file.type !== Type.Script && file.type !== Type.Style) {
-            if (file.type === Type.Section) {
-              wss.hydrate(`shopify-section-${file.name}`);
-            } else {
-              await queue.onIdle().then(() => wss.replace());
-            }
+          if (file.type === Type.Section) {
+            wss.section(file.name);
+          } else if (file.type !== Type.Script && file.type !== Type.Style) {
+            await queue.onIdle().then(() => wss.replace());
           }
 
         }
