@@ -1,125 +1,276 @@
 import m from 'mithril';
 import { LiteralUnion } from 'type-fest';
 
+declare global {
+  export interface Window {
+    syncify: {
+      /**
+       * Check to see if Syncify is ready or not
+       */
+      ready: boolean;
+      /**
+       * Full page refresh
+       */
+      refresh?: () => void;
+      /**
+       * HOT reload entire page
+       */
+      reload?: () => void;
+      /**
+       * HOT Reloads all assets
+       */
+      assets?: () => void;
+      /**
+       * Change the vnode style
+       */
+      style?: {
+        /**
+         * The dynamic parent node
+         */
+        parent: (style: Partial<CSSStyleDeclaration>) => void;
+        /**
+         * The inner node which contains the event text
+         */
+        label: (style: Partial<CSSStyleDeclaration>) => void;
+      }
+    }
+  }
+}
+
 (function syncify (syncify: {
   server: string;
   socket: string;
+  label: string;
 }) {
 
-  let state: string = 'SYNCIFY CONNECTING';
+  window.syncify = window.syncify || { ready: false };
 
-  const mount = document.createElement('div');
+  /* -------------------------------------------- */
+  /* CONSTANTS                                    */
+  /* -------------------------------------------- */
 
-  const event = (label?: string) => {
-    if (label !== undefined) state = label;
-    m.redraw();
-    return state;
-  };
+  const server = `http://localhost:${syncify.server}/`;
+  const socket = new WebSocket(`ws://localhost:${syncify.socket}/ws`);
+  const parser = new DOMParser();
 
-  const component = (node: HTMLElement) => {
+  /* -------------------------------------------- */
+  /* UTILITIES                                    */
+  /* -------------------------------------------- */
 
-    Object.assign(mount.style, <CSSStyleDeclaration>{
+  /**
+   * Mithril Component - Renders the virutal label
+   */
+  const label = (function vnode () {
+
+    /**
+     * Local State Message
+     */
+    let state: string = 'Syncify Connected';
+
+    /**
+     * Virtual DOM Element
+     */
+    const node = document.createElement('div');
+
+    /**
+     * The dynamic nodes style - Exposed to user
+     */
+    const nodeStyle: Partial<CSSStyleDeclaration> = {
       position: 'fixed',
       top: '0',
-      left: '44%',
+      left: '0',
+      right: '0',
       margin: '0 auto',
-      height: '18px',
-      width: '180px',
-      backgroundColor: '#111',
-      borderRadius: '5px',
-      borderTopLeftRadius: '0',
-      borderTopRightRadius: '0',
       display: 'flex',
-      color: '#fff',
-      fontFamily: 'monospace',
+      color: '#f7f7f7',
+      zIndex: '99999',
+      fontFamily: 'system-ui,sans-serif',
       textAlign: 'center',
       justifyContent: 'space-around',
-      alignContent: 'center',
-      lineHeight: 'initial',
-      fontSize: '12px',
-      textTransform: 'uppercase'
-    });
+      alignItems: 'center',
+      fontSize: '11px'
+    };
 
-    m.mount(mount, { view: () => m('span', event()) });
+    const childStyle: Partial<CSSStyleDeclaration> = {
+      padding: '5px 20px',
+      backgroundColor: '#232326',
+      border: '0.8px solid transparent',
+      borderRadius: '5px',
+      borderTop: '0',
+      borderTopLeftRadius: '0',
+      borderTopRightRadius: '0'
+    };
 
-    node.append(mount);
+    const child = { view: () => m('div', { style: childStyle }, state) };
 
-  };
+    /**
+     * Parent Style
+     */
+    Object.assign(node.style, nodeStyle);
+
+    window.syncify.style = {
+      parent: (style: Partial<CSSStyleDeclaration>) => {
+        Object.assign(node.style, nodeStyle, style);
+        m.redraw();
+      },
+      label: (style: Partial<CSSStyleDeclaration>) => {
+        Object.assign(childStyle, style);
+        m.redraw();
+      }
+    };
+
+    /**
+     * The Mithril component - Mounted to the dynamic node
+     */
+    m.mount(node, child);
+
+    return {
+      get node () {
+        return node;
+      },
+      event: (label?: string) => {
+        if (label !== undefined) state = label;
+        m.redraw();
+        return state;
+      },
+      render: (dom: HTMLElement) => {
+        dom.append(node);
+      }
+    };
+
+  }());
+
+  /**
+   * Execution Timer - Measures the ellapsed time of reloads
+   */
+  const timer = (function (mark: number[]) {
+
+    let timeout: NodeJS.Timeout = null;
+
+    return {
+      start: () => {
+
+        const time = performance.now();
+        mark.push(time);
+
+      },
+      stop: () => {
+
+        if (timeout !== null) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+
+        timeout = setTimeout(() => {
+          label.event('Waiting for changes...');
+          timeout = null;
+        }, 5000);
+
+        const ms = (performance.now() - mark.pop());
+        if (ms < 1000) return `${ms.toFixed(0)}ms`;
+
+        const s = ms / 1000;
+        if (s < 60) return `${s.toFixed(0)}s ${+ms.toFixed(0).slice(1)}ms`;
+
+        const m = (s / 60).toFixed(0);
+        return `${m}m ${(s - (60 * Number(m)))}s ${+ms.toFixed(0).slice(1)}ms`;
+      }
+    };
+
+  })([]);
 
   /**
    * Assert new value hash so scripts reload
    */
-  const params = (url: string) => {
+  function params (url: string) {
     const p = url.lastIndexOf('/') + 1;
     const q = url.indexOf('?', p);
     return (q > -1 ? url.substring(p, q) : url.substring(p)) + '?v=' + Date.now();
   };
 
-  const styles = (dom: Document) => {
+  /**
+   * Asset src/href matcher - Swaps the remote origin with local
+   */
+  function assetMatch (src: string, uri: string) {
 
-    dom.querySelectorAll('link[data-syncify-live]').forEach((node) => {
+    if (typeof uri !== 'string') return false;
+
+    return src.slice(src.lastIndexOf('/') + 1).startsWith(uri);
+
+  };
+
+  /**
+   * Asset styles - Selects all `<link>` nodes and replaces the `href`
+   * This is what allows for the HOT reload
+   */
+  function stylesheets (dom: Document, uri?: string) {
+
+    dom.querySelectorAll('link[rel=stylesheet]').forEach((node) => {
+
       const href = node.getAttribute('href');
-      node.setAttribute('href', `http://localhost:${syncify.server}/${params(href)}`);
-      event('HOT RELOAD ~ <link>');
+      if (!assetMatch(href, uri)) return;
+
+      node.setAttribute('href', server + params(href));
+
     });
 
     return dom;
 
   };
 
-  const scripts = (dom: Document) => {
+  /**
+   * Asset scripts - Selects all `<script src="*">` nodes and clones the
+   * tags then replaces the current elements with the newer ones.
+   */
+  function scripts (dom: Document, uri?: string) {
 
-    dom.querySelectorAll('script[data-syncify-live]').forEach((node) => {
+    dom.querySelectorAll('script[src]').forEach((node) => {
 
-      const make = dom.createElement('script');
       const href = node.getAttribute('src');
-      const src = `http://localhost:${syncify.server}/${params(href)}`;
+      if (!assetMatch(href, uri)) return;
 
-      make.src = src;
+      const script = dom.createElement('script');
+      script.setAttribute('src', server + params(href));
 
       for (const attr of Array.from(node.attributes)) {
-        if (attr.nodeName.toUpperCase() !== 'SRC') make.setAttribute(attr.nodeName, attr.nodeValue);
+        if (attr.nodeName !== 'src') script.setAttribute(attr.nodeName, attr.nodeValue);
       }
 
       dom.head.removeChild(node);
-      dom.head.appendChild(make);
+      dom.head.appendChild(script);
 
-      event('HOT RELOAD ~ <script>');
     });
 
     return dom;
 
   };
   /**
-   * Replace paths - Replaces all instances of
-   * Shopify CDN paths that we will serve locally.
+   * Replace all asset paths
    */
-  const assets = (dom: Document, node?: 'script' | 'style') => {
+  function assets (dom: Document) {
 
-    if (node === 'script') return scripts(dom);
-    if (node === 'style') return styles(dom);
-
-    styles(dom);
     scripts(dom);
-    event('HOT RELOAD ~ ASSETS');
+    stylesheets(dom);
 
     return dom;
+
   };
 
   /**
    * XHR Request - Reloads the page via XHR
    * and resolves the document as a string.
    */
-  const req = (uri: string) => {
+  function req (uri: string, type: 'json' | 'text') {
 
     return new Promise(function (resolve, reject) {
 
       const xhr = new XMLHttpRequest();
 
+      xhr.responseType = type;
       xhr.open('GET', uri);
       xhr.setRequestHeader('X-Syncify-Reload', 'true');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-      xhr.onload = () => resolve(xhr.responseText);
+      xhr.onload = () => resolve(xhr.response);
       xhr.onerror = () => reject(xhr.statusText);
       xhr.send();
 
@@ -127,71 +278,96 @@ import { LiteralUnion } from 'type-fest';
 
   };
 
-  const socket = new WebSocket(`ws://localhost:${syncify.socket}/ws`);
-  const parser = new DOMParser();
-
   // status('Syncify Live (connected)');
 
   socket.addEventListener('message', function ({ data }: {
-      data: LiteralUnion<'reload' | 'replace' | 'script' | 'style', string>
+    data: LiteralUnion<'reload' | 'replace' | 'script' | 'style', string>
   }) {
 
     if (data === 'reload') {
 
-      event('FULL RELOAD ~ REFRESH');
+      label.event('Refreshing');
 
       return top.location.reload();
 
     } else if (data === 'replace') {
 
-      event('HOT RELOAD ~ VIEW');
+      timer.start();
+      label.event('Reloading');
 
-      return req(location.href).then((doc: string) => {
+      return req(location.href, 'text').then((doc: string) => {
 
         const dom = parser.parseFromString(doc, 'text/html');
         const newDom = assets(dom);
         document.body.replaceWith(newDom.body);
 
-        component(document.body);
-
-        event('SYNCIFY ~ HOT');
+        label.render(document.body);
+        label.event(`Reloaded in ${timer.stop()}`);
 
       });
-
-    } else if (data === 'script') {
-
-      event('HOT RELOAD ~ JS');
-
-      return scripts(document);
-
-    } else if (data === 'style') {
-
-      event('HOT RELOAD ~ CSS');
-
-      return styles(document);
 
     } else {
 
-      event('HOT REPLACE ~ VIEW');
+      timer.start();
 
-      return req(location.href).then((doc: string) => {
+      const [ type, uri ] = data.split(',');
 
-        const dom = parser.parseFromString(doc, 'text/html');
-        const newDom = assets(dom).body.querySelector(`#${data}`);
+      if (type === 'section') {
 
-        document.body.querySelector(`#${data}`).replaceWith(newDom);
+        label.event(`Reloading Section: ${uri}`);
 
-        event('HOT SECTION ~ ' + data);
+        return req(`${location.pathname}?sections=${uri}`, 'json').then((value: {
+          [prop: string]: string
+        }) => {
+          const { firstElementChild } = parser.parseFromString(value[uri], 'text/html').body;
+          document.body.querySelector(`#shopify-section-${data}`).replaceWith(firstElementChild);
+          label.event(`Reloaded in ${timer.stop()}`);
+        });
 
-      });
+      } else if (type === 'script') {
 
+        label.event(`Reloading JavaScript: ${uri}`);
+
+        scripts(document, uri);
+
+        label.event(`Reloaded in ${timer.stop()}`);
+
+      } else if (type === 'stylesheet') {
+
+        label.event(`Reloading Stylesheet: ${uri}`);
+
+        stylesheets(document, uri);
+
+        label.event(`Reloaded in ${timer.stop()}`);
+
+      }
     }
 
   });
 
-  document.addEventListener('DOMContentLoaded', () => component(document.body));
+  /* -------------------------------------------- */
+  /* EXPOSED METHODS                              */
+  /* -------------------------------------------- */
+
+  window.syncify.assets = () => assets(document);
+  window.syncify.refresh = () => top.location.reload();
+  window.syncify.reload = () => req(location.href, 'text').then((doc: string) => {
+    const dom = parser.parseFromString(doc, 'text/html');
+    document.body.replaceWith(assets(dom).body);
+    label.render(document.body);
+  });
+
+  /* -------------------------------------------- */
+  /* RENDER VNODE                                 */
+  /* -------------------------------------------- */
+
+  document.addEventListener('DOMContentLoaded', () => {
+    label.render(document.body);
+    window.syncify.ready = true;
+  });
 
 }({
   server: '{{- server | default: 3000 -}}',
-  socket: '{{- socket | default: 8089 -}}'
+  socket: '{{- socket | default: 8089 -}}',
+  label: '{{- label | default: "visible" -}}'
 }));
