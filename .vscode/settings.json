@@ -11,7 +11,7 @@
     "*config.js.liquid": "javascript"
   },
   "files.exclude": {
-    "**/.git": false,
+    "**/.git": true,
     "**/.svn": true,
     "**/.hg": true,
     "**/CVS": true,
