@@ -1,4 +1,9 @@
 /**
+ * HOT reload snippet filename
+ */
+export const HOT_SNIPPET = 'hot.js.liquid';
+
+/**
  * Syncify configuration files
  */
 export const CONFIG_FILES = [
