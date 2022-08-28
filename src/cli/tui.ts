@@ -115,7 +115,7 @@ export const reloaded = (type: string, time: string) => (
  *
  * `├ process ...`
  */
-export const message = (message: string) => log(c.item + c.whiteBright(`${message}`));
+export const message = (message: string) => log(c.line + c.whiteBright(`${message}`));
 
 /**
  * Compile `whiteBright`
