@@ -1,11 +1,12 @@
-import { Commands, Config, Package, Bundle, Modes } from 'types';
-import { anyTrue, isNil, has, includes, forEach } from 'rambdax';
+import { Commands, Config, Package, Bundle, Modes, HOTConfig } from 'types';
+import { anyTrue, isNil, has, includes, isEmpty } from 'rambdax';
 import merge from 'mergerino';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
 import { join } from 'node:path';
 import { pathExists, readJson } from 'fs-extra';
-import { isArray, keys, is, assign, nil, log, isString, isObject, ws, defineProperty } from '../shared/native';
+import { typeError, invalidError, missingConfig, throwError, unknownError, warnOption } from './validate';
+import { isArray, keys, assign, nil, log, isString, isObject, ws, defineProperty, isBoolean } from '../shared/native';
 import { normalPath } from '../shared/paths';
 import { authURL } from '../shared/options';
 import { logHeader } from '../logger/heading';
@@ -22,7 +23,6 @@ import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
 import { setMinifyOptions } from './minify';
 import { bundle, cache, processor, plugins, config, hot } from '.';
-import { typeError, invalidError, missingConfig, throwError } from './validate';
 import { PATH_KEYS } from '../constants';
 
 /* -------------------------------------------- */
@@ -76,8 +76,6 @@ export async function define (cli: Commands, _options?: Config) {
 
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
-  process.env.SYNCIFY_SERVER = String(bundle.hot.server);
-  process.env.SYNCIFY_SOCKET = String(bundle.hot.socket);
 
   const promise = await Promise.all([
     setBaseDirs(cli, config),
@@ -105,23 +103,72 @@ export async function define (cli: Commands, _options?: Config) {
 
 async function setHotReloads (cli: Commands, config: Config) {
 
-  if (bundle.mode.watch) {
-    if ((cli.hot === true || config.hot === true)) {
-      bundle.hot = true;
-      hot.render = `{% render 'hot.js.liquid', server: ${hot.server}, socket: ${hot.socket} %}`;
-    } else if (isObject(config.hot)) {
-      const { server, socket } = assign(hot, config.hot);
-      bundle.hot = true;
-      hot.render = `{% render 'hot.js.liquid', server: ${server}, socket: ${socket} %}`;
-    }
+  if (bundle.mode.watch === false || cli.hot === false) return;
+
+  const warn = warnOption('HOT Reloads');
+
+  if (bundle.sync.stores.length > 1) {
+    warn('HOT Reload can only be used on 1 store');
+    return;
+  } else if (bundle.sync.themes.length > 1) {
+    warn('HOT Reload can only be used on 1 theme');
+    return;
   }
 
-  if (!bundle.hot) return;
+  let defaults = true;
+
+  if (isBoolean(config.hot)) {
+    if (config.hot === false) return;
+    bundle.hot = true;
+  } else if (isObject(config.hot)) {
+    bundle.hot = true;
+    defaults = isEmpty(config.hot);
+  } else {
+    typeError('hot', 'hot', config.hot, 'boolean | {}');
+  }
+
+  if (!defaults) {
+
+    for (const prop in config.hot as HOTConfig) {
+
+      if (has(prop, hot)) {
+
+        if (prop === 'label') {
+          if (config.hot[prop] === 'visible' || config.hot[prop] === 'hidden') {
+            hot[prop] = config.hot[prop];
+          } else {
+            invalidError('hot', prop, config.hot[prop], 'visible | hidden');
+          }
+        } else if (prop === 'method') {
+          if (config.hot[prop] === 'hot' || config.hot[prop] === 'refresh') {
+            hot[prop] = config.hot[prop];
+          } else {
+            invalidError('hot', prop, config.hot[prop], 'hot | refresh');
+          }
+        } else if (prop === 'scroll') {
+          if (config.hot[prop] === 'preserved' || config.hot[prop] === 'top') {
+            hot[prop] = config.hot[prop];
+          } else {
+            invalidError('hot', prop, config.hot[prop], 'preserved | top');
+          }
+        } else if (typeof hot[prop] === typeof config.hot[prop]) {
+          hot[prop] = config.hot[prop];
+        } else {
+          typeError('hot', prop, config.hot[prop], typeof hot[prop]);
+        }
+
+      } else {
+        unknownError(`hot > ${prop}`, config.hot[prop]);
+      }
+
+    }
+  }
 
   hot.snippet = join(bundle.cwd, 'node_modules', '@syncify/cli', 'hot.js.liquid');
   hot.output = join(bundle.dirs.output, 'snippets', 'hot.js.liquid');
 
-  bundle.watch.add(bundle.hot.output);
+  for (const layout of hot.layouts) hot.alive[join(bundle.dirs.output, 'layout', layout)] = false;
+
 }
 
 /**
@@ -386,7 +433,7 @@ async function getConfig (pkg: Package, cli: Commands) {
  */
 export function setStores (cli: Commands, config: Config) {
 
-  if (is(cli._.length, 0)) return;
+  if (cli._.length === 0) return;
 
   const stores = cli._[0].split(',');
   const file = dotenv.config({ path: join(bundle.cwd, '.env') });
@@ -394,7 +441,7 @@ export function setStores (cli: Commands, config: Config) {
   const items = array.filter(({ domain }) => includes(domain, stores));
   const queue = items.length > 1;
 
-  forEach(store => {
+  for (const store of items) {
 
     // The myshopify store domain
     const domain = `${store.domain}.myshopify.com`.toLowerCase();
@@ -424,7 +471,7 @@ export function setStores (cli: Commands, config: Config) {
         ? cli[store.domain].split(',')
         : keys(store.themes);
 
-    forEach(target => {
+    for (const target of themes) {
 
       if (!has(target, store.themes)) invalidError('theme', 'target', target, 'string');
 
@@ -437,9 +484,9 @@ export function setStores (cli: Commands, config: Config) {
         url: `/themes/${store.themes[target]}/assets.json`
       });
 
-    }, themes);
+    }
 
-  }, items);
+  }
 
   if (bundle.sync.stores.length === 0) {
     throwError(
