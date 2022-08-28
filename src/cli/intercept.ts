@@ -1,6 +1,7 @@
 import { PassThrough } from 'node:stream';
 import { Console } from 'node:console';
 import { forEach } from 'rambdax';
+import { CONSOLE_METHODS } from '../constants'
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -11,33 +12,6 @@ import { forEach } from 'rambdax';
  */
 type Callback = (stream: 'stdout' | 'stderr', data: string) => void
 
-/* -------------------------------------------- */
-/* CONSTANTS                                    */
-/* -------------------------------------------- */
-
-/**
- * Console Methods
- */
-const methods = [
-  'assert',
-  'count',
-  'countReset',
-  'debug',
-  'dir',
-  'dirxml',
-  'error',
-  'group',
-  'groupCollapsed',
-  'groupEnd',
-  'info',
-  'log',
-  'table',
-  'time',
-  'timeEnd',
-  'timeLog',
-  'trace',
-  'warn'
-];
 
 /**
  * Native Methods
@@ -62,13 +36,15 @@ export const intercept = (callback: Callback): () => void => {
 
   const internal = new Console(stdout, stderr);
 
-  forEach((method) => {
+  for (const method of CONSOLE_METHODS) {
     native.set(method, console[method]);
     console[method] = (internal as any)[method];
-  }, methods);
+  }
 
   return () => {
-    forEach((method) => { console[method] = native.get(method); }, methods);
+
+    for (const method of CONSOLE_METHODS) console[method] = native.get(method);
     native.clear();
+
   };
 };

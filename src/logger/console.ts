@@ -4,7 +4,7 @@ import { has } from 'rambdax';
 import { nil } from '../shared/native';
 import { byteConvert, byteSize, sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
-import { bundle } from '../options/index';
+import { bundle, hot } from '../options/index';
 import { queue } from '../requests/queue';
 import { Group, File, Theme } from 'types';
 import * as timer from '../process/timer';
@@ -137,7 +137,9 @@ export const syncing = (message: string) => {
     tui.warning(`${count} ${c.yellowBright(`~ Type ${c.bold('w')} and press ${c.bold('enter')} to view`)}`);
   }
 
-  tui.reloaded(c.bold('HOT ASSET'), timer.now());
+  if (bundle.hot) {
+    tui.reloaded(c.bold('HOT REPLACEMENT'), timer.now());
+  }
 
   tui.syncing(message);
 

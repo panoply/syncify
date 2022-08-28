@@ -62,17 +62,15 @@ export default defineConfig(options => [
     clean: [
       'dist'
     ],
+    globalName: 'syncify',
     splitting: true,
     treeshake: 'smallest',
     noExternal,
     external,
-    esbuildOptions(options, context) {
-      options.chunkNames = context.format
-    },
     async onSuccess () {
 
       await build({
-        entryPoints: [ 'src/hot/embed.ts' ],
+        entryPoints: [ 'src/hot/snippet.ts' ],
         bundle: true,
         minify: true,
         format: 'iife',

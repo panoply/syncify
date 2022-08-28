@@ -1,15 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { Pages, Sections, Snippets } from './views';
+import { HOTConfig } from '../bundle/hot';
 import { ImageTransform, ScriptTransform, StyleTransform, SVGTransform } from './transforms';
 import { ESBuildMinify, JSONMinify, ViewMinify } from './minify';
 import { PluginHooks } from '../bundle/plugin';
 import { Processors } from './processors';
 import { InferPaths, RenamePaths } from '../misc/shared';
 import { MergeExclusive, RequireAllOrNone } from 'type-fest';
-
-/* -------------------------------------------- */
-/* PROCESSORS                                   */
-/* -------------------------------------------- */
 
 /* -------------------------------------------- */
 /* VIEWS                                        */
@@ -43,12 +40,7 @@ export interface Transforms {
   | string[]
   | ImageTransform
   | ImageTransform[]
-  | {
-    [output: `assets/${string}`]:
-    string
-    | string[]
-    | ImageTransform
-  }
+  | { [output: `assets/${string}`]: string | string[] | ImageTransform }
   /**
    * Style File transforms
    *
@@ -265,69 +257,7 @@ export interface Logger {
    *
    * @default true
    */
-  clearScreen: boolean;
-}
-
-/* -------------------------------------------- */
-/* LIVE RELOADS                                 */
-/* -------------------------------------------- */
-
-export interface HOT {
-  /**
-   * Whether or not Syncify hot reloads UI labels should render.
-   *
-   * @default true
-   */
-  labels?: boolean;
-  /**
-   * Whether or not Syncify should inject the required HOT snippet
-   * at runtime to the defined layouts. When `false` you will need
-   * to manually place the `hot.liquid` snippet into your theme.
-   *
-   * _Please note that by default when running `--hot` Syncify will
-   * upload layouts upon initializing_
-   *
-   * @default true
-   */
-  inject?: boolean;
-  /**
-   * A string list of Liquid template layouts used in your theme.
-   *
-   * @default ['theme.liquid']
-   */
-  layouts?: string[];
-  /**
-   * The static server for assets
-   *
-   * @default 3000
-   * @example 'http://localhost:3000/some-asset.js'
-   */
-  server?: number;
-  /**
-   * Websocket port
-   *
-   * @default 8089
-   * @example 'ws://localhost:8089/ws'
-   */
-  socket?: number;
-  /**
-   * Reload Method
-   *
-   * @default 'hot'
-   */
-  reload?: 'hot' | 'refresh' | 'manual';
-  /**
-   * Scroll position between reloads
-   *
-   * @default 'preserved'
-   */
-  scroll?: 'preserved' | 'top';
-  /**
-   * Hides the Shopify iFrame preview label.
-   *
-   * @default true
-   */
-  hidePreview?: boolean;
+  clear: boolean;
 }
 
 /* -------------------------------------------- */
@@ -500,7 +430,7 @@ export interface Config extends Directories {
    *
    * @default false
    */
-  hot?: boolean | HOT;
+  hot?: boolean | HOTConfig;
   /**
    * Syncify Plugins
    */

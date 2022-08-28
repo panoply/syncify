@@ -1,4 +1,5 @@
 import { type, has } from 'rambdax';
+import { isUndefined } from '../shared/native';
 import { c } from '../logger';
 
 /**
@@ -30,10 +31,16 @@ export function warnOption (group: string) {
 
   if (!has(group, warnings)) warnings[group] = [];
 
-  return (message: string, value: string) => {
-    warnings[group].push(
-      `${c.line}  ${c.yellowBright(`${message}${c.whiteBright(':')} ${c.bold(value)}`)}`
-    );
+  return (message: string, value?: string) => {
+    if (isUndefined(value)) {
+      warnings[group].push(
+        `${c.line}  ${c.yellowBright(`${message}`)}`
+      );
+    } else {
+      warnings[group].push(
+        `${c.line}  ${c.yellowBright(`${message}${c.whiteBright(':')} ${c.bold(value)}`)}`
+      );
+    }
   };
 };
 

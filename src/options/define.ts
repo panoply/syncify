@@ -1,11 +1,12 @@
-import { Commands, Config, Package, Bundle, Modes, HOT } from 'types';
-import { anyTrue, isNil, has, includes, forEach } from 'rambdax';
+import { Commands, Config, Package, Bundle, Modes, HOTConfig } from 'types';
+import { anyTrue, isNil, has, includes, isEmpty } from 'rambdax';
 import merge from 'mergerino';
-import { join } from 'path';
-import { pathExists, readFile, readJson, writeFile } from 'fs-extra';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { isArray, keys, is, assign, nil, log, isString, isObject, ws, nl } from '../shared/native';
+import { join } from 'node:path';
+import { pathExists, readJson } from 'fs-extra';
+import { typeError, invalidError, missingConfig, throwError, unknownError, warnOption } from './validate';
+import { isArray, keys, assign, nil, log, isString, isObject, ws, defineProperty, isBoolean } from '../shared/native';
 import { normalPath } from '../shared/paths';
 import { authURL } from '../shared/options';
 import { logHeader } from '../logger/heading';
@@ -21,12 +22,8 @@ import { setJsonOptions, setViewOptions } from './transforms';
 import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
 import { setMinifyOptions } from './minify';
-import { bundle, cache, processor, plugins, config } from '.';
-import { typeError, invalidError, missingConfig, throwError } from './validate';
+import { bundle, cache, processor, plugins, config, hot } from '.';
 import { PATH_KEYS } from '../constants';
-import { inject } from '../hot/inject';
-import { glob } from 'glob';
-import { getResolvedPaths } from './utilities';
 
 /* -------------------------------------------- */
 /* EXIT HANDLER                                 */
@@ -66,6 +63,8 @@ export async function define (cli: Commands, _options?: Config) {
 
   const pkg = await getPackageJson(cli.cwd);
 
+  defineProperty(bundle, 'pkg', { get () { return pkg; } });
+
   bundle.config = await getConfig(pkg, cli);
   bundle.mode = setModes(cli);
   bundle.cli = cli.cli;
@@ -75,11 +74,8 @@ export async function define (cli: Commands, _options?: Config) {
   bundle.prod = cli.prod;
   bundle.dev = cli.dev && !cli.prod;
 
-  // env variables
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
-  process.env.SYNCIFY_SERVER = String(bundle.hot.server);
-  process.env.SYNCIFY_SOCKET = String(bundle.hot.socket);
 
   const promise = await Promise.all([
     setBaseDirs(cli, config),
@@ -107,20 +103,72 @@ export async function define (cli: Commands, _options?: Config) {
 
 async function setHotReloads (cli: Commands, config: Config) {
 
-  if (anyTrue(cli.hot, config.hot, isObject(config.hot))) bundle.hot = config.hot;
+  if (bundle.mode.watch === false || cli.hot === false) return;
 
-  const { build } = await import('esbuild');
+  const warn = warnOption('HOT Reloads');
 
-  bundle.hot.output = join(bundle.dirs.output, 'snippets', 'hot.liquid');
+  if (bundle.sync.stores.length > 1) {
+    warn('HOT Reload can only be used on 1 store');
+    return;
+  } else if (bundle.sync.themes.length > 1) {
+    warn('HOT Reload can only be used on 1 theme');
+    return;
+  }
 
-  build({
-    entryPoints: [ join(bundle.dirs.output, 'snippets', 'hot.liquid') ]
-  });
+  let defaults = true;
 
-  bundle.hot.code = join(bundle.cwd, 'node_modules/@syncify/cli/dist/hot/script.txt');
-  bundle.hot.output = join(bundle.dirs.output, 'snippets', 'hot.liquid');
+  if (isBoolean(config.hot)) {
+    if (config.hot === false) return;
+    bundle.hot = true;
+  } else if (isObject(config.hot)) {
+    bundle.hot = true;
+    defaults = isEmpty(config.hot);
+  } else {
+    typeError('hot', 'hot', config.hot, 'boolean | {}');
+  }
 
-  bundle.watch.add(bundle.hot.output);
+  if (!defaults) {
+
+    for (const prop in config.hot as HOTConfig) {
+
+      if (has(prop, hot)) {
+
+        if (prop === 'label') {
+          if (config.hot[prop] === 'visible' || config.hot[prop] === 'hidden') {
+            hot[prop] = config.hot[prop];
+          } else {
+            invalidError('hot', prop, config.hot[prop], 'visible | hidden');
+          }
+        } else if (prop === 'method') {
+          if (config.hot[prop] === 'hot' || config.hot[prop] === 'refresh') {
+            hot[prop] = config.hot[prop];
+          } else {
+            invalidError('hot', prop, config.hot[prop], 'hot | refresh');
+          }
+        } else if (prop === 'scroll') {
+          if (config.hot[prop] === 'preserved' || config.hot[prop] === 'top') {
+            hot[prop] = config.hot[prop];
+          } else {
+            invalidError('hot', prop, config.hot[prop], 'preserved | top');
+          }
+        } else if (typeof hot[prop] === typeof config.hot[prop]) {
+          hot[prop] = config.hot[prop];
+        } else {
+          typeError('hot', prop, config.hot[prop], typeof hot[prop]);
+        }
+
+      } else {
+        unknownError(`hot > ${prop}`, config.hot[prop]);
+      }
+
+    }
+  }
+
+  hot.snippet = join(bundle.cwd, 'node_modules', '@syncify/cli', 'hot.js.liquid');
+  hot.output = join(bundle.dirs.output, 'snippets', 'hot.js.liquid');
+
+  for (const layout of hot.layouts) hot.alive[join(bundle.dirs.output, 'layout', layout)] = false;
+
 }
 
 /**
@@ -230,7 +278,7 @@ function setSpawns (config: Config, bundle: Bundle) {
 
   if (props.length === 0) return;
 
-  forEach(name => {
+  for (const name in config.spawn[mode]) {
 
     const command = config.spawn[mode][name];
 
@@ -265,7 +313,7 @@ function setSpawns (config: Config, bundle: Bundle) {
       typeError('spawn', mode, config.spawn[mode], 'string | string[]');
     }
 
-  }, keys(config.spawn[mode]));
+  }
 
 };
 
@@ -385,7 +433,7 @@ async function getConfig (pkg: Package, cli: Commands) {
  */
 export function setStores (cli: Commands, config: Config) {
 
-  if (is(cli._.length, 0)) return;
+  if (cli._.length === 0) return;
 
   const stores = cli._[0].split(',');
   const file = dotenv.config({ path: join(bundle.cwd, '.env') });
@@ -393,7 +441,7 @@ export function setStores (cli: Commands, config: Config) {
   const items = array.filter(({ domain }) => includes(domain, stores));
   const queue = items.length > 1;
 
-  forEach(store => {
+  for (const store of items) {
 
     // The myshopify store domain
     const domain = `${store.domain}.myshopify.com`.toLowerCase();
@@ -423,7 +471,7 @@ export function setStores (cli: Commands, config: Config) {
         ? cli[store.domain].split(',')
         : keys(store.themes);
 
-    forEach(target => {
+    for (const target of themes) {
 
       if (!has(target, store.themes)) invalidError('theme', 'target', target, 'string');
 
@@ -436,9 +484,9 @@ export function setStores (cli: Commands, config: Config) {
         url: `/themes/${store.themes[target]}/assets.json`
       });
 
-    }, themes);
+    }
 
-  }, items);
+  }
 
   if (bundle.sync.stores.length === 0) {
     throwError(

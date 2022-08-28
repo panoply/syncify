@@ -159,7 +159,7 @@ interface File<T = unknown> extends ParsedPath {
    * 'snippets/file.liquid'
    * 'templates/index.liquid'
    */
-  key: LiteralUnion<FileKeys, string>;
+  key: FileKeys;
   /**
    * The `namespace` value will typically refelect the output
    * parent directory name reference, but sometimes this might

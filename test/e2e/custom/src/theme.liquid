@@ -1,8 +1,6 @@
 <!doctype html>
 <html class="no-js" lang="{{ request.locale.iso_code }}">
   <head>
-{%- render "hot" -%}
-
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -80,7 +78,7 @@
       {%- render 'cart-drawer' -%}
     {%- endif -%}
 
-    {% section 'announcement-bar' %}
+{%render 'test'%}
     {% section 'header' %}
 
     <main id="maincontent" class="content-for-layout focus-none" role="main" tabindex="-1">
@@ -97,6 +95,7 @@
         {{ 'accessibility.link_messages.new_window' | t }}
       </li>
     </ul>
+
 
     <script>
       window.shopUrl = "{{ request.origin }}";
