@@ -12,12 +12,6 @@ export default defineConfig({
       custom: 129457717489
     }
   },
-  hot: {
-    label: 'visible',
-    method: 'hot',
-    inject: true,
-    layouts: ['theme.liquid']
-  },
   paths: {
     assets: 'assets/images/*',
     config: 'data/settings/*',
@@ -48,7 +42,8 @@ export default defineConfig({
       'snippets/[dir]-[file]': ['scripts/globs/*.ts'],
       'assets/globs.min.js': {
         input: 'scripts/globs.ts',
-        format: 'iife'
+        format: 'iife',
+
       }
     },
     style: {

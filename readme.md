@@ -60,7 +60,7 @@ Syncify uses built-in capabilities when handling snippets, templates, layouts, l
 
 ### Asset Files
 
-Syncify does not want to re-create or impede on developer preferences and tool appropriation when it comes to handling asset files. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify's `build` and `watch` instances. In addition to spawn processing, Syncify also provides pre-processor capabilities for handling TypeScript, JavaScript, CSS, SCSS and SVG file types.
+Syncify does not want to re-create or impede on developer preferences and tool appropriation. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify's `build` and `watch` instances. Syncify also provides pre-processor capabilities for handling TypeScript, JavaScript, CSS, SCSS and SVG file types and exposes wrappers around the popular and performant modules.
 
 ### Data Files
 
@@ -254,10 +254,13 @@ export default defineConfig({
     themes: {}
   },
   hot: {
-    server: 3000,
-    socket: 8089,
+    label: 'visible',
+    method: 'hot',
+    inject: true,
+    layouts: ['theme.liquid'],
     scroll: 'preserved',
-    reload: 'hot',
+    server: 3000,
+    socket: 8089
   },
   logger: {
     timer: true,
@@ -873,6 +876,24 @@ An array list of glob path patterns to `.json` or `.liquid` **template** files. 
 </p>
 </details>
 
+# HOT
+
+Live reloading is supported in development modes. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional workflows. When you invoke `--hot` syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes.
+
+### Assets
+
+SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out URL's with localhost equivalents that Syncify will statically serve.
+
+### Sections
+
+Sections are fetched via the Ajax Section rendering API. Replacements are applied to fragments in real-time.
+
+### Snippets
+
+In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippet files will have HTML comments `<!-- hot:1aa4f32cf9 -->` containing a UUID injected before they are uploaded to themes. Syncify will pass this UUID to the client via websocket and once received an XHR (fetch) will be triggered. The response of XHR request is then parsed and all nodes which proceed the injected UUID comment/s are plucked and applied swapped in the persisted DOM. Scroll position is persisted, assets and surrounding (unchanged) elements are left intact and not reloaded.
+
+This approach is a mild form DOM hydration that's 10x faster than invoking a hard-refresh.
+
 # Spawn
 
 The spawn option accepts a **key** > **value** list of commands (ie: scripts) which you can be used when we are running `watch` or `build` modes. Spawn allows you to leverage additional build tools and have them execute in parallel with Syncify. Spawned processes allow you use your preferred asset bundlers, like [Rollup](#), [Webpack](#), [Gulp](#) and many more without having to run multiple npm-scripts.
@@ -1028,117 +1049,41 @@ In the below example we are generating multiple stylesheets and compiling both S
 > **Please Note** You will need to remove the comments from the code example if you are copy and pasting it into your `package.json` file. JSON with Comments is not supported in `package.json` files.
 
 <!-- prettier-ignore-->
-```jsonc
-{
-  "syncify": {
-    "transform": {
+```ts
+import { defineConfig } from '@syncify/syncify'
 
-      // Styles options is define within transform
-      // an array list must be provided.
-      //
-      "styles": [
-
-        // Generate a bootstrap.css file
-        //
-        {
-          // Compile and watch for changes on this file
-          // Syncify adds input values to watch automatically
-          "input": "styles/vendors/bootstrap.scss",
-
-          // Included paths which are passed to SASS Dart
-          "include": ["node_modules"],
-
-          // SASS Dart specific options
-          //
-          "sass": {
-
-            // Do not show warnings
-            "warnings": false,
-
-            // Generate source maps, source maps are written
-            // to the following location: node_modules/.cache/syncify
-            "sourcemap": true,
-
-            // Output style, this should always be compressed to ensure
-            // the fastest possible upload time to your store.
-            "style": "compressed"
-          }
-        },
-
-        // Generate an inlined <style> snippet file:
-        //
-        {
-
-          // Compile and watch for changes on this file
-          // This is a CSS file that will simply pass through
-          "input": "styles/variables.css",
-
-          // Tell Syncify to write this output as a snippet
-          // This will wrap contents within a <style> tag.
-          "snippet": true,
-
-          // Rename the file. When snippet is true and
-          // no rename is defined the filename is used
-          "rename": "css-variables.liquid",
-
-          // PostCSS specific options
-          "postcss": {
-
-            // Never process this file with PostCSS
-            "env": "none"
-          }
-        },
-
-        // Generate a custom stylesheet
-        //
-        {
-          // This stylesheet is where all our @imports exists
-          // Compile and watch this file.
-          "input": "styles/stylesheet.scss",
-
-          // Rename the file to this name
-          "rename": "stylesheet.min.css",
-
-          // We want to watch for changes to all files in the "styles"
-          // directory. Changes detected will trigger a compile on the
-          // input file we have defined. We want to exclude any changes
-          // made to files contained within the "inline" and "vendors" directory.
-          "watch": ["styles/**/*.scss", "!styles/inline/**", "!styles/vendors/**"],
-
-          // PostCSS specific options
-          "postcss": {
-
-            // We want to process this file with PostCSS when
-            // running in --prod flag. Syncify will use the
-            // settings defined in your postcss.config.js file.
-            "env": "prod"
-          }
-        },
-
-        // Compile multiple stylesheets
-        //
-        {
-          // Watch and compile changes detected on any files
-          // which exist within the "inline" directory.
-          // Notice how we supplied an array list of globs as input.
-          // Syncify would handle each one if there were more.
-          "input": ["styles/inline/*.css"],
-
-          // We are passing an object to rename and informing Syncify
-          // to rename all these files with their directory name as
-          // a prefix, for example: inline-file.css
-          "rename": {
-            "prefixDir": true,
-            "separator": "-"
-          }
-        }
-      ]
+export default defineConfig({
+  transforms: {
+   script: {
+      'assets/bundle.min.js': 'scripts/bundle.ts',
+      'assets/mithril.min.js': 'scripts/virtual.ts',,
+      'snippets/[dir]-[file]': ['scripts/globs/*.ts'],
+      'assets/globs.min.js': {
+        input: 'scripts/globs.ts',
+        format: 'iife'
+      }
+    },
+    style: {
+      'assets/stylesheet.min.css': {
+        input: 'styles/stylesheet.scss',
+        watch: ['styles/sections/*'],
+        postcss: true,
+        sass: true
+      },
+      'snippets/css.liquid': {
+        input: 'styles/vars.css.liquid',
+        postcss: true,
+        sass: true
+      },
+      'assets/bootstrap.min.scss': {
+        input: 'styles/vendors/bootstrap.scss',
+        style: 'expanded',
+        includePaths: ['node_modules/bootstrap']
+      }
     }
   }
-}
+})
 ```
-
-If we were to pass the above configuration to Syncify it will go about generating each input accordingly. When `.scss` files are detected they will be always passed to **Dart SASS** and unless instructed otherwise the compiled CSS is passed to **PostCSS**. We informed upon different watch directories, generated an inline snippet style and also took advantage of an installed node_module (Bootstrap). For every input we defined a resulting output will be written to **assets** or if **snippet** is `true` the contents of the style is inlined are output written to **snippets**
 
 ## Views
 
@@ -1619,13 +1564,7 @@ pnpm add sharp -D
 
 # Minify
 
-### JSON
-
-### Script
-
-### Liquid
-
-### HTML
+TODO
 
 # CLI Usage
 
