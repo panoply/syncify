@@ -9,7 +9,7 @@ import { existsSync } from 'fs-extra';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { normalPath } from '../shared/paths';
 import { typeError, invalidError, warnOption, missingDependency } from './validate';
-import { bundle, processor } from '.';
+import { bundle, processor } from '../config';
 import { getTransform } from './utilities';
 import * as u from '../shared/native';
 import { c } from '../logger';

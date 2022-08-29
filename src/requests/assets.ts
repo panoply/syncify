@@ -4,7 +4,7 @@ import { assign, is } from '../shared/native';
 import { log, c, error } from '../logger';
 import * as timer from '../process/timer';
 import { AxiosError, AxiosRequestConfig } from 'axios';
-import { bundle } from '../options';
+import { bundle } from '../config';
 /* -------------------------------------------- */
 /* PRIVATE                                      */
 /* -------------------------------------------- */

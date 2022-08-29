@@ -6,7 +6,7 @@ import { Type } from '../process/files';
 import { is, nil } from '../shared/native';
 import { byteConvert, byteSize, fileSize, toUpcase } from '../shared/utils';
 import { log, c } from '../logger';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import * as timer from '../process/timer';
 import { ViewMinify } from 'types/config/minify';
 

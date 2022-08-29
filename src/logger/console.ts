@@ -4,7 +4,7 @@ import { has } from 'rambdax';
 import { nil } from '../shared/native';
 import { byteConvert, byteSize, sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
-import { bundle, hot } from '../options/index';
+import { bundle, hot } from '../config';
 import { queue } from '../requests/queue';
 import { Group, File, Theme } from 'types';
 import * as timer from '../process/timer';

@@ -8,7 +8,7 @@ import { compile as pages } from '../transform/pages';
 import { styles } from '../transform/styles';
 import { isUndefined } from '../shared/native';
 import { parseFile, Type } from '../process/files';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import { clean } from './clean';
 import { log, c } from '../logger';
 import * as timer from '../process/timer';

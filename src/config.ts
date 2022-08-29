@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import { PartialDeep } from 'type-fest';
 import { HOT, Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
-import { assign } from '../shared/native';
+import { assign } from './shared/native';
 
 /**
  * Cache Configuration

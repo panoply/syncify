@@ -10,7 +10,7 @@ import { compile as json } from '../transform/json';
 import { compile as pages } from '../transform/pages';
 import { is, isUndefined, from, ws } from '../shared/native';
 import { Kind, parseFile, Type } from '../process/files';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import { log } from '../logger';
 import { socket } from './server';
 import { event } from '../shared/utils';

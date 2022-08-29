@@ -9,7 +9,7 @@ import { error } from '../logger/errors';
 import { assign, is } from '../shared/native';
 import { queue, axios, requeue } from '../requests/queue';
 import { log, c } from '../logger';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 
 /**
  * Write Metafields

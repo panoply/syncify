@@ -5,7 +5,7 @@ import { is, isBuffer, isArray, isObject, isUndefined, isString } from '../share
 import { Type } from '../process/files';
 import { byteSize, byteConvert } from '../shared/utils';
 import { log, c } from '../logger';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import * as timer from '../process/timer';
 
 /**

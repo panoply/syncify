@@ -6,7 +6,7 @@ import { assign } from '../shared/native';
 import { lastPath } from '../shared/paths';
 import { Partial } from 'rambdax';
 import * as context from './context';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import { Tester } from 'anymatch';
 
 /**

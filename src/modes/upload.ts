@@ -5,7 +5,7 @@ import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
 import { outputFile } from '../process/files';
 import { log } from '../logger';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import { isFunction, isUndefined, isString, isBuffer } from '../shared/native';
 import * as timer from '../process/timer';
 

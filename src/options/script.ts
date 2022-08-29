@@ -6,7 +6,7 @@ import { warnOption, missingDependency, invalidError, typeError } from './valida
 import { getTransform, renameFile } from './utilities';
 import { assign, defineProperty, isArray, isObject } from '../shared/native';
 import { getTSConfig } from './files';
-import { bundle, processor } from '.';
+import { bundle, processor } from '../config';
 import { runtime, pluginWatch, pluginPaths } from '../transform/script';
 import { c } from '../logger';
 import merge from 'mergerino';

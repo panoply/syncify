@@ -12,14 +12,34 @@ import { server } from './modes/server';
 import { help } from './logger/help';
 import { log } from './logger';
 import { define } from './options/define';
-import { bundle } from './options/index';
+import { bundle } from './config';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
 /* -------------------------------------------- */
 
 export * from './api';
-export * as utils from './utils';
+
+/**
+ * ENV Utilities
+ *
+ * Helper utility for checking environment variables
+ * and returning some other data references
+ */
+export const env = {
+  get dev () {
+    return process.env.SYNCIFY_ENV === 'dev';
+  },
+  get prod () {
+    return process.env.SYNCIFY_ENV === 'prod';
+  },
+  get watch () {
+    return process.env.SYNCIFY_WATCH === 'true';
+  },
+  get options () {
+    return bundle.config;
+  }
+};
 
 /**
  * Run Syncify
