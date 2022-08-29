@@ -1,7 +1,7 @@
 import { has, hasPath } from 'rambdax';
 import { Config } from 'types';
 import { isArray, isRegex } from '../shared/native';
-import { bundle, minify } from './index';
+import { bundle, minify } from '../config';
 import { typeError, warnOption } from './validate';
 
 const presets = {

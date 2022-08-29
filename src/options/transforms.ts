@@ -5,7 +5,7 @@ import merge from 'mergerino';
 import { getModules, readConfigFile } from '../shared/options';
 import { lastPath, normalPath } from '../shared/paths';
 import { typeError, unknownError, invalidError } from './validate';
-import { bundle } from './index';
+import { bundle } from '../config';
 import * as u from '../shared/native';
 import { Merge } from 'type-fest';
 

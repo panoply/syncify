@@ -4,7 +4,7 @@ import { join, resolve, normalize } from 'node:path';
 import { has } from 'rambdax';
 import { isString, nil, keys } from '../shared/native';
 import { writeFile } from 'fs-extra';
-import { bundle, cache, processor } from '../options';
+import { bundle, cache, processor } from '../config';
 import { log, c } from '../logger';
 import { parentPath } from '../shared/paths';
 import { byteSize, event, byteConvert } from '../shared/utils';

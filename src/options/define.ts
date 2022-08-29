@@ -22,8 +22,8 @@ import { setJsonOptions, setViewOptions } from './transforms';
 import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
 import { setMinifyOptions } from './minify';
-import { bundle, cache, processor, plugins, config, hot } from '.';
-import { PATH_KEYS } from '../constants';
+import { bundle, cache, processor, plugins, config, hot } from '../config';
+import { PATH_KEYS, HOT_SNIPPET } from '../constants';
 
 /* -------------------------------------------- */
 /* EXIT HANDLER                                 */
@@ -164,8 +164,8 @@ async function setHotReloads (cli: Commands, config: Config) {
     }
   }
 
-  hot.snippet = join(bundle.cwd, 'node_modules', '@syncify/cli', 'hot.js.liquid');
-  hot.output = join(bundle.dirs.output, 'snippets', 'hot.js.liquid');
+  hot.snippet = join(bundle.cwd, 'node_modules', '@syncify/cli', HOT_SNIPPET);
+  hot.output = join(bundle.dirs.output, 'snippets', HOT_SNIPPET);
 
   for (const layout of hot.layouts) hot.alive[join(bundle.dirs.output, 'layout', layout)] = false;
 

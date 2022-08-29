@@ -2385,7 +2385,7 @@ var intercept = (callback) => {
   };
 };
 
-// src/options/index.ts
+// src/config.ts
 var cache = {};
 var minify = {
   json: {
@@ -5768,8 +5768,8 @@ async function setHotReloads(cli, config2) {
       }
     }
   }
-  hot.snippet = path$1.join(bundle.cwd, "node_modules", "@syncify/cli", "hot.js.liquid");
-  hot.output = path$1.join(bundle.dirs.output, "snippets", "hot.js.liquid");
+  hot.snippet = path$1.join(bundle.cwd, "node_modules", "@syncify/cli", HOT_SNIPPET);
+  hot.output = path$1.join(bundle.dirs.output, "snippets", HOT_SNIPPET);
   for (const layout of hot.layouts)
     hot.alive[path$1.join(bundle.dirs.output, "layout", layout)] = false;
 }
@@ -5964,11 +5964,7 @@ async function setPaths(config2) {
   }
 }
 
-// src/utils.ts
-var utils_exports = {};
-__export(utils_exports, {
-  env: () => env
-});
+// src/index.ts
 var env = {
   get dev() {
     return process.env.SYNCIFY_ENV === "dev";
@@ -5983,8 +5979,6 @@ var env = {
     return bundle.config;
   }
 };
-
-// src/index.ts
 async function run(options, config2, callback) {
   process.on("SIGINT", signal);
   process.on("uncaughtException", exception);
@@ -6055,6 +6049,6 @@ var api_default = api;
 
 exports.api_default = api_default;
 exports.defineConfig = defineConfig;
+exports.env = env;
 exports.run = run;
 exports.throws = throws;
-exports.utils_exports = utils_exports;

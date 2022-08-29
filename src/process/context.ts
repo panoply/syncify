@@ -1,7 +1,7 @@
 import { Bundle, File } from 'types';
 import { join, dirname, basename } from 'path';
 import { defineProperty, isRegex, isUndefined } from '../shared/native';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import { lastPath, parentPath } from '../shared/paths';
 
 /**

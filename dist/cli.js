@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 'use strict';
 
-var chunkQI3KL4XP_js = require('./chunk-QI3KL4XP.js');
+var chunkVZP53RJU_js = require('./chunk-VZP53RJU.js');
 var mm = require('minimist');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 var mm__default = /*#__PURE__*/_interopDefaultLegacy(mm);
 
-chunkQI3KL4XP_js.run(mm__default["default"](process.argv.slice(1), {
+chunkVZP53RJU_js.run(mm__default["default"](process.argv.slice(1), {
   alias: {
     config: "c",
     build: "b",
@@ -86,4 +86,4 @@ chunkQI3KL4XP_js.run(mm__default["default"](process.argv.slice(1), {
     "del",
     "bump"
   ]
-})).catch(chunkQI3KL4XP_js.throws);
+})).catch(chunkVZP53RJU_js.throws);

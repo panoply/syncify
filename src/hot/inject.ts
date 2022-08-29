@@ -1,7 +1,7 @@
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { basename } from 'node:path';
 import { nl } from '../shared/native';
-import { bundle, hot } from '../options';
+import { bundle, hot } from '../config';
 import { HOT_SNIPPET } from '../constants';
 import * as request from '../requests/assets';
 import { c } from '../logger';

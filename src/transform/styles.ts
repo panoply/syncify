@@ -6,7 +6,7 @@ import { isNil } from 'rambdax';
 import { isFunction, isString, isUndefined, isBuffer, nl } from '../shared/native';
 import { byteSize, fileSize } from '../shared/utils';
 import { log, c } from '../logger';
-import { bundle, cache, processor } from '../options/index';
+import { bundle, cache, processor } from '../config';
 import * as timer from '../process/timer';
 
 /**

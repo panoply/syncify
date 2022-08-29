@@ -6,7 +6,7 @@ import handler from 'finalhandler';
 import http from 'node:http';
 import { log } from '../shared/native';
 import { c, tui } from '../logger';
-import { hot } from '../options';
+import { hot } from '../config';
 import { injectSnippet, injectRender } from '../hot/inject';
 import update from 'log-update';
 

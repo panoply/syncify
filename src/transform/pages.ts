@@ -6,7 +6,7 @@ import { has } from 'rambdax';
 import Turndown from 'turndown';
 import gfm from 'turndown-plugin-gfm';
 import Markdown from 'markdown-it';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import { log } from '../logger';
 
 export async function toMarkdown (content: string) {

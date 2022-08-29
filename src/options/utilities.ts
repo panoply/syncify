@@ -9,7 +9,7 @@ import { bundleRequire } from 'bundle-require';
 import { lastPath, normalPath } from '../shared/paths';
 import { isArray, isObject, isString, isUndefined, nil } from '../shared/native';
 import { typeError, invalidError, unknownError, warnOption } from './validate';
-import { bundle } from './index';
+import { bundle } from '../config';
 import glob from 'glob';
 import { assign } from 'markdown-it/lib/common/utils';
 
