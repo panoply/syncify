@@ -3,9 +3,9 @@ import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { is, isBuffer, isArray, isObject, isUndefined, isString } from '../shared/native';
 import { Type } from '../process/files';
-import { byteSize, byteConvert } from '../shared/utils';
+import { byteSize, byteConvert, fileSize } from '../shared/utils';
 import { log, c } from '../logger';
-import { bundle } from '../config';
+import { bundle, minify } from '../config';
 import * as timer from '../process/timer';
 
 /**
@@ -37,7 +37,7 @@ export function parse (data: string) {
  * comments be provided, this function strips
  * them and will push a minified to the store.
  */
-export function minify (data: string, space = 0): any {
+export function minifyJSON (data: string, space = 0): any {
 
   try {
 
@@ -62,19 +62,17 @@ export function minify (data: string, space = 0): any {
  */
 export function jsonCompile (file: File, data: string, space = 0): any {
 
-  const minified = minify(data, space);
+  const minified = minifyJSON(data, space);
 
   if (isNil(minified)) {
     timer.stop();
     return minified;
   }
-  if (is(space, 0)) {
-    const size = byteSize(minified);
-    if (bundle.mode.watch) {
-      log.info(`created ${c.bold(file.key)} ${c.gray(`µ${timer.stop()}`)}`);
-    } else {
-      log.info(`${c.cyan(file.key)} ${c.bold(byteConvert(size))} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
-    }
+  if (space === 0) {
+    const s = fileSize(data, file.size);
+    log.transform(`${c.bold('JSON')} minified ${s.before} to ${s.after} ${c.gray(`~ saved ${s.saved}`)}`);
+  } else {
+    log.transform(`${c.bold(file.namespace)} → ${byteConvert(file.size)}`);
   }
 
   if (is(file.type, Type.Metafield)) {
@@ -102,11 +100,23 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
   file.size = byteSize(json);
 
   const data = parse(json.toString());
-  const space = bundle.minify.json[file.namespace] ? 0 : bundle.json.indent;
 
-  if (bundle.mode.watch) {
-    log.info(`created ${c.bold(file.key)} ${c.gray(`µ${timer.stop()}`)}`);
+  let space: number = bundle.processor.json.indent;
+
+  if (bundle.mode.minify) {
+    if (file.type === Type.Asset) {
+      if (minify.json.assets) space = 0;
+    } else if (file.type === Type.Locale) {
+      if (minify.json.locales) space = 0;
+    } else if (file.type === Type.Template) {
+      if (minify.json.templates) space = 0;
+    } else if (file.type === Type.Metafield) {
+      if (minify.json.metafields) space = 0;
+    } else if (file.type === Type.Config) {
+      if (minify.json.config) space = 0;
+    }
   }
+
   if (!isType('Function', cb)) return jsonCompile(file, data, space);
 
   const update = cb.apply({ ...file }, data);
