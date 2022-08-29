@@ -2,15 +2,15 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var chunkVZP53RJU_js = require('./chunk-VZP53RJU.js');
+var cjs_js = require('./cjs.js');
 
 
 
 Object.defineProperty(exports, 'default', {
-  enumerable: true,
-  get: function () { return chunkVZP53RJU_js.api_default; }
+	enumerable: true,
+	get: function () { return cjs_js.c; }
 });
 Object.defineProperty(exports, 'defineConfig', {
-  enumerable: true,
-  get: function () { return chunkVZP53RJU_js.defineConfig; }
+	enumerable: true,
+	get: function () { return cjs_js.b; }
 });
