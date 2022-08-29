@@ -38,16 +38,39 @@ export const minify: Minify = {
     mangleQuoted: false,
     keepNames: false
   },
-  views: {
+  liquid: {
     minifyScript: true,
     minifyStyle: true,
     minifySchema: true,
     removeComments: true,
     stripDashes: true,
-    collapseWhitespace: true,
-    ignoreTags: [],
-    ignoreObjects: [],
     exclude: []
+  },
+  html: {
+    caseSensitive: false,
+    collapseBooleanAttributes: false,
+    collapseInlineTagWhitespace: false,
+    conservativeCollapse: false,
+    keepClosingSlash: false,
+    noNewlinesBeforeTagClose: false,
+    preventAttributesEscaping: false,
+    removeEmptyAttributes: false,
+    removeEmptyElements: false,
+    removeOptionalTags: false,
+    removeRedundantAttributes: true,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
+    useShortDoctype: true,
+    collapseWhitespace: true,
+    continueOnParseError: true,
+    removeComments: true,
+    trimCustomFragments: true,
+    ignoreCustomFragments: [
+      /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+      /<style[\s\S]*?<\/style>/,
+      /{%[\s\S]*?%}/,
+      /{{[\s\S]*?}}/
+    ]
   }
 };
 
@@ -269,6 +292,7 @@ export const bundle = {
     upload: false,
     download: false,
     metafields: false,
+    minify: false,
     hot: false,
     pages: false,
     pull: false,
@@ -320,8 +344,22 @@ export const bundle = {
     sprite: [],
     inline: []
   },
-  set config (merge: Config) { assign(options, merge); },
-  get config () { return options; },
-  get processor () { return processor; },
-  get minify () { return minify; }
+  set config (merge: Config) {
+    assign(options, merge);
+  },
+  get config () {
+    return options;
+  },
+  get processor () {
+    return processor;
+  },
+  minify: {
+    json: false,
+    views: false,
+    script: false,
+    get options () {
+      return minify;
+    }
+  }
+
 } as unknown as Bundle;
