@@ -137,7 +137,7 @@ export const syncing = (message: string) => {
     tui.warning(`${count} ${c.yellowBright(`~ Type ${c.bold('w')} and press ${c.bold('enter')} to view`)}`);
   }
 
-  if (bundle.hot) {
+  if (bundle.mode.hot) {
     tui.reloaded(c.bold('HOT REPLACEMENT'), timer.now());
   }
 
