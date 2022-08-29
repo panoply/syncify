@@ -1,23 +1,17 @@
-import { minify } from 'html-minifier-terser';
+import { minify as terser } from 'html-minifier-terser';
 import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
 import { Type } from '../process/files';
 import { is, nil } from '../shared/native';
-import { byteConvert, byteSize, fileSize, toUpcase } from '../shared/utils';
+import { byteConvert, byteSize, fileSize } from '../shared/utils';
 import { log, c } from '../logger';
-import { bundle } from '../config';
+import { bundle, minify } from '../config';
 import * as timer from '../process/timer';
-import { ViewMinify } from 'types/config/minify';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
 /* -------------------------------------------- */
-
-/**
- * Liquid Delimiter
- */
-const LiquidDelimiter = /{[{%]/g;
 
 /**
  * Liquid Comments
@@ -54,9 +48,11 @@ const HTMLStripDashSpace = /(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g;
  * Strips Liquid comments from file content.
  * This is executed before passing to HTML bundle.minify.
  */
-const removeComments = (content: string) => {
+function removeComments (content: string) {
 
-  return content.replace(LiquidComments, nil);
+  return minify.liquid.removeComments
+    ? content.replace(LiquidComments, nil)
+    : content;
 
 };
 
@@ -66,9 +62,9 @@ const removeComments = (content: string) => {
  * Minfies the contents of a `{% schema %}` tag
  * from within sections.
  */
-const minifySchema = (file: File, content: string) => {
+function minifySchema (file: File, content: string) {
 
-  if (!(bundle.minify.views as ViewMinify).minifySchema) return removeComments(content);
+  if (!minify.liquid.minifySchema) return removeComments(content);
 
   const minified = content.replace(LiquidSchemaTag, data => {
 
@@ -105,14 +101,15 @@ const minifySchema = (file: File, content: string) => {
  * are of not whitespace. this is executed in the post-minify
  * cycle and will help reduce the render times imposed by Liquid.
  */
-const removeDashes = (content: string) => {
+function removeDashes (content: string) {
 
-  if (!(bundle.minify.views as ViewMinify).stripDashes) return content;
+  if (!minify.liquid.stripDashes) return content;
 
   return content
     .replace(HTMLStripDashSpace, nil)
     .replace(LiquidStripDashSpace, nil)
     .replace(LiquidUselessDashes, m => m.replace(/-/g, nil));
+
 };
 
 /**
@@ -121,11 +118,11 @@ const removeDashes = (content: string) => {
  * Executes html terser on remaining document contents
  * and applied rules that were previously setup in config.
  */
-const htmlMinify = async (file: File, content: string, terser: IHTML) => {
+async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await minify(content, terser);
+    const htmlmin = await terser(content, minify.html);
 
     return htmlmin;
 
@@ -148,7 +145,7 @@ const htmlMinify = async (file: File, content: string, terser: IHTML) => {
  */
 const transform = (file: File) => async (data: string) => {
 
-  if (!bundle.prod) {
+  if (!bundle.mode.minify) {
     await writeFile(file.output, data);
     log.transform(`${c.bold(file.namespace)} → ${byteConvert(file.size)}`);
     return data;
@@ -158,7 +155,7 @@ const transform = (file: File) => async (data: string) => {
     ? minifySchema(file, data)
     : removeComments(data);
 
-  const htmlmin = await htmlMinify(file, content, bundle.minify.views);
+  const htmlmin = await htmlMinify(file, content);
 
   log.process('HTML Terser', timer.now());
 
