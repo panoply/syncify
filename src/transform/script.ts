@@ -1,7 +1,7 @@
 import type { Syncify, File, ScriptTransform, ESBuildConfig } from 'types';
-import type { Plugin, BuildResult, build } from 'esbuild';
+import type ESBuild from 'esbuild';
 import { join, resolve, normalize } from 'node:path';
-import { has } from 'rambdax';
+import { has, isNil } from 'rambdax';
 import { isString, nil, keys } from '../shared/native';
 import { writeFile } from 'fs-extra';
 import { bundle, cache, processor } from '../config';
@@ -10,6 +10,30 @@ import { parentPath } from '../shared/paths';
 import { byteSize, event, byteConvert } from '../shared/utils';
 import glob from 'glob';
 import * as timer from '../process/timer';
+
+/**
+ * ESBuild Module
+ */
+export let esbuild: typeof ESBuild = null;
+
+/**
+ * Load ESBuild
+ *
+ * Dynamically imports ESBuild and assigns the module to
+ * letting `esbuild`. This allows users to optionally include
+ * modules in the build.
+ */
+export async function load () {
+
+  esbuild = await import('esbuild');
+
+  return isNil(esbuild) === false;
+
+}
+
+/* -------------------------------------------- */
+/* TRANSFORMS                                   */
+/* -------------------------------------------- */
 
 export const paths: Set<string> = new Set();
 
@@ -23,7 +47,7 @@ export const paths: Set<string> = new Set();
  * > ESBuild supports this capability natively but seems to have issues.
  * This plugin ensures resolution is applied.
  */
-export function pluginPaths (transform?: ScriptTransform): Plugin {
+export function pluginPaths (transform?: ScriptTransform): ESBuild.Plugin {
 
   const { compilerOptions } = processor.esbuild.tsconfig;
 
@@ -88,7 +112,7 @@ export function pluginPaths (transform?: ScriptTransform): Plugin {
  * of entry points (imports) which are added to the chokidar watch
  * instances.
  */
-export function pluginWatch (transform?: ScriptTransform): Plugin {
+export function pluginWatch (transform?: ScriptTransform): ESBuild.Plugin {
 
   return {
     name: 'syncify-watch',
@@ -133,18 +157,6 @@ export function pluginWatch (transform?: ScriptTransform): Plugin {
   };
 };
 
-let esbuild: typeof build;
-
-export async function runtime (options: ESBuildConfig) {
-
-  const { build } = await import('esbuild');
-
-  esbuild = build;
-
-  return build(options);
-
-}
-
 export const createSnippet = (string: string) => '<script>' + string + '</script>';
 
 /**
@@ -160,7 +172,7 @@ export async function script (file: File<ScriptTransform>, cb: Syncify) {
 
   try {
 
-    const compile = await esbuild(file.config.esbuild as ESBuildConfig);
+    const compile = await esbuild.build(file.config.esbuild as ESBuildConfig);
 
     for (const { text, path } of compile.outputFiles) {
 
@@ -188,7 +200,7 @@ export async function script (file: File<ScriptTransform>, cb: Syncify) {
 
   } catch (e) {
 
-    for (const { text, location } of e.errors as BuildResult['errors']) {
+    for (const { text, location } of e.errors as ESBuild.BuildResult['errors']) {
       log.error(text, file);
       log.info(c.redBright(`Line ${location.line} in ${c.bold(location.file)}`));
     }

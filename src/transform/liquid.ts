@@ -1,5 +1,5 @@
 import { minify } from 'html-minifier-terser';
-import { File, Syncify, IHTML } from 'types';
+import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
 import { Type } from '../process/files';

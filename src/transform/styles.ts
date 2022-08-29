@@ -1,6 +1,6 @@
-import type { Processor } from 'postcss';
+import type PostCSS from 'postcss';
+import type SASS from 'sass';
 import { File, StyleTransform, Syncify, Processors } from 'types';
-import { compile, Logger } from 'sass';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
 import { isFunction, isString, isUndefined, isBuffer, nl } from '../shared/native';
@@ -12,19 +12,37 @@ import * as timer from '../process/timer';
 /**
  * PostCSS Module
  */
-let pcss: Processor = null;
+export let postcss: typeof PostCSS = null;
 
 /**
- * Loads PostCSS
- *
- * This is executed and the `postcss` variable is
- * assigned upon initialization.
+ * SASS Dart module
  */
-export const processer = (config: any) => {
+export let sass: typeof SASS = null;
 
-  pcss = require('postcss')(config);
+/**
+ * Load PostCSS / SASS
+ *
+ * Dynamically imports PostCSS and SASS. Assigns the modules to
+ * lettings `sass` or `postcss`. This allows users to optionally
+ * include modules in the build.
+ */
+export async function load (processor: 'postcss' | 'sass') {
+
+  if (processor === 'postcss') {
+    postcss = await import('postcss') as any;
+    return isNil(postcss) === false;
+  }
+
+  if (processor === 'sass') {
+    sass = await import('sass');
+    return isNil(sass) === false;
+  }
 
 };
+
+/* -------------------------------------------- */
+/* TRANSFORMS                                   */
+/* -------------------------------------------- */
 
 function write (file: File<StyleTransform>, cb: Syncify) {
 
@@ -64,7 +82,7 @@ function write (file: File<StyleTransform>, cb: Syncify) {
   };
 };
 
-async function sass (file: File<StyleTransform>) {
+async function sassProcess (file: File<StyleTransform>) {
 
   const { config } = file;
   const opts = config.sass === true
@@ -81,11 +99,11 @@ async function sass (file: File<StyleTransform>) {
 
       log.hook('sass');
 
-      const { css, sourceMap } = compile(file.input, {
+      const { css, sourceMap } = sass.compile(file.input, {
         ...opts,
         loadPaths: opts.includePaths,
         sourceMapIncludeSources: false,
-        logger: opts.warnings ? Logger.silent : {
+        logger: opts.warnings ? sass.Logger.silent : {
           debug: msg => console.log('DEBUG', msg),
           warn: (msg, opts) => {
             log.warn(msg + '\n\n' + opts.stack);
@@ -146,7 +164,7 @@ async function sass (file: File<StyleTransform>) {
  *
  * Runs postcss on compiled SASS or CSS styles
  */
-async function postcss (file: File<StyleTransform>, css: string, map: any) {
+async function postcssProcess (file: File<StyleTransform>, css: string, map: any) {
 
   const { config } = file;
 
@@ -154,7 +172,7 @@ async function postcss (file: File<StyleTransform>, css: string, map: any) {
 
   try {
 
-    const result = await pcss.process(css, {
+    const result = await postcss(config.postcss as any).process(css, {
       from: config.rename,
       to: config.rename,
       map: map ? { prev: map, inline: false } : null
@@ -203,20 +221,13 @@ export async function styles (file: File<StyleTransform>, cb: Syncify): Promise<
 
   const output = write(file, cb);
 
-  // console.log(file.config, bundle.processors.sass);
-
   try {
 
-    const out = await sass(file);
+    const out = await sassProcess(file);
 
-    if (isNil(pcss) || (
-      file.config.postcss === false &&
-      file.config.snippet === false)) {
-      return output(out.css);
-    }
-
+    if (isNil(postcss) || (!file.config.postcss && !file.config.snippet)) return output(out.css);
     if (file.config.postcss) {
-      const post = await postcss(file, out.css, out.map);
+      const post = await postcssProcess(file, out.css, out.map);
       if (post === null) return null;
       if (file.config.snippet) return output(snippet(post));
     }
