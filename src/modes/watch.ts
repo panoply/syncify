@@ -14,6 +14,7 @@ import { bundle } from '../config';
 import { log } from '../logger';
 import { socket } from './server';
 import { event } from '../shared/utils';
+import { isNil } from 'rambdax';
 
 /**
  * Watch Function
@@ -100,7 +101,6 @@ export function watch (callback: Syncify) {
 
           return;
 
-          // return request.pages(value);
         } else if (file.type === Type.Asset || file.type === Type.Spawn) {
 
           value = await asset(file, callback);
@@ -109,7 +109,7 @@ export function watch (callback: Syncify) {
 
         }
 
-        if (value !== null) {
+        if (!isNil(value)) {
 
           log.syncing(file.key);
 
@@ -122,7 +122,6 @@ export function watch (callback: Syncify) {
               await queue.onIdle().then(() => wss.replace());
             }
           }
-
         }
 
       } catch (e) {
