@@ -1,35 +1,10 @@
-import { has, hasPath } from 'rambdax';
-import { Config } from 'types';
-import { isArray, isRegex } from '../shared/native';
-import { bundle, minify } from '../config';
-import { typeError, warnOption } from './validate';
-
-const presets = {
-  caseSensitive: false,
-  collapseBooleanAttributes: false,
-  collapseInlineTagWhitespace: false,
-  conservativeCollapse: false,
-  keepClosingSlash: false,
-  noNewlinesBeforeTagClose: false,
-  preventAttributesEscaping: false,
-  removeEmptyAttributes: false,
-  removeEmptyElements: false,
-  removeOptionalTags: false,
-  removeRedundantAttributes: true,
-  removeScriptTypeAttributes: true,
-  removeStyleLinkTypeAttributes: true,
-  useShortDoctype: true,
-  collapseWhitespace: true,
-  continueOnParseError: true,
-  removeComments: true,
-  trimCustomFragments: true,
-  ignoreCustomFragments: [
-    /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
-    /<style[\s\S]*?<\/style>/,
-    /{%[\s\S]*?%}/,
-    /{{[\s\S]*?}}/
-  ]
-};
+import { Config, MinifyConfig } from 'types';
+import { has, isEmpty, isNil } from 'rambdax';
+import { isBoolean, isObject } from '../shared/native';
+import { bundle, minify, processor } from '../config';
+import { invalidError, throwError, typeError, unknownError } from './validate';
+import { ESBUILD_NOT_INSTALLED } from '../constants';
+import { getResolvedPaths } from './utilities';
 
 /**
  * Minification Options
@@ -39,93 +14,64 @@ const presets = {
  */
 export const setMinifyOptions = (config: Config) => {
 
-  if (!hasPath('minify', config)) return;
+  if (bundle.mode.minify === false && config.minify === false) return;
+  if (bundle.mode.minify === false && config.minify === true) bundle.mode.minify = true;
 
-  let warn: (message: string, value: string) => void = warnOption('Minify');
+  if (isBoolean(config.minify) && config.minify === true) {
 
-  for (const key in config.minify) {
-
-    if (bundle.minify[key] === false) continue;
-    if (config.minify[key] === false) continue;
-
-    warn = warnOption(`${key.toUpperCase()} Minify Rule`);
-
-    for (const rule in config.minify[key]) {
-
-      if (key === 'html') {
-
-        if (
-          rule === 'minifyCSS' ||
-          rule === 'minifyJS' ||
-          rule === 'sortAttributes' ||
-          rule === 'sortClassName'
-        ) {
-
-          warn('Option is not allowed', key);
-          continue;
-        }
-
-        if (rule === 'ignoreCustomFragments') continue;
-      }
-
-      if (typeof config.minify[key][rule] === typeof minify[key][rule]) {
-        bundle.minify[key][rule] = config.minify[key][rule];
-      } else {
-        warn('Option type is invalid', rule);
-      }
-
-    }
-  }
-
-  if (has('ignoreCustomFragments', config.minify.html) && typeof config.minify.html === 'object') {
-
-    const { ignoreCustomFragments } = config.minify.html;
-
-    if (isArray(ignoreCustomFragments)) {
-      if (ignoreCustomFragments.length > 0) {
-        const tags = ignoreCustomFragments.map((v: any) => isRegex(v) ? v : new RegExp(v));
-        bundle.minify.html.ignoreCustomFragments.push(...tags);
-      }
-    } else {
-      typeError('minify', ignoreCustomFragments, 'option must be an array type', 'string[]');
+    if (!processor.esbuild.installed) {
+      throwError('esbuild is not installed', ESBUILD_NOT_INSTALLED);
     }
 
-  }
+  } else if (isObject(config.minify)) {
 
-  if (typeof bundle.minify.liquid === 'object') {
+    for (const key in config.minify as MinifyConfig) {
 
-    if (has('ignoreTags', bundle.minify.liquid)) {
+      // We don't care if false, or is nil, we can carry on as normal
+      if (config.minify[key] === false || isNil(config.minify[key])) continue;
 
-      const { ignoreTags } = bundle.minify.liquid;
-
-      if (isArray(ignoreTags)) {
-        if (ignoreTags.length > 0) {
-          const tags = new RegExp(`{%-?\\s*(?:(?!${ignoreTags.join('|')})[\\s\\S])*?%}`);
-          bundle.minify.html.ignoreCustomFragments.push(tags);
+      if (key === 'script') {
+        if (!processor.esbuild.installed) {
+          throwError('esbuild is not installed', ESBUILD_NOT_INSTALLED);
         }
-      } else {
-        typeError('minify', ignoreTags, 'option must be an array type', 'string[]');
       }
 
-    }
+      if (isBoolean(config.minify[key])) {
 
-    if (has('ignoreObjects', bundle.minify.liquid)) {
+        // use defaults when true
+        bundle.minify[key] = true;
 
-      const { ignoreObjects } = bundle.minify.liquid;
+      } else if (isObject(minify[key]) && isEmpty(minify[key]) === false) {
 
-      if (isArray(ignoreObjects)) {
-        if (ignoreObjects.length > 0) {
-          const tags = new RegExp(`{{-?\\s*(?:(?!${ignoreObjects.join('|')})[\\s\\S])*?-?}}`);
-          bundle.minify.html.ignoreCustomFragments.push(tags);
+        for (const opt in config.minify[key]) {
+
+          const p = key === 'views' ? 'liquid' : key;
+
+          if (!has(opt, minify[p])) unknownError(`minify > ${key}`, opt);
+
+          if (!isNil(config.minify[key][opt]) && typeof minify[p][opt] !== typeof config.minify[key][opt]) {
+            typeError(
+              `minify > ${key}`,
+              opt,
+              typeof config.minify[key][opt],
+              typeof minify[p][opt]
+            );
+          }
+
+          if (opt === 'exclude' && !isEmpty(config.minify[key][opt])) {
+            minify[key][opt] = getResolvedPaths(config.minify[key][opt]);
+          } else if (opt === 'collapseWhitespace') {
+            minify.html.collapseWhitespace = config.minify[key][opt];
+          } else {
+            minify[key][opt] = config.minify[key][opt];
+          }
+
         }
       } else {
-        typeError('minify', ignoreObjects, 'option must be an array type', 'string[]');
+        invalidError('minify', key, typeof minify[key], 'boolean | {}');
       }
-
     }
 
   }
-
-  return config;
 
 };
