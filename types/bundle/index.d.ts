@@ -1,16 +1,18 @@
 /* eslint-disable no-unused-vars */
 
 import type { Tester } from 'anymatch';
+import type { Options as HTMLTerserOptions } from 'html-minifier-terser';
 import type { BuildOptions as ESBuildConfig } from 'esbuild';
 import type { Merge, MergeExclusive, PackageJson } from 'type-fest';
 import type { Markdown } from '../misc/markdown';
-import type { Paths, Directories, Transforms, Views, Minify, Config } from '../config/index';
+import type { Paths, Directories, Transforms, Views, Config } from '../config/index';
 import type { ScriptTransform, StyleTransform, SVGInline, SVGSprite } from '../config/transforms';
 import type { AxiosRequestConfig } from 'axios';
 import type { Plugins } from './plugin';
 import type { Processors } from '../config/processors';
 import type { Tsconfig } from 'tsconfig-type';
 import { HOT } from './hot';
+import { JSONMinify, ESBuildMinify, ViewMinify } from '../config/minify';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -176,6 +178,32 @@ export interface Sync {
 }
 
 /* -------------------------------------------- */
+/* MINIFY                                       */
+/* -------------------------------------------- */
+
+export interface Minify {
+  /**
+   * JSON Minification
+   */
+  json?: JSONMinify;
+  /**
+   * View (Liquid) Minification
+   */
+  liquid?: Omit<ViewMinify, 'collapseWhitespace'>;
+  /**
+   * View (HTML) Minification
+   *
+   * > Uses [html-minifier-terser](https://github.com/terser/html-minifier-terser)
+   */
+  html?: HTMLTerserOptions;
+  /**
+   * JS/TS Minification
+   *
+   * > Uses [esbuild](https://esbuild.github.io/api/#minify) minificiation
+   */
+  script?: ESBuildMinify;
+}
+/* -------------------------------------------- */
 /* RESOURCE MODES                               */
 /* -------------------------------------------- */
 
@@ -249,6 +277,10 @@ export interface Modes {
    */
   image: boolean;
   /**
+   * Run minification, either `--prod` or `--minify`
+   */
+  minify: boolean;
+  /**
    * Trigger export, alias: `-e`
    */
   export: boolean;
@@ -258,7 +290,13 @@ export interface Modes {
 /* BUNDLE                                       */
 /* -------------------------------------------- */
 
-export declare type Style = Merge<Transforms['style'], { input: string; watch: Tester; }>
+export declare type Style = Merge<
+  Transforms['style'],
+  {
+    input: string;
+    watch: Tester;
+  }
+>
 
 export interface Bundle<T = unknown> {
   /**
@@ -383,7 +421,12 @@ export interface Bundle<T = unknown> {
   /**
    * Minify Options
    */
-  get minify(): Minify
+  minify: {
+    json: boolean;
+    views: boolean;
+    script: boolean;
+    get options(): Minify
+  }
   /**
    * Processor Configurations
    */
