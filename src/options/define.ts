@@ -1,5 +1,5 @@
 import { Commands, Config, Package, Bundle, Modes, HOTConfig } from 'types';
-import { anyTrue, isNil, has, includes, isEmpty } from 'rambdax';
+import { anyTrue, isNil, has, includes, isEmpty, allFalse } from 'rambdax';
 import merge from 'mergerino';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
@@ -22,7 +22,7 @@ import { setJsonOptions, setViewOptions } from './transforms';
 import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
 import { setMinifyOptions } from './minify';
-import { bundle, cache, processor, plugins, config, hot } from '../config';
+import { bundle, cache, processor, plugins, options } from '../config';
 import { PATH_KEYS, HOT_SNIPPET } from '../constants';
 
 /* -------------------------------------------- */
@@ -78,21 +78,21 @@ export async function define (cli: Commands, _options?: Config) {
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
   const promise = await Promise.all([
-    setBaseDirs(cli, config),
+    setBaseDirs(cli, options),
     setCaches(bundle.cwd),
     setThemeDirs(bundle.dirs.output),
     setImportDirs(bundle),
-    setStores(cli, config),
-    setPaths(config),
-    setProcessors(config),
-    setMinifyOptions(config),
-    setViewOptions(config),
-    setJsonOptions(config),
-    setScriptOptions(config, pkg),
-    setStyleConfig(config, pkg),
-    setSpawns(config, bundle),
-    setPlugins(config, bundle),
-    setHotReloads(cli, config)
+    setStores(cli, options),
+    setPaths(options),
+    setProcessors(options),
+    setMinifyOptions(options),
+    setViewOptions(options),
+    setJsonOptions(options),
+    setScriptOptions(options, pkg),
+    setStyleConfig(options, pkg),
+    setSpawns(options, bundle),
+    setPlugins(options, bundle),
+    setHotReloads(options)
   ]);
 
   log(logHeader(bundle));
@@ -101,9 +101,10 @@ export async function define (cli: Commands, _options?: Config) {
 
 };
 
-async function setHotReloads (cli: Commands, config: Config) {
+async function setHotReloads (config: Config) {
 
-  if (bundle.mode.watch === false || cli.hot === false) return;
+  if (bundle.mode.hot === false && config.hot === false) return;
+  if (bundle.mode.hot === false && config.hot === true) bundle.mode.hot = true;
 
   const warn = warnOption('HOT Reloads');
 
@@ -115,23 +116,17 @@ async function setHotReloads (cli: Commands, config: Config) {
     return;
   }
 
-  let defaults = true;
-
-  if (isBoolean(config.hot)) {
-    if (config.hot === false) return;
-    bundle.hot = true;
-  } else if (isObject(config.hot)) {
-    bundle.hot = true;
-    defaults = isEmpty(config.hot);
-  } else {
+  if (allFalse(isObject(config.hot), isBoolean(config.hot), isNil(config.hot))) {
     typeError('hot', 'hot', config.hot, 'boolean | {}');
   }
 
-  if (!defaults) {
+  const { hot } = bundle;
+
+  if (isObject(config.hot) && isEmpty(config.hot) === false) {
 
     for (const prop in config.hot as HOTConfig) {
 
-      if (has(prop, hot)) {
+      if (has(prop, bundle.hot)) {
 
         if (prop === 'label') {
           if (config.hot[prop] === 'visible' || config.hot[prop] === 'hidden') {
@@ -328,10 +323,12 @@ function setModes (cli: Commands) {
 
   const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
   const transfrom = anyTrue(cli.style, cli.script, cli.image, cli.svg);
+  const watch = anyTrue(resource, cli.upload, cli.download) ? false : cli.watch;
 
   return <Modes>{
+    watch,
+    hot: watch && cli.hot,
     vsc: cli.vsc,
-    live: cli.watch && cli.hot,
     export: cli.export,
     redirects: cli.redirects,
     metafields: cli.metafields,
@@ -339,48 +336,14 @@ function setModes (cli: Commands) {
     prompt: cli.prompt,
     pull: cli.pull,
     push: cli.push,
-    script: transfrom
-      ? cli.script
-      : false,
-    style: transfrom
-      ? cli.style
-      : false,
-    image: transfrom
-      ? cli.image
-      : false,
-    svg: transfrom
-      ? cli.svg
-      : false,
-    clean: anyTrue(
-      resource,
-      transfrom,
-      cli.upload
-    ) ? false : cli.clean,
-    build: anyTrue(
-      resource,
-      transfrom,
-      cli.upload,
-      cli.watch,
-      cli.download
-    ) ? false : cli.build,
-    watch: anyTrue(
-      resource,
-      cli.upload,
-      cli.download
-    ) ? false : cli.watch,
-    upload: anyTrue(
-      resource,
-      transfrom,
-      cli.download,
-      cli.watch
-    ) ? false : cli.upload,
-    download: anyTrue(
-      resource,
-      transfrom,
-      cli.upload,
-      cli.watch,
-      cli.build
-    ) ? false : cli.download
+    script: transfrom ? cli.script : false,
+    style: transfrom ? cli.style : false,
+    image: transfrom ? cli.image : false,
+    svg: transfrom ? cli.svg : false,
+    clean: anyTrue(resource, transfrom, cli.upload) ? false : cli.clean,
+    build: anyTrue(transfrom, cli.upload, cli.watch, cli.download) ? false : cli.build,
+    upload: anyTrue(transfrom, watch) ? false : cli.upload,
+    download: anyTrue(resource, transfrom, cli.upload, cli.watch, cli.build) ? false : cli.download
   };
 };
 
@@ -415,10 +378,10 @@ async function setCaches (cwd: string) {
  */
 async function getConfig (pkg: Package, cli: Commands) {
 
-  const options = await configFile(cli.cwd);
+  const cfg = await configFile(cli.cwd);
 
-  if (options !== null) return merge(config, options);
-  if (has('syncify', pkg)) return merge(config, pkg.syncify);
+  if (cfg !== null) return merge(options, cfg);
+  if (has('syncify', pkg)) return merge(options, pkg.syncify);
 
   missingConfig(cli.cwd);
 
