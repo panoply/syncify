@@ -20,7 +20,7 @@ export default defineConfig({
     layout: 'theme.liquid',
     pages: 'views/pages/*',
     customers: 'views/customer/*',
-    templates: 'views/*.liquid',
+    templates: 'views/*.json',
     snippets: 'views/include/*',
     sections: ['views/layout/*', 'views/sections/**/*']
   },
@@ -110,5 +110,6 @@ export default defineConfig({
     },
     postcss: [autoprefix()]
   },
+  minify: {},
   plugins: []
 });
