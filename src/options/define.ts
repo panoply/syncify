@@ -3,7 +3,7 @@ import { anyTrue, isNil, has, includes, isEmpty, allFalse } from 'rambdax';
 import merge from 'mergerino';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { pathExists, readJson } from 'fs-extra';
 import { typeError, invalidError, missingConfig, throwError, unknownError, warnOption } from './validate';
 import { isArray, keys, assign, nil, log, isString, isObject, ws, defineProperty, isBoolean } from '../shared/native';
@@ -24,6 +24,7 @@ import { setStyleConfig } from './style';
 import { setMinifyOptions } from './minify';
 import { bundle, cache, processor, plugins, options } from '../config';
 import { PATH_KEYS, HOT_SNIPPET } from '../constants';
+import { glob } from 'glob';
 
 /* -------------------------------------------- */
 /* EXIT HANDLER                                 */
@@ -340,6 +341,7 @@ function setModes (cli: Commands) {
     style: transfrom ? cli.style : false,
     image: transfrom ? cli.image : false,
     svg: transfrom ? cli.svg : false,
+    minify: anyTrue(cli.minify, cli.prod),
     clean: anyTrue(resource, transfrom, cli.upload) ? false : cli.clean,
     build: anyTrue(transfrom, cli.upload, cli.watch, cli.download) ? false : cli.build,
     upload: anyTrue(transfrom, watch) ? false : cli.upload,
@@ -472,6 +474,7 @@ export async function setPaths (config: Config) {
 
   // Path normalize,
   const path = normalPath(bundle.dirs.input);
+  const warn = warnOption('path resolution');
 
   // iterate over the defined path mappings
   for (const key of PATH_KEYS) {
@@ -504,7 +507,12 @@ export async function setPaths (config: Config) {
 
     }
 
-    uri.forEach(p => bundle.watch.add(p));
+    uri.forEach(p => {
+      const exists = glob.sync(p);
+      if (exists.length === 0) warn('No files could be resolved in', relative(bundle.cwd, p));
+      bundle.watch.add(p);
+    });
+
     bundle.paths[key] = anymatch(uri);
 
   }
