@@ -2,14 +2,15 @@
 
 import type { Tester } from 'anymatch';
 import type { BuildOptions as ESBuildConfig } from 'esbuild';
-import type { Merge, MergeExclusive, PackageJson, PartialDeep } from 'type-fest';
+import type { Merge, MergeExclusive, PackageJson } from 'type-fest';
 import type { Markdown } from '../misc/markdown';
-import type { Paths, Directories, HOT, Transforms, Views, Minify, Config } from '../config/index';
+import type { Paths, Directories, Transforms, Views, Minify, Config } from '../config/index';
 import type { ScriptTransform, StyleTransform, SVGInline, SVGSprite } from '../config/transforms';
 import type { AxiosRequestConfig } from 'axios';
 import type { Plugins } from './plugin';
 import type { Processors } from '../config/processors';
 import type { Tsconfig } from 'tsconfig-type';
+import { HOT } from './hot';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -228,6 +229,10 @@ export interface Modes {
    */
   push: boolean;
   /**
+   * Invoke HOT reloads, `--hot`
+   */
+  hot: boolean;
+  /**
    * Run the style transform, `--style`
    */
   style: boolean;
@@ -287,7 +292,7 @@ export interface Bundle<T = unknown> {
   /**
    * Hot reload mode options
    */
-  hot: boolean;
+  hot: HOT;
    /**
     * Directory structure paths
     */
