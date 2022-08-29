@@ -105,6 +105,30 @@ export function logHeader (bundle: Bundle) {
 
   text.push(`${c.line}${(_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : nil)}`);
 
+  /* -------------------------------------------- */
+  /* CONFIG WARNINGS                              */
+  /* -------------------------------------------- */
+
+  let hasWarning: boolean = false;
+
+  const cf = basename(bundle.file);
+
+  for (const prop in warnings) {
+
+    const warn = warnings[prop];
+
+    if (warn.length > 0) {
+
+      if (!hasWarning) {
+        text.push(`${c.line + nl + c.line}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`)}:${nl}${c.line}`);
+        hasWarning = true;
+      }
+
+      const title = c.yellowBright(`${c.bold(`${warn.length}`)} ${prop} ${warn.length > 1 ? 'warnings' : 'warning'}`);
+      text.push(`${c.line}${title}${c.newline}${warn.join(nl)}`);
+    }
+  }
+
   if (anyTrue(mode.build, mode.watch) && _ss > 0) {
     text.push(`Spawned ${c.cyan.bold(`${_ss}`)} child ${_ss > 1 ? 'processes' : 'process'}${nl}`);
   } else {
@@ -175,30 +199,6 @@ export function logHeader (bundle: Bundle) {
       text.push(`${c.line}${c.bold('Theme Previews:')}${urls.join(nl)}${nl}${c.line}`);
     }
 
-  }
-
-  /* -------------------------------------------- */
-  /* CONFIG WARNINGS                              */
-  /* -------------------------------------------- */
-
-  let hasWarning: boolean = false;
-
-  const cf = basename(bundle.file);
-
-  for (const prop in warnings) {
-
-    const warn = warnings[prop];
-
-    if (warn.length > 0) {
-
-      if (!hasWarning) {
-        text.push(`${c.line}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`)}:${nl}${c.line}`);
-        hasWarning = true;
-      }
-
-      const title = c.yellowBright(`${c.bold(`${warn.length}`)} ${prop} ${warn.length > 1 ? 'warnings' : 'warning'}`);
-      text.push(`${c.line}${title}${c.newline}${warn.join(nl)}${nl}${c.line}`);
-    }
   }
 
   return text.join(`${nl}`);
