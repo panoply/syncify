@@ -1,7 +1,7 @@
 import { Request, Theme, File, FileKeys } from 'types';
 import { queue, axios } from './queue';
 import { assign, is } from '../shared/native';
-import { log, c, error } from '../logger';
+import { log, error } from '../logger';
 import * as timer from '../process/timer';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { bundle } from '../config';
@@ -117,7 +117,6 @@ export async function sync (theme: Theme, file: File, config: Request) {
       log.info(theme.store);
     } else {
       log.upload(theme);
-      // if (queue.onIdle()) log.complete();
     }
 
     limit = parseInt(headers['x-shopify-shop-api-call-limit'].slice(0, 2), 10);
@@ -126,13 +125,11 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
     // if (!sync.queue) return error(file.key, e.response);
     if (is(e.response.status, 429) || is(e.response.status, 500)) {
-
-      log.info(`${c.orange('↻')} ${c.orange(file.key)}`);
+      log.retrying(file.key, theme.target, theme.store);
       queue.add(() => sync(theme, file, config));
-
     } else {
-      log.info(`${c.redBright('invalid')} ${c.redBright.bold(file.key)}`);
-      error(e.response);
+      log.failed(file.key);
+      console.log(error(file, e.response));
     }
 
   });
