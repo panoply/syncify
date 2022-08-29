@@ -8,7 +8,7 @@ import { script } from '../transform/script';
 import { compile as asset } from '../transform/asset';
 import { compile as json } from '../transform/json';
 import { compile as pages } from '../transform/pages';
-import { is, isUndefined, from, ws } from '../shared/native';
+import { is, isUndefined, from } from '../shared/native';
 import { Kind, parseFile, Type } from '../process/files';
 import { bundle } from '../config';
 import { log } from '../logger';
@@ -54,13 +54,13 @@ export function watch (callback: Syncify) {
 
           value = await script(file as File<ScriptTransform>, callback);
 
-          wss.script(file.key);
+          if (bundle.mode.hot) wss.script(file.key);
 
         } else if (file.type === Type.Style) {
 
           value = await styles(file as File<StyleTransform>, callback);
 
-          wss.stylesheet(file.key);
+          if (bundle.mode.hot) wss.stylesheet(file.key);
 
         } else if (file.type === Type.Section) {
 
@@ -115,10 +115,12 @@ export function watch (callback: Syncify) {
 
           await request.assets('put', file, value);
 
-          if (file.type === Type.Section) {
-            wss.section(file.name);
-          } else if (file.type !== Type.Script && file.type !== Type.Style) {
-            await queue.onIdle().then(() => wss.replace());
+          if (bundle.mode.hot) {
+            if (file.type === Type.Section) {
+              wss.section(file.name);
+            } else if (file.type !== Type.Script && file.type !== Type.Style) {
+              await queue.onIdle().then(() => wss.replace());
+            }
           }
 
         }
