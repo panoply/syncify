@@ -1,0 +1,53 @@
+<!doctype html>
+<html class="no-js full-height" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | img_url: '32x32' }}">
+    {%- endif -%}
+
+    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %}
+        &ndash; tagged "{{ current_tags | join: ',   ' }}"
+      {% endif -%}
+      {%- if current_page != 1 %}
+        &ndash; Page {{  current_page }}
+      {% endif -%}
+      {%- unless page_title contains shop.name %}
+        &ndash; {{ shop.name }}
+      {% endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+
+    <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+
+    {{content_for_header}}
+
+  </head>
+
+  <body class="gradient">
+
+    <main id="MainContent" class="container" role="main" tabindex="-1">
+      <div class="col-6">
+        {{content_for_layout}}
+      </div>
+    </main>
+
+  </body>
+</html>

@@ -1,0 +1,14 @@
+body {
+  font-size: $font-size;
+}
+
+ul > li {
+
+  &.one {
+    color: $font-color;
+
+    .nest {
+      font-size: $font-size;
+    }
+  }
+}

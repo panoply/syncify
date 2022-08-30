@@ -1,0 +1,12 @@
+
+$red: red;
+
+body {
+  color: $red;
+}
+
+ul li.foo {
+      color: $red;
+    }
+
+/*# sourceMappingURL=index.css.map */

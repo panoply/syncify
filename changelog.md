@@ -4,6 +4,15 @@ Project changelog start at version 0.8.0. All previous version should be avoided
 
 <hr>
 
+## [1.0.0-beta.3] - <small>11/12/2021</small>
+
+- Removed `.shopifysync` config
+- Enforce `package.json` config logic and throw when no `.env` file.
+- Fixed the `resource` repeating config setting when executing in script.
+- Added a modifier option when using callback function in `watch` mode. You can return a string or buffer and the file contents will be modified before uploading to shopify. Note, this is only available in `watch` mode. You can apply modifiers when using `upload` or `download`.
+- Removed the callback option for `upload` and `download`.
+- Remove Bluebird promises. Using native methods.
+
 ## [1.0.0-beta.2] - <small>01/08/2021</small>
 
 - Fixed file delete logic

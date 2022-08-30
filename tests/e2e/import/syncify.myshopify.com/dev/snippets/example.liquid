@@ -1,0 +1,33 @@
+{% assign currentInsurableItems = policy.detail.insurableItems | where:
+  'versionInfo.versionNumber', policy.versionInfo.versionNumber | where:
+  'itemType', 'vehicle' %}
+{% if currentInsurableItems %}
+  <div>
+    <table class="esignAutoAppTable" data-testid="coverages-table">
+      <tbody>
+        {% for currentItem in currentInsurableItems %}
+          {% assign usState =
+        policy.detail.usState %}
+          {% assign umLabel = 'UM' %}
+          {% assign biLimit =
+        nil %}
+          {% assign pdLimit = nil %}
+          {% assign umpdLimit = nil %}
+          {% assign
+        umpdValue = nil %}
+          {% assign collLimit = nil %}
+          {% assign compLimit = nil
+        %}
+          {% assign mpLimit = nil %}
+          {% assign raLimit = 'Not Included' %}
+          {%
+        assign atLimit = nil %}
+          {% assign uimpdLimit = nil %}
+          {% assign umLimit =
+        nil %}
+          {% assign uiumLimit = nil %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}

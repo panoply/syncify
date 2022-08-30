@@ -1,0 +1,760 @@
+{
+  "current": {
+    "currency_conversion": true,
+    "font_smoothing": true,
+    "font_provider_adobe": "zeg4olx",
+    "adobe_font_family_heading": "calling-code",
+    "adobe_font_family_body": "proxima-nova",
+    "font_size_body": 16,
+    "font_weight_body": 300,
+    "navigation_font_size": 16,
+    "navigation_font_weight": 300,
+    "font_size_h1": 32,
+    "font_size_h2": 28,
+    "font_size_h3": 24,
+    "font_size_h4": 20,
+    "font_size_h5": 16,
+    "font_size_h6": 14,
+    "color_bg_body": "#ffffff",
+    "color_text": "#111111",
+    "color_href": "#354086",
+    "color_href_hover": "#354086",
+    "color_progress_bar": "#000000",
+    "color_footer_bg": "#f2f2f2",
+    "color_footer_text": "#636363",
+    "color_footer_social_link": "#bbbbbb",
+    "product_item_gutter": 2,
+    "favicon_application_name": "BRIXTOL TEXTILES",
+    "favicon_apple_mobile_web_app_title": "BRIXTOL TEXTILES",
+    "favicon_ico": "https://cdn.brixtol.cloud/favicons/favicon.ico",
+    "favicon_16x": "https://cdn.brixtol.cloud/favicons/favicon-16x16.png",
+    "favicon_32x": "https://cdn.brixtol.cloud/favicons/favicon-32x32.png",
+    "favicon_apple_touch": "https://cdn.brixtol.cloud/favicons/apple-touch-icon.png",
+    "favicon_safari_pinned_tab": "https://cdn.brixtol.cloud/favicons/safari-pinned-tab.svg",
+    "favicon_safari_pinned_tab_color": "#ffffff",
+    "social_facebook_link": "http://facebook.com/brixtoltextiles",
+    "social_messenger_link": "https://m.me/brixtoltextiles",
+    "social_instagram_link": "http://instagram.com/brixtoltextiles",
+    "social_pinterest_link": "http://pinterest.com/brixtoltextiles",
+    "social_twitter_link": "http://twitter.com/brixtoltextiles",
+    "social_youtube_link": "https://www.youtube.com/channel/UCqNtkC5NpW9OkL0wkS9H83g",
+    "social_linkedin_link": "http://linkedin.com/brixtoltextiles",
+    "social_github_link": "http://github.com/brixtol",
+    "social_vk_link": "https://vk.com/brixtol",
+    "google_client_id": "926587477881-43dvk99f2q7v1okkiuambv3riskbiokj.apps.googleusercontent.com",
+    "facebook_client_id": "2077455829215463",
+    "checkout_header_image": "",
+    "checkout_logo_image": "shopify://shop_images/logo-emails.png",
+    "checkout_logo_position": "center",
+    "checkout_logo_size": "large",
+    "checkout_body_background_image": "",
+    "checkout_body_background_color": "#fff",
+    "checkout_input_background_color_mode": "white",
+    "checkout_sidebar_background_image": "",
+    "checkout_sidebar_background_color": "#ffffff",
+    "checkout_heading_font": "Garamond, Baskerville, 'Baskerville Old Face', 'Hoefler Text', 'Times New Roman'",
+    "checkout_body_font": "Roboto",
+    "checkout_accent_color": "#000000",
+    "checkout_button_color": "#000000",
+    "checkout_error_color": "#e32c2b",
+    "favicon": "",
+    "social_snapchat_link": "",
+    "social_tumblr_link": "",
+    "enable_bogo": false,
+    "currency_formatting": "without_currency",
+    "shipping_rates": true,
+    "progress_bar": true,
+    "progress_bar_height": 2,
+    "progress_bar_delay": 500,
+    "google_font_family_heading": "optima_nova_n4",
+    "font_family_body": "helvetica_n4",
+    "custom_css": "",
+    "custom_html": "",
+    "custom_javascript": "",
+    "layout_header_overlay": true,
+    "automatic_locale": true,
+    "supported_currencies": "",
+    "product_hover_bg": "0,0,0,",
+    "product_hover_opacity": "0.8",
+    "product_hover_bg_opacity": 0.7,
+    "product_item_hover_bg": "light",
+    "product_item_hover_bg_opacity": 0.8,
+    "color_links": "#354086",
+    "color_borders": "#e5e5e5",
+    "color_header_bg": "",
+    "color_header_link": "#111111",
+    "color_header_link_hover": "#999999",
+    "color_banner_bg": "#111111",
+    "color_banner_link": "#ffffff",
+    "color_banner_link_hover": "#333333",
+    "font_family_heading": "helvetica_n4",
+    "font_family_header": "roboto_n7",
+    "font_size_header": 12,
+    "font_weight_header": 400,
+    "font_size_banner": 12,
+    "font_weight_banner": 300,
+    "company_founded": "2010",
+    "company_vat_number": "SE556840368601",
+    "company_trademark_number": "30870",
+    "instagram_api_token": "561957018.1677ed0.24e91de4cbc64daea1c12d2a795ab0ad",
+    "company_agency_name": "Söndag Den Sjunde AB",
+    "company_agency_type": "Fashion Agency",
+    "company_agency_website": "https://www.sunday-seven.com",
+    "founded": "2010",
+    "vat_number": "SE556840368601",
+    "trademark_number": "30870",
+    "agency_name": "Söndag Den Sjunde AB",
+    "agency_type": "Fashion Agency",
+    "agency_website": "https://www.sunday-seven.com",
+    "color_primary": "#747474",
+    "color_secondary": "#bbb",
+    "color_body_bg": "#fff",
+    "color_body_text": "#333333",
+    "locale_asia_pacific": "",
+    "locale_europe": "",
+    "locale_middle_east": "",
+    "locale_north_america": "",
+    "locale_south _america": "",
+    "locale_scandinavia": "",
+    "footer_social_enable": true,
+    "footer_newsletter_enable": true,
+    "newsletter_form_action": "",
+    "cart_notes_enable": true,
+    "cart_vendor_enable": false,
+    "ajax_cart_method": "drawer",
+    "favicon_enable": false,
+    "logo_use_image": false,
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "sticky": true,
+          "sticky_bg": "rgba(0,0,0,0)",
+          "sticky_opacity": 1,
+          "spacing": 3,
+          "enable_discount": true,
+          "flip_symbol": true,
+          "logo_desktop_size": 140,
+          "logo_mobile_size": 115,
+          "main_menu": "navbar-menu",
+          "locale_style": "text_and_flag",
+          "search_style": "text_and_icon",
+          "cart_style": "text_only",
+          "account_style": "text_only"
+        }
+      },
+      "banner": {
+        "type": "banner",
+        "blocks": {
+          "1564924214116": {
+            "type": "select",
+            "settings": {
+              "text": "collections",
+              "href": "shopify://collections"
+            }
+          },
+          "1564924226142": {
+            "type": "select",
+            "settings": {
+              "text": "Example two",
+              "href": ""
+            }
+          },
+          "1564924231461": {
+            "type": "select",
+            "settings": {
+              "text": "Three",
+              "href": ""
+            }
+          }
+        },
+        "block_order": [
+          "1564924214116",
+          "1564924226142",
+          "1564924231461"
+        ],
+        "settings": {
+          "loop": true,
+          "draggable": true,
+          "show_arrows": true,
+          "interval": 4,
+          "gutter": 2,
+          "text_size": 1,
+          "text_color": "#111111",
+          "bg_color": "transparent"
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "footer_menu_align": "jc-between",
+          "navigation": "single-footer",
+          "gdrp_banner": "<p>We use cookies to ensure that we give you the best experience on our website. </p>"
+        }
+      },
+      "product_page": {
+        "type": "product_page",
+        "settings": {
+          "align": "jc-center",
+          "viewer_size": 5,
+          "show_arrows": true,
+          "loop_slideshow": true,
+          "descriptive_size": 5
+        }
+      },
+      "collection": {
+        "type": "collection",
+        "settings": {
+          "collection": "men"
+        }
+      },
+      "collection_sustainable": {
+        "type": "collection_sustainable",
+        "blocks": {
+          "1597919114593": {
+            "type": "text_banner",
+            "settings": {
+              "align": "text-left",
+              "title": "OUR SUSTAINABLE WORK",
+              "underline": true,
+              "gutter": 4,
+              "bg_colour": ""
+            }
+          },
+          "1597919119674": {
+            "type": "image_with_text",
+            "settings": {
+              "alignment": "left",
+              "image": "shopify://shop_images/Recycled_WOOL_2.jpg",
+              "title": "RECYCLED WOOL",
+              "description": "<p><span style=\"text-decoration: none;\">We use recycled wool to the furthest extent. The recycled wool is derived from old wool garments and acquire extensive manual labour such as sorting by colour and composition, as well as picking off trims and labels. Occasionally the material does not live up to our desired finish and that is when we use 100% European wool. By using European wool we skip long distance freights from wool producers such as Australia which results in a great environmental win.</span></p>",
+              "padding": 4,
+              "background_colour": "",
+              "feature_product": ""
+            }
+          },
+          "1597919154944": {
+            "type": "image_with_text",
+            "settings": {
+              "alignment": "flex-row-reverse",
+              "image": "shopify://shop_images/IMG_1254_7e96107a-1856-43e4-99d8-d3808da44d90.JPG",
+              "title": "European Wool",
+              "description": "<p><span style=\"text-decoration: none;\">Our ambition is to use as much recycled wool as possible. However this is not always possible since we don't want to compromise the quality and the life span of a product. In this case we always use 100% European Wool. We mostly use Portuguese and British wool.</span></p>",
+              "padding": 4,
+              "background_colour": "",
+              "feature_product": ""
+            }
+          },
+          "1598002137110": {
+            "type": "image_with_text",
+            "settings": {
+              "alignment": "left",
+              "image": "shopify://shop_images/photo16_4787ac3f-5dd9-4b02-8bda-abf04afbf68f.jpg",
+              "title": "RECYCLED PET",
+              "description": "<p><span style=\"text-decoration: none;\">One product group we take large pride in is our jackets made out of recycled polyethylene terephthalate (PET) bottles.</span><br><span style=\"text-decoration: none;\">What might have been an obvious choice for Swedes is not always a choice in other parts of the world. pet bottles are a large part of the waste and garbage we see on land and in our oceans.</span><br><span style=\"text-decoration: none;\">The ability to recycle these bottles, not only to make new bottles, is a huge possibility to decrease the waste issue in the long run. We also use the recycled pet as padding in our jackets, as we refrain from using materials from animals.</span></p>",
+              "padding": 4,
+              "background_colour": "",
+              "feature_product": ""
+            }
+          },
+          "1598009491425": {
+            "type": "image_with_text",
+            "settings": {
+              "alignment": "flex-row-reverse",
+              "image": "shopify://shop_images/RECYCLED_FIHSING_NETS.jpg",
+              "title": "RECYCLED FISHING NETS",
+              "description": "<p><span style=\"text-decoration: none;\">A young entrepreneur in China sparked an interest for recycling of fibres. His company&nbsp;has complex logistic for collecting old fishing nets from small villages in China and South East Asia. The collected old and used nets are then being processed into new thread and later woven into fabrics.</span></p>",
+              "padding": 4,
+              "background_colour": "",
+              "feature_product": ""
+            }
+          },
+          "1598009797119": {
+            "type": "image_with_text",
+            "settings": {
+              "alignment": "left",
+              "image": "shopify://shop_images/RECYCLED_COTTON.jpg",
+              "title": "RECYCLED Cotton",
+              "description": "<p><span style=\"text-decoration: none;\">The recycled cotton we use is reused production spill from factories situated in the Jiangsu and Anhui provinces in China. Along the textile production line the different processes, such as cutting, generate spill material. This material is commonly thrown away causing a great loss of resources. But our suppliers do not do that, they gather it and refine it.</span></p>",
+              "padding": 4,
+              "background_colour": "",
+              "feature_product": ""
+            }
+          },
+          "1598362432734": {
+            "type": "image_with_text",
+            "settings": {
+              "alignment": "flex-row-reverse",
+              "image": "shopify://shop_images/ECO_FINISH.jpg",
+              "title": "WATER TREPELLENT REATMENT",
+              "description": "<p>For water repellent treatments we only use sustainable bionic finish eco. At times we also use lamination to achieve higher repellency.</p>",
+              "padding": 4,
+              "background_colour": "",
+              "feature_product": ""
+            }
+          }
+        },
+        "block_order": [
+          "1597919114593",
+          "1597919119674",
+          "1597919154944",
+          "1598002137110",
+          "1598009491425",
+          "1598009797119",
+          "1598362432734"
+        ],
+        "settings": {
+          "gutter": 0,
+          "columns": 3
+        }
+      },
+      "rewaxing_service": {
+        "type": "rewaxing_service",
+        "blocks": {
+          "1597903961762": {
+            "type": "text_block",
+            "settings": {
+              "title": "Send To Brixtol",
+              "content": "<p>To get your waxed cotton jacket professionally rewaxed by Brixtol, do so by sending your garment to us here in Stockholm, Sweden.</p>",
+              "auto_open": "data-open"
+            }
+          },
+          "1597904296094": {
+            "type": "text_block",
+            "settings": {
+              "title": "Fabric Treatment",
+              "content": "<p>We rewax garments using our <a href=\"/products/reproof-spray\" title=\"Reproof Spray\">Reproof Spray. </a>Our wax is fully biodegradable, as PFC’s are extremely persistent in the environment, and free from fluorocarbons.</p>",
+              "auto_open": "data-open"
+            }
+          },
+          "1597904315489": {
+            "type": "text_block",
+            "settings": {
+              "title": "Receive from Brixtol",
+              "content": "<p>We will express ship your garment back to the address you used at checkout after the rewaxing treatment process has completed.</p>",
+              "auto_open": "data-open"
+            }
+          }
+        },
+        "block_order": [
+          "1597903961762",
+          "1597904296094",
+          "1597904315489"
+        ],
+        "settings": {
+          "position": "as-center",
+          "multi_select": true,
+          "collapsible": true,
+          "gutter": 1,
+          "text_size": 1,
+          "title": "RE-WAXING SERVICE"
+        }
+      },
+      "rewaxing_collection": {
+        "type": "rewaxing_collection",
+        "settings": {
+          "title": "Your Jacket",
+          "description": "",
+          "loop": false,
+          "draggable": true,
+          "show_arrows": true,
+          "collection": "re-waxing"
+        }
+      },
+      "rewaxing_checkout": {
+        "type": "rewaxing_checkout",
+        "settings": {
+          "position": "as-center",
+          "multi_select": false,
+          "collapsible": true,
+          "gutter": 2,
+          "text_size": 2,
+          "title": "SERVICE PAYMENT"
+        }
+      },
+      "rewaxing_product": {
+        "type": "rewaxing_product",
+        "settings": {
+          "title": "Your Jacket",
+          "description": "",
+          "loop": false,
+          "draggable": true,
+          "show_arrows": true
+        }
+      },
+      "product_viewer": {
+        "type": "product_viewer",
+        "settings": {
+          "viewer_size": 5,
+          "show_arrows": true,
+          "loop_slideshow": true,
+          "descriptive_size": 5
+        }
+      },
+      "product_descriptive": {
+        "type": "product_descriptive",
+        "settings": {
+          "show_description": true,
+          "show_details": true,
+          "details_list_style": "square",
+          "show_fabric": true,
+          "fabric_display_type": "pie_chart",
+          "show_fit_reference": true,
+          "show_help": true,
+          "form_contact_name": true
+        }
+      },
+      "product_promotions": {
+        "type": "product_promotions",
+        "settings": {
+          "show_collection": false,
+          "show_price_comparison": false
+        }
+      },
+      "product_heading": {
+        "type": "product_heading",
+        "settings": {
+          "show_collection": false,
+          "show_price_comparison": true,
+          "free_shipping": true,
+          "free_returns": true
+        }
+      },
+      "product_purchase": {
+        "type": "product_purchase",
+        "settings": {
+          "show_collection": false,
+          "show_price_comparison": false
+        }
+      },
+      "product_information": {
+        "type": "product_information",
+        "settings": {
+          "show_description": true,
+          "details_list_style": "square",
+          "show_sustainable": true,
+          "show_fabric": true,
+          "fabric_display_type": "pie_chart",
+          "show_fit_reference": true,
+          "fit_tolerence_metric": "1 ½ cm",
+          "show_help": false
+        }
+      },
+      "product_pictograms": {
+        "type": "product_pictograms",
+        "settings": {
+          "title": "Logo List"
+        }
+      },
+      "sustainable_collection": {
+        "type": "sustainable_collection",
+        "blocks": {
+          "1598806836372": {
+            "type": "text_banner",
+            "settings": {
+              "align": "text-center",
+              "title": "OUR SUSTAINABLE WORK",
+              "text_size": 3,
+              "text_color": "#ffffff",
+              "underline": true,
+              "underline_color": "#f5f5f5",
+              "gutter": 4,
+              "bg_colour": ""
+            }
+          },
+          "1598807023943": {
+            "type": "image_with_text",
+            "settings": {
+              "show": "true",
+              "alignment": "left",
+              "image": "shopify://shop_images/Recycled_WOOL.jpg",
+              "title": "RECYCLED WOOL",
+              "pictogram": "recycled",
+              "text_size": 4,
+              "description": "<p>We use recycled wool to the furthest extent. The recycled wool is derived from old wool garments and acquire extensive manual labour such as sorting by colour and composition, as well as picking off trims and labels. Occasionally the material does not live up to our desired finish and that is when we use 100% European wool. By using European wool we skip long distance freights from wool producers such as Australia which results in a great environmental win.</p>",
+              "padding": 4,
+              "background_colour": ""
+            }
+          },
+          "1598809326902": {
+            "type": "collection_slideshow",
+            "settings": {
+              "loop": false,
+              "draggable": true,
+              "show_arrows": true,
+              "per_page": 6,
+              "gutter": 2,
+              "collection": "recycled-wool"
+            }
+          },
+          "1598808790870": {
+            "type": "image_with_text",
+            "settings": {
+              "show": "true",
+              "alignment": "flex-row-reverse",
+              "image": "shopify://shop_images/IMG_1254_7e96107a-1856-43e4-99d8-d3808da44d90.JPG",
+              "title": "EUROPEAN WOOL",
+              "pictogram": "made-in-europe",
+              "text_size": 4,
+              "description": "<p>Our ambition is to use as much recycled wool as possible. However this is not always possible since we don&#x27;t want to compromise the quality and the life span of a product. In this case we always use 100% European Wool. We mostly use Portuguese and British wool.</p>",
+              "padding": 4,
+              "background_colour": ""
+            }
+          },
+          "1598816254870": {
+            "type": "collection_slideshow",
+            "settings": {
+              "loop": false,
+              "draggable": true,
+              "show_arrows": true,
+              "per_page": 6,
+              "gutter": 2,
+              "collection": "european-wool"
+            }
+          },
+          "1598816789846": {
+            "type": "image_with_text",
+            "settings": {
+              "show": "true",
+              "alignment": "left",
+              "image": "shopify://shop_images/photo16_4787ac3f-5dd9-4b02-8bda-abf04afbf68f.jpg",
+              "title": "Recycled PET",
+              "pictogram": "recycled-pet",
+              "text_size": 3,
+              "description": "<p>One product group we take large pride in is our jackets made out of recycled polyethylene terephthalate (PET) bottles.<br/>What might have been an obvious choice for Swedes is not always a choice in other parts of the world. pet bottles are a large part of the waste and garbage we see on land and in our oceans.<br/>The ability to recycle these bottles, not only to make new bottles, is a huge possibility to decrease the waste issue in the long run. We also use the recycled pet as padding in our jackets, as we refrain from using materials from animals.</p>",
+              "padding": 4,
+              "background_colour": ""
+            }
+          },
+          "1598816867314": {
+            "type": "collection_slideshow",
+            "settings": {
+              "loop": false,
+              "draggable": true,
+              "show_arrows": true,
+              "per_page": 6,
+              "gutter": 2,
+              "collection": "recycled-pet"
+            }
+          },
+          "1598816968898": {
+            "type": "image_with_text",
+            "settings": {
+              "show": "false",
+              "alignment": "flex-row-reverse",
+              "image": "shopify://shop_images/RECYCLED_COTTON.jpg",
+              "title": "Recycled Cotton",
+              "pictogram": "organic-cotton",
+              "text_size": 3,
+              "description": "<p>The recycled cotton we use is reused production spill from factories situated in the Jiangsu and Anhui provinces in China. Along the textile production line the different processes, such as cutting, generate spill material. This material is commonly thrown away causing a great loss of resources. But our suppliers do not do that, they gather it and refine it.</p>",
+              "padding": 4,
+              "background_colour": ""
+            }
+          },
+          "1598817109340": {
+            "type": "collection_slideshow",
+            "settings": {
+              "loop": false,
+              "draggable": true,
+              "show_arrows": true,
+              "per_page": 6,
+              "gutter": 2,
+              "collection": "recycled-cotton"
+            }
+          }
+        },
+        "block_order": [
+          "1598806836372",
+          "1598807023943",
+          "1598809326902",
+          "1598808790870",
+          "1598816254870",
+          "1598816789846",
+          "1598816867314",
+          "1598816968898",
+          "1598817109340"
+        ],
+        "settings": {
+          "gutter": 0,
+          "columns": 3
+        }
+      },
+      "login_lost_password": {
+        "type": "login_lost_password",
+        "settings": {}
+      },
+      "login_create_account": {
+        "type": "login_create_account",
+        "blocks": {
+          "8877b6a4-dbba-44a7-858a-70c8027d7993": {
+            "type": "benefits",
+            "settings": {
+              "title": "Discounts and promotions"
+            }
+          },
+          "0285d1db-464c-44c1-b1ae-95539ce61b44": {
+            "type": "benefits",
+            "settings": {
+              "title": "Track and trace on orders"
+            }
+          },
+          "788af7f8-e4c8-4c7a-bfba-f7f8dba6b974": {
+            "type": "benefits",
+            "settings": {
+              "title": "Order history"
+            }
+          },
+          "16d37002-c59b-4fa1-bad6-72e4f1d941d2": {
+            "type": "benefits",
+            "settings": {
+              "title": "Faster checkout"
+            }
+          },
+          "06c2c035-b4e9-46a5-bfd3-0ab9c5e3e121": {
+            "type": "benefits",
+            "settings": {
+              "title": "Priority customer service"
+            }
+          },
+          "3dc6161d-31e3-4198-a2cd-92cbbcfa9c0f": {
+            "type": "benefits",
+            "settings": {
+              "title": "Pre-Release Shopping"
+            }
+          },
+          "23a6e87f-d86a-44e4-80a0-1211a5cea714": {
+            "type": "benefits",
+            "settings": {
+              "title": "Privacy Control"
+            }
+          }
+        },
+        "block_order": [
+          "8877b6a4-dbba-44a7-858a-70c8027d7993",
+          "0285d1db-464c-44c1-b1ae-95539ce61b44",
+          "788af7f8-e4c8-4c7a-bfba-f7f8dba6b974",
+          "16d37002-c59b-4fa1-bad6-72e4f1d941d2",
+          "06c2c035-b4e9-46a5-bfd3-0ab9c5e3e121",
+          "3dc6161d-31e3-4198-a2cd-92cbbcfa9c0f",
+          "23a6e87f-d86a-44e4-80a0-1211a5cea714"
+        ],
+        "settings": {
+          "title": "Sign Up",
+          "paragraph": "<p>Register an account and receive exclusive<br/>benefits from us:</p>",
+          "button": "Register account"
+        }
+      },
+      "product_notification": {
+        "type": "product_notification",
+        "settings": {
+          "show_collection": false,
+          "show_price_comparison": false
+        }
+      },
+      "1627801289056e89bd": {
+        "type": "hero_static",
+        "settings": {
+          "caption_width": 300,
+          "gutter": 2,
+          "txt_gutter": 2,
+          "subtitle_color": "",
+          "subtitle_size": 6,
+          "title_color": "",
+          "title_size": 3,
+          "caption_color": "",
+          "caption_size": 3,
+          "btn_offset": 3,
+          "btn_text_color": "",
+          "btn_bg_color": "",
+          "btn_size": "btn-md",
+          "btn_shadow": true,
+          "btn_radius": true,
+          "flex_align": "jc-center ai-center",
+          "subtitle": "",
+          "title": "",
+          "caption": "",
+          "text_align": "center",
+          "buttons": "show_buttons",
+          "btn_label_1": "",
+          "btn_url_1": "",
+          "btn_label_2": "",
+          "btn_url_2": "",
+          "btn_width": 5,
+          "aspect_ratio": "x720"
+        }
+      },
+      "rewaxing_garments": {
+        "type": "rewaxing_garments",
+        "settings": {
+          "title": "",
+          "description": "",
+          "loop": false,
+          "draggable": true,
+          "show_arrows": true
+        }
+      },
+      "pages_careers": {
+        "type": "pages_careers",
+        "blocks": {
+          "afbc7aae-9506-4a81-96c1-a3ecbec520e5": {
+            "type": "select",
+            "settings": {
+              "title_text-box": "KEY ACCOUNT MANAGER",
+              "location_text-box": "Stockholm, Sweden",
+              "description_richtext": "<p class=\"pt-3\">\n  Brixtol Textiles är ett svenskt varumärke och företag med ett sortiment i huvudsak bestående av ytter- plagg som idag finns på 14 marknader med över 300 återförsäljare. Vårt fokus har från start varit att tillverka högkvalitativa produkter i hållbara material för den internationella marknaden. Företaget har vuxit organiskt från sin start 2011 och drivs från huvudkontoret i centrala Stockholm av ett drivet team på åtta personer som hanterar design, produktion, logistik, webbhandel och wholesale.\n</p>\n\n<p class=\"pt-3\">\n  Brixtol Textiles söker en ambitiös person, gärna tjej, med erfarenhet av försäljning till heltidstjänsten som Sales Representative. Arbetet utgår från Stockholm där du ansvarar för försäljningen till Brixtol Textiles återförsäljare i Sverige. Det innebär ett varierat jobb där försäljning och personliga möten står i centrum.\n</p>\n\n<div class=\"row pt-4 pb-2\">\n  <div class=\"col pr-1\">\n    <img src=\"https://brixtol.photo/job-1.jpg\" class=\"img-fluid\">\n  </div>\n  <div class=\"col pr-1\">\n    <img src=\"https://brixtol.photo/job-2.jpg\" class=\"img-fluid\">\n  </div>\n  <div class=\"col\">\n    <img src=\"https://brixtol.photo/job-3.jpg\" class=\"img-fluid\">\n  </div>\n</div>\n\n<p class=\"py-3\">\n  Du som söker motiveras av att skapa personliga kontakter och att jobba med uppföljning av resultat. Du är självgående och engagerad, driven och analytisk, samt lyhörd, effektiv och ansvarstagande. Det är också viktigt att du är proaktiv, kan jobba självständigt och klarar av att prioritera när situationen så kräver. Tjänsten innefattar bland annat:\n</p>\n<ul>\n  <li>- Kollektionspresentation och införsäljningsmöten</li>\n  <li>- Omfattande kontakt med återförsäljare och butiksbesök samt \"kundkvällar\"</li>\n  <li>- Rådgivning till återförsäljare kring varuflödesplanering baserat på kundbehov</li>\n  <li>- Medverkande vid mässor, visningar och andra event</li>\n  <li>- Försäljningsanalys och rapportering</li>\n  <li>- Uppföljning av resultat och budget</li>\n</ul>\n<strong class=\"py-3 d-block\">Kvalifikationer:</strong>\n<ul>\n  <li>- Erfarenhet av försäljning i modebranschen</li>\n  <li>- Din svenska är flytande i tal och skrift, och din engelska är mycket god</li>\n  <li>- B-körkort</li>\n  <li>- Möjlighet att tillbringa en del av arbetstiden resande i syfte att besöka återförsäljare och delta på branschmässor</li>\n\n  <p class=\"py-3\">\n    Ta chansen att jobba på ett ödmjukt företag där vi tar hand om varandra där man har chansen att lära sig hur ett medelstort modeföretag jobbar. Vår förhoppning är att tjänsten är tillsatt den 1 april. Vi kommer att hålla intervjuer löpande. Det är en heltidstjänst som inleds med sex månaders provanställning som sedan övergår till tillsvidareanställning. Ansök genom att skicka CV och personligt brev till\n    <a href=\"mailto:jobs@brixtoltextiles.com.\">jobs@brixtoltextiles.com.</a>\n    Vi ser fram emot att höra från dig!\n  </p>\n</ul>"
+            }
+          },
+          "103b45cb-1149-49af-a322-12c4e7713e1b": {
+            "type": "select",
+            "settings": {
+              "title_text-box": "<hr class=\"d-block\"><br> BRIXTOL TEXTILES SÖKER EN PROVMODELL",
+              "location_text-box": "Stockholm, Sweden",
+              "description_richtext": "<p class=\"pt-3\">På Brixtol Textiles provar vi av våra plagg på människor för att garantera rätt passform och storlek. Som provmodell hos oss får du prova nya plagg tillsammans med designer och inköpare, och vi ser gärna att du kommer med feedback på plaggens passform och funktion. Ett intresse av mode och kläder är ett plus, men inget krav.</p>\n<h6 class=\"pt-3\">Är du en kille i storlek 48/M och har följande kroppsmått:</h6>\n<p>\n<strong>Byst:</strong> 100cm<br> <strong>Midja:</strong> 88cm<br> <strong>Stuss:</strong> 104cm<br> <strong>Längd:</strong> 178 - 183cm</p>\n<br>\n<p>Midjemåttet tar du under sista revbenet och stussen 20 cm ner från midjan. Vänligen ange dina mått in din ansökan. Endast ansökningar med mått inkluderade kommer att besvaras. Avprovningarna sker under kontorstid mellan kl. <strong>9 – 17</strong> på huvudkontoret i Stockholm. Det är en fördel om du är tidsmässigt flexibel. Betalning sker i form av timpenning. En passformsmodell är inte fotomodell, alltså ingen kommersiell fotografering eller digital exponering.</p>\n<p class=\"pt-3\">Jobbstart helst omgående med varierande tidsåtgång men runt 2 timmar per tillfälle med cirka 1 tillfälle per vecka, under vissa perioder mer eller mindre.</p>"
+            }
+          }
+        },
+        "block_order": [
+          "afbc7aae-9506-4a81-96c1-a3ecbec520e5",
+          "103b45cb-1149-49af-a322-12c4e7713e1b"
+        ],
+        "settings": {
+          "header_text-box": "Current Listings"
+        }
+      },
+      "navbar": {
+        "type": "navbar",
+        "settings": {
+          "sticky": true,
+          "sticky_bg": "rgba(0,0,0,0)",
+          "sticky_opacity": 1,
+          "main_menu": "navbar-menu"
+        }
+      },
+      "pages_sidebar": {
+        "type": "pages_sidebar",
+        "settings": {}
+      }
+    },
+    "content_for_index": ["1627801289056e89bd"]
+  },
+  "presets": {
+    "Default": {
+      "ajax_cart_method": "drawer",
+      "cart_notes_enable": true,
+      "color_body_bg": "#fff",
+      "color_body_text": "#333333",
+      "color_borders": "#e5e5e5",
+      "color_footer_bg": "#f2f2f2",
+      "color_footer_social_link": "#bbbbbb",
+      "color_footer_text": "#636363",
+      "color_primary": "#747474",
+      "color_secondary": "#bbb",
+      "favicon_enable": false,
+      "footer_newsletter_enable": true,
+      "footer_social_enable": true,
+      "logo_use_image": false,
+      "social_facebook_link": "",
+      "social_twitter_link": ""
+    }
+  }
+}

@@ -1,0 +1,676 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "syncify",
+  "version": 1.1,
+  "definitions": {
+    "stores": {
+      "type": "object",
+      "required": ["domain", "themes"],
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "description": "Do not include the \"myshopify.com\" portion of the domain.",
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "themes": {
+          "description": "An object list of theme maps where the key properties represent a theme target names and their values the theme id.",
+          "examples": [
+            {
+              "dev": 123456789
+            }
+          ],
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z0-9_$-]{1,15}$",
+            "description": "Property keys will be used as target references by the CLI. The theme target name cannot contain spaces and cannot exceed 15 characters"
+          }
+        }
+      }
+    },
+    "path-type": {
+      "type": ["string", "array"],
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[!*a-zA-Z0-9_-]{1,}){1,}([.a-z]{1,})?$"
+          }
+        }
+      ]
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Customize the development theme structure of your project. You can create path maps to different locations within your project and Syncify will re-route them to the accepted theme structure imposed by Shopify. You cannot define reverse paths and globs must be relative to your root directory.\n\nAll paths must point to directories and files contained within the \"source\" directory defined. You can optionally omit the \"source\" entry from paths as Syncify will normalize and prepend that to all values defined.",
+      "properties": {
+        "assets": {
+          "$ref": "#/definitions/path-type",
+          "description": "Paths to files to be published to theme \"/assets\" directory. Accepts a glob (anymatch) pattern.",
+          "default": "assets/**/*"
+        },
+        "config": {
+          "$ref": "#/definitions/path-type",
+          "description": "Paths to files to be published to the theme \"/config\" directory. These are typically the \"settings_schema.json\" and \"settings_data.json\" files.",
+          "default": "config/*.json"
+        },
+        "locales": {
+          "description": "Paths to files to be published to theme \"/locales\" directory. These are the translation files used by your store.",
+          "$ref": "#/definitions/path-type",
+          "default": "locales/*.json"
+        },
+        "layout": {
+          "description": "Paths to files to be published to the theme \"/layout\" directory. These are Liquid template files.",
+          "$ref": "#/definitions/path-type",
+          "default": "layout/*.liquid"
+        },
+        "snippets": {
+          "description": "Paths to files to be published to the theme \"/snippets\" directory. These are Liquid template files.",
+          "$ref": "#/definitions/path-type",
+          "default": "snippets/*.liquid"
+        },
+        "sections": {
+          "description": "Paths to files to be published to the theme \"/sections\" directory. These are Liquid template files.\n\nYou can provide sub-directory references here and Syncify will re-path values. See the \"views.sections\" options to control how sections should be output.",
+          "$ref": "#/definitions/path-type",
+          "default": "sections/*.liquid"
+        },
+        "templates": {
+          "description": "Paths to files to be published to the theme \"/templates\" directory.. These can be either JSON or Liquid template files.",
+          "$ref": "#/definitions/path-type",
+          "default": [
+            "templates/*.json",
+            "templates/*.liquid"
+          ]
+        },
+        "customers": {
+          "description": "Paths to files to be published to the theme \"/templates/customers\" directory. directory. These can be either JSON or Liquid template files.",
+          "$ref": "#/definitions/path-type",
+          "default": [
+            "templates/customers/*.json",
+            "templates/customers*.liquid"
+          ]
+        },
+        "metafields": {
+          "description": "The directory path to global shop metafields. Syncify provides a elegant approach to metafield synchronization using a directory > file based structure.",
+          "$ref": "#/definitions/path-type",
+          "default": "metafields/**/*.json"
+        },
+        "pages": {
+          "description": "The directory path to markdown or html files. Shopify does not support Liquid code in Page body content. Syncify supports page body html content synchronization be written in markdown using frontmatter attribution.\n\nPlease note, page html content cannot contain or reference Liquid objects and/or tags, Shopify will omit or escape them if they are found present. Syncify will validate the contents of your markdown pages are warn you when Liquid syntax is encountered.",
+          "$ref": "#/definitions/path-type",
+          "default": ["pages/**/*.html", "pages/**/*.md"]
+        },
+        "redirects": {
+          "description": "The directory path to redirect file, defaults to redirects.yml",
+          "type": "string",
+          "default": "redirects.yaml"
+        }
+      }
+    },
+    "spawn": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Spawned child processes to run in parallel with the Syncify resource instance. Supply the CLI command of the process to execute.\n\nYou can leverage Syncify utilities and environment variables to conditionally execute different builds, eg: production or development.",
+      "properties": {
+        "watch": {
+          "type": "object",
+          "description": "Supply the script commands you wish to spawn in watch mode. The \"key\" value will be used as the group reference in the CLI logs."
+        },
+        "build": {
+          "type": "object",
+          "description": "Supply the script commands you wish to spawn in build mode. Build mode will trigger spawns in resource modes such as \"upload\" and \"build\". The \"key\" value will be used as the group reference in the CLI logs.\n\nBuild spawns will execute only once."
+        }
+      }
+    },
+    "style": {
+      "required": ["input"],
+      "type": "object",
+      "properties": {
+        "input": {
+          "default": "",
+          "oneOf": [
+            {
+              "description": "Input path to a stylesheet, eg: \"styles/stylesheet.scss\". This is the root SCSS file from which @imports or @use is called. When changes are detected Syncify will trigger the build from this file. Any \"watch\" files referenced will trigger this file on rebuild.",
+              "type": "string"
+            },
+            {
+              "description": "List on input paths or glob patterns of stylesheets to process, for example:\n\n[\n\t\"styles/dir/*.scss\",\n\t\"styles/vendors/framework.css\"\n]\n\nIf you define \".scss\" or \".sass\" styles they will be processed with Dart SASS. If you have PostCSS installed and your project contains a \"postcss.config.js\" file then compiled \".scss\" and \".sass\" file contents will be passed to PostCSS.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "rename": {
+          "description": "Rename the stylesheet before uploading to theme assets.",
+          "type": "string",
+          "default": ""
+        },
+        "snippet": {
+          "description": "Whether or not to output the contents of the stylesheet as a snippet. When \"true\" the transformed CSS will be wrapped in <style></style> tags and published to the theme \"snippets\" directory opposed to the theme \"assets\" directory.",
+          "type": "boolean",
+          "default": false
+        },
+        "watch": {
+          "description": "Files and/or paths to watch. When changes are detected and paths match the defined entries within this option then the input file will be processed.\n\nPlease note that you do not need to include the input file within this configuration setting, Syncify will automatically apply this.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "postcss": {
+          "description": "Control PostCSS execution when bundling SASS/SCSS. If you setup PostCSS within your workspace then by default Syncify will pass your compiled SASS to PostCSS for post-processing. This might not always be ideal as larger stylesheets will take longer to transform as they will need to pass through both the Dart SASS and PostCSS compilers.\n\nYou can optionally execute PostCSS to run only when transforms are running in \"production\" mode.",
+          "type": "boolean",
+          "default": false
+        },
+        "sass": {
+          "description": "For compiling SASS Syncify uses Dart SASS. You can inform Syncify to pass through additional options to the compilers instance, like (for example) disabling warnings.",
+          "type": "object",
+          "properties": {
+            "sourcemap": {
+              "description": "Whether or not to generate a source maps. Syncify stores source maps locally within your projects \"node_modules/.cache/.syncify\" directory.",
+              "type": "boolean",
+              "default": true
+            },
+            "style": {
+              "description": "Inform Dart SASS on how you wish to compiled CSS to output. By default, this is set to \"compressed\" so as provide Shopify with the smallest file size when uploading and downloading from store/s.\n\nPlease note, you should use PostCSS for post-processing styles.",
+              "type": "string",
+              "default": "compressed",
+              "oneOf": [
+                {
+                  "enum": ["compressed"]
+                },
+                {
+                  "enum": ["expanded"]
+                }
+              ]
+            },
+            "warnings": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether or not you wish to disable warnings printed by Dart SASS. By default, this is set to \"true\" so warnings will be printed. When \"false\" Syncify will omit warnings from Dart SASS."
+            },
+            "includePaths": {
+              "description": "Define a list of include paths. These will be passed to SASS and are useful when you want to include \"node_modules\" within @import references. You will need to prefex import paths with ~ character to inform Syncify to resolve imports from \"node_modules\" directory.",
+              "type": "array",
+              "default": ["node_modules"],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "json": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "indent": {
+          "type": "number",
+          "maximum": 5,
+          "minimum": 1,
+          "default": 2,
+          "description": "The level of indentation to be applied to JSON files"
+        },
+        "useTab": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to use `\t` identation characters."
+        },
+        "crlf": {
+          "type": "boolean",
+          "default": false,
+          "description": "If line termination should be Windows (CRLF) format. Unix (LF) format is the default."
+        },
+        "exclude": {
+          "type": "array",
+          "default": [],
+          "description": "An optional string list of paths/filenames to exclude from processing, ie: pass through",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "svg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input"],
+      "properties": {
+        "input": {
+          "description": "Path to SVG files",
+          "default": "",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "rename": {
+          "type": "string",
+          "description": "Rename the svg file - The same name as source file will be used undefined.",
+          "default": ""
+        },
+        "snippet": {
+          "type": "boolean",
+          "description": "Whether to generate svg as snippet or asset. When `true` the svg source will be written as a snippet",
+          "default": false
+        },
+        "svgo": {
+          "type": "boolean",
+          "default": true,
+          "description": "Options to be passed to `svgo` - Requires `svgo` to be installed."
+        },
+        "sprite": {
+          "type": "object",
+          "additionalProperties": false,
+          "default": {},
+          "description": "Syncify exposes only a couple of options when generating SVG Sprites. These options are passed to \"svg-sprites\".",
+          "properties": {
+            "namespaceIDS": {
+              "type": "boolean",
+              "default": false,
+              "description": "In order to avoid ID clashes, the default behavior is to namespace all IDs in the source SVGs before compiling them into a sprite. Each ID is prepended with a unique string."
+            },
+            "dimensionAttributes": {
+              "type": "boolean",
+              "default": true,
+              "description": "If truthy, width and height attributes will be set on the sprite's element (where applicable)."
+            },
+            "rootAttributes": {
+              "type": "object",
+              "default": {},
+              "description": "Shorthand for applying custom attributes to the outermost element. Please be aware that certain attributes (e.g. viewBox) will be calculated dynamically and override custom rootAttributes in any case."
+            },
+            "namespaceClassnames": {
+              "type": "boolean",
+              "default": false,
+              "description": "In order to avoid CSS class name ambiguities, the default behavior is to namespace CSS class names in the source SVGs before compiling them into a sprite. Each class name is prepended with a unique string. Disable this option to keep the class names untouched."
+            }
+          }
+        }
+      }
+    },
+    "views": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Transform options for Liquid/HTML files",
+      "properties": {
+        "sections": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Section specific transform options when processing section theme files.",
+          "properties": {
+            "prefixDir": {
+              "type": "boolean",
+              "default": false,
+              "description": "Sections can be structured within sub-directories. If a section file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the filenames. For example,\n\nIf a section path is \"theme/sections/index/some-file.liquid\" then the filename will be prefixed with \"index\" so when referencing it within themes you'd need to use \"index_some-file.liquid\"\n\nPrefixing is helpful when you have a large number of sections and want to avoid name collusions. You can only control what sub-directories should have prefexing applied using the \"global:[]\" option or alternatively do not reference paths to sections which contain sub directories."
+            },
+            "separator": {
+              "type": "string",
+              "default": "-",
+              "description": "Define a separator character to be used for prefixing",
+              "oneOf": [
+                {
+                  "enum": ["-"]
+                },
+                {
+                  "enum": ["_"]
+                },
+                {
+                  "enum": [":"]
+                },
+                {
+                  "enum": ["@"]
+                }
+              ]
+            },
+            "globals": {
+              "description": "Glob path to files to section directories that should skip prefixing when a sub-directory structure is detected.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "pages": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "language": {
+              "type": "string",
+              "oneOf": [
+                {
+                  "enum": ["all"]
+                },
+                {
+                  "enum": ["html"]
+                },
+                {
+                  "enum": ["markdown"]
+                }
+              ]
+            },
+            "suffixDir": {
+              "type": "boolean",
+              "default": false
+            },
+            "author": {
+              "description": "Fallback author",
+              "type": "string",
+              "default": ""
+            },
+            "globals": {
+              "description": "Glob path to files to section directories that should skip prefixing when a sub-directory structure is detected.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "snippets": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Snippet specific transform options when processing snippet files",
+          "properties": {
+            "prefixDir": {
+              "type": "boolean",
+              "default": false
+            },
+            "separator": {
+              "type": "string",
+              "default": "-",
+              "description": "Define a separator character to be used for prefixing",
+              "oneOf": [
+                {
+                  "enum": ["-"]
+                },
+                {
+                  "enum": ["_"]
+                },
+                {
+                  "enum": [":"]
+                },
+                {
+                  "enum": ["@"]
+                }
+              ]
+            },
+            "globals": {
+              "description": "Glob path to files to snippet directories that should skip prefixing when a sub-directory structure is detected.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "minify": {
+      "type": "object",
+      "description": "Minification options to be applied to Liquid/HTML files.",
+      "properties": {
+        "json": {
+          "type": "object",
+          "properties": {
+            "assets": {
+              "description": "Minify `.json` files writing to `theme/assets`",
+              "type": "boolean",
+              "default": true
+            },
+            "config": {
+              "description": "Minify `settings_schema.json` and `setting_data.json` config files.",
+              "type": "boolean",
+              "default": true
+            },
+            "locales": {
+              "description": "Minify locale JSON files.",
+              "type": "boolean",
+              "default": true
+            },
+            "metafields": {
+              "description": "Minify metafield files.",
+              "type": "boolean",
+              "default": true
+            },
+            "templates": {
+              "description": "Minify template JSON files.",
+              "type": "boolean",
+              "default": true
+            },
+            "exclude": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "liquid": {
+          "type": "object",
+          "properties": {
+            "minifySchemaTag": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether JSON section schema tag contents should be minified."
+            },
+            "removeNewlineAttributes": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether or not to remove newlines contained within attributes. This is specifically helpful when you a expressing Liquid in HTML attributes that spans newlines."
+            },
+            "removeWhitespaceDashes": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether or not to remove redundant whitespace dashes from Liquid tags when proceeding characters are not whitespace values."
+            },
+            "removeComments": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether or not to remove Liquid comments"
+            },
+            "ignoreTags": {
+              "description": "A list of Liquid tags to be ignored from minification",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "ignoreObjects": {
+              "description": "A list of Liquid objects to be ignored from minification",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "exclude": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "html": {
+          "type": "object",
+          "properties": {
+            "removeComments": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether or not to remove HTML comments"
+            },
+            "collapseWhitespace": {
+              "type": "boolean",
+              "default": true,
+              "description": "Should whitespace be collapsed"
+            },
+            "trimCustomFragments": {
+              "type": "boolean",
+              "default": true
+            },
+            "caseSensitive": {
+              "type": "boolean",
+              "description": "Treat attributes in case sensitive manner (useful for custom HTML tags)",
+              "default": false
+            },
+            "omitBooleanValues": {
+              "type": "boolean",
+              "description": "Omit attribute values from boolean attributes",
+              "default": false
+            },
+            "keepClosingSlash": {
+              "type": "boolean",
+              "description": "Keep the trailing slash on singleton elements",
+              "default": false
+            },
+            "ignoreCustomFragments": {
+              "description": "A regular expression list of HTML fragments to ignore. Please keep in mind that the expressions will be converted using new RegExp() method so ensure to escape character where necessary.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sortAttributes": {
+              "type": "boolean",
+              "description": "Sort attributes by frequency",
+              "default": false
+            },
+            "exclude": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "type": "object",
+  "description": "Syncify Configuration options for Shopify theme development.",
+  "required": ["stores"],
+  "additionalProperties": false,
+  "properties": {
+    "input": {
+      "type": "string",
+      "default": "source",
+      "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
+      "description": "The source build path is the directory where theme files exist. Syncify defaults this to \"source\". The value defined here will be prepended to any path you define within \"paths\"."
+    },
+    "output": {
+      "type": "string",
+      "default": "theme",
+      "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
+      "description": "The output build path is the directory where transformed theme files will be written. This is typically called \"dist\" in most projects but Syncify defaults this to \"theme\". The output directory will reflect the theme files synced with your store online."
+    },
+    "import": {
+      "type": "string",
+      "default": "import",
+      "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
+      "description": "The import build path is the directory where downloaded themes and files will be written. It is relative to your projects root directory and only used in the download mode."
+    },
+    "export": {
+      "type": "string",
+      "default": "export",
+      "pattern": "^[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,}$",
+      "description": "The export path is where packaged (.zip) themes will be written when running the \"package\" resource. Packaged themes will be prepended with the version number defined in your \"package.json\" file and are exported as \".zip\" files."
+    },
+    "config": {
+      "type": "string",
+      "default": ".",
+      "pattern": "^(\\.|[a-zA-Z0-9_-]{1,}(\\/[a-zA-Z0-9_-]{1,}){0,})$",
+      "description": "Syncify will look for configuration files in the root of your project but this might not always be ideal as it can create clutter in your workspace. You can optionally place these config files within a sub-directory (relative to root) and Syncify will look for any spawned of config files from within this directory (opposed to root). \n\nTypically this is named \"scripts\" in most node projects, you can place config files like you \"rollup.config.js\" or \"postcss.config.js\" files within."
+    },
+    "paths": {
+      "$ref": "#/definitions/paths"
+    },
+    "stores": {
+      "description": "List of Shopify stores to connect",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/stores"
+          }
+        },
+        {
+          "type": "object",
+          "$ref": "#/definitions/stores"
+        }
+      ],
+      "$ref": "#/definitions/stores"
+    },
+    "spawn": {
+      "$ref": "#/definitions/spawn"
+    },
+    "views": {
+      "$ref": "#/definitions/views"
+    },
+    "transforms": {
+      "description": "Transform configuration options for processing in the asset and file pipeline.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "json": {
+          "description": "Transform options for handling \".json\" files. The configuration options you define here will be applied to all JSON file types intercepted by Syncify.",
+          "$ref": "#/definitions/json"
+        },
+        "style": {
+          "description": "A list of SCSS or SASS stylesheets to transform. Files will be processed with \"Dart SASS\" and compiled contents will be passed to PostCSS for post-processing if you have PostCSS installed and your project contains a \"postcss.config.js\" file.\n\nYou can also define \".css\" files to be processed in accordance.",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/definitions/style"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/style"
+              }
+            }
+          ]
+        },
+        "svg": {
+          "description": "Transform options for \".svg\" files. Generate an svg sprite or svg snippet files.",
+          "oneOf": [
+            {
+              "type": "object",
+              "$ref": "#/definitions/svg"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/svg"
+              }
+            }
+          ]
+        },
+        "script": {
+          "type": "object"
+        }
+      }
+    },
+
+    "minify": {
+      "$ref": "#/definitions/minify"
+    }
+  }
+}

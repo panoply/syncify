@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../plugins/style.scss"],"names":[],"mappings":";AACA,SAAS;;AAET;EACE,WAAW;AACb;;AAMI;MACE,WAAW;IACb","file":"index.css","sourcesContent":["\n$red: red;\n\nbody {\n  color: $red;\n}\n\nul {\n\n  li {\n\n    &.foo {\n      color: $red;\n    }\n  }\n}\n"]}

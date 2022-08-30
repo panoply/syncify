@@ -1,0 +1,165 @@
+{
+  "name": "test-syncify",
+  "version": "1.0.0",
+  "description": "Test project for Syncify",
+  "main": "index.js",
+  "license": "ISC",
+  "scripts": {
+    "syncify:watch:scripts": "rollup -c -w",
+    "syncify:upload:scripts": "rollup -c",
+    "postcss": "postcss plugins/style.scss --output theme/assets/index.css --env development --verbose --watch",
+    "sync": "node ./unit/watch.cjs",
+    "cli:sync": "sync",
+    "cli:watch": "sync watch syncify -t dev",
+    "cli:watch:multi": "sync watch -s syncify,boefje --syncify dev,prod,stage,test --boefje dev,prod",
+    "cli:upload": "sync upload syncify -t dev",
+    "cli:upload:multi": "sync upload --store syncify,boefje --syncify dev --boefje dev,prod",
+    "cli:download": "sync watch syncify -t dev -o downloads",
+    "cli:download:multi": "sync watch --store syncify,boefje --syncify dev --boefje dev,prod -o downloads/multi",
+    "test": "ava"
+  },
+  "ava": {
+    "files": [
+			"transforms/**/*"
+		]
+  },
+  "syncify": {
+    "stores": [
+      {
+        "domain": "syncify",
+        "themes": {
+          "dev": 129457717489,
+          "prod": 129457717489,
+          "stage": 129457717489,
+          "test": 129457717489
+        }
+      },
+      {
+        "domain": "boefje",
+        "themes": {
+          "dev": 43989205050,
+          "prod": 43989205050
+        }
+      }
+    ],
+    "dirs": {
+      "source": "theme",
+      "import": "import",
+      "export": "export",
+      "config": "config",
+      "metafields": "metafields"
+    },
+    "paths": {
+      "assets": [
+        "assets/**/*"
+      ],
+      "config": [
+        "schema/config"
+      ],
+      "locales": [
+        "schema/locales"
+      ],
+      "layout": [
+        "views/theme.liquid"
+      ],
+      "sections": [
+        "views/sections"
+      ],
+      "templates": [
+        "views/templates"
+      ],
+      "templates/customers": [
+        "views/templates/customers"
+      ],
+      "snippets": [
+        "views/snippets",
+        "scripts/vars.js.liquid",
+        "styles/vars.css.liquid"
+      ]
+    },
+    "transform": {
+      "styles": [
+        {
+          "input": "styles/style.scss",
+          "snippet": false,
+          "rename": "style.min.css",
+          "watch": [
+            "styles/**/*.scss"
+          ],
+          "include": [
+            "node_modules/"
+          ]
+        }
+      ],
+      "icons": {
+        "inline": [
+          "icons/inline/*.svg"
+        ],
+        "sprites": [
+          {
+            "input": [
+              "icons/default/*.svg"
+            ],
+            "output": "icons.liquid",
+            "options": {
+              "dimensionAttributes": true,
+              "namespaceClassnames": false,
+              "namespaceIDS": false,
+              "rootAttributes": {}
+            }
+          }
+        ]
+      },
+      "json": {
+        "allowComments": false,
+        "minify": {
+          "apply": "always",
+          "removeSchemaRefs": true,
+          "exclude": []
+        }
+      },
+      "views": {
+        "sections": {
+          "allowPrefix": true,
+          "onlyPrefixDuplicates": false,
+          "prefixSeparator": "_",
+          "globals": [
+            "layout",
+            "shared"
+          ]
+        },
+        "minify": {
+          "env": "any",
+          "minifyJS": true,
+          "minifyCSS": true,
+          "removeComments": true,
+          "collapseWhitespace": true,
+          "trimCustomFragments": true,
+          "ignoreCustomFragments": [],
+          "minifySectionSchema": true,
+          "removeLiquidComments": true,
+          "ignoredLiquidTags": [],
+          "exclude": []
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@liquify/syncify": "link:.."
+  },
+  "devDependencies": {
+    "@csstools/postcss-sass": "^4.0.0",
+    "autoprefixer": "^10.4.2",
+    "ava": "^4.0.1",
+    "cssnano": "^5.0.15",
+    "postcss": "^8.4.5",
+    "postcss-assets": "^6.0.0",
+    "postcss-cli": "^9.1.0",
+    "postcss-map-get": "^0.3.0",
+    "postcss-nested": "^5.0.6",
+    "postcss-node-sass": "^3.1.1",
+    "postcss-scss": "^4.0.2",
+    "postcss-sort-media-queries": "^4.2.1",
+    "rollup": "^2.63.0"
+  }
+}

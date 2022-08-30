@@ -1,0 +1,30 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+    <link data-syncify-live rel="stylesheet" href="{{ 'bootstrap.css' | asset_url }}">
+    <script data-syncify-live src="{{ 'rollup-bundle.js' | asset_url }}" type="module"></script>
+    <script data-syncify-live src="{{ 'esbuild-bundle.js' | asset_url }}" type="module"></script>
+    {% render 'syncify' %}
+
+    {{ content_for_header }}
+
+
+  </head>
+
+  <body class="gradient">
+
+
+    <main id="maincontent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+
+  </body>
+</html>

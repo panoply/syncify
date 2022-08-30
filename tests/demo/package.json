@@ -1,0 +1,34 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "sync syncify -t dev -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.14.53",
+    "sass": "^1.54.3",
+    "syncify-cli": "link:../..",
+    "tsup": "^6.2.1"
+  },
+  "dependencies": {
+    "@brixtol/bootstrap": "^1.4.2"
+  },
+  "tsup": {
+    "entry": [
+      "./src/scripts/index.ts"
+    ],
+    "outDir": "./theme/assets",
+    "treeshake": true,
+    "splitting": false,
+    "format": [
+      "cjs",
+      "esm"
+    ]
+  }
+}

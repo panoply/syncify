@@ -1,0 +1,36 @@
+<p>Syncify is a blazing fast, extensible and superior alternative Shopify <a href="https://shopify.github.io/themekit/">theme kit</a> tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI that can spawn child processes (compiler coupling). Supports multiple storefront theme synchronization with watch, upload, download and metafield capabilities included.</p>
+<p><strong>Syncify exists as part of the <a href="https://liquify.dev">Liquify</a> project</strong></p>
+<pre><code class="language-html">
+{{ foo }}
+
+</code></pre>
+<h3>Key Features</h3>
+<ul>
+<li>Upload, download and watch multiple storefronts and/or themes.</li>
+<li>Clear, concise and informative CLI logging.</li>
+<li>Supports HTML + Liquid and JSON minification.</li>
+<li>An elegant directory based metafields sync approach using JSON files.</li>
+<li>Built-in support for SCSS and CSS transpilation using SASS Dart and <a href="https://postcss.org/">PostCSS</a>.</li>
+<li>SVG Sprite and inlined SVG snippet generation using <a href="https://github.com/svg/svgo">SVGO</a>.</li>
+<li>Intelligent path mapping capabilities for custom theme directory structures.</li>
+<li>Digests existing build tool configurations for asset transformations.</li>
+<li>Prompt based CLI/TUI and exposed module API for script usage.</li>
+</ul>
+<h3>Why?</h3>
+<p>I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped in my productivity. Theme Kit and other tools in this nexus fail to achieve fluidity. Syncify is how I handle theme creation, development and maintenance, it's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.</p>
+<h1>Install</h1>
+<p>Install as development dependency in your project. Syncify will run a script on post-install which writes default configuration options to your package.json file.</p>
+<p><strong>PNPM</strong></p>
+<pre><code class="language-cli">pnpm add @liquify/syncify -D
+</code></pre>
+<p><strong>NPM</strong></p>
+<pre><code class="language-cli">npm i @liquify/syncify --save-dev
+</code></pre>
+<p><strong>Yarn</strong></p>
+<pre><code class="language-cli">yarn add @liquify/syncify --dev
+</code></pre>
+<pre><code class="language-typescript">import { shopifysync as sync } from '@liquify/syncify';
+
+// Backward compatible, ie: shopify-sync
+sync(mode: string, options: {}, function() {})
+</code></pre>

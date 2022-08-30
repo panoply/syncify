@@ -1,0 +1,15 @@
+{
+  "name": "@syncify/tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Syncify Tests",
+  "main": "index.js",
+  "scripts": {
+    "test:options:scripts": "ava test/options/scripts/scripts.test.mjs ---",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^4.3.1"
+  }
+}
