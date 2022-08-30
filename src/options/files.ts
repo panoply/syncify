@@ -3,7 +3,7 @@ import { join } from 'path';
 import { pathExists, readFile, readJson } from 'fs-extra';
 import { bundleRequire } from 'bundle-require';
 import { jsonc } from '../shared/utils';
-import { bundle } from '.';
+import { bundle } from '../config';
 import stripJsonComments from 'strip-json-comments';
 
 /**

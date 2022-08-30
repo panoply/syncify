@@ -20,7 +20,7 @@ export default defineConfig({
     layout: 'theme.liquid',
     pages: 'views/pages/*',
     customers: 'views/customer/*',
-    templates: 'views/*.liquid',
+    templates: 'views/*.json',
     snippets: 'views/include/*',
     sections: ['views/layout/*', 'views/sections/**/*']
   },
@@ -42,8 +42,7 @@ export default defineConfig({
       'snippets/[dir]-[file]': ['scripts/globs/*.ts'],
       'assets/globs.min.js': {
         input: 'scripts/globs.ts',
-        format: 'iife',
-
+        format: 'iife'
       }
     },
     style: {
@@ -111,5 +110,6 @@ export default defineConfig({
     },
     postcss: [autoprefix()]
   },
+  minify: {},
   plugins: []
 });

@@ -4,7 +4,7 @@ import { has } from 'rambdax';
 import { nil } from '../shared/native';
 import { byteConvert, byteSize, sanitize } from '../shared/utils';
 import { intercept } from '../cli/intercept';
-import { bundle, hot } from '../options/index';
+import { bundle } from '../config';
 import { queue } from '../requests/queue';
 import { Group, File, Theme } from 'types';
 import * as timer from '../process/timer';
@@ -15,7 +15,16 @@ import * as c from '../cli/ansi';
 /* RE-EXPORTS                                   */
 /* -------------------------------------------- */
 
-export { deleted, updated, processor as process, uploaded, transform } from '../cli/tui';
+export {
+  deleted,
+  processor as process,
+  uploaded,
+  transform,
+  invalid,
+  ignored,
+  failed,
+  retrying
+} from '../cli/tui';
 
 /**
  * Warning stacks, maintains a store of log messages
@@ -43,11 +52,6 @@ let listen: () => void = null;
 let idle: boolean = false;
 
 /**
- * File Kind
- */
-let kind: string = '';
-
-/**
  * Current Filename
  */
 let group: Group = 'Syncify';
@@ -72,10 +76,12 @@ process.stdin.on('data', data => {
 
       if (warning.process[prop].size === 0) continue;
 
-      tui.title(prop, 'yellow');
+      tui.title(prop);
 
       for (const message of warning.process[prop].values()) {
-        if (typeof message === 'string' && message.length > 0) tui.write(message);
+        if (typeof message === 'string' && message.length > 0) {
+          tui.multiline(message, 'yellowBright');
+        }
       }
 
       warning.process[prop].clear();
@@ -95,6 +101,7 @@ process.stdin.on('data', data => {
 export const hook = (name: string) => {
 
   if (warning.current !== name) warning.current = name;
+
   if (!has(name, warning.process)) {
     warning.current = name;
     warning.process[name] = new Set();
@@ -111,11 +118,6 @@ export const hook = (name: string) => {
       }
     }
   });
-
-};
-
-export const complete = () => {
-
 };
 
 /**
@@ -124,20 +126,17 @@ export const complete = () => {
  * `stdin` input.
  */
 export const unhook = () => {
-
   listen();
   listen = null;
-
 };
 
 export const syncing = (message: string) => {
 
   if (warning.count > 0) {
-    const count = c.bold(`! ${warning.count} ${warning.count > 1 ? 'warnings' : 'warning'}`);
-    tui.warning(`${count} ${c.yellowBright(`~ Type ${c.bold('w')} and press ${c.bold('enter')} to view`)}`);
+    tui.warning(`${warning.count} ${warning.count > 1 ? 'warnings' : 'warning'}`);
   }
 
-  if (bundle.hot) {
+  if (bundle.mode.hot) {
     tui.reloaded(c.bold('HOT REPLACEMENT'), timer.now());
   }
 
@@ -169,7 +168,6 @@ export const changed = (file: File) => {
   if (close) {
     tui.clear();
     tui.title(file.kind);
-    kind = file.kind;
     title = file.relative;
   }
 
@@ -208,10 +206,9 @@ export const filesize = (file: File, content: string | Buffer) => {
   const after = byteConvert(size);
 
   if ((size > file.size || (size === file.size))) {
-    const gzip = byteConvert(zlib.gzipSync(content).length);
-    tui.transform(`filesize ${before} → gzip ${gzip}`);
+    tui.transform(`filesize ${before} → gzip ${byteConvert(zlib.gzipSync(content).length)}`);
   } else {
-    tui.item(`minified ${before} → ${after} ${c.gray(`saved ${byteConvert(file.size - size)}`)}`);
+    tui.minified(before, after, file.size - size);
   }
 };
 
@@ -228,7 +225,7 @@ export const throws = (message: string) => {
 
   tui.nwl();
 
-  console.log(message);
+  tui.multiline(message, 'redBright');
 
 };
 
@@ -238,20 +235,21 @@ export const throws = (message: string) => {
 export const error = (message: string, file: File) => {
 
   if (queue.pending > 0) {
-    tui.item(c.orange.bold(`${queue.pending} ${queue.pending > 1 ? 'requests' : 'request'} in queue`));
+    tui.pending(message, queue.pending);
     queue.pause();
   }
 
-  // Object
-  notifier.notify({
+  const notification = notifier.notify({
     title: 'Syncify Error',
     sound: 'Pop',
     open: file.input,
     subtitle: message,
     message: file.relative
-  }).notify();
+  });
 
-  tui.write(c.redBright.bold(message));
+  notification.notify();
+
+  tui.message(message);
   tui.nwl();
 
 };
@@ -283,16 +281,16 @@ export const spawn = (name: string) => (...message: string[]) => {
 
   if (!bundle.spawn.invoked) bundle.spawn.invoked = true;
 
-  if (group !== 'SPAWNS') {
+  if (group !== 'Spawn') {
 
     tui.closed(group);
 
     // do not clear if first run
-    if (group !== 'SYNCIFY') tui.clear();
+    if (group !== 'Syncify') tui.clear();
 
     // update name reference
-    tui.opened('SPAWNS');
-    group = 'SPAWNS';
+    tui.opened('Spawn');
+    group = 'Spawn';
   }
 
   if (title !== name) {
@@ -312,7 +310,7 @@ export const catcher = (error: any) => {
 
   while (error.length !== 0) {
     const text = sanitize(error.shift()).split('\n');
-    while (text.length !== 0) tui.write(text.shift());
+    while (text.length !== 0) tui.message(text.shift());
   }
 
 };

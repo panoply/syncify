@@ -1,13 +1,19 @@
 import m from 'mithril';
 
 export default function () {
-  console.log('mous');
+
   const node = document.querySelector('#some-vnode');
 
   m.mount(node, {
-    view: () => m('h1', 'hello world')
+    view: () => [
+      m(
+        '.row.justify-content-center.my-5',
+        m('.col-auto.bg-danger',
+          m('h1', 'FOO - Virtual DOM'),
+
+        )
+      )
+    ]
   });
 
-  console.log('fo');
-  return 'basssd';
 }

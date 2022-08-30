@@ -15,6 +15,7 @@ export * from './config/processors';
 export * from './misc/markdown';
 export * from './misc/requests';
 export * from './misc/shared';
+export * from './misc/errors';
 
 export declare function defineConfig(config: Config): void
 export default syncify;

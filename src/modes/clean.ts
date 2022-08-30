@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import { mapFastAsync } from 'rambdax';
 import { log, c } from '../logger';
 import { setThemeDirs } from '../options/dirs';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 
 /**
  * Cleans Output directory

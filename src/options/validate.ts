@@ -1,5 +1,5 @@
 import { type, has } from 'rambdax';
-import { isUndefined } from '../shared/native';
+import { isArray, isUndefined, nl } from '../shared/native';
 import { c } from '../logger';
 
 /**
@@ -156,11 +156,11 @@ export function missingConfig (cwd: string) {
  * Throws an error when an unknown config option
  * was provided.
  */
-export function throwError (message: string, solution: string) {
+export function throwError (message: string, solution: string | string[]) {
 
   console.error(
-    c.redBright.bold(`Error ${message} option\n\n`),
-    c.gray(`${solution}`)
+    c.redBright.bold(`Error ${message}\n\n`),
+    c.gray.italic(isArray(solution) ? solution.join(nl) : solution)
   );
 
   process.exit(1);

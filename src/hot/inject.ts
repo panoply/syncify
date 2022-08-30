@@ -1,7 +1,7 @@
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { basename } from 'node:path';
 import { nl } from '../shared/native';
-import { bundle, hot } from '../options';
+import { bundle } from '../config';
 import { HOT_SNIPPET } from '../constants';
 import * as request from '../requests/assets';
 import { c } from '../logger';
@@ -15,12 +15,12 @@ const EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET}['"][,\\slablsockvet
  * Checks whether or not the theme contains
  * the HOT reload snippet both locally and remote.
  */
-export async function injectSnippet (path: string) {
+export async function injectSnippet () {
 
   const key = `snippets/${HOT_SNIPPET}`;
   const [ theme ] = bundle.sync.themes;
 
-  const snippet = await readFile(hot.snippet);
+  const snippet = await readFile(bundle.hot.snippet);
   const upload = await request.upload(snippet.toString(), { theme, key });
   update(`${c.line}${c.italic.gray(`${key} uploaded snippet injection`)}`);
   return upload;
@@ -66,7 +66,7 @@ export function writeRender (content: string) {
 
   const ender = content.lastIndexOf('<head>') + 6;
   const start = content.slice(0, ender);
-  return start + nl + hot.renderer + nl + content.slice(ender);
+  return start + nl + bundle.hot.renderer + nl + content.slice(ender);
 
 }
 

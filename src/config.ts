@@ -1,8 +1,8 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
 import { PartialDeep } from 'type-fest';
-import { HOT, Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
-import { assign } from '../shared/native';
+import { Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
+import { assign } from './shared/native';
 
 /**
  * Cache Configuration
@@ -38,16 +38,39 @@ export const minify: Minify = {
     mangleQuoted: false,
     keepNames: false
   },
-  views: {
+  liquid: {
     minifyScript: true,
     minifyStyle: true,
     minifySchema: true,
     removeComments: true,
     stripDashes: true,
-    collapseWhitespace: true,
-    ignoreTags: [],
-    ignoreObjects: [],
     exclude: []
+  },
+  html: {
+    caseSensitive: false,
+    collapseBooleanAttributes: false,
+    collapseInlineTagWhitespace: false,
+    conservativeCollapse: false,
+    keepClosingSlash: false,
+    noNewlinesBeforeTagClose: false,
+    preventAttributesEscaping: false,
+    removeEmptyAttributes: false,
+    removeEmptyElements: false,
+    removeOptionalTags: false,
+    removeRedundantAttributes: true,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
+    useShortDoctype: true,
+    collapseWhitespace: true,
+    continueOnParseError: true,
+    removeComments: true,
+    trimCustomFragments: true,
+    ignoreCustomFragments: [
+      /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+      /<style[\s\S]*?<\/style>/,
+      /{%[\s\S]*?%}/,
+      /{{[\s\S]*?}}/
+    ]
   }
 };
 
@@ -141,33 +164,6 @@ export const processor: PartialDeep<ProcessorConfigs> = {
 };
 
 /**
- * HOT~Reload Configuration
- *
- * This model is used for HOT Reloading assets, views and
- * other content. HOT Reloads are only available in `--watch`
- * mode. The `bundle` config will use a boolean value to indicate
- * whether or not we should enable the feature.
- */
-export const hot: HOT = {
-  inject: true,
-  server: 3000,
-  socket: 8089,
-  method: 'hot',
-  scroll: 'preserved',
-  layouts: [ 'theme.liquid' ],
-  label: 'visible',
-  output: null,
-  renderer: '{% render \'hot.js.liquid\', server: 3000, socket: 8089 %}',
-  snippet: null,
-  alive: {},
-  assets: {
-    js: new Set(),
-    css: new Set(),
-    svg: new Set()
-  }
-};
-
-/**
  * Preset Configuration
  *
  * This model is merged with the users config file
@@ -183,7 +179,7 @@ export const hot: HOT = {
  * defined options, the model is immutable and as such
  * we can reference it.
  */
-export const config: Config = {
+export const options: Config = {
   input: 'source',
   output: 'theme',
   import: 'import',
@@ -270,7 +266,19 @@ export const bundle = {
   silent: false,
   prod: false,
   dev: true,
-  hot: false,
+  hot: {
+    inject: true,
+    server: 3000,
+    socket: 8089,
+    method: 'hot',
+    scroll: 'preserved',
+    layouts: [ 'theme.liquid' ],
+    label: 'visible',
+    renderer: '{% render \'hot.js.liquid\', server: 3000, socket: 8089 %}',
+    snippet: null,
+    output: null,
+    alive: {}
+  },
   dirs: {},
   sync: {
     themes: [],
@@ -284,6 +292,8 @@ export const bundle = {
     upload: false,
     download: false,
     metafields: false,
+    minify: false,
+    hot: false,
     pages: false,
     pull: false,
     push: false,
@@ -334,8 +344,22 @@ export const bundle = {
     sprite: [],
     inline: []
   },
-  set config (merge: Config) { assign(config, merge); },
-  get config () { return config; },
-  get processor () { return processor; },
-  get minify () { return minify; }
+  set config (merge: Config) {
+    assign(options, merge);
+  },
+  get config () {
+    return options;
+  },
+  get processor () {
+    return processor;
+  },
+  minify: {
+    json: false,
+    views: false,
+    script: false,
+    get options () {
+      return minify;
+    }
+  }
+
 } as unknown as Bundle;

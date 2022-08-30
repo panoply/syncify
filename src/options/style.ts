@@ -8,11 +8,12 @@ import { join, extname } from 'path';
 import { existsSync } from 'fs-extra';
 import { getModules, renameFile, readConfigFile } from '../shared/options';
 import { normalPath } from '../shared/paths';
-import { typeError, invalidError, warnOption, missingDependency } from './validate';
-import { bundle, processor } from '.';
+import { typeError, invalidError, warnOption, missingDependency, throwError } from './validate';
+import { bundle, processor } from '../config';
+import { load } from '../transform/styles';
 import { getTransform } from './utilities';
 import * as u from '../shared/native';
-import { c } from '../logger';
+
 type PostCSSProcess = Processors['postcss']
 type SassDartProcess = Processors['sass']
 type StylesFlattened = Merge<StyleTransform, {
@@ -34,14 +35,28 @@ export async function setStyleConfig (config: Config, pkg: Package) {
   const warn = warnOption('style transform option');
 
   sass.installed = getModules(pkg, 'sass');
+
+  // Load SASS Dart module
+  if (sass.installed) {
+    const loaded = await load('sass');
+    if (!loaded) throwError('Unable to dynamically import SASS', 'Ensure you have installed sass');
+  }
+
   postcss.installed = getModules(pkg, 'postcss');
 
   if (postcss.installed) {
+
+    // Load PostCSS module
+    const loaded = await load('postcss');
+    if (!loaded) throwError('Unable to dynamically import PostCSS', 'Ensure you have installed postcss');
+
     const pcss = await readConfigFile<PostCSSProcess>('postcss.config');
+
     if (pcss !== null) {
       postcss.file = pcss.path;
       postcss.config = pcss.config;
     }
+
   }
 
   // Convert to an array if styles is using an object

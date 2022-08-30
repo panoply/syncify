@@ -6,7 +6,7 @@ import handler from 'finalhandler';
 import http from 'node:http';
 import { log } from '../shared/native';
 import { c, tui } from '../logger';
-import { hot } from '../options';
+import { bundle } from '../config';
 import { injectSnippet, injectRender } from '../hot/inject';
 import update from 'log-update';
 
@@ -14,13 +14,13 @@ async function injection () {
 
   update(`${c.line}${c.italic.gray('validating snippet injection')}`);
 
-  const snippet = await injectSnippet(hot.snippet);
+  const snippet = await injectSnippet();
 
   if (snippet) {
 
     update(`${c.line}${c.italic.gray('validating layouts')}`);
 
-    for (const layout in hot.alive) {
+    for (const layout in bundle.hot.alive) {
 
       const render = await injectRender(layout);
 
@@ -46,7 +46,7 @@ async function injection () {
  */
 export async function server (bundle: Bundle<HOT>) {
 
-  log(`${c.line}${c.bold(`${hot.method === 'hot' ? 'HOT' : 'LIVE'} Reloading:`)}`);
+  log(`${c.line}${c.bold(`${bundle.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reloading:`)}`);
   tui.nwl();
   update(`${c.line}${c.italic.gray('configuring HOT Reload')}`);
 
@@ -60,9 +60,9 @@ export async function server (bundle: Bundle<HOT>) {
   const assets = statics(join(bundle.dirs.output, 'assets'), { setHeaders });
   const server = http.createServer((req, res) => assets(req, res, handler(req, res) as any));
 
-  server.listen(hot.server);
+  server.listen(bundle.hot.server);
 
-  log(c.line + c.pink(`server → ${c.bold('assets')} → ${c.gray.underline(`http://localhost:${hot.server}`)}`));
+  log(c.line + c.pink(`server → ${c.bold('assets')} → ${c.gray.underline(`http://localhost:${bundle.hot.server}`)}`));
 
 };
 
@@ -75,7 +75,7 @@ export async function server (bundle: Bundle<HOT>) {
 export function socket () {
 
   const wss = new Server({
-    port: hot.socket,
+    port: bundle.hot.socket,
     path: '/ws'
   });
 

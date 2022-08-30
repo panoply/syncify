@@ -2,15 +2,15 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var chunk3O6KLWD6_js = require('./chunk-3O6KLWD6.js');
+var cjs_js = require('./cjs.js');
 
 
 
 Object.defineProperty(exports, 'default', {
-	enumerable: true,
-	get: function () { return chunk3O6KLWD6_js.c; }
+  enumerable: true,
+  get: function () { return cjs_js.api_default; }
 });
 Object.defineProperty(exports, 'defineConfig', {
-	enumerable: true,
-	get: function () { return chunk3O6KLWD6_js.b; }
+  enumerable: true,
+  get: function () { return cjs_js.defineConfig; }
 });

@@ -6,7 +6,7 @@ import { ESBuildMinify, JSONMinify, ViewMinify } from './minify';
 import { PluginHooks } from '../bundle/plugin';
 import { Processors } from './processors';
 import { InferPaths, RenamePaths } from '../misc/shared';
-import { MergeExclusive, RequireAllOrNone } from 'type-fest';
+import { MergeExclusive } from 'type-fest';
 
 /* -------------------------------------------- */
 /* VIEWS                                        */
@@ -207,23 +207,29 @@ export interface Transforms {
 /* MINIFY                                       */
 /* -------------------------------------------- */
 
-export interface Minify {
+export interface MinifyConfig {
   /**
-   * JSON Minification
+   * JSON minification options. You can disable all JSON files from
+   * being minified by passing a boolean `false`. Optionally, you can
+   * exclude certain types of JSON from being minified.
    */
-  json?: false | JSONMinify;
+  json?: boolean | JSONMinify;
   /**
-   * View (Liquid/HTML) Minification
+   * View minification options. You can disable all views from
+   * being minified by passing a boolean `false`.
    *
-   * > Uses [html-minifier-terser](https://github.com/terser/html-minifier-terser)
+   * Syncify uses HTML Minifier Terser under the hood, it has been
+   * configured to work with Liquid files so only a limited number
+   * of options are exposed in order to prevent invalid or broken
+   * output from being generated.
    */
-  views?: false | ViewMinify;
+  views?: boolean | ViewMinify;
   /**
-   * JS/TS Minification
-   *
-   * > Uses [esbuild](https://esbuild.github.io/api/#minify) minificiation
+   * JavaScript minification options. Script minification is only
+   * available for projects with `esbuild` installed and configured
+   * as a processor.
    */
-  script?: false | ESBuildMinify
+  script?: boolean | ESBuildMinify;
 }
 
 /* -------------------------------------------- */
@@ -493,5 +499,5 @@ export interface Config extends Directories {
    * if the `--minify` flag was passed. Options will default to `false`
    * when either of these conditionals are not met.
    */
-  minify?: Minify
+  minify?: boolean | MinifyConfig
 }

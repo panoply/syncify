@@ -1,6 +1,6 @@
 import { has } from 'rambdax';
 import { writeJson, readJson } from 'fs-extra';
-import { bundle, cache } from '../options';
+import { bundle, cache } from '../config';
 import { Cache } from '../../types';
 
 type Files = keyof Omit<Cache, 'updated' | 'created' | 'sections' | 'pages'>

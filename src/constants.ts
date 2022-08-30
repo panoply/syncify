@@ -105,3 +105,12 @@ export const CONSOLE_METHODS = [
   'trace',
   'warn'
 ];
+
+/**
+ * Error message when esbuild is not installed
+ */
+export const ESBUILD_NOT_INSTALLED = [
+  'You cannot use script minification without esbuild installed',
+  'and configured as a processor. Install esbuild and configure Syncify',
+  'to apply transforms to leverage script minification.'
+];

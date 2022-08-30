@@ -3,7 +3,7 @@ import { join } from 'path';
 import { has } from 'rambdax';
 import { writeFile } from 'fs-extra';
 import { isFunction, assign, isUndefined, isString, isBuffer } from '../shared/native';
-import { bundle } from '../options/index';
+import { bundle } from '../config';
 import { log } from '../logger';
 import * as timer from '../process/timer';
 import * as request from '../requests/assets';

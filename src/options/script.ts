@@ -2,13 +2,12 @@ import { Bundle, Config, ESBuildConfig, Package, Processors, ScriptTransform } f
 import { relative, join } from 'node:path';
 import { has, hasPath, isEmpty, omit } from 'rambdax';
 import { getModules, readConfigFile } from '../shared/options';
-import { warnOption, missingDependency, invalidError, typeError } from './validate';
+import { warnOption, missingDependency, invalidError, typeError, throwError } from './validate';
 import { getTransform, renameFile } from './utilities';
 import { assign, defineProperty, isArray, isObject } from '../shared/native';
 import { getTSConfig } from './files';
-import { bundle, processor } from '.';
-import { runtime, pluginWatch, pluginPaths } from '../transform/script';
-import { c } from '../logger';
+import { bundle, processor } from '../config';
+import { load, pluginWatch, pluginPaths, esbuild as runtime } from '../transform/script';
 import merge from 'mergerino';
 import anymatch from 'anymatch';
 
@@ -31,6 +30,9 @@ export async function setScriptOptions (config: Config, pkg: Package) {
   esbuild.installed = getModules(pkg, 'esbuild');
 
   if (esbuild.installed) {
+
+    const loaded = await load();
+    if (!loaded) throwError('failed to import ESBuild', 'Ensure you have installed esbuild');
 
     const esb = await readConfigFile<ESBuildProcess>('esbuild.config');
 
@@ -150,7 +152,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       entries.plugins.push(pluginWatch(transform));
     }
 
-    await runtime(entries);
+    await runtime.build(entries);
 
     transform.watch.forEach(p => bundle.watch.add(p));
 

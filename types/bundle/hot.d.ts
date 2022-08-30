@@ -92,27 +92,6 @@ export interface HOT {
    * @default true
    */
   alive?: { [template: string]: boolean; };
-  /**
-   * The asset output filename names to swap and apply the
-   * localhost asset paths.
-   *
-   * @default
-   * 'theme/snippets/hot.js.liquid'
-   */
-  assets?: {
-    /**
-     * Script tags
-     */
-    js?: Set<string>;
-    /**
-     * Style tags
-     */
-    css?: Set<string>;
-    /**
-     * SVG sprites/snippets
-     */
-    svg?: Set<string>;
-  }
 }
 
 export type HOTConfig = Pick<HOT,

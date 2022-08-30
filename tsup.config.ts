@@ -5,12 +5,12 @@ const noExternal = [
   'ansis',
   'clean-stack',
   'mergerino',
+  'log-update',
   'p-queue',
   'rambdax',
   'strip-json-comments',
   'tiny-spinner',
-  'wrap-ansi',
-  'log-update'
+  'wrap-ansi'
 ];
 
 const external = [
@@ -35,15 +35,16 @@ const external = [
   'turndown-plugin-gfm',
   'ws',
 
-  // DEV
+  // BUILD DEPS
   'ava',
   'eslint',
   'prettier',
   'tsup',
   'typefest',
+  'tsconfig-type',
   'typescript',
 
-  // PEERS
+  // PEER DEPS
   'esbuild',
   'postcss',
   'sass',
@@ -52,35 +53,34 @@ const external = [
   'svgo'
 ];
 
-export default defineConfig(options => [
-  {
-    entry: [
-      'src/cli.ts',
-      'src/api.ts',
-      'src/index.ts'
-    ],
-    clean: [
-      'dist'
-    ],
-    globalName: 'syncify',
-    splitting: true,
-    treeshake: 'smallest',
-    noExternal,
-    external,
-    async onSuccess () {
+export default defineConfig(options => ({
+  entry: [
+    'src/cli.ts',
+    'src/api.ts',
+    'src/index.ts'
+  ],
+  clean: [
+    'dist'
+  ],
+  splitting: true,
+  treeshake: true,
+  noExternal,
+  external,
+  esbuildOptions (options) {
+    options.chunkNames = 'cjs';
+  },
+  async onSuccess () {
 
-      await build({
-        entryPoints: [ 'src/hot/snippet.ts' ],
-        bundle: true,
-        minify: true,
-        format: 'iife',
-        watch: options.watch === true,
-        banner: { js: '<script>' },
-        footer: { js: '</script>' },
-        treeShaking: true,
-        outfile: 'hot.js.liquid'
-      });
+    await build({
+      entryPoints: [ 'src/hot/snippet.ts' ],
+      bundle: true,
+      minify: true,
+      format: 'iife',
+      banner: { js: '<script>' },
+      footer: { js: '</script>' },
+      treeShaking: true,
+      outfile: 'hot.js.liquid'
+    });
 
-    }
   }
-]);
+}));

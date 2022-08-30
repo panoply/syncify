@@ -345,6 +345,7 @@ export default defineConfig({
       minifyWhitespace: true,
       mangleProps: null,
       mangleCache: false,
+      exclude: []
     },
     views: {
       minifyScript: true,
@@ -353,8 +354,6 @@ export default defineConfig({
       removeComments: true,
       collapseWhitespace: true,
       stripDashes: true,
-      ignoreTags: [],
-      ignoreObjects: [],
       exclude: []
     }
   },
