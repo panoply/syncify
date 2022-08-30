@@ -26,14 +26,15 @@ export let sass: typeof SASS = null;
  * lettings `sass` or `postcss`. This allows users to optionally
  * include modules in the build.
  */
-export async function load (processor: 'postcss' | 'sass') {
+export async function load (id: 'postcss' | 'sass') {
 
-  if (processor === 'postcss') {
-    postcss = await import('postcss') as any;
+  if (id === 'postcss') {
+    const pcss = await import('postcss') as any;
+    postcss = pcss.default;
     return isNil(postcss) === false;
   }
 
-  if (processor === 'sass') {
+  if (id === 'sass') {
     sass = await import('sass');
     return isNil(sass) === false;
   }
@@ -172,7 +173,7 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
 
   try {
 
-    const result = await postcss(config.postcss as any).process(css, {
+    const result = await postcss(processor.postcss.config as any).process(css, {
       from: config.rename,
       to: config.rename,
       map: map ? { prev: map, inline: false } : null
@@ -195,7 +196,7 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
 
     log.unhook();
     log.error('error occured processing css with postcss', file);
-    log.throws(e);
+    console.log(e);
 
     return null;
 
@@ -236,7 +237,7 @@ export async function styles (file: File<StyleTransform>, cb: Syncify): Promise<
 
   } catch (e) {
 
-    log.throws(e);
+    console.log(e);
 
     return null;
   }
