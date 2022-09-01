@@ -2,10 +2,10 @@ import { Syncify, Requests } from 'types';
 import { join } from 'path';
 import { has } from 'rambdax';
 import { writeFile } from 'fs-extra';
-import { isFunction, assign, isUndefined, isString, isBuffer } from '../shared/native';
+import { isFunction, assign, isUndefined, isString, isBuffer } from '../utils/native';
 import { bundle } from '../config';
-import { log } from '../logger';
-import * as timer from '../process/timer';
+import { log } from '~log';
+import * as timer from '../utils/timer';
 import * as request from '../requests/assets';
 
 export async function download (cb?: Syncify): Promise<void> {

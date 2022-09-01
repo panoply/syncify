@@ -1,5 +1,5 @@
 import ansis from 'ansis';
-import { nil, nl } from '../shared/native';
+import { nil, nl } from '~utils/native';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -109,17 +109,21 @@ export const open = lightGray('┌─ ');
  * │
  * ```
  */
-export const line = lightGray('│  ');
+export const line = {
+  /**
+   * Light Gray (default) line
+   */
+  gray: lightGray('│  '),
+  /**
+   * Red dim - used in errors
+   */
+  red: red.dim('│  '),
+  /**
+   * Yellow dim - used in warnings
+   */
+  yellow: yellow.dim('│  ')
 
-/**
- * TUI Tree - line
- *
- * ```
- * │
- * ```
- */
-export const eline = red.dim('│  ');
-
+};
 /**
  * TUI Tree - newline lines, ie: `\n` are prepended and appended
  *
@@ -158,6 +162,13 @@ export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
 /* EXTENDED HELPERS                             */
 /* -------------------------------------------- */
 
+/**
+ * Colon character in gray suffixed with single space
+ *
+ * ```
+ * :
+ * ```
+ */
 export const colon = gray(': ');
 
 /**
@@ -191,10 +202,10 @@ export const rpr = gray(')');
  * Warning stdin suffix
  *
  * ```
- * ~ Type w and press enter to view
+ *  ~ Type w and press enter to view
  * ```
  */
-export const warn = yellowBright(` ~ Type ${bold('w')} and press ${bold('enter')} to view`);
+export const warning = yellowBright(` ~ Type ${bold('w')} and press ${bold('enter')} to view`);
 
 /**
  * Time Suffix
@@ -203,4 +214,4 @@ export const warn = yellowBright(` ~ Type ${bold('w')} and press ${bold('enter')
  *  ~ 01:59:20
  * ```
  */
-export const time = (now: string) => now ? gray(` ~ ${now}`) : nil;
+export const time = (now: string) => now ? reset.gray(` ~ ${now}`) : nil;

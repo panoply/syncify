@@ -2,11 +2,11 @@ import { Config, Package, Processors, SVGInline, SVGSprite } from 'types';
 import anymatch from 'anymatch';
 import { forEach, has } from 'rambdax';
 import merge from 'mergerino';
-import { getModules, readConfigFile } from '../shared/options';
-import { lastPath, normalPath } from '../shared/paths';
-import { typeError, unknownError, invalidError } from './validate';
+import { getModules, readConfigFile } from '../utils/options';
+import { lastPath, normalPath } from '../utils/paths';
+import { typeError, unknownError, invalidError } from '~log/validate';
 import { bundle } from '../config';
-import * as u from '../shared/native';
+import * as u from '../utils/native';
 import { Merge } from 'type-fest';
 
 /**

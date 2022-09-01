@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { throws } from './logger/console';
+import { log } from '~log';
 import { run } from '.';
 import mm from 'minimist';
 
@@ -82,4 +82,4 @@ run(mm(process.argv.slice(1), {
     'del',
     'bump'
   ]
-})).catch(throws);
+})).catch(log.throws);

@@ -1,5 +1,5 @@
 import { Config, Resource, Syncify } from 'types';
-import { isObject, isString, isUndefined } from './shared/native';
+import { isObject, isString, isUndefined } from './utils/native';
 import { run } from '.';
 
 /**

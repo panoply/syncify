@@ -1,9 +1,9 @@
 import { Config, MinifyConfig } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { isBoolean, isObject } from '../shared/native';
+import { isBoolean, isObject } from '../utils/native';
 import { bundle, minify, processor } from '../config';
-import { invalidError, throwError, typeError, unknownError } from './validate';
-import { ESBUILD_NOT_INSTALLED } from '../constants';
+import { invalidError, throwError, typeError, unknownError } from '../log/validate';
+import { ESBUILD_NOT_INSTALLED } from '../const';
 import { getResolvedPaths } from './utilities';
 
 /**

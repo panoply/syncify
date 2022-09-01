@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "syncify syncify -t custom --watch --hot",
-    "build": "syncify custom --build --prod",
+    "build": "syncify --build --prod --clean",
     "upload": "syncify custom --upload",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

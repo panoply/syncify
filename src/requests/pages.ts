@@ -6,11 +6,11 @@ import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
 import Turndown from 'turndown';
 import { stringify } from 'markdown-it';
-import { error } from '../logger/errors';
+
 import { pathExistsSync, stat, writeFile } from 'fs-extra';
-import { assign, is } from '../shared/native';
+import { assign, is } from '../utils/native';
 import { queue, axios, requeue } from '../requests/queue';
-import { log, c } from '../logger';
+import { log, c, error } from '~log';
 
 /**
  * Merge Pages

@@ -4,10 +4,10 @@ import { mapFastAsync } from 'rambdax';
 import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
 import { outputFile } from '../process/files';
-import { log } from '../logger';
+import { log } from '~log';
 import { bundle } from '../config';
-import { isFunction, isUndefined, isString, isBuffer } from '../shared/native';
-import * as timer from '../process/timer';
+import { isFunction, isUndefined, isString, isBuffer } from '../utils/native';
+import * as timer from '../utils/timer';
 
 export async function upload (cb?: Syncify): Promise<void> {
 

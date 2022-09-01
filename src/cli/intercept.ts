@@ -1,7 +1,6 @@
 import { PassThrough } from 'node:stream';
 import { Console } from 'node:console';
-import { forEach } from 'rambdax';
-import { CONSOLE_METHODS } from '../constants'
+import { CONSOLE_METHODS } from '~const';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -11,7 +10,6 @@ import { CONSOLE_METHODS } from '../constants'
  * Callback function method
  */
 type Callback = (stream: 'stdout' | 'stderr', data: string) => void
-
 
 /**
  * Native Methods
@@ -26,7 +24,7 @@ const native: Map<string, typeof console> = new Map();
  * the TUI aesthetic. Interception is dynamic and is only
  * enabled during processing to catch any logs from external tooling.
  */
-export const intercept = (callback: Callback): () => void => {
+export function intercept (callback: Callback): () => void {
 
   const stdout: any = new PassThrough();
   const stderr: any = new PassThrough();

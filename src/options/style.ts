@@ -6,13 +6,17 @@ import anymatch, { Tester } from 'anymatch';
 import { has, hasPath, isNil, uniq } from 'rambdax';
 import { join, extname } from 'path';
 import { existsSync } from 'fs-extra';
-import { getModules, renameFile, readConfigFile } from '../shared/options';
-import { normalPath } from '../shared/paths';
-import { typeError, invalidError, warnOption, missingDependency, throwError } from './validate';
-import { bundle, processor } from '../config';
-import { load } from '../transform/styles';
+import { getModules, renameFile, readConfigFile } from '~utils/options';
+import { normalPath } from '~utils/paths';
+import { typeError, invalidError, warnOption, missingDependency, throwError } from '~log/validate';
+import { bundle, processor } from '~config';
+import { load } from '~transform/styles';
 import { getTransform } from './utilities';
-import * as u from '../shared/native';
+import * as u from '~utils/native';
+
+/* -------------------------------------------- */
+/* TYPES                                        */
+/* -------------------------------------------- */
 
 type PostCSSProcess = Processors['postcss']
 type SassDartProcess = Processors['sass']

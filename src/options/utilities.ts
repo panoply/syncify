@@ -1,103 +1,16 @@
 /* eslint-disable no-unused-vars */
 
+import type { Package } from 'types';
 import type { AxiosRequestConfig } from 'axios';
-import { Transforms, Package, Bundle } from 'types';
-import { pathExists, rename } from 'fs-extra';
-import { forEach, has, omit } from 'rambdax';
-import { basename, extname, join } from 'path';
-import { bundleRequire } from 'bundle-require';
-import { lastPath, normalPath } from '../shared/paths';
-import { isArray, isObject, isString, isUndefined, nil } from '../shared/native';
-import { typeError, invalidError, unknownError, warnOption } from './validate';
-import { bundle } from '../config';
+import { pathExists } from 'fs-extra';
+import { has } from 'rambdax';
 import glob from 'glob';
-import { assign } from 'markdown-it/lib/common/utils';
-
-export const enum TransformType {
-  /**
-   * ```js
-   * {
-   *   style: 'input-path'
-   * }
-   * ```
-   */
-  Input,
-  /**
-   * ```js
-   * {
-   *   style: [
-   *     'input-path-1',
-   *     'input-path-2'
-   *   ]
-   * }
-   * ```
-   */
-  InputList,
-  /**
-   * ```js
-   * {
-   *   style: {
-   *     'assets/filename': 'input-path'
-   *   }
-   * }
-   * ```
-   */
-  RenameInput,
-  /**
-   * ```js
-   * {
-   *   script: {
-   *     'snippet/filename': [
-   *       'input-path-1',
-   *       'input-path-2'
-   *     ]
-   *   }
-   * }
-   * ```
-   */
-  RenameInputList,
-  /**
-   * ```js
-   * {
-   *   style: {
-   *     'snippet/filename': {
-   *       input: 'input-path',
-   *       // options...
-   *     }
-   *   }
-   * }
-   * ```
-   */
-  RenameConfig,
-  /**
-   * ```js
-   * {
-   *   style: {
-   *     input: 'input-path',
-   *     // options...
-   *   }
-   * }
-   * ```
-   */
-  Config,
-  /**
-   * ```js
-   * {
-   *   style: [
-   *     {
-   *       input: 'input-path-1',
-   *       // options...
-   *     },
-   *     {
-   *       input: 'input-path-2',
-   *       // options...
-   *     }
-   *   ]
-   * }
-   * ```
-   */
-  ConfigList
-}
+import { basename, extname } from 'node:path';
+import { bundleRequire } from 'bundle-require';
+import { lastPath, normalPath } from 'src/utils/paths';
+import { isArray, isObject, isString, isUndefined, assign } from 'src/utils/native';
+import { typeError, invalidError, unknownError, warnOption } from '~log/validate';
+import { bundle } from '~config';
 
 /**
  * Path Resovler
@@ -365,8 +278,6 @@ export const renameFile = (src: string, rename?: string) => {
   // Get the filename (remember we flattened this earlier)
   const file = basename(src, ext);
 
-  // TODO
-  // FIX THE .css EXTENSION HARDCODE
   if (isUndefined(rename)) return { dir, ext, file, name: file };
 
   if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);

@@ -1,7 +1,7 @@
-import { Request, Store, File, Methods, Sync, Requests, Theme } from 'types';
+import { Request, Store, File, Methods, Sync, Requests, Theme, FileKeys } from 'types';
 import { mapFastAsync } from 'rambdax';
 import { queue } from '../requests/queue';
-import { assign, isUndefined } from '../shared/native';
+import { assign, isUndefined } from '../utils/native';
 import * as asset from '../requests/assets';
 import * as metafields from '../requests/metafields';
 // import * as pages from '../requests/pages';

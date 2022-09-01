@@ -55,3 +55,23 @@ export default function plugin (options = {}) {
 
 }
 ```
+
+### Scope
+
+Each plugin hook exposes access to the build scope and allows.
+
+<!--prettier-ignore-->
+```ts
+
+onChange() {
+
+  // Logger
+  this.log.warn('')
+  this.log.error('')
+  this.log.process('')
+
+  // Bundle
+  this.bundle
+
+}
+```

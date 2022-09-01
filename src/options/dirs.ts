@@ -2,10 +2,10 @@ import { Bundle, Commands, Config } from 'types';
 import { uniq } from 'rambdax';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'node:path';
-import { assign, isArray } from '../shared/native';
-import { basePath } from '../shared/paths';
+import { assign, isArray } from '../utils/native';
+import { basePath } from '../utils/paths';
 import { bundle, cache } from '../config';
-import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '../constants';
+import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '../const';
 
 /**
  * Create Cache Directories

@@ -1,15 +1,16 @@
 import { Bundle, Config, ESBuildConfig, Package, Processors, ScriptTransform } from 'types';
 import { relative, join } from 'node:path';
 import { has, hasPath, isEmpty, omit } from 'rambdax';
-import { getModules, readConfigFile } from '../shared/options';
-import { warnOption, missingDependency, invalidError, typeError, throwError } from './validate';
-import { getTransform, renameFile } from './utilities';
-import { assign, defineProperty, isArray, isObject } from '../shared/native';
-import { getTSConfig } from './files';
-import { bundle, processor } from '../config';
-import { load, pluginWatch, pluginPaths, esbuild as runtime } from '../transform/script';
 import merge from 'mergerino';
 import anymatch from 'anymatch';
+import { getModules, readConfigFile } from '~utils/options';
+import { warnOption, missingDependency, invalidError, typeError, throwError } from '~log/validate';
+import { getTransform, renameFile } from './utilities';
+import { assign, defineProperty, isArray, isObject } from '~utils/native';
+import { getTSConfig } from './files';
+import { bundle, processor } from '~config';
+import { load, pluginWatch, pluginPaths, esbuild as runtime } from '~transform/script';
+import { log } from '~log';
 
 type ESBuildProcess = Processors['esbuild']
 
@@ -141,7 +142,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       write: false,
       watch: false,
       incremental: true,
-      logLevel: 'silent',
+      // logLevel: 'silent',
       absWorkingDir: bundle.cwd,
       plugins: []
     }) as unknown;
@@ -152,7 +153,16 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       entries.plugins.push(pluginWatch(transform));
     }
 
-    await runtime.build(entries);
+    try {
+
+      await runtime.build(entries);
+
+    } catch (e) {
+
+      // TODO - HANDLE RUNTIME ERRORS
+      log.err(e.errors);
+
+    }
 
     transform.watch.forEach(p => bundle.watch.add(p));
 

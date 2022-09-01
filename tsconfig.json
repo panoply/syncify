@@ -35,7 +35,19 @@
     "rootDir": "src",
     "baseUrl": ".",
     "paths": {
-      "types": ["./types/index.d.ts"]
+      "types": ["./types/index.d.ts"],
+      "~config": ["./src/config.ts"],
+      "~const": ["./src/const.ts"],
+      "~process/*": ["src/process/*"],
+      "~cli/*": ["./src/cli/*"],
+      "~options/*": ["./src/options/*"],
+      "~transform/*": ["./src/transform/*"],
+      "~modes/*": ["./src/modes/*"],
+      "~requests/*": ["./src/requests/*"],
+      "~hot/*": ["./src/hot/*"],
+      "~log": ["./src/log/index.ts"],
+      "~log/*": ["./src/log/*.ts", "!./src/log/index.ts"],
+      "~utils/*": ["src/utils/*"]
     }
   }
 }

@@ -2,12 +2,12 @@ import { minify as terser } from 'html-minifier-terser';
 import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, isType } from 'rambdax';
-import { Type } from '../process/files';
-import { is, nil } from '../shared/native';
-import { byteConvert, byteSize, fileSize } from '../shared/utils';
-import { log, c } from '../logger';
-import { bundle, minify } from '../config';
-import * as timer from '../process/timer';
+import { Type } from '~process/files';
+import { nil } from '~utils/native';
+import { byteConvert, byteSize, fileSize } from '~utils/utils';
+import { bundle, minify } from '~config';
+import * as timer from '~utils/timer';
+import { log } from '~log';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -68,21 +68,17 @@ function minifySchema (file: File, content: string) {
 
   const minified = content.replace(LiquidSchemaTag, data => {
 
-    const before = byteSize(data);
-
     try {
 
       const parsed = JSON.parse(data);
       const minified = JSON.stringify(parsed, null, 0);
-      const after = byteSize(data);
 
-      log.transform(`minified section ${c.bold('schema')} ~ saved ${byteConvert(before - after)}`);
       return minified;
 
     } catch (e) {
 
-      log.error('error occured minifying schema', file);
-      log.throws(e);
+      log.invalid(file.relative);
+      console.log(e);
 
       return data;
 
@@ -128,8 +124,8 @@ async function htmlMinify (file: File, content: string) {
 
   } catch (e) {
 
-    log.error('error occured during minfication', file);
-    log.throws(e);
+    log.invalid(file.relative);
+    console.error(e);
 
     return null;
 
@@ -147,14 +143,11 @@ const transform = (file: File) => async (data: string) => {
 
   if (!bundle.mode.minify) {
     await writeFile(file.output, data);
-    log.transform(`${c.bold(file.namespace)} → ${byteConvert(file.size)}`);
+    log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
     return data;
   }
 
-  const content = is(file.type, Type.Section)
-    ? minifySchema(file, data)
-    : removeComments(data);
-
+  const content = file.type === Type.Section ? minifySchema(file, data) : removeComments(data);
   const htmlmin = await htmlMinify(file, content);
 
   log.process('HTML Terser', timer.now());
@@ -168,12 +161,14 @@ const transform = (file: File) => async (data: string) => {
 
   await writeFile(file.output, postmin);
 
-  const { isSmaller, after, before, gzip, saved } = fileSize(data, file.size);
+  if (!bundle.mode.build) {
+    const size = fileSize(data, file.size);
 
-  if (isSmaller) {
-    log.transform(`${c.bold('View')} ${before} → gzip ${gzip}`);
-  } else {
-    log.transform(`${c.bold('View')} minified ${before} to ${after} ${c.gray(`~ saved ${saved}`)}`);
+    if (size.isSmaller) {
+      log.transform(`${file.namespace} ${size.before} → gzip ${size.gzip}`);
+    } else {
+      log.minified('Liquid', size.before, size.after, size.saved);
+    }
   }
 
   return postmin;

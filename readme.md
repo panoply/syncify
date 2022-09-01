@@ -4,7 +4,7 @@
 
 # @liquify/syncify
 
-The fast, extensible and superior alternative Shopify CLI [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI, hot reloading, asset transformations, multiple storefront theme synchronization with watch, upload, download and metafield capabilities plus a whole lot more.
+An exceptionally fast, extensible and superior alternative Shopify CLI [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI, hot reloading, asset transformations, multiple storefront theme synchronization with watch, upload, download and metafield capabilities plus a whole lot more.
 
 **Syncify exists as part of the [Liquify](https://liquify.dev) project**
 
@@ -12,21 +12,22 @@ The fast, extensible and superior alternative Shopify CLI [theme kit](https://sh
 
 - Watch, upload, download and export multiple storefronts and themes.
 - Intelligent path mapping capabilities for custom directory structures.
-- Live hot reloading support for assets and views.
+- HOT reloading of assets, section, snippets, templates and layouts.
 - Clear, concise, informative and beautiful CLI logging.
-- Liquid/HTML and JSON minification support.
+- Liquid + HTML and JSON minification support.
 - An elegant global directory based metafields sync approach using JSON files.
 - TypeScript/JavaScript transpilation using [ESBuild](https://esbuild.github.io/).
-- SCSS/CSS transpilation using SASS Dart and [PostCSS](https://postcss.org/).
+- SCSS/CSS transpilation using [SASS Dart](https://sass-lang.com/dart-sass) and [PostCSS](https://postcss.org/).
 - SVG Sprite and inlined SVG snippet generation using [SVGO](https://github.com/svg/svgo).
 - Digests and spawns existing build tools for asset transformations.
+- Exposed Plugin API for adding those seeking extensibility.
 - Prompt based CLI/TUI and exposed module API for script usage.
+- Pull, push and merge support for aligning local and remote sources.
+- Files, Pages, Redirects sync strategies and support.
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped me. Shopify's tooling tends to impede upon my productivity and alternatives like the Shopify CLI fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus.
-
-_Powerful and productive tooling built by a developer for developers_
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped me. Shopify's tooling tends to impede upon my productivity and alternatives like the Shopify CLI fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus. It allows you to progressively enhance your development process and produce the most efficient and performant results.
 
 # Install
 
@@ -877,21 +878,19 @@ An array list of glob path patterns to `.json` or `.liquid` **template** files. 
 
 # HOT
 
-Live reloading is supported in development modes. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional workflows. When you invoke `--hot` syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes.
+Live reloading is supported in watch mode. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional tooling. No extensions and no complexities. When you invoke `--hot` syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes. Syncify's HOT reloads are considerably faster than Shopify's CLI and will never invoke a full-page refresh.
 
 ### Assets
 
-SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out URL's with localhost equivalents that Syncify will statically serve.
+SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out the URL's or containing source with localhost equivalents that Syncify will statically serve.
 
 ### Sections
 
 Sections are fetched via the Ajax Section rendering API. Replacements are applied to fragments in real-time.
 
-### Snippets
+### Snippets, Layouts and Templates
 
-In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippet files will have HTML comments `<!-- hot:1aa4f32cf9 -->` containing a UUID injected before they are uploaded to themes. Syncify will pass this UUID to the client via websocket and once received an XHR (fetch) will be triggered. The response of XHR request is then parsed and all nodes which proceed the injected UUID comment/s are plucked and applied swapped in the persisted DOM. Scroll position is persisted, assets and surrounding (unchanged) elements are left intact and not reloaded.
-
-This approach is a mild form DOM hydration that's 10x faster than invoking a hard-refresh.
+In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippets, templated and liquid layout files will inject HTML comments `<!-- hot:1aa4f32cf9 -->` containing a UUID before they are uploaded to themes. Syncify will pass this UUID to the client via websocket and once received an XHR (fetch) will be triggered. The response of XHR request is then parsed and all nodes which proceed the injected UUID comment/s are plucked and swapped in the persisted DOM leaving unchanged element intact. The approach employed by Syncify is a mild form DOM hydration that's 10x faster than invoking a hard-refresh.
 
 # Spawn
 

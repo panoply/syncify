@@ -5,10 +5,9 @@ import { Bundle, Config, Store, Requests } from '../../types';
 import { join } from 'path';
 import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
-import { error } from '../logger/errors';
-import { assign, is } from '../shared/native';
+import { assign } from '../utils/native';
 import { queue, axios, requeue } from '../requests/queue';
-import { log, c } from '../logger';
+import { log, c, error } from '~log';
 import { bundle } from '../config';
 
 /**

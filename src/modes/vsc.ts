@@ -1,16 +1,16 @@
+import { Bundle } from 'types';
 import { mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { join } from 'path';
 import { allTrue, has } from 'rambdax';
-import { IBundle } from 'types';
-import { log, c } from '../logger';
-import * as timer from '../process/timer';
+import { log, c } from '~log';
+import * as timer from '~utils/timer';
 
 /**
  * Create `.vscode` directory
  *
  * Returns the `settings.json` path
  */
-export async function createVSCodeDir (config: IBundle) {
+export async function createVSCodeDir (config: Bundle) {
 
   const vsc = join(config.cwd, '.vscode');
 
@@ -22,7 +22,7 @@ export async function createVSCodeDir (config: IBundle) {
 
 }
 
-export const vsc = async (config: IBundle) => {
+export const vsc = async (config: Bundle) => {
 
   timer.start();
 

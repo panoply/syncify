@@ -1,12 +1,12 @@
-import { isNil, isType } from 'rambdax';
+import { isEmpty, isNil, isType } from 'rambdax';
 import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { is, isBuffer, isArray, isObject, isUndefined, isString } from '../shared/native';
-import { Type } from '../process/files';
-import { byteSize, byteConvert, fileSize } from '../shared/utils';
-import { log, c } from '../logger';
-import { bundle, minify } from '../config';
-import * as timer from '../process/timer';
+import { isBuffer, isArray, isObject, isUndefined, isString, isFunction, toBuffer } from '~utils/native';
+import { Type } from '~process/files';
+import { byteSize, byteConvert, fileSize } from '~utils/utils';
+import { bundle, minify } from '~config';
+import * as timer from '~utils/timer';
+import { log, error } from '~log';
 
 /**
  * Parse JSON
@@ -21,7 +21,7 @@ export function parse (data: string) {
 
   } catch (e) {
 
-    log.throws(e);
+    console.log(e);
 
     return null;
 
@@ -45,7 +45,7 @@ export function minifyJSON (data: string, space = 0): any {
 
   } catch (e) {
 
-    log.throws(e);
+    console.log(e);
 
     return null;
 
@@ -60,27 +60,33 @@ export function minifyJSON (data: string, space = 0): any {
  * passed in file and contents. We do not publish
  * metafield file types to output directory.
  */
-export function jsonCompile (file: File, data: string, space = 0): any {
+export async function jsonCompile (file: File, data: string, space = 0): any {
 
   const minified = minifyJSON(data, space);
 
   if (isNil(minified)) {
     timer.stop();
-    return minified;
-  }
-  if (space === 0) {
-    const s = fileSize(data, file.size);
-    log.transform(`${c.bold('JSON')} minified ${s.before} to ${s.after} ${c.gray(`~ saved ${s.saved}`)}`);
-  } else {
-    log.transform(`${c.bold(file.namespace)} → ${byteConvert(file.size)}`);
+    return data;
   }
 
-  if (is(file.type, Type.Metafield)) {
-    return minified;
-  } else {
-    writeFile(file.output, minified, (e) => e ? log.throws(e.message) : null);
-    return minified;
+  if (!bundle.mode.build) {
+    if (space === 0) {
+      const size = fileSize(minified, file.size);
+      log.minified('JSON', size.before, size.after, size.saved);
+    } else {
+      log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
+    }
   }
+
+  if (file.type === Type.Metafield) return minified;
+
+  writeFile(file.output, minified).catch(
+    error.write('Error writing JSON', {
+      file: file.relative
+    })
+  );
+
+  return minified;
 
 };
 
@@ -95,42 +101,61 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
 
   if (bundle.mode.watch) timer.start();
 
-  const json = await readFile(file.input);
+  const json = await readFile(file.input).catch(
+    error.write('Error reading JSON file', {
+      file: file.relative
+    })
+  );
 
-  file.size = byteSize(json);
+  if (isBuffer(json)) {
 
-  const data = parse(json.toString());
+    const read = json.toString();
 
-  let space: number = bundle.processor.json.indent;
+    file.size = byteSize(read);
 
-  if (bundle.mode.minify) {
-    if (file.type === Type.Asset) {
-      if (minify.json.assets) space = 0;
-    } else if (file.type === Type.Locale) {
-      if (minify.json.locales) space = 0;
-    } else if (file.type === Type.Template) {
-      if (minify.json.templates) space = 0;
-    } else if (file.type === Type.Metafield) {
-      if (minify.json.metafields) space = 0;
-    } else if (file.type === Type.Config) {
-      if (minify.json.config) space = 0;
+    if (read.trim().length === 0) {
+      log.skipped(file, 'empty file');
+      return null;
     }
-  }
 
-  if (!isType('Function', cb)) return jsonCompile(file, data, space);
+    const data = parse(read);
 
-  const update = cb.apply({ ...file }, data);
+    if (isEmpty(data)) {
+      log.skipped(file, 'empty file');
+      return null;
+    }
 
-  if (isUndefined(update)) {
+    let space: number = bundle.processor.json.indent;
+
+    if (bundle.mode.minify) {
+      if (file.type === Type.Asset) {
+        if (minify.json.assets) space = 0;
+      } else if (file.type === Type.Locale) {
+        if (minify.json.locales) space = 0;
+      } else if (file.type === Type.Template) {
+        if (minify.json.templates) space = 0;
+      } else if (file.type === Type.Metafield) {
+        if (minify.json.metafields) space = 0;
+      } else if (file.type === Type.Config) {
+        if (minify.json.config) space = 0;
+      }
+    }
+
+    if (!isFunction(cb)) return jsonCompile(file, data, space);
+
+    const update = cb.apply({ ...file }, data);
+
+    if (isUndefined(update)) {
+      return jsonCompile(file, data, space);
+    } else if (isArray(update) || isObject(update)) {
+      return jsonCompile(file, update, space);
+    } else if (isString(update)) {
+      return jsonCompile(file, parse(update), space);
+    } else if (isBuffer(update)) {
+      return jsonCompile(file, parse(update.toString()), space);
+    }
+
     return jsonCompile(file, data, space);
-  } else if (isArray(update) || isObject(update)) {
-    return jsonCompile(file, update, space);
-  } else if (isString(update)) {
-    return jsonCompile(file, parse(update), space);
-  } else if (isBuffer(update)) {
-    return jsonCompile(file, parse(update.toString()), space);
+
   }
-
-  return jsonCompile(file, data, space);
-
 };

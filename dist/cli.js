@@ -86,4 +86,4 @@ cjs_js.run(mm__default["default"](process.argv.slice(1), {
     "del",
     "bump"
   ]
-})).catch(cjs_js.throws);
+})).catch(cjs_js.loggers_exports.throws);

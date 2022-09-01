@@ -1,6 +1,5 @@
-import { log, nil } from '../shared/native';
-import { redBright, gray } from './ansi';
-import * as tui from './tui';
+import { nil } from '~utils/native';
+import { log, gray } from '~log';
 
 /**
  * Signal Interuption
@@ -9,8 +8,8 @@ import * as tui from './tui';
  */
 export function signal () {
 
-  tui.nwl(nil);
-  log(gray('SIGINT'));
+  log.nwl(nil);
+  log.out(gray('SIGINT'));
   process.exit();
 
 }
@@ -22,10 +21,10 @@ export function signal () {
  */
 export function rejection (reason: any, p: Promise<any>) {
 
-  tui.nwl();
-  tui.write(redBright(`Unhandled Promise Rejection at: ${p}`));
-  tui.nwl();
-  tui.write(gray(`${reason}`));
+  log.nwl();
+  log.err(`Unhandled Promise Rejection at: ${p}`);
+  log.nwl('red');
+  log.out(gray(reason));
 
 };
 
@@ -36,8 +35,9 @@ export function rejection (reason: any, p: Promise<any>) {
  */
 export function exception (e: Error) {
 
-  tui.write(`Uncaught Exception: ${e.message}`);
-  tui.nwl();
-  tui.write(`${e.stack}`);
+  log.nwl();
+  log.err(`Uncaught Exception: ${e.message}`);
+  log.nwl('red');
+  log.err(`${e.stack}`);
 
 };

@@ -1,13 +1,13 @@
-import { IFile, IPages, Syncify } from 'types';
+import { File, Pages, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { join } from 'path';
 import matter from 'gray-matter';
-import { has } from 'rambdax';
+import { has, isEmpty } from 'rambdax';
 import Turndown from 'turndown';
 import gfm from 'turndown-plugin-gfm';
 import Markdown from 'markdown-it';
 import { bundle } from '../config';
-import { log } from '../logger';
+import { log, error } from '~log';
 
 export async function toMarkdown (content: string) {
 
@@ -19,13 +19,19 @@ export async function toMarkdown (content: string) {
 
 }
 
-export async function compile (file: IFile<IPages>, cb: Syncify) {
+export async function compile (file: File<Pages>, cb: Syncify) {
 
   const read = await readFile(file.input);
+
+  if (isEmpty(read.toString())) {
+    log.skipped(file.relative, 'empty file');
+    return null;
+  }
+
   const { data, content } = matter(read);
 
   if (!has('title', data)) {
-    throw log.error('Missing Title', file);
+    // throw log.write('Missing Title');
   }
 
   if (has('html', data)) {
@@ -42,7 +48,11 @@ export async function compile (file: IFile<IPages>, cb: Syncify) {
 
   const body_html = Markdown(bundle.page.export).render(content);
 
-  await writeFile(join(bundle.dirs.cache, 'pages', file.base), body_html);
+  await writeFile(join(bundle.dirs.cache, 'pages', file.base), body_html).catch(
+    error.write('Error writing Page reference', {
+      file: file.relative
+    })
+  ); ;
 
   return {
     title: data.title,

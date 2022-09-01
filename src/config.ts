@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import { PartialDeep } from 'type-fest';
 import { Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
-import { assign } from './shared/native';
+import { assign } from './utils/native';
 
 /**
  * Cache Configuration
@@ -11,6 +11,21 @@ import { assign } from './shared/native';
  * within the `node_modules/.syncify` directory.
  */
 export const cache = <PartialDeep<Cache>>({ /* DYNAMICALLY POPULATED */ });
+
+/**
+ * Warning stacks, maintains a store of log messages
+ */
+export const warning: {
+  current: string;
+  count: number;
+  process: {
+    [id: string]: Set<string>
+  }
+} = {
+  current: null,
+  count: 0,
+  process: {}
+};
 
 /**
  * Minify Configuration

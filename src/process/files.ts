@@ -2,8 +2,8 @@
 
 import { join, parse, relative } from 'path';
 import { File, Paths } from 'types';
-import { assign } from '../shared/native';
-import { lastPath } from '../shared/paths';
+import { assign } from '../utils/native';
+import { lastPath } from '../utils/paths';
 import { Partial } from 'rambdax';
 import * as context from './context';
 import { bundle } from '../config';

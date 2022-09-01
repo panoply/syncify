@@ -1,30 +1,28 @@
 import { Commands, Config, Package, Bundle, Modes, HOTConfig } from 'types';
 import { anyTrue, isNil, has, includes, isEmpty, allFalse } from 'rambdax';
+import { glob } from 'glob';
 import merge from 'mergerino';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
 import { join, relative } from 'node:path';
 import { pathExists, readJson } from 'fs-extra';
-import { typeError, invalidError, missingConfig, throwError, unknownError, warnOption } from './validate';
-import { isArray, keys, assign, nil, log, isString, isObject, ws, defineProperty, isBoolean } from '../shared/native';
-import { normalPath } from '../shared/paths';
-import { authURL } from '../shared/options';
-import { logHeader } from '../logger/heading';
-import { spawn } from '../logger/console';
-import { spawned, spawns } from '../cli/spawn';
-import { kill } from '../cli/exit';
-import { nwl, clear } from '../cli/tui';
-import { gray } from '../cli/ansi';
-import { queue } from '../requests/queue';
+import { isArray, keys, assign, nil, isString, isObject, ws, defineProperty, isBoolean, error } from '~utils/native';
+import { normalPath } from '~utils/paths';
+import { authURL } from '~utils/options';
+import { spawned, spawns } from '~cli/spawn';
+import { kill } from '~cli/exit';
+import { gray } from '~cli/ansi';
+import { queue } from '~requests/queue';
 import { configFile, getPackageJson } from './files';
 import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from './dirs';
 import { setJsonOptions, setViewOptions } from './transforms';
 import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
 import { setMinifyOptions } from './minify';
-import { bundle, cache, processor, plugins, options } from '../config';
-import { PATH_KEYS, HOT_SNIPPET } from '../constants';
-import { glob } from 'glob';
+import { bundle, cache, processor, plugins, options } from '~config';
+import { PATH_KEYS, HOT_SNIPPET } from '~const';
+import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError } from '~log/validate';
+import { log } from '~log';
 
 /* -------------------------------------------- */
 /* EXIT HANDLER                                 */
@@ -35,16 +33,16 @@ kill(() => {
   queue.pause();
   queue.clear();
 
-  nwl(nil);
+  log.nwl(nil);
 
   spawns.forEach((child, name) => {
 
-    log(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
+    error(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
     child.kill();
 
   });
 
-  nwl(nil);
+  log.nwl(nil);
 
   spawns.clear();
   process.exit(0);
@@ -60,7 +58,7 @@ kill(() => {
  */
 export async function define (cli: Commands, _options?: Config) {
 
-  clear();
+  log.clear();
 
   const pkg = await getPackageJson(cli.cwd);
 
@@ -94,9 +92,12 @@ export async function define (cli: Commands, _options?: Config) {
     setSpawns(options, bundle),
     setPlugins(options, bundle),
     setHotReloads(options)
-  ]);
+  ]).catch(e => {
 
-  log(logHeader(bundle));
+    console.log(e);
+  });
+
+  log.start(bundle);
 
   return promise;
 
@@ -295,7 +296,7 @@ function setSpawns (config: Config, bundle: Bundle) {
       bundle.spawn.commands[name].cmd = cmd.shift();
       bundle.spawn.commands[name].args = cmd;
 
-      spawned(name, bundle.spawn.commands[name], spawn(name));
+      spawned(name, bundle.spawn.commands[name], log.spawn(name));
 
     } else if (isArray(command)) {
 
@@ -303,7 +304,7 @@ function setSpawns (config: Config, bundle: Bundle) {
       const cmd = command.shift();
       bundle.spawn.commands[name] = { cmd, args: command, pid: NaN };
 
-      spawned(name, bundle.spawn.commands[name], spawn(name));
+      spawned(name, bundle.spawn.commands[name], log.spawn(name));
 
     } else {
       typeError('spawn', mode, config.spawn[mode], 'string | string[]');
@@ -453,7 +454,7 @@ export function setStores (cli: Commands, config: Config) {
 
   }
 
-  if (bundle.sync.stores.length === 0) {
+  if (bundle.sync.stores.length === 0 && bundle.mode.build !== false) {
     throwError(
       'Unknown, missing or invalid store/theme targets',
       'Check your store config'

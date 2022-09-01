@@ -1,13 +1,10 @@
-import { Request, Theme, File, FileKeys } from 'types';
-import { queue, axios } from './queue';
-import { assign, is } from '../shared/native';
-import { log, error } from '../logger';
-import * as timer from '../process/timer';
-import { AxiosError, AxiosRequestConfig } from 'axios';
-import { bundle } from '../config';
-/* -------------------------------------------- */
-/* PRIVATE                                      */
-/* -------------------------------------------- */
+import type { AxiosError, AxiosRequestConfig } from 'axios';
+import type { Request, Theme, File, FileKeys } from 'types';
+import { queue, axios } from '~requests/queue';
+import { assign } from '~utils/native';
+import * as timer from '~utils/timer';
+import { log, error } from '~log';
+import { bundle } from '~config';
 
 /**
  * Has Asset
@@ -82,7 +79,8 @@ export async function get <T> (url: string, config: AxiosRequestConfig<Request>)
 
   }).catch((e: AxiosError) => {
 
-    log.throws(e.message);
+    log.failed(url);
+    error.request(url, e.response);
 
   });
 
@@ -114,7 +112,7 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
     if (config.method === 'get') return data;
     if (config.method === 'delete') {
-      log.info(theme.store);
+      log.deleted(file.relative, theme);
     } else {
       log.upload(theme);
     }
@@ -124,12 +122,12 @@ export async function sync (theme: Theme, file: File, config: Request) {
   }).catch((e: AxiosError) => {
 
     // if (!sync.queue) return error(file.key, e.response);
-    if (is(e.response.status, 429) || is(e.response.status, 500)) {
-      log.retrying(file.key, theme.target, theme.store);
+    if ((e.response.status === 429) || (e.response.status === 500)) {
+      log.retrying(file.key, theme);
       queue.add(() => sync(theme, file, config));
     } else {
       log.failed(file.key);
-      console.log(error(file, e.response));
+      error.request(file.relative, e.response);
     }
 
   });

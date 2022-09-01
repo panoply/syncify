@@ -1,11 +1,10 @@
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { basename } from 'node:path';
-import { nl } from '../shared/native';
-import { bundle } from '../config';
-import { HOT_SNIPPET } from '../constants';
-import * as request from '../requests/assets';
-import { c } from '../logger';
-import update from 'log-update';
+import { nl } from '~utils/native';
+import { log, tui } from '~log';
+import { bundle } from '~config';
+import { HOT_SNIPPET } from '~const';
+import * as request from '~requests/assets';
 
 const EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET}['"][,\\slablsockvetr:0-9'"]+?-?%}\\s+`);
 
@@ -22,7 +21,7 @@ export async function injectSnippet () {
 
   const snippet = await readFile(bundle.hot.snippet);
   const upload = await request.upload(snippet.toString(), { theme, key });
-  update(`${c.line}${c.italic.gray(`${key} uploaded snippet injection`)}`);
+  log.update(tui.message('gray', `${key} uploaded snippet injection`));
   return upload;
 
 }
@@ -82,7 +81,7 @@ export async function injectRender (path: string) {
   if (!EXP.test(content)) {
     content = writeRender(content);
     await writeFile(path, content);
-    update(`${c.line}${c.italic.gray('injected render tag in output layout')}`);
+    log.update(tui.message('gray', 'injected render tag in output layout'));
   }
 
   const [ theme ] = bundle.sync.themes;
@@ -95,7 +94,7 @@ export async function injectRender (path: string) {
   const upload = await request.upload(content, { theme, key });
 
   if (upload) {
-    update(`${c.line}${c.italic.gray(`${key} uploaded and inject render tag`)}`);
+    log.update(tui.message('gray', 'uploaded and inject render tag'));
     return true;
   }
 

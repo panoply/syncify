@@ -1,8 +1,9 @@
 import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
-import { isFunction, isBuffer, isUndefined } from '../shared/native';
-import { Type } from '../process/files';
+import { isFunction, isBuffer, isUndefined } from '~utils/native';
+import { Type } from '~process/files';
+import { error } from '~log';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */
@@ -14,9 +15,17 @@ import { Type } from '../process/files';
  * Catches spawned generated files and determines whether
  * the file should be written or just fall through.
  */
-const passthrough = (file: File) => async (data: string) => {
+const passthrough = (file: File) => async (data: Buffer | string) => {
 
-  if (file.type !== Type.Spawn) await writeFile(file.output, data);
+  if (file.type !== Type.Spawn) {
+
+    await writeFile(file.output, data).catch(
+      error.write('Error writing asset to output', {
+        file: file.relative,
+        source: file.relative
+      })
+    );
+  } ;
 
   return data;
 
@@ -31,21 +40,28 @@ const passthrough = (file: File) => async (data: string) => {
 export async function compile (file: File, cb: Syncify) {
 
   const copy = passthrough(file);
-  const read = await readFile(file.input);
-  const data = read.toString();
+  const data = await readFile(file.input).catch(
+    error.write('Error reading asset file', {
+      file: file.relative,
+      source: file.relative
+    })
+  );
 
-  if (!isFunction(cb)) return copy(data);
+  if (data) {
 
-  const update = cb.apply({ ...file }, data);
+    if (!isFunction(cb)) return copy(data);
 
-  if (isUndefined(update) || update === false) {
+    const update = cb.apply({ ...file }, data);
+
+    if (isUndefined(update) || update === false) {
+      return copy(data);
+    } else if (isType(update)) {
+      return copy(update);
+    } else if (isBuffer(update)) {
+      return copy(update.toString());
+    }
+
     return copy(data);
-  } else if (isType(update)) {
-    return copy(update);
-  } else if (isBuffer(update)) {
-    return copy(update.toString());
+
   }
-
-  return copy(data);
-
 };

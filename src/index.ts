@@ -6,13 +6,14 @@ import { download } from './modes/download';
 import { clean } from './modes/clean';
 import { build } from './modes/build';
 import { watch } from './modes/watch';
-import { server } from './modes/server';
+import { server } from './hot/server';
+import { stdin } from './log/stdin';
 // import { resource } from 'modes/resource';
 // import { readConfig } from 'config/config';
-import { help } from './logger/help';
-import { log } from './logger';
+import { help } from '~log/help';
+import { log } from '~log';
 import { define } from './options/define';
-import { bundle } from './config';
+import { bundle } from '~config';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -59,6 +60,12 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   process.on('unhandledRejection', rejection);
 
   /* -------------------------------------------- */
+  /* STDIN                                        */
+  /* -------------------------------------------- */
+
+  process.stdin.on('data', stdin);
+
+  /* -------------------------------------------- */
   /* LAUNCH SYNCIFY                               */
   /* -------------------------------------------- */
 
@@ -79,7 +86,9 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
     }
   }
 
-  await server(bundle);
+  if (bundle.mode.hot) {
+    await server(bundle);
+  }
 
   // console.log(bundle);
 
@@ -101,7 +110,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
 
   } catch (e) {
 
-    log.warn(e);
+    log.throws(e);
 
   }
 };

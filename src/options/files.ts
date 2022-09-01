@@ -2,7 +2,7 @@ import { Config, ENV, Package, Tsconfig } from 'types';
 import { join } from 'path';
 import { pathExists, readFile, readJson } from 'fs-extra';
 import { bundleRequire } from 'bundle-require';
-import { jsonc } from '../shared/utils';
+import { jsonc } from '../utils/utils';
 import { bundle } from '../config';
 import stripJsonComments from 'strip-json-comments';
 

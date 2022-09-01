@@ -1,15 +1,21 @@
 import type { Syncify, File, ScriptTransform, ESBuildConfig } from 'types';
 import type ESBuild from 'esbuild';
-import { join, resolve, normalize } from 'node:path';
+import { join, resolve, normalize, relative } from 'node:path';
 import { has, isNil } from 'rambdax';
-import { isString, nil, keys } from '../shared/native';
-import { writeFile } from 'fs-extra';
-import { bundle, cache, processor } from '../config';
-import { log, c } from '../logger';
-import { parentPath } from '../shared/paths';
-import { byteSize, event, byteConvert } from '../shared/utils';
 import glob from 'glob';
-import * as timer from '../process/timer';
+import { isString, nil, keys } from '~utils/native';
+import { writeFile } from 'fs-extra';
+import { log, error, bold } from '~log';
+import { parentPath } from '~utils/paths';
+import { byteSize, event, byteConvert } from '~utils/utils';
+import * as timer from '~utils/timer';
+import { bundle, cache, processor } from '~config';
+
+/* -------------------------------------------- */
+/* SCOPES                                       */
+/* -------------------------------------------- */
+
+export const paths: Set<string> = new Set();
 
 /**
  * ESBuild Module
@@ -32,10 +38,8 @@ export async function load () {
 }
 
 /* -------------------------------------------- */
-/* TRANSFORMS                                   */
+/* PLUGINS                                      */
 /* -------------------------------------------- */
-
-export const paths: Set<string> = new Set();
 
 /**
  * Syncify Paths ~ ESBuild Plugin
@@ -164,7 +168,7 @@ export const createSnippet = (string: string) => '<script>' + string + '</script
  *
  * Used for Script transformations.
  */
-export async function script (file: File<ScriptTransform>, cb: Syncify) {
+export async function script (file: File<ScriptTransform>, request: any, cb: Syncify) {
 
   timer.start();
 
@@ -178,32 +182,58 @@ export async function script (file: File<ScriptTransform>, cb: Syncify) {
 
       if (/\.map$/.test(path)) {
 
-        writeFile(join(cache.script.uri, file.base), text);
+        const map = join(cache.script.uri, file.base);
+
+        writeFile(join(cache.script.uri, file.base), text).catch(
+          error.write('Error writing JavaScript Source Map file to the cache directory', {
+            file: relative(bundle.cwd, map),
+            source: file.relative
+          })
+        );
 
       } else {
 
-        log.process(`${c.bold('ESBuild')}`, timer.stop());
+        log.process(bold('ESBuild'), timer.stop());
 
         const { format } = file.config.esbuild as any;
 
-        log.transform(`created ${c.bold(format.toUpperCase())} bundle → ${c.bold(byteConvert(byteSize(text)))}`);
+        log.transform(`${bold(format.toUpperCase())} bundle → ${bold(byteConvert(byteSize(text)))}`);
 
         if (config.snippet) {
-          await writeFile(file.output, createSnippet(text));
-          log.transform(`exported as ${c.bold('snippet')}`);
+
+          await writeFile(file.output, createSnippet(text)).catch(
+            error.write('Error writing inline <script> snippet', {
+              file: file.relative
+            })
+          );
+
+          log.transform(`exported as ${bold('snippet')}`);
+
         } else {
-          await writeFile(file.output, text);
+
+          await writeFile(file.output, text).catch(
+            error.write('Error writing JavaScript asset', {
+              file: file.relative
+            })
+          );
+
+          if (!bundle.mode.build) {
+            await request('put', file, file.output);
+          }
         }
 
       }
     }
 
-  } catch (e) {
-
-    for (const { text, location } of e.errors as ESBuild.BuildResult['errors']) {
-      log.error(text, file);
-      log.info(c.redBright(`Line ${location.line} in ${c.bold(location.file)}`));
+    if (compile.outputFiles.length === 1) {
+      const out = compile.outputFiles.pop();
+      return out.text;
     }
+  } catch (err) {
+
+    log.invalid(file.relative);
+
+    for (const e of err.errors as ESBuild.BuildResult['errors']) error.esbuild(e);
 
     return null;
 
