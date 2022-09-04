@@ -1,8 +1,43 @@
-import { Bundle, File } from 'types';
+import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
 import { join, dirname, basename } from 'path';
 import { defineProperty, isRegex, isUndefined } from '../utils/native';
 import { bundle } from '../config';
 import { lastPath, parentPath } from '../utils/paths';
+import { Kind } from './files';
+
+/**
+ * Script Context
+ *
+ * Locate the entry and apply context to the script change
+ */
+export function svg (file: File<SVGBundle>) {
+
+  const config = bundle.svg.find(x => x.watch(file.input));
+
+  if (isUndefined(config)) return file;
+
+  defineProperty(file, 'config', { get () { return config; } });
+
+  if (config.format === 'sprite') file.kind = Kind.Sprite;
+
+  if (config.snippet) {
+    file.namespace = 'snippets';
+    file.key = join('snippets', config.rename);
+  } else {
+    file.key = join('assets', config.rename);
+  }
+
+  if (config.rename !== basename(file.output)) {
+    if (config.snippet) {
+      file.output = join(bundle.dirs.output, file.key);
+    } else {
+      file.output = join(parentPath(file.output), config.rename);
+    }
+  }
+
+  return file;
+
+};
 
 /**
  * Style Context
@@ -10,7 +45,7 @@ import { lastPath, parentPath } from '../utils/paths';
  * Augment the file configuration to accept
  * style types.
  */
-export function style (file: File<Bundle['style'][number]>) {
+export function style (file: File<StyleBundle>) {
 
   const config = bundle.style.find(x => x.watch(file.input));
 
@@ -38,12 +73,11 @@ export function style (file: File<Bundle['style'][number]>) {
 };
 
 /**
- * Style Context
+ * Script Context
  *
- * Augment the file configuration to accept
- * style types.
+ * Locate the entry and apply context to the script change
  */
-export function script (file: File<Bundle['script'][number]>) {
+export function script (file: File<ScriptBundle>) {
 
   const config = bundle.script.find(x => x.watch(file.input));
 

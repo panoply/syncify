@@ -2,15 +2,75 @@
 
 import type { Package } from 'types';
 import type { AxiosRequestConfig } from 'axios';
-import { pathExists } from 'fs-extra';
-import { has } from 'rambdax';
-import glob from 'glob';
 import { basename, extname } from 'node:path';
+import glob from 'fast-glob';
+import { pathExists } from 'fs-extra';
+import { anyTrue, has } from 'rambdax';
 import { bundleRequire } from 'bundle-require';
-import { lastPath, normalPath } from 'src/utils/paths';
-import { isArray, isObject, isString, isUndefined, assign } from 'src/utils/native';
-import { typeError, invalidError, unknownError, warnOption } from '~log/validate';
+import { lastPath, normalPath } from '~utils/paths';
+import { isArray, isObject, isString, isUndefined, assign } from '~utils/native';
+import { typeError, invalidError, unknownError, warnOption, throwError } from '~log/validate';
+import { cyan } from '~cli/ansi';
+import { CONFIG_FILE_EXT } from '~const';
 import { bundle } from '~config';
+
+const enum EnvType {
+  /**
+   * Using `.env` file
+   */
+  DOTENV = 1,
+  /**
+   * Using `process.env` variables
+   */
+  VARENV
+}
+
+/**
+ * Store Authorization URL
+ *
+ * Generate the the authorization URL to
+ * be used for requests.
+ */
+export function authURL (domain: string, env: object, type: EnvType): AxiosRequestConfig {
+
+  let api_token = domain + '_api_token';
+
+  if (!has(api_token, env)) api_token = api_token.toUpperCase();
+
+  if (has(api_token, env)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      headers: { 'X-Shopify-Access-Token': env[api_token] }
+    };
+  }
+
+  let api_key = domain + '_api_key';
+  let api_secret = domain + '_api_secret';
+
+  if (!has(api_key, env)) api_key = api_key.toUpperCase();
+  if (!has(api_secret, env)) api_secret = api_secret.toUpperCase();
+  if (has(api_key, env) && has(api_secret, env)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      auth: {
+        username: env[api_key],
+        password: env[api_secret]
+      }
+    };
+  }
+
+  if (type === EnvType.DOTENV) {
+    throwError(`Invalid or missing ${cyan(domain + '.myshopify.com')} credentials`, [
+      `Your shop credentials in the ${cyan.bold('.env')} file could`,
+      'not be read correctly or are missing.'
+    ]);
+  } else if (type === EnvType.VARENV) {
+    throwError(`Missing credentials for: ${cyan(domain + '.myshopify.com')}`, `
+    You need to provide shop credentials within a ${cyan.bold('.env')} file.
+    Please check you project setup and ensure you have correctly provided authorization.`);
+  }
+
+};
 
 /**
  * Path Resovler
@@ -23,24 +83,31 @@ import { bundle } from '~config';
  */
 export function getResolvedPaths (filePath: string | string[]) {
 
-  const warn = warnOption('URI Resolver');
   const { cwd } = bundle;
-  const path = normalPath(bundle.config.input); // Path normalizer
+  const warn = warnOption('URI Resolver');
+  const path = normalPath(bundle.dirs.input); // Path normalizer
 
   if (isArray(filePath)) {
-    return filePath.flatMap((item) => {
-      const match = glob.sync(path(item), { cwd, realpath: true });
+
+    const paths: string[] = [];
+
+    for (const item of filePath) {
+      const match = glob.sync(path(item), { cwd, absolute: true });
       if (match.length === 0) {
         warn('Path could not be resolved at', item);
-        return null;
       } else {
-        return match;
+        paths.push(...match);
       }
-    });
+    }
+
+    return paths;
+
   }
 
   if (isString(filePath)) {
-    const match = glob.sync(path(filePath), { cwd, realpath: true });
+
+    const match = glob.sync(path(filePath), { cwd, absolute: true });
+
     if (match.length === 0) {
       warn('Path could not be resolved at', filePath);
       return null;
@@ -82,7 +149,10 @@ export function getTransform <T extends unknown> (transforms: any, flatten = fal
     if (isString(option) || (isArr && rename)) { // { 'assets/file': '...' | ['...'] }
 
       if (rename) o.rename = asset ? prop.slice(7) : prop.slice(9);
-      if (isArr && !option.every(isString)) typeError('transform', prop, option, 'string[]');
+
+      if (isArr && !option.every(isString)) {
+        typeError('transform', prop, option, 'string[]');
+      }
 
       const paths = getResolvedPaths(option as string);
 
@@ -96,7 +166,9 @@ export function getTransform <T extends unknown> (transforms: any, flatten = fal
 
     } else if (isObject(option)) { // { 'assets/file': {} }
 
-      if (!has('input', option)) invalidError('tranform', prop, option, '{ input: string | string[] }');
+      if (!has('input', option)) {
+        invalidError('tranform', prop, option, '{ input: string | string[] }');
+      }
 
       const paths = getResolvedPaths(option.input as string);
 
@@ -131,8 +203,13 @@ export function getTransform <T extends unknown> (transforms: any, flatten = fal
 
         for (const item of option) {
 
-          if (!isObject(item)) typeError('transform', prop, item, '{ input: string }');
-          if (!has('input', item)) invalidError('tranform', prop, item, '{ input: string | string[] }');
+          if (!isObject(item)) {
+            typeError('transform', prop, item, '{ input: string }');
+          }
+
+          if (!has('input', item)) {
+            invalidError('tranform', prop, item, '{ input: string | string[] }');
+          }
 
           const paths = getResolvedPaths(item.input as string | string[]);
 
@@ -158,66 +235,28 @@ export function getTransform <T extends unknown> (transforms: any, flatten = fal
 };
 
 /**
- * Store Authorization URL
- *
- * Generate the the authorization URL to
- * be used for requests.
- */
-export const authURL = (domain: string, env: object): AxiosRequestConfig => {
-
-  let api_token = domain + '_api_token';
-
-  if (!has(api_token, env)) api_token = api_token.toUpperCase();
-
-  if (has(api_token, env)) {
-    return {
-      baseURL: `https://${domain}.myshopify.com/admin`,
-      headers: { 'X-Shopify-Access-Token': env[api_token] }
-    };
-  }
-
-  let api_key = domain + '_api_key';
-  let api_secret = domain + '_api_secret';
-
-  if (!has(api_key, env)) api_key = api_key.toUpperCase();
-  if (!has(api_secret, env)) api_secret = api_secret.toUpperCase();
-  if (has(api_key, env) && has(api_secret, env)) {
-    return {
-      baseURL: `https://${domain}.myshopify.com/admin`,
-      auth: {
-        username: env[api_key],
-        password: env[api_secret]
-      }
-    };
-  }
-
-  throw new Error(`Missing "${domain}" credentials`);
-
-};
-
-/**
  * Get Required modules
  *
  * Ensures that peer dependencies exists for
  * the transform processors.
  */
-export const getModules = (pkg: Package, name: string) => {
+export function getModules (pkg: Package, name: string) {
 
-  if (has('devDependencies', pkg) && has(name, pkg.devDependencies)) return true;
-  if (has('dependencies', pkg) && has(name, pkg.dependencies)) return true;
-  if (has('peerDependencies', pkg) && has(name, pkg.peerDependencies)) return true;
-  if (has('optionalDependencies', pkg) && has(name, pkg.peerDependencies)) return true;
-
-  return false;
+  return anyTrue(
+    (has('devDependencies', pkg) && has(name, pkg.devDependencies)),
+    (has('dependencies', pkg) && has(name, pkg.dependencies)),
+    (has('peerDependencies', pkg) && has(name, pkg.peerDependencies)),
+    (has('optionalDependencies', pkg) && has(name, pkg.peerDependencies))
+  );
 
 };
 
-export const getConfigFilePath = async (filename: string): Promise<string> => {
+export async function getConfigFilePath (filename: string): Promise<string> {
 
-  for (const ext of [ 'js', 'cjs', 'mjs' ]) {
+  for (const ext of CONFIG_FILE_EXT) {
 
     const filepath = `${filename}.${ext}`;
-    const fileExists = await pathExists(`${filepath}.${ext}`);
+    const fileExists = await pathExists(filepath);
 
     if (fileExists) return filepath;
 
@@ -233,7 +272,7 @@ export const getConfigFilePath = async (filename: string): Promise<string> => {
  * Load the syncify config file for node projects.
  * Supports loading config as es module or common js module,
  */
-export const readConfigFile = async <T>(filename: string): Promise<{ config: T; path: string; }> => {
+export async function readConfigFile <T> (filename: string): Promise<{ config: T; path: string; }> {
 
   try {
 
@@ -265,7 +304,7 @@ export const readConfigFile = async <T>(filename: string): Promise<{ config: T; 
  * String parser for file renaming. Uses the common braced
  * reference structures find in most bundlers.
  */
-export const renameFile = (src: string, rename?: string) => {
+export function renameFile (src: string, rename?: string) {
 
   let name = rename;
 
@@ -288,5 +327,6 @@ export const renameFile = (src: string, rename?: string) => {
     ext,
     file,
     dir,
-    name: rename.replace(rename, name) };
+    name: rename.replace(rename, name)
+  };
 };

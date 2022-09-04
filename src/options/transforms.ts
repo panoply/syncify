@@ -1,13 +1,9 @@
-import { Config, Package, Processors, SVGInline, SVGSprite } from 'types';
+import { Config } from 'types';
 import anymatch from 'anymatch';
-import { forEach, has } from 'rambdax';
-import merge from 'mergerino';
-import { getModules, readConfigFile } from '../utils/options';
-import { lastPath, normalPath } from '../utils/paths';
+import { has } from 'rambdax';
 import { typeError, unknownError, invalidError } from '~log/validate';
 import { bundle } from '../config';
 import * as u from '../utils/native';
-import { Merge } from 'type-fest';
 
 /**
  * Section Options
@@ -96,29 +92,21 @@ export function setPageOptions (config: Config) {
       if (u.isString(pages[option])) {
         if (pages[option] === 'markdown' || pages[option] === 'html') {
           bundle.page[option] = pages[option];
-          continue;
         } else {
           invalidError('pages', option, pages[option], 'markdown | html');
         }
-        continue;
       } else {
         typeError('pages', option, pages[option], 'string');
       }
-    }
-
-    if (option === 'author') {
+    } else if (option === 'author') {
       if (u.isString(pages[option])) {
         bundle.page[option] = pages[option];
-        continue;
       } else {
         typeError('pages', option, pages[option], 'string');
       }
-    }
-
-    if (option === 'markdown') {
+    } else if (option === 'markdown') {
       if (u.isObject(pages[option])) {
         u.assign(bundle.page[option], pages[option]);
-        continue;
       } else {
         typeError('pages', option, pages[option], 'object');
       }
@@ -179,87 +167,5 @@ export function setJsonOptions (config: Config) {
     }
 
   }
-
-}
-
-/**
- * SVG Icon Transforms
- *
- * Build the icons configuration for generating
- * SVG sprites and snippets.
- */
-export async function SvgOptions (config: Config, pkg: Package) {
-
-  if (!has('svg', config.transforms)) return;
-
-  const { svgo, sprite } = bundle.processor;
-  // const warn = warnOption('SVG Option');
-
-  svgo.installed = getModules(pkg, 'svgo');
-  sprite.installed = getModules(pkg, 'svg-sprite');
-
-  if (svgo.installed) {
-    const csvgo = await readConfigFile<Processors['svgo']>('svgo.config');
-    if (csvgo !== null) {
-      svgo.configFile = csvgo.path;
-      svgo.config = csvgo.config;
-    }
-  }
-
-  const svgs = u.isArray(config.transforms.svg)
-    ? config.transforms.svg
-    : [ config.transforms.svg ];
-
-  forEach(svg => {
-
-    const path = normalPath(lastPath(svg.input));
-    const override = u.isObject(svg.svgo);
-
-    if (((u.isUndefined(svg.sprite) || (
-      u.isBoolean(svg.sprite) && svg.sprite === false)) && override === true) || (
-      u.isBoolean(svg.svgo) && svg.svgo === true)
-    ) {
-
-      bundle.svg.inline.push({
-        input: path(svg.input),
-        type: 'inline',
-        rename: has('rename', svg)
-          ? svg.rename
-          : null,
-        snippet: has('snippet', svg)
-          ? svg.snippet
-          : true,
-        svgo: override
-          ? merge(svg.svgo as Processors['svgo'], svgo.config)
-          : svg.svgo
-      });
-
-    } else if ((u.isUndefined(svg.svgo) ||
-      (u.isBoolean(svg.svgo) && svg.svgo === false)) ||
-      (u.isBoolean(svg.sprite) && svg.sprite === true) ||
-      (u.isObject(svg.sprite))
-    ) {
-
-      const input = path(svg.input);
-
-      bundle.svg.sprite.push({
-        input: u.isArray(input)
-          ? input
-          : [ input ],
-        type: 'sprite',
-        rename: has('rename', svg)
-          ? svg.rename
-          : null,
-        snippet: has('snippet', svg)
-          ? svg.snippet
-          : true,
-        sprite: u.isObject(svg.sprite)
-          ? merge(svg.sprite as Processors['sprite'], sprite.config)
-          : svg.sprite
-      });
-
-    }
-
-  }, svgs as Merge<SVGInline, SVGSprite>[]);
 
 }

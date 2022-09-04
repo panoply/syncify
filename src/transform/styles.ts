@@ -103,7 +103,7 @@ async function sassProcess (file: File<StyleTransform>) {
     try {
 
       const { css, sourceMap } = sass.compile(file.input, {
-        loadPaths: opts.includePaths,
+        loadPaths: opts.include,
         sourceMapIncludeSources: false,
         sourceMap: opts.sourcemap,
         style: opts.style,
@@ -115,7 +115,7 @@ async function sassProcess (file: File<StyleTransform>) {
 
       if (opts.sourcemap) {
 
-        const map = join(cache.styles.uri, file.base + '.map');
+        const map = join(cache.style.uri, file.base + '.map');
 
         writeFile(map, JSON.stringify(sourceMap)).catch(
           error.write('Error writing SASS Source Map file to the cache directory', {
@@ -177,6 +177,8 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
 
   try {
 
+    if (bundle.mode.watch) timer.start();
+
     const result = await postcss(processor.postcss.config as any).process(css, {
       from: config.rename,
       to: config.rename,
@@ -214,7 +216,7 @@ function snippet (css: string) {
 /**
  * SASS and PostCSS Compiler
  */
-export async function styles (file: File<StyleTransform>, cb: Syncify): Promise<string> {
+export async function compile (file: File<StyleTransform>, cb: Syncify): Promise<string> {
 
   if (bundle.mode.watch) timer.start();
 

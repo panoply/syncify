@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
 import { PartialDeep } from 'type-fest';
-import { Bundle, Cache, Config, Minify, Plugins, ProcessorConfigs } from 'types';
+import { Bundle, Cache, Config, Minify, Plugins, ProcessorConfig } from 'types';
 import { assign } from './utils/native';
 
 /**
@@ -95,35 +95,32 @@ export const minify: Minify = {
  * This model is the default options for
  * the transform processors.
  */
-export const processor: PartialDeep<ProcessorConfigs> = {
+export const processor: PartialDeep<ProcessorConfig> = {
   json: {
     indent: 2,
     useTab: false,
     crlf: false,
-    exclude: []
+    exclude: null
   },
   postcss: {
     installed: false,
-    required: false,
     loaded: false,
     file: false,
     config: []
   },
   sass: {
     installed: false,
-    required: false,
     loaded: false,
     file: false,
     config: {
       warnings: true,
       style: 'compressed',
       sourcemap: true,
-      includePaths: [ 'node_modules' ]
+      include: [ 'node_modules' ]
     }
   },
   esbuild: {
     installed: false,
-    required: false,
     loaded: false,
     file: false,
     config: {
@@ -147,7 +144,6 @@ export const processor: PartialDeep<ProcessorConfigs> = {
   },
   sprite: {
     installed: false,
-    required: false,
     loaded: false,
     file: false,
     config: {
@@ -160,7 +156,6 @@ export const processor: PartialDeep<ProcessorConfigs> = {
   },
   svgo: {
     installed: false,
-    required: false,
     loaded: false,
     file: false,
     config: {
@@ -199,12 +194,18 @@ export const options: Config = {
   output: 'theme',
   import: 'import',
   export: 'export',
-  stores: null,
   config: '.',
   hot: false,
+  stores: null,
   spawn: {
     build: null,
     watch: null
+  },
+  logger: {
+    clear: true,
+    silent: false,
+    stats: true,
+    warnings: true
   },
   paths: {
     assets: 'assets/*',
@@ -234,6 +235,11 @@ export const options: Config = {
       separator: '-',
       global: []
     },
+    snippets: {
+      prefixDir: false,
+      separator: '-',
+      global: []
+    },
     pages: {
       author: '',
       language: 'html'
@@ -241,7 +247,6 @@ export const options: Config = {
   },
   transforms: {
     svg: null,
-    image: null,
     style: null,
     script: null
   },
@@ -326,6 +331,7 @@ export const bundle = {
     commands: {}
   },
   watch: new Set(),
+  logger: {},
   paths: {},
   section: {},
   cmd: {},
@@ -355,26 +361,15 @@ export const bundle = {
   image: [],
   style: [],
   script: [],
-  svg: {
-    sprite: [],
-    inline: []
-  },
-  set config (merge: Config) {
-    assign(options, merge);
-  },
-  get config () {
-    return options;
-  },
-  get processor () {
-    return processor;
-  },
+  svg: [],
+  set config (merge: Config) { assign(options, merge); },
+  get config () { return options; },
+  get processor () { return processor; },
   minify: {
     json: false,
     views: false,
     script: false,
-    get options () {
-      return minify;
-    }
+    get options () { return minify; }
   }
 
 } as unknown as Bundle;

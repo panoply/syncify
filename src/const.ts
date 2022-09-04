@@ -72,6 +72,16 @@ export const THEME_DIRS = [
 ];
 
 /**
+ * Configuration file extensions
+ */
+export const CONFIG_FILE_EXT = [
+  'js',
+  'cjs',
+  'mjs',
+  'ts'
+];
+
+/**
  * Transform Units
  */
 export const UNITS = [

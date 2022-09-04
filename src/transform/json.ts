@@ -65,7 +65,7 @@ export async function jsonCompile (file: File, data: string, space = 0): any {
   const minified = minifyJSON(data, space);
 
   if (isNil(minified)) {
-    timer.stop();
+    if (bundle.mode.watch) timer.stop();
     return data;
   }
 

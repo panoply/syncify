@@ -1,6 +1,7 @@
 import { type, has } from 'rambdax';
-import { isArray, isUndefined, nl, ws, error, nlr } from '../utils/native';
-import { bold, yellow, yellowBright, line, white, colon, red, cyan, gray, blue } from '~cli/ansi';
+import { isArray, isUndefined, nl, ws, error, nlr, isString } from '../utils/native';
+import { bold, yellowBright, line, white, colon, red, cyan, gray, blue, blueBright, whiteBright } from '~cli/ansi';
+import { bundle } from '~config';
 
 /**
  * Warning Store
@@ -48,21 +49,20 @@ export function warnOption (group: string) {
 export function typeError (option: string, name: string, value: any, expects: string) {
 
   error(
-    red(`
-      ${bold(`Invalid ${cyan(option)} configuration`)}
-
-      The ${cyan(name)} option has an incorrect type value.
-
-      Provided${gray(':')} ${yellow.bold(type(value).toLowerCase())}
-      Expected${gray(':')} ${blue.bold(expects)}
-
-      ${white.bold('How to fix?')}
-      ${white('You need to update the option type.')}
-
-    `)
+    nlr(2),
+    red(`${bold(`Invalid ${cyan(option)} type value provided`)}`) + nlr(2),
+    red(`The ${cyan(name)} option has an incorrect type value`) + nlr(2),
+    red(`provided${colon}${yellowBright(type(value).toLowerCase())}`) + nl,
+    red(`expected${colon}${blue(expects.replace(/([|,])/g, gray('$1')))}`) + nlr(2),
+    red(`at${colon}${gray.underline(bundle.file)}`) + nlr(2),
+    white.bold('How to fix?') + colon + nl,
+    `
+    ${gray('You need to change the option value to use the')} ${blue('expected')} ${gray('type.')}
+    ${gray(`Use the ${cyan('defineConfig')} named export for type checking`)}
+    `
   );
 
-  process.exit(1);
+  process.exit(0);
 
 };
 
@@ -71,21 +71,65 @@ export function typeError (option: string, name: string, value: any, expects: st
  *
  * Throws an error when an invalid config option was provided.
  */
-export function missingDependency (dep: string) {
+export function missingDependency (deps: string | string[]) {
+
+  if (isString(deps)) {
+
+    error(
+      nlr(2),
+      red(`${bold(`Missing ${cyan(deps as string)} dependency`)}`) + nlr(2),
+      red(`You need to install ${cyan(deps as string)} to use it as a processor`) + nlr(2),
+      white.bold('How to fix?') + colon + nl,
+      `
+      $ ${blue.bold('pnpm add ' + deps as string + ' -D')}
+
+      ${gray('If you are using a different package manager (ie: Yarn or NPM) then')}
+      ${gray('please consider adopting pnpm. Pnpm is dope and does dope shit.')}
+      `
+    );
+
+  } else {
+
+    error(
+      nlr(2),
+      red(`${bold(`Missing ${cyan(`${deps.length}`)} dependencies`)}`) + nlr(2),
+      red('You are attempting to use processors which are not yet installed!') + nlr(2),
+      whiteBright(gray('-') + ws + (deps as string[]).join(nl + gray(' -') + ws)) + nlr(2),
+      white.bold('How to fix?') + colon + nl,
+     `
+     $ ${blueBright('pnpm add ' + (deps as string[]).join(ws) + ' -D')}
+
+     ${gray('If you are using a different package manager (ie: Yarn or NPM) then')}
+     ${gray('please consider adopting pnpm. Pnpm is dope and does dope shit.')}
+     `
+    );
+
+  }
+
+  process.exit(0);
+
+};
+
+/**
+ * Missing Option
+ *
+ * Throws an error when an option is required but not defined
+ */
+export function missingOption (option: string, name: any, expects: string, why: string) {
 
   error(
-    red(`
-      ${bold(`Missing ${cyan(dep)} dependency`)}
-
-      You need to install ${cyan(dep)} to use it as a processor
-
-      ${white.bold('How to fix?')}
-      ${white('Run ' + bold('pnpm add ' + dep + '-D'))}
-
-    `)
+    nlr(2),
+    red(`${bold(`Missing ${cyan(option)} configuration option`)}`) + nlr(2),
+    red(`The ${cyan(name)} option needs to be defined`) + nlr(2),
+    red(`expects${colon}${blue(expects.replace(/([|,])/g, gray('$1')))}`) + nlr(2),
+    red(`at${colon}${gray.underline(bundle.file)}`) + nlr(2),
+    white.bold('Why?') + colon + nl,
+    `
+    ${gray(why)}
+    `
   );
 
-  process.exit(1);
+  process.exit(0);
 
 };
 
@@ -97,21 +141,19 @@ export function missingDependency (dep: string) {
 export function invalidError (option: string, name: any, value: any, expects: string) {
 
   error(
-    red(`
-      ${bold(`Invalid ${cyan(option)} configuration`)}
-
-      The ${cyan(name)} option has an invalid or missing value.
-
-      Provided${gray(':')} ${yellow.bold(value)}
-      Expected${gray(':')} ${blue(expects.replace(/([|,])/g, gray('$1')))}
-
-      ${white.bold('How to fix?')}
-      ${white('You need to update the option and use one of the expected values.')}
-
-    `)
+    nlr(2),
+    red(`${bold(`Invalid ${cyan(option)} configuration`)}`) + nlr(2),
+    red(`The ${cyan(name)} option has an invalid or missing value`) + nlr(2),
+    red(`provided${colon}${yellowBright(value)}`) + nl,
+    red(`expected${colon}${blue(expects.replace(/([|,])/g, gray('$1')))}`) + nlr(2),
+    white.bold('How to fix?') + colon + nl,
+    `
+    ${gray('You need to update the option and use one of the expected values.')}
+    ${gray(`Use the ${cyan('defineConfig')} named export for type checking`)}
+    `
   );
 
-  process.exit(1);
+  process.exit(0);
 
 };
 
@@ -123,24 +165,26 @@ export function invalidError (option: string, name: any, value: any, expects: st
 export function missingConfig (cwd: string) {
 
   error(
-    red(`
-      ${bold(`Missing ${cyan('syncify.config.js')} configuration`)}
+    nlr(2),
+    red(`${bold(`Missing ${cyan('syncify.config.js')} configuration`)}`) + nlr(2),
+    red('Unable to resolve a configuration file within the workspace') + nlr(2),
+    red(`at${colon + gray.underline(cwd)}`) + nlr(2),
+    white.bold('How to fix?') + colon + nl,
+    `
+    ${gray('You need to add one the following files to your project' + colon)}
 
-      Unable to resolve a configuration file in the workspace.
+    ${gray('-')} ${white('syncify.config.ts')}
+    ${gray('-')} ${white('syncify.config.js')}
+    ${gray('-')} ${white('syncify.config.mjs')}
+    ${gray('-')} ${white('syncify.config.cjs')}
+    ${gray('-')} ${white('syncify.config.json')}
 
-      Directory${colon + gray.underline(cwd)}
-
-      ${white.bold('How to fix?')}
-      ${white('Add one of the following files to your workspace') + colon}
-        ${gray('-')} ${white('syncify.config.ts')}
-        ${gray('-')} ${white('syncify.config.js')}
-        ${gray('-')} ${white('syncify.config.mjs')}
-        ${gray('-')} ${white('syncify.config.cjs')}
-        ${gray('-')} ${white('syncify.config.json')}
-    `)
+    ${gray('You can also provide configuration in your')} ${white('package.json')}
+    ${gray('file using a')} ${yellowBright('syncify')} ${gray('property.')}
+    `
   );
 
-  process.exit(1);
+  process.exit(0);
 
 };
 
@@ -152,11 +196,14 @@ export function missingConfig (cwd: string) {
 export function throwError (message: string, solution: string | string[]) {
 
   error(
-    red.bold(`Error ${message + nlr(2)}`),
-    gray.italic(isArray(solution) ? solution.join(nl) : solution)
+    nlr(2),
+    red.bold(message) + nlr(2),
+    white.bold('How to fix?') + colon + nl,
+    gray(isArray(solution) ? solution.join(nl).trimStart() : solution),
+    nlr(2)
   );
 
-  process.exit(1);
+  process.exit(0);
 
 };
 
@@ -167,11 +214,13 @@ export function throwError (message: string, solution: string | string[]) {
  */
 export function unknownError (option: string, value: any) {
 
-  console.error(
-    red.bold(`Unknown ${option} option\n\n`),
-    red(`The ${bold(value)} option in invalid, remove it from the config`)
+  error(
+    nlr(2),
+    red.bold(`Unknown ${option} option`) + nlr(2),
+    red(`The ${bold(value)} option in invalid, remove it from the config`),
+    nlr(2)
   );
 
-  process.exit(1);
+  process.exit(0);
 
 };

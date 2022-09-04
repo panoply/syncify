@@ -1,6 +1,6 @@
 import { Merge } from 'type-fest';
 import { Config, Package, StyleTransform, Processors } from 'types';
-import glob from 'glob';
+import glob from 'fast-glob';
 import merge from 'mergerino';
 import anymatch, { Tester } from 'anymatch';
 import { has, hasPath, isNil, uniq } from 'rambdax';
@@ -88,7 +88,6 @@ export async function setStyleConfig (config: Config, pkg: Package) {
         if (style.postcss !== false) {
 
           if (!postcss.installed) missingDependency('postcss');
-          if (!postcss.required) postcss.required = true;
 
           compile.postcss = override
             ? merge(postcss.config, style.postcss as Processors['postcss'])
@@ -106,7 +105,6 @@ export async function setStyleConfig (config: Config, pkg: Package) {
 
       if ((u.isBoolean(style.sass) || override) && !isNil(style.sass)) {
         if (!sass.installed) missingDependency('sass');
-        if (!sass.required) sass.required = true;
         if (!override) {
 
           u.defineProperty(compile, 'sass', { get () { return style.sass; } });
@@ -197,7 +195,7 @@ export async function setStyleConfig (config: Config, pkg: Package) {
 
       for (const uri of style.watch as unknown as string[]) {
 
-        const globs = glob.sync(join(bundle.cwd, path(uri)));
+        const globs = await glob(join(bundle.cwd, path(uri)));
 
         if (globs.length === 0 && uri[0] !== '!') warn('Cannot resolve watch glob/path uri', uri);
 
@@ -223,11 +221,11 @@ export async function setStyleConfig (config: Config, pkg: Package) {
     if (typeof compile.sass === 'object') {
 
       // Include the CWD and parent directory
-      compile.sass.includePaths.unshift(bundle.cwd, join(bundle.cwd, rename.dir));
+      compile.sass.include.unshift(bundle.cwd, join(bundle.cwd, rename.dir));
 
       // Apply includes (for Dart SASS)
-      if (hasPath('sass.includePaths', style)) {
-        compile.sass.includePaths = (style.sass as SassDartProcess).includePaths.map(p => join(bundle.cwd, p));
+      if (hasPath('sass.include', style)) {
+        compile.sass.include = (style.sass as SassDartProcess).include.map(p => join(bundle.cwd, p));
       }
     }
 

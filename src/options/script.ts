@@ -1,4 +1,4 @@
-import { Bundle, Config, ESBuildConfig, Package, Processors, ScriptTransform } from 'types';
+import { Config, ESBuildConfig, Package, ScriptBundle, ScriptTransform } from 'types';
 import { relative, join } from 'node:path';
 import { has, hasPath, isEmpty, omit } from 'rambdax';
 import merge from 'mergerino';
@@ -11,8 +11,6 @@ import { getTSConfig } from './files';
 import { bundle, processor } from '~config';
 import { load, pluginWatch, pluginPaths, esbuild as runtime } from '~transform/script';
 import { log } from '~log';
-
-type ESBuildProcess = Processors['esbuild']
 
 /**
  * Script Transform
@@ -35,7 +33,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     const loaded = await load();
     if (!loaded) throwError('failed to import ESBuild', 'Ensure you have installed esbuild');
 
-    const esb = await readConfigFile<ESBuildProcess>('esbuild.config');
+    const esb = await readConfigFile<ESBuildConfig>('esbuild.config');
 
     if (esb !== null) {
       esbuild.file = esb.path;
@@ -72,7 +70,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       warn('input already in use', relative(bundle.cwd, transform.input as string));
     }
 
-    const o: Bundle['script'][number] = {
+    const o: ScriptBundle = {
       input: transform.input as string,
       snippet: transform.snippet,
       rename: null,

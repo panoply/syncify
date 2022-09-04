@@ -1,53 +1,29 @@
 import { Commands, Config, Package, Bundle, Modes, HOTConfig } from 'types';
+import { join, relative } from 'node:path';
 import { anyTrue, isNil, has, includes, isEmpty, allFalse } from 'rambdax';
-import { glob } from 'glob';
+import glob from 'fast-glob';
 import merge from 'mergerino';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
-import { join, relative } from 'node:path';
 import { pathExists, readJson } from 'fs-extra';
-import { isArray, keys, assign, nil, isString, isObject, ws, defineProperty, isBoolean, error } from '~utils/native';
-import { normalPath } from '~utils/paths';
-import { authURL } from '~utils/options';
+import { queue } from '~requests/queue';
 import { spawned, spawns } from '~cli/spawn';
 import { kill } from '~cli/exit';
 import { gray } from '~cli/ansi';
-import { queue } from '~requests/queue';
-import { configFile, getPackageJson } from './files';
-import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from './dirs';
-import { setJsonOptions, setViewOptions } from './transforms';
-import { setScriptOptions } from './script';
-import { setStyleConfig } from './style';
-import { setMinifyOptions } from './minify';
-import { bundle, cache, processor, plugins, options } from '~config';
-import { PATH_KEYS, HOT_SNIPPET } from '~const';
+import { isArray, keys, assign, nil, isString, isObject, ws, defineProperty, isBoolean, error } from '~utils/native';
+import { normalPath } from '~utils/paths';
+import { configFile, getPackageJson } from '~options/files';
+import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from '~options/dirs';
+import { setJsonOptions, setViewOptions } from '~options/transforms';
+import { setScriptOptions } from '~options/script';
+import { setStyleConfig } from '~options/style';
+import { setSvgOptions } from '~options/svgs';
+import { setMinifyOptions } from '~options/minify';
+import { authURL } from '~options/utilities';
+import { PATH_KEYS, HOT_SNIPPET, CACHE_DIRS } from '~const';
 import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError } from '~log/validate';
 import { log } from '~log';
-
-/* -------------------------------------------- */
-/* EXIT HANDLER                                 */
-/* -------------------------------------------- */
-
-kill(() => {
-
-  queue.pause();
-  queue.clear();
-
-  log.nwl(nil);
-
-  spawns.forEach((child, name) => {
-
-    error(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
-    child.kill();
-
-  });
-
-  log.nwl(nil);
-
-  spawns.clear();
-  process.exit(0);
-
-});
+import { bundle, cache, processor, plugins, options } from '~config';
 
 /**
  * Resolve Paths
@@ -72,6 +48,7 @@ export async function define (cli: Commands, _options?: Config) {
   bundle.silent = cli.silent;
   bundle.prod = cli.prod;
   bundle.dev = cli.dev && !cli.prod;
+  bundle.logger = options.logger;
 
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
@@ -89,20 +66,28 @@ export async function define (cli: Commands, _options?: Config) {
     setJsonOptions(options),
     setScriptOptions(options, pkg),
     setStyleConfig(options, pkg),
+    setSvgOptions(options, pkg),
     setSpawns(options, bundle),
     setPlugins(options, bundle),
     setHotReloads(options)
   ]).catch(e => {
 
     console.log(e);
+
   });
 
-  log.start(bundle);
+  // log.start(bundle);
 
   return promise;
 
 };
 
+/**
+ * Hot Reloading Setup
+ *
+ * Validates the hot reload configuration
+ * defined options.
+ */
 async function setHotReloads (config: Config) {
 
   if (bundle.mode.hot === false && config.hot === false) return;
@@ -312,6 +297,27 @@ function setSpawns (config: Config, bundle: Bundle) {
 
   }
 
+  kill(() => {
+
+    queue.pause();
+    queue.clear();
+
+    log.nwl(nil);
+
+    spawns.forEach((child, name) => {
+
+      error(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
+      child.kill();
+
+    });
+
+    log.nwl(nil);
+
+    spawns.clear();
+    process.exit(0);
+
+  });
+
 };
 
 /**
@@ -366,6 +372,14 @@ async function setCaches (cwd: string) {
 
   if (!has) return setCacheDirs(dir);
 
+  let P: number = 0;
+
+  while (P < CACHE_DIRS.length) {
+    const exists = await pathExists(join(dir, CACHE_DIRS[P]));
+    if (!exists) return setCacheDirs(dir);
+    P = P + 1;
+  }
+
   bundle.dirs.cache = `${dir}/`;
   const read = await readJson(map);
 
@@ -383,8 +397,13 @@ async function getConfig (pkg: Package, cli: Commands) {
 
   const cfg = await configFile(cli.cwd);
 
-  if (cfg !== null) return merge(options, cfg);
-  if (has('syncify', pkg)) return merge(options, pkg.syncify);
+  if (cfg !== null) {
+    return merge(options, cfg);
+  }
+
+  if (has('syncify', pkg)) {
+    return merge(options, pkg.syncify);
+  }
 
   missingConfig(cli.cwd);
 
@@ -397,7 +416,7 @@ async function getConfig (pkg: Package, cli: Commands) {
  * and `.env` file locations relative to the current
  * working directory.
  */
-export function setStores (cli: Commands, config: Config) {
+function setStores (cli: Commands, config: Config) {
 
   if (cli._.length === 0) return;
 
@@ -412,11 +431,10 @@ export function setStores (cli: Commands, config: Config) {
     // The myshopify store domain
     const domain = `${store.domain}.myshopify.com`.toLowerCase();
 
-    // Fallback to environment variables if no .env file
-    const env = file.error ? process.env : file.parsed;
-
     // Get authorization url for the store
-    const client = authURL(store.domain, env);
+    const client = file.error
+      ? authURL(store.domain, process.env, 2) // fallback to environment variables
+      : authURL(store.domain, file.parsed, 1); // using .env file
 
     // Set store endpoints
     const sidx = bundle.sync.stores.push({
@@ -454,7 +472,7 @@ export function setStores (cli: Commands, config: Config) {
 
   }
 
-  if (bundle.sync.stores.length === 0 && bundle.mode.build !== false) {
+  if (bundle.sync.stores.length === 0 && bundle.mode.build === true) {
     throwError(
       'Unknown, missing or invalid store/theme targets',
       'Check your store config'
@@ -471,7 +489,7 @@ export function setStores (cli: Commands, config: Config) {
  * defines the build directory input in directory paths
  * it will ensure it is formed correctly.
  */
-export async function setPaths (config: Config) {
+async function setPaths (config: Config) {
 
   // Path normalize,
   const path = normalPath(bundle.dirs.input);
@@ -508,11 +526,11 @@ export async function setPaths (config: Config) {
 
     }
 
-    uri.forEach(p => {
-      const exists = glob.sync(p);
+    for (const p of uri) {
+      const exists = await glob(p);
       if (exists.length === 0) warn('No files could be resolved in', relative(bundle.cwd, p));
       bundle.watch.add(p);
-    });
+    }
 
     bundle.paths[key] = anymatch(uri);
 

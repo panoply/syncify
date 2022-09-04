@@ -1,6 +1,6 @@
 import { defineConfig } from '@syncify/cli';
 import autoprefix from 'autoprefixer';
-// import icons from '@syncify/plugin-icons';
+
 
 export default defineConfig({
   clean: false,
@@ -11,6 +11,12 @@ export default defineConfig({
     themes: {
       custom: 129457717489
     }
+  },
+  logger: {
+    warnings: false,
+    clear: true,
+    silent: false,
+    stats: true
   },
   paths: {
     assets: 'assets/images/*',
@@ -63,32 +69,29 @@ export default defineConfig({
         sass: false
       }
     },
-    svg: [
-      {
-        input: 'icons/social/*',
-        type: 'inline',
-        rename: 'icon.[file]',
-        snippet: true,
-        svgo: true
+    svg: {
+      'snippets/icon.[file]': {
+        input: 'assets/icons/social/*',
+        format: 'file'
       },
-      {
-        input: 'icons/sprites/feather/*',
-        rename: 'icons.liquid',
-        svgo: false,
-        snippet: true,
+      'snippets/sprite.liquid': {
+        input: 'assets/icons/feather/*',
         sprite: {
-          dimensionAttributes: true,
-          namespaceClassnames: true,
-          namespaceIDS: false,
-          rootAttributes: {
-            id: 'foo'
+          svg: {
+            dimensionAttributes: true,
+            namespaceClassnames: true,
+            namespaceIDs: false
           }
         }
+      },
+      'snippets/social.liquid': {
+        format: 'sprite',
+        input: [
+          'assets/icons/social/facebook.svg',
+          'assets/icons/social/instagram.svg',
+        ],
       }
-    ],
-    image: {
-      input: 'assets/images/*'
-    }
+    },
   },
   processors: {
     esbuild: {},
@@ -106,7 +109,7 @@ export default defineConfig({
     sass: {
       sourcemap: true,
       style: 'compressed',
-      includePaths: ['node_modules/']
+      include: ['node_modules/']
     },
     postcss: [autoprefix()]
   },

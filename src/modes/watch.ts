@@ -1,13 +1,14 @@
-import type { Syncify, File, Pages, StyleTransform, ScriptTransform } from 'types';
+import type { Syncify, File, Pages, StyleTransform, ScriptTransform, SVGBundle } from 'types';
 import chokidar from 'chokidar';
 import { inject } from '~hot/inject';
 import { client, queue } from '~requests/client';
 import { compile as liquid } from '~transform/liquid';
-import { styles } from '~transform/styles';
+import { compile as styles } from '~transform/styles';
 import { script } from '~transform/script';
 import { compile as asset } from '~transform/asset';
 import { compile as json } from '~transform/json';
 import { compile as pages } from '~transform/pages';
+import { compile as svgs } from '~transform/svgs';
 import { isUndefined, toArray } from '~utils/native';
 import { Kind, parseFile, Type } from '~process/files';
 import { bundle } from '~config';
@@ -49,7 +50,7 @@ export function watch (callback: Syncify) {
 
       try {
 
-        let value: string | void | { title: any; body_html: any; } = null;
+        let value: Buffer | string | void | { title: any; body_html: any; } = null;
 
         if (file.type === Type.Script) {
 
@@ -100,6 +101,12 @@ export function watch (callback: Syncify) {
         } else if (file.type === Type.Page) {
 
           value = await pages(file as File<Pages>, callback);
+
+          return;
+
+        } else if (file.type === Type.Svg) {
+
+          value = await svgs(file as File<SVGBundle>, callback);
 
           return;
 

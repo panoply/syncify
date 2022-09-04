@@ -128,7 +128,13 @@ export type StyleTransformer = (
     [K in RenamePaths]: (
       | string
       | string[]
-      | Omit<StyleTransform, 'rename'>
+      | Pick<StyleTransform,
+        | 'postcss'
+        | 'sass'
+        | 'snippet'
+        | 'watch'
+        | 'input'
+      >
     )
   }
 )
@@ -165,4 +171,4 @@ export type StyleBundle = Merge<StyleTransform, {
    * Anymatch function
    */
   watch: Tester;
-}>[];
+}>;

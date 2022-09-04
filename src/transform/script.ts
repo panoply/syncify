@@ -2,7 +2,7 @@ import type { Syncify, File, ScriptTransform, ESBuildConfig } from 'types';
 import type ESBuild from 'esbuild';
 import { join, resolve, normalize, relative } from 'node:path';
 import { has, isNil } from 'rambdax';
-import glob from 'glob';
+import glob from 'fast-glob';
 import { isString, nil, keys } from '~utils/native';
 import { writeFile } from 'fs-extra';
 import { log, error, bold } from '~log';
@@ -122,7 +122,7 @@ export function pluginWatch (transform?: ScriptTransform): ESBuild.Plugin {
     name: 'syncify-watch',
     setup (build) {
 
-      build.onStart(() => timer.start());
+      // build.onStart(() => timer.start());
       build.onResolve({ filter: /.*/ }, (args) => {
 
         if (!/node_modules/.test(args.importer)) {
@@ -132,7 +132,9 @@ export function pluginWatch (transform?: ScriptTransform): ESBuild.Plugin {
           if (/^[./]/.test(args.path)) {
             if (args.importer !== nil) {
 
-              const [ path ] = glob.sync(join(parentPath(args.importer), args.path + '.*'));
+              const [ path ] = glob.sync('.*', {
+                cwd: join(parentPath(args.importer), args.path)
+              });
 
               if (isString(path) && !paths.has(path)) {
                 if (!processor.esbuild.loaded) {
@@ -170,7 +172,7 @@ export const createSnippet = (string: string) => '<script>' + string + '</script
  */
 export async function script (file: File<ScriptTransform>, request: any, cb: Syncify) {
 
-  timer.start();
+  if (bundle.mode.watch) timer.start();
 
   const { config } = file;
 
@@ -193,7 +195,7 @@ export async function script (file: File<ScriptTransform>, request: any, cb: Syn
 
       } else {
 
-        log.process(bold('ESBuild'), timer.stop());
+        if (bundle.mode.watch) log.process(bold('ESBuild'), timer.stop());
 
         const { format } = file.config.esbuild as any;
 

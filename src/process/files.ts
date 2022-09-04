@@ -64,13 +64,13 @@ export const enum Kind {
   TSX = 'TSK',
   Font = 'Font',
   SVG = 'SVG',
+  Sprite = 'SVG Sprite',
   PDF = 'PDF',
   Image = 'Image',
   Video = 'Video',
   Liquid = 'Liquid',
   HTML = 'HTML',
   Markdown = 'Markdown',
-  Sprite = 'SVG Sprite',
   Yaml = 'YAML',
 }
 
@@ -155,6 +155,8 @@ export const parseFile = (paths: Paths<Tester>, output: string) => (path: string
       return merge('templates/customers', Type.Template, Kind.JSON);
     }
 
+  } else if (file.ext === '.svg') {
+    return context.svg(merge('assets', Type.Svg, Kind.SVG));
   } else if (file.ext === '.css') {
     return context.style(merge('assets', Type.Style, Kind.CSS));
   } else if (file.ext === '.scss') {
@@ -175,8 +177,6 @@ export const parseFile = (paths: Paths<Tester>, output: string) => (path: string
 
     if (bundle.spawn.invoked) {
       return merge('assets', Type.Spawn);
-    } else if (file.ext === '.svg') {
-      return merge('assets', Type.Svg, Kind.SVG);
     } else if (file.ext === '.jpg' || file.ext === '.png' || file.ext === '.gif' || file.ext === '.pjpg') {
       return merge('assets', Type.Asset, Kind.Image);
     } else if (file.ext === '.mov' || file.ext === '.mp4' || file.ext === '.webm' || file.ext === '.ogg') {

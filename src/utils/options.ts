@@ -41,8 +41,6 @@ export function authURL (domain: string, env: object): AxiosRequestConfig {
     };
   }
 
-  throw new Error(`Missing "${domain}" credentials`);
-
 };
 
 /**
@@ -53,7 +51,7 @@ export function authURL (domain: string, env: object): AxiosRequestConfig {
  */
 export function getModules (pkg: Package, name: string) {
 
-  if (has('devDependencies', pkg)) {
+  if (has('devDependencies', pkg) && has(name, pkg.devDependencies)) {
     if (has(name, pkg.devDependencies)) return true;
   }
 

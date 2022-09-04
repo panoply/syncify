@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
+import type { Tsconfig } from 'tsconfig-type';
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
 import type { GetProcessorConfigs, RenamePaths } from '../misc/shared';
 
@@ -61,6 +62,14 @@ export interface ScriptTransform {
    * @default undefined
    */
   input: string | string[];
+   /**
+     * The format to be generated. Because we are targeting
+     * browser environments, Syncify does not allow for CJS (commonjs)
+     * bundles to be produced.
+     *
+     * @default 'esm'
+     */
+  format?: 'esm' | 'iife';
   /**
    * Rename the stylesheet file/s. The same name as source file will be used
    * when undefined. Accepts namespaces, `[file]`, `[dir]` and `[ext]`.
@@ -115,7 +124,13 @@ export type ScriptTransformer = (
     [K in RenamePaths]: (
       | string
       | string[]
-      | Omit<ScriptTransform, 'rename'>
+      | Pick<ScriptTransform,
+        | 'input'
+        | 'format'
+        | 'snippet'
+        | 'watch'
+        | 'esbuild'
+      >
     )
   }
 )
@@ -129,7 +144,12 @@ export type ScriptTransformer = (
  *
  * Processor Configuration
  */
-export type ESBuildProcesser = GetProcessorConfigs<ESBuildConfig>
+export type ESBuildProcesser = Merge<
+  GetProcessorConfigs<ESBuildOptions>,
+  {
+    get tsconfig(): Tsconfig,
+  }
+>
 
 /**
  * **INTERNAL USE**
@@ -147,4 +167,4 @@ export type ScriptBundle = Merge<ScriptTransform, {
    * at runtime.
    */
   watch: Tester;
-}>[];
+}>;

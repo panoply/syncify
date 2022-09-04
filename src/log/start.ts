@@ -123,10 +123,10 @@ export function start (bundle: Bundle) {
         hasWarning = true;
         text.push(
           c.line.gray +
-          nl + c.line.yellow +
-          c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`) +
-          c.colon +
-          nl + c.line.yellow
+            nl + c.line.yellow +
+            c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`) +
+            c.colon +
+            nl + c.line.yellow
         );
       }
 
@@ -134,9 +134,9 @@ export function start (bundle: Bundle) {
 
       text.push(
         c.line.yellow +
-        title +
-        nl + c.line.yellow + nl +
-        warn.join(nl)
+          title +
+          nl + c.line.yellow + nl +
+          warn.join(nl)
       );
     }
   }

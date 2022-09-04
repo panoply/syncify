@@ -6,8 +6,9 @@ import { has, isEmpty } from 'rambdax';
 import Turndown from 'turndown';
 import gfm from 'turndown-plugin-gfm';
 import Markdown from 'markdown-it';
-import { bundle } from '../config';
+import { bundle, cache } from '../config';
 import { log, error } from '~log';
+import { nil } from '~utils/native';
 
 export async function toMarkdown (content: string) {
 
@@ -19,18 +20,19 @@ export async function toMarkdown (content: string) {
 
 }
 
-export async function compile (file: File<Pages>, cb: Syncify) {
+export async function compile (file: File, cb: Syncify) {
 
   const read = await readFile(file.input);
 
   if (isEmpty(read.toString())) {
-    log.skipped(file.relative, 'empty file');
+    if (bundle.mode.watch) log.skipped(file, 'empty file');
     return null;
   }
 
   const { data, content } = matter(read);
 
   if (!has('title', data)) {
+    data.title = '';
     // throw log.write('Missing Title');
   }
 
@@ -48,13 +50,13 @@ export async function compile (file: File<Pages>, cb: Syncify) {
 
   const body_html = Markdown(bundle.page.export).render(content);
 
-  await writeFile(join(bundle.dirs.cache, 'pages', file.base), body_html).catch(
+  writeFile(join(cache.pages.uri, file.base), body_html).catch(
     error.write('Error writing Page reference', {
       file: file.relative
     })
-  ); ;
+  );
 
-  return {
+  return bundle.mode.build ? body_html : {
     title: data.title,
     body_html
   };

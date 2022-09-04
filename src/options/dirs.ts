@@ -2,10 +2,11 @@ import { Bundle, Commands, Config } from 'types';
 import { uniq } from 'rambdax';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'node:path';
-import { assign, isArray } from '../utils/native';
-import { basePath } from '../utils/paths';
-import { bundle, cache } from '../config';
-import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '../const';
+import { assign, isArray, isString } from '~utils/native';
+import { basePath } from '~utils/paths';
+import { bundle, cache } from '~config';
+import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '~const';
+import { typeError } from '~log/validate';
 
 /**
  * Create Cache Directories
@@ -33,8 +34,6 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
 
     if (dir === 'sections') {
       cache[dir] = [];
-    } else if (dir === 'pages') {
-      cache[dir] = {};
     } else {
       cache[dir] = {};
 
@@ -130,7 +129,7 @@ export function setBaseDirs (cli: Commands, config: Config) {
     if (cli[dir] === def) {
       if (config[dir] === def) {
         bundle.dirs[dir] = base(cli[dir]);
-        return;
+        continue;
       } else {
         path = config[dir];
       }
@@ -141,8 +140,10 @@ export function setBaseDirs (cli: Commands, config: Config) {
     if (isArray(path)) {
       const roots = uniq(path.map(base));
       bundle.dirs[dir] = roots.length === 1 ? roots[0] : roots;
-    } else {
+    } else if (isString(path)) {
       bundle.dirs[dir] = base(path);
+    } else {
+      typeError('config', dir, config[dir], 'string');
     }
   }
 

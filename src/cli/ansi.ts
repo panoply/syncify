@@ -163,6 +163,15 @@ export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
 /* -------------------------------------------- */
 
 /**
+ * Checkmark character in neonGreen suffixed with single space
+ *
+ * ```
+ * ✓
+ * ```
+ */
+export const check = neonGreen('✓ ');
+
+/**
  * Colon character in gray suffixed with single space
  *
  * ```

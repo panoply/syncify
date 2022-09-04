@@ -1,13 +1,14 @@
 import type { Error } from 'types';
-import type { Colors } from '../cli/ansi';
+import type { Colors } from '~cli/ansi';
 import { has, hasPath, isEmpty } from 'rambdax';
+import readline from 'node:readline';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
-import { REGEX_LINE_NO, REGEX_ADDRESS, REGEX_OBJECT, REGEX_QUOTES, REGEX_STRING } from '../const';
-import { isArray, log, nil, nl, nlr, wsr } from '../utils/native';
-import { getTime } from '../utils/utils';
-import { bundle } from '../config';
-import * as c from '../cli/ansi';
+import { REGEX_LINE_NO, REGEX_ADDRESS, REGEX_OBJECT, REGEX_QUOTES, REGEX_STRING } from '~const';
+import { isArray, log, nil, nl, nlr, wsr } from '~utils/native';
+import { getTime } from '~utils/utils';
+import { bundle } from '~config';
+import * as c from '~cli/ansi';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -65,9 +66,15 @@ export let stack: string = nil;
  * a `boolean` value of `true` to execute a purge
  * and clean the logs.
  */
-export function clear (purge?: boolean) {
+export function clear () {
 
-  process.stdout.write(purge ? c.purge : c.clear);
+  const count = process.stdout.rows - 2;
+  const blank = count > 0 ? nlr(count) : nil;
+
+  log(blank);
+
+  readline.cursorTo(process.stdout, 0, 0);
+  readline.clearScreenDown(process.stdout);
 
 }
 

@@ -1,12 +1,65 @@
 /* eslint-disable no-unused-vars */
-import { Pages, Sections, Snippets } from './views';
-import { HOTConfig } from '../bundle/hot';
-import { ImageTransform, ScriptTransform, StyleTransform, SVGTransform } from './transforms';
-import { ESBuildMinify, JSONMinify, ViewMinify } from './minify';
-import { PluginHooks } from '../bundle/plugin';
-import { Processors } from './processors';
-import { InferPaths, RenamePaths } from '../misc/shared';
-import { MergeExclusive } from 'type-fest';
+
+import type { Pages, Sections, Snippets } from './views';
+import type { HOTConfig } from '../bundle/hot';
+import type { ESBuildMinify, JSONMinify, ViewMinify } from './minify';
+import type { PluginHooks } from '../bundle/plugin';
+import type { JSONConfig } from '../transforms/json';
+import type { SharpConfig } from '../transforms/image';
+import type { ScriptTransformer, ESBuildConfig } from '../transforms/script';
+import type { StyleTransformer, SASSConfig, PostCSSConfig } from '../transforms/style';
+import type { SVGTransformer, SVGOConfig, SVGSpriteConfig } from '../transforms/svg';
+
+/* -------------------------------------------- */
+/* PROCESSORS                                   */
+/* -------------------------------------------- */
+
+/**
+ * Processor Default Configurations
+ *
+ * Holds reference to default config options for
+ * each supported processor.
+ */
+export interface Processors {
+  /**
+   * JSON File processing - Options defined here are used when
+   * writing to the file system. Typically in operations like
+   * `--merge`, `--pull` and `--download`.
+   *
+   * > The options will also be used in **development** (`dev`)
+   * mode when uploading `.json` files to stores/themes.
+   */
+  json?: JSONConfig;
+  /**
+   * [ESBuild](https://esbuild.github.io/) Config
+   *
+   * Syncify uses ESBuild under the hood for JS/TS transpilation.
+   * Some native ESBuild options are omitted from processing and
+   * handled internally by Syncify.
+   */
+  esbuild?: ESBuildConfig
+  /**
+   * [PostCSS](https://postcss.org/) Plugins
+   */
+  postcss?: PostCSSConfig[]
+  /**
+   * [SASS Dart](https://sass-lang.com/documentation/js-api/) Config
+   */
+  sass?: SASSConfig
+  /**
+   * [Sharp](https://sharp.pixelplumbing.com) Config
+   */
+  sharp?: SharpConfig;
+  /**
+   * [SVGO](https://github.com/svg/svgo) Config
+   *
+   */
+  svgo?: SVGOConfig;
+  /**
+   * [SVG Sprite](https://github.com/svg-sprite) Config
+   */
+  sprite?: SVGSpriteConfig
+}
 
 /* -------------------------------------------- */
 /* VIEWS                                        */
@@ -32,15 +85,6 @@ export interface Views {
 /* -------------------------------------------- */
 
 export interface Transforms {
-  /**
-   * Image File transforms
-   */
-  image?:
-  string
-  | string[]
-  | ImageTransform
-  | ImageTransform[]
-  | { [output: `assets/${string}`]: string | string[] | ImageTransform }
   /**
    * Style File transforms
    *
@@ -106,12 +150,7 @@ export interface Transforms {
    *   ]
    * }
    */
-  style?:
-  string
-  | string[]
-  | StyleTransform
-  | StyleTransform[]
-  | { [K in RenamePaths]: string | string[] | Pick<StyleTransform, 'postcss' | 'sass' | 'input' | 'watch'> }
+  style?: StyleTransformer
   /**
    * JavaScript/TypeScript Transforms - _Requires [ESBuild](https://esbuild.github.io)_
    *
@@ -171,36 +210,11 @@ export interface Transforms {
    *   ]
    * }
    */
-  script?:
-  string
-  | string[]
-  | ScriptTransform
-  | StyleTransform[]
-  | { [K in InferPaths]: string | string[] | MergeExclusive<
-      Pick<ScriptTransform, 'input' | 'watch'>,
-      ScriptTransform['esbuild']
-    >
-  }
-  | { [K in RenamePaths]: string | MergeExclusive<
-      Pick<ScriptTransform, 'input' | 'watch'>,
-      ScriptTransform['esbuild']
-    >
-  }
-
+  script?: ScriptTransformer
   /**
    * SVG File transforms
    */
-  svg?:
-  string
-  | string[]
-  | SVGTransform
-  | SVGTransform[]
-  | {
-    [output: `${'assets' | 'snippets'}/${string}`]:
-    string
-    | string[]
-    | SVGTransform
-  }
+  svg?: SVGTransformer
 }
 
 /* -------------------------------------------- */
@@ -238,32 +252,31 @@ export interface MinifyConfig {
 
 export interface Logger {
   /**
-   * Suppress CLI logs
-   *
-   * @default false
-   */
-  silent: boolean;
-  /**
    * Whether or not file stats should print
    *
    * > Helpful when building for production (`--prod`)
    *
-   * @default false
+   * @default true
    */
-  stats: boolean;
+  stats?: boolean;
   /**
    * Whether or not to print warnings
    *
+   * @default true
+   */
+  warnings?: boolean;
+  /**
+   * Suppress CLI logs
+   *
    * @default false
    */
-  warnings: boolean;
+  silent?: boolean;
   /**
-   * Whether or not to clear the screen
-   * between changes.
+   * Whether or not to clear the screen between changes.
    *
    * @default true
    */
-  clear: boolean;
+  clear?: boolean;
 }
 
 /* -------------------------------------------- */
@@ -487,7 +500,7 @@ export interface Config extends Directories {
    * Configurations for the `transform` processors. Define options
    * for the transformers to inherit. You can override these on a
    * per-transform basis. Optionally, you can use the default presets
-   * pre-configured for optimal use.
+   * which syncify has pre-configured for optimal output.
    */
   processors?: Processors;
   /**

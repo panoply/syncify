@@ -1,4 +1,4 @@
-import { performance } from 'perf_hooks';
+import { performance } from 'node:perf_hooks';
 
 /* -------------------------------------------- */
 /* LOCAL SCOPES                                 */
@@ -9,7 +9,7 @@ import { performance } from 'perf_hooks';
  *
  * Holds reference to different running timers
  */
-const mark = [];
+export const mark = [];
 
 /* -------------------------------------------- */
 /* FUNCTIONS                                    */
@@ -27,7 +27,11 @@ export const now = () => stop(true);
  *
  * Captures the current timestamp and applies it to the mark model.
  */
-export const start = () => { mark.push(performance.now()); };
+export const start = () => {
+
+  mark.push(performance.now());
+
+};
 
 /**
  * Clear timers
@@ -56,7 +60,8 @@ export const clear = () => {
  */
 export function stop (now = false) {
 
-  const ms = (performance.now() - (now ? mark[mark.length - 1] : mark.pop()));
+  const gt = now ? mark[mark.length - 1] : mark.pop();
+  const ms = performance.now() - gt;
 
   if (ms < 1000) return `${ms.toFixed(0)}ms`;
 

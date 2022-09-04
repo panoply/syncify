@@ -13,7 +13,18 @@ export interface Cache {
    * cached for lookup when changes occur. The `map` object
    * holds the references and applied to model on initialization.
    */
-  pages: { [path: string]: number }
+  pages: {
+    /**
+     * The URI cache map location
+     *
+     * @default 'node_modules/.syncify/pages'
+     */
+    uri: string;
+    /**
+     * Page output name and Buffer
+     */
+    data: { [outputName: string]: Buffer }
+  },
    /**
     * Section related cache records, this reference typically
     * holds output filename reference and used to prevent
@@ -38,7 +49,7 @@ export interface Cache {
   /**
    * Stylesheet related cache records, typically source maps
    */
-  styles: {
+  style: {
     /**
      * The URI cache map location
      *

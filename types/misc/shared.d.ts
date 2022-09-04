@@ -1,14 +1,25 @@
 import { Config } from '../config';
 
+export type Namespacing = (
+  | '[dir]'
+  | '[file]'
+  | '[ext]'
+)
+
 /**
- * Rename Paths
+ * Namespaced Paths
  */
-export type InferPaths = `${'assets' | 'snippets'}/[${'dir' | 'file'}]${string}[${'file' | 'dir'}]${string}`
+export type NamespacePaths = `${'assets' | 'snippets'}/${Namespacing}${string}${Namespacing}`
+
+/**
+ * Directory Paths
+ */
+export type DirPaths = `${'assets' | 'snippets'}/${string}`
 
 /**
  * Rename Paths
  */
-export type RenamePaths = `${'assets' | 'snippets'}/${string}`
+export type RenamePaths = NamespacePaths | DirPaths
 
 /**
  * Rename input type
@@ -31,6 +42,34 @@ export type RenameConfig<T> = {
   [filename: RenamePaths]: string | string[] | T
 }
 
+/**
+ * Processor Configuration
+ */
+export type GetProcessorConfigs<T> = {
+  /**
+   * Whether or not the processor is installed
+   */
+  installed: boolean;
+  /**
+   * Whether or not the module was loaded, ie: imported.
+   * This will be `false` until the the import was loaded.
+   */
+  loaded: boolean;
+  /**
+   * Whether or not a config file exists for the processor,
+   * When one exists the URI path location to the file will
+   * applied as the value.
+   */
+  file: false | string;
+  /**
+   * Configuration of the processor, Initialized with defaults
+   */
+  config: T;
+}
+
+/**
+ * Picked `package.json` fields
+ */
 export interface Package {
   version?: string;
   syncify?: Config;

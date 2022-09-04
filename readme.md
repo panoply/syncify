@@ -23,7 +23,7 @@ An exceptionally fast, extensible and superior alternative Shopify CLI [theme ki
 - Exposed Plugin API for adding those seeking extensibility.
 - Prompt based CLI/TUI and exposed module API for script usage.
 - Pull, push and merge support for aligning local and remote sources.
-- Files, Pages, Redirects sync strategies and support.
+- Files, Pages and Redirects sync strategies and support.
 
 ### Why?
 
@@ -144,33 +144,6 @@ YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
 
-### Using a `.env.syncify.json` file
-
-If you do not wish to use an `.env` file you can store API credentials within a `.env.syncify` or `.env.syncify.json` file. When using this approach it is important that the file is added to `.gitignore` and never committed to a public repository. The file expects credentials be supplied as array list and depending on your authorization method items should use one of following models:
-
-Using an **API Access Token**
-
-```json
-[
-  {
-    "domain": "your-shop-name",
-    "token": "shpat_abcdefghijklmnopqrstuvwz"
-  }
-]
-```
-
-Using an **API key** and **API Secret**
-
-```json
-[
-  {
-    "domain": "your-shop-name",
-    "key": "abcdefghijklmnopqrstuvwz",
-    "secret": "abcdefghijklmnopqrstuvwz"
-  }
-]
-```
-
 ### Using `process.env` variables
 
 Syncify also supports runtime credential assignment. This approach allows you to set credentials via the command line or within a script executable. This is highly discouraged and rather insecure.
@@ -264,10 +237,10 @@ export default defineConfig({
     socket: 8089
   },
   logger: {
-    timer: true,
-    sizes: true,
     clear: true,
-    silent: false
+    silent: false,
+    stats: true,
+    warnings: true
   },
   paths: {
     redirects: 'redirects.yaml',

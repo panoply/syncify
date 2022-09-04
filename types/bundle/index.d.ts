@@ -3,16 +3,17 @@
 import type { Tester } from 'anymatch';
 import type { Options as HTMLTerserOptions } from 'html-minifier-terser';
 import type { BuildOptions as ESBuildConfig } from 'esbuild';
-import type { Merge, MergeExclusive, PackageJson } from 'type-fest';
+import type { Merge, PackageJson } from 'type-fest';
 import type { Markdown } from '../misc/markdown';
-import type { Paths, Directories, Transforms, Views, Config } from '../config/index';
-import type { ScriptTransform, StyleTransform, SVGInline, SVGSprite } from '../config/transforms';
+import type { Paths, Directories, Views, Config, Logger, Processors } from '../config/index';
 import type { AxiosRequestConfig } from 'axios';
 import type { Plugins } from './plugin';
-import type { Processors } from '../config/processors';
-import type { Tsconfig } from 'tsconfig-type';
-import { HOT } from './hot';
-import { JSONMinify, ESBuildMinify, ViewMinify } from '../config/minify';
+import type { ScriptBundle, ESBuildProcesser } from '../transforms/script';
+import type { StyleBundle, SASSProcesser, PostCSSProcesser } from '../transforms/style';
+import type { SVGBundle, SVGOProcesser, SVGSpriteProcesser } from '../transforms/svg';
+import type { HOT } from './hot';
+import type { JSONMinify, ESBuildMinify, ViewMinify } from '../config/minify';
+import type { JSONBundle } from '../transforms/json';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -25,47 +26,50 @@ export { Cache } from './cache';
 /* PROCESSORS                                   */
 /* -------------------------------------------- */
 
-type GetProcessorConfigs<T> = {
+/**
+ * **INTERNAL USE**
+ *
+ * Processor configuration state. This model infers which
+ * pre-processors are being used and/or available.
+ */
+export interface ProcessorConfig {
+  json: JSONBundle
   /**
-   * Whether or not the processor is required
+   * [PostCSS](https://postcss.org/) Pre-Processor
    */
-  required: boolean;
+  postcss: PostCSSProcesser;
   /**
-   * Whether or not the processor is installed
+   *  [SASS Dart](https://sass-lang.com/documentation/js-api/) Pre-Processor
    */
-  installed: boolean;
+  sass: SASSProcesser;
   /**
-   * Whether or not the module was loaded, ie: imported.
-   * This will be `false` until the the import was loaded.
+   * [Sharp](https://sharp.pixelplumbing.com) Pre-Processor
    */
-  loaded: boolean;
+  sharp: any;
   /**
-   * Whether or not a config file exists for the processor,
-   * When one exists the URI path location to the file will
-   * applied as the value.
+   * [SVG Sprite](https://github.com/svg-sprite) Pre-Processor
    */
-  file: false | string;
+  sprite: SVGSpriteProcesser;
   /**
-   * Configuration of the processor, Initialized with defaults
+   * [SVGO](https://github.com/svg/svgo) Pre-Processor
    */
-  config: T;
-}
-
-export interface ProcessorConfigs {
-  json: Processors['json'];
-  postcss: GetProcessorConfigs<Processors['postcss']>;
-  sass: GetProcessorConfigs<Processors['sass']>;
-  sharp: GetProcessorConfigs<Processors['sharp']>;
-  sprite:GetProcessorConfigs<Processors['sprite']>;
-  svgo: GetProcessorConfigs<Processors['svgo']>
-  esbuild: Merge<GetProcessorConfigs<ESBuildConfig>, { get tsconfig(): Tsconfig }>
+  svgo: SVGOProcesser
+  /**
+   * [ESBuild](https://esbuild.github.io/) Pre-Processor
+   */
+  esbuild: ESBuildProcesser
 }
 
 /* -------------------------------------------- */
 /* SPAWNED PROCESSES                            */
 /* -------------------------------------------- */
 
-export interface Spawn {
+/**
+ * **INTERNAL USE**
+ *
+ * Spawn configuration state.
+ */
+export interface SpawnBundle {
   /**
    * Dynamically populated `Set` of file paths
    * that were generated from a spawned process.
@@ -116,6 +120,11 @@ export interface Spawn {
 /* STORE                                        */
 /* -------------------------------------------- */
 
+/**
+ * **INTERNAL USE**
+ *
+ * Store authorisation client
+ */
 export interface Store {
   /**
   * The store domain name in Upcase (without `myshopify.com`)
@@ -139,6 +148,11 @@ export interface Store {
 /* THEME                                        */
 /* -------------------------------------------- */
 
+/**
+ * **INTERNAL USE**
+ *
+ * Theme related model
+ */
 export interface Theme {
   /**
    * The store index reference
@@ -166,6 +180,11 @@ export interface Theme {
 /* SYNC                                         */
 /* -------------------------------------------- */
 
+/**
+ * **INTERNAL USE**
+ *
+ * Sync clients
+ */
 export interface Sync {
   /**
    * Theme synchronization options
@@ -181,6 +200,9 @@ export interface Sync {
 /* MINIFY                                       */
 /* -------------------------------------------- */
 
+/**
+ * **INTERNAL USE**
+ */
 export interface Minify {
   /**
    * JSON Minification
@@ -207,6 +229,9 @@ export interface Minify {
 /* RESOURCE MODES                               */
 /* -------------------------------------------- */
 
+/**
+ * **INTERNAL USE**
+ */
 export interface Modes {
   /**
    * Run the command prompt
@@ -290,19 +315,22 @@ export interface Modes {
 /* BUNDLE                                       */
 /* -------------------------------------------- */
 
-export declare type Style = Merge<
-  Transforms['style'],
-  {
-    input: string;
-    watch: Tester;
-  }
->
-
-export interface Bundle<T = unknown> {
+/**
+ * **INTERNAL USE**
+ *
+ * Bundle Configuration. This is an internally used model
+ * which maintains a store used for handling. It holds the
+ * modules path resolutions and execution options.
+ */
+export interface Bundle {
   /**
    * The version defined in the package.json
    */
   version: string;
+  /**
+   * Logger Options
+   */
+  logger: Logger;
   /**
    * The configuration file name
    */
@@ -338,7 +366,7 @@ export interface Bundle<T = unknown> {
    /**
     * Base directory path references
     */
-  dirs: Directories & { cache: string };
+  dirs: Merge<Directories, { cache: string }>;
    /**
     * The sync clients. Multiple stores and themes
     * can run concurrently.
@@ -369,7 +397,7 @@ export interface Bundle<T = unknown> {
    /**
     * Spawn related configuration operations
     */
-  spawn: Spawn
+  spawn: SpawnBundle
    /**
     * The operation to run
     */
@@ -396,28 +424,19 @@ export interface Bundle<T = unknown> {
   /**
    * Script handling
    */
-  script: Merge<ScriptTransform, {
-    input: string;
-    watch: Tester;
-  }>[];
+  script: ScriptBundle[];
   /**
    * Style handling
    */
-  style: Merge<StyleTransform, {
-    input: string;
-    watch: Tester;
-  }>[];
-  /**
-   * Image handling
-   */
-  image: Merge<Transforms['image'], { input: Tester }>[];
+  style: StyleBundle[];
   /**
    * SVG handling
    */
-  svg: {
-    sprite: Merge<SVGSprite, { input: string[]; }>[];
-    inline: Merge<SVGInline, { input: Tester; }>[]
-  };
+  svg: SVGBundle[];
+  /**
+   * Image handling
+   */
+  image: any
   /**
    * Minify Options
    */

@@ -3,7 +3,6 @@ import { Commands, Syncify, Config } from 'types';
 import { exception, rejection, signal } from './cli/emitters';
 import { upload } from './modes/upload';
 import { download } from './modes/download';
-import { clean } from './modes/clean';
 import { build } from './modes/build';
 import { watch } from './modes/watch';
 import { server } from './hot/server';
@@ -52,14 +51,6 @@ export const env = {
 export async function run (options: Commands, config?: Config, callback?: Syncify) {
 
   /* -------------------------------------------- */
-  /* PROCESS LISTENERS                            */
-  /* -------------------------------------------- */
-
-  process.on('SIGINT', signal);
-  process.on('uncaughtException', exception);
-  process.on('unhandledRejection', rejection);
-
-  /* -------------------------------------------- */
   /* STDIN                                        */
   /* -------------------------------------------- */
 
@@ -75,16 +66,12 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   await define(options, config);
 
   /* -------------------------------------------- */
-  /* CLEAN MODE                                   */
+  /* PROCESS LISTENERS                            */
   /* -------------------------------------------- */
 
-  if (bundle.mode.clean) {
-    try {
-      await clean();
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
+  process.on('SIGINT', signal);
+  process.on('uncaughtException', exception);
+  process.on('unhandledRejection', rejection);
 
   if (bundle.mode.hot) {
     await server(bundle);

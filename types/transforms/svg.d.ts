@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import type { Merge } from 'type-fest';
+import type { LiteralUnion, Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { OptimizeOptions as SVGOConfig } from 'svgo';
 import type { Config as SVGSpriteConfig } from 'svg-sprite';
@@ -77,7 +77,7 @@ interface SVGShared<T extends 'file' | 'sprite'> {
    * 'file'      // When SVGO is the only processor installed
    * 'sprite'    // When SVG Sprite is the only processor installed
    */
-  format?: T;
+  format?: LiteralUnion<T, string>;
 }
 
 export interface SVGFile extends SVGShared<'file'> {
@@ -120,7 +120,6 @@ export interface SVGSprite extends SVGShared<'sprite'> {
 export type SVGTransform = (
   | SVGFile
   | SVGSprite
-  | Array<SVGFile & SVGSprite>
 )
 
 /* -------------------------------------------- */
@@ -136,7 +135,8 @@ export type SVGTransformer = (
     [K in RenamePaths]: (
       | string
       | string[]
-      | Omit<SVGTransform, 'rename'>
+      | Pick<SVGFile, 'format' | 'input' | 'snippet' | 'svgo'>
+      | Pick<SVGSprite, 'format'| 'input'| 'snippet' | 'sprite'>
     )
   }
 )
@@ -173,4 +173,12 @@ export type SVGBundle = Merge<SVGTransform, {
    * Anymatch function - (input paths)
    */
   watch: Tester;
-}>[];
+  /**
+   * SVGO Override
+   */
+  svgo?: true | SVGOConfig;
+  /**
+   * SVG Sprite Override
+   */
+  sprite?: true | SVGSpriteConfig;
+}>;

@@ -1,4 +1,4 @@
-import glob from 'glob';
+import glob from 'fast-glob';
 import { readFile } from 'fs-extra';
 import { mapFastAsync } from 'rambdax';
 import { Syncify } from 'types';
