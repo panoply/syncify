@@ -1,21 +1,34 @@
-import type { SVGBundle, File, Syncify } from 'types';
-import type { SVGSpriter } from 'svg-sprite';
-import type { OptimizedSvg } from 'svgo';
-import { basename } from 'node:path';
-import { readFile } from 'fs-extra';
-import { isNil } from 'rambdax';
-import { processor } from '~config';
-// import { log } from '../logs/screen';
+import type { SVGBundle, File, Syncify, SVGSpriteConfig } from 'types';
+import type { SVGSpriter, SVGSpriterConstructor } from 'svg-sprite';
+import type SVGO from 'svgo';
+import type { client } from '~requests/client';
+import { basename, relative, join } from 'node:path';
+import { readFile, writeFile } from 'fs-extra';
+import { isNil, mapFastAsync } from 'rambdax';
+import { isArray, isObject, toArray, isString } from '~utils/native';
+import { log, error } from '~log';
+import { bundle, processor } from '~config';
+import { Kind } from '~process/files';
 
-/**
- * SVG Spriter Module
- */
-export let Spriter: SVGSpriter = null;
+/* -------------------------------------------- */
+/* TYPES                                        */
+/* -------------------------------------------- */
+
+type SVGFile = File<SVGBundle>
+
+/* -------------------------------------------- */
+/* DYNAMIC IMPORTS                              */
+/* -------------------------------------------- */
 
 /**
  * SVGO Module
  */
-export let svgo: OptimizedSvg = null; // eslint-disable-line
+export let svgo: typeof SVGO = null;
+
+/**
+ * SVG Sprite Module
+ */
+export let SVGSprite: SVGSpriterConstructor = null;
 
 /**
  * Load SVG Sprite / SVGO
@@ -27,14 +40,12 @@ export let svgo: OptimizedSvg = null; // eslint-disable-line
 export async function load (id: 'svg-sprite' | 'svgo') {
 
   if (id === 'svg-sprite') {
-    const isprite = await import('svg-sprite') as any;
-    Spriter = isprite.default as unknown as SVGSpriter;
-    return isNil(Spriter) === false;
+    SVGSprite = (await import('svg-sprite')).default;
+    return isNil(svgo) === false;
   }
 
   if (id === 'svgo') {
-    const isvgo = await import('svgo');
-    svgo = isvgo.default as unknown as OptimizedSvg;
+    svgo = (await import('svgo')).default;
     return isNil(svgo) === false;
   }
 
@@ -44,54 +55,123 @@ export async function load (id: 'svg-sprite' | 'svgo') {
 /* TRANSFORMS                                   */
 /* -------------------------------------------- */
 
-export async function files (icons: string[]) {
+async function getFile (path: string): Promise<[path: string, svg: string]> {
 
-  for (const svg of icons) {
-    const icon = await readFile(svg);
-    sprite.add(svg, null, icon.toString());
-  }
+  const svg = await readFile(path);
 
-  sprite.compile(function (error, result) {
+  return [
+    path,
+    svg.toString()
+  ];
+}
 
-    if (error) console.log(error);
+/**
+ *
+ */
+function getSprite (sprite: SVGSpriter): Promise<string[]> {
 
-    /* Write `result` files to disk (or do whatever with them ...) */
-    for (const mode in result) {
-      for (const resource in result[mode]) {
+  return new Promise(function (resolve, reject) {
 
-        console.log(result[mode][resource].contents);
-      }
-    }
+    const svgs: string[] = [];
+
+    sprite.compile((error, svg) => {
+      if (error) return reject(error);
+      for (const m in svg) for (const p in svg[m]) svgs.push(svg[m][p].contents.toString());
+      resolve(svgs);
+    });
   });
 }
 
-export async function compile (file: File<SVGBundle>, cb: Syncify) {
+/**
+ * Compile Sprite
+ *
+ * Generates an sprite using SVG Sprite. Upon completion will invoke an
+ * upload of the output asset/file.
+ *
+ * @param file
+ * The file context for the changed SVG
+ *
+ * @param request
+ * The Shipify request client
+ */
+export async function compileSprite (file: SVGFile, request: ReturnType<typeof client>, cb: Syncify) {
 
   const { config } = file;
+  const options = (config.sprite === true ? processor.sprite : config.sprite) as SVGSpriteConfig;
+  const sprite = new SVGSprite(options);
+  const svgs = await mapFastAsync(getFile, toArray(config.input)).catch(
+    error.write('Error reading an SVG file', {
+      file: file.base,
+      source: file.relative
+    })
+  );
 
-  if (config.format === 'sprite') {
+  if (svgs) {
 
-    const sprite = new Spriter(config.sprite === true ? processor.sprite : config.sprite);
+    for (const [ path, svg ] of svgs) sprite.add(path, null, svg);
 
-    for (const svg of config.input) {
-      const icon = await readFile(svg);
-      sprite.add(svg, null, icon.toString());
+    const files = await getSprite(sprite);
+
+    for (const file of files) {
+
+      await writeFile(file);
+
     }
+  }
 
-    console.log(sprite);
-    sprite.compile(function (error, result) {
+}
 
-      if (error) console.log(error);
+/**
+ * SVG Compiler
+ *
+ * Transforms SVG files into either a sprite on inline file.
+ *
+ * @param file
+ * The file context for the changed SVG
+ * @param request
+ * The Shipify request client
+ * @param cb
+ * The Syncify callback hook for API usage
+ */
+export async function compile (
+  file: File<SVGBundle | SVGBundle[]>,
+  request: ReturnType<typeof client>,
+  cb: Syncify
+) {
 
-      console.log(JSON.stringify(result, null, 3));
-      /* Write `result` files to disk (or do whatever with them ...) */
-      for (const mode in result) {
-        for (const resource in result[mode]) {
+  if (isArray(file.config)) {
 
-          console.log(result[mode][resource].contents);
+    for (const config of file.config) {
+
+      if (config.snippet) {
+        file.namespace = 'snippets';
+        file.key = join('snippets', config.rename);
+      } else {
+        file.key = join('assets', config.rename);
+      }
+
+      if (file.config.rename !== basename(file.output)) {
+        if (config.snippet) {
+          file.output = join(bundle.dirs.output, file.key);
+        } else {
+          file.output = join(parentPath(file.output), file.config.rename);
         }
       }
-    });
+
+      if (config.format === 'sprite') {
+        file.kind = Kind.Sprite;
+        await compileSprite(file as SVGFile, request);
+      }
+
+    }
+
+  } else if (isObject(file.config)) {
+
+    const { config } = file as unknown as File<SVGBundle>;
+
+    if (config.format === 'sprite') {
+      return compileSprite(config, request);
+    }
   }
 
 }

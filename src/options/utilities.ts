@@ -4,15 +4,20 @@ import type { Package } from 'types';
 import type { AxiosRequestConfig } from 'axios';
 import { basename, extname } from 'node:path';
 import glob from 'fast-glob';
+import anymatch, { Tester } from 'anymatch';
 import { pathExists } from 'fs-extra';
 import { anyTrue, has } from 'rambdax';
 import { bundleRequire } from 'bundle-require';
-import { lastPath, normalPath } from '~utils/paths';
-import { isArray, isObject, isString, isUndefined, assign } from '~utils/native';
+import { lastPath, normalPath, globPath } from '~utils/paths';
+import { isArray, isObject, isString, isUndefined, assign, isFunction } from '~utils/native';
 import { typeError, invalidError, unknownError, warnOption, throwError } from '~log/validate';
 import { cyan } from '~cli/ansi';
 import { CONFIG_FILE_EXT } from '~const';
 import { bundle } from '~config';
+
+/* -------------------------------------------- */
+/* TYPES                                        */
+/* -------------------------------------------- */
 
 const enum EnvType {
   /**
@@ -24,6 +29,42 @@ const enum EnvType {
    */
   VARENV
 }
+
+interface NormalizeTransform {
+  /**
+   * Whether or not to flatten inputs, when `true`
+   * a transform model will be created for every
+   * resolved input. Also note that when true, then
+   * the `anymatch` tester will not be assigned.
+   *
+   * @default false
+   * @example
+   * { input: ['dir/glob/*'], rename: 'foo-[file]' }
+   *
+   * // A model will be created for every glob:
+   * return [
+   *   { input: 'dir/glob/file-1', rename: 'foo-file-1' },
+   *   { input: 'dir/glob/file-2', rename: 'foo-file-2' }
+   * ]
+   *
+   */
+  flatten?: boolean;
+  /**
+   * Whether or not the input should be added to
+   * the bundle _watch_ `Set<string>` - when `true`
+   * the resolved globs are added to `bundle.watch`
+   */
+  addWatch?: boolean;
+}
+
+interface Resolver {
+  paths: string[];
+  match: Tester
+}
+
+/* -------------------------------------------- */
+/* FUNCTIONS                                    */
+/* -------------------------------------------- */
 
 /**
  * Store Authorization URL
@@ -79,41 +120,79 @@ export function authURL (domain: string, env: object, type: EnvType): AxiosReque
  * path locations. Before passing entries to this function,
  * it is assumed existence was confirmed.
  *
- * @param filePath The path we need to resolve
+ * The resolver also provides an optional hook function which
+ * will pass the resolved input path as a parameter, when the
+ * hook exists and returns a `string[]` or `string` value then
+ * the resolver will return an object type containing resolved
+ * inputs and an anymatch tester containing the `filePath`
+ *
+ * @param filePath The path/s we need to resolve
+ * @param hook An optional callback hook which passed resolved input
  */
-export function getResolvedPaths (filePath: string | string[]) {
+export function getResolvedPaths<R extends string[] | Resolver> (
+  filePath: string | string[],
+  hook?: ((uri: string) => string | string[])
+): R {
 
   const { cwd } = bundle;
-  const warn = warnOption('URI Resolver');
+  const match: string[] | false = isFunction(hook) ? [] : false;
+  const warn = warnOption('Path Resolver');
   const path = normalPath(bundle.dirs.input); // Path normalizer
+
+  console.log(filePath);
 
   if (isArray(filePath)) {
 
     const paths: string[] = [];
 
     for (const item of filePath) {
-      const match = glob.sync(path(item), { cwd, absolute: true });
-      if (match.length === 0) {
-        warn('Path could not be resolved at', item);
+
+      const uri = path(item);
+      const resolved = glob.sync(uri, {
+        cwd,
+        absolute: true
+      });
+
+      if (match) {
+        const test = hook(uri);
+        if (isString(test)) {
+          match.push(test as string);
+        } else if (isArray(test)) {
+          match.push(...test);
+        }
+      }
+
+      if (resolved.length === 0) {
+        warn('No files can be resolved in', item);
       } else {
-        paths.push(...match);
+        paths.push(...resolved);
       }
     }
 
-    return paths;
+    return <R>(match ? { paths, match: anymatch(match) } : paths);
 
   }
 
   if (isString(filePath)) {
 
-    const match = glob.sync(path(filePath), { cwd, absolute: true });
+    const uri = path(filePath);
+    const paths = glob.sync(uri, { cwd, absolute: true });
 
-    if (match.length === 0) {
-      warn('Path could not be resolved at', filePath);
-      return null;
-    } else {
-      return match;
+    if (paths.length === 0) {
+      warn('No files can be resolved in', filePath);
     }
+
+    if (match) {
+      const test = hook(uri);
+      if (isString(test)) {
+        match.push(test as string);
+      } else if (isArray(test)) {
+        match.push(...test);
+      }
+    }
+
+    return <R>(match ? { paths, match: anymatch(match) } : paths);
+
   }
 
   typeError('uri', 'uri/path', filePath, 'string | string[]');
@@ -123,114 +202,220 @@ export function getResolvedPaths (filePath: string | string[]) {
 /**
  * Transform Schema
  *
- * Determines the transform schema which was provided.
- * Transform options can be provided in a multitude of
- * different formats, such as:
+ * Determines the transform schema which was provided and normalizes
+ * it into a standardized model that we can work with. The function accepts
+ * a couple of options which can be used to apply additional context to
+ * the bundle model and each transfrom.
  *
- * - _string_ or _string[]_
- * - _object_ or _object[]_
+ * Transform options can be provided in a multitude of different
+ * formats / structures, such as:
  *
- * This function will handle and return a workable reference
- * from that which the user provided.
+ * **String Transform**
+ *
+ * ```ts
+ * {
+ *   svg: 'path/to/input' | ['path/to/input']
+ * }
+ * ```
+ *
+ * **Object Transfrom**
+ *
+ * ```js
+ * {
+ *   style: {
+ *     input: 'path/to/input' | ['path/to/input']
+ *     // ....
+ *   }
+ * }
+ * ```
+ *
+ * **Array Object Inputs**
+ *
+ * ```js
+ * {
+ *   style: [
+ *     {
+ *       input: 'path/to/input' | ['path/to/input']
+ *       // ....
+ *     },
+ *     {
+ *       input: 'path/to/input' | ['path/to/input']
+ *       // ....
+ *     }
+ *   ]
+ * }
+ * ```
+ *
+ * **Raname Transfrom**
+ *
+ * ```js
+ * {
+ *   'snippets/rename': 'path/to/input' | ['path/to/input']
+ *   'assets/rename': {
+ *     input: 'path/to/input' | ['path/to/input']
+ *     // ....
+ *   }
+ * }
+ * ```
  */
-export function getTransform <T extends unknown> (transforms: any, flatten = false): T {
+export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
-  const config = [];
+  if (isString(transforms)) {
 
-  for (const prop in transforms) {
+    const { paths, match } = getResolvedPaths<Resolver>(transforms, (watch) => {
+      if (opts.addWatch) bundle.watch.add(watch);
+      return globPath(watch);
+    });
 
-    const o: any = { snippet: prop.startsWith('snippets/') };
-
-    const asset = prop.startsWith('assets/');
-    const option = transforms[prop];
-    const isArr = isArray(option);
-    const rename = (asset || o.snippet);
-
-    if (isString(option) || (isArr && rename)) { // { 'assets/file': '...' | ['...'] }
-
-      if (rename) o.rename = asset ? prop.slice(7) : prop.slice(9);
-
-      if (isArr && !option.every(isString)) {
-        typeError('transform', prop, option, 'string[]');
+    if (paths) {
+      if (opts.flatten) {
+        return paths.map(
+          input => ({
+            input,
+            rename: basename(input),
+            snippet: false
+          })
+        ) as T;
+      } else {
+        return [
+          {
+            input: paths,
+            snippet: false,
+            match
+          }
+        ] as T;
       }
+    }
 
-      const paths = getResolvedPaths(option as string);
+  } else if (isArray(transforms)) {
+
+    if (transforms.every(isString)) {
+
+      const { paths, match } = getResolvedPaths<Resolver>(transforms, watch => {
+        if (opts.addWatch) bundle.watch.add(watch);
+        return globPath(watch);
+      });
 
       if (paths) {
-        if (flatten) {
-          for (const input of paths) config.push(assign({}, o, { input }));
+        if (opts.flatten) {
+          return paths.map(input => ({ input, snippet: false })) as T;
         } else {
-          config.push(assign({}, o, { input: paths }));
+          return [
+            {
+              input: paths,
+              snippet: false,
+              match
+            }
+          ] as T;
         }
       }
 
-    } else if (isObject(option)) { // { 'assets/file': {} }
+    } else if (transforms.every(isObject)) {
 
-      if (!has('input', option)) {
-        invalidError('tranform', prop, option, '{ input: string | string[] }');
-      }
+      return transforms.map(option => {
 
-      const paths = getResolvedPaths(option.input as string);
-
-      if (paths) {
-
-        const merge = rename
-          ? assign({}, option, o, { rename: asset ? prop.slice(7) : prop.slice(9) })
-          : assign({}, o, option);
-
-        if (flatten) {
-          for (const input of paths) config.push(assign(merge, { input }));
-        } else {
-          config.push(assign(merge, { input: paths }));
+        if (!has('input', option)) {
+          invalidError('tranform', 'input', option, '{ input: string | string[] }');
         }
-      }
 
-    } else if (isArray(option)) {
+        const { paths, match } = getResolvedPaths<Resolver>(transforms, watch => {
+          if (opts.addWatch) bundle.watch.add(watch);
+          return globPath(watch);
+        });
 
-      if (option.every(isString)) {
+        option.match = match;
 
-        const paths = getResolvedPaths(option as string[]);
+        if (paths) option.input = paths;
+        if (!has('snippet', option)) option.snippet = false;
+
+        return option;
+
+      }) as T;
+
+    }
+
+  } else if (isObject(transforms)) {
+
+    const config = [];
+
+    for (const prop in transforms) {
+
+      const o: any = { snippet: prop.startsWith('snippets/') };
+      const asset = prop.startsWith('assets/');
+      const option = transforms[prop];
+      const rename = asset || o.snippet;
+
+      if (isString(option)) { // { 'assets/file': '...' }
+
+        if (rename) o.rename = asset ? prop.slice(7) : prop.slice(9);
+
+        const { paths, match } = getResolvedPaths<Resolver>(option, watch => {
+          if (opts.addWatch) bundle.watch.add(watch);
+          return globPath(watch);
+        });
 
         if (paths) {
-          if (flatten) {
-            for (const input of paths) config.push(assign({}, o, option, { input }));
+          if (opts.flatten) {
+            for (const input of paths) config.push(assign({}, o, { input }));
           } else {
-            config.push(assign({}, o, option, { input: paths }));
+            config.push(assign({}, o, { input: paths, match }));
           }
         }
 
-      } else if (isObject(option[0])) { // check first item is an object
+      } else if (isObject(option)) { // { 'assets/file': {} }
 
-        for (const item of option) {
+        if (!has('input', option)) {
+          invalidError('tranform', prop, option, '{ input: string | string[] }');
+        }
 
-          if (!isObject(item)) {
-            typeError('transform', prop, item, '{ input: string }');
+        const { paths, match } = getResolvedPaths<Resolver>(option.input, watch => {
+          if (opts.addWatch) bundle.watch.add(watch);
+          return globPath(watch);
+        });
+
+        if (paths) {
+
+          const merge = rename
+            ? assign({}, option, o, { rename: asset ? prop.slice(7) : prop.slice(9) })
+            : assign({}, o, option);
+
+          if (opts.flatten) {
+            for (const input of paths) config.push(assign(merge, { input }));
+          } else {
+            config.push(assign(merge, { input: paths, match }));
           }
+        }
 
-          if (!has('input', item)) {
-            invalidError('tranform', prop, item, '{ input: string | string[] }');
-          }
+      } else if (isArray(option)) { // { 'assets/file': [''] }
 
-          const paths = getResolvedPaths(item.input as string | string[]);
+        if (option.every(isString)) {
+
+          const { paths, match } = getResolvedPaths<Resolver>(option, watch => {
+            if (opts.addWatch) bundle.watch.add(watch);
+            return globPath(watch);
+          });
 
           if (paths) {
-            if (flatten) {
-              for (const input of paths) config.push(assign({}, o, item, { input }));
+            if (opts.flatten) {
+              for (const input of paths) config.push(assign({}, o, option, { input }));
             } else {
-              config.push(assign({}, o, item, { input: paths }));
+              config.push(assign({}, o, option, { input: paths, match }));
             }
           }
+
+        } else {
+
+          typeError('transform', prop, option, 'string[]');
+
         }
 
-      } else {
-        typeError('transform', prop, option, 'string[] | object[]');
       }
 
     }
 
-  }
+    return config as T;
 
-  return config as T;
+  }
 
 };
 

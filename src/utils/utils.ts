@@ -12,24 +12,24 @@ export const event = new EventEmitter();
 
 /**
  * Strip JSON Comments
+ *
+ * @param data JSON content in string form
  */
 export function jsonc <T> (data: string): T {
 
   try {
-
     return JSON.parse(strip(data).trim());
-
   } catch (e) {
-
     throw new Error(e);
   }
 }
 
 /**
- * Returns a grouping reference name according
- * to file extension
+ * Returns a grouping reference name according to file extension
+ *
+ * @param ext The file extension within the `.`
  */
-export const fileKind = (ext: string) => {
+export function fileKind (ext: string) {
 
   switch (ext) {
     case 'webm':
@@ -61,18 +61,23 @@ export const fileKind = (ext: string) => {
 };
 
 /**
- * Pluralize Word
- *
  * Adds an `s` to the end of a word if length is more than 1
+ *
+ * @param word The word to pluralize
+ * @param length The length to determine
  */
-export const plural = (word: string, length: number) => length > 1 ? `${word}s` : word;
+export function plural (word: string, length: number) {
+
+  return length > 1 ? `${word}s` : word;
+
+}
 
 /**
- * Sanitize Message
- *
  * Sanatizes the log message passed
+ *
+ * @param message The input to sanitize
  */
-export const sanitize = (message: string) => {
+export function sanitize (message: string | Buffer | object | any[]): string {
 
   if (isBuffer(message)) return message.toString();
   if (isObject(message) || isArray(message)) return JSON.stringify(message);
@@ -82,12 +87,12 @@ export const sanitize = (message: string) => {
 };
 
 /**
- * To Upcase
- *
  * Will captilalize the first letter of a string. Used
  * by the console for names and various other informatives.
+ *
+ * @param value The word to upcase
  */
-export const toUpcase = <T extends string> (value: T) => {
+export function toUpcase <T extends string> (value: T) {
 
   return value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -95,8 +100,10 @@ export const toUpcase = <T extends string> (value: T) => {
 
 /**
  * Returns the byte size of a string value
+ *
+ * @param string The string to determine
  */
-export const byteSize = (string: string | Buffer): number => {
+export function byteSize (string: string | Buffer): number {
 
   return isString(string)
     ? Buffer.from(string).toString().length
@@ -107,8 +114,10 @@ export const byteSize = (string: string | Buffer): number => {
 /**
  * Converts byte size to killobyte, megabyre,
  * gigabyte or terrabyte
+ *
+ * @param bytes The bytes number to convert
  */
-export const byteConvert = (bytes: number): string => {
+export function byteConvert (bytes: number): string {
 
   if (bytes === 0) return '0b';
 
@@ -119,7 +128,7 @@ export const byteConvert = (bytes: number): string => {
     : `${bold((bytes / 1024 ** size).toFixed(1))}${(UNITS[size])}`;
 };
 
-export const fileSize = (content: string | Buffer, beforeSize: number) => {
+export function fileSize (content: string | Buffer, beforeSize: number) {
 
   const size = byteSize(content);
   const gzip = byteConvert(zlib.gzipSync(content).length);
@@ -138,6 +147,8 @@ export const fileSize = (content: string | Buffer, beforeSize: number) => {
 
 /**
  * Converts Time
+ *
+ * @param ms The miliseconds to convert
  */
 export function convertTimer (ms: number) {
 
@@ -200,7 +211,17 @@ export function getDateTime () {
 
 };
 
-export function addSuffix (i: number) {
+/**
+ * Append an `st`, `nd`, `rd` or `th` to the end of a number
+ *
+ * @param i The number to suffix
+ * @example
+ * 1 // => 1st
+ * 2 // => 2nd
+ * 3 // => 3rd
+ * 4 // => 4th
+ */
+export function addSuffix (i: number): string {
 
   const a = i % 10;
   const b = i % 100;

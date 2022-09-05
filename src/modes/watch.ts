@@ -4,7 +4,7 @@ import { inject } from '~hot/inject';
 import { client, queue } from '~requests/client';
 import { compile as liquid } from '~transform/liquid';
 import { compile as styles } from '~transform/styles';
-import { script } from '~transform/script';
+import { compile as script } from '~transform/script';
 import { compile as asset } from '~transform/asset';
 import { compile as json } from '~transform/json';
 import { compile as pages } from '~transform/pages';
@@ -60,6 +60,14 @@ export function watch (callback: Syncify) {
 
           return;
 
+        } else if (file.type === Type.Page) {
+
+          return pages(file as File<Pages>, callback);
+
+        } else if (file.type === Type.Svg) {
+
+          return svgs(file as File<SVGBundle>, request.assets, callback);
+
         } else if (file.type === Type.Style) {
 
           value = await styles(file as File<StyleTransform>, callback);
@@ -98,23 +106,9 @@ export function watch (callback: Syncify) {
 
           value = await liquid(file, callback);
 
-        } else if (file.type === Type.Page) {
-
-          value = await pages(file as File<Pages>, callback);
-
-          return;
-
-        } else if (file.type === Type.Svg) {
-
-          value = await svgs(file as File<SVGBundle>, callback);
-
-          return;
-
         } else if (file.type === Type.Asset || file.type === Type.Spawn) {
 
           value = await asset(file, callback);
-
-          // wss.assets(file.key);
 
         }
 

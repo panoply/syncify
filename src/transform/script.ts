@@ -170,7 +170,7 @@ export const createSnippet = (string: string) => '<script>' + string + '</script
  *
  * Used for Script transformations.
  */
-export async function script (file: File<ScriptTransform>, request: any, cb: Syncify) {
+export async function compile (file: File<ScriptTransform>, request: any, cb: Syncify) {
 
   if (bundle.mode.watch) timer.start();
 

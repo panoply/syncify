@@ -17,7 +17,7 @@ var spawn2 = require('cross-spawn');
 var glob2 = require('fast-glob');
 var fsExtra = require('fs-extra');
 require('prompts');
-var anymatch4 = require('anymatch');
+var anymatch3 = require('anymatch');
 var htmlMinifierTerser = require('html-minifier-terser');
 var matter = require('gray-matter');
 require('turndown');
@@ -59,7 +59,7 @@ var readline__default = /*#__PURE__*/_interopDefaultLegacy(readline);
 var process3__default = /*#__PURE__*/_interopDefaultLegacy(process3);
 var spawn2__default = /*#__PURE__*/_interopDefaultLegacy(spawn2);
 var glob2__default = /*#__PURE__*/_interopDefaultLegacy(glob2);
-var anymatch4__default = /*#__PURE__*/_interopDefaultLegacy(anymatch4);
+var anymatch3__default = /*#__PURE__*/_interopDefaultLegacy(anymatch3);
 var matter__default = /*#__PURE__*/_interopDefaultLegacy(matter);
 var Markdown__default = /*#__PURE__*/_interopDefaultLegacy(Markdown);
 var chokidar__default = /*#__PURE__*/_interopDefaultLegacy(chokidar);
@@ -1267,7 +1267,21 @@ var processor = {
     loaded: false,
     file: false,
     config: {
+      mode: {
+        inline: true,
+        symbol: {
+          example: false
+        }
+      },
+      shape: {
+        transform: ["svgo"],
+        id: {
+          generator: "svg-%s"
+        }
+      },
       svg: {
+        xmlDeclaration: false,
+        doctypeDeclaration: false,
         dimensionAttributes: false,
         namespaceClassnames: false,
         namespaceIDs: false
@@ -2088,27 +2102,29 @@ function jsonc(data) {
     throw new Error(e2);
   }
 }
-var plural = (word, length) => length > 1 ? `${word}s` : word;
-var sanitize = (message2) => {
+function plural(word, length) {
+  return length > 1 ? `${word}s` : word;
+}
+function sanitize(message2) {
   if (isBuffer(message2))
     return message2.toString();
   if (isObject(message2) || isArray(message2))
     return JSON.stringify(message2);
   return String(message2);
-};
-var toUpcase = (value) => {
+}
+function toUpcase(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
-};
-var byteSize = (string) => {
+}
+function byteSize(string) {
   return isString(string) ? Buffer.from(string).toString().length : string.toString().length;
-};
-var byteConvert = (bytes) => {
+}
+function byteConvert(bytes) {
   if (bytes === 0)
     return "0b";
   const size = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
   return size === 0 ? `${bold(String(bytes))}${UNITS[size]}` : `${bold((bytes / 1024 ** size).toFixed(1))}${UNITS[size]}`;
-};
-var fileSize = (content, beforeSize) => {
+}
+function fileSize(content, beforeSize) {
   const size = byteSize(content);
   const gzip = byteConvert(zlib__default["default"].gzipSync(content).length);
   const before = byteConvert(beforeSize);
@@ -2121,7 +2137,7 @@ var fileSize = (content, beforeSize) => {
     after,
     saved
   };
-};
+}
 function getTime() {
   const now2 = new Date();
   const hur = now2.getHours();
@@ -4100,7 +4116,10 @@ var client = ({ stores, themes }) => ({
     });
   }
 });
-var lastPath = (path2) => {
+function globPath(path2) {
+  return isArray(path2) ? path2.filter((uri2) => /\*/.test(uri2)) : /\*/.test(path2) ? path2 : null;
+}
+function lastPath(path2) {
   if (isArray(path2))
     return path2.map(lastPath);
   if (path2.indexOf("/") === -1)
@@ -4108,17 +4127,17 @@ var lastPath = (path2) => {
   const dir = path$1.dirname(path2);
   const ender = dir.lastIndexOf("/") + 1;
   return dir.slice(ender);
-};
-var parentPath = (path2) => {
+}
+function parentPath2(path2) {
   if (isArray(path2))
-    return path2.map(parentPath);
+    return path2.map(parentPath2);
   const last2 = path2.lastIndexOf("/");
   if (last2 === -1)
     return path2;
   const glob7 = path2.indexOf("*");
   return glob7 === -1 ? path2.slice(0, last2) : path2.slice(0, glob7);
-};
-var normalPath = (input) => {
+}
+function normalPath(input) {
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
   return function prepend(path2) {
     if (isArray(path2))
@@ -4129,15 +4148,20 @@ var normalPath = (input) => {
     if (regex.test(path2))
       return ignore ? "!" + path2 : path2;
     if (path2.charCodeAt(0) === 46 && path2.charCodeAt(1) === 46 && path2.charCodeAt(2) === 47) {
-      throw new Error("Invalid path at: " + path2 + " - Paths must be relative to source");
+      throwError(
+        `Invalid path defined at: ${colon}${yellowBright(`"${path2}"`)}`,
+        "Paths must be relative to source"
+      );
     }
     return (ignore ? "!" : "") + path$1.join(input, path2);
   };
-};
+}
 var basePath = (cwd) => (path2) => {
   if (path2.indexOf("*") !== -1) {
-    console.error(`Base directory path cannot contain glob, at "${path2}"`);
-    process.exit(1);
+    throwError(
+      `Base directory path cannot contain glob${colon}${yellowBright(`"${path2}"`)}`,
+      "Ensure that path you are resolving is correctly formed"
+    );
   }
   if (path2.charCodeAt(0) === 46) {
     if (path2.length === 1)
@@ -4145,8 +4169,10 @@ var basePath = (cwd) => (path2) => {
     if (path2.charCodeAt(1) === 47) {
       path2 = path2.slice(1);
     } else {
-      console.error('Directory path is invalid at: "' + path2 + '"');
-      process.exit(1);
+      throwError(
+        `Directory path is invalid at${colon}${yellowBright(`"${path2}"`)}`,
+        "Ensure that path you are resolving is correctly formed"
+      );
     }
   }
   if (path2.charCodeAt(0) === 47) {
@@ -4160,31 +4186,27 @@ var basePath = (cwd) => (path2) => {
     path2 = path$1.join(cwd, path2);
     return last(path2).charCodeAt(0) === 47 ? path2 : path2 + "/";
   } else {
-    throw new Error('Directory path is invalid at: "' + path2 + '"');
+    throwError(
+      `Directory path is invalid at${colon}${yellowBright(`"${path2}"`)}`,
+      "Ensure that path you are resolving is correctly formed"
+    );
   }
 };
 function svg(file) {
-  const config = bundle.svg.find((x) => x.watch(file.input));
+  const config = bundle.svg.filter((context2) => {
+    if (context2.input.has(file.input))
+      return true;
+    if (context2.match(file.input)) {
+      context2.input.add(file.input);
+      return true;
+    }
+    return false;
+  });
   if (isUndefined(config))
     return file;
   defineProperty(file, "config", { get() {
     return config;
   } });
-  if (config.format === "sprite")
-    file.kind = "SVG Sprite" /* Sprite */;
-  if (config.snippet) {
-    file.namespace = "snippets";
-    file.key = path$1.join("snippets", config.rename);
-  } else {
-    file.key = path$1.join("assets", config.rename);
-  }
-  if (config.rename !== path$1.basename(file.output)) {
-    if (config.snippet) {
-      file.output = path$1.join(bundle.dirs.output, file.key);
-    } else {
-      file.output = path$1.join(parentPath(file.output), config.rename);
-    }
-  }
   return file;
 }
 function style(file) {
@@ -4204,7 +4226,7 @@ function style(file) {
     if (config.snippet) {
       file.output = path$1.join(bundle.dirs.output, file.key);
     } else {
-      file.output = path$1.join(parentPath(file.output), file.config.rename);
+      file.output = path$1.join(parentPath2(file.output), file.config.rename);
     }
   }
   return file;
@@ -4226,7 +4248,7 @@ function script(file) {
     if (config.snippet) {
       file.output = path$1.join(bundle.dirs.output, file.key);
     } else {
-      file.output = path$1.join(parentPath(file.output), config.rename);
+      file.output = path$1.join(parentPath2(file.output), config.rename);
     }
   }
   return file;
@@ -4269,66 +4291,68 @@ function setFile(file, input, output) {
     });
   };
 }
-var parseFile = (paths2, output) => (path2) => {
-  const file = path$1.parse(path2);
-  const merge = setFile(file, path2, output);
-  if (file.ext === ".liquid") {
-    if (paths2.sections(path2)) {
-      return section(merge("sections", 4 /* Section */, "Liquid" /* Liquid */));
-    } else if (paths2.snippets(path2)) {
-      return merge("snippets", 3 /* Snippet */, "Liquid" /* Liquid */);
-    } else if (paths2.layout(path2)) {
-      return merge("layout", 2 /* Layout */, "Liquid" /* Liquid */);
-    } else if (paths2.templates(path2)) {
-      return merge("templates", 1 /* Template */, "Liquid" /* Liquid */);
-    } else if (paths2.customers(path2)) {
-      return merge("templates/customers", 1 /* Template */, "Liquid" /* Liquid */);
+function parseFile(paths2, output) {
+  return (path2) => {
+    const file = path$1.parse(path2);
+    const merge = setFile(file, path2, output);
+    if (file.ext === ".liquid") {
+      if (paths2.sections(path2)) {
+        return section(merge("sections", 4 /* Section */, "Liquid" /* Liquid */));
+      } else if (paths2.snippets(path2)) {
+        return merge("snippets", 3 /* Snippet */, "Liquid" /* Liquid */);
+      } else if (paths2.layout(path2)) {
+        return merge("layout", 2 /* Layout */, "Liquid" /* Liquid */);
+      } else if (paths2.templates(path2)) {
+        return merge("templates", 1 /* Template */, "Liquid" /* Liquid */);
+      } else if (paths2.customers(path2)) {
+        return merge("templates/customers", 1 /* Template */, "Liquid" /* Liquid */);
+      }
+    } else if (file.ext === ".md" || file.ext === ".html") {
+      return merge("pages", 14 /* Page */, file.ext === ".html" ? "HTML" /* HTML */ : "Markdown" /* Markdown */);
+    } else if (file.ext === ".json") {
+      if (paths2.metafields(path2)) {
+        return merge("metafields", 13 /* Metafield */, "JSON" /* JSON */);
+      } else if (paths2.templates(path2)) {
+        return merge("templates", 1 /* Template */, "JSON" /* JSON */);
+      } else if (paths2.config(path2)) {
+        return merge("config", 5 /* Config */, "JSON" /* JSON */);
+      } else if (paths2.locales(path2)) {
+        return merge("locales", 6 /* Locale */, "JSON" /* JSON */);
+      } else if (paths2.customers(path2)) {
+        return merge("templates/customers", 1 /* Template */, "JSON" /* JSON */);
+      }
+    } else if (file.ext === ".svg") {
+      return svg(merge("assets", 11 /* Svg */, "SVG" /* SVG */));
+    } else if (file.ext === ".css") {
+      return style(merge("assets", 7 /* Style */, "CSS" /* CSS */));
+    } else if (file.ext === ".scss") {
+      return style(merge("assets", 7 /* Style */, "SCSS" /* SCSS */));
+    } else if (file.ext === ".sass") {
+      return style(merge("assets", 7 /* Style */, "SASS" /* SASS */));
+    } else if (file.ext === ".js") {
+      return script(merge("assets", 8 /* Script */, "JavaScript" /* JavaScript */));
+    } else if (file.ext === ".ts") {
+      return script(merge("assets", 8 /* Script */, "TypeScript" /* TypeScript */));
+    } else if (file.ext === ".jsx") {
+      return script(merge("assets", 8 /* Script */, "JSX" /* JSX */));
+    } else if (file.ext === ".tsx") {
+      return script(merge("assets", 8 /* Script */, "TSK" /* TSX */));
+    } else if (paths2.assets(path2)) {
+      if (bundle.spawn.invoked) {
+        return merge("assets", 15 /* Spawn */);
+      } else if (file.ext === ".jpg" || file.ext === ".png" || file.ext === ".gif" || file.ext === ".pjpg") {
+        return merge("assets", 12 /* Asset */, "Image" /* Image */);
+      } else if (file.ext === ".mov" || file.ext === ".mp4" || file.ext === ".webm" || file.ext === ".ogg") {
+        return merge("assets", 12 /* Asset */, "Video" /* Video */);
+      } else if (file.ext === ".pdf") {
+        return merge("assets", 12 /* Asset */, "PDF" /* PDF */);
+      } else if (file.ext === ".eot" || file.ext === ".ttf" || file.ext === ".woff" || file.ext === ".woff2") {
+        return merge("assets", 12 /* Asset */, "Font" /* Font */);
+      }
     }
-  } else if (file.ext === ".md" || file.ext === ".html") {
-    return merge("pages", 14 /* Page */, file.ext === ".html" ? "HTML" /* HTML */ : "Markdown" /* Markdown */);
-  } else if (file.ext === ".json") {
-    if (paths2.metafields(path2)) {
-      return merge("metafields", 13 /* Metafield */, "JSON" /* JSON */);
-    } else if (paths2.templates(path2)) {
-      return merge("templates", 1 /* Template */, "JSON" /* JSON */);
-    } else if (paths2.config(path2)) {
-      return merge("config", 5 /* Config */, "JSON" /* JSON */);
-    } else if (paths2.locales(path2)) {
-      return merge("locales", 6 /* Locale */, "JSON" /* JSON */);
-    } else if (paths2.customers(path2)) {
-      return merge("templates/customers", 1 /* Template */, "JSON" /* JSON */);
-    }
-  } else if (file.ext === ".svg") {
-    return svg(merge("assets", 11 /* Svg */, "SVG" /* SVG */));
-  } else if (file.ext === ".css") {
-    return style(merge("assets", 7 /* Style */, "CSS" /* CSS */));
-  } else if (file.ext === ".scss") {
-    return style(merge("assets", 7 /* Style */, "SCSS" /* SCSS */));
-  } else if (file.ext === ".sass") {
-    return style(merge("assets", 7 /* Style */, "SASS" /* SASS */));
-  } else if (file.ext === ".js") {
-    return script(merge("assets", 8 /* Script */, "JavaScript" /* JavaScript */));
-  } else if (file.ext === ".ts") {
-    return script(merge("assets", 8 /* Script */, "TypeScript" /* TypeScript */));
-  } else if (file.ext === ".jsx") {
-    return script(merge("assets", 8 /* Script */, "JSX" /* JSX */));
-  } else if (file.ext === ".tsx") {
-    return script(merge("assets", 8 /* Script */, "TSK" /* TSX */));
-  } else if (paths2.assets(path2)) {
-    if (bundle.spawn.invoked) {
-      return merge("assets", 15 /* Spawn */);
-    } else if (file.ext === ".jpg" || file.ext === ".png" || file.ext === ".gif" || file.ext === ".pjpg") {
-      return merge("assets", 12 /* Asset */, "Image" /* Image */);
-    } else if (file.ext === ".mov" || file.ext === ".mp4" || file.ext === ".webm" || file.ext === ".ogg") {
-      return merge("assets", 12 /* Asset */, "Video" /* Video */);
-    } else if (file.ext === ".pdf") {
-      return merge("assets", 12 /* Asset */, "PDF" /* PDF */);
-    } else if (file.ext === ".eot" || file.ext === ".ttf" || file.ext === ".woff" || file.ext === ".woff2") {
-      return merge("assets", 12 /* Asset */, "Font" /* Font */);
-    }
-  }
-  return void 0;
-};
+    return void 0;
+  };
+}
 var outputFile = (output) => (path2) => {
   const file = path$1.parse(path2);
   const merge = setFile(file, path2, output);
@@ -4702,7 +4726,7 @@ function pluginWatch(transform3) {
           if (/^[./]/.test(args.path)) {
             if (args.importer !== nil) {
               const [path2] = glob2__default["default"].sync(".*", {
-                cwd: path$1.join(parentPath(args.importer), args.path)
+                cwd: path$1.join(parentPath2(args.importer), args.path)
               });
               if (isString(path2) && !paths.has(path2)) {
                 if (!processor.esbuild.loaded) {
@@ -4728,13 +4752,13 @@ function pluginWatch(transform3) {
   };
 }
 var createSnippet = (string) => "<script>" + string + "<\/script>";
-async function script2(file, request2, cb) {
+async function compile5(file, request2, cb) {
   if (bundle.mode.watch)
     start();
   const { config } = file;
   try {
-    const compile7 = await esbuild2.build(file.config.esbuild);
-    for (const { text, path: path2 } of compile7.outputFiles) {
+    const compile8 = await esbuild2.build(file.config.esbuild);
+    for (const { text, path: path2 } of compile8.outputFiles) {
       if (/\.map$/.test(path2)) {
         const map2 = path$1.join(cache.script.uri, file.base);
         fsExtra.writeFile(path$1.join(cache.script.uri, file.base), text).catch(
@@ -4767,8 +4791,8 @@ async function script2(file, request2, cb) {
         }
       }
     }
-    if (compile7.outputFiles.length === 1) {
-      const out = compile7.outputFiles.pop();
+    if (compile8.outputFiles.length === 1) {
+      const out = compile8.outputFiles.pop();
       return out.text;
     }
   } catch (err2) {
@@ -4900,7 +4924,7 @@ async function postcssProcess(file, css, map2) {
 function snippet(css) {
   return `<style type="text/css">${nl + wsr(2) + css}</style>`;
 }
-async function compile5(file, cb) {
+async function compile6(file, cb) {
   if (bundle.mode.watch)
     start();
   const output = write3(file, cb);
@@ -4929,7 +4953,7 @@ async function compile5(file, cb) {
 async function build2(callback) {
   start();
   const parse3 = parseFile(bundle.paths, bundle.dirs.output);
-  const match = anymatch4__default["default"](toArray(bundle.watch.values()));
+  const match = anymatch3__default["default"](toArray(bundle.watch.values()));
   const paths2 = await glob2__default["default"]("**", {
     onlyFiles: true,
     absolute: true,
@@ -5078,10 +5102,10 @@ async function build2(callback) {
     loggers_exports.update(`${line.gray}Building ${id}`);
     start();
     if (id === "styles") {
-      source[id].report = await mapAsync(handle(compile5), source[id].files);
+      source[id].report = await mapAsync(handle(compile6), source[id].files);
       source[id].time = stop();
     } else if (id === "scripts") {
-      source[id].report = await mapAsync(handle(script2), source[id].files);
+      source[id].report = await mapAsync(handle(compile5), source[id].files);
       source[id].time = stop();
     } else if (id === "layouts" || id === "snippets" || id === "sections" || id === "templates") {
       source[id].report = await mapAsync(handle(compile2), source[id].files);
@@ -5151,39 +5175,83 @@ async function injectRender(path2) {
   }
   return false;
 }
-var Spriter = null;
 var svgo = null;
+var SVGSprite = null;
 async function load3(id) {
   if (id === "svg-sprite") {
-    const isprite = await Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('svg-sprite')); });
-    Spriter = isprite.default;
-    return isNil(Spriter) === false;
+    SVGSprite = (await Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('svg-sprite')); })).default;
+    return isNil(svgo) === false;
   }
   if (id === "svgo") {
-    const isvgo = await Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('svgo')); });
-    svgo = isvgo.default;
+    svgo = (await Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require('svgo')); })).default;
     return isNil(svgo) === false;
   }
 }
-async function compile6(file, cb) {
-  const { config } = file;
-  if (config.format === "sprite") {
-    const sprite2 = new Spriter(config.sprite === true ? processor.sprite : config.sprite);
-    for (const svg2 of config.input) {
-      const icon = await fsExtra.readFile(svg2);
-      sprite2.add(svg2, null, icon.toString());
-    }
-    console.log(sprite2);
-    sprite2.compile(function(error3, result) {
+async function getFile(path2) {
+  const svg2 = await fsExtra.readFile(path2);
+  return [
+    path2,
+    svg2.toString()
+  ];
+}
+function getSprite(sprite) {
+  return new Promise(function(resolve2, reject) {
+    const svgs = [];
+    sprite.compile((error3, svg2) => {
       if (error3)
-        console.log(error3);
-      console.log(JSON.stringify(result, null, 3));
-      for (const mode in result) {
-        for (const resource in result[mode]) {
-          console.log(result[mode][resource].contents);
+        return reject(error3);
+      for (const m in svg2)
+        for (const p in svg2[m])
+          svgs.push(svg2[m][p].contents.toString());
+      resolve2(svgs);
+    });
+  });
+}
+async function compileSprite(file, request2, cb) {
+  const { config } = file;
+  const options2 = config.sprite === true ? processor.sprite : config.sprite;
+  const sprite = new SVGSprite(options2);
+  const svgs = await mapFastAsync(getFile, toArray(config.input)).catch(
+    errors_exports.write("Error reading an SVG file", {
+      file: file.base,
+      source: file.relative
+    })
+  );
+  if (svgs) {
+    for (const [path2, svg2] of svgs)
+      sprite.add(path2, null, svg2);
+    const files = await getSprite(sprite);
+    for (const file2 of files) {
+      await fsExtra.writeFile(file2);
+    }
+  }
+}
+async function compile7(file, request2, cb) {
+  if (isArray(file.config)) {
+    for (const config of file.config) {
+      if (config.snippet) {
+        file.namespace = "snippets";
+        file.key = path$1.join("snippets", config.rename);
+      } else {
+        file.key = path$1.join("assets", config.rename);
+      }
+      if (file.config.rename !== path$1.basename(file.output)) {
+        if (config.snippet) {
+          file.output = path$1.join(bundle.dirs.output, file.key);
+        } else {
+          file.output = path$1.join(parentPath(file.output), file.config.rename);
         }
       }
-    });
+      if (config.format === "sprite") {
+        file.kind = "SVG Sprite" /* Sprite */;
+        await compileSprite(file);
+      }
+    }
+  } else if (isObject(file.config)) {
+    const { config } = file;
+    if (config.format === "sprite") {
+      return compileSprite(config);
+    }
   }
 }
 async function injection() {
@@ -5269,12 +5337,16 @@ function watch(callback) {
       try {
         let value = null;
         if (file.type === 8 /* Script */) {
-          await script2(file, request2.assets, callback);
+          await compile5(file, request2.assets, callback);
           if (bundle.mode.hot)
             wss.script(file.key);
           return;
+        } else if (file.type === 14 /* Page */) {
+          return compile4(file, callback);
+        } else if (file.type === 11 /* Svg */) {
+          return compile7(file, request2.assets, callback);
         } else if (file.type === 7 /* Style */) {
-          value = await compile5(file, callback);
+          value = await compile6(file, callback);
           if (bundle.mode.hot)
             wss.stylesheet(file.key);
         } else if (file.type === 4 /* Section */) {
@@ -5294,12 +5366,6 @@ function watch(callback) {
           value = await compile3(file, callback);
         } else if (file.type === 1 /* Template */ && file.kind === "Liquid" /* Liquid */) {
           value = await compile2(file, callback);
-        } else if (file.type === 14 /* Page */) {
-          value = await compile4(file, callback);
-          return;
-        } else if (file.type === 11 /* Svg */) {
-          value = await compile6(file, callback);
-          return;
         } else if (file.type === 12 /* Asset */ || file.type === 15 /* Spawn */) {
           value = await compile(file, callback);
         }
@@ -5748,7 +5814,7 @@ function setJsonOptions(config) {
     if (option === "exclude") {
       const exclude = isString(json[option]) ? [json[option]] : json[option];
       if (isArray(exclude)) {
-        bundle.json[option] = anymatch4__default["default"](exclude);
+        bundle.json[option] = anymatch3__default["default"](exclude);
         continue;
       } else {
         typeError("exclude", option, exclude[option], "string | string[]");
@@ -5855,105 +5921,181 @@ function authURL(domain, env2, type2) {
     Please check you project setup and ensure you have correctly provided authorization.`);
   }
 }
-function getResolvedPaths(filePath) {
+function getResolvedPaths(filePath, hook2) {
   const { cwd } = bundle;
-  const warn2 = warnOption("URI Resolver");
+  const match = isFunction(hook2) ? [] : false;
+  const warn2 = warnOption("Path Resolver");
   const path2 = normalPath(bundle.dirs.input);
+  console.log(filePath);
   if (isArray(filePath)) {
     const paths2 = [];
     for (const item of filePath) {
-      const match = glob2__default["default"].sync(path2(item), { cwd, absolute: true });
-      if (match.length === 0) {
-        warn2("Path could not be resolved at", item);
+      const uri2 = path2(item);
+      const resolved = glob2__default["default"].sync(uri2, {
+        cwd,
+        absolute: true
+      });
+      if (match) {
+        const test2 = hook2(uri2);
+        if (isString(test2)) {
+          match.push(test2);
+        } else if (isArray(test2)) {
+          match.push(...test2);
+        }
+      }
+      if (resolved.length === 0) {
+        warn2("No files can be resolved in", item);
       } else {
-        paths2.push(...match);
+        paths2.push(...resolved);
       }
     }
-    return paths2;
+    return match ? { paths: paths2, match: anymatch3__default["default"](match) } : paths2;
   }
   if (isString(filePath)) {
-    const match = glob2__default["default"].sync(path2(filePath), { cwd, absolute: true });
-    if (match.length === 0) {
-      warn2("Path could not be resolved at", filePath);
-      return null;
-    } else {
-      return match;
+    const uri2 = path2(filePath);
+    const paths2 = glob2__default["default"].sync(uri2, { cwd, absolute: true });
+    if (paths2.length === 0) {
+      warn2("No files can be resolved in", filePath);
     }
+    if (match) {
+      const test2 = hook2(uri2);
+      if (isString(test2)) {
+        match.push(test2);
+      } else if (isArray(test2)) {
+        match.push(...test2);
+      }
+    }
+    return match ? { paths: paths2, match: anymatch3__default["default"](match) } : paths2;
   }
   typeError("uri", "uri/path", filePath, "string | string[]");
 }
-function getTransform(transforms, flatten = false) {
-  const config = [];
-  for (const prop2 in transforms) {
-    const o2 = { snippet: prop2.startsWith("snippets/") };
-    const asset = prop2.startsWith("assets/");
-    const option = transforms[prop2];
-    const isArr = isArray(option);
-    const rename = asset || o2.snippet;
-    if (isString(option) || isArr && rename) {
-      if (rename)
-        o2.rename = asset ? prop2.slice(7) : prop2.slice(9);
-      if (isArr && !option.every(isString)) {
-        typeError("transform", prop2, option, "string[]");
-      }
-      const paths2 = getResolvedPaths(option);
-      if (paths2) {
-        if (flatten) {
-          for (const input of paths2)
-            config.push(assign({}, o2, { input }));
-        } else {
-          config.push(assign({}, o2, { input: paths2 }));
-        }
-      }
-    } else if (isObject(option)) {
-      if (!has("input", option)) {
-        invalidError("tranform", prop2, option, "{ input: string | string[] }");
-      }
-      const paths2 = getResolvedPaths(option.input);
-      if (paths2) {
-        const merge = rename ? assign({}, option, o2, { rename: asset ? prop2.slice(7) : prop2.slice(9) }) : assign({}, o2, option);
-        if (flatten) {
-          for (const input of paths2)
-            config.push(assign(merge, { input }));
-        } else {
-          config.push(assign(merge, { input: paths2 }));
-        }
-      }
-    } else if (isArray(option)) {
-      if (option.every(isString)) {
-        const paths2 = getResolvedPaths(option);
-        if (paths2) {
-          if (flatten) {
-            for (const input of paths2)
-              config.push(assign({}, o2, option, { input }));
-          } else {
-            config.push(assign({}, o2, option, { input: paths2 }));
-          }
-        }
-      } else if (isObject(option[0])) {
-        for (const item of option) {
-          if (!isObject(item)) {
-            typeError("transform", prop2, item, "{ input: string }");
-          }
-          if (!has("input", item)) {
-            invalidError("tranform", prop2, item, "{ input: string | string[] }");
-          }
-          const paths2 = getResolvedPaths(item.input);
-          if (paths2) {
-            if (flatten) {
-              for (const input of paths2)
-                config.push(assign({}, o2, item, { input }));
-            } else {
-              config.push(assign({}, o2, item, { input: paths2 }));
-            }
-          }
-        }
+function getTransform(transforms, opts) {
+  if (isString(transforms)) {
+    const { paths: paths2, match } = getResolvedPaths(transforms, (watch2) => {
+      if (opts.addWatch)
+        bundle.watch.add(watch2);
+      return globPath(watch2);
+    });
+    if (paths2) {
+      if (opts.flatten) {
+        return paths2.map(
+          (input) => ({
+            input,
+            rename: path$1.basename(input),
+            snippet: false
+          })
+        );
       } else {
-        typeError("transform", prop2, option, "string[] | object[]");
+        return [
+          {
+            input: paths2,
+            snippet: false,
+            match
+          }
+        ];
       }
     }
+  } else if (isArray(transforms)) {
+    if (transforms.every(isString)) {
+      const { paths: paths2, match } = getResolvedPaths(transforms, (watch2) => {
+        if (opts.addWatch)
+          bundle.watch.add(watch2);
+        return globPath(watch2);
+      });
+      if (paths2) {
+        if (opts.flatten) {
+          return paths2.map((input) => ({ input, snippet: false }));
+        } else {
+          return [
+            {
+              input: paths2,
+              snippet: false,
+              match
+            }
+          ];
+        }
+      }
+    } else if (transforms.every(isObject)) {
+      return transforms.map((option) => {
+        if (!has("input", option)) {
+          invalidError("tranform", "input", option, "{ input: string | string[] }");
+        }
+        const { paths: paths2, match } = getResolvedPaths(transforms, (watch2) => {
+          if (opts.addWatch)
+            bundle.watch.add(watch2);
+          return globPath(watch2);
+        });
+        option.match = match;
+        if (paths2)
+          option.input = paths2;
+        if (!has("snippet", option))
+          option.snippet = false;
+        return option;
+      });
+    }
+  } else if (isObject(transforms)) {
+    const config = [];
+    for (const prop2 in transforms) {
+      const o2 = { snippet: prop2.startsWith("snippets/") };
+      const asset = prop2.startsWith("assets/");
+      const option = transforms[prop2];
+      const rename = asset || o2.snippet;
+      if (isString(option)) {
+        if (rename)
+          o2.rename = asset ? prop2.slice(7) : prop2.slice(9);
+        const { paths: paths2, match } = getResolvedPaths(option, (watch2) => {
+          if (opts.addWatch)
+            bundle.watch.add(watch2);
+          return globPath(watch2);
+        });
+        if (paths2) {
+          if (opts.flatten) {
+            for (const input of paths2)
+              config.push(assign({}, o2, { input }));
+          } else {
+            config.push(assign({}, o2, { input: paths2, match }));
+          }
+        }
+      } else if (isObject(option)) {
+        if (!has("input", option)) {
+          invalidError("tranform", prop2, option, "{ input: string | string[] }");
+        }
+        const { paths: paths2, match } = getResolvedPaths(option.input, (watch2) => {
+          if (opts.addWatch)
+            bundle.watch.add(watch2);
+          return globPath(watch2);
+        });
+        if (paths2) {
+          const merge = rename ? assign({}, option, o2, { rename: asset ? prop2.slice(7) : prop2.slice(9) }) : assign({}, o2, option);
+          if (opts.flatten) {
+            for (const input of paths2)
+              config.push(assign(merge, { input }));
+          } else {
+            config.push(assign(merge, { input: paths2, match }));
+          }
+        }
+      } else if (isArray(option)) {
+        if (option.every(isString)) {
+          const { paths: paths2, match } = getResolvedPaths(option, (watch2) => {
+            if (opts.addWatch)
+              bundle.watch.add(watch2);
+            return globPath(watch2);
+          });
+          if (paths2) {
+            if (opts.flatten) {
+              for (const input of paths2)
+                config.push(assign({}, o2, option, { input }));
+            } else {
+              config.push(assign({}, o2, option, { input: paths2, match }));
+            }
+          }
+        } else {
+          typeError("transform", prop2, option, "string[]");
+        }
+      }
+    }
+    return config;
   }
-  return config;
 }
 function getModules2(pkg, name) {
   return anyTrue(
@@ -5989,7 +6131,7 @@ async function setScriptOptions(config, pkg) {
   if (!has("script", config.transforms))
     return;
   const { esbuild: esbuild3 } = processor;
-  const { script: script3 } = config.transforms;
+  const { script: script2 } = config.transforms;
   const warn2 = warnOption("script transform option");
   esbuild3.installed = getModules(pkg, "esbuild");
   if (esbuild3.installed) {
@@ -6009,7 +6151,10 @@ async function setScriptOptions(config, pkg) {
     delete esbuild3.config.entryPoints;
   }
   const tsconfig = await getTSConfig(bundle.cwd);
-  const transforms = getTransform(script3, true);
+  const transforms = getTransform(script2, {
+    addWatch: false,
+    flatten: true
+  });
   const esboptions = omit(["input", "watch", "rename", "snippet"]);
   defineProperty(esbuild3, "tsconfig", { get() {
     return tsconfig;
@@ -6097,7 +6242,7 @@ async function setScriptOptions(config, pkg) {
       loggers_exports.err(e2.errors);
     }
     transform3.watch.forEach((p) => bundle.watch.add(p));
-    o2.watch = anymatch4__default["default"](transform3.watch);
+    o2.watch = anymatch3__default["default"](transform3.watch);
     bundle.script.push(o2);
   }
   esbuild3.loaded = true;
@@ -6110,24 +6255,30 @@ async function setStyleConfig(config, pkg) {
   sass4.installed = getModules(pkg, "sass");
   if (sass4.installed) {
     const loaded = await load2("sass");
-    if (!loaded)
+    if (!loaded) {
       throwError("Unable to dynamically import SASS", "Ensure you have installed sass");
+    }
   }
   postcss4.installed = getModules(pkg, "postcss");
   if (postcss4.installed) {
     const loaded = await load2("postcss");
-    if (!loaded)
+    if (!loaded) {
       throwError("Unable to dynamically import PostCSS", "Ensure you have installed postcss");
+    }
     const pcss = await readConfigFile("postcss.config");
     if (pcss !== null) {
       postcss4.file = pcss.path;
       postcss4.config = pcss.config;
     }
   }
-  const styles = getTransform(config.transforms.style, true);
+  const styles = getTransform(config.transforms.style, {
+    addWatch: false,
+    flatten: true
+  });
+  console.log(styles);
   const path2 = normalPath(config.input);
   for (const style2 of styles) {
-    const compile7 = {
+    const compile8 = {
       input: style2.input,
       watch: null,
       postcss: false,
@@ -6139,10 +6290,10 @@ async function setStyleConfig(config, pkg) {
         if (style2.postcss !== false) {
           if (!postcss4.installed)
             missingDependency("postcss");
-          compile7.postcss = override ? mergerino_min_default(postcss4.config, style2.postcss) : true;
+          compile8.postcss = override ? mergerino_min_default(postcss4.config, style2.postcss) : true;
         }
       } else {
-        typeError("style", "postcss", compile7.postcss, "boolean | {}");
+        typeError("style", "postcss", compile8.postcss, "boolean | {}");
       }
     }
     if (has("sass", style2) && style2.sass !== false || sass4.installed === true) {
@@ -6151,15 +6302,15 @@ async function setStyleConfig(config, pkg) {
         if (!sass4.installed)
           missingDependency("sass");
         if (!override) {
-          defineProperty(compile7, "sass", { get() {
+          defineProperty(compile8, "sass", { get() {
             return style2.sass;
           } });
         } else {
-          compile7.sass = assign(sass4.config, style2.sass);
+          compile8.sass = assign(sass4.config, style2.sass);
           for (const option in style2.sass) {
             if (option === "sourcemap" || option === "warnings") {
               if (isBoolean(style2.sass[option])) {
-                compile7.sass[option] = style2.sass[option];
+                compile8.sass[option] = style2.sass[option];
               } else {
                 typeError("sass", option, style2.sass[option], "boolean");
               }
@@ -6167,13 +6318,13 @@ async function setStyleConfig(config, pkg) {
               if (!isString(style2.sass[option]))
                 typeError("sass", option, style2.sass[option], "string");
               if (style2.sass[option] === "expanded" || style2.sass[option] === "compressed") {
-                compile7.sass[option] = style2.sass[option];
+                compile8.sass[option] = style2.sass[option];
               } else {
                 invalidError("sass", option, style2.sass[option], "expanded | compressed");
               }
             } else if (option === "includePaths") {
               if (isArray(style2.sass[option])) {
-                compile7.sass[option] = uniq(style2.sass[option]).map((p) => path$1.join(bundle.cwd, p));
+                compile8.sass[option] = uniq(style2.sass[option]).map((p) => path$1.join(bundle.cwd, p));
               } else {
                 typeError("sass", option, style2.sass[option], "string[]");
               }
@@ -6183,19 +6334,19 @@ async function setStyleConfig(config, pkg) {
       } else {
         typeError("style", "sass", style2.sass, "boolean | {}");
       }
-      if (!style2.snippet && !/\.s[ac]ss/.test(path$1.extname(compile7.input))) {
-        warn2("Input is not a sass file", compile7.input);
+      if (!style2.snippet && !/\.s[ac]ss/.test(path$1.extname(compile8.input))) {
+        warn2("Input is not a sass file", compile8.input);
       }
     }
     let rename = renameFile(style2.rename);
     if (has("rename", style2) && !isNil(style2)) {
       if (!isString(style2.rename))
         typeError("styles", "rename", style2.rename, "string");
-      rename = renameFile(compile7.input, style2.rename);
+      rename = renameFile(compile8.input, style2.rename);
       if (!/[a-zA-Z0-9_.-]+/.test(rename.name))
         typeError("sass", "rename", rename, "Invalid rename augment");
       if (rename.name.endsWith(".css")) {
-        compile7.rename = rename.name;
+        compile8.rename = rename.name;
       } else {
         if (rename.name.endsWith(".scss")) {
           rename.name = rename.name.replace(".scss", ".css");
@@ -6222,42 +6373,42 @@ async function setStyleConfig(config, pkg) {
           }
         }
       }
-      watch2.push(compile7.input);
+      watch2.push(compile8.input);
       watch2.forEach((p) => bundle.watch.add(p));
-      compile7.watch = anymatch4__default["default"](watch2);
+      compile8.watch = anymatch3__default["default"](watch2);
     } else {
-      compile7.watch = anymatch4__default["default"]([compile7.input]);
-      bundle.watch.add(compile7.input);
+      compile8.watch = anymatch3__default["default"]([compile8.input]);
+      bundle.watch.add(compile8.input);
     }
-    if (typeof compile7.sass === "object") {
-      compile7.sass.include.unshift(bundle.cwd, path$1.join(bundle.cwd, rename.dir));
+    if (typeof compile8.sass === "object") {
+      compile8.sass.include.unshift(bundle.cwd, path$1.join(bundle.cwd, rename.dir));
       if (hasPath("sass.include", style2)) {
-        compile7.sass.include = style2.sass.include.map((p) => path$1.join(bundle.cwd, p));
+        compile8.sass.include = style2.sass.include.map((p) => path$1.join(bundle.cwd, p));
       }
     }
     if (has("snippet", style2)) {
       if (!isBoolean(style2.snippet))
         typeError("styles", "snippet", style2.snippet, "boolean");
-      compile7.snippet = style2.snippet;
+      compile8.snippet = style2.snippet;
     }
-    if (compile7.snippet) {
-      if (!has("rename", compile7))
-        compile7.rename = rename.name;
-      if (!rename.name.endsWith(".liquid") || !compile7.rename.endsWith(".liquid")) {
-        compile7.rename = rename.name + ".liquid";
+    if (compile8.snippet) {
+      if (!has("rename", compile8))
+        compile8.rename = rename.name;
+      if (!rename.name.endsWith(".liquid") || !compile8.rename.endsWith(".liquid")) {
+        compile8.rename = rename.name + ".liquid";
       }
-      bundle.watch.add(`!${path$1.join(bundle.cwd, config.output, "snippets", compile7.rename)}`);
+      bundle.watch.add(`!${path$1.join(bundle.cwd, config.output, "snippets", compile8.rename)}`);
     } else {
-      compile7.rename = rename.name;
+      compile8.rename = rename.name;
       bundle.watch.add(`!${path$1.join(bundle.cwd, config.output, "assets", rename.name)}`);
     }
-    bundle.style.push(compile7);
+    bundle.style.push(compile8);
   }
 }
 async function setSvgOptions(config, pkg) {
   if (!has("svg", config.transforms))
     return;
-  const { sprite: sprite2, svgo: svgo2 } = processor;
+  const { sprite, svgo: svgo2 } = processor;
   const warn2 = warnOption("svg transform");
   svgo2.installed = getModules2(pkg, "svgo");
   if (svgo2.installed) {
@@ -6265,34 +6416,36 @@ async function setSvgOptions(config, pkg) {
     if (!loaded)
       throwError("Unable to dynamically import SVGO", "Ensure you have installed svgo");
   }
-  sprite2.installed = getModules2(pkg, "svg-sprite");
-  if (sprite2.installed) {
+  sprite.installed = getModules2(pkg, "svg-sprite");
+  if (sprite.installed) {
     const loaded = await load3("svg-sprite");
     if (!loaded)
       throwError("Unable to dynamically import SVG Sprite", "Ensure you have installed svgo-sprite");
   }
-  if (!sprite2.installed && !svgo2.installed) {
+  if (!sprite.installed && !svgo2.installed) {
     missingDependency(["svgo", "svg-sprite"]);
   }
-  const svgs = getTransform(config.transforms.svg, false);
+  const svgs = getTransform(config.transforms.svg, {
+    addWatch: true,
+    flatten: false
+  });
   for (const svg2 of svgs) {
-    const input = svg2.input.filter((path2) => {
+    const files = svg2.input.filter((path2) => {
       if (path$1.extname(path2) !== ".svg") {
         warn2("Excluded file which is not an SVG type", path$1.relative(bundle.cwd, path2));
         return false;
       } else {
-        bundle.watch.add(path2);
         return true;
       }
     });
-    if (input.length === 0) {
+    if (files.length === 0) {
       warn2("No SVG file paths were resolved");
       continue;
     }
     const o2 = {
-      input,
+      input: new Set(files),
+      match: svg2.match,
       format: null,
-      watch: anymatch4__default["default"](svg2.input),
       rename: svg2.rename,
       snippet: svg2.snippet
     };
@@ -6306,21 +6459,21 @@ async function setSvgOptions(config, pkg) {
         o2.format = "file";
         o2.svgo = isObject(svg2.svgo) ? mergerino_min_default(svgo2.config, svg2.svgo) : true;
       } else if (has("sprite", svg2)) {
-        if (!sprite2.installed)
+        if (!sprite.installed)
           missingDependency("svg-sprite");
         o2.format = "sprite";
-        o2.sprite = isObject(svg2.sprite) ? mergerino_min_default(sprite2.config, svg2.sprite) : true;
+        o2.sprite = isObject(svg2.sprite) ? mergerino_min_default(sprite.config, svg2.sprite) : true;
       } else {
-        if (svgo2.installed && sprite2.installed) {
+        if (svgo2.installed && sprite.installed) {
           missingOption("transform > svg", "format", "sprite | file", [
             `SVG transforms require you to define ${cyan("format")} when both SVGO and SVG Sprite`,
             "processors are installed. Syncify needs to knows how is should handle the input and",
             "which processor to use for the transform."
           ].join(nl));
-        } else if (svgo2.installed && !sprite2.installed) {
+        } else if (svgo2.installed && !sprite.installed) {
           o2.format = "file";
           o2.sprite = true;
-        } else if (sprite2.installed && !svgo2.installed) {
+        } else if (sprite.installed && !svgo2.installed) {
           o2.format = "sprite";
           o2.sprite = true;
         } else {
@@ -6336,7 +6489,7 @@ async function setSvgOptions(config, pkg) {
             missingDependency("svgo");
         } else {
           o2.sprite = true;
-          if (!sprite2.installed)
+          if (!sprite.installed)
             missingDependency("svg-sprite");
         }
       } else {
@@ -6704,7 +6857,7 @@ async function setPaths(config) {
         warn2("No files could be resolved in", path$1.relative(bundle.cwd, p));
       bundle.watch.add(p);
     }
-    bundle.paths[key] = anymatch4__default["default"](uri2);
+    bundle.paths[key] = anymatch3__default["default"](uri2);
   }
 }
 

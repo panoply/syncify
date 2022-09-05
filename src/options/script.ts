@@ -50,7 +50,11 @@ export async function setScriptOptions (config: Config, pkg: Package) {
   }
 
   const tsconfig = await getTSConfig(bundle.cwd);
-  const transforms = getTransform<ScriptTransform[]>(script, true);
+  const transforms = getTransform<ScriptTransform[]>(script, {
+    addWatch: false,
+    flatten: true
+  });
+
   const esboptions = omit([ 'input', 'watch', 'rename', 'snippet' ]);
 
   defineProperty(esbuild, 'tsconfig', { get () { return tsconfig; } });

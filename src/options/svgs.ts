@@ -1,7 +1,7 @@
 import { Merge } from 'type-fest';
+import { Tester } from 'anymatch';
 import { Config, Package, SVGBundle, SVGOConfig, SVGSprite, SVGFile, SVGSpriteConfig } from 'types';
 import { extname, relative } from 'node:path';
-import anymatch from 'anymatch';
 import { has } from 'rambdax';
 import merge from 'mergerino';
 import { cyan } from '~log';
@@ -46,29 +46,31 @@ export async function setSvgOptions (config: Config, pkg: Package) {
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const svgs = getTransform<Merge<SVGFile, SVGSprite>[]>(config.transforms.svg, false);
+  const svgs = getTransform<Merge<SVGFile, SVGSprite>[]>(config.transforms.svg, {
+    addWatch: true,
+    flatten: false
+  });
 
-  for (const svg of svgs as Merge<SVGFile, SVGSprite>[]) {
+  for (const svg of svgs as Merge<SVGFile, SVGSprite & { match: Tester }>[]) {
 
-    const input = (svg.input as string[]).filter(path => {
+    const files = (svg.input as string[]).filter(path => {
       if (extname(path) !== '.svg') {
         warn('Excluded file which is not an SVG type', relative(bundle.cwd, path));
         return false;
       } else {
-        bundle.watch.add(path);
         return true;
       }
     });
 
-    if (input.length === 0) {
+    if (files.length === 0) {
       warn('No SVG file paths were resolved');
       continue;
     }
 
     const o: SVGBundle = {
-      input,
+      input: new Set(files),
+      match: svg.match,
       format: null,
-      watch: anymatch(svg.input),
       rename: svg.rename,
       snippet: svg.snippet
     };

@@ -147,7 +147,21 @@ export const processor: PartialDeep<ProcessorConfig> = {
     loaded: false,
     file: false,
     config: {
+      mode: {
+        inline: true,
+        symbol: {
+          example: false
+        }
+      },
+      shape: {
+        transform: [ 'svgo' ],
+        id: {
+          generator: 'svg-%s'
+        }
+      },
       svg: {
+        xmlDeclaration: false,
+        doctypeDeclaration: false,
         dimensionAttributes: false,
         namespaceClassnames: false,
         namespaceIDs: false

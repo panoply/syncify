@@ -50,38 +50,51 @@ const external = [
   'postcss',
   'sass',
   'sharp',
-  'svg-sprite',
+  'svgstore',
   'svgo'
 ];
 
-export default defineConfig(options => ({
-  entry: [
-    'src/cli.ts',
-    'src/api.ts',
-    'src/index.ts'
-  ],
-  clean: [
-    'dist'
-  ],
-  splitting: true,
-  treeshake: true,
-  noExternal,
-  external,
-  esbuildOptions (options) {
-    options.chunkNames = 'cjs';
+export default defineConfig(options => ([
+  {
+    entry: [
+      'src/cli.ts',
+      'src/api.ts',
+      'src/index.ts'
+    ],
+    outDir: 'dist',
+    clean: [
+      'dist'
+    ],
+    splitting: true,
+    treeshake: true,
+    noExternal,
+    external,
+    esbuildOptions (options) {
+      options.chunkNames = 'cjs';
+    },
+    async onSuccess () {
+
+      await build({
+        entryPoints: [ 'src/hot/snippet.ts' ],
+        bundle: true,
+        minify: true,
+        format: 'iife',
+        banner: { js: '<script>' },
+        footer: { js: '</script>' },
+        treeShaking: true,
+        outfile: 'hot.js.liquid'
+      });
+
+    }
   },
-  async onSuccess () {
-
-    await build({
-      entryPoints: [ 'src/hot/snippet.ts' ],
-      bundle: true,
-      minify: true,
-      format: 'iife',
-      banner: { js: '<script>' },
-      footer: { js: '</script>' },
-      treeShaking: true,
-      outfile: 'hot.js.liquid'
-    });
-
+  {
+    entry: {
+      'options/files/utilities': 'src/options/utilities.ts'
+    },
+    outDir: 'test',
+    splitting: false,
+    treeshake: true,
+    noExternal,
+    external
   }
-}));
+]));

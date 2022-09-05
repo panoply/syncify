@@ -43,7 +43,10 @@ export async function setStyleConfig (config: Config, pkg: Package) {
   // Load SASS Dart module
   if (sass.installed) {
     const loaded = await load('sass');
-    if (!loaded) throwError('Unable to dynamically import SASS', 'Ensure you have installed sass');
+
+    if (!loaded) {
+      throwError('Unable to dynamically import SASS', 'Ensure you have installed sass');
+    }
   }
 
   postcss.installed = getModules(pkg, 'postcss');
@@ -52,7 +55,10 @@ export async function setStyleConfig (config: Config, pkg: Package) {
 
     // Load PostCSS module
     const loaded = await load('postcss');
-    if (!loaded) throwError('Unable to dynamically import PostCSS', 'Ensure you have installed postcss');
+
+    if (!loaded) {
+      throwError('Unable to dynamically import PostCSS', 'Ensure you have installed postcss');
+    }
 
     const pcss = await readConfigFile<PostCSSProcess>('postcss.config');
 
@@ -65,8 +71,12 @@ export async function setStyleConfig (config: Config, pkg: Package) {
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const styles = getTransform<StylesFlattened[]>(config.transforms.style, true);
+  const styles = getTransform<StylesFlattened[]>(config.transforms.style, {
+    addWatch: false,
+    flatten: true
+  });
 
+  console.log(styles);
   // Path normalizer
   const path = normalPath(config.input);
 

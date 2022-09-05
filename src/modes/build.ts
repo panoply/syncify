@@ -5,7 +5,7 @@ import { compile as assets } from '~transform/asset';
 import { compile as liquid } from '~transform/liquid';
 import { compile as json } from '~transform/json';
 import { compile as pages } from '~transform/pages';
-import { script } from '~transform/script';
+import { compile as script } from '~transform/script';
 import { compile as styles } from '~transform/styles';
 import { isUndefined, nil, toArray } from '~utils/native';
 import { parseFile, Type } from '~process/files';

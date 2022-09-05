@@ -168,11 +168,12 @@ export type SVGBundle = Merge<SVGTransform, {
   /**
    * Resolved input paths (paths are expanded)
    */
-  input: string[];
+  input: Set<string>;
   /**
-   * Anymatch function - (input paths)
+   * File matching, used to determine when new files are
+   * added to an `input` defined path/directory.
    */
-  watch: Tester;
+  match: Tester;
   /**
    * SVGO Override
    */

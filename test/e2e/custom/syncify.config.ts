@@ -95,17 +95,7 @@ export default defineConfig({
   },
   processors: {
     esbuild: {},
-    sprite: {
-      svg: {
-        dimensionAttributes: true,
-        namespaceClassnames: true,
-        namespaceIDs: true,
-        rootAttributes: {
-          id: 'icons',
-          class: 'd-none'
-        }
-      }
-    },
+    sprite: {},
     sass: {
       sourcemap: true,
       style: 'compressed',

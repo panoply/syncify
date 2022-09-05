@@ -1,9 +1,8 @@
 import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
-import { join, dirname, basename } from 'path';
+import { join, dirname, basename } from 'node:path';
 import { defineProperty, isRegex, isUndefined } from '../utils/native';
 import { bundle } from '../config';
 import { lastPath, parentPath } from '../utils/paths';
-import { Kind } from './files';
 
 /**
  * Script Context
@@ -12,28 +11,22 @@ import { Kind } from './files';
  */
 export function svg (file: File<SVGBundle>) {
 
-  const config = bundle.svg.find(x => x.watch(file.input));
+  const config = bundle.svg.filter(context => {
+
+    if (context.input.has(file.input)) return true;
+
+    if (context.match(file.input)) {
+      context.input.add(file.input);
+      return true;
+    }
+
+    return false;
+  });
 
   if (isUndefined(config)) return file;
 
+  // Assign the bundle configuration to a getter
   defineProperty(file, 'config', { get () { return config; } });
-
-  if (config.format === 'sprite') file.kind = Kind.Sprite;
-
-  if (config.snippet) {
-    file.namespace = 'snippets';
-    file.key = join('snippets', config.rename);
-  } else {
-    file.key = join('assets', config.rename);
-  }
-
-  if (config.rename !== basename(file.output)) {
-    if (config.snippet) {
-      file.output = join(bundle.dirs.output, file.key);
-    } else {
-      file.output = join(parentPath(file.output), config.rename);
-    }
-  }
 
   return file;
 

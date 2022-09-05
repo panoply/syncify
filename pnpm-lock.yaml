@@ -4429,7 +4429,6 @@ packages:
     resolution: {integrity: sha512-3jeqAmQS4c4rAMzsQNBXo3+J/x65JIxaFl15wTyvrJdT/G0DzXd67oTMBxz5+lCb8ETsWjM6ZAyr/+R+BwXzag==}
     engines: {node: '>=6.4.0'}
     hasBin: true
-    requiresBuild: true
     dependencies:
       '@xmldom/xmldom': 0.7.5
       async: 3.2.4

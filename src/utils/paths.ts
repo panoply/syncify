@@ -1,6 +1,24 @@
 import { last } from 'rambdax';
 import { join, dirname } from 'path';
-import { isArray } from './native';
+import { isArray } from '~utils/native';
+import { throwError } from '~log/validate';
+import { colon, yellowBright } from '~log';
+
+/**
+ * Glob Path
+ *
+ * Returns the path/s containing globs patterns,
+ * filtering out paths which point to a file.
+ */
+export function globPath <T extends string | string[]> (path: T): T {
+
+  return isArray(path)
+    ? path.filter(uri => /\*/.test(uri)) as T
+    : /\*/.test(path)
+      ? path
+      : null;
+
+}
 
 /**
  * Last Path
@@ -18,7 +36,7 @@ import { isArray } from './native';
  * // last directory name
  * '/some/path/foo/bar/baz' => 'baz'
  */
-export const lastPath = (path: string | string[]) => {
+export function lastPath (path: string | string[]) {
 
   if (isArray(path)) return path.map(lastPath);
   if (path.indexOf('/') === -1) return path;
@@ -43,7 +61,7 @@ export const lastPath = (path: string | string[]) => {
  * // last directory name
  * '/some/path/foo/bar/baz' => '/some/path/foo/bar'
  */
-export const parentPath = (path: string | string[]) => {
+export function parentPath (path: string | string[]) {
 
   if (isArray(path)) return path.map(parentPath);
 
@@ -72,7 +90,7 @@ export const parentPath = (path: string | string[]) => {
  * // handles ignores
  * normalPath('input')('!ignore') => '!input/ignore'
  */
-export const normalPath = (input: string) => {
+export function normalPath (input: string) {
 
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
 
@@ -90,7 +108,10 @@ export const normalPath = (input: string) => {
     if (regex.test(path)) return ignore ? '!' + path : path;
 
     if (path.charCodeAt(0) === 46 && path.charCodeAt(1) === 46 && path.charCodeAt(2) === 47) {
-      throw new Error('Invalid path at: ' + path + ' - Paths must be relative to source');
+      throwError(
+        `Invalid path defined at: ${colon}${yellowBright(`"${path}"`)}`,
+        'Paths must be relative to source'
+      );
     }
 
     return (ignore ? '!' : '') + join(input, path);
@@ -116,8 +137,10 @@ export const normalPath = (input: string) => {
 export const basePath = (cwd: string) => (path: string) => {
 
   if (path.indexOf('*') !== -1) {
-    console.error(`Base directory path cannot contain glob, at "${path}"`);
-    process.exit(1);
+    throwError(
+      `Base directory path cannot contain glob${colon}${yellowBright(`"${path}"`)}`,
+      'Ensure that path you are resolving is correctly formed'
+    );
   }
 
   // path directory starts with . character
@@ -131,8 +154,10 @@ export const basePath = (cwd: string) => (path: string) => {
     if (path.charCodeAt(1) === 47) {
       path = path.slice(1);
     } else {
-      console.error('Directory path is invalid at: "' + path + '"');
-      process.exit(1);
+      throwError(
+        `Directory path is invalid at${colon}${yellowBright(`"${path}"`)}`,
+        'Ensure that path you are resolving is correctly formed'
+      );
     }
 
   }
@@ -152,6 +177,9 @@ export const basePath = (cwd: string) => (path: string) => {
     path = join(cwd, path);
     return last(path).charCodeAt(0) === 47 ? path : path + '/';
   } else {
-    throw new Error('Directory path is invalid at: "' + path + '"');
+    throwError(
+      `Directory path is invalid at${colon}${yellowBright(`"${path}"`)}`,
+      'Ensure that path you are resolving is correctly formed'
+    );
   }
 };
