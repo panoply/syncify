@@ -1,21 +1,16 @@
-import type { SVGBundle, File, Syncify, SVGSpriteConfig } from 'types';
+import type { SVGBundle, File, Syncify, SVGSpriteConfig, SVGOConfig } from 'types';
 import type { SVGSpriter, SVGSpriterConstructor } from 'svg-sprite';
+import type { AssetRequest } from '~requests/client';
 import type SVGO from 'svgo';
-import type { client } from '~requests/client';
-import { basename, relative, join } from 'node:path';
+import { join } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, mapFastAsync } from 'rambdax';
-import { isArray, isObject, toArray, isString } from '~utils/native';
-import { log, error } from '~log';
+import { toArray, assign } from '~utils/native';
+import { log, error, bold, arrow } from '~log';
 import { bundle, processor } from '~config';
-import { Kind } from '~process/files';
-
-/* -------------------------------------------- */
-/* TYPES                                        */
-/* -------------------------------------------- */
-
-type SVGFile = File<SVGBundle>
-
+import { Kind, renameFile } from '~process/files';
+import { byteSize, fileSize, plural } from '~utils/utils';
+import * as timer from '~utils/timer';
 /* -------------------------------------------- */
 /* DYNAMIC IMPORTS                              */
 /* -------------------------------------------- */
@@ -55,29 +50,27 @@ export async function load (id: 'svg-sprite' | 'svgo') {
 /* TRANSFORMS                                   */
 /* -------------------------------------------- */
 
-async function getFile (path: string): Promise<[path: string, svg: string]> {
+async function getFile (path: string): Promise<[path: string, svg: string, size: number]> {
 
   const svg = await readFile(path);
 
   return [
     path,
-    svg.toString()
+    svg.toString(),
+    byteSize(svg)
   ];
 }
 
 /**
  *
  */
-function getSprite (sprite: SVGSpriter): Promise<string[]> {
+function getSprite (sprite: SVGSpriter): Promise<string> {
 
   return new Promise(function (resolve, reject) {
 
-    const svgs: string[] = [];
-
     sprite.compile((error, svg) => {
       if (error) return reject(error);
-      for (const m in svg) for (const p in svg[m]) svgs.push(svg[m][p].contents.toString());
-      resolve(svgs);
+      for (const m in svg) for (const p in svg[m]) resolve(svg[m][p].contents.toString());
     });
   });
 }
@@ -88,36 +81,144 @@ function getSprite (sprite: SVGSpriter): Promise<string[]> {
  * Generates an sprite using SVG Sprite. Upon completion will invoke an
  * upload of the output asset/file.
  *
- * @param file
- * The file context for the changed SVG
- *
- * @param request
- * The Shipify request client
+ * @param context The file context for the changed SVG
+ * @param request The Shipify request client
+ * @param cb The Syncify callback hook for API usage
  */
-export async function compileSprite (file: SVGFile, request: ReturnType<typeof client>, cb: Syncify) {
+export function compileSprite (context: File<SVGBundle[]>, request: AssetRequest, cb: Syncify) {
 
-  const { config } = file;
-  const options = (config.sprite === true ? processor.sprite : config.sprite) as SVGSpriteConfig;
-  const sprite = new SVGSprite(options);
-  const svgs = await mapFastAsync(getFile, toArray(config.input)).catch(
-    error.write('Error reading an SVG file', {
-      file: file.base,
-      source: file.relative
-    })
-  );
+  async function run (config: SVGBundle) {
 
-  if (svgs) {
+    const file = assign({}, context); // clone the file context
 
-    for (const [ path, svg ] of svgs) sprite.add(path, null, svg);
+    if (bundle.mode.watch) timer.start();
 
-    const files = await getSprite(sprite);
+    file.kind = Kind.Sprite;
 
-    for (const file of files) {
+    if (config.snippet) {
+      file.namespace = 'snippets';
+      file.key = join('snippets', renameFile(file, config.rename));
+      file.output = join(bundle.dirs.output, file.key);
+    } else {
+      file.key = join('assets', renameFile(file, config.rename));
+      file.output = join(bundle.dirs.output, file.key);
+    }
 
-      await writeFile(file);
+    const options = (config.sprite === true ? processor.sprite.config : config.sprite) as SVGSpriteConfig;
+    const sprite = new SVGSprite(options);
+    const svgs = await mapFastAsync(getFile, toArray(config.input)).catch(
+      error.write('Error reading an SVG file', {
+        file: file.base,
+        source: file.relative
+      })
+    );
+
+    if (svgs) {
+
+      file.size = 0;
+
+      for (const [ path, svg, size ] of svgs) {
+        sprite.add(path, null, svg);
+        file.size = file.size + size;
+      }
+
+      const content = await getSprite(sprite);
+
+      log.process(`${bold('SVG Sprite')} ${arrow}${svgs.length} ${plural('SVG', svgs.length)}`, timer.stop());
+
+      await writeFile(file.output, content).catch(
+        error.write('Error writing SVG Sprite', {
+          file: file.key,
+          caller: context.relative
+        })
+      );
+
+      const size = fileSize(content, file.size);
+
+      if (size.isSmaller) {
+        log.transform(`${file.kind} ${size.before} → gzip ${size.gzip}`);
+      } else {
+        log.minified(file.kind, size.before, size.after, size.saved);
+      }
+
+      log.syncing(file.key);
+
+      await request('put', file, content);
 
     }
-  }
+  };
+
+  return run;
+
+}
+
+/**
+ * Compile Sprite
+ *
+ * Generates an sprite using SVG Sprite. Upon completion will invoke an
+ * upload of the output asset/file.
+ *
+ * @param context The file context for the changed SVG
+ * @param request The Shipify request client
+ * @param cb The Syncify callback hook for API usage
+ */
+export function compileInline (context: File<SVGBundle[]>, request: AssetRequest, cb: Syncify) {
+
+  const file = assign({}, context); // clone the file context
+
+  async function run (config: SVGBundle) {
+
+    if (bundle.mode.watch) timer.start();
+
+    if (config.snippet) {
+      file.namespace = 'snippets';
+      file.key = join('snippets', renameFile(file, config.rename));
+      file.output = join(bundle.dirs.output, file.key);
+    } else {
+      file.key = join('assets', renameFile(file, config.rename));
+      file.output = join(bundle.dirs.output, file.key);
+    }
+
+    const options = (config.svgo === true ? processor.svgo : config.svgo) as SVGOConfig;
+    const read = await readFile(file.input);
+
+    file.size = byteSize(read);
+    const svg = svgo.optimize(read.toString(), options);
+
+    if (bundle.mode.watch) log.process(bold('SVGO'), timer.stop());
+
+    if (svg.error) {
+      log.err(svg.error);
+      return null;
+    }
+
+    const { data } = svg as SVGO.OptimizedSvg;
+
+    if (!bundle.mode.build) {
+
+      const size = fileSize(data, file.size);
+
+      if (size.isSmaller) {
+        log.transform(`${file.kind} ${size.before} → gzip ${size.gzip}`);
+      } else {
+        log.minified(file.kind, size.before, size.after, size.saved);
+      }
+    }
+
+    await writeFile(file.output, data).catch(
+      error.write('Error writing SVG', {
+        file: file.key,
+        caller: context.relative
+      })
+    );
+
+    log.syncing(file.key);
+
+    await request('put', file, data);
+
+  };
+
+  return run;
 
 }
 
@@ -126,52 +227,32 @@ export async function compileSprite (file: SVGFile, request: ReturnType<typeof c
  *
  * Transforms SVG files into either a sprite on inline file.
  *
- * @param file
- * The file context for the changed SVG
- * @param request
- * The Shipify request client
- * @param cb
- * The Syncify callback hook for API usage
+ * @param file The file context for the changed SVG
+ * @param request The Shipify request client
+ * @param cb The Syncify callback hook for API usage
  */
-export async function compile (
-  file: File<SVGBundle | SVGBundle[]>,
-  request: ReturnType<typeof client>,
-  cb: Syncify
-) {
+export async function compile (file: File<SVGBundle[]>, request: AssetRequest, cb: Syncify) {
 
-  if (isArray(file.config)) {
+  if (bundle.mode.watch) timer.start();
 
-    for (const config of file.config) {
+  const sprite = compileSprite(file, request, cb);
+  const inline = compileInline(file, request, cb);
+  const length = file.config.length;
 
-      if (config.snippet) {
-        file.namespace = 'snippets';
-        file.key = join('snippets', config.rename);
-      } else {
-        file.key = join('assets', config.rename);
-      }
+  for (let i = 0; i < length; i++) {
 
-      if (file.config.rename !== basename(file.output)) {
-        if (config.snippet) {
-          file.output = join(bundle.dirs.output, file.key);
-        } else {
-          file.output = join(parentPath(file.output), file.config.rename);
-        }
-      }
+    const config = file.config[i];
 
-      if (config.format === 'sprite') {
-        file.kind = Kind.Sprite;
-        await compileSprite(file as SVGFile, request);
-      }
-
-    }
-
-  } else if (isObject(file.config)) {
-
-    const { config } = file as unknown as File<SVGBundle>;
+    if (i > 0) log.changed(file);
 
     if (config.format === 'sprite') {
-      return compileSprite(config, request);
+      await sprite(config);
     }
+
+    if (config.format === 'file') {
+      await inline(config);
+    }
+
   }
 
 }

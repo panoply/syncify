@@ -1,13 +1,10 @@
-import type { Error } from 'types';
 import type { Colors } from '~cli/ansi';
-import { has, hasPath, isEmpty } from 'rambdax';
+import { has, hasPath } from 'rambdax';
 import readline from 'node:readline';
 import wrap from 'wrap-ansi';
-import cleanStack from 'clean-stack';
 import { REGEX_LINE_NO, REGEX_ADDRESS, REGEX_OBJECT, REGEX_QUOTES, REGEX_STRING } from '~const';
 import { isArray, log, nil, nl, nlr, wsr } from '~utils/native';
 import { getTime } from '~utils/utils';
-import { bundle } from '~config';
 import * as c from '~cli/ansi';
 
 /* -------------------------------------------- */
@@ -38,7 +35,7 @@ type Prefixes = (
   | 'changed'
   | 'process'
   | 'skipped'
-  | 'transfrom'
+  | 'transform'
   | 'minified'
   | 'reloaded'
   | 'syncing'
@@ -332,94 +329,4 @@ export function multiline (type: Loggers, message: string): string {
 
   return line + nl + stdout.join(nl);
 
-};
-
-/**
- * TUI Errors
- *
- * ```
- * │  invalid  →  sections/filename.liquid
- * │
- * │  ERROR 422:
- * │
- * │  lorem ipsum lorem ipsum, lorem ipsum lorem ipsum lorem:
- * │
- * │  19 |
- * │  20 | Hello World {{ tag }
- * │  21 |                    ^
- * │
- * │  DETAILS:
- * │
- * │  - lorem ipsum lorem ipsum
- * │  - lorem ipsum lorem ipsum lorem
- * │
- * │  LOCATION:
- * │
- * │  line:    20
- * │  column:  14
- * │  file:    src/views/sections/filename.liquid
- * │
- * │  NOTES:
- * │
- * │  some addition notes in italic gray will be printed
- * │
- * │  STACK:
- * │
- * │  at startup (node.js:139:18)
- * │  at startup (node.js:139:18)
- * │
- * ```
- */
-export function error (e: Error) {
-
-  const stderr: string[] = [];
-  const title = c.red.bold(`ERROR${has('code', e) ? ` ${e.code + c.colon}` : c.colon}`);
-
-  stderr.push(c.line.red + nl + c.line.red + title);
-  stderr.push(multiline(e.message, 'redBright', false));
-
-  if (e.details) {
-
-    stderr.push(c.line.red + c.redBright.bold('DETAILS' + c.colon) + nl + c.line.red);
-
-    if (isArray(e.details)) {
-
-      while (e.details.length !== 0) {
-        const line = e.details.shift();
-        if (line.trim().length > 0) stderr.push(c.line.red + c.gray('- ') + c.redBright(line));
-      }
-
-      stderr.push(nl + c.line.red);
-    }
-  }
-
-  if (e.notes) {
-    stderr.push(c.line.red + c.gray('NOTES:') + nl + c.line.red);
-    stderr.push(c.italic(multiline(e.notes, 'gray', false)));
-  }
-
-  if (e.location) {
-    stderr.push(c.line.red + c.redBright('LOCATION:') + nl + c.line.red + nl);
-    stderr.push(c.line.red + c.gray('line:   ') + c.whiteBright(`${e.location.line}`) + nl);
-
-    if (e.location.column) {
-      stderr.push(c.line.red + c.gray('column: ') + c.whiteBright(`${e.location.column}`) + nl + c.line.red + nl);
-    }
-  }
-
-  if (e.stack) {
-    stderr.push(c.line.red + c.redBright('STACK:') + nl + c.line.red + nl);
-    const stack = cleanStack(e.stack, { pretty: true, basePath: bundle.cwd });
-    const lines = wrap(stack, process.stdout.columns - 5).split(nl);
-    while (lines.length !== 0) {
-      const line = lines.shift();
-      if (line.trim().length > 0) stderr.push(c.reset(c.line.red + line));
-    }
-  }
-
-  if (e.throw) {
-    throw log(stderr.join(nil));
-  } else {
-    log(stderr.join(nl));
-  }
 };

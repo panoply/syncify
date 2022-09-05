@@ -2,8 +2,8 @@ import { Config } from 'types';
 import anymatch from 'anymatch';
 import { has } from 'rambdax';
 import { typeError, unknownError, invalidError } from '~log/validate';
-import { bundle } from '../config';
-import * as u from '../utils/native';
+import { bundle, processor } from '~config';
+import * as u from '~utils/native';
 
 /**
  * Section Options
@@ -123,9 +123,9 @@ export function setPageOptions (config: Config) {
  */
 export function setJsonOptions (config: Config) {
 
-  if (!has('json', config.transforms)) return;
+  if (!has('json', config.processors)) return;
 
-  const { json } = config.transforms;
+  const { json } = config.processors;
 
   // Ensure the section option is an object
   if (!u.isObject(json)) unknownError('json', json);
@@ -136,7 +136,7 @@ export function setJsonOptions (config: Config) {
     // Validate theindent number
     if (option === 'indent') {
       if (u.isNumber(json[option])) {
-        bundle.json[option] = json[option];
+        processor.json[option] = json[option];
         continue;
       } else {
         typeError('json', option, json[option], 'number');
@@ -146,7 +146,7 @@ export function setJsonOptions (config: Config) {
     // Validate the useTabs options, when true we indent with tabs
     if (option === 'useTab') {
       if (u.isBoolean(json[option])) {
-        bundle.json[option] = json[option];
+        processor.json[option] = json[option];
         continue;
       } else {
         typeError('json', option, json[option], 'boolean');
@@ -159,7 +159,7 @@ export function setJsonOptions (config: Config) {
       const exclude = u.isString(json[option]) ? [ json[option] ] : json[option];
 
       if (u.isArray(exclude)) {
-        bundle.json[option] = anymatch(exclude as string[]);
+        processor.json[option] = anymatch(exclude as string[]);
         continue;
       } else {
         typeError('exclude', option, exclude[option], 'string | string[]');

@@ -1,4 +1,4 @@
-import { Request, Store, File, Methods, Sync, Requests, Theme, FileKeys } from 'types';
+import { Request, Store, File, Methods, Sync, Requests, Theme } from 'types';
 import { mapFastAsync } from 'rambdax';
 import { queue } from '../requests/queue';
 import { assign, isUndefined } from '../utils/native';
@@ -9,11 +9,22 @@ import * as metafields from '../requests/metafields';
 /* -------------------------------------------- */
 /* EXPORTED                                     */
 /* -------------------------------------------- */
+
 export { queue } from '../requests/queue';
+
+/* -------------------------------------------- */
+/* TYPES                                        */
+/* -------------------------------------------- */
+
+export type AssetRequest = (method: Methods, file: File, content?: any) => Promise<any[]>
+
+/* -------------------------------------------- */
+/* CLIENT                                       */
+/* -------------------------------------------- */
 
 export const client = ({ stores, themes }: Sync) => ({
 
-  assets: (method: Methods, file: File, content?: any) => {
+  assets: <T>(method: Methods, file: File<T>, content?: any) => {
 
     const payload: Request = isUndefined(content) ? {
       method,

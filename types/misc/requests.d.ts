@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { File } from '../bundle/file';
+import { File, FileKeys } from '../bundle/file';
 
 /**
  * Axios Request Methods
@@ -151,7 +151,10 @@ export namespace Requests {
     /**
      * The theme asset
      */
-    asset: Asset
+    asset: {
+      key: FileKeys,
+      value: string
+    }
   }
 
   /* -------------------------------------------- */

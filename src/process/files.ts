@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 
-import { join, parse, relative } from 'path';
+import { join, parse, relative, extname } from 'node:path';
 import { File, Paths } from 'types';
-import { assign, nil } from '../utils/native';
-import { lastPath } from '../utils/paths';
+import { assign, nil } from '~utils/native';
+import { lastPath } from '~utils/paths';
 import { Partial } from 'rambdax';
-import * as context from './context';
-import { bundle } from '../config';
+import * as context from '~process/context';
+import { bundle } from '~config';
 import { Tester } from 'anymatch';
 
 /* -------------------------------------------- */
@@ -88,15 +88,25 @@ export const enum Kind {
  * @param file The file context
  * @param rename The rename string
  */
-export function renameFile<T> ({ name, dir, ext }: File<T>, rename: string): string {
+export function renameFile<T> ({ name, dir, ext, namespace }: File<T>, rename: string): string {
 
-  if (/\[dir\]/.test(rename)) rename = name.replace(/\[dir\]/g, dir);
-  if (/\[file\]/.test(rename)) rename = name.replace(/\[file\]/g, name);
-  if (/\[ext\]/.test(rename)) rename = name.replace(/\[ext\]/g, ext);
+  let newName = rename;
 
-  return /\.[a-z]+$/.test(rename)
-    ? rename
-    : rename + ext;
+  if (/\[dir\]/.test(newName)) newName = newName.replace(/\[dir\]/g, dir);
+  if (/\[file\]/.test(newName)) newName = newName.replace(/\[file\]/g, name);
+  if (/\[ext\]/.test(newName)) newName = newName.replace(/\[ext\]/g, ext);
+
+  // validate the rename extension
+  if (namespace === 'snippets' && rename.endsWith('.liquid') === false) return newName + '.liquid';
+
+  // validate the rename extension
+  if (!rename.endsWith('.[ext]') || !rename.endsWith(ext)) {
+    return /\.[a-z]+$/.test(rename)
+      ? newName
+      : newName + ext;
+  }
+
+  return newName;
 
 }
 

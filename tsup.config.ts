@@ -86,15 +86,5 @@ export default defineConfig(options => ([
       });
 
     }
-  },
-  {
-    entry: {
-      'options/files/utilities': 'src/options/utilities.ts'
-    },
-    outDir: 'test',
-    splitting: false,
-    treeshake: true,
-    noExternal,
-    external
   }
 ]));

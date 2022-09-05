@@ -5,6 +5,7 @@
   "description": "Syncify Tests",
   "main": "index.js",
   "scripts": {
+    "test:options:utilities": "ava test/options/scripts/utilities.test.mjs ---",
     "test:options:scripts": "ava test/options/scripts/scripts.test.mjs ---",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

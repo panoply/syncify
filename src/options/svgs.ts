@@ -80,6 +80,7 @@ export async function setSvgOptions (config: Config, pkg: Package) {
     }
 
     if (!has('format', svg)) {
+
       if (has('svgo', svg)) {
 
         if (!svgo.installed) missingDependency('svgo');
@@ -109,7 +110,7 @@ export async function setSvgOptions (config: Config, pkg: Package) {
         } else if (svgo.installed && !sprite.installed) {
 
           o.format = 'file';
-          o.sprite = true;
+          o.svgo = true;
 
         } else if (sprite.installed && !svgo.installed) {
 
@@ -123,12 +124,18 @@ export async function setSvgOptions (config: Config, pkg: Package) {
     } else {
 
       if (svg.format === 'file' || svg.format === 'sprite') {
+
         o.format = svg.format;
+
         if (svg.format === 'file') {
+
           o.svgo = true;
           if (!svgo.installed) missingDependency('svgo');
+
         } else {
+
           o.sprite = true;
+
           if (!sprite.installed) missingDependency('svg-sprite');
         }
 
@@ -138,6 +145,7 @@ export async function setSvgOptions (config: Config, pkg: Package) {
 
     }
 
+    console.log(o);
     bundle.svg.push(o);
 
   };

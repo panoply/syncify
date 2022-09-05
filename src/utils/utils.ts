@@ -61,6 +61,17 @@ export function fileKind (ext: string) {
 };
 
 /**
+ * Check for the existence of a rename namespace
+ *
+ * @param rename The rename string value
+ */
+export function hasRenamespace (rename: string) {
+
+  return /\[(?:file|dir|ext)\]/.test(rename);
+
+}
+
+/**
  * Adds an `s` to the end of a word if length is more than 1
  *
  * @param word The word to pluralize

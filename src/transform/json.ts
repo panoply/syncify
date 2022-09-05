@@ -1,7 +1,7 @@
-import { isEmpty, isNil, isType } from 'rambdax';
+import { isEmpty, isNil } from 'rambdax';
 import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { isBuffer, isArray, isObject, isUndefined, isString, isFunction, toBuffer } from '~utils/native';
+import { isBuffer, isArray, isObject, isUndefined, isString, isFunction } from '~utils/native';
 import { Type } from '~process/files';
 import { byteSize, byteConvert, fileSize } from '~utils/utils';
 import { bundle, minify } from '~config';
@@ -60,7 +60,7 @@ export function minifyJSON (data: string, space = 0): any {
  * passed in file and contents. We do not publish
  * metafield file types to output directory.
  */
-export async function jsonCompile (file: File, data: string, space = 0): any {
+export async function jsonCompile (file: File, data: string, space = 0) {
 
   const minified = minifyJSON(data, space);
 

@@ -281,6 +281,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
           {
             input: paths,
             snippet: false,
+            rename: '[name].[ext]',
             match
           }
         ] as T;
@@ -298,12 +299,17 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
       if (paths) {
         if (opts.flatten) {
-          return paths.map(input => ({ input, snippet: false })) as T;
+          return paths.map(input => ({
+            input,
+            rename: basename(input),
+            snippet: false
+          })) as T;
         } else {
           return [
             {
               input: paths,
               snippet: false,
+              rename: '[name].[ext]',
               match
             }
           ] as T;
@@ -324,9 +330,17 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
         });
 
         option.match = match;
+        option.input = paths;
 
-        if (paths) option.input = paths;
-        if (!has('snippet', option)) option.snippet = false;
+        // apply snippet default is not defined
+        if (!has('snippet', option)) {
+          option.snippet = false;
+        }
+
+        // apply namespaced rename if no rename is defined
+        if (!has('rename', option)) {
+          option.rename = option.snippet ? '[name].liquid' : '[name].[ext]';
+        }
 
         return option;
 
@@ -338,57 +352,49 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
     const config = [];
 
-    for (const prop in transforms) {
+    // config based transfrom
+    if (has('input', transforms)) {
 
-      const o: any = { snippet: prop.startsWith('snippets/') };
-      const asset = prop.startsWith('assets/');
-      const option = transforms[prop];
-      const rename = asset || o.snippet;
+      const { paths, match } = getResolvedPaths<Resolver>(transforms.input, watch => {
+        if (opts.addWatch) bundle.watch.add(watch);
+        return globPath(watch);
+      });
 
-      if (isString(option)) { // { 'assets/file': '...' }
+      // apply snippet default is not defined
+      if (!has('snippet', transforms)) {
+        transforms.snippet = false;
+      }
 
-        if (rename) o.rename = asset ? prop.slice(7) : prop.slice(9);
+      // apply namespaced rename if no rename is defined
+      if (!has('rename', transforms)) {
+        transforms.rename = transforms.snippet ? '[name].liquid' : '[name].[ext]';
+      }
 
-        const { paths, match } = getResolvedPaths<Resolver>(option, watch => {
-          if (opts.addWatch) bundle.watch.add(watch);
-          return globPath(watch);
-        });
+      if (opts.flatten) {
 
-        if (paths) {
-          if (opts.flatten) {
-            for (const input of paths) config.push(assign({}, o, { input }));
-          } else {
-            config.push(assign({}, o, { input: paths, match }));
-          }
-        }
+        for (const input of paths) config.push(assign(transforms, { input }));
 
-      } else if (isObject(option)) { // { 'assets/file': {} }
+      } else {
 
-        if (!has('input', option)) {
-          invalidError('tranform', prop, option, '{ input: string | string[] }');
-        }
+        transforms.input = paths;
+        transforms.match = match;
 
-        const { paths, match } = getResolvedPaths<Resolver>(option.input, watch => {
-          if (opts.addWatch) bundle.watch.add(watch);
-          return globPath(watch);
-        });
+        config.push(transforms);
+      }
 
-        if (paths) {
+    } else {
 
-          const merge = rename
-            ? assign({}, option, o, { rename: asset ? prop.slice(7) : prop.slice(9) })
-            : assign({}, o, option);
+      // rename based config
+      for (const prop in transforms) {
 
-          if (opts.flatten) {
-            for (const input of paths) config.push(assign(merge, { input }));
-          } else {
-            config.push(assign(merge, { input: paths, match }));
-          }
-        }
+        const o: any = { snippet: prop.startsWith('snippets/') };
+        const asset = prop.startsWith('assets/');
+        const option = transforms[prop];
+        const rename = asset || o.snippet;
 
-      } else if (isArray(option)) { // { 'assets/file': [''] }
+        if (isString(option)) { // { 'assets/file': '...' }
 
-        if (option.every(isString)) {
+          if (rename) o.rename = asset ? prop.slice(7) : prop.slice(9);
 
           const { paths, match } = getResolvedPaths<Resolver>(option, watch => {
             if (opts.addWatch) bundle.watch.add(watch);
@@ -397,20 +403,62 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
           if (paths) {
             if (opts.flatten) {
-              for (const input of paths) config.push(assign({}, o, option, { input }));
+              for (const input of paths) config.push(assign({}, o, { input }));
             } else {
-              config.push(assign({}, o, option, { input: paths, match }));
+              config.push(assign({}, o, { input: paths, match }));
             }
           }
 
-        } else {
+        } else if (isObject(option)) { // { 'assets/file': {} }
 
-          typeError('transform', prop, option, 'string[]');
+          if (!has('input', option)) {
+            invalidError('tranform', prop, option, '{ input: string | string[] }');
+          }
+
+          const { paths, match } = getResolvedPaths<Resolver>(option.input, watch => {
+            if (opts.addWatch) bundle.watch.add(watch);
+            return globPath(watch);
+          });
+
+          if (paths) {
+
+            const merge = rename
+              ? assign({}, option, o, { rename: asset ? prop.slice(7) : prop.slice(9) })
+              : assign({}, o, option);
+
+            if (opts.flatten) {
+              for (const input of paths) config.push(assign(merge, { input }));
+            } else {
+              config.push(assign(merge, { input: paths, match }));
+            }
+          }
+
+        } else if (isArray(option)) { // { 'assets/file': [''] }
+
+          if (option.every(isString)) {
+
+            const { paths, match } = getResolvedPaths<Resolver>(option, watch => {
+              if (opts.addWatch) bundle.watch.add(watch);
+              return globPath(watch);
+            });
+
+            if (paths) {
+              if (opts.flatten) {
+                for (const input of paths) config.push(assign({}, o, option, { input }));
+              } else {
+                config.push(assign({}, o, option, { input: paths, match }));
+              }
+            }
+
+          } else {
+
+            typeError('transform', prop, option, 'string[]');
+
+          }
 
         }
 
       }
-
     }
 
     return config as T;

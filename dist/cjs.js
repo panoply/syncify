@@ -1531,8 +1531,8 @@ function pTimeout(promise, milliseconds, fallback, options2) {
       if (typeof fallback === "function") {
         try {
           resolve2(fallback());
-        } catch (error3) {
-          reject(error3);
+        } catch (error2) {
+          reject(error2);
         }
         return;
       }
@@ -1546,8 +1546,8 @@ function pTimeout(promise, milliseconds, fallback, options2) {
     (async () => {
       try {
         resolve2(await promise);
-      } catch (error3) {
-        reject(error3);
+      } catch (error2) {
+        reject(error2);
       } finally {
         options2.customTimers.clearTimeout.call(void 0, timer);
       }
@@ -1747,9 +1747,9 @@ var PQueue = class extends import_eventemitter3.default {
           const result = await operation;
           resolve2(result);
           this.emit("completed", result);
-        } catch (error3) {
-          reject(error3);
-          this.emit("error", error3);
+        } catch (error2) {
+          reject(error2);
+          this.emit("error", error2);
         }
         __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_next).call(this);
       };
@@ -2606,7 +2606,6 @@ __export(tui_exports, {
   clear: () => clear2,
   closer: () => closer,
   context: () => context,
-  error: () => error2,
   indent: () => indent,
   message: () => message,
   multiline: () => multiline,
@@ -2797,49 +2796,6 @@ function multiline(type2, message2) {
       stdout.push(line2 + color(text));
   }
   return line2 + nl + stdout.join(nl);
-}
-function error2(e2) {
-  const stderr = [];
-  const title2 = red.bold(`ERROR${has("code", e2) ? ` ${e2.code + colon}` : colon}`);
-  stderr.push(line.red + nl + line.red + title2);
-  stderr.push(multiline(e2.message, "redBright"));
-  if (e2.details) {
-    stderr.push(line.red + redBright.bold("DETAILS" + colon) + nl + line.red);
-    if (isArray(e2.details)) {
-      while (e2.details.length !== 0) {
-        const line2 = e2.details.shift();
-        if (line2.trim().length > 0)
-          stderr.push(line.red + gray("- ") + redBright(line2));
-      }
-      stderr.push(nl + line.red);
-    }
-  }
-  if (e2.notes) {
-    stderr.push(line.red + gray("NOTES:") + nl + line.red);
-    stderr.push(italic(multiline(e2.notes, "gray")));
-  }
-  if (e2.location) {
-    stderr.push(line.red + redBright("LOCATION:") + nl + line.red + nl);
-    stderr.push(line.red + gray("line:   ") + whiteBright(`${e2.location.line}`) + nl);
-    if (e2.location.column) {
-      stderr.push(line.red + gray("column: ") + whiteBright(`${e2.location.column}`) + nl + line.red + nl);
-    }
-  }
-  if (e2.stack) {
-    stderr.push(line.red + redBright("STACK:") + nl + line.red + nl);
-    const stack2 = cleanStack(e2.stack, { pretty: true, basePath: bundle.cwd });
-    const lines = wrapAnsi(stack2, process.stdout.columns - 5).split(nl);
-    while (lines.length !== 0) {
-      const line2 = lines.shift();
-      if (line2.trim().length > 0)
-        stderr.push(reset(line.red + line2));
-    }
-  }
-  if (e2.throw) {
-    throw log(stderr.join(nil));
-  } else {
-    log(stderr.join(nl));
-  }
 }
 
 // src/log/errors.ts
@@ -3636,7 +3592,7 @@ function process5(name, time2) {
 }
 function transform(message2) {
   if (!bundle.mode.build)
-    log(suffix("whiteBright", "transfrom", message2));
+    log(suffix("whiteBright", "transform", message2));
 }
 function retrying(file, theme) {
   log(suffix("orange", "retrying", `${file} \u2192 ${theme.target} ${gray(`~ ${theme.store}`)}`));
@@ -3645,7 +3601,7 @@ function deleted(file, theme) {
   log(suffix("blueBright", "deleted", `${file} \u2192 ${theme.target} ${gray(`~ ${theme.store}`)}`));
 }
 function minified(kind, before, after, saved) {
-  const suffix2 = `${bold(kind)} ${arrow} ${before} > ${after} ${gray(`~ saved ${saved}`)}`;
+  const suffix2 = `${bold(kind)} ${arrow}${before} > ${after} ${gray(`~ saved ${saved}`)}`;
   log(suffix("whiteBright", "minified", suffix2));
 }
 function reloaded(path2, time2) {
@@ -4128,9 +4084,9 @@ function lastPath(path2) {
   const ender = dir.lastIndexOf("/") + 1;
   return dir.slice(ender);
 }
-function parentPath2(path2) {
+function parentPath(path2) {
   if (isArray(path2))
-    return path2.map(parentPath2);
+    return path2.map(parentPath);
   const last2 = path2.lastIndexOf("/");
   if (last2 === -1)
     return path2;
@@ -4226,7 +4182,7 @@ function style(file) {
     if (config.snippet) {
       file.output = path$1.join(bundle.dirs.output, file.key);
     } else {
-      file.output = path$1.join(parentPath2(file.output), file.config.rename);
+      file.output = path$1.join(parentPath(file.output), file.config.rename);
     }
   }
   return file;
@@ -4248,7 +4204,7 @@ function script(file) {
     if (config.snippet) {
       file.output = path$1.join(bundle.dirs.output, file.key);
     } else {
-      file.output = path$1.join(parentPath2(file.output), config.rename);
+      file.output = path$1.join(parentPath(file.output), config.rename);
     }
   }
   return file;
@@ -4268,6 +4224,21 @@ function section(file) {
 }
 
 // src/process/files.ts
+function renameFile({ name, dir, ext, namespace }, rename) {
+  let newName = rename;
+  if (/\[dir\]/.test(newName))
+    newName = newName.replace(/\[dir\]/g, dir);
+  if (/\[file\]/.test(newName))
+    newName = newName.replace(/\[file\]/g, name);
+  if (/\[ext\]/.test(newName))
+    newName = newName.replace(/\[ext\]/g, ext);
+  if (namespace === "snippets" && rename.endsWith(".liquid") === false)
+    return newName + ".liquid";
+  if (!rename.endsWith(".[ext]") || !rename.endsWith(ext)) {
+    return /\.[a-z]+$/.test(rename) ? newName : newName + ext;
+  }
+  return newName;
+}
 function setFile(file, input, output) {
   return (namespace, type2, kind) => {
     let key;
@@ -4726,7 +4697,7 @@ function pluginWatch(transform3) {
           if (/^[./]/.test(args.path)) {
             if (args.importer !== nil) {
               const [path2] = glob2__default["default"].sync(".*", {
-                cwd: path$1.join(parentPath2(args.importer), args.path)
+                cwd: path$1.join(parentPath(args.importer), args.path)
               });
               if (isString(path2) && !paths.has(path2)) {
                 if (!processor.esbuild.loaded) {
@@ -5191,66 +5162,127 @@ async function getFile(path2) {
   const svg2 = await fsExtra.readFile(path2);
   return [
     path2,
-    svg2.toString()
+    svg2.toString(),
+    byteSize(svg2)
   ];
 }
 function getSprite(sprite) {
   return new Promise(function(resolve2, reject) {
-    const svgs = [];
-    sprite.compile((error3, svg2) => {
-      if (error3)
-        return reject(error3);
+    sprite.compile((error2, svg2) => {
+      if (error2)
+        return reject(error2);
       for (const m in svg2)
         for (const p in svg2[m])
-          svgs.push(svg2[m][p].contents.toString());
-      resolve2(svgs);
+          resolve2(svg2[m][p].contents.toString());
     });
   });
 }
-async function compileSprite(file, request2, cb) {
-  const { config } = file;
-  const options2 = config.sprite === true ? processor.sprite : config.sprite;
-  const sprite = new SVGSprite(options2);
-  const svgs = await mapFastAsync(getFile, toArray(config.input)).catch(
-    errors_exports.write("Error reading an SVG file", {
-      file: file.base,
-      source: file.relative
-    })
-  );
-  if (svgs) {
-    for (const [path2, svg2] of svgs)
-      sprite.add(path2, null, svg2);
-    const files = await getSprite(sprite);
-    for (const file2 of files) {
-      await fsExtra.writeFile(file2);
+function compileSprite(context2, request2, cb) {
+  async function run2(config) {
+    const file = assign({}, context2);
+    if (bundle.mode.watch)
+      start();
+    file.kind = "SVG Sprite" /* Sprite */;
+    if (config.snippet) {
+      file.namespace = "snippets";
+      file.key = path$1.join("snippets", renameFile(file, config.rename));
+      file.output = path$1.join(bundle.dirs.output, file.key);
+    } else {
+      file.key = path$1.join("assets", renameFile(file, config.rename));
+      file.output = path$1.join(bundle.dirs.output, file.key);
+    }
+    const options2 = config.sprite === true ? processor.sprite.config : config.sprite;
+    const sprite = new SVGSprite(options2);
+    const svgs = await mapFastAsync(getFile, toArray(config.input)).catch(
+      errors_exports.write("Error reading an SVG file", {
+        file: file.base,
+        source: file.relative
+      })
+    );
+    if (svgs) {
+      file.size = 0;
+      for (const [path2, svg2, size2] of svgs) {
+        sprite.add(path2, null, svg2);
+        file.size = file.size + size2;
+      }
+      const content = await getSprite(sprite);
+      loggers_exports.process(`${bold("SVG Sprite")} ${arrow}${svgs.length} ${plural("SVG", svgs.length)}`, stop());
+      await fsExtra.writeFile(file.output, content).catch(
+        errors_exports.write("Error writing SVG Sprite", {
+          file: file.key,
+          caller: context2.relative
+        })
+      );
+      const size = fileSize(content, file.size);
+      if (size.isSmaller) {
+        loggers_exports.transform(`${file.kind} ${size.before} \u2192 gzip ${size.gzip}`);
+      } else {
+        loggers_exports.minified(file.kind, size.before, size.after, size.saved);
+      }
+      loggers_exports.syncing(file.key);
+      await request2("put", file, content);
     }
   }
+  return run2;
 }
-async function compile7(file, request2, cb) {
-  if (isArray(file.config)) {
-    for (const config of file.config) {
-      if (config.snippet) {
-        file.namespace = "snippets";
-        file.key = path$1.join("snippets", config.rename);
+function compileInline(context2, request2, cb) {
+  const file = assign({}, context2);
+  async function run2(config) {
+    if (bundle.mode.watch)
+      start();
+    if (config.snippet) {
+      file.namespace = "snippets";
+      file.key = path$1.join("snippets", renameFile(file, config.rename));
+      file.output = path$1.join(bundle.dirs.output, file.key);
+    } else {
+      file.key = path$1.join("assets", renameFile(file, config.rename));
+      file.output = path$1.join(bundle.dirs.output, file.key);
+    }
+    const options2 = config.svgo === true ? processor.svgo : config.svgo;
+    const read = await fsExtra.readFile(file.input);
+    file.size = byteSize(read);
+    const svg2 = svgo.optimize(read.toString(), options2);
+    if (bundle.mode.watch)
+      loggers_exports.process(bold("SVGO"), stop());
+    if (svg2.error) {
+      loggers_exports.err(svg2.error);
+      return null;
+    }
+    const { data } = svg2;
+    if (!bundle.mode.build) {
+      const size = fileSize(data, file.size);
+      if (size.isSmaller) {
+        loggers_exports.transform(`${file.kind} ${size.before} \u2192 gzip ${size.gzip}`);
       } else {
-        file.key = path$1.join("assets", config.rename);
-      }
-      if (file.config.rename !== path$1.basename(file.output)) {
-        if (config.snippet) {
-          file.output = path$1.join(bundle.dirs.output, file.key);
-        } else {
-          file.output = path$1.join(parentPath(file.output), file.config.rename);
-        }
-      }
-      if (config.format === "sprite") {
-        file.kind = "SVG Sprite" /* Sprite */;
-        await compileSprite(file);
+        loggers_exports.minified(file.kind, size.before, size.after, size.saved);
       }
     }
-  } else if (isObject(file.config)) {
-    const { config } = file;
+    await fsExtra.writeFile(file.output, data).catch(
+      errors_exports.write("Error writing SVG", {
+        file: file.key,
+        caller: context2.relative
+      })
+    );
+    loggers_exports.syncing(file.key);
+    await request2("put", file, data);
+  }
+  return run2;
+}
+async function compile7(file, request2, cb) {
+  if (bundle.mode.watch)
+    start();
+  const sprite = compileSprite(file, request2);
+  const inline = compileInline(file, request2);
+  const length = file.config.length;
+  for (let i = 0; i < length; i++) {
+    const config = file.config[i];
+    if (i > 0)
+      loggers_exports.changed(file);
     if (config.format === "sprite") {
-      return compileSprite(config);
+      await sprite(config);
+    }
+    if (config.format === "file") {
+      await inline(config);
     }
   }
 }
@@ -5789,15 +5821,15 @@ var setViewOptions = (config) => {
   }
 };
 function setJsonOptions(config) {
-  if (!has("json", config.transforms))
+  if (!has("json", config.processors))
     return;
-  const { json } = config.transforms;
+  const { json } = config.processors;
   if (!isObject(json))
     unknownError("json", json);
   for (const option in json) {
     if (option === "indent") {
       if (isNumber(json[option])) {
-        bundle.json[option] = json[option];
+        processor.json[option] = json[option];
         continue;
       } else {
         typeError("json", option, json[option], "number");
@@ -5805,7 +5837,7 @@ function setJsonOptions(config) {
     }
     if (option === "useTab") {
       if (isBoolean(json[option])) {
-        bundle.json[option] = json[option];
+        processor.json[option] = json[option];
         continue;
       } else {
         typeError("json", option, json[option], "boolean");
@@ -5814,7 +5846,7 @@ function setJsonOptions(config) {
     if (option === "exclude") {
       const exclude = isString(json[option]) ? [json[option]] : json[option];
       if (isArray(exclude)) {
-        bundle.json[option] = anymatch3__default["default"](exclude);
+        processor.json[option] = anymatch3__default["default"](exclude);
         continue;
       } else {
         typeError("exclude", option, exclude[option], "string | string[]");
@@ -5865,7 +5897,7 @@ async function readConfigFile(filename) {
     return null;
   }
 }
-function renameFile(src, rename) {
+function renameFile2(src, rename) {
   let name = rename;
   const dir = lastPath(src);
   const ext = path$1.extname(src);
@@ -5990,6 +6022,7 @@ function getTransform(transforms, opts) {
           {
             input: paths2,
             snippet: false,
+            rename: "[name].[ext]",
             match
           }
         ];
@@ -6004,12 +6037,17 @@ function getTransform(transforms, opts) {
       });
       if (paths2) {
         if (opts.flatten) {
-          return paths2.map((input) => ({ input, snippet: false }));
+          return paths2.map((input) => ({
+            input,
+            rename: path$1.basename(input),
+            snippet: false
+          }));
         } else {
           return [
             {
               input: paths2,
               snippet: false,
+              rename: "[name].[ext]",
               match
             }
           ];
@@ -6026,56 +6064,47 @@ function getTransform(transforms, opts) {
           return globPath(watch2);
         });
         option.match = match;
-        if (paths2)
-          option.input = paths2;
-        if (!has("snippet", option))
+        option.input = paths2;
+        if (!has("snippet", option)) {
           option.snippet = false;
+        }
+        if (!has("rename", option)) {
+          option.rename = option.snippet ? "[name].liquid" : "[name].[ext]";
+        }
         return option;
       });
     }
   } else if (isObject(transforms)) {
     const config = [];
-    for (const prop2 in transforms) {
-      const o2 = { snippet: prop2.startsWith("snippets/") };
-      const asset = prop2.startsWith("assets/");
-      const option = transforms[prop2];
-      const rename = asset || o2.snippet;
-      if (isString(option)) {
-        if (rename)
-          o2.rename = asset ? prop2.slice(7) : prop2.slice(9);
-        const { paths: paths2, match } = getResolvedPaths(option, (watch2) => {
-          if (opts.addWatch)
-            bundle.watch.add(watch2);
-          return globPath(watch2);
-        });
-        if (paths2) {
-          if (opts.flatten) {
-            for (const input of paths2)
-              config.push(assign({}, o2, { input }));
-          } else {
-            config.push(assign({}, o2, { input: paths2, match }));
-          }
-        }
-      } else if (isObject(option)) {
-        if (!has("input", option)) {
-          invalidError("tranform", prop2, option, "{ input: string | string[] }");
-        }
-        const { paths: paths2, match } = getResolvedPaths(option.input, (watch2) => {
-          if (opts.addWatch)
-            bundle.watch.add(watch2);
-          return globPath(watch2);
-        });
-        if (paths2) {
-          const merge = rename ? assign({}, option, o2, { rename: asset ? prop2.slice(7) : prop2.slice(9) }) : assign({}, o2, option);
-          if (opts.flatten) {
-            for (const input of paths2)
-              config.push(assign(merge, { input }));
-          } else {
-            config.push(assign(merge, { input: paths2, match }));
-          }
-        }
-      } else if (isArray(option)) {
-        if (option.every(isString)) {
+    if (has("input", transforms)) {
+      const { paths: paths2, match } = getResolvedPaths(transforms.input, (watch2) => {
+        if (opts.addWatch)
+          bundle.watch.add(watch2);
+        return globPath(watch2);
+      });
+      if (!has("snippet", transforms)) {
+        transforms.snippet = false;
+      }
+      if (!has("rename", transforms)) {
+        transforms.rename = transforms.snippet ? "[name].liquid" : "[name].[ext]";
+      }
+      if (opts.flatten) {
+        for (const input of paths2)
+          config.push(assign(transforms, { input }));
+      } else {
+        transforms.input = paths2;
+        transforms.match = match;
+        config.push(transforms);
+      }
+    } else {
+      for (const prop2 in transforms) {
+        const o2 = { snippet: prop2.startsWith("snippets/") };
+        const asset = prop2.startsWith("assets/");
+        const option = transforms[prop2];
+        const rename = asset || o2.snippet;
+        if (isString(option)) {
+          if (rename)
+            o2.rename = asset ? prop2.slice(7) : prop2.slice(9);
           const { paths: paths2, match } = getResolvedPaths(option, (watch2) => {
             if (opts.addWatch)
               bundle.watch.add(watch2);
@@ -6084,13 +6113,47 @@ function getTransform(transforms, opts) {
           if (paths2) {
             if (opts.flatten) {
               for (const input of paths2)
-                config.push(assign({}, o2, option, { input }));
+                config.push(assign({}, o2, { input }));
             } else {
-              config.push(assign({}, o2, option, { input: paths2, match }));
+              config.push(assign({}, o2, { input: paths2, match }));
             }
           }
-        } else {
-          typeError("transform", prop2, option, "string[]");
+        } else if (isObject(option)) {
+          if (!has("input", option)) {
+            invalidError("tranform", prop2, option, "{ input: string | string[] }");
+          }
+          const { paths: paths2, match } = getResolvedPaths(option.input, (watch2) => {
+            if (opts.addWatch)
+              bundle.watch.add(watch2);
+            return globPath(watch2);
+          });
+          if (paths2) {
+            const merge = rename ? assign({}, option, o2, { rename: asset ? prop2.slice(7) : prop2.slice(9) }) : assign({}, o2, option);
+            if (opts.flatten) {
+              for (const input of paths2)
+                config.push(assign(merge, { input }));
+            } else {
+              config.push(assign(merge, { input: paths2, match }));
+            }
+          }
+        } else if (isArray(option)) {
+          if (option.every(isString)) {
+            const { paths: paths2, match } = getResolvedPaths(option, (watch2) => {
+              if (opts.addWatch)
+                bundle.watch.add(watch2);
+              return globPath(watch2);
+            });
+            if (paths2) {
+              if (opts.flatten) {
+                for (const input of paths2)
+                  config.push(assign({}, o2, option, { input }));
+              } else {
+                config.push(assign({}, o2, option, { input: paths2, match }));
+              }
+            }
+          } else {
+            typeError("transform", prop2, option, "string[]");
+          }
         }
       }
     }
@@ -6105,7 +6168,7 @@ function getModules2(pkg, name) {
     has("optionalDependencies", pkg) && has(name, pkg.peerDependencies)
   );
 }
-function renameFile2(src, rename) {
+function renameFile3(src, rename) {
   let name = rename;
   const dir = lastPath(src);
   const ext = path$1.extname(src);
@@ -6178,7 +6241,7 @@ async function setScriptOptions(config, pkg) {
     };
     const build3 = assign({ entryPoints: [transform3.input] }, esbuild3.config);
     const esb = esboptions(transform3);
-    const { name } = renameFile2(transform3.input, transform3.rename);
+    const { name } = renameFile3(transform3.input, transform3.rename);
     if (!name.endsWith(".js") && !name.endsWith(".mjs")) {
       o2.rename = name + ".js";
     } else if (name.endsWith(".cjs")) {
@@ -6338,11 +6401,11 @@ async function setStyleConfig(config, pkg) {
         warn2("Input is not a sass file", compile8.input);
       }
     }
-    let rename = renameFile(style2.rename);
+    let rename = renameFile2(style2.rename);
     if (has("rename", style2) && !isNil(style2)) {
       if (!isString(style2.rename))
         typeError("styles", "rename", style2.rename, "string");
-      rename = renameFile(compile8.input, style2.rename);
+      rename = renameFile2(compile8.input, style2.rename);
       if (!/[a-zA-Z0-9_.-]+/.test(rename.name))
         typeError("sass", "rename", rename, "Invalid rename augment");
       if (rename.name.endsWith(".css")) {
@@ -6472,7 +6535,7 @@ async function setSvgOptions(config, pkg) {
           ].join(nl));
         } else if (svgo2.installed && !sprite.installed) {
           o2.format = "file";
-          o2.sprite = true;
+          o2.svgo = true;
         } else if (sprite.installed && !svgo2.installed) {
           o2.format = "sprite";
           o2.sprite = true;
@@ -6496,6 +6559,7 @@ async function setSvgOptions(config, pkg) {
         invalidError("transform > svg", "format", svg2.format, '"sprite" | "file"');
       }
     }
+    console.log(o2);
     bundle.svg.push(o2);
   }
 }

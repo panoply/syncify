@@ -284,7 +284,7 @@ export function process (name: string, time: string) {
  */
 export function transform (message: string) {
 
-  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'transfrom', message));
+  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'transform', message));
 
 };
 
@@ -317,7 +317,7 @@ export function deleted (file: string, theme: Theme) {
  */
 export function minified (kind: string, before: string, after: string, saved: string) {
 
-  const suffix = `${c.bold(kind)} ${c.arrow} ${before} > ${after} ${c.gray(`~ saved ${saved}`)}`;
+  const suffix = `${c.bold(kind)} ${c.arrow}${before} > ${after} ${c.gray(`~ saved ${saved}`)}`;
 
   log(tui.suffix('whiteBright', 'minified', suffix));
 
