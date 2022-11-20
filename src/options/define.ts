@@ -20,7 +20,7 @@ import { setStyleConfig } from '~options/style';
 import { setSvgOptions } from '~options/svgs';
 import { setMinifyOptions } from '~options/minify';
 import { authURL } from '~options/utilities';
-import { PATH_KEYS, HOT_SNIPPET, CACHE_DIRS } from '~const';
+import { PATH_KEYS, HOT_SNIPPET } from '~const';
 import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError } from '~log/validate';
 import { log } from '~log';
 import { bundle, cache, processor, plugins, options } from '~config';
@@ -61,7 +61,6 @@ export async function define (cli: Commands, _options?: Config) {
     setStores(cli, options),
     setPaths(options),
     setProcessors(options),
-    setMinifyOptions(options),
     setViewOptions(options),
     setJsonOptions(options),
     setScriptOptions(options, pkg),
@@ -69,6 +68,7 @@ export async function define (cli: Commands, _options?: Config) {
     setSvgOptions(options, pkg),
     setSpawns(options, bundle),
     setPlugins(options, bundle),
+    setMinifyOptions(options),
     setHotReloads(options)
   ]).catch(e => {
 
@@ -76,7 +76,7 @@ export async function define (cli: Commands, _options?: Config) {
 
   });
 
-  // log.start(bundle);
+  log.start(bundle);
 
   return promise;
 
@@ -371,14 +371,6 @@ async function setCaches (cwd: string) {
   const has = await pathExists(map);
 
   if (!has) return setCacheDirs(dir);
-
-  let P: number = 0;
-
-  while (P < CACHE_DIRS.length) {
-    const exists = await pathExists(join(dir, CACHE_DIRS[P]));
-    if (!exists) return setCacheDirs(dir);
-    P = P + 1;
-  }
 
   bundle.dirs.cache = `${dir}/`;
   const read = await readJson(map);
