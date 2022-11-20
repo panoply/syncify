@@ -10,7 +10,7 @@ import { assign, defineProperty, isArray, isObject } from '~utils/native';
 import { getTSConfig } from './files';
 import { bundle, processor } from '~config';
 import { load, pluginWatch, pluginPaths, esbuild as runtime } from '~transform/script';
-import { log } from '~log';
+// import { log } from '~log';
 
 /**
  * Script Transform
@@ -111,7 +111,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       for (const prop in esb) {
 
         if (prop === 'entryPoints') {
-          warn('Option is not allowed, use Syncify input instead', prop);
+          warn('Option is not allowed, use Syncify "input" instead', prop);
         } else if (prop === 'outdir') {
           warn('Option is not allowed, Syncify will handle output', prop);
         } else if (prop === 'watch') {
@@ -139,15 +139,28 @@ export async function setScriptOptions (config: Config, pkg: Package) {
 
     // Lets run a pre-build to obtain all the entry points
     // of script imports. We will use this in watch process
-    const entries: ESBuildConfig = assign({}, isObject(transform.esbuild) ? transform.esbuild : esbuild.config, {
-      entryPoints: [ transform.input ],
-      write: false,
-      watch: false,
-      incremental: true,
-      // logLevel: 'silent',
-      absWorkingDir: bundle.cwd,
-      plugins: []
-    }) as unknown;
+    const entries: ESBuildConfig = assign(
+      {},
+      isObject(transform.esbuild)
+        ? transform.esbuild
+        : esbuild.config,
+      {
+        entryPoints: [ transform.input ],
+        write: false,
+        watch: false,
+        incremental: true,
+        sourcemap: false,
+        // logLevel: 'silent',
+        absWorkingDir: bundle.cwd,
+        plugins: [],
+        outdir: transform.snippet
+          ? join(bundle.dirs.output, 'snippets')
+          : join(bundle.dirs.output, 'assets'),
+        loader: {
+          '.liquid': 'file'
+        }
+      }
+    ) as unknown;
 
     if (esbuild.tsconfig !== null && hasPath('compilerOptions.paths', esbuild.tsconfig)) {
       entries.plugins.push(pluginPaths(transform), pluginWatch(transform));
@@ -162,7 +175,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     } catch (e) {
 
       // TODO - HANDLE RUNTIME ERRORS
-      log.err(e.errors);
+      console.error(e);
 
     }
 
