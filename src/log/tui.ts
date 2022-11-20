@@ -201,7 +201,7 @@ export function sample (code: string, data: {
 
   }
 
-  return line + nl + line + code + nl;
+  return line + nl + line + code;
 
 }
 
@@ -231,7 +231,7 @@ export function indent (message: string | string[], ansi: {
     }
   }
 
-  return output.trimEnd();
+  return output;
 
 }
 
@@ -260,9 +260,7 @@ export function context (data: {
 }) {
 
   let space: number = 0;
-  let output: string = nl;
-
-  output += c.line.red + nl;
+  let output: string = c.line.red + nl;
 
   for (const key in data.entries) {
     if (space < key.length) space = key.length;
