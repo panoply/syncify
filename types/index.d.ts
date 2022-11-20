@@ -15,6 +15,7 @@ export * from './misc/markdown';
 export * from './misc/requests';
 export * from './misc/shared';
 export * from './misc/errors';
+export * from './misc/modes';
 export * from './transforms/image';
 export * from './transforms/json';
 export * from './transforms/script';
