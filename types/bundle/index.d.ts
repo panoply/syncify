@@ -409,7 +409,7 @@ export interface Bundle {
   /**
    * Section handling
    */
-  snippet: Merge<Views['snippets'], { global: RegExp }>;
+  snippet: Merge<Views['snippets'], { global: RegExp; }>;
   /**
    * Section handling
    */
