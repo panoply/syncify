@@ -1,7 +1,7 @@
 import { IPurchase, ISession } from '../types/export';
 import * as pjax from 'spx';
 import { Controller } from 'application/controller';
-import * as api from 'components/cart/api';
+import * as api from 'cart/api';
 import * as customer from 'application/customer';
 import * as currency from 'application/currency';
 

@@ -2,37 +2,31 @@ import { defineConfig } from '@syncify/cli';
 import autoprefix from 'autoprefixer';
 
 export default defineConfig({
-  hot: true,
+  clean: true,
   input: 'src',
   output: 'theme',
   stores: {
     domain: 'syncify',
     themes: {
-      custom: 129457717489
+      dev: 129457717489
     }
   },
   paths: {
     config: 'data/settings/*',
     locales: 'data/translations/*',
     metafields: 'data/metafields/**/*',
-    layout: 'theme.liquid',
+    layout: 'views/*.liquid',
     pages: 'views/pages/*',
     customers: 'views/customer/*',
     templates: 'views/*',
     snippets: 'views/snippets/*',
-    assets: [
-      'assets/images/*',
-      'assets/fonts/*'
-    ],
-    sections: [
-      'views/layout/*',
-      'views/sections/**/*'
-    ]
+    assets: [ 'assets/images/*', 'assets/fonts/*' ],
+    sections: [ 'views/layout/*', 'views/sections/**/*' ]
   },
   transforms: {
     script: {
-      'assets/bundle.min.js': 'script/bundle.ts',
-      'snippets/i18n.liquid': 'script/i18n.ts'
+      'assets/bundle.min.js': 'scripts/bundle.ts',
+      'snippets/i18n.liquid': 'scripts/vars.js.liquid'
     },
     svg: {
       'snippets/icons.liquid': 'assets/icons/*.svg'
@@ -40,17 +34,13 @@ export default defineConfig({
     style: {
       'assets/stylesheet.min.css': {
         input: 'styles/stylesheet.scss',
-        postcss: true,
         sass: true,
-        watch: [
-          'styles/components/*',
-          'styles/mixins/*'
-        ]
+        watch: [ 'styles/components/*', 'styles/mixins/*' ]
       },
       'snippets/css.liquid': {
         input: 'styles/vars.css.liquid',
         postcss: false,
-        sass: false
+        sass: true
       }
     }
   },
@@ -58,9 +48,7 @@ export default defineConfig({
     sections: {
       prefixDir: true,
       separator: '-',
-      global: [
-        'index'
-      ]
+      global: [ 'index' ]
     },
     pages: {
       language: 'markdown',
@@ -68,21 +56,16 @@ export default defineConfig({
     }
   },
   processors: {
-    tsup: {
-      platform: 'browser',
-      splitting: false,
-      treeshake: 'smallest',
-      format: [
-        'esm'
-      ]
+    esbuild: {
+      format: 'esm',
+      bundle: true,
+      sourcemap: true
     },
     sprite: {
       svg: {
         dimensionAttributes: true,
-        namespaceClassnames: true,
         namespaceIDs: true,
         rootAttributes: {
-          id: 'icons',
           class: 'd-none'
         }
       }
@@ -90,9 +73,7 @@ export default defineConfig({
     sass: {
       sourcemap: true,
       style: 'compressed',
-      includePaths: [
-        'node_modules'
-      ]
+      include: [ 'node_modules' ]
     },
     postcss: [
       autoprefix()

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { Controller } from 'application/controller';
-import { api, cart } from 'components/cart';
+import { api, cart } from 'cart/index';
 
 export class Cart extends Controller {
 

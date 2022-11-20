@@ -1,0 +1,95 @@
+{
+  "version": 1.1,
+  "globalAttributes": [
+    {
+      "name": "data-sticky-use-parent-value",
+      "description": "Uses the parent element as the sticky selector, this is a project specific option that is unrelated to stickybits. When `true` then `this.element.parentElement` will be used as selector.",
+      "valueSet": "boolean"
+    },
+    {
+      "name": "data-sticky-offset-value",
+      "description": "By default, an element will have a 0px sticky layout top offset. This means that the element will stick flush to the top of the viewport. This will control the offset of stick."
+    },
+    {
+      "name": "data-sticky-breakpoint-value",
+      "description": "The screen max-width viewport breakpoint the sticky element should operate. If the screen width is is less than the viewport defined here then the sticky will either disconnect or not initialize.",
+      "valueSet": "breakpoint"
+    },
+    {
+      "name": "data-sticky-no-styles-value",
+      "description": "Apply the sticky without inline styles except for `position: sticky` or `position: fixed;`",
+      "valueSet": "boolean"
+    },
+    {
+      "name": "data-sticky-bottom-value",
+      "description": "Stick elements stick to the bottom. The default is to stick to the top.",
+      "valueSet": "boolean"
+    },
+    {
+      "name": "data-sticky-bounding-value",
+      "description": "Disabled use of `offsetTop`. This feature is optimal when dealing with things like CSS calc which can throw off `offsetTop` calculations. Read more about this functionality [here](https://muffinman.io/blog/javascript-get-element-offset/)",
+      "valueSet": "boolean"
+    },
+    {
+      "name": "data-sticky-use-fixed-value",
+      "description": "Disabled the use of `position: sticky` and instead uses `position: fixed`",
+      "valueSet": "boolean"
+    },
+    {
+      "name": "data-sticky-scroll-element-value",
+      "description": "Stickies will use `window` as scroll element. You can define a different scroll element here by providing the selector to use besides `window`."
+    },
+    {
+      "name": "data-sticky-parent-class",
+      "description": "Apply a custom CSS to the parent element"
+    },
+    {
+      "name": "data-sticky-sticky-class",
+      "description": "Apply a custom CSS to the sticky element"
+    },
+    {
+      "name": "data-sticky-stuck-class",
+      "description": "Apply a custom CSS to the stuck element"
+    }
+  ],
+  "valueSets": [
+    {
+      "name": "boolean",
+      "values": [
+        {
+          "name": "true",
+          "description": "Enabled"
+        },
+        {
+          "name": "false",
+          "description": "Disabled"
+        }
+      ]
+    },
+    {
+      "name": "breakpoint",
+      "values": [
+        {
+          "name": "xs",
+          "description": "Visible until the `xs` viewport screen width."
+        },
+        {
+          "name": "sm",
+          "description": "Visible until the `sm` viewport screen width."
+        },
+        {
+          "name": "md",
+          "description": "Visible until the `md` viewport screen width."
+        },
+        {
+          "name": "lg",
+          "description": "Visible until the `lg` viewport screen width."
+        },
+        {
+          "name": "xl",
+          "description": "Visible until the `xl` viewport screen width."
+        }
+      ]
+    }
+  ]
+}

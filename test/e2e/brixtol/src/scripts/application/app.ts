@@ -17,7 +17,7 @@ function gtag (...args: any[]) {
 
 }
 
-export function app ({ targets, screens, controllers }) {
+export function brixtol ({ targets, screens, controllers }) {
 
   /**
    * spx Connection

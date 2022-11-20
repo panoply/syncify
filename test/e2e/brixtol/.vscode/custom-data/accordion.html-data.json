@@ -1,0 +1,50 @@
+{
+  "version": 1.1,
+  "globalAttributes": [
+    {
+      "name": "data-accordion-multiple-value",
+      "description": "Whether or not multiple folds can be expanded. This will allow the use to control what folds are collapsed and expanded.",
+      "valueSet": "boolean"
+    },
+    {
+      "name": "data-accordion-persist-value",
+      "description": "Whether or not to persist a fold. This will prevent the accordion from collapsing all folds, keeping one expanded.",
+      "valueSet": "boolean"
+    },
+    {
+      "name": "data-accordion-expanded-class",
+      "description": "The expanded class name which is added to buttons and folds upon being expanded, ie: transition end"
+    },
+    {
+      "name": "data-accordion-focused-class",
+      "description": "The focused class name which is added to buttons and folds that are in focus."
+    },
+    {
+      "name": "data-accordion-disabled-class",
+      "description": "The focused class name which is added to buttons and folds that are disabled."
+    },
+    {
+      "name": "data-accordion-initial-class",
+      "description": "The class to use for loaded folds in an opened state. Applies on button elements, it will expand folds at runtime."
+    },
+    {
+      "name": "data-accordion-opened-class",
+      "description": "The opened class name which is added to buttons and folds upon being opened."
+    }
+  ],
+  "valueSets": [
+    {
+      "name": "boolean",
+      "values": [
+        {
+          "name": "true",
+          "description": "Enabled"
+        },
+        {
+          "name": "false",
+          "description": "Disabled"
+        }
+      ]
+    }
+  ]
+}

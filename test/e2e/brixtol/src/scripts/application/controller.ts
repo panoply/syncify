@@ -1,5 +1,5 @@
 import { Controller as BaseController, Application } from '@hotwired/stimulus';
-import { Shared } from '../types/export';
+import { Shared } from 'types/export';
 
 export class Controller extends BaseController implements Shared {
 

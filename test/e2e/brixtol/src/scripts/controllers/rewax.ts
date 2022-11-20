@@ -1,6 +1,6 @@
 import { Controller } from '../application/controller';
 import { IRewaxing } from '../types/export';
-import * as api from '../components/cart/api';
+import * as api from 'cart/api';
 
 export interface Rewaxing extends IRewaxing {
   checkoutTarget: HTMLElement,
@@ -19,11 +19,6 @@ export class Rewaxing extends Controller {
   get carousel () {
 
     return this.controller('carousel', 'rewaxing-products');
-
-
-
-
-
 
   }
 

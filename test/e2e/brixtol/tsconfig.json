@@ -1,33 +1,51 @@
 {
-  "exclude": [
-    "node_modules/**/*",
-    "dist"
+  "exclude": ["node_modules", "package", "test", "build"],
+  "include": [
+    "src/scripts/types/export.d.ts",
+    "src/scripts/types/*.ts",
+    "src/scripts/modules/*.ts",
+    "src/scripts/components/*",
+    "src/scripts/components/cart/*.ts",
+    "src/scripts/components/product/*.ts",
+    "src/scripts/components/collection/*.ts",
+    "src/scripts/controllers/*.ts",
+    "src/scripts/application/toast.ts",
+    "src/scripts/bundle.ts"
   ],
-  "include": ["src/scripts/**/*.ts"],
-  "typeAcquisition": {
-    "enable": true,
-    "include": ["node"]
-  },
   "compilerOptions": {
-    "types": ["node"],
-    "incremental": true,
     "target": "ES6",
-    "removeComments": true,
-    "lib": ["es2020", "DOM"],
+    "lib": ["es2020", "dom", "dom.iterable"],
     "module": "ESNext",
-    "alwaysStrict": true,
-    "allowUmdGlobalAccess": true,
-    "experimentalDecorators": true,
+    "allowUnreachableCode": true,
+    "checkJs": false,
+    "allowJs": true,
+    "incremental": true,
+    "outDir": "theme/assets",
+    "declaration": false,
+    "preserveSymlinks": true,
     "allowSyntheticDefaultImports": true,
-    "importsNotUsedAsValues": "remove",
+    "keyofStringsOnly": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "preserveSymlinks": true,
-    "skipDefaultLibCheck": false,
     "moduleResolution": "node",
-    "noEmitOnError": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": true,
-    "pretty": true
+    "noImplicitThis": false,
+    "skipDefaultLibCheck": true,
+    "noStrictGenericChecks": true,
+    "noEmit": true,
+    "suppressExcessPropertyErrors": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "baseUrl": ".",
+    "pretty": true,
+    "typeRoots": ["node_modules/@types"],
+    "paths": {
+      "types/*": ["src/scripts/types/*.ts"],
+      "application/*": ["src/scripts/application/*.ts"],
+      "components/*": ["src/scripts/components/*.ts"],
+      "cart/*": ["src/scripts/components/cart/*.ts"],
+      "controllers/*": ["src/scripts/controllers/*.ts"],
+      "utils/*": ["src/scripts/utils/*.ts"],
+      "modules/*": ["src/scripts/modules/*.ts"]
+    }
   }
 }

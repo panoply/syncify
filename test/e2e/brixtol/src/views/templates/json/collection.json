@@ -1,0 +1,12 @@
+{
+  "name": "Collection",
+  "wrapper": "main#main.container-fluid",
+  "sections": {
+    "products": {
+      "type": "products"
+    }
+  },
+  "order": [
+    "products"
+  ]
+}

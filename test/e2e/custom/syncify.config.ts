@@ -34,7 +34,12 @@ export default defineConfig({
     sections: {
       prefixDir: true,
       separator: '-',
-      global: ['layout', 'collection', 'product', 'index']
+      global: [
+        'layout',
+        'collection',
+        'product',
+        'index'
+      ]
     },
     pages: {
       language: 'markdown',

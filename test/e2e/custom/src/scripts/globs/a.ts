@@ -5,6 +5,7 @@ export class ClipboardController extends Controller {
   sourceTarget: any;
 
   copy() {
+
     this.dispatch('copy', {
       detail: { content: this.sourceTarget.value }
     });
