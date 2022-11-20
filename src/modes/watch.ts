@@ -14,7 +14,6 @@ import { Kind, parseFile, Type } from '~process/files';
 import { bundle } from '~config';
 import { log } from '~log';
 import { socket } from '~hot/server';
-import { event } from '~utils/utils';
 import { isNil } from 'rambdax';
 
 /**
@@ -36,9 +35,7 @@ export function watch (callback: Syncify) {
     ignored: [ '**/*.map' ]
   });
 
-  event.on('script:watch', (d) => { });
-
-  watcher.on('all', async function (event, path) {
+  watcher.on('all', function (event, path) {
 
     const file: File = parse(path);
 
@@ -46,92 +43,9 @@ export function watch (callback: Syncify) {
 
     if (file.type !== Type.Spawn) log.changed(file);
 
-    if ((event === 'change') || (event === 'add')) {
+    if (event === 'change' || event === 'add') {
 
-      try {
-
-        let value: Buffer | string | void | { title: any; body_html: any; } = null;
-
-        if (file.type === Type.Script) {
-
-          await script(file as File<ScriptTransform>, request.assets, callback);
-
-          if (bundle.mode.hot) wss.script(file.key);
-
-          return;
-
-        } else if (file.type === Type.Page) {
-
-          return pages(file as File<Pages>, callback);
-
-        } else if (file.type === Type.Svg) {
-
-          return svgs(file as File<SVGBundle>, request.assets, callback);
-
-        } else if (file.type === Type.Style) {
-
-          value = await styles(file as File<StyleTransform>, callback);
-
-          if (bundle.mode.hot) wss.stylesheet(file.key);
-
-        } else if (file.type === Type.Section) {
-
-          value = await liquid(file, callback);
-
-        } else if (file.type === Type.Layout) {
-
-          value = await liquid(file, callback);
-
-          if (bundle.hot) value = inject(value);
-
-        } else if (file.type === Type.Snippet) {
-
-          value = await liquid(file, callback);
-
-        } else if (file.type === Type.Locale || file.type === Type.Config) {
-
-          value = await json(file, callback);
-
-        } else if (file.type === Type.Metafield) {
-
-          value = await json(file, callback);
-
-          return request.metafields({ value, namespace: file.namespace, key: file.key });
-
-        } else if (file.type === Type.Template && file.kind === Kind.JSON) {
-
-          value = await json(file, callback);
-
-        } else if (file.type === Type.Template && file.kind === Kind.Liquid) {
-
-          value = await liquid(file, callback);
-
-        } else if (file.type === Type.Asset || file.type === Type.Spawn) {
-
-          value = await asset(file, callback);
-
-        }
-
-        if (!isNil(value)) {
-
-          log.syncing(file.key);
-
-          await request.assets('put', file, value);
-
-          if (bundle.mode.hot) {
-            if (file.type === Type.Section) {
-              wss.section(file.name);
-            } else if (file.type !== Type.Script && file.type !== Type.Style) {
-              await queue.onIdle().then(() => wss.replace());
-            }
-          }
-        }
-
-      } catch (e) {
-
-        log.err(e);
-
-      }
+      handler(file);
 
     } else if (event === 'unlink') {
 
@@ -144,5 +58,92 @@ export function watch (callback: Syncify) {
     }
 
   });
+
+  async function handler (file: File) {
+
+    try {
+
+      let value: Buffer | string | void | { title: any; body_html: any; } = null;
+
+      if (file.type === Type.Script) {
+
+        return script(file as File<ScriptTransform>, request.assets, wss, callback);
+
+      } else if (file.type === Type.Page) {
+
+        return pages(file as File<Pages>, callback);
+
+      } else if (file.type === Type.Svg) {
+
+        return svgs(file as File<SVGBundle[]>, request.assets, callback);
+
+      } else if (file.type === Type.Style) {
+
+        value = await styles(file as File<StyleTransform>, callback);
+
+        if (bundle.mode.hot) wss.stylesheet(file.key);
+
+      } else if (file.type === Type.Section) {
+
+        value = await liquid(file, callback);
+
+      } else if (file.type === Type.Layout) {
+
+        value = await liquid(file, callback);
+
+        if (bundle.hot) value = inject(value);
+
+      } else if (file.type === Type.Snippet) {
+
+        value = await liquid(file, callback);
+
+      } else if (file.type === Type.Locale || file.type === Type.Config) {
+
+        value = await json(file, callback);
+
+      } else if (file.type === Type.Metafield) {
+
+        value = await json(file, callback);
+
+        return request.metafields({ value, namespace: file.namespace, key: file.key });
+
+      } else if (file.type === Type.Template && file.kind === Kind.JSON) {
+
+        value = await json(file, callback);
+
+      } else if (file.type === Type.Template && file.kind === Kind.Liquid) {
+
+        value = await liquid(file, callback);
+
+      } else if (file.type === Type.Asset || file.type === Type.Spawn) {
+
+        value = await asset(file, callback);
+
+      }
+
+      if (!isNil(value)) {
+
+        log.syncing(file.key);
+
+        await request.assets('put', file, value);
+
+        if (bundle.mode.hot) {
+          if (file.type === Type.Section) {
+            wss.section(file.name);
+          } else if (file.type !== Type.Script && file.type !== Type.Style) {
+            await queue.onIdle().then(() => wss.replace());
+          }
+        }
+      }
+
+    } catch (e) {
+
+      log.err(e);
+
+      console.error(e);
+
+    }
+
+  }
 
 };
