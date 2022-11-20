@@ -38,7 +38,7 @@
       "types": ["./types/index.d.ts"],
       "~config": ["./src/config.ts"],
       "~const": ["./src/const.ts"],
-      "~process/*": ["src/process/*"],
+      "~process/*": ["./src/process/*"],
       "~cli/*": ["./src/cli/*"],
       "~options/*": ["./src/options/*"],
       "~transform/*": ["./src/transform/*"],
