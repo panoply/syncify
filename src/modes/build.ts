@@ -1,5 +1,5 @@
 import anymatch from 'anymatch';
-import { File, Syncify } from 'types';
+import { File, Syncify, BuildReport, BuildModeReport } from 'types';
 import glob from 'fast-glob';
 import { compile as assets } from '~transform/asset';
 import { compile as liquid } from '~transform/liquid';
@@ -10,24 +10,11 @@ import { compile as styles } from '~transform/styles';
 import { isUndefined, nil, toArray } from '~utils/native';
 import { parseFile, Type } from '~process/files';
 import { bundle } from '~config';
-import { log, line, gray } from '~log';
+import { log, line, gray, bold, newline } from '~log';
 import * as timer from '~utils/timer';
 import { mapAsync } from 'rambdax';
-import { fileSize } from '~utils/utils';
+import { fileSize, toUpcase } from '~utils/utils';
 import { lastPath } from '~utils/paths';
-
-type Files = {
-  name: string;
-  time: string;
-  output: string;
-  error: any[]
-  size?: {
-    before: string;
-    after: string;
-    saved: string;
-    gzip: string;
-  }
-}
 
 /**
  * Build Function
@@ -83,7 +70,7 @@ export async function build (callback?: Syncify) {
 
     return acc;
 
-  }, {
+  }, <{ [group: string]: BuildReport }>{
     styles: {
       time: nil,
       files: [],
@@ -192,44 +179,52 @@ export async function build (callback?: Syncify) {
 
   for (const id in source) {
 
-    log.update(`${line.gray}Building ${id}`);
+    log.write(bold(`${newline + line.gray}${source[id].files.length} ${toUpcase(id)}`));
+
     timer.start();
 
     if (id === 'styles') {
 
-      source[id].report = await mapAsync<File, Files>(handle(styles), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(styles), source[id].files);
       source[id].time = timer.stop();
+
+      log.build(id, source[id]);
 
     } else if (id === 'scripts') {
 
-      source[id].report = await mapAsync<File, Files>(handle(script), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(script), source[id].files);
       source[id].time = timer.stop();
+      log.build(id, source[id]);
 
     } else if (id === 'layouts' || id === 'snippets' || id === 'sections' || id === 'templates') {
 
-      source[id].report = await mapAsync<File, Files>(handle(liquid), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(liquid), source[id].files);
       source[id].time = timer.stop();
+      log.build(id, source[id]);
 
     } else if (id === 'locales' || id === 'configs' || id === 'metafields') {
 
-      source[id].report = await mapAsync<File, Files>(handle(json), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(json), source[id].files);
       source[id].time = timer.stop();
+      log.build(id, source[id]);
 
     } else if (id === 'pages') {
 
-      source[id].report = await mapAsync<File, Files>(handle(pages), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(pages), source[id].files);
       source[id].time = timer.stop();
+      log.build(id, source[id]);
 
     } else if (id === 'assets') {
 
-      source[id].report = await mapAsync<File, Files>(handle(assets), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(assets), source[id].files);
       source[id].time = timer.stop();
+      log.build(id, source[id]);
 
     } else if (id === 'svgs') {
 
-      source[id].report = await mapAsync<File, Files>(handle(pages), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(pages), source[id].files);
       source[id].time = timer.stop();
-
+      log.build(id, source[id]);
     }
   }
 
