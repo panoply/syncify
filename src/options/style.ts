@@ -76,13 +76,12 @@ export async function setStyleConfig (config: Config, pkg: Package) {
     flatten: true
   });
 
-  console.log(styles);
   // Path normalizer
   const path = normalPath(config.input);
 
   for (const style of styles) {
 
-    // Default Dart SASS options  compile model for each style
+    // Default Dart SASS options compile model for each style
     const compile: typeof style = {
       input: style.input,
       watch: null,
