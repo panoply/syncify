@@ -139,8 +139,6 @@ export function getResolvedPaths<R extends string[] | Resolver> (
   const warn = warnOption('Path Resolver');
   const path = normalPath(bundle.dirs.input); // Path normalizer
 
-  console.log(filePath);
-
   if (isArray(filePath)) {
 
     const paths: string[] = [];
@@ -176,7 +174,7 @@ export function getResolvedPaths<R extends string[] | Resolver> (
   if (isString(filePath)) {
 
     const uri = path(filePath);
-    const paths = glob.sync(uri, { cwd, absolute: true });
+    const paths = glob.sync(uri, { cwd });
 
     if (paths.length === 0) {
       warn('No files can be resolved in', filePath);
