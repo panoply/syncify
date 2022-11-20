@@ -16,27 +16,19 @@ import { log } from '~log';
 /**
  * Liquid Comments
  */
-const LiquidComments = /{%-?\s*comment\s*-?%}[\s\S]*?{%-?\s*endcomment\s*-?%}/g;
+const LiquidLineComments = /{%-?\s*#[\s\S]+?%}/g;
 
 /**
- * Liquid Schema Tag
+ * Liquid Comments
  */
-const LiquidSchemaTag = /(?<={%-?\s{0,}schema\s{0,}-?%})[\s\S]*?(?={%-?\s{0,}endschema\s{0,}-?%})/;
-
-/**
- * Liquid Strip Dash Spaces
- */
-const LiquidStripDashSpace = /(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g;
-
-/**
- * Liquid Useless Whitespace Dashes
- */
-const LiquidUselessDashes = /(?<=\S){[{%]-|-?[%}]}{[{%]-?|-}[%}]<\/?(?=[a-zA-Z]{1,})/g;
+const LiquidBlockComments = /{%-?\s*comment\s*-?%}[\s\S]+?{%-?\s*endcomment\s*-?%}/g;
 
 /**
  * Liquid Strip Dash Spaces
  */
-const HTMLStripDashSpace = /(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g;
+const LiquidTag = /{%-?\s*liquid[\s\S]+?%}/g;
+
+const ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
 
 /* -------------------------------------------- */
 /* PRIVATE FUNCTIONS                            */
@@ -50,9 +42,21 @@ const HTMLStripDashSpace = /(?<=-?[%}]})\s(?=<\/?[a-zA-Z])/g;
  */
 function removeComments (content: string) {
 
-  return minify.liquid.removeComments
-    ? content.replace(LiquidComments, nil)
-    : content;
+  return minify.liquid.removeComments ? content
+    .replace(LiquidBlockComments, nil)
+    .replace(LiquidLineComments, nil) : content;
+
+};
+
+/**
+ * Remove Liquid Comments
+ *
+ * Strips Liquid comments from file content.
+ * This is executed before passing to HTML bundle.minify.
+ */
+function minifyLiquidTag (content: string) {
+
+  return content.replace(LiquidTag, (tag) => '\n' + tag.replace(/#.*?$/gm, nil) + '\n');
 
 };
 
@@ -66,27 +70,26 @@ function minifySchema (file: File, content: string) {
 
   if (!minify.liquid.minifySchema) return removeComments(content);
 
-  const minified = content.replace(LiquidSchemaTag, data => {
+  const open = content.search(/{%-?\s*schema/);
 
-    try {
+  if (open > -1) {
 
-      const parsed = JSON.parse(data);
-      const minified = JSON.stringify(parsed, null, 0);
+    const begin = content.indexOf('%}', open + 2) + 2;
+    const start = content.slice(begin);
+    const ender = begin + start.search(/{%-?\s*endschema/);
 
-      return minified;
-
-    } catch (e) {
-
-      log.invalid(file.relative);
-      console.log(e);
-
-      return data;
-
+    if (ender > -1) {
+      const parse = JSON.parse(content.slice(begin, ender));
+      const minified = JSON.stringify(parse, null, 0);
+      const schema = content.slice(0, begin) + minified + content.slice(ender);
+      return removeComments(schema);
     }
 
-  });
+    log.invalid(file.relative);
 
-  return removeComments(minified);
+  }
+
+  return removeComments(content);
 
 };
 
@@ -101,10 +104,7 @@ function removeDashes (content: string) {
 
   if (!minify.liquid.stripDashes) return content;
 
-  return content
-    .replace(HTMLStripDashSpace, nil)
-    .replace(LiquidStripDashSpace, nil)
-    .replace(LiquidUselessDashes, m => m.replace(/-/g, nil));
+  return content;
 
 };
 
@@ -146,9 +146,29 @@ const transform = (file: File) => async (data: string) => {
     log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
     return data;
   }
+  let htmlmin: string;
 
-  const content = file.type === Type.Section ? minifySchema(file, data) : removeComments(data);
-  const htmlmin = await htmlMinify(file, content);
+  if (file.base.endsWith('.js.liquid')) {
+
+    htmlmin = data
+      .replace(ScriptJsonWhitespace, nil)
+      .replace(/(?<=[:,]) +(?=['"{[])/g, nil);
+
+  } else if (file.base.endsWith('.json.liquid')) {
+
+    htmlmin = JSON.stringify(JSON.parse(data), null, 0);
+
+  } else {
+
+    const content = file.type === Type.Section
+      ? minifySchema(file, data)
+      : removeComments(data);
+
+    const htmlterser = await htmlMinify(file, content);
+
+    htmlmin = minifyLiquidTag(htmlterser);
+
+  }
 
   log.process('HTML Terser', timer.now());
 
@@ -163,7 +183,6 @@ const transform = (file: File) => async (data: string) => {
 
   if (!bundle.mode.build) {
     const size = fileSize(data, file.size);
-
     if (size.isSmaller) {
       log.transform(`${file.namespace} ${size.before} → gzip ${size.gzip}`);
     } else {
