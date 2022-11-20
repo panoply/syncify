@@ -1,15 +1,14 @@
-import type { Syncify, File, ScriptTransform, ESBuildConfig } from 'types';
+import type { Syncify, File, ScriptTransform, ESBuildConfig, Methods } from 'types';
 import type ESBuild from 'esbuild';
 import { join, resolve, normalize, relative } from 'node:path';
 import { has, isNil } from 'rambdax';
 import glob from 'fast-glob';
-import { isString, nil, keys } from '~utils/native';
+import { nil, keys, assign } from '~utils/native';
 import { writeFile } from 'fs-extra';
 import { log, error, bold } from '~log';
-import { parentPath } from '~utils/paths';
 import { byteSize, event, byteConvert } from '~utils/utils';
 import * as timer from '~utils/timer';
-import { bundle, cache, processor } from '~config';
+import { bundle, cache, minify, processor } from '~config';
 
 /* -------------------------------------------- */
 /* SCOPES                                       */
@@ -118,38 +117,43 @@ export function pluginPaths (transform?: ScriptTransform): ESBuild.Plugin {
  */
 export function pluginWatch (transform?: ScriptTransform): ESBuild.Plugin {
 
+  const dirs: Set<string> = new Set();
+
   return {
     name: 'syncify-watch',
     setup (build) {
+      build.onResolve({ filter: /.*/ }, (args: ESBuild.OnResolveArgs) => {
 
-      // build.onStart(() => timer.start());
-      build.onResolve({ filter: /.*/ }, (args) => {
+        if (!/node_modules/.test(args.importer) && /^[./]/.test(args.path)) {
 
-        if (!/node_modules/.test(args.importer)) {
+          if (dirs.has(args.resolveDir)) return undefined;
 
-          // console.log(args);
+          if (args.importer !== nil) {
 
-          if (/^[./]/.test(args.path)) {
-            if (args.importer !== nil) {
+            dirs.add(args.resolveDir);
 
-              const [ path ] = glob.sync('.*', {
-                cwd: join(parentPath(args.importer), args.path)
-              });
+            const files = glob.sync(join(args.resolveDir, '*'), { cwd: bundle.cwd });
 
-              if (isString(path) && !paths.has(path)) {
-                if (!processor.esbuild.loaded) {
+            for (const path of files) {
+              if (!paths.has(path) && !path.endsWith('.liquid')) {
+
+                paths.add(path);
+
+                if (processor.esbuild.loaded === false) {
                   transform.watch.push(path);
                 } else {
                   event.emit('script:watch', path);
                 }
               }
-            } else {
-              if (!paths.has(args.path)) {
-                if (!processor.esbuild.loaded) {
-                  transform.watch.push(args.path);
-                } else {
-                  event.emit('script:watch', args.path);
-                }
+            }
+          } else {
+
+            // Entry Points
+            if (!paths.has(args.path)) {
+              if (!processor.esbuild.loaded) {
+                transform.watch.push(args.path);
+              } else {
+                event.emit('script:watch', args.path);
               }
             }
           }
@@ -158,7 +162,6 @@ export function pluginWatch (transform?: ScriptTransform): ESBuild.Plugin {
         return undefined;
 
       });
-
     }
   };
 };
@@ -170,15 +173,34 @@ export const createSnippet = (string: string) => '<script>' + string + '</script
  *
  * Used for Script transformations.
  */
-export async function compile (file: File<ScriptTransform>, request: any, cb: Syncify) {
+export async function compile (
+  file: File<ScriptTransform>,
+  request: (
+    method: Methods,
+    file: File<ScriptTransform>,
+    content?: any
+  ) => Promise<any[]>,
+  wss: {
+    script: (src: string) => boolean;
+    stylesheet: (href: string) => boolean;
+    section: (id: string) => boolean;
+    svg: (id: string) => boolean;
+    assets: () => boolean;
+    reload: () => boolean;
+    replace: () => boolean;
+  },
+  _cb: Syncify
+) {
 
   if (bundle.mode.watch) timer.start();
 
-  const { config } = file;
+  const options = file.config;
+
+  if (bundle.minify.script === true) assign(options.esbuild, minify.script, { sourcemap: false });
 
   try {
 
-    const compile = await esbuild.build(file.config.esbuild as ESBuildConfig);
+    const compile = await esbuild.build(options.esbuild as ESBuildConfig);
 
     for (const { text, path } of compile.outputFiles) {
 
@@ -197,17 +219,23 @@ export async function compile (file: File<ScriptTransform>, request: any, cb: Sy
 
         if (bundle.mode.watch) log.process(bold('ESBuild'), timer.stop());
 
-        const { format } = file.config.esbuild as any;
+        const { format } = options.esbuild as any;
 
         log.transform(`${bold(format.toUpperCase())} bundle → ${bold(byteConvert(byteSize(text)))}`);
 
-        if (config.snippet) {
+        if (options.snippet) {
 
-          await writeFile(file.output, createSnippet(text)).catch(
+          const snippet = createSnippet(text);
+
+          await writeFile(file.output, snippet).catch(
             error.write('Error writing inline <script> snippet', {
               file: file.relative
             })
           );
+
+          if (!bundle.mode.build) {
+            await request('put', file, createSnippet(text));
+          }
 
           log.transform(`exported as ${bold('snippet')}`);
 
@@ -220,22 +248,24 @@ export async function compile (file: File<ScriptTransform>, request: any, cb: Sy
           );
 
           if (!bundle.mode.build) {
-            await request('put', file, file.output);
+            await request('put', file, text);
           }
         }
 
       }
     }
 
-    if (compile.outputFiles.length === 1) {
-      const out = compile.outputFiles.pop();
-      return out.text;
-    }
+    if (bundle.mode.hot) wss.script(file.key);
+
   } catch (err) {
 
     log.invalid(file.relative);
 
-    for (const e of err.errors as ESBuild.BuildResult['errors']) error.esbuild(e);
+    if (has('errors', err)) {
+      for (const e of err.errors as ESBuild.BuildResult['errors']) {
+        error.esbuild(e);
+      }
+    }
 
     return null;
 
