@@ -105,15 +105,14 @@ export function section (file: File) {
 
   if (bundle.section.prefixDir) {
 
-    if (isRegex(bundle.section.global)) {
-      if (bundle.section.global.test(file.input)) return file;
-    }
+    if (isRegex(bundle.section.global) && bundle.section.global.test(file.input)) return file;
 
     const rename = lastPath(file.input) + bundle.section.separator + file.base;
 
     file.name = rename;
     file.key = join(file.namespace, rename);
     file.output = join(dirname(file.output), rename);
+
   }
 
   return file;
