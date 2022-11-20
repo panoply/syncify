@@ -24,7 +24,7 @@ export type AssetRequest = (method: Methods, file: File, content?: any) => Promi
 
 export const client = ({ stores, themes }: Sync) => ({
 
-  assets: <T>(method: Methods, file: File<T>, content?: any) => {
+  assets: async <T>(method: Methods, file: File<T>, content?: any) => {
 
     const payload: Request = isUndefined(content) ? {
       method,
@@ -41,9 +41,9 @@ export const client = ({ stores, themes }: Sync) => ({
       }
     };
 
-    return queue.add(() => mapFastAsync<Theme, any>(theme => {
+    await queue.add(() => mapFastAsync<Theme, any>(async theme => {
 
-      return asset.sync(theme, file, assign<any, any, Request>(
+      await asset.sync(theme, file, assign<any, any, Request>(
         { url: theme.url },
         stores[theme.sidx].client,
         payload
