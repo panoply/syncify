@@ -36,7 +36,8 @@ export async function load (id: 'postcss' | 'sass') {
   }
 
   if (id === 'sass') {
-    sass = await import('sass');
+    const dart = await import('sass');
+    sass = dart.default;
     return isNil(sass) === false;
   }
 
