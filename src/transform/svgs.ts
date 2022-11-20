@@ -36,7 +36,7 @@ export async function load (id: 'svg-sprite' | 'svgo') {
 
   if (id === 'svg-sprite') {
     SVGSprite = (await import('svg-sprite')).default;
-    return isNil(svgo) === false;
+    return isNil(SVGSprite) === false;
   }
 
   if (id === 'svgo') {
@@ -183,16 +183,19 @@ export function compileInline (context: File<SVGBundle[]>, request: AssetRequest
     const read = await readFile(file.input);
 
     file.size = byteSize(read);
-    const svg = svgo.optimize(read.toString(), options);
 
-    if (bundle.mode.watch) log.process(bold('SVGO'), timer.stop());
+    let svg: SVGO.Output;
 
-    if (svg.error) {
-      log.err(svg.error);
+    try {
+      svg = svgo.optimize(read.toString(), options);
+    } catch (error) {
+      log.err(error.toString());
       return null;
     }
 
-    const { data } = svg as SVGO.OptimizedSvg;
+    if (bundle.mode.watch) log.process(bold('SVGO'), timer.stop());
+
+    const { data } = svg;
 
     if (!bundle.mode.build) {
 
