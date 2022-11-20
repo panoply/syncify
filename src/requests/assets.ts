@@ -108,7 +108,7 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
   timer.start();
 
-  return axios(config).then(({ headers, data }) => {
+  const promise = axios(config).then(({ headers, data }) => {
 
     if (config.method === 'get') return data;
     if (config.method === 'delete') {
@@ -122,7 +122,8 @@ export async function sync (theme: Theme, file: File, config: Request) {
   }).catch((e: AxiosError) => {
 
     // if (!sync.queue) return error(file.key, e.response);
-    if ((e.response.status === 429) || (e.response.status === 500)) {
+
+    if (e.response && (e.response.status === 429 || e.response.status === 500)) {
       log.retrying(file.key, theme);
       queue.add(() => sync(theme, file, config));
     } else {
@@ -131,5 +132,7 @@ export async function sync (theme: Theme, file: File, config: Request) {
     }
 
   });
+
+  return promise;
 
 };
