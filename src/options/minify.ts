@@ -28,7 +28,10 @@ export const setMinifyOptions = (config: Config) => {
     for (const key in config.minify as MinifyConfig) {
 
       // We don't care if false, or is nil, we can carry on as normal
-      if (config.minify[key] === false || isNil(config.minify[key])) continue;
+      if (config.minify[key] === false || isNil(config.minify[key])) {
+        if (bundle.mode.minify === true) bundle.minify[key] = true;
+        continue;
+      }
 
       if (key === 'script') {
         if (!processor.esbuild.installed) {
