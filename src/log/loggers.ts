@@ -1,9 +1,10 @@
-import { File, Group, Theme } from 'types';
+import { BuildReport, File, Group, Theme } from 'types';
+// import { join } from 'node:path';
 import { has, isEmpty } from 'rambdax';
 import notifier from 'node-notifier';
 import { bundle, warning } from '~config';
 import { queue } from '~requests/queue';
-import { addSuffix, sanitize, plural, toUpcase } from '~utils/utils';
+import { addSuffix, sanitize, plural } from '~utils/utils';
 import { error, isArray, log, nil, nl } from '~utils/native';
 import * as timer from '~utils/timer';
 import * as errors from '~log/errors';
@@ -58,25 +59,12 @@ let uri: string = nil;
 /* FUNCTIONS                                    */
 /* -------------------------------------------- */
 
-export function build (file: File) {
+export function build (id: string, { report }: BuildReport) {
 
-  const close = group !== toUpcase(file.namespace);
+  for (const { name } of report) {
 
-  log(c.line.gray + c.neonCyan(file.key));
+    log(c.line.gray + ' - ' + c.neonCyan(name));
 
-  // close previous group
-  if (close) {
-    log(tui.closer(group));
-    tui.clear();
-  }
-  // update group
-  group = toUpcase(file.namespace);
-
-  // open new group
-  if (close) {
-    log(tui.opener(group));
-    nwl();
-    title = toUpcase(file.namespace);
   }
 
 }
@@ -341,8 +329,9 @@ export function reloaded (path: string, time: string) {
  */
 export function skipped (file: File, reason: string) {
 
-  log(c.line.gray + c.gray(`${file.key} ~ ${reason}`));
-
+  if (!bundle.mode.build) {
+    log(c.line.gray + c.gray(`${file.key} ~ ${reason}`));
+  }
 };
 
 /**
