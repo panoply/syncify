@@ -37,7 +37,7 @@ export async function setSvgOptions (config: Config, pkg: Package) {
   // Load SVG Sprite module
   if (sprite.installed) {
     const loaded = await load('svg-sprite');
-    if (!loaded) throwError('Unable to dynamically import SVG Sprite', 'Ensure you have installed svgo-sprite');
+    if (!loaded) throwError('Unable to dynamically import SVG Sprite', 'Ensure you have installed svg-sprite');
   }
 
   if (!sprite.installed && !svgo.installed) {
@@ -145,7 +145,6 @@ export async function setSvgOptions (config: Config, pkg: Package) {
 
     }
 
-    console.log(o);
     bundle.svg.push(o);
 
   };
