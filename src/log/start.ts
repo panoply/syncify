@@ -125,15 +125,14 @@ export function start (bundle: Bundle) {
           c.line.gray +
             nl + c.line.yellow +
             c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`) +
-            c.colon +
-            nl + c.line.yellow
+            c.colon
         );
       }
 
-      const title = c.yellowBright(`${c.bold(`${warn.length}`)} ${prop} ${plural('warning', warn.length)}`);
+      const title = c.yellow.bold(`${warn.length} ${prop} ${plural('warning', warn.length)}`);
 
       text.push(
-        c.line.yellow +
+        c.line.yellow + nl + c.line.yellow +
           title +
           nl + c.line.yellow + nl +
           warn.join(nl)
