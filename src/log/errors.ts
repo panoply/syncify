@@ -2,7 +2,7 @@ import type { File } from 'types';
 import type { AxiosResponse } from 'axios';
 import type { Exception } from 'sass';
 import type { NodeErrorOptions } from 'postcss';
-import type { BuildFailure, Message } from 'esbuild';
+import type { Message } from 'esbuild';
 import { hasPath } from 'rambdax';
 import { nil, nl, error } from '~utils/native';
 import cleanStack from 'clean-stack';
@@ -71,6 +71,8 @@ export function spawn (data: string) {
  * and additional information is appended.
  */
 export function request (file: string, e: AxiosResponse) {
+
+  console.log(e);
 
   const message = hasPath('error.asset', e.data)
     ? e.data.error.asset
@@ -197,12 +199,14 @@ export function esbuild (e: Message) {
         start: e.location.line,
         end: e.location.line + 1
       }
-    }) + tui.context({
+    }) +
+    tui.context({
       stack: false,
       entries: {
-        plugin: e.pluginName,
-        id: e.id,
-        namespace: e.location.namespace
+        file: e.location.file,
+        column: e.location.column,
+        line: e.location.line,
+        plugin: e.pluginName
       }
     })
   );
