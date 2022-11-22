@@ -10,8 +10,6 @@ export function stdin (data: Buffer) {
 
   if (input === 's') {
 
-
-
   } else if (input === 'w') {
 
     for (const prop in warning.process) {
