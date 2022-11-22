@@ -48,8 +48,8 @@ export const minify: Minify = {
     minifySyntax: true,
     minifyIdentifiers: true,
     minifyWhitespace: true,
-    mangleProps: null,
-    legalComments: 'inline',
+    mangleProps: undefined,
+    legalComments: 'none',
     mangleQuoted: false,
     keepNames: false
   },
@@ -83,8 +83,9 @@ export const minify: Minify = {
     ignoreCustomFragments: [
       /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
       /<style[\s\S]*?<\/style>/,
-      /{%[\s\S]*?%}/,
-      /{{[\s\S]*?}}/
+      /<script[\s\S]*?<\/script>/,
+      /{%-?\s*liquid[\s\S]*?%}/,
+      /{%[\s\S]*?%}/
     ]
   }
 };
@@ -347,7 +348,11 @@ export const bundle = {
   watch: new Set(),
   logger: {},
   paths: {},
-  section: {},
+  section: {
+    prefixDir: false,
+    separator: '-',
+    global: []
+  },
   cmd: {},
   json: {},
   page: {
