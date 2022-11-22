@@ -93,6 +93,7 @@ function write (file: File<StyleTransform>, cb: Syncify) {
 async function sassProcess (file: File<StyleTransform>) {
 
   const { config } = file;
+
   const opts = config.sass === true
     ? processor.sass.config
     : config.sass as Processors['sass'];
@@ -103,7 +104,7 @@ async function sassProcess (file: File<StyleTransform>) {
 
     try {
 
-      const { css, sourceMap } = sass.compile(file.input, {
+      const { css, sourceMap } = sass.compile(config.input as string, {
         loadPaths: opts.include,
         sourceMapIncludeSources: false,
         sourceMap: opts.sourcemap,
