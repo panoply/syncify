@@ -4,7 +4,7 @@
 
 # @liquify/syncify
 
-An exceptionally fast, extensible and superior alternative Shopify CLI [theme kit](https://shopify.github.io/themekit/) tool. Syncify applies an intuitive approach for theme development that extends upon your existing build tools. It ships with a powerful and informative CLI, hot reloading, asset transformations, multiple storefront theme synchronization with watch, upload, download and metafield capabilities plus a whole lot more.
+A lightening fast, extensible and superior alternative Shopify CLI ([theme kit](https://shopify.github.io/themekit/)) tool. Syncify is a powerful and informative CLI which employs an intuitive approach for Shopify theme development.
 
 **Syncify exists as part of the [Liquify](https://liquify.dev) project**
 
@@ -14,11 +14,7 @@ An exceptionally fast, extensible and superior alternative Shopify CLI [theme ki
 - Intelligent path mapping capabilities for custom directory structures.
 - HOT reloading of assets, section, snippets, templates and layouts.
 - Clear, concise, informative and beautiful CLI logging.
-- Liquid + HTML and JSON minification support.
 - An elegant global directory based metafields sync approach using JSON files.
-- TypeScript/JavaScript transpilation using [ESBuild](https://esbuild.github.io/).
-- SCSS/CSS transpilation using [SASS Dart](https://sass-lang.com/dart-sass) and [PostCSS](https://postcss.org/).
-- SVG Sprite and inlined SVG snippet generation using [SVGO](https://github.com/svg/svgo).
 - Digests and spawns existing build tools for asset transformations.
 - Exposed Plugin API for adding those seeking extensibility.
 - Prompt based CLI/TUI and exposed module API for script usage.
@@ -27,7 +23,7 @@ An exceptionally fast, extensible and superior alternative Shopify CLI [theme ki
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped me. Shopify's tooling tends to impede upon my productivity and alternatives like the Shopify CLI fail to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus. It allows you to progressively enhance your development process and produce the most efficient and performant results.
+I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped me and their tooling tends to impede upon my productivity. Alternatives like the Shopify CLI fail to achieve fluidity, either doing too much or not enough. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus. It allows you to progressively enhance your development process and produce the most efficient and performant results.
 
 # Install
 
@@ -53,19 +49,23 @@ yarn add @syncify/syncify --dev
 
 # Overview
 
-The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store/s. It ships with build, watch, download, upload, merge and pull capabilities for interfacing with remote Shopify webshop's. Together with a prompt based execution model, Syncify provides developers with theme control that aims to exceed expectations. In addition to the core sync support, Syncify also provides opt-in pre-processor capabilities for handling asset file types.
+The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store/s. It ships with build, watch, download, upload, merge and pull capabilities for interfacing with remote Shopify webshop's. Together with a prompt based execution model, Syncify provides developers with theme control that aims to exceed expectations.
 
 ### Theme Files
 
-Syncify uses built-in capabilities when handling snippets, templates, layouts, locales, configs and sections. Files using a `.liquid` or `.json` extension are considered **views** in Syncify. Content transformations like minification and path mappings are applied to these files types.
-
-### Asset Files
-
-Syncify does not want to re-create or impede on developer preferences and tool appropriation. Build tools and bundlers specifically designed for processing different assets types can be spawned and run in parallel with Syncify's `build` and `watch` instances. Syncify also provides pre-processor capabilities for handling TypeScript, JavaScript, CSS, SCSS and SVG file types and exposes wrappers around the popular and performant modules.
+Syncify uses built-in capabilities when handling snippets, templates, layouts, locales, configs and sections. Files using a `.liquid` or `.json` extension are typically considered theme files in syncify and always determined before handling. Content transformations like minification and path mappings are applied to these files types either natively or with plugins.
 
 ### Data Files
 
-Syncify exposes and introduces an elegant low-level method for interfacing with shop metafields, pages, redirects and files. Pull, push, merge and delete resource capabilities are provided using a directory/file based approach which allows developers to advance their workflows in a controlled and extensible manner.
+Syncify exposes and introduces an elegant low-level method for interfacing with shop metafields, pages, redirects and files. Pull, push, merge and delete resource capabilities are provided for data identified files and for metafield resources a directory/file path based approach is employed which allows developers to advance their workflows in a controlled and extensible manner.
+
+### Asset Files
+
+Syncify does not want to re-create or impede on developer preferences and tool appropriation. Build tools and bundlers specifically designed for processing different asset types can be spawned and run in parallel with Syncify's `build` and `watch` instances, but for more advanced use cases, Syncify also provides developers with pre-processor capabilities via plugins. Plugins can be leveraged for transforming TypeScript, JavaScript, CSS, SCSS and SVG file types and use wrappers around popular and performant modules.
+
+### Plugins
+
+Syncify can be extended with Plugins. Similar to build tools like webpack and rollup, Syncify exposes a plugin API which allows you to hook into the build cycle and apply transforms to assets and files.
 
 # Setup
 
@@ -165,13 +165,13 @@ process.env['YOUR-SHOP-NAME_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
 
 # Package Schema
 
-Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one which supports extension of [JSON Schema Specs](https://json-schema.org/specification.html) then you can extend `package.json` schemas. JSON schema specs provide features like hover descriptions, validations, auto-completion and intellisense for JSON file types. Extending the package schema will enable these capabilities be provided to the `syncify` field.
+Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one which supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can extend `package.json` schemas. JSON schema specs provide features like hover descriptions, validations, auto-completion and intellisense for JSON file types. Extending the package schema will enable these capabilities be provided to the `syncify` field.
 
 > It is **highly recommended** that you extend the `package.json` json specifications.
 
 ### Generate Schemas (vscode users)
 
-Syncify can automatically generate the `package.json` schema specs for developers using the VS Code text editor. The settings reference will be written within a `.vscode` directory. Use the following command:
+Syncify can automatically generate the `package.json` schema specs for developers using the VSCode text editor. The settings reference will be written within the `.vscode` directory relative to root. Use the following command:
 
 ```
 syncify --vsc
@@ -189,11 +189,11 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
   "json.schemas": [
     {
       "fileMatch": ["package.json"],
-      "url": "https://schema.liquify.dev/syncify.json"
+      "url": "https://unpkg.com/@syncify/schema/package.json"
     },
     {
       "fileMatch": [".syncifyrc", ".syncifyrc.json"],
-      "url": "https://schema.liquify.dev/syncifyrc.json"
+      "url": "https://unpkg.com/@syncify/schema/syncify.json"
     }
   ]
 }
@@ -201,9 +201,9 @@ If you wish to provide the specs manually you will need to create a `.vscode` di
 
 # Configuration
 
-Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on a `syncify` property.
+Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on the `syncify` property.
 
-### Support Files
+### Supported Files
 
 - `syncify.config.js`
 - `syncify.config.ts`
@@ -223,18 +223,23 @@ export default defineConfig({
   export: 'export',
   import: 'import',
   config: '.',
-  stores: {
-    domain: '',
-    themes: {}
-  },
+  clean: true,
+  stores: [
+    {
+      domain: '',
+      themes: {}
+    }
+  ],
   hot: {
     label: 'visible',
     method: 'hot',
     inject: true,
-    layouts: ['theme.liquid'],
     scroll: 'preserved',
     server: 3000,
-    socket: 8089
+    socket: 8089,
+    layouts: [
+      'theme.liquid'
+    ],
   },
   logger: {
     clear: true,
@@ -282,56 +287,15 @@ export default defineConfig({
     },
     pages: {
       suffixDir: true,
-      language: ['html', 'markdown'],
       author: '',
-      global: []
+      global: [],
+      language: [
+        'html',
+        'markdown'
+      ],
     }
   },
-  transforms: {
-    script: {},
-    style: {},
-    svg: {},
-    image: {},
-  },
-  processors: {
-    esbuild: {},
-    sass: {},
-    postcss: {},
-    sharp: {},
-    svgo: {},
-    sprite:{},
-    json: {},
-  },
-  minify: {
-    json: {
-      assets: true,
-      config: true,
-      locales: true,
-      metafields: true,
-      templates: true,
-      exclude: []
-    },
-    script: {
-      legalComments: 'none',
-      mangleQuoted: true,
-      minifyIdentifiers: true,
-      minifySyntax: true,
-      minifyWhitespace: true,
-      mangleProps: null,
-      mangleCache: false,
-      exclude: []
-    },
-    views: {
-      minifyScript: true,
-      minifyStyle: true,
-      minifySchema: true,
-      removeComments: true,
-      collapseWhitespace: true,
-      stripDashes: true,
-      exclude: []
-    }
-  },
-  plugins: [],
+  plugins: []
 });
 ```
 
@@ -349,7 +313,7 @@ Before going over the features Syncify provides, it is assumed that you have don
 
 ### Contents
 
-- [Directories](#dirs)
+- [Directories](#directories)
 - [Paths](#dirs)
 - [Stores](#stores-required)
 - [Hot](#hot)
@@ -361,13 +325,13 @@ Before going over the features Syncify provides, it is assumed that you have don
 
 ## Directories
 
-The `dirs` option allows you to define custom base directories. In Syncify, `dirs` refers to a directory name which is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). This option accepts string values only.
+In Syncify you define custom base directories for your theme files. The values you define refers to a directory name which is relative to the root of your project and you **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`).
 
 <!-- prettier-ignore -->
 <table>
   <thead>
     <tr>
-      <th width="500px"> API</th>
+      <th width="500px">API</th>
       <th width="500px">CLI</th>
     </tr>
   </thead>
@@ -405,11 +369,15 @@ The `dirs` option allows you to define custom base directories. In Syncify, `dir
 
 ### Input > Output
 
-Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can rebuilt from input. If you are used to working from a single directory (eg: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
+Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can rebuilt from input.
+
+If you are used to working from a single directory (e.g: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
 
 # Stores (Required)
 
-The `stores` option accepts an **object** or **array** list. Each item will hold a settings object that contains references to your shopify store/s and their theme/s. For each store you define, Syncify requires you provide the shop name and theme id/s you wish to sync. The `themes` object uses a **key** > **value** structure. Please see theme [commands](#commands) example for more information on how this is used with the CLI.
+The `stores` option accepts an **object** or **array** type. Each item will hold a settings object that contains references to your shopify store/s and their theme/s. For each store you define, Syncify requires you provide the shop name and theme id/s you wish to sync. The `themes` object uses a **key** > **value** structure.
+
+> Please see theme [commands](#commands) example for more information on how this is used with the CLI.
 
 ### CLI
 
@@ -461,7 +429,7 @@ The `themes` option refers to theme ids the store contains. This option is an ob
 
 # Metafields
 
-The `metafields` directory path reference is where you can provide **global** JSON metafield files that can be synced to your Shopify store. Metafield sync capabilities provided by Syncify use a simple **directory** > **file** based approach. The sub-directory names represent a metafield `namespace` value and JSON file names contained within represent metafield `key` values.
+The `metafields` directory `path` reference is where you can provide **global** JSON metafield files that can be synced to your Shopify store. Metafield sync capabilities provided by Syncify use a simple **directory** > **file** based approach. The sub-directory names represent a metafield `namespace` value and JSON file names contained within represent metafield `key` values.
 
 > Syncify will keep your remote and local metafield references aligned with one another and warn you when local versions do not match remote versions. This will help prevent you from overwriting changes that may have been applied by third-party apps or online within your store.
 
@@ -863,7 +831,7 @@ Sections are fetched via the Ajax Section rendering API. Replacements are applie
 
 ### Snippets, Layouts and Templates
 
-In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippets, templated and liquid layout files will inject HTML comments `<!-- hot:1aa4f32cf9 -->` containing a UUID before they are uploaded to themes. Syncify will pass this UUID to the client via websocket and once received an XHR (fetch) will be triggered. The response of XHR request is then parsed and all nodes which proceed the injected UUID comment/s are plucked and swapped in the persisted DOM leaving unchanged element intact. The approach employed by Syncify is a mild form DOM hydration that's 10x faster than invoking a hard-refresh.
+In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippets, templated and liquid layout files will inject HTML comments `<!-- hot:1aa4f32cf9 -->` containing a UUID before they are uploaded to themes. Syncify will pass this UUID to the client via websocket and once received an XHR (fetch) will be triggered. The response of the XHR request is then parsed and all nodes which proceed the injected UUID comment/s are plucked and swapped in the persisted DOM while leaving unchanged elements intact. The approach employed by Syncify is a mild form DOM hydration that's 10x faster than invoking a hard-refresh.
 
 # Spawn
 

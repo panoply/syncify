@@ -1,12 +1,15 @@
-import { Bundle, HOT } from 'types';
+import { Bundle } from 'types';
 import { join, basename } from 'node:path';
 import { Server } from 'ws';
 import statics from 'serve-static';
 import handler from 'finalhandler';
 import http from 'node:http';
+import { kill } from '~cli/exit';
 import { log, tui, bold, gray } from '~log';
 import { bundle } from '~config';
 import { injectSnippet, injectRender } from './inject';
+import { pathExists, readFile, writeFile } from 'fs-extra';
+import { isArray } from '~utils/native';
 
 async function injection () {
 
@@ -19,6 +22,25 @@ async function injection () {
     log.update(tui.message('gray', 'validating layouts'));
 
     for (const layout in bundle.hot.alive) {
+
+      const exists = await pathExists(layout);
+
+      if (!exists) {
+
+        log.update(tui.message('gray', 'layout has not yet been bundled, building now...'));
+
+        const find = isArray(bundle.config.paths.layout)
+          ? bundle.config.paths.layout
+          : [ bundle.config.paths.layout ];
+
+        for (const input of find) {
+          const path = join(bundle.dirs.input, input);
+          const source = await readFile(path);
+          await writeFile(layout, source);
+        }
+
+        log.update(tui.message('gray', 'layout was bundled from source, injecting hot snippet'));
+      }
 
       const render = await injectRender(layout);
 
@@ -44,7 +66,7 @@ async function injection () {
  *
  * Creates a server for assets files in hot mode
  */
-export async function server (bundle: Bundle<HOT>) {
+export async function server (bundle: Bundle) {
 
   log.out(tui.message('whiteBright', bold(`${bundle.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reloading:`)));
   log.nwl();
@@ -79,6 +101,8 @@ export function socket () {
     port: bundle.hot.socket,
     path: '/ws'
   });
+
+  kill(() => wss.removeAllListeners());
 
   wss.on('connection', v => {
     wss.on('script', (src) => v.send(`script,${src}`));

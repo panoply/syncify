@@ -4,11 +4,7 @@
 var cjs_js = require('./cjs.js');
 var mm = require('minimist');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var mm__default = /*#__PURE__*/_interopDefaultLegacy(mm);
-
-cjs_js.run(mm__default["default"](process.argv.slice(1), {
+cjs_js.run(mm(process.argv.slice(1), {
   alias: {
     config: "c",
     build: "b",

@@ -77,8 +77,8 @@ declare global {
      */
     const nodeStyle: Partial<CSSStyleDeclaration> = {
       position: 'fixed',
-      top: '0',
       left: '0',
+      bottom: '0',
       right: '0',
       margin: '0 auto',
       display: 'flex',
@@ -96,9 +96,11 @@ declare global {
       backgroundColor: '#232326',
       border: '0.8px solid transparent',
       borderRadius: '5px',
-      borderTop: '0',
       borderTopLeftRadius: '0',
-      borderTopRightRadius: '0'
+      borderTopRightRadius: '0',
+      borderBottomLeftRadius: '0',
+      borderBottomRightRadius: '0',
+      borderBottom: '0'
     };
 
     const child = { view: () => m('div', { style: childStyle }, state) };
