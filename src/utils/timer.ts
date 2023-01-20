@@ -60,7 +60,7 @@ export const clear = () => {
  */
 export function stop (now = false) {
 
-  const gt = now ? mark[mark.length - 1] : mark.pop();
+  const gt = now ? mark[mark.length - 2] : mark.pop();
   const ms = performance.now() - gt;
 
   if (ms < 1000) return `${ms.toFixed(0)}ms`;

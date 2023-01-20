@@ -119,6 +119,17 @@ export function write (input: string | string[]) {
 }
 
 /**
+ * External Handling - `cyan`
+ *
+ * @example '│ external → operation'
+ */
+export function external (operation: string) {
+
+  log(tui.suffix('cyan', 'external', operation));
+
+};
+
+/**
  * Hook
  *
  * Listens on `stdout` and Intercepts logs messages.
@@ -244,14 +255,25 @@ export function syncing (path: string) {
   }
 
   if (bundle.mode.hot) {
-    log(tui.suffix('magenta', 'reloaded', 'HOT REPLACEMENT'));
+
+    log(tui.suffix('neonRouge', 'reloaded', `${c.bold('HOT RELOAD')}${c.time(timer.now())}`));
+    log(tui.suffix('magentaBright', 'syncing', path));
+
+    // when hot reloads hold off on logging queues
+    if (queue.pending > 2) {
+      log(tui.suffix('orange', 'queued', `${path} ~ ${c.bold(addSuffix(queue.pending))} in queue`));
+    }
+
+  } else {
+
+    log(tui.suffix('magentaBright', 'syncing', path));
+
+    if (queue.pending > 0) {
+
+      log(tui.suffix('orange', 'queued', `${path} ~ ${c.bold(addSuffix(queue.pending))} in queue`));
+    }
   }
 
-  log(tui.suffix('magenta', 'syncing', path));
-
-  if (queue.pending > 0) {
-    log(tui.suffix('orange', 'queued', `${path} ~ ${c.bold(addSuffix(queue.pending))} in queue`));
-  }
 };
 
 /**

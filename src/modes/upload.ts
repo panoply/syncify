@@ -1,6 +1,6 @@
 import glob from 'fast-glob';
 import { readFile } from 'fs-extra';
-import { mapFastAsync } from 'rambdax';
+import { mapParallelAsync } from 'rambdax';
 import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
 import { outputFile } from '../process/files';
@@ -14,11 +14,11 @@ export async function upload (cb?: Syncify): Promise<void> {
   timer.start();
 
   const parse = outputFile(bundle.dirs.output);
-  const files = glob.sync(`${bundle.dirs.output}/**`, { nodir: true, mark: true }).sort();
+  const files = glob.sync(`${bundle.dirs.output}/**`).sort();
   const request = client(bundle.sync);
   const hashook = isFunction(cb);
 
-  await mapFastAsync(async (path) => {
+  await mapParallelAsync(async (path) => {
 
     const file = parse(path);
     const read = await readFile(path);
@@ -39,6 +39,6 @@ export async function upload (cb?: Syncify): Promise<void> {
 
   }, files);
 
-  return queue.onIdle().then(() => log.info('Completed Upload', 3));
+  return queue.onIdle().then(() => log.write('Completed Upload'));
 
 };

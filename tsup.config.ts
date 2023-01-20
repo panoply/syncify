@@ -16,7 +16,6 @@ const noExternal = [
 const external = [
   'anymatch',
   'axios',
-  'bundle-require',
   'chokidar',
   'cross-spawn',
   'dotenv',
@@ -77,7 +76,7 @@ export default defineConfig(options => ([
       await build({
         entryPoints: [ 'src/hot/snippet.ts' ],
         bundle: true,
-        minify: true,
+        minify: false,
         format: 'iife',
         banner: { js: '<script>' },
         footer: { js: '</script>' },

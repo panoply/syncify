@@ -1,7 +1,12 @@
 /**
  * HOT reload snippet filename
  */
-export const HOT_SNIPPET = 'hot.js.liquid';
+export const HOT_SNIPPET_FILE = 'hot.js.liquid';
+
+/**
+ * HOT reload snippet filename
+ */
+export const HOT_SNIPPET_NAME = 'hot.js';
 
 /**
  * Syncify configuration files
@@ -44,7 +49,6 @@ export const BASE_DIRS = [
  */
 export const PATH_KEYS = [
   'assets',
-  'styles',
   'config',
   'layout',
   'customers',
@@ -124,6 +128,26 @@ export const ESBUILD_NOT_INSTALLED = [
   'and configured as a processor. Install esbuild and configure Syncify',
   'to apply transforms to leverage script minification.'
 ];
+
+/**
+ * Bundle Require related constant
+ */
+export const DIRNAME_VAR_NAME = '__injected_dirname__';
+
+/**
+ * Bundle Require related constant
+ */
+export const FILENAME_VAR_NAME = '__injected_filename__';
+
+/**
+ * Bundle Require related constant
+ */
+export const IMPORT_META_URL_VAR_NAME = '__injected_import_meta_url__';
+
+/**
+ * Bundle Require esbuild extension validation
+ */
+export const REGEX_EXTJS = /\.(mjs|cjs|ts|js|tsx|jsx)$/;
 
 /**
  * Shopify response line number

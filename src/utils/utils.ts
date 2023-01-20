@@ -1,7 +1,8 @@
 import strip from 'strip-json-comments';
 import { bold, gray } from '~log';
-import { isString, isBuffer, isArray, isObject, ws } from './native';
+import { isString, isBuffer, isArray, isObject, ws, isFunction } from './native';
 import { EventEmitter } from 'node:events';
+import { createRequire } from 'node:module';
 import zlib from 'node:zlib';
 import { UNITS } from '../const';
 
@@ -96,6 +97,41 @@ export function sanitize (message: string | Buffer | object | any[]): string {
   return String(message);
 
 };
+
+/**
+ * Dynamically import files.
+ *
+ * As a temporary workaround for Jest's lack of stable ESM support, we fallback to require
+ * if we're in a Jest environment.
+ *
+ * See https://github.com/vitejs/vite/pull/5197#issuecomment-938054077
+ *
+ * @param file File path to import.
+ */
+export async function dynamicImport (id: string, { format }) {
+
+  if (format === 'esm') {
+
+    return (file: string) => import(file);
+
+  } else {
+
+    return getImport(id);
+
+  }
+
+};
+
+/**
+ * Infer JavaScript loader (used for esbuild related logic)
+ */
+export function inferLoader <T> (ext: string): T {
+
+  if (ext === '.mjs' || ext === '.cjs') return 'js' as T;
+
+  return ext.slice(1) as T;
+
+}
 
 /**
  * Will captilalize the first letter of a string. Used
@@ -254,3 +290,27 @@ export function getSize (string: string | Buffer): number {
     : string.toString().length;
 
 };
+
+/**
+ * Small helper for determining how an external dependency should
+ * be resolved, returning an import resolver.
+ */
+export function getImport <T> (id: string): T {
+
+  if (isFunction(globalThis.require)) {
+    return globalThis.require(id);
+  }
+
+  // @ts-expect-error
+  return createRequire(import.meta.url)(id);
+
+}
+
+/**
+ * Generate a random UUID
+ */
+export function uuid (): string {
+
+  return Math.random().toString(36).slice(2);
+
+}

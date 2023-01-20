@@ -12,6 +12,11 @@ export type Methods = 'get' | 'post' | 'put' | 'delete'
 export type Client = (method: Methods, file: File, content?: string) => Promise<void>
 
 /**
+ * Client Request as parameter
+ */
+export type ClientParam<T> = (method: Methods, file: File<T>, content?: string) => Promise<void>
+
+/**
  * Resources
  */
 export type Resource = 'build' | 'watch' | 'upload' |'download'

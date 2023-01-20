@@ -164,6 +164,10 @@ export type SASSProcesser = GetProcessorConfigs<SASSConfig>
  */
 export type StyleBundle = Merge<StyleTransform, {
   /**
+   * A UUID reference for this bundle.
+   */
+  uuid: string;
+  /**
    * Resolved input path
    */
   input: string;

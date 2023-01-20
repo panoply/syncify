@@ -67,7 +67,7 @@ export function watch (callback: Syncify) {
 
       if (file.type === Type.Script) {
 
-        return script(file as File<ScriptTransform>, request.assets, wss, callback);
+        return script.apply(wss, [ file, request.assets, callback ]);
 
       } else if (file.type === Type.Page) {
 
@@ -81,7 +81,11 @@ export function watch (callback: Syncify) {
 
         value = await styles(file as File<StyleTransform>, callback);
 
-        if (bundle.mode.hot) wss.stylesheet(file.key);
+        if (bundle.mode.hot) {
+
+          wss.stylesheet(file.key);
+
+        }
 
       } else if (file.type === Type.Section) {
 
@@ -91,7 +95,11 @@ export function watch (callback: Syncify) {
 
         value = await liquid(file, callback);
 
-        if (bundle.hot) value = inject(value);
+        if (bundle.mode.hot) {
+
+          value = inject(value);
+
+        };
 
       } else if (file.type === Type.Snippet) {
 

@@ -18,6 +18,7 @@ import { Sticky } from './controllers/sticky';
 // import { Rewaxing } from './controllers/rewaxing';
 // import { Subscription } from './controllers/subscribe';
 
+console.log('foo xsssssssp');
 export default brixtol({
   targets: [
     '#navigation',

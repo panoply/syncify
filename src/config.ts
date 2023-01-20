@@ -129,9 +129,7 @@ export const processor: PartialDeep<ProcessorConfig> = {
       format: 'esm',
       splitting: false,
       sourcemap: true,
-      watch: false,
       write: false,
-      incremental: true,
       logLevel: 'silent',
       plugins: []
     }
@@ -309,7 +307,7 @@ export const bundle = {
     scroll: 'preserved',
     layouts: [ 'theme.liquid' ],
     label: 'visible',
-    renderer: '{% render \'hot.js.liquid\', server: 3000, socket: 8089 %}',
+    renderer: '{% render \'hot.js\', server: 3000, socket: 8089 %}',
     snippet: null,
     output: null,
     alive: {}
@@ -347,7 +345,9 @@ export const bundle = {
   },
   watch: new Set(),
   logger: {},
-  paths: {},
+  paths: {
+    transforms: new Map()
+  },
   section: {
     prefixDir: false,
     separator: '-',
@@ -384,6 +384,7 @@ export const bundle = {
   set config (merge: Config) { assign(options, merge); },
   get config () { return options; },
   get processor () { return processor; },
+
   minify: {
     json: false,
     views: false,

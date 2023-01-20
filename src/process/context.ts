@@ -80,7 +80,11 @@ export function script (file: File<ScriptBundle>) {
 
   if (config.snippet) {
     file.namespace = 'snippets';
-    file.key = join('snippets', config.rename);
+    if (/\.liquid$/.test(config.rename)) {
+      file.key = join('snippets', config.rename);
+    } else {
+      file.key = join('snippets', config.rename + '.liquid');
+    }
   } else {
     file.key = join('assets', config.rename);
   }

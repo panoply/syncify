@@ -1,4 +1,3 @@
-import { Bundle } from 'types';
 import { join, basename } from 'node:path';
 import { Server } from 'ws';
 import statics from 'serve-static';
@@ -10,6 +9,7 @@ import { bundle } from '~config';
 import { injectSnippet, injectRender } from './inject';
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { isArray } from '~utils/native';
+import { HOTSockets } from 'types';
 
 async function injection () {
 
@@ -40,13 +40,14 @@ async function injection () {
         }
 
         log.update(tui.message('gray', 'layout was bundled from source, injecting hot snippet'));
+
       }
 
       const render = await injectRender(layout);
 
       if (!render) {
         log.update.clear();
-        log.err('Failed to inject render tag');
+        log.err('Failed to inject hot reload render tag');
       }
     }
 
@@ -66,7 +67,7 @@ async function injection () {
  *
  * Creates a server for assets files in hot mode
  */
-export async function server (bundle: Bundle) {
+export async function server () {
 
   log.out(tui.message('whiteBright', bold(`${bundle.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reloading:`)));
   log.nwl();
@@ -75,8 +76,10 @@ export async function server (bundle: Bundle) {
   await injection();
 
   function setHeaders (res: any) {
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'public, max-age=0');
+
   }
 
   const assets = statics(join(bundle.dirs.output, 'assets'), { setHeaders });
@@ -95,7 +98,7 @@ export async function server (bundle: Bundle) {
  * Used in `watch` mode and faciliatates the hot reloading
  * by sending change events to the document.
  */
-export function socket () {
+export function socket (): HOTSockets {
 
   const wss = new Server({
     port: bundle.hot.socket,

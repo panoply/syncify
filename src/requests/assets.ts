@@ -60,7 +60,19 @@ export async function upload (asset: string, config: { theme: Theme, key: FileKe
     }
   });
 
-  return axios(request).then(() => true).catch(() => false);
+  return axios(request).then(() => {
+
+    return true;
+
+  }).catch((e: AxiosError) => {
+
+    log.failed(config.key);
+
+    error.request(config.key, e.response);
+
+    return false;
+
+  });
 
 };
 

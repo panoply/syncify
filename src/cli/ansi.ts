@@ -29,6 +29,7 @@ export type Colors = (
   | 'lightGray'
   | 'neonCyan'
   | 'neonGreen'
+  | 'neonRouge'
   | 'orange'
   | 'pink'
 )
@@ -88,6 +89,11 @@ export const neonGreen = ansis.hex('#56ef83');
  * Neon Cyan
  */
 export const neonCyan = ansis.hex('#69d5fd');
+
+/**
+ * Neon Rouge
+ */
+export const neonRouge = ansis.hex('#D47179');
 
 /* -------------------------------------------- */
 /* TREE CHARACTERS                              */

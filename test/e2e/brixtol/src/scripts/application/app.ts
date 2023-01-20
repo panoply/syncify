@@ -19,8 +19,9 @@ function gtag (...args: any[]) {
 
 export function brixtol ({ targets, screens, controllers }) {
 
+  console.log('hello    ');
   /**
-   * spx Connection
+   * spx Connectio
    */
   spx.connect({
     targets,

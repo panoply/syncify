@@ -359,10 +359,20 @@ export interface Bundle {
    * Hot reload mode options
    */
   hot: HOT;
-   /**
-    * Directory structure paths
-    */
-  paths: Paths<Tester>
+  /**
+   * Directory structure paths.
+   *
+   * Includes a special `transforms` Map reference for transform related files
+   * which may potentially be using an extension which would lead to it being identified
+   * as a different file type. This occurs when (for example) snippet generated transforms
+   * are inferred. The `transform` option will point to resolved file names and the values
+   * for each entry will equal an enum `Type` number. The following transforms are identifiable:
+   *
+   * - `7` > `Type.Style`
+   * - `8` > `Type.Script`
+   * - `9` > `Type.SVG`
+   */
+  paths: Merge<Paths<Tester>, { transforms?: Map<string, 7 | 8 | 9> }>;
    /**
     * Base directory path references
     */
@@ -407,7 +417,7 @@ export interface Bundle {
     */
   watch: Set<string>
   /**
-   * Section handling
+   * Snippet handling
    */
   snippet: Merge<Views['snippets'], { global: RegExp; }>;
   /**

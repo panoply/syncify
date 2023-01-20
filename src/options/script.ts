@@ -9,7 +9,9 @@ import { getTransform, renameFile } from './utilities';
 import { assign, defineProperty, isArray, isObject } from '~utils/native';
 import { getTSConfig } from './files';
 import { bundle, processor } from '~config';
-import { load, pluginWatch, pluginPaths, esbuild as runtime } from '~transform/script';
+import { module, pluginWatch, pluginPaths, esbuild as runtime } from '~transform/script';
+import { uuid } from '~utils/utils';
+import { Type } from '~process/files';
 // import { log } from '~log';
 
 /**
@@ -30,7 +32,8 @@ export async function setScriptOptions (config: Config, pkg: Package) {
 
   if (esbuild.installed) {
 
-    const loaded = await load();
+    const loaded = await module();
+
     if (!loaded) throwError('failed to import ESBuild', 'Ensure you have installed esbuild');
 
     const esb = await readConfigFile<ESBuildConfig>('esbuild.config');
@@ -75,6 +78,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     }
 
     const o: ScriptBundle = {
+      uuid: uuid(),
       input: transform.input as string,
       snippet: transform.snippet,
       rename: null,
@@ -97,6 +101,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     if (transform.snippet) {
       if (!name.endsWith('.liquid')) o.rename = name + '.liquid';
       bundle.watch.add(`!${join(bundle.cwd, config.output, 'snippets', o.rename)}`);
+      bundle.paths.transforms.set(o.input, Type.Script);
     } else {
       if (name.endsWith('.liquid')) warn('Using .liquid extension rename for asset', name);
       bundle.watch.add(`!${join(bundle.cwd, config.output, 'assets', o.rename)}`);
@@ -141,14 +146,10 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     // of script imports. We will use this in watch process
     const entries: ESBuildConfig = assign(
       {},
-      isObject(transform.esbuild)
-        ? transform.esbuild
-        : esbuild.config,
+      isObject(transform.esbuild) ? transform.esbuild : esbuild.config,
       {
         entryPoints: [ transform.input ],
         write: false,
-        watch: false,
-        incremental: true,
         sourcemap: false,
         // logLevel: 'silent',
         absWorkingDir: bundle.cwd,
@@ -175,13 +176,19 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     } catch (e) {
 
       // TODO - HANDLE RUNTIME ERRORS
-      console.error(e);
+      throw new Error(e);
 
     }
 
-    transform.watch.forEach(p => bundle.watch.add(p));
+    transform.watch.forEach(p => {
+
+      if (!bundle.watch.has(p)) bundle.watch.add(p);
+
+    });
 
     o.watch = anymatch(transform.watch);
+
+    await module(o);
 
     bundle.script.push(o);
 

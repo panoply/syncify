@@ -20,7 +20,7 @@ import { setStyleConfig } from '~options/style';
 import { setSvgOptions } from '~options/svgs';
 import { setMinifyOptions } from '~options/minify';
 import { authURL } from '~options/utilities';
-import { PATH_KEYS, HOT_SNIPPET } from '~const';
+import { PATH_KEYS, HOT_SNIPPET_FILE } from '~const';
 import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError } from '~log/validate';
 import { log } from '~log';
 import { bundle, cache, processor, plugins, options } from '~config';
@@ -90,6 +90,7 @@ export async function define (cli: Commands, _options?: Config) {
  */
 async function setHotReloads (config: Config) {
 
+  if (bundle.mode.watch !== true) return;
   if (bundle.mode.hot === false && config.hot === false) return;
   if (bundle.mode.hot === false && config.hot === true) bundle.mode.hot = true;
 
@@ -146,11 +147,12 @@ async function setHotReloads (config: Config) {
     }
   }
 
-  hot.snippet = join(bundle.cwd, 'node_modules', '@syncify/cli', HOT_SNIPPET);
-  hot.output = join(bundle.dirs.output, 'snippets', HOT_SNIPPET);
+  hot.snippet = join(bundle.cwd, 'node_modules', '@syncify/cli', HOT_SNIPPET_FILE);
+  hot.output = join(bundle.dirs.output, 'snippets', HOT_SNIPPET_FILE);
 
-  for (const layout of hot.layouts) hot.alive[join(bundle.dirs.output, 'layout', layout)] = false;
-
+  for (const layout of hot.layouts) {
+    hot.alive[join(bundle.dirs.output, 'layout', layout)] = false;
+  }
 }
 
 /**

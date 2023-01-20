@@ -158,6 +158,10 @@ export type ESBuildProcesser = Merge<
  */
 export type ScriptBundle = Merge<ScriptTransform, {
   /**
+   * A UUID reference for this bundle.
+   */
+  uuid: string;
+  /**
    * Resolved input path
    */
   input: string;

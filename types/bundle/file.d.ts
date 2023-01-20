@@ -105,7 +105,7 @@ export type FileResources = LiteralUnion<
  * resource and used to dispatch to correct transform
  * process.
  */
-interface File<T = unknown> extends ParsedPath {
+interface File<T = any> extends ParsedPath {
   /**
    * The file type that was intercepted. This is an enum number value.
    * The number value will infer on how the file should be handled.

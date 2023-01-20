@@ -3,6 +3,38 @@
 /* LIVE RELOADS                                 */
 /* -------------------------------------------- */
 
+export interface HOTSockets {
+  /**
+   * Hot Socket for `<script>` tags
+   */
+  script(src: string): boolean;
+  /**
+   * Hot Socket for `<link>` stylesheet tags
+   */
+  stylesheet(href: string): boolean;
+  /**
+   * Hot Socket for theme sections
+   */
+  section(id: string): boolean;
+  /**
+   * Hot Socket SVG tags or sprites
+   */
+  svg(id: string): boolean;
+  /**
+   * Hot Socket for other asset files
+   */
+  assets(): boolean;
+  /**
+   * Hot Socket for `refresh` mode
+   */
+  reload(): boolean;
+  /**
+   * Hot Socket for view replacement
+   */
+  replace(): boolean;
+
+}
+
 export interface HOT {
   /**
    * Whether or not Syncify hot reloads UI labels should render.

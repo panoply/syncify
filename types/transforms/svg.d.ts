@@ -166,6 +166,10 @@ export type SVGSpriteProcesser = GetProcessorConfigs<SVGSpriteConfig>
  */
 export type SVGBundle = Merge<SVGTransform, {
   /**
+   * A UUID reference for this bundle.
+   */
+  uuid: string;
+  /**
    * Resolved input paths (paths are expanded)
    */
   input: Set<string>;

@@ -5,7 +5,7 @@ import { has } from 'rambdax';
 import { basename, extname } from 'path';
 import { lastPath } from './paths';
 import { isUndefined } from './native';
-import { bundleRequire } from 'bundle-require';
+import { bundleRequire } from '~utils/require';
 
 /**
  * Store Authorization URL

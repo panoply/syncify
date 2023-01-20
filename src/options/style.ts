@@ -13,6 +13,8 @@ import { bundle, processor } from '~config';
 import { load } from '~transform/styles';
 import { getTransform } from './utilities';
 import * as u from '~utils/native';
+import { uuid } from '~utils/utils';
+import { Type } from '~process/files';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -21,6 +23,7 @@ import * as u from '~utils/native';
 type PostCSSProcess = Processors['postcss']
 type SassDartProcess = Processors['sass']
 type StylesFlattened = Merge<StyleTransform, {
+  uuid: string;
   input: string;
   watch: Tester
 }>
@@ -83,6 +86,7 @@ export async function setStyleConfig (config: Config, pkg: Package) {
 
     // Default Dart SASS options compile model for each style
     const compile: typeof style = {
+      uuid: uuid(),
       input: style.input,
       watch: null,
       postcss: false,
@@ -251,8 +255,11 @@ export async function setStyleConfig (config: Config, pkg: Package) {
         compile.rename = rename.name + '.liquid';
       }
 
+      bundle.paths.transforms.set(compile.input, Type.Style);
       bundle.watch.add(`!${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
+
     } else {
+
       compile.rename = rename.name;
       bundle.watch.add(`!${join(bundle.cwd, config.output, 'assets', rename.name)}`);
     }

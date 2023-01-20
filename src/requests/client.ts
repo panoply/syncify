@@ -1,5 +1,5 @@
 import { Request, Store, File, Methods, Sync, Requests, Theme } from 'types';
-import { mapFastAsync } from 'rambdax';
+import { mapParallelAsync } from 'rambdax';
 import { queue } from '../requests/queue';
 import { assign, isUndefined } from '../utils/native';
 import * as asset from '../requests/assets';
@@ -26,7 +26,7 @@ export const client = ({ stores, themes }: Sync) => ({
 
   assets: async <T>(method: Methods, file: File<T>, content?: any) => {
 
-    const payload: Request = isUndefined(content) ? {
+    const payload: Partial<Request> = isUndefined(content) ? {
       method,
       params: {
         'asset[key]': file.key
@@ -41,9 +41,9 @@ export const client = ({ stores, themes }: Sync) => ({
       }
     };
 
-    await queue.add(() => mapFastAsync<Theme, any>(async theme => {
+    await queue.add(() => mapParallelAsync<Theme, any>(async theme => {
 
-      await asset.sync(theme, file, assign<any, any, Request>(
+      await asset.sync(theme, file, assign<any, any, Partial<Request>>(
         { url: theme.url },
         stores[theme.sidx].client,
         payload
@@ -56,7 +56,7 @@ export const client = ({ stores, themes }: Sync) => ({
 
     return queue.add(function () {
 
-      return mapFastAsync<Store, any>(async function (store) {
+      return mapParallelAsync<Store, any>(async function (store) {
 
         //  await pages.sync(store, content);
 
@@ -70,7 +70,7 @@ export const client = ({ stores, themes }: Sync) => ({
 
     return queue.add(function () {
 
-      return mapFastAsync<Store, any>(async function (store) {
+      return mapParallelAsync<Store, any>(async function (store) {
 
         await metafields.sync(store, content);
 

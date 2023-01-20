@@ -10,6 +10,7 @@ import { isObject, nl } from '~utils/native';
 import { load } from '~transform/svgs';
 import { bundle, processor } from '~config';
 import { getTransform, getModules } from '~options/utilities';
+import { uuid } from '~utils/utils';
 
 /**
  * SVG Icon Transforms
@@ -68,6 +69,7 @@ export async function setSvgOptions (config: Config, pkg: Package) {
     }
 
     const o: SVGBundle = {
+      uuid: uuid(),
       input: new Set(files),
       match: svg.match,
       format: null,

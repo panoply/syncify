@@ -1,12 +1,12 @@
-import type { Syncify, File, ScriptTransform, ESBuildConfig, Methods } from 'types';
-import type ESBuild from 'esbuild';
+import type { Syncify, File, ScriptTransform, ESBuildConfig, HOTSockets, ClientParam, ScriptBundle } from 'types';
+import ESBuild from 'esbuild';
 import { join, resolve, normalize, relative } from 'node:path';
-import { has, isNil } from 'rambdax';
+import { has, isNil, isType } from 'rambdax';
 import glob from 'fast-glob';
-import { nil, keys, assign } from '~utils/native';
+import { nil, keys, assign, isObject } from '~utils/native';
 import { writeFile } from 'fs-extra';
 import { log, error, bold } from '~log';
-import { byteSize, event, byteConvert } from '~utils/utils';
+import { byteSize, event, byteConvert, getImport } from '~utils/utils';
 import * as timer from '~utils/timer';
 import { bundle, cache, minify, processor } from '~config';
 
@@ -17,9 +17,18 @@ import { bundle, cache, minify, processor } from '~config';
 export const paths: Set<string> = new Set();
 
 /**
- * ESBuild Module
+ * ESBuild Cached
+ */
+export const context: { [uuid: string]: ESBuild.BuildContext } = {};
+
+/**
+ * ESBuild Instance
  */
 export let esbuild: typeof ESBuild = null;
+
+/* -------------------------------------------- */
+/* FUNCTIONS                                    */
+/* -------------------------------------------- */
 
 /**
  * Load ESBuild
@@ -28,13 +37,35 @@ export let esbuild: typeof ESBuild = null;
  * letting `esbuild`. This allows users to optionally include
  * modules in the build.
  */
-export async function load () {
+export const module = async (options?: ScriptBundle): Promise<boolean> => {
 
-  esbuild = await import('esbuild');
+  if (isObject(options)) {
 
-  return isNil(esbuild) === false;
+    if (has(options.uuid, context)) {
 
-}
+      await context[options.uuid].dispose();
+
+      if (bundle.minify.script === true) {
+        assign(options.esbuild, minify.script, { sourcemap: false });
+      }
+
+    }
+
+    context[options.uuid] = await esbuild.context(options.esbuild as ESBuildConfig);
+
+  } else {
+
+    esbuild = getImport('esbuild');
+
+    if (isNil(esbuild)) {
+      esbuild = null;
+      return false;
+    }
+
+    return true;
+
+  }
+};
 
 /* -------------------------------------------- */
 /* PLUGINS                                      */
@@ -122,6 +153,7 @@ export function pluginWatch (transform?: ScriptTransform): ESBuild.Plugin {
   return {
     name: 'syncify-watch',
     setup (build) {
+
       build.onResolve({ filter: /.*/ }, (args: ESBuild.OnResolveArgs) => {
 
         if (!/node_modules/.test(args.importer) && /^[./]/.test(args.path)) {
@@ -168,101 +200,149 @@ export function pluginWatch (transform?: ScriptTransform): ESBuild.Plugin {
 
 export const createSnippet = (string: string) => '<script>' + string + '</script>';
 
+async function handler<T extends ScriptBundle> (
+  output: ESBuild.OutputFile[],
+  file: File<T>,
+  request: ClientParam<T>,
+  hook: Syncify
+) {
+
+  const option = file.config;
+  const config = option.esbuild as ESBuildConfig;
+
+  for (const { text, path } of output) {
+
+    if (/\.map$/.test(path)) {
+
+      const map = join(cache.script.uri, file.base);
+
+      writeFile(map, text).catch(
+        error.write('Error writing JavaScript Source Map to cache', {
+          file: relative(bundle.cwd, map),
+          source: file.relative
+        })
+      );
+
+    } else {
+
+      if (bundle.mode.watch) {
+        log.process(bold('ESBuild'), timer.stop());
+      }
+
+      log.transform(`${bold(config.format.toUpperCase())} bundle → ${bold(byteConvert(byteSize(text)))}`);
+
+      let data: string;
+
+      if (option.snippet) {
+
+        data = createSnippet(text);
+
+        if (isType('Function', hook)) {
+
+          const update = hook.apply({ ...file }, data);
+
+          if (update === false) {
+            log.external('cancelled');
+            continue;
+          } else if (isType('String', update)) {
+            log.external('augment');
+            data = update;
+          } else if (Buffer.isBuffer(update)) {
+            log.external('augment');
+            data = update.toString();
+          }
+
+        }
+
+        await writeFile(file.output, data).catch(
+          error.write('Error writing inline <script> snippet', {
+            file: file.relative
+          })
+        );
+
+        log.transform(`exported as ${bold('snippet')}`);
+
+        if (!bundle.mode.build) {
+          if (bundle.mode.hot) {
+            request('put', file, data);
+          } else {
+            await request('put', file, data);
+          }
+        }
+
+      } else {
+
+        data = text;
+
+        if (isType('Function', hook)) {
+
+          const update = hook.apply({ ...file }, text);
+
+          if (update === false) {
+            log.external('cancelled');
+            continue;
+          } else if (isType('String', update)) {
+            log.external('augment');
+            data = update;
+          } else if (Buffer.isBuffer(update)) {
+            log.external('augment');
+            data = update.toString();
+          }
+
+        }
+
+        await writeFile(file.output, text).catch(
+          error.write('Error writing JavaScript asset', {
+            file: file.relative
+          })
+        );
+
+        if (!bundle.mode.build) {
+          if (bundle.mode.hot) {
+            request('put', file, text);
+          } else {
+            await request('put', file, text);
+          }
+        }
+      }
+
+    }
+  }
+
+}
+
 /**
  * TypeScript/JavaScript compile
  *
  * Used for Script transformations.
  */
-export async function compile (
-  file: File<ScriptTransform>,
-  request: (
-    method: Methods,
-    file: File<ScriptTransform>,
-    content?: any
-  ) => Promise<any[]>,
-  wss: {
-    script: (src: string) => boolean;
-    stylesheet: (href: string) => boolean;
-    section: (id: string) => boolean;
-    svg: (id: string) => boolean;
-    assets: () => boolean;
-    reload: () => boolean;
-    replace: () => boolean;
-  },
-  _cb: Syncify
-) {
+export async function compile <T extends ScriptBundle> (
+  this: HOTSockets,
+  file: File<T>,
+  request: ClientParam<T>,
+  hook: Syncify
+): Promise<void> {
 
   if (bundle.mode.watch) timer.start();
 
-  const options = file.config;
-
-  if (bundle.minify.script === true) assign(options.esbuild, minify.script, { sourcemap: false });
-
+  console.log(file, context);
   try {
 
-    const compile = await esbuild.build(options.esbuild as ESBuildConfig);
+    const result = await context[file.config.uuid].rebuild();
 
-    for (const { text, path } of compile.outputFiles) {
+    await handler(result.outputFiles, file, request, hook);
 
-      if (/\.map$/.test(path)) {
-
-        const map = join(cache.script.uri, file.base);
-
-        writeFile(join(cache.script.uri, file.base), text).catch(
-          error.write('Error writing JavaScript Source Map file to the cache directory', {
-            file: relative(bundle.cwd, map),
-            source: file.relative
-          })
-        );
-
-      } else {
-
-        if (bundle.mode.watch) log.process(bold('ESBuild'), timer.stop());
-
-        const { format } = options.esbuild as any;
-
-        log.transform(`${bold(format.toUpperCase())} bundle → ${bold(byteConvert(byteSize(text)))}`);
-
-        if (options.snippet) {
-
-          const snippet = createSnippet(text);
-
-          await writeFile(file.output, snippet).catch(
-            error.write('Error writing inline <script> snippet', {
-              file: file.relative
-            })
-          );
-
-          if (!bundle.mode.build) {
-            await request('put', file, createSnippet(text));
-          }
-
-          log.transform(`exported as ${bold('snippet')}`);
-
-        } else {
-
-          await writeFile(file.output, text).catch(
-            error.write('Error writing JavaScript asset', {
-              file: file.relative
-            })
-          );
-
-          if (!bundle.mode.build) {
-            await request('put', file, text);
-          }
-        }
-
-      }
+    if (bundle.mode.hot) {
+      log.syncing(file.key);
+      this.script(file.key);
     }
 
-    if (bundle.mode.hot) wss.script(file.key);
-
-  } catch (err) {
+  } catch (error) {
 
     log.invalid(file.relative);
 
-    if (has('errors', err)) {
-      for (const e of err.errors as ESBuild.BuildResult['errors']) {
+    if (has('errors', error)) {
+      for (const e of error.errors as ESBuild.BuildResult['errors']) {
         error.esbuild(e);
       }
     }

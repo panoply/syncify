@@ -2,7 +2,7 @@ import { defineConfig } from '@syncify/cli';
 import autoprefix from 'autoprefixer';
 
 export default defineConfig({
-  clean: true,
+  clean: false,
   input: 'src',
   output: 'theme',
   stores: {

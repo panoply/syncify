@@ -41,6 +41,7 @@ type Prefixes = (
   | 'syncing'
   | 'queued'
   | 'pending'
+  | 'external'
   | 'uploaded'
   | 'invalid'
   | 'failed'

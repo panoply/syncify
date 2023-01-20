@@ -14,7 +14,7 @@
   "compilerOptions": {
     "types": ["node"],
     "incremental": true,
-    "target": "ES6",
+    "target": "ESNext",
     "removeComments": true,
     "lib": ["es2020", "DOM"],
     "module": "CommonJS",

@@ -4,7 +4,7 @@ import type { AssetRequest } from '~requests/client';
 import type SVGO from 'svgo';
 import { join } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
-import { isNil, mapFastAsync } from 'rambdax';
+import { isNil, mapParallelAsync } from 'rambdax';
 import { toArray, assign } from '~utils/native';
 import { log, error, bold, arrow } from '~log';
 import { bundle, processor } from '~config';
@@ -106,7 +106,7 @@ export function compileSprite (context: File<SVGBundle[]>, request: AssetRequest
 
     const options = (config.sprite === true ? processor.sprite.config : config.sprite) as SVGSpriteConfig;
     const sprite = new SVGSprite(options);
-    const svgs = await mapFastAsync(getFile, toArray(config.input)).catch(
+    const svgs = await mapParallelAsync(getFile, toArray(config.input)).catch(
       error.write('Error reading an SVG file', {
         file: file.base,
         source: file.relative

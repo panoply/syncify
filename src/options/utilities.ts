@@ -7,7 +7,7 @@ import glob from 'fast-glob';
 import anymatch, { Tester } from 'anymatch';
 import { pathExists } from 'fs-extra';
 import { anyTrue, has } from 'rambdax';
-import { bundleRequire } from 'bundle-require';
+import { bundleRequire } from '~utils/require';
 import { lastPath, normalPath, globPath } from '~utils/paths';
 import { isArray, isObject, isString, isUndefined, assign, isFunction } from '~utils/native';
 import { typeError, invalidError, unknownError, warnOption, throwError } from '~log/validate';

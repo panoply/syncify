@@ -97,6 +97,7 @@ export interface Transforms {
    *    'snippets/style.liquid': 'path/to/foo.css' // write as snippet
    *   }
    * }
+   *
    * // OPTION 2 - Rename with multiple inputs
    * {
    *   style: {
@@ -106,6 +107,7 @@ export interface Transforms {
    *    ]
    *   }
    * }
+   *
    * // OPTION 3 - Rename with overrides
    * {
    *   style: {
@@ -116,6 +118,7 @@ export interface Transforms {
    *    }
    *   }
    * }
+   *
    * // OPTION 4 - Single config
    * {
    *   style: {
@@ -129,6 +132,7 @@ export interface Transforms {
    *     }
    *   }
    * }
+   *
    * // OPTION 5 - Multiple configs
    * {
    *   style: [
@@ -168,6 +172,7 @@ export interface Transforms {
    *    'snippets/js-file.liquid': 'path/to/source/foo.ts' // write as snippet
    *   }
    * }
+   *
    * // OPTION 2 - Rename with multiple inputs
    * {
    *   script: {
@@ -177,6 +182,7 @@ export interface Transforms {
    *    ]
    *   }
    * }
+   *
    * // OPTION 3 - Rename with overrides
    * {
    *   script: {
@@ -187,6 +193,7 @@ export interface Transforms {
    *    }
    *   }
    * }
+   *
    * // OPTION 4 - Single config
    * {
    *   script: {
@@ -195,6 +202,7 @@ export interface Transforms {
    *     esbuild: {}
    *   }
    * }
+   *
    * // OPTION 5 - Multiple configs
    * {
    *   script: [

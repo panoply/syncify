@@ -210,6 +210,7 @@ declare global {
     dom.querySelectorAll('link[rel=stylesheet]').forEach((node) => {
 
       const href = node.getAttribute('href');
+
       if (!assetMatch(href, uri)) return;
 
       node.setAttribute('href', server + params(href));
@@ -224,22 +225,24 @@ declare global {
    * Asset scripts - Selects all `<script src="*">` nodes and clones the
    * tags then replaces the current elements with the newer ones.
    */
-  function scripts (dom: Document, uri?: string) {
+  function scripts (dom: Document | HTMLHeadElement, uri?: string) {
 
-    dom.querySelectorAll('script[src]').forEach((node) => {
+    dom.querySelectorAll('script').forEach((node) => {
+
+      if (!node.hasAttribute('src')) return;
 
       const href = node.getAttribute('src');
+
       if (!assetMatch(href, uri)) return;
 
-      const script = dom.createElement('script');
+      const script = document.createElement('script');
       script.setAttribute('src', server + params(href));
 
       for (const attr of Array.from(node.attributes)) {
         if (attr.nodeName !== 'src') script.setAttribute(attr.nodeName, attr.nodeValue);
       }
 
-      dom.head.removeChild(node);
-      dom.head.appendChild(script);
+      node.replaceWith(script);
 
     });
 

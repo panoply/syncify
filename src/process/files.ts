@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import { join, parse, relative, extname } from 'node:path';
-import { File, Paths } from 'types';
+import { Bundle, File, Paths } from 'types';
 import { assign, nil } from '~utils/native';
 import { lastPath } from '~utils/paths';
 import { Partial } from 'rambdax';
@@ -25,9 +25,9 @@ export const enum Type {
   Locale,
   Style,
   Script,
+  Svg,
   Redirect,
   File,
-  Svg,
   Asset,
   Metafield,
   Page,
@@ -157,7 +157,7 @@ export function setFile (file: Partial<File>, input: string, output: string) {
  * @param paths The Anymatch tester
  * @param output The output base directory path
  */
-export function parseFile (paths: Paths<Tester>, output: string) {
+export function parseFile (paths: Bundle['paths'], output: string) {
 
   return (path: string) => {
 
@@ -176,9 +176,15 @@ export function parseFile (paths: Paths<Tester>, output: string) {
         return merge('templates', Type.Template, Kind.Liquid);
       } else if (paths.customers(path)) {
         return merge('templates/customers', Type.Template, Kind.Liquid);
+      } else if (paths.transforms.has(path)) {
+        switch (paths.transforms.get(path)) {
+          case Type.Script: return context.script(merge('snippets', Type.Script, Kind.JavaScript));
+          case Type.Style: return context.script(merge('snippets', Type.Style, Kind.CSS));
+        }
       }
 
     } else if (file.ext === '.md' || file.ext === '.html') {
+
       return merge('pages', Type.Page, file.ext === '.html' ? Kind.HTML : Kind.Markdown);
 
     } else if (file.ext === '.json') {

@@ -74,7 +74,9 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   process.on('unhandledRejection', rejection);
 
   if (bundle.mode.hot) {
-    await server(bundle);
+
+    await server();
+
   }
 
   // console.log(bundle);

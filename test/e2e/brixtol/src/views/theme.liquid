@@ -19,29 +19,27 @@
     </title>
 
     {% render 'favicons' %}
-    {% render 'meta_tags' %}
-    {% render 'preloads' %}
-    {% render 'styles.css' %}
-    {% render 'scripts.js' %}
+
+
+
+    <script
+      src="{{ 'bundle.min.js' | asset_url }}"
+      data-spx-eval="false"
+      type="module"
+      defer></script>
 
     {{ content_for_header }}
 
   </head>
   <body>
 
-    {% render 'drawer_menu', overlay: 'drawer-overlay' %}
-    {% render 'drawer_cart', overlay: 'drawer-overlay' %}
 
-    {% section 'header' %}
 
     {{ content_for_layout }}
 
-    {% section 'footer' %}
-    {% section 'modal' %}
 
-    {% render 'drawer_gdrp', overlay: 'bg-visible' %}
-    {% render 'nodes' %}
+
     {% render 'icons' %}
-    {% render 'discounts' %}
+
   </body>
 </html>
