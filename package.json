@@ -39,8 +39,8 @@
     "node": ">=14",
     "vscode": "^1.22.0"
   },
-  "types": "types/index.d.ts",
-  "main": "dist/index.js",
+  "types": "./types/index.d.ts",
+  "main": "./dist/index.js",
   "bin": {
     "syncify": "dist/cli.js",
     "sync": "dist/cli.js"

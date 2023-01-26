@@ -40,7 +40,7 @@ export * from './transforms/svg';
  *
  * @example
  *
- * import { defineConfig } from '@liquify/syncify';
+ * import { defineConfig } from '@syncify/cli';
  *
  * export default defineConfig({
  *   //...

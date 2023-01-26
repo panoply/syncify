@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@syncify/cli": "link:../../..",
+    "@syncify/cli": "0.1.0-beta",
     "autoprefixer": "^10.4.13",
     "esbuild": "^0.17.4",
     "postcss": "^8.4.21",
