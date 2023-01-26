@@ -4840,7 +4840,6 @@ async function handler(output, file, request2, hook2) {
 async function compile5(file, request2, hook2) {
   if (bundle.mode.watch)
     start();
-  console.log(file, context2);
   try {
     const result = await context2[file.config.uuid].rebuild();
     await handler(result.outputFiles, file, request2, hook2);

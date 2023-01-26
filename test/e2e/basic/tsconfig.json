@@ -1,0 +1,34 @@
+{
+  "exclude": ["node_modules/**", "export", "theme"],
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": ["es2020", "dom", "dom.iterable"],
+    "module": "ESNext",
+    "allowUnreachableCode": true,
+    "checkJs": false,
+    "allowJs": true,
+    "incremental": true,
+    "outDir": "theme/assets",
+    "declaration": false,
+    "preserveSymlinks": true,
+    "allowSyntheticDefaultImports": true,
+    "keyofStringsOnly": true,
+    "esModuleInterop": true,
+    "ignoreDeprecations": "5.0",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "noImplicitThis": false,
+    "skipDefaultLibCheck": true,
+    "noStrictGenericChecks": true,
+    "noEmit": true,
+    "suppressExcessPropertyErrors": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "baseUrl": ".",
+    "pretty": true,
+    "typeRoots": ["node_modules/@types"],
+    "paths": {
+      "components/*": ["/source/assets/scripts/components/*.ts"]
+    }
+  }
+}

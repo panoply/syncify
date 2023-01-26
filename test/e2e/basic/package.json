@@ -4,12 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "syncify syncify -t dev --watch --minify",
+    "build": "syncify -t dev --build --prod --clean",
+    "upload": "syncify dev --upload",
+    "script": "syncify --script",
+    "style": "syncify --style",
+    "svg": "syncify --svg",
+    "image": "syncify --image",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@liquify/syncify": "link:../.."
+  "devDependencies": {
+    "@syncify/cli": "https://github.com/panoply/syncify/tarball/development",
+    "autoprefixer": "^10.4.13",
+    "esbuild": "^0.17.4",
+    "postcss": "^8.4.21",
+    "sass": "^1.57.1",
+    "svg-sprite": "^2.0.2",
+    "svgo": "^3.0.2"
   }
 }

@@ -325,7 +325,6 @@ export async function compile <T extends ScriptBundle> (
 
   if (bundle.mode.watch) timer.start();
 
-  console.log(file, context);
   try {
 
     const result = await context[file.config.uuid].rebuild();
