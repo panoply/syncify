@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@syncify/cli": "https://github.com/panoply/syncify/tarball/development",
+    "@syncify/cli": "link:../../..",
     "autoprefixer": "^10.4.13",
     "esbuild": "^0.17.4",
     "postcss": "^8.4.21",

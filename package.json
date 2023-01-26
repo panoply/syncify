@@ -125,7 +125,7 @@
     "sharp": "^0.31.3"
   },
   "peerDependencies": {
-    "esbuild": "^0.15.5",
+    "esbuild": "^0.17.3",
     "postcss": "^8.4.16",
     "sass": "^1.54.5",
     "svg-sprite": "^1.5.4",

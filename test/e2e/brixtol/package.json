@@ -14,7 +14,7 @@
     "email": "n@brixtol.com"
   },
   "scripts": {
-    "dev": "syncify syncify -t dev --watch --hot --minify",
+    "dev": "syncify syncify -t dev --watch --minify",
     "build": "syncify -t dev --build --prod --clean",
     "upload": "syncify dev --upload",
     "script": "syncify --script",

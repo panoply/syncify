@@ -100,6 +100,8 @@ export async function server () {
  */
 export function socket (): HOTSockets {
 
+  if (bundle.mode.hot === false) return;
+
   const wss = new Server({
     port: bundle.hot.socket,
     path: '/ws'

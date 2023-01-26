@@ -1,4 +1,4 @@
-import type { Syncify, File, Pages, StyleTransform, ScriptTransform, SVGBundle } from 'types';
+import type { Syncify, File, Pages, StyleTransform, SVGBundle } from 'types';
 import chokidar from 'chokidar';
 import { inject } from '~hot/inject';
 import { client, queue } from '~requests/client';
