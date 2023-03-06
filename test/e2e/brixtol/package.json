@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "syncify syncify -t dev --watch --minify",
     "build": "syncify -t dev --build --prod --clean",
-    "upload": "syncify dev --upload",
+    "upload": "syncify -t dev --upload",
     "script": "syncify --script",
     "style": "syncify --style",
     "svg": "syncify --svg",
