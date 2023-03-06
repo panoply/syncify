@@ -1,7 +1,7 @@
 {
   "name": "@syncify/cli",
   "description": "The next generation build tool for Shopify theme development.",
-  "version": "0.1.0-beta",
+  "version": "0.1.1-beta",
   "license": "MIT",
   "homepage": "https://github.com/panoply/syncify",
   "bugs": "https://github.com/panoply/syncify/issues",

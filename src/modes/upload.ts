@@ -23,6 +23,8 @@ export async function upload (cb?: Syncify): Promise<void> {
     const file = parse(path);
     const read = await readFile(path);
 
+    log.write(file.key);
+
     if (!hashook) return request.assets('put', file, read.toString());
 
     const update = cb.apply({ ...file }, read.toString());

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import { join, parse, relative, extname } from 'node:path';
+import { join, parse, relative, extname, basename } from 'node:path';
 import { Bundle, File, Paths } from 'types';
 import { assign, nil } from '~utils/native';
 import { lastPath } from '~utils/paths';
@@ -278,7 +278,7 @@ export const outputFile = (output: string) => (path: string) => {
   const file: Partial<File> = parse(path);
   const merge = setFile(file, path, output);
 
-  switch (lastPath(file.dir)) {
+  switch (basename(file.dir)) {
     case 'sections': return merge('sections', Type.Section);
     case 'snippets': return merge('snippets', Type.Snippet);
     case 'layout': return merge('layout', Type.Layout);
