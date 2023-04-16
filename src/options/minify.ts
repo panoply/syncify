@@ -23,7 +23,9 @@ export const setMinifyOptions = (config: Config) => {
       throwError('esbuild is not installed', ESBUILD_NOT_INSTALLED);
     }
 
-  } else if (isObject(config.minify)) {
+  }
+
+  if (isObject(config.minify)) {
 
     for (const key in config.minify as MinifyConfig) {
 

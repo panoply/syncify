@@ -42,13 +42,11 @@ export const module = async (options?: ScriptBundle): Promise<boolean> => {
   if (isObject(options)) {
 
     if (has(options.uuid, context)) {
-
       await context[options.uuid].dispose();
+    }
 
-      if (bundle.minify.script === true) {
-        assign(options.esbuild, minify.script, { sourcemap: false });
-      }
-
+    if (bundle.minify.script === true) {
+      assign(options.esbuild, minify.script, { sourcemap: false });
     }
 
     context[options.uuid] = await esbuild.context(options.esbuild as ESBuildConfig);

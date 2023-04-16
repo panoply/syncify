@@ -61,6 +61,7 @@ export async function define (cli: Commands, _options?: Config) {
     setStores(cli, options),
     setPaths(options),
     setProcessors(options),
+    setMinifyOptions(options),
     setViewOptions(options),
     setJsonOptions(options),
     setScriptOptions(options, pkg),
@@ -68,7 +69,6 @@ export async function define (cli: Commands, _options?: Config) {
     setSvgOptions(options, pkg),
     setSpawns(options, bundle),
     setPlugins(options, bundle),
-    setMinifyOptions(options),
     setHotReloads(options)
   ]).catch(e => {
 
