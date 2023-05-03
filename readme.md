@@ -32,19 +32,19 @@ Install as development dependency in your project.
 **PNPM**
 
 ```cli
-pnpm add @syncify/syncify -D
+pnpm add @syncify/cli -D
 ```
 
 **NPM**
 
 ```cli
-npm i @syncify/syncify --save-dev
+npm i @syncify/cli --save-dev
 ```
 
 **Yarn**
 
 ```cli
-yarn add @syncify/syncify --dev
+yarn add @syncify/cli --dev
 ```
 
 # Overview

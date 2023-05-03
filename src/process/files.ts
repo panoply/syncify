@@ -191,6 +191,8 @@ export function parseFile (paths: Bundle['paths'], output: string) {
 
       if (paths.metafields(path)) {
         return merge('metafields', Type.Metafield, Kind.JSON);
+      } else if (paths.sections(path)) {
+        return context.section(merge('sections', Type.Section, Kind.JSON));
       } else if (paths.templates(path)) {
         return merge('templates', Type.Template, Kind.JSON);
       } else if (paths.config(path)) {
