@@ -4886,7 +4886,7 @@ function esbuildModule() {
   }
   return true;
 }
-async function esbuildMetafile(options) {
+async function esbuildBundle(options) {
   if (processor.esbuild.loaded)
     options.watch.clear();
   const result = await esbuild2.build(options.esbuild);
@@ -4895,6 +4895,7 @@ async function esbuildMetafile(options) {
       if (!/node_modules/.test(file)) {
         const path2 = path$1.join(bundle.cwd, file);
         options.watch.add(path2);
+        console.log(path2);
         if (!bundle.watch.has(path2))
           bundle.watch.add(path2);
       }
@@ -4921,6 +4922,11 @@ async function compile5(file, sync3, hook2) {
           loggers_exports.importer(path$1.relative(bundle.cwd, config.input));
         }
         const result = await esbuild2.build(config.esbuild);
+        for (const file2 of keys(result.metafile.inputs).filter((file3) => !/node_modules/.test(file3))) {
+          const path2 = path$1.join(bundle.cwd, file2);
+          config.watch.add(path2);
+          bundle.watch.add(path2);
+        }
         await handle(result.outputFiles, config);
         loggers_exports.process(bold("ESBuild"), now());
         if (bundle.mode.hot) {
@@ -6785,7 +6791,7 @@ async function setScriptOptions(config, pkg) {
       scriptBundle.watch = new Set(watchers);
     }
     try {
-      await esbuildMetafile(scriptBundle);
+      await esbuildBundle(scriptBundle);
     } catch (e2) {
       throw new Error(e2);
     }

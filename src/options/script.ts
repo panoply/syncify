@@ -7,7 +7,7 @@ import { warnOption, missingDependency, invalidError, typeError, throwError } fr
 import { getResolvedPaths, getTransform, renameFile } from './utilities';
 import { isArray } from '~utils/native';
 import { bundle, processor } from '~config';
-import { esbuildModule, esbuildMetafile } from '~transform/script';
+import { esbuildModule, esbuildBundle } from '~transform/script';
 import { uuid } from '~utils/utils';
 import * as u from '~utils/native';
 
@@ -248,7 +248,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
 
     try {
 
-      await esbuildMetafile(scriptBundle);
+      await esbuildBundle(scriptBundle);
 
     } catch (e) {
 

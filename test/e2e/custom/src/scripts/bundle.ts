@@ -4,8 +4,13 @@ import baz from './components/baz';
 import qux from './components/qux';
 import test from './components/test';
 import b from './globs/b'
-
+import { d } from './globs/d'
+import { e } from './globs/e'
 console.log('hello sissel');
+
+b()
+d()
+e()
 // ss
 bar();
 foo();

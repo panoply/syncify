@@ -5,7 +5,7 @@ import { has, isNil, isType } from 'rambdax';
 import { keys } from '~utils/native';
 import { writeFile } from 'fs-extra';
 import { log, error, bold } from '~log';
-import { getImport, getSizeStr } from '~utils/utils';
+import { debouncePromise, getImport, getSizeStr } from '~utils/utils';
 import * as timer from '~utils/timer';
 import { bundle, cache, processor } from '~config';
 
@@ -43,7 +43,7 @@ export function esbuildModule (): boolean {
  *
  * A sub-build process used at runtime to collect all import paths.
  */
-export async function esbuildMetafile (options: ScriptBundle): Promise<void> {
+export async function esbuildBundle (options: ScriptBundle): Promise<void> {
 
   if (processor.esbuild.loaded) options.watch.clear();
 
@@ -56,6 +56,8 @@ export async function esbuildMetafile (options: ScriptBundle): Promise<void> {
         const path = join(bundle.cwd, file);
 
         options.watch.add(path);
+
+        console.log(path);
 
         if (!bundle.watch.has(path)) bundle.watch.add(path);
 
@@ -105,6 +107,12 @@ export async function compile <T extends ScriptBundle> (
         }
 
         const result = await esbuild.build(config.esbuild);
+
+        for (const file of keys(result.metafile.inputs).filter(file => !/node_modules/.test(file))) {
+          const path = join(bundle.cwd, file);
+          config.watch.add(path);
+          bundle.watch.add(path);
+        }
 
         await handle(result.outputFiles, config);
 
