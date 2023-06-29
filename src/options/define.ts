@@ -24,6 +24,7 @@ import { PATH_KEYS, HOT_SNIPPET_FILE } from '~const';
 import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError } from '~log/validate';
 import { log } from '~log';
 import { bundle, cache, processor, plugins, options } from '~config';
+import { FSWatcher } from 'chokidar';
 
 /**
  * Resolve Paths
@@ -54,6 +55,7 @@ export async function define (cli: Commands, _options?: Config) {
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
   const promise = await Promise.all([
+    setChokidar(cli.watch, cli.cwd),
     setBaseDirs(cli, options),
     setCaches(bundle.cwd),
     setThemeDirs(bundle.dirs.output),
@@ -82,6 +84,40 @@ export async function define (cli: Commands, _options?: Config) {
 
 };
 
+/**
+ * Set Chokidar
+ *
+ * Creates an instance of chodkidar FSWatcher, we will assign watch paths
+ * during the initialization process that executes in directly after this.
+ */
+function setChokidar (watch: boolean, cwd: string) {
+
+  if (!watch) return;
+
+  bundle.watch = new FSWatcher({
+    persistent: true,
+    ignoreInitial: true,
+    usePolling: true,
+    interval: 75,
+    binaryInterval: 100,
+    ignored: [ '**/*.map' ],
+    ignorePermissionErrors: true
+  });
+
+  Object.defineProperties(bundle.watch, {
+    has: {
+      value (path: string, dir = cwd) {
+        return bundle.watch._watched.get(dir).items.has(path);
+      }
+    },
+    watching: {
+      get () {
+        return bundle.watch._watched;
+      }
+    }
+  });
+
+}
 /**
  * Hot Reloading Setup
  *
@@ -345,7 +381,7 @@ function setModes (cli: Commands) {
     pages: cli.pages,
     prompt: cli.prompt,
     pull: cli.pull,
-    push: cli.push,
+    force: cli.force,
     script: transfrom ? cli.script : false,
     style: transfrom ? cli.style : false,
     image: transfrom ? cli.image : false,
@@ -391,13 +427,9 @@ async function getConfig (pkg: Package, cli: Commands) {
 
   const cfg = await configFile(cli.cwd);
 
-  if (cfg !== null) {
-    return merge(options, cfg);
-  }
+  if (cfg !== null) return merge(options, cfg);
 
-  if (has('syncify', pkg)) {
-    return merge(options, pkg.syncify);
-  }
+  if (has('syncify', pkg)) return merge(options, pkg.syncify);
 
   missingConfig(cli.cwd);
 
