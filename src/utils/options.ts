@@ -135,7 +135,7 @@ export function renameFile (src: string, rename?: string) {
 
   if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);
   if (/(\[file\])/.test(name)) name = name.replace('[file]', file);
-  if (/(\[ext\])/.test(name)) name = name.replace('.[ext]', ext);
+  if (/(\.?\[ext\])/.test(name)) name = name.replace(/\.?\[ext\]/, ext);
 
   return {
     ext,
