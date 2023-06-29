@@ -1,8 +1,8 @@
 import { Config, MinifyConfig } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { isBoolean, isObject } from '~utils/native';
+import { isBoolean, isObject, isRegex } from '~utils/native';
 import { bundle, minify, processor } from '~config';
-import { invalidError, throwError, typeError, unknownError } from '~log/validate';
+import { throwError, typeError, unknownError, warnOption } from '~log/validate';
 import { ESBUILD_NOT_INSTALLED } from '~const';
 import { getResolvedPaths } from './utilities';
 
@@ -12,18 +12,17 @@ import { getResolvedPaths } from './utilities';
  * Apply minification options for views. This will write
  * logic for both liquid and HTML terser minifier options.
  */
-export const setMinifyOptions = (config: Config) => {
+export function setMinifyOptions (config: Config) {
 
-  if (bundle.mode.minify === false && config.minify === false) return;
-  if (bundle.mode.minify === false && config.minify === true) bundle.mode.minify = true;
-
-  if (isBoolean(config.minify) && config.minify === true) {
-
-    if (!processor.esbuild.installed) {
-      throwError('esbuild is not installed', ESBUILD_NOT_INSTALLED);
+  // Do not minify
+  if (isBoolean(config.minify)) {
+    if (bundle.mode.minify === false && config.minify === false) return;
+    if (bundle.mode.minify === false && config.minify === true) {
+      bundle.mode.minify = true;
     }
-
   }
+
+  const warn = warnOption('minify configuration');
 
   if (isObject(config.minify)) {
 
@@ -36,31 +35,58 @@ export const setMinifyOptions = (config: Config) => {
       }
 
       if (key === 'script') {
-        if (!processor.esbuild.installed) {
+
+        if (processor.esbuild.installed === false && (
+          (
+            isObject(config.minify[key]) &&
+            isEmpty(config.minify[key]) === false
+          ) || (
+            isBoolean(config.minify[key]) &&
+            config.minify[key] === true
+          )
+        )) {
+
           throwError('esbuild is not installed', ESBUILD_NOT_INSTALLED);
         }
+
       }
 
       if (isBoolean(config.minify[key])) {
 
         // use defaults when true
-        bundle.minify[key] = true;
+        bundle.minify[key] = config.minify[key];
 
-      } else if (isObject(minify[key]) && isEmpty(minify[key]) === false) {
+      } else if (isObject(minify[key])) {
+
+        if (isEmpty(minify[key])) continue;
 
         for (const opt in config.minify[key]) {
 
           const p = key === 'views' ? 'liquid' : key;
 
-          if (!has(opt, minify[p])) unknownError(`minify > ${key}`, opt);
+          if (!has(opt, minify[p])) unknownError(`minify.${key}`, opt);
 
-          if (!isNil(config.minify[key][opt]) && typeof minify[p][opt] !== typeof config.minify[key][opt]) {
-            typeError(
-              `minify > ${key}`,
-              opt,
-              typeof config.minify[key][opt],
-              typeof minify[p][opt]
-            );
+          if (opt === 'mangleProps') {
+
+            if (!isNil(config.minify[key][opt]) && !isRegex(minify[p][opt])) {
+              typeError({
+                option: `minify.${key}`,
+                name: opt,
+                provided: `${typeof config.minify[key][opt]} (${config.minify[key][opt]})`,
+                expects: 'Regex | string | undefined'
+              });
+            }
+
+          } else {
+
+            if (!isNil(config.minify[key][opt]) && typeof minify[p][opt] !== typeof config.minify[key][opt]) {
+              typeError({
+                option: `minify.${key}`,
+                name: opt,
+                provided: typeof config.minify[key][opt],
+                expects: typeof minify[p][opt]
+              });
+            }
           }
 
           if (opt === 'exclude' && !isEmpty(config.minify[key][opt])) {
@@ -73,7 +99,9 @@ export const setMinifyOptions = (config: Config) => {
 
         }
       } else {
-        invalidError('minify', key, typeof minify[key], 'boolean | {}');
+
+        warn('unkown option provided', key);
+
       }
     }
 
