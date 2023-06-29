@@ -182,7 +182,7 @@ export function unhook () {
  */
 export function changed (file: File) {
 
-  const close = title !== file.relative;
+  const close = (title !== file.relative);
 
   timer.start();
 
@@ -284,6 +284,28 @@ export function syncing (path: string) {
 export function process (name: string, time: string) {
 
   if (!bundle.mode.build) log(tui.suffix('whiteBright', 'process', name + c.time(time)));
+
+};
+
+/**
+ * Log Generate `whiteBright`
+ *
+ * @example '│ exported → Snippet → file.js.liquid'
+ */
+export function exported (file: string) {
+
+  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'exports', file));
+
+};
+
+/**
+ * Log Transfrom `whiteBright`
+ *
+ * @example '│ importer → source/dir/file.ext'
+ */
+export function importer (message: string) {
+
+  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'importer', message));
 
 };
 
