@@ -1,17 +1,16 @@
 import { Config, ESBuildConfig, Package, ScriptBundle, ScriptTransform } from 'types';
-import { relative, join } from 'node:path';
-import { has, hasPath, isEmpty, omit } from 'rambdax';
+import { join } from 'node:path';
+import { has, isEmpty, isNil, omit } from 'rambdax';
 import merge from 'mergerino';
-import anymatch from 'anymatch';
 import { getModules, readConfigFile } from '~utils/options';
 import { warnOption, missingDependency, invalidError, typeError, throwError } from '~log/validate';
-import { getTransform, renameFile } from './utilities';
-import { assign, defineProperty, isArray, isObject } from '~utils/native';
-import { getTSConfig } from './files';
+import { getResolvedPaths, getTransform, renameFile } from './utilities';
+import { isArray } from '~utils/native';
 import { bundle, processor } from '~config';
-import { module, pluginWatch, pluginPaths, esbuild as runtime } from '~transform/script';
+import { esbuildModule, esbuildMetafile } from '~transform/script';
 import { uuid } from '~utils/utils';
-import { Type } from '~process/files';
+import * as u from '~utils/native';
+
 // import { log } from '~log';
 
 /**
@@ -23,155 +22,233 @@ import { Type } from '~process/files';
 export async function setScriptOptions (config: Config, pkg: Package) {
 
   if (!has('script', config.transforms)) return;
+  if (config.transforms.script === false) return;
+
+  const warn = warnOption('script transform option');
 
   const { esbuild } = processor;
   const { script } = config.transforms;
-  const warn = warnOption('script transform option');
 
   esbuild.installed = getModules(pkg, 'esbuild');
 
   if (esbuild.installed) {
 
-    const loaded = await module();
+    const loaded = esbuildModule();
 
-    if (!loaded) throwError('failed to import ESBuild', 'Ensure you have installed esbuild');
+    if (!loaded) {
+      throwError(
+        'failed to import ESBuild',
+        'Ensure you have installed esbuild'
+      );
+    }
 
-    const esb = await readConfigFile<ESBuildConfig>('esbuild.config');
+    /** External `esbuild.config.js` file  */
+    const esbuildConfigFile = await readConfigFile<ESBuildConfig>('esbuild.config');
 
-    if (esb !== null) {
-      esbuild.file = esb.path;
-      esbuild.config = merge(esbuild.config, esb.config);
+    if (esbuildConfigFile !== null) {
+      esbuild.file = esbuildConfigFile.path;
+      esbuild.config = merge(esbuild.config, esbuildConfigFile.config);
     }
 
   } else {
+
     missingDependency('esbuild');
+
   }
 
+  // Lets ensure that no excluded esbuild options were provided
+  // on the processor configuration object
   if (has('entryPoints', esbuild.config)) {
-    warn('processor config is not allowed and was omitted', 'entryPoints');
+    warn('processor option is not allowed and was omitted', 'entryPoints');
     delete esbuild.config.entryPoints;
   }
 
-  const tsconfig = await getTSConfig(bundle.cwd);
+  // Provide tsconfig raw options
+  //
+  // const tsconfig = await getTSConfig(bundle.cwd);
+  //
+  // defineProperty(esbuild, 'tsconfig', {
+  //   get () {
+  //     return tsconfig;
+  //   }
+  // });
+
   const transforms = getTransform<ScriptTransform[]>(script, {
     addWatch: false,
     flatten: true
   });
 
-  const esboptions = omit([ 'input', 'watch', 'rename', 'snippet' ]);
-
-  defineProperty(esbuild, 'tsconfig', { get () { return tsconfig; } });
+  /**
+   * Curry omitter for excluding all properties from
+   * the `script` transform which are not esbuild related.
+   * Some esbuild options are exposed per-script transform
+   * for convenience sake, this fuction will retrive only this
+   * which are relative to esbuild
+   */
+  const esbuildOptions = omit([
+    'input',
+    'watch',
+    'rename',
+    'snippet'
+  ]);
 
   // Set global plugins
-  if (esbuild.config.plugins.length > 0) {
-    esbuild.config.plugins.unshift(pluginPaths(), pluginWatch());
-  } else {
-    esbuild.config.plugins.push(pluginPaths(), pluginWatch());
-  }
+  // if (esbuild.config.plugins.length > 0) {
+  //   esbuild.config.plugins.unshift(pluginPaths(), pluginWatch());
+  // } else {
+  //   esbuild.config.plugins.push(pluginPaths(), pluginWatch());
+  // }
 
-  esbuild.config.absWorkingDir = bundle.cwd;
-
-  for (const transform of transforms) {
-
-    if (bundle.watch.has(transform.input as string)) {
-      warn('input already in use', relative(bundle.cwd, transform.input as string));
-    }
-
-    const o: ScriptBundle = {
+  /*
+  {
       uuid: uuid(),
+      format: 'esm',
+      target: 'es2016',
+      snippet,
       input: transform.input as string,
-      snippet: transform.snippet,
+      output: join(bundle.dirs.output, snippet ? 'snippets' : 'assets'),
+      external: [],
       rename: null,
+      key: '',
+      namespace: transform.snippet ? 'snippets' : 'assets',
       watch: null,
       esbuild: null
     };
 
-    const build = assign({ entryPoints: [ transform.input ] }, esbuild.config) as unknown;
-    const esb = esboptions(transform);
+  */
+  if (!has('absWorkingDir', esbuild.config)) esbuild.config.absWorkingDir = bundle.cwd;
+
+  for (const transform of transforms) {
+
+    // if (bundle.watch.has(transform.input as string)) {
+    //   warn('input already in use', relative(bundle.cwd, transform.input as string));
+    // }
+
+    const { snippet } = transform;
+
+    /**
+     * The Shopify request key directory
+     */
+    const keyDir = snippet ? 'snippets' : 'assets';
+
+    /**
+     * Rename file
+     */
     const { name } = renameFile(transform.input as string, transform.rename); // Rename file
 
+    let rename: string;
+
     if (!name.endsWith('.js') && !name.endsWith('.mjs')) {
-      o.rename = name + '.js';
+      rename = name + '.js';
     } else if (name.endsWith('.cjs')) {
       invalidError('rename', 'file extension', name, '.js | .mjs');
     } else {
-      o.rename = name;
+      rename = name;
     }
 
-    if (transform.snippet) {
-      if (!name.endsWith('.liquid')) o.rename = name + '.liquid';
-      bundle.watch.add(`!${join(bundle.cwd, config.output, 'snippets', o.rename)}`);
-      bundle.paths.transforms.set(o.input, Type.Script);
-    } else {
-      if (name.endsWith('.liquid')) warn('Using .liquid extension rename for asset', name);
-      bundle.watch.add(`!${join(bundle.cwd, config.output, 'assets', o.rename)}`);
-    }
+    if (snippet && !/\.liquid$/.test(rename)) rename = rename + '.liquid';
 
-    if (isEmpty(esb)) {
+    /**
+     * The script bundle to be added to the `bundle` model
+     */
+    const scriptBundle: ScriptBundle = {
+      uuid: uuid(),
+      snippet,
+      input: transform.input as string,
+      output: join(bundle.dirs.output, keyDir, rename),
+      key: join(keyDir, rename),
+      namespace: transform.snippet ? 'snippets' : 'assets',
+      watch: null,
+      esbuild: null
+    };
 
-      defineProperty(o, 'esbuild', { get () { return build; } });
+    bundle.watch.unwatch(scriptBundle.output);
 
-    } else {
+    if (has('esbuild', transform)) {
+      if (u.isBoolean(transform.esbuild) || isNil(transform.esbuild)) {
 
-      for (const prop in esb) {
-
-        if (prop === 'entryPoints') {
-          warn('Option is not allowed, use Syncify "input" instead', prop);
-        } else if (prop === 'outdir') {
-          warn('Option is not allowed, Syncify will handle output', prop);
-        } else if (prop === 'watch') {
-          warn('Option is not allowed, declare watch using Syncify', prop);
-        } else if (
-          prop === 'absWorkingDir' ||
-          prop === 'watch' ||
-          prop === 'incremental' ||
-          prop === 'write' ||
-          prop === 'logLevel'
-        ) {
-          warn('Option is not allowed and will be ignored', prop);
-        } else if (prop === 'plugins') {
-          build[prop].push(...esb[prop]);
+        if (isEmpty(esbuildOptions)) {
+          scriptBundle.esbuild = merge<any>(esbuild.config);
         } else {
-          build[prop] = esb[prop]; // Apply override
+          scriptBundle.esbuild = merge(esbuild.config, esbuildOptions);
         }
+
+      } else if (typeof transform.esbuild === 'object') {
+
+        for (const prop in [
+          'entryPoints',
+          'outdir',
+          'watch',
+          'absWorkingDir',
+          'watch',
+          'write',
+          'logLevel',
+          'incremental'
+        ]) {
+          if (prop === 'entryPoints' && has(prop, transform.esbuild)) {
+            warn('Option is not allowed, use Syncify "input" instead', prop);
+          } else if (prop === 'outdir' && has(prop, transform.esbuild)) {
+            warn('Option is not allowed, Syncify will handle output', prop);
+          } else if (prop === 'watch' && has(prop, transform.esbuild)) {
+            warn('Option is not allowed, declare watch using Syncify', prop);
+          } else if (has(prop, transform.esbuild)) {
+            warn('Option is not allowed and will be ignored', prop);
+          }
+        }
+
+        if (has('plugins', transform.esbuild) && has('plugins', esbuild.config)) {
+          transform.esbuild.plugins.unshift(...esbuild.config.plugins);
+        }
+
+        if (isEmpty(esbuildOptions)) {
+          scriptBundle.esbuild = merge<any>(esbuild.config, transform.esbuild);
+        } else {
+          scriptBundle.esbuild = merge<any>(esbuild.config, transform.esbuild, esbuildOptions);
+        }
+
+      } else {
+        typeError({
+          option: 'script',
+          name: 'esbuild',
+          provided: typeof transform.esbuild,
+          expects: 'boolean | null | {}'
+        });
       }
 
-      defineProperty(o, 'esbuild', { get () { return build; } });
+    } else {
+      if (isEmpty(esbuildOptions)) {
+        scriptBundle.esbuild = esbuild.config as ESBuildConfig;
+      } else {
+        scriptBundle.esbuild = merge(esbuild.config, esbuildOptions);
+      }
     }
 
-    if (!has('watch', transform)) transform.watch = [];
-    if (!isArray(transform.watch)) typeError('script', 'watch', transform.watch, 'string[]');
+    scriptBundle.esbuild.entryPoints = [ scriptBundle.input as string ];
 
-    // Lets run a pre-build to obtain all the entry points
-    // of script imports. We will use this in watch process
-    const entries: ESBuildConfig = assign(
-      {},
-      isObject(transform.esbuild) ? transform.esbuild : esbuild.config,
-      {
-        entryPoints: [ transform.input ],
-        write: false,
-        sourcemap: false,
-        // logLevel: 'silent',
-        absWorkingDir: bundle.cwd,
-        plugins: [],
-        outdir: transform.snippet
-          ? join(bundle.dirs.output, 'snippets')
-          : join(bundle.dirs.output, 'assets'),
-        loader: {
-          '.liquid': 'file'
-        }
-      }
-    ) as unknown;
+    if (!has('watch', transform)) {
 
-    if (esbuild.tsconfig !== null && hasPath('compilerOptions.paths', esbuild.tsconfig)) {
-      entries.plugins.push(pluginPaths(transform), pluginWatch(transform));
+      scriptBundle.watch = new Set();
+
     } else {
-      entries.plugins.push(pluginWatch(transform));
+
+      if (!isArray(transform.watch)) {
+        typeError({
+          option: 'script',
+          name: 'watch',
+          provided: transform.watch,
+          expects: 'string[]'
+        });
+      }
+
+      const watchers = getResolvedPaths<string[]>(transform.watch);
+
+      scriptBundle.watch = new Set(watchers);
+
     }
 
     try {
 
-      await runtime.build(entries);
+      await esbuildMetafile(scriptBundle);
 
     } catch (e) {
 
@@ -180,17 +257,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
 
     }
 
-    transform.watch.forEach(p => {
-
-      if (!bundle.watch.has(p)) bundle.watch.add(p);
-
-    });
-
-    o.watch = anymatch(transform.watch);
-
-    await module(o);
-
-    bundle.script.push(o);
+    bundle.script.push(scriptBundle);
 
   }
 
