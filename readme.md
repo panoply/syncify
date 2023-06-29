@@ -2,48 +2,53 @@
 
 <hr>
 
-# @liquify/syncify
+# _SYNCIFY_
 
-A lightening fast, extensible and superior alternative Shopify CLI ([theme kit](https://shopify.github.io/themekit/)) tool. Syncify is a powerful and informative CLI which employs an intuitive approach for Shopify theme development.
+A lightening fast, extensible and superior alternative Shopify CLI (Theme Development) tool. Syncify provides developers with a powerful CLI and employs an intuitive approach for creating Shopify themes.
 
-**Syncify exists as part of the [Liquify](https://liquify.dev) project**
+**Syncify will exists as part of the [Liquify](https://liquify.dev) project**
 
 ### Key Features
 
-- Watch, upload, download and export multiple storefronts and themes.
+- Watch, upload, download and export to multiple storefronts and themes.
 - Intelligent path mapping capabilities for custom directory structures.
 - HOT reloading of assets, section, snippets, templates and layouts.
 - Clear, concise, informative and beautiful CLI logging.
 - An elegant global directory based metafields sync approach using JSON files.
 - Digests and spawns existing build tools for asset transformations.
-- Exposed Plugin API for adding those seeking extensibility.
 - Prompt based CLI/TUI and exposed module API for script usage.
 - Pull, push and merge support for aligning local and remote sources.
-- Files, Pages and Redirects sync strategies and support.
+- Supports additional resources like Files, Pages and Redirects.
 
 ### Why?
 
-I have been working on the Shopify platform for last several years and nothing the Shopify team maintain or have produced has actually helped me and their tooling tends to impede upon my productivity. Alternatives like the Shopify CLI fail to achieve fluidity, either doing too much or not enough. Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive workflow and setup apparatus. It allows you to progressively enhance your development process and produce the most efficient and performant results.
+I have been working on the Shopify platform for several years and nothing the Shopify team have produced has actually increased my productivity. Despite the advancements Shopify has made in recent years I still find that their developer tooling to be rather average. The Shopify CLI is cool and all but for theme development it fails to achieve fluidity.
+
+Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive low grade elementary workflow. It allows you to progressively enhance your development process and produce the most efficient and performant results with the tools you already love.
 
 # Install
 
-Install as development dependency in your project.
+Syncify is distributed as both an ESM and CJS module. It is recommended that you install as a development dependency in your project opposed to installing globally.
 
 **PNPM**
 
-```cli
+```bash
 pnpm add @syncify/cli -D
 ```
 
+> Use `pnpx @syncify/cli` for remote execution
+
 **NPM**
 
-```cli
+```bash
 npm i @syncify/cli --save-dev
 ```
 
+> Use `npx @syncify/cli` for remote execution
+
 **Yarn**
 
-```cli
+```bash
 yarn add @syncify/cli --dev
 ```
 
@@ -61,15 +66,11 @@ Syncify exposes and introduces an elegant low-level method for interfacing with 
 
 ### Asset Files
 
-Syncify does not want to re-create or impede on developer preferences and tool appropriation. Build tools and bundlers specifically designed for processing different asset types can be spawned and run in parallel with Syncify's `build` and `watch` instances, but for more advanced use cases, Syncify also provides developers with pre-processor capabilities via plugins. Plugins can be leveraged for transforming TypeScript, JavaScript, CSS, SCSS and SVG file types and use wrappers around popular and performant modules.
-
-### Plugins
-
-Syncify can be extended with Plugins. Similar to build tools like webpack and rollup, Syncify exposes a plugin API which allows you to hook into the build cycle and apply transforms to assets and files.
+Syncify does not want to re-create or impede on developer preferences and tool appropriation. Build tools and bundlers specifically designed for processing different asset types can be spawned and run in parallel with Syncify's `build` and `watch` instances, but for more advanced use cases, Syncify also provides developers with pre-processor capabilities via [transforms](#transform). Transform can be leveraged for processing TypeScript, JavaScript, CSS, SCSS and SVG file types by exposing integrated configuration wrappers around popular and performant modules like ESBuild, SASS Dart, SVGO Tailwind and more!
 
 # Setup
 
-After installing you will need to configure a connection to your shopify store. Syncify requires you provide either an admin API access token (recommended) or API Key and secret as credentials.
+After installing you will need to configure a connection to your shopify store. Syncify requires you provide either an Admin API Access Token (recommended) or API Key and Secret as credentials.
 
 <details>
 <summary>
@@ -213,6 +214,8 @@ Syncify supports `syncify.config.js` and `package.json` configurations. Dependin
 
 ### Default Options
 
+This is defaults used in a `syncify.config.js` file. Options commented out within [transforms](#transform), [processors](#processors) and [minify](#minify) require peer dependencies to be installed to be used.
+
 <!-- prettier-ignore -->
 ```ts
 import { defineConfig } from '@syncify/syncify';
@@ -232,6 +235,7 @@ export default defineConfig({
   ],
   hot: {
     label: 'visible',
+    history: true,
     method: 'hot',
     inject: true,
     scroll: 'preserved',
@@ -295,13 +299,53 @@ export default defineConfig({
       ],
     }
   },
-  plugins: []
+  transforms: {
+    script: {},
+    style: {},
+    svg: {}
+  },
+  processors: {
+    json: {
+      crlf: false,
+      indent: 2,
+      useTab: false,
+      exclude: []
+    },
+    // esbuild: {},
+    // sass: {},
+    // postcss: [],
+    // tailwind: {},
+    // svgo: {},
+    // sprite: {},
+    // sharp: {},
+  },
+  minify: {
+    json: {
+      assets: true,
+      config: true,
+      locales: true,
+      metafields: true,
+      templates: true,
+      exclude: []
+    },
+    views: {
+      collapseWhitespace: true,
+      minifySchema: true,
+      minifyScript: true,
+      minifyStyle: true,
+      removeComments: true,
+      stripDashes: true,
+      exclude: []
+    },
+    // script: {},
+    // style: {},
+  }
 });
 ```
 
 # Getting Started
 
-It is relatively easy to get started developing Shopify themes using Syncify. If you are converting an existing project and using Theme Kit or another build environment you can progressively adapt it into your workflow by manually configuring how Syncify should behave. Whatever the case, have a look at the [Dusk](#) theme in the [Syncify Examples](#) repository. Dusk is the Shopify [Dawn](#) theme using Syncify instead of Theme Kit and provides developers a great starting point for new projects.
+It is relatively easy to get started developing Shopify themes using Syncify. If you are converting an existing project and using Theme Kit or another build environment you can progressively adapt it into your workflow by manually configuring how Syncify should behave. Whatever the case, have a look at the [Syncify Examples](#) repository.
 
 ### Pre-requisites
 
@@ -321,11 +365,11 @@ Before going over the features Syncify provides, it is assumed that you have don
 - [Views](#views)
 - [Transforms](#views)
 - [Processors](#views)
-- [Minify](#views)
+- [Terser](#views)
 
 ## Directories
 
-In Syncify you define custom base directories for your theme files. The values you define refers to a directory name which is relative to the root of your project and you **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`).
+In Syncify you define custom base directories for your theme files. The values you define refer to a directory name which is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`).
 
 <!-- prettier-ignore -->
 <table>
@@ -369,13 +413,13 @@ In Syncify you define custom base directories for your theme files. The values y
 
 ### Input > Output
 
-Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can rebuilt from input.
+Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can always be rebuilt from input.
 
 If you are used to working from a single directory (e.g: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
 
 # Stores (Required)
 
-The `stores` option accepts an **object** or **array** type. Each item will hold a settings object that contains references to your shopify store/s and their theme/s. For each store you define, Syncify requires you provide the shop name and theme id/s you wish to sync. The `themes` object uses a **key** > **value** structure.
+The `stores` option accepts an **object** or **array** type. Each item will hold a _settings_ object that contains references to your shopify store/s and their theme/s. For each store you define, Syncify requires you provide the shop name and theme id/s you wish to sync. The `themes` object uses a **key** > **value** structure.
 
 > Please see theme [commands](#commands) example for more information on how this is used with the CLI.
 
@@ -388,7 +432,7 @@ The `stores` option accepts an **object** or **array** type. Each item will hold
 ### API
 
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
   stores: [
@@ -411,7 +455,7 @@ export default defineConfig({
 </summary>
 <p>
 
-The `domain` option expects a string value, which is your Shopify store name without the `myshopify.com` portion. The domain will be used by the CLI as a target reference argument. Each store (domain) can have multiple themes.
+The `domain` option expects a string value, which is your Shopify store name without the `myshopify.com` portion. The domain will be used by the CLI as a target argument. Each store (domain) can have multiple themes.
 
 </p>
 </details>
@@ -422,12 +466,14 @@ The `domain` option expects a string value, which is your Shopify store name wit
 </summary>
 <p>
 
-The `themes` option refers to theme ids the store contains. This option is an object type which uses **key** > **value** mappings. The theme **keys** represent a unique target name, this can be any alpha numeric value. The **key** value will be used by the CLI as target names. The **value** should be the theme id.
+The `themes` option refers to theme ids the store contains. This option is an object type which uses **key** > **value** mappings. The theme **keys** represent a unique target name, this can be any alpha numeric value. The **key** value is used by the CLI as target reference. The **value** should be the theme id.
 
 </p>
 </details>
 
 # Metafields
+
+###### NOT YET AVAILABLE
 
 The `metafields` directory `path` reference is where you can provide **global** JSON metafield files that can be synced to your Shopify store. Metafield sync capabilities provided by Syncify use a simple **directory** > **file** based approach. The sub-directory names represent a metafield `namespace` value and JSON file names contained within represent metafield `key` values.
 
@@ -438,7 +484,7 @@ The `metafields` directory `path` reference is where you can provide **global** 
 Syncify provides you with simple interactive prompt based approach for importing pre-existing metafields from your online store. You can optionally choose which metafields you'd like to maintain. Use the `-m` or `--metafields` flag together with the `--pull` flag on the command line to download metafields:
 
 ```
-$ syncify -m --pull
+$ syncify --metafields --pull
 ```
 
 **Merge Metafields**
@@ -446,7 +492,7 @@ $ syncify -m --pull
 Working with metafields from your local machine may have result in unexpected overwrites if changes were made to remote versions that conflict with local versions. In order to combat this Syncify support **merge** capabilities which can be used to merge changes when metafield modification timestamps differ. Use the `-m` or `--metafields` flag together with the `--merge` flag on the command line perform local and remote alignments.
 
 ```
-$ syncify -m --merge
+$ syncify --metafields --merge
 ```
 
 **Structure**
@@ -589,11 +635,13 @@ The `metafields` option refers to a directory within your project which can cont
 
 # Paths
 
-The `paths` option allows you to define a custom set of path locations which point to theme specific files contained within the defined `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify in your **input** because files are re-routed to the standard theme structure upon generating the **output**. Each path option accepts either a `string` or `string[]` array list of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns. Paths will automatically resolve to the `input` directory, so you do not need to include it within your mapping.
+The `paths` option allows you to define a custom set of path locations which point to theme specific files contained within the defined `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify and you should begin to decouple from that logic as it is generally a flawed and borderline daft approach. The contents (files) contained within your **input** will be re-routed as a standard theme structure that Shopify understands when generating **output** distribution.
+
+Each path option accepts either a `string` or `string[]` array list of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns. Paths will automatically resolve to the `input` directory, so you do not need to include it within your configurations.
 
 ### API
 
-By default, Syncify assumes you are using the basic-bitch (default) structure as followed:
+By default, Syncify assumes you are using the basic-bitch (default) structure as follows:
 
 <!-- prettier-ignore -->
 ```ts
@@ -620,7 +668,7 @@ export default defineConfig({
 
 ### Custom Structures
 
-Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration, the tool defaults to this. The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify understands.
+Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration, the tool defaults to this. The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify can digest.
 
 <table>
   <thead>
@@ -713,7 +761,7 @@ Below are **2** different **input** structures and an **output** structure. The 
   </tbody>
 </table>
 
-There is no distributed difference between the **default** and **customized** structures illustrated above. Both would generate an **output** that Shopify understands, requires and reasons with. Only the **input** source locations differ. The **output** Syncify creates will always be written to a standard Shopify theme structure regardless of how you may decide to organize **input** paths.
+There is no distributed difference between the **default** and **customized** structures illustrated above. Both would generate an **output** that Shopify understands, requires and reasons with. Only the **input** source locations differ. The **output** Syncify creates will always be written to a standard Shopify theme structure regardless of how you may decide to organize **input** paths. Custom structures give you creative freedom and does not impose a restrictive workflow you may have become behest to working with Dawn and the Shopify CLI. Welcome to the better approach, you're welcome.
 
 ### Options
 
@@ -819,7 +867,9 @@ An array list of glob path patterns to `.json` or `.liquid` **template** files. 
 
 # HOT
 
-Live reloading is supported in watch mode. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional tooling. No extensions and no complexities. When you invoke `--hot` syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes. Syncify's HOT reloads are considerably faster than Shopify's CLI and will never invoke a full-page refresh.
+Live reloading is supported in watch mode. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional tooling. No extensions and no complexities. When you invoke `--hot` syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes.
+
+> The HOT reload approach Syncify employs tends to be considerably faster than HOT reloading with the Shopify CLI.
 
 ### Assets
 
@@ -941,7 +991,9 @@ export default defineConfig({
 
 # Transform
 
-In Syncify, asset files can be transformed and augmented before being written to the defined `output` directory and uploaded to your Shopify store. The `transform` option allows you to control how your asset files are processed. Syncify supports built-in and partial processing for the following file types:
+In Syncify, asset files can be transformed before being written to the defined `output` directory and uploaded to your Shopify store. The `transform` option provides users with control of the "asset pipeline" and Syncify exposes configuration wrappers for handling files together with modern developer tooling.
+
+Syncify supports built-in and partial processing for the following file types:
 
 - `.json`
 - `.js`
@@ -955,23 +1007,106 @@ In Syncify, asset files can be transformed and augmented before being written to
 
 ## Scripts
 
-Syncify exposes a `scripts` transform option which can be used as a convenience wrapped around the [tsup](https://tsup.egoist.sh/#what-can-it-bundle) bundler. TSUP uses the powerful [ESBuild](https://esbuild.github.io/) under the hood for processing TypeScript and JavaScript file types.
+Syncify exposes a `script` transform option which supports TypeScript (`.ts` and `.tsx`) and/or JavaScript (`.js` and `.jsx`) bundling using [ESBuild](https://esbuild.github.io/). Script transforms use a pre-defined set of processing configurations and will produce lean JavaScript bundles designed to work seamlessly in development mode or when leveraging HOT reloads. Syncify will also apply refinements to distribution bundles focused on performance when generating production builds for your Shopify theme.
+
+> ESBuild is the same bundler used under the hood by tools like [vite](https://vitejs.dev/) and [tsup](https://tsup.egoist.sh). If you are using existing tools like Webpack or Rollup, consider adopting ESBuild as its a far superior option.
+
+### Installing ESBuild
+
+In order for you to leverage **script** transforms, you will need to install ESBuild as a development dependency. Syncify will complain if you try to use script options without esbuild installed.
+
+```bash
+pnpm add esbuild -D
+```
+
+### Bundling TypeScript
+
+The **script** transform option aims to make bundling easy but also extensible for more advanced use cases. Syncify will automatically detect `tsconfig.json` (or `jsconfig.json`) files located in your workspace and respect processing options defined within. By default, Syncify will produce **ESM** module formats that output in **ES2016** but you can also generate **IIFE** bundles and even inline code as a snippets within `<script></script>` tags.
+
+The `script` options accepts several different structures and it is up to you how you wish to provide settings. The below code sample depicts the default configuration structure:
+
+<!--prettier-ignore-->
+```ts
+import { defineConfig } from '@syncify/syncify';
+
+export default defineConfig({
+  transforms: {
+    script: [
+       {
+        input: [],
+        format: 'esm',
+        target: 'es2016',
+        snippet: false,
+        rename: '',
+        external: [],
+        watch: [],
+        esbuild: {}
+      }
+    ]
+  }
+})
+```
+
+You may prefer to use rename (entry point) structures instead. When we are using rename entry points the prefix path expects either `snippets/` or `assets/` be provided. When passing `snippets/` then a snippet will be generated, whereas `assets/` will generate a `.js` file.
+
+> Rename entry points accept `[file]`, `[dir]` and `[ext]` placeholders.
+
+<!--prettier-ignore-->
+```ts
+import { defineConfig } from '@syncify/syncify';
+
+export default defineConfig({
+  transforms: {
+    script: {
+
+      // Producing 2 inline snippet <script> bundles
+      // Output will be slideshow.js.liquid and search-form.js.liquid
+      'snippets/[file][ext]': [
+        'scripts/sections/slideshow.ts',
+        'scripts/sections/search-form.ts'
+      ]
+
+      // Producing an IIFE script as an asset
+      // The return value is accessible via window.Foo
+      'assets/foo.min.js': {
+        input: 'scripts/index.ts',
+        format: 'iife',
+        globalName: 'window.Foo,
+      }
+    }
+  }
+})
+```
 
 ## Styles
 
-Syncify exposes a `styles` transform option which can be used as a convenience wrapper for handling `.css`, `.scss` or `.scss` asset files types. The **styles** option accepts an **array** list of style specific configurations that are used together with compilers like [Dart SASS](#) and [PostCSS](#). Style transforms help alleviate the complexities sometimes involved in setting up these tools so you can easily process and generate asset specific stylesheets that can be optionally inlined as a **snippet** file.
+###### TAILWIND IS NOT YET SUPPORT
+
+Syncify exposes a `style` transform option which can be used for CSS (`.css`) and SCSS/SASS (`.scss` or `.sass`) bundling. Style transform support is made possible by using compilers like [Dart SASS](#), [PostCSS](#) and/or [Tailwind](#). The `style` option provides developers with replicated configuration control but you may also prefer to use standard config files (e.g: `postcss.config.js`) which Syncify also supports.
+
+Style transforms help alleviate the complexities sometimes involved in setting up these tools so you can easily process asset specific stylesheets or generate output as a **snippet** within `<style></style>` tags.
 
 ### SASS Support
 
-Syncify provides partial processing of `.scss` and `.sass` file types using [Dart SASS](#). If you require transform support for these files you need to install the Dart module as a development dependency in your project.
+Syncify provides SCSS/SASS transform support for `.scss` and `.sass` file types using [Dart SASS](#). Using SASS required you to install the Dart module as a development dependency in your project. Syncify will complain if you try to use SASS transforms without Dart SASS installed.
 
-```
+```bash
 pnpm add sass -D
 ```
 
-### CSS Support
+### Tailwind Support
 
-In addition to SASS transformation, Syncify also support CSS processing using [PostCSS](#). If you wish have Syncify handle CSS transforms then you need to install **PostCSS** as a development dependency and also include a `postcss.config.js` file in your project. Syncify expects you will inform upon how CSS files are to be handled within a `postcss.config.js` file and it will look for the existence of one within your workspace.
+Syncify supports TailwindCSS for CSS processing. If you require transform support for Tailwind, you need to install the TailwindCSS module as a development dependency in your project. Syncify will ignore Tailwind class name occurrences without the module installed.
+
+```bash
+pnpm add tailwindcss -D
+```
+
+> Tailwind is not yet available in the beta.
+
+### PostCSS Support
+
+In addition to SASS transformation, Syncify also support CSS (post)-processing using [PostCSS](#). If you wish have Syncify handle CSS transforms then you need to install **PostCSS** as a development dependency. Syncify will complain if you try to use PostCSS transforms without PostCSS installed.
 
 > Provide PostCSS plugins and any specific settings within the `postcss.config.js` file.
 
@@ -979,7 +1114,7 @@ In addition to SASS transformation, Syncify also support CSS processing using [P
 pnpm add postcss -D
 ```
 
-**Please note:** If you are using Syncify to compile SASS files, then by default the transformed CSS will be passed to PostCSS. Use the available Syncify `style` options to disable this behavior.
+**Please note:** If you are using Syncify to compile SASS files, then by default the transformed CSS will be passed to PostCSS.
 
 ### Usage
 
@@ -993,15 +1128,6 @@ import { defineConfig } from '@syncify/syncify'
 
 export default defineConfig({
   transforms: {
-   script: {
-      'assets/bundle.min.js': 'scripts/bundle.ts',
-      'assets/mithril.min.js': 'scripts/virtual.ts',,
-      'snippets/[dir]-[file]': ['scripts/globs/*.ts'],
-      'assets/globs.min.js': {
-        input: 'scripts/globs.ts',
-        format: 'iife'
-      }
-    },
     style: {
       'assets/stylesheet.min.css': {
         input: 'styles/stylesheet.scss',
@@ -1331,24 +1457,26 @@ PostCSS options
 
 # Processors
 
-Syncify can used together with different _third party_ preprocessor tooling and has built-in support that can be deferred to for handling. Using processors requires installing the relative module you'd like to leverage. This is an opt-in capability.
+As per the [Transform](#transform) section of this readme, Syncify digests _third party_ preprocessor tooling. For each transform compiler available Syncify has a preset configuration in-place to be used as defaults. The `processors` configuration option exposes these preset defaults for you to control and customize but you may also prefer to use designated config files which Syncify also supports.
 
-### Script
+You can overwrite processor defaults on a per-file basis on the transform level but in most cases you will want to use a common configuration model. The `processors` option allows developers to retain a single point of control from which all _third party_ processor tooling refers.
+
+> Using processors requires installing the relative module you'd like to leverage. This is an opt-in capability.
+
+### External Config Files
+
+Some third party tools allow config file usage. Syncify will check for the existence of processor configuration files in the workspace and use them as the processor defaults. In situations where an external config file is detected and you've defined custom `processor` settings which differ from the Syncify defaults then options of the external config will overwritten by those defined in `processor` configuration.
+
+### Supported Processors
+
+Syncify provides extendable support with the following build tools:
 
 - [ESBuild](#esbuild)
-
-### Svg
-
-- [SVGO](#svgo)
-- [Sprite](#sprite)
-
-### Style
-
 - [SASS](#sass)
 - [PostCSS](#postcss)
-
-### Image
-
+- [Tailwind](#tailwind-support)
+- [SVGO](#svgo)
+- [Sprite](#sprite)
 - [Sharp](#sharp)
 
 # ESBuild
@@ -1357,23 +1485,23 @@ Syncify provides integrated support with ESBuild for processing TypeScript, Java
 
 See also [Script Transforms](#).
 
-### Installation
+### Using Config File
 
-Install ESBuild as a development dependency in your project:
+ESBuild Configuration files `esbuild.config.js` are not supported for script transforms.
 
-```bash
-pnpm add esbuild -D
-```
+### Using Processors
 
-### Configuration
+The `esbuild` property is were ESBuild configuration option defaults can be provided.
 
 <!-- prettier-ignore -->
 ```ts
-{
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
   processors: {
-    esbuild: {} // TSUP config options
+    esbuild: {} // ESBuild Options
   }
-}
+})
 ```
 
 # SASS
@@ -1382,23 +1510,23 @@ Syncify provides integrated support with SASS Dart for processing SASS/SCSS file
 
 See also [Style Transforms](#).
 
-### Installation
+### Config File is not supported
 
-Install SASS as a development dependency in your project:
+SASS Configuration files are not supported for style transforms.
 
-```bash
-pnpm add sass -D
-```
+### Using Processors
 
-### Configuration
+The `sass` property is were SASS configuration option defaults can be provided.
 
 <!-- prettier-ignore -->
 ```ts
-{
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
   processors: {
-    sass: {} // SASS config options
+    sass: {} // SASS Options
   }
-}
+})
 ```
 
 # PostCSS
@@ -1407,73 +1535,73 @@ Syncify provides integrated support with PostCSS for processing CSS file types. 
 
 See also [Style Transforms](#).
 
-### Installation
+### Using Config File
 
-Install PostCSS as a development dependency in your project:
+Provide a `postcss.config.js` file in the root of your project or within the defined `config` path.
 
-```bash
-pnpm add postcss -D
-```
+### Using Processors
 
-### Configuration
+The `postcss` property accepts an array list of PostCSS plugins.
 
 <!-- prettier-ignore -->
 ```ts
-{
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
   processors: {
-    postcss: [] // PostCSS plugins
+    postCSS: [] // PostCSS Plugins
   }
-}
+})
 ```
 
 # SVGO
 
-Syncify provides integrated support with SVGO for processing SVG file types. If you would like to produce SVG Sprites, then you install [Spriter](#spriter) which uses SVGO under the hood.
+Syncify provides integrated support with SVGO for processing SVG file types. If you would like to produce SVG Sprites, then refer to [Sprites](#) section which uses SVGO under the hood.
 
-See also [SVG Transforms](#) and [Icons Plugin](#).
+See also [SVG Transforms](#).
 
-### Installation
+### Using Config File
 
-Install SVGO as a development dependency in your project:
+Provide a `svgo.config.js` file in the root of your project or within the defined `config` path.
 
-```bash
-pnpm add svgo -D
-```
+### Using Processors
 
-### Configuration
+The `svgo` property accepts SVGO configuration options.
 
 <!-- prettier-ignore -->
 ```ts
-{
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
   processors: {
-    svgo: {} // SVGO config options
+   svgo: {} // SVGO Options
   }
-}
+})
 ```
 
 # Sprite
 
-Syncify provides integrated support for creating SVG Sprites using Spriter (aka: SVG Sprite). SVG Sprite is a low level module that optimizes SVGs and bakes them into sprites that Syncify can inline and output.
+Syncify provides integrated support for creating SVG Sprites using [SVG Sprites](#). SVG Sprite is a low level module that optimizes SVGs and bakes them into sprites that Syncify can inline and output.
 
-See also [SVG Transforms](#) and [@syncify/icons-plugin](#).
+See also [SVG Transforms](#).
 
-### Installation
+### Config File is not supported
 
-Install Spriter as a development dependency in your project:
+SVG Sprites Configuration files are not supported for Sprite transforms.
 
-```bash
-pnpm add svg-sprites -D
-```
+### Using Processors
 
-### Configuration
+The `sprite` property accepts SVG Sprite configuration options.
 
 <!-- prettier-ignore -->
 ```ts
-{
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
   processors: {
-    sprite: {} // SVG Sprite config options
+    sprite: {} // SVG Sprite Options
   }
-}
+})
 ```
 
 # Sharp
@@ -1482,28 +1610,83 @@ Syncify provides integrated support for convert large images in common formats t
 
 See also [Image Transforms](#)
 
-### Installation
+### Config File is not supported
 
-Install Sharp as a development dependency in your project:
+Sharp Configuration files are not supported for Image transforms.
 
-```bash
-pnpm add sharp -D
-```
+### Using Processors
 
-### Configuration
+The `sharp` property accepts Sharp configuration options.
 
 <!-- prettier-ignore -->
 ```ts
-{
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
   processors: {
-    sharp: {} // Sharp config options
+    sharp: {} // Sharp Options
   }
-}
+})
 ```
 
-# Minify
+# Terser
 
-TODO
+The **Terser** option is for minification configuration options. Syncify supports minification and compression of Liquid, HTML JSON and also provides handling around Script and Style Transform file types. Terse output is core to theme development using Syncify and developers should indeed get into a habit a distributing themes in terse a format.
+
+### Does Liquid Minification Matter?
+
+When we are talking about Liquid syntax specifically, there is no real measurable performance increase one gets removing whitespace and newlines but Syncify does more than just strip whitespace, it also performs code elimination. The Syncify minification process will remove comments, strip extraneous delimiter trims and where possible it replaces syntax occurrences for faster equivalents.
+
+### Usage
+
+Produce terse output by passing `--terse` (or `--minify`) command flag. The `--prod` flag will also produce terse output. You can pass a boolean `false` to options to skip minification.
+
+### Terse Options
+
+Below is is the default configuration Syncify uses for minification.
+
+<!-- prettier-ignore -->
+```ts
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
+ terser: {
+    json: {
+      assets: true,
+      config: true,
+      locales: true,
+      metafields: true,
+      templates: true,
+      exclude: []
+    },
+    view: {
+      collapseWhitespace: true,
+      minifySchema: true,
+      minifyScript: true,
+      minifyStyle: true,
+      replaceSugar: true,
+      removeComments: true,
+      stripDashes: true,
+      swapAssign: true,
+      exclude: []
+    },
+    // Requires ESBuild to be installed
+    script: {
+      mangleProps: true,
+      keepNames: false,
+      legalComments: true,
+      keepNames: false,
+      legalComments: "inline",
+      mangleProps: undefined,
+      minifyIdentifiers: true,
+      minifySyntax: true,
+      minifyWhitespace: true,
+      mangleQuoted: true,
+      exclude: []
+    }
+  }
+});
+```
 
 # CLI Usage
 
@@ -1523,9 +1706,9 @@ If you are using a package manager like [pnpm](https://pnpm.js.org/en/cli/instal
 
 ### Commands
 
-The Syncify CLI provides the following commands:
+The Syncify CLI supports the following commands.
 
-```cli
+```bash
 Default:
   syncify       Starts interactive CLI command prompt
 
@@ -1536,21 +1719,26 @@ Commands:
   syncify                   Starts interactive CLI command prompt
   syncify <store> --flags   Store name or comma separated list of stores and flags
 
-Resource Flags:
-  -t, --theme   <targets>    A comma separated list of theme targets
+Flags:
+  -t, --theme   <targets>   A comma separated list of theme targets
   -b, --build               Triggers a build, use with upload to run build before uploading
   -w, --watch               Starts watching for changes of files building when they occur
   -u, --upload              Uploads theme to online store, use with -t to target theme
   -d, --download            Downloads themes/s from specified stores
-  -p, --package             Package theme and export a .zip
-  -m, --metafields          Metafields resource mode
-  -l, --locales             Locales resource mode
-  -s, --settings            Settings resource mode
-  -o, --output  <path>      A path value (used in download and build mode only)
+  -c, --config  <path>      An optional config path to the syncify.config.js file.
+  -h, --hot                 HOT Reloading (available in watch mode only)
+  -p, --package             Package theme and export to a .zip file
+  -s, --spawn,   <name>     Target a specific spawn (use with -w or -b flags to specify mode)
+  -o, --output   <path>     A path value (used in download and build mode only)
   -h, --help,               Prints command list and some help information
-  -c, --clean,              Removes all output files, use with --build to clean before bundling
-  -q, --query   <filter>    Query online store data API, eg: themes, metafields assets
-  -v, --version <action>    Version control resource mode (see version arguments)
+  -f, --filter   <filter>   Query online store data API, eg: themes, metafields assets
+  -v, --version  <action>   Version control resource mode (see version arguments)
+
+Resource Modes:
+  --metafields              Metafields resource mode
+  --locales                 Locales resource mode
+  --settings                Settings resource mode
+  --redirects               Redirects resource mode
 
 Version Arguments:
   patch                    Increments the package.json version patch, eg: 1.0.0 > 1.0.1
@@ -1558,25 +1746,31 @@ Version Arguments:
   major                    Increments the package.json version major, eg: 1.0.0 > 2.0.0
 
 Operation Flags:
+  --clean                  Removes all output files, use with --build to clean before bundling
   --status                 Checks development environment and connections are valid.
   --pull                   Pull data from online store
   --merge                  Merge online data with local references
+  --force                  Forces a sync, replacing remote source with local one
+  --silent                 Silence the logger, omit only errors
 
 Generator Flags:
   --vsc                    Generates JSON schema spec for vscode users
+  --strap  <name>          Generates a Syncify theme strap, eg: --strap dawn
 
 Environment Flags:
   --dev, --development     Run in development mode (default)
   --prod, --production     Run in production mode
 ```
 
-### Example
+> Please keep in mind that not all commands are active as the project is still in beta.
 
-CLI usage aims to be as simple as possible. A typical project will be targeting a single Shopify theme but you can target multiple themes and stores in seamless and productive manner. When targeting multiple stores or themes the CLI employs a flag based naming approach.
+## Examples
+
+CLI usage aims to be as simple as possible. A typical project will be targeting a single Shopify theme but you can target multiple themes and stores in a seamless manner. When targeting multiple stores or themes the CLI employs a flag based naming approach.
 
 **Generate theme targets**
 
-```cli
+```bash
 $ syncify store-name -q themes
 ```
 
@@ -1588,8 +1782,8 @@ Prompt interface will be initialized
 
 **Generate local metafields**
 
-```cli
-$ syncify store-name -m --pull
+```bash
+$ syncify store-name --metafields --pull
 ```
 
 Prompt interface will be initialized
@@ -1600,8 +1794,8 @@ Prompt interface will be initialized
 
 **Upload theme to online store**
 
-```cli
-$ syncify store-name -t theme-1,theme-2 -c -b -u --prod
+```bash
+$ syncify store-name -t theme-1,theme-2 --clean -b -u --prod
 ```
 
 Exchange interface will be initialized
@@ -1614,7 +1808,7 @@ Exchange interface will be initialized
 
 **Watching 1 store and 1 theme**
 
-```cli
+```bash
 $ syncify shop -w -t dev
 ```
 
@@ -1637,14 +1831,12 @@ The `package.json` configuration for the command would look like this:
 ```jsonc
 {
   "syncify": {
-    "stores": [
-      {
-        "domain": "cool-shop", // The store name
-        "themes": {
-          "dev": 123456789 // The theme id and target name
-        }
+    "stores": {
+      "domain": "cool-shop", // The store name
+      "themes": {
+        "dev": 123456789 // The theme id and target name
       }
-    ]
+    }
   }
 }
 ```
@@ -1653,8 +1845,8 @@ The `package.json` configuration for the command would look like this:
 
 **Watching 1 store and 2 themes**
 
-```cli
-$ syncify shop -w -t dev,prod
+```bash
+$ syncify shop -t dev,prod -w
 ```
 
 <details>
@@ -1676,15 +1868,13 @@ The `package.json` configuration for the command would look like this:
 ```jsonc
 {
   "syncify": {
-    "stores": [
-      {
-        "domain": "my-shop", // The store name
-        "themes": {
-          "dev": 123456789, // The theme id and target name
-          "prod": 123456789 // The theme id and target name
-        }
+    "stores": {
+      "domain": "my-shop", // The store name
+      "themes": {
+        "dev": 123456789, // The theme id and target name
+        "prod": 123456789 // The theme id and target name
       }
-    ]
+    }
   }
 }
 ```
@@ -1693,8 +1883,8 @@ The `package.json` configuration for the command would look like this:
 
 **Watching 2 stores and multiple themes**
 
-```cli
-$ syncify shop1,shop2 -w --shop1=test --shop2=dev,stage,prod
+```bash
+$ syncify shop1,shop2 --shop1=test --shop2=dev,stage,prod -w
 ```
 
 <details>
@@ -1754,7 +1944,7 @@ Syncify can be initialized within scripts. This approach is a little more featur
 
 Syncify exports a function that has several methods which you can use to trigger specific modes. The default export can also target multiple hooks in accordance with what was passed from the command line.
 
-```typescript
+```ts
 import { syncify } from '@liquify/syncify';
 
 // Build hook
@@ -1784,7 +1974,7 @@ syncify(options: {})({
 Utilities will return some basic information about the Syncify instance. These are extremely helpful when when you are executing spawned processes and need to control what feature to load. For example, if you are spawning a webpack process for compiling JavaScript assets and need to inform upon watch mode you'd use `util.resource('watch')` which returns a boolean value when running in watch mode.
 
 ```typescript
-import { util, env } from 'shopify-sync'
+import { util, env } from '@syncify/cli'
 
 // Environment Conditions
 env.prod: boolean;
@@ -1807,7 +1997,7 @@ util.spawned(): string[]
 
 ### Backwards Compatibility
 
-Syncify supports backward compatibility for [shopify-sync](https://github.com/panoply/shopify-sync). This allows you to use it as you would have in earlier versions with build tools like [Gulp](https://gulpjs.com).
+Syncify supports backward compatibility for [shopify-sync](#). This allows you to use it as you would have in earlier versions with build tools like [Gulp](https://gulpjs.com).
 
 > Please note this support for this will eventually be deprecated.
 
