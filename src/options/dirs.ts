@@ -143,7 +143,12 @@ export function setBaseDirs (cli: Commands, config: Config) {
     } else if (isString(path)) {
       bundle.dirs[dir] = base(path);
     } else {
-      typeError('config', dir, config[dir], 'string');
+      typeError({
+        option: 'config',
+        name: dir,
+        provided: config[dir],
+        expects: 'string'
+      });
     }
   }
 
