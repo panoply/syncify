@@ -72,8 +72,6 @@ export function spawn (data: string) {
  */
 export function request (file: string, e: AxiosResponse) {
 
-  console.log(e);
-
   const message = hasPath('error.asset', e.data)
     ? e.data.error.asset
     : hasPath('errors.asset', e.data) ? e.data.errors.asset : null;
