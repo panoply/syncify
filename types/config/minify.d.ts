@@ -82,7 +82,7 @@ export interface ViewMinify {
    */
   minifyStyle?: boolean;
   /**
-   * Minifies JSON contained within schema tags, ie: `{% schema %}`
+   * Minifies JSON contained within Liquid `{% schema %}` tags.
    *
    * @default true
    */

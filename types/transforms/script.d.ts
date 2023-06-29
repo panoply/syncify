@@ -5,32 +5,89 @@ import type { Tsconfig } from 'tsconfig-type';
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
 import type { GetProcessorConfigs, RenamePaths } from '../misc/shared';
 
-export type ESBuildConfig = Merge<Pick<ESBuildOptions,
-  | 'bundle'
-  | 'treeShaking'
-  | 'tsconfig'
-  | 'target'
-  | 'splitting'
-  | 'pure'
-  | 'define'
-  | 'format'
+type TargetBrowser = (
+  | 'chrome'
+  | 'deno'
+  | 'edge'
+  | 'firefox'
+  | 'hermes'
+  | 'ie'
+  | 'ios'
+  | 'node'
+  | 'opera'
+  | 'rhino'
+  | 'safari'
+);
+
+type TargetBrowserVersion = (
+  | `${TargetBrowser}${number}`
+  | `${TargetBrowser}${number}.${number}`
+  | `${TargetBrowser}${number}.${number}.${number}`
+);
+
+type TargetESVersion = (
+  | 'es3'
+  | 'es5'
+  | 'es6'
+  | 'es2015'
+  | 'es2016'
+  | 'es2017'
+  | 'es2018'
+  | 'es2019'
+  | 'es2020'
+  | 'es2021'
+  | 'es2022'
+  | 'esnext'
+);
+
+type ESBuildAllowedOptions = Pick<ESBuildOptions, (
+  | 'alias'
+  | 'assetNames'
   | 'banner'
-  | 'footer'
+  | 'bundle'
   | 'charset'
   | 'chunkNames'
-  | 'drop'
-  | 'ignoreAnnotations'
+  | 'entryNames'
+  | 'conditions'
+  | 'define'
+  | 'external'
+  | 'footer'
+  | 'format'
+  | 'globalName'
+  | 'tsconfigRaw'
+  | 'tsconfig'
+  | 'treeShaking'
+  | 'target'
   | 'jsx'
   | 'jsxDev'
   | 'jsxFactory'
   | 'jsxFragment'
   | 'jsxImportSource'
-  | 'mainFields'
-  | 'metafile'
-  | 'resolveExtensions'
+  | 'jsxSideEffects'
+  | 'inject'
+  | 'ignoreAnnotations'
+  | 'drop'
+  | 'splitting'
   | 'supported'
+  | 'sourcesContent'
+  | 'sourceRoot'
+  | 'sourcemap'
+  | 'pure'
   | 'plugins'
-  >, {
+  | 'metafile'
+  | 'loader'
+  | 'publicPath'
+)>
+
+export { ESBuildOptions };
+
+export type Target = (
+  | TargetBrowser
+  | TargetBrowserVersion
+  | TargetESVersion
+);
+
+export type ESBuildConfig = Merge<ESBuildAllowedOptions, {
     /**
      * The format to be generated. Because we are targeting
      * browser environments, Syncify does not allow for CJS (commonjs)
@@ -54,24 +111,42 @@ export type ESBuildConfig = Merge<Pick<ESBuildOptions,
 /* TRANSFORM                                    */
 /* -------------------------------------------- */
 
-export interface ScriptTransform {
+interface ScriptSharedConfig {
   /**
    * JS/TS input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.
    *
+   * ---
+   *
    * @default undefined
    */
   input: string | string[];
-   /**
-     * The format to be generated. Because we are targeting
-     * browser environments, Syncify does not allow for CJS (commonjs)
-     * bundles to be produced.
-     *
-     * @default 'esm'
-     */
-  format?: 'esm' | 'iife';
   /**
-   * Rename the stylesheet file/s. The same name as source file will be used
+   * This sets the target environment for the generated JavaScript. It
+   * tells esbuild to transform JavaScript syntax which is too new for
+   * these environments into older JavaScript syntax that works in this
+   * environment\s.
+   *
+   * ---
+   *
+   * @default 'es2016'
+   */
+  target?: Target | Target[];
+  /**
+   * Instructs ESBuild to treat these modules as external. The import/s
+   * will be preserved and evaluated at run time instead.
+   *
+   * ---
+   *
+   * @see
+   * https://esbuild.github.io/api/#external
+   *
+   * @default
+   * []
+   */
+  external?: string[];
+  /**
+   * Rename the JavaScript file/s. The same name as source file will be used
    * when undefined. Accepts namespaces, `[file]`, `[dir]` and `[ext]`.
    *
    * ---
@@ -81,7 +156,7 @@ export interface ScriptTransform {
   rename?: string;
   /**
    * Optionally write the javascript file inline as a snippet. This will transform
-   * the JS and contained code will be output within `<script></script>` tags output as a
+   * the JS and contained code will be output within `<script></script>` tags as a
    * `snippet.liquid` file.
    *
    * @default false
@@ -89,12 +164,12 @@ export interface ScriptTransform {
   snippet?: boolean;
   /**
    * Entry points (paths/files) to watch that will trigger a rebuilds of
-   * the define _input_ file. By default, Syncify will watch all import entries
+   * the defined _input_ file. By default, Syncify will watch all import entries
    * imported by the _input_.
    *
    * @default []
    */
-  watch?: string[];
+  watch?: string[]
   /**
    * [ESBuild](https://esbuild.github.io/) Override
    *
@@ -111,6 +186,40 @@ export interface ScriptTransform {
   esbuild?: boolean | ESBuildConfig;
 }
 
+interface ScriptFormatESM extends ScriptSharedConfig {
+
+  /**
+   * The format to be generated. Because we are targeting
+   * browser environments, Syncify does not allow for CJS (commonjs)
+   * bundles to be produced.
+   *
+   * @default 'esm'
+   */
+  format?: 'esm';
+}
+
+interface ScriptFormatIIFE extends ScriptSharedConfig {
+  /**
+   * The format to be generated. Because we are targeting
+   * browser environments, Syncify does not allow for CJS (commonjs)
+   * bundles to be produced.
+   *
+   * @see https://esbuild.github.io/api/#format
+   * @default 'esm'
+   */
+  format?: 'iife';
+  /**
+   * Sets the name of the global variable which is used to store the
+   * exports from the entry point.
+   *
+   * @see https://esbuild.github.io/api/#global-name
+   * @default undefined
+   */
+  globalName?: string;
+}
+
+export type ScriptTransform = ScriptFormatESM | ScriptFormatIIFE;
+
 /* -------------------------------------------- */
 /* TRANSFORMER                                  */
 /* -------------------------------------------- */
@@ -120,19 +229,7 @@ export type ScriptTransformer = (
   | string[]
   | ScriptTransform
   | ScriptTransform[]
-  | {
-    [K in RenamePaths]: (
-      | string
-      | string[]
-      | Pick<ScriptTransform,
-        | 'input'
-        | 'format'
-        | 'snippet'
-        | 'watch'
-        | 'esbuild'
-      >
-    )
-  }
+  | { [rename: RenamePaths]: string | string[] | Omit<ScriptTransform, 'rename'> }
 )
 
 /* -------------------------------------------- */
@@ -144,31 +241,53 @@ export type ScriptTransformer = (
  *
  * Processor Configuration
  */
-export type ESBuildProcesser = Merge<
-  GetProcessorConfigs<ESBuildOptions>,
-  {
-    get tsconfig(): Tsconfig,
-  }
->
+export type ESBuildProcesser = Merge<GetProcessorConfigs<ESBuildOptions>, {
+  /**
+   * Despite the name, this getter represents both
+   * `tsconfig.json` or `jsconfig.json` files.
+   */
+  get tsconfig(): Tsconfig,
+}>
 
 /**
  * **INTERNAL USE**
  *
- * Bundling Configuration
+ * Bundling Configuration for scripts
  */
-export type ScriptBundle = Merge<ScriptTransform, {
+export type ScriptBundle = {
   /**
    * A UUID reference for this bundle.
    */
   uuid: string;
   /**
-   * Resolved input path
+   * Resolved input path. Passed to the ESBuild `entryPoint` option.
    */
   input: string;
   /**
-   * All entry points (imports) contained in the input.
-   * Matches applied to the anymatch pattern and applied
-   * at runtime.
+   * The namespace value, used in CLI logs
    */
-  watch: Tester;
-}>;
+  namespace: string;
+  /**
+   * Whether or not to export as a snippet
+   */
+  snippet: boolean;
+  /**
+   * Resolved key reference, used in the Shopify sync requests
+   */
+  key: string;
+  /**
+   * Resolved output path where the transformed file should be written.
+   * This value will have a rename applied in the uri.
+   */
+  output: string;
+  /**
+   * Imports contained in the input. This is used to trigger a build.
+   * Matches applied to the anymatch pattern at runtime.
+   */
+  watch: Set<string>;
+  /**
+   * ESBuild options which will either use the processor defaults or
+   * if defined on script bundle, will be merged with processor defaults.
+   */
+  esbuild: ESBuildOptions
+};

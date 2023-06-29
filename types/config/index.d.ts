@@ -218,7 +218,7 @@ export interface Transforms {
    *   ]
    * }
    */
-  script?: ScriptTransformer
+  script?: false | ScriptTransformer
   /**
    * SVG File transforms
    */

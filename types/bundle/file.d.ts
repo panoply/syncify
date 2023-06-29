@@ -197,8 +197,9 @@ interface File<T = any> extends ParsedPath {
   /**
    * The output path location which files will be written.
    * Only theme specific files have an output path location,
-   * when a file write from source (like metafield) this will
-   * have a `null` value.
+   * when a file writes from its source (like a metafield) or
+   * if the file is handled in an asset pipeline transform then
+   * this will have a `null` value.
    *
    * @example
    *

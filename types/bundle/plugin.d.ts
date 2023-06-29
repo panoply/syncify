@@ -26,6 +26,10 @@ export interface PluginHooks {
    */
   name: Lowercase<string>;
   /**
+   * A list of file extension the plugin handles
+   */
+  extensions?: string[];
+  /**
    * Optionally infer the required transformer
    */
   transforms?: Array<keyof Transforms>

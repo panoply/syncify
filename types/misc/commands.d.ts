@@ -1,4 +1,3 @@
-
 /* -------------------------------------------- */
 /* CLI OPTIONS                                  */
 /* -------------------------------------------- */
@@ -84,10 +83,10 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --prompt
+   * $ syncify --interactive
    * ```
    */
-  prompt?: boolean;
+  interactive?: boolean;
   /**
    * Run in watch mode (chokidar). This requires a store target be passed.
    *
@@ -204,20 +203,19 @@ export interface Commands {
    */
   pull?: boolean;
   /**
-   * Pushes a resource from local to remote shop. This is different from `-u` or `--upload`
-   * flags as it can be used to push targets assets, files or resources and can be used
-   * together with the `-f` filter flag.
+   * Force uploads a resource from local to remote shop. This will instruct
+   * syncify to overwrite any remote versions.
    *
    * ---
    *
    * Example:
    *
    * ```bash
-   * $ syncify store_1 -t dev_theme -f assets/file --push
-   * $ syncify store_1 -f metafields/namespace/*.json --push
+   * $ syncify store_1 -t dev_theme -f assets/file -u --force
+   * $ syncify store_1 -f metafields/namespace/*.json -u --force
    * ```
    */
-  push?: boolean;
+  force?: boolean;
   /**
    * Generator flag for automatically applying JSON schema specifications
    * for VS Code users.
@@ -295,19 +293,6 @@ export interface Commands {
    */
   silent?: boolean;
   /**
-   * Initialized Browser Sync in watch mode. Can only be used when
-   * targeting a single store and theme.
-   *
-   * ---
-   *
-   * Example:
-   *
-   * ```bash
-   * $ syncify store_1 --watch --server
-   * ```
-   */
-  server?: boolean;
-  /**
    * Pulls in a Syncify theme strap environment.
    *
    * ---
@@ -315,7 +300,7 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --strap dusk
+   * $ syncify --strap dawn
    * $ syncify --strap silk
    * ```
    */
@@ -378,7 +363,7 @@ export interface Commands {
    */
    input?: string;
   /**
-   * An optional output path. This will overwrite and configuration predefined
+   * An optional output path. This will overwrite any configuration predefined
    * in settings.
    *
    * ---
@@ -392,16 +377,19 @@ export interface Commands {
   output?: string;
   /**
    * Version control. The bump flag accepts 3 different arguments.
-   * Passing `--bump major` bumps main version, eg: `1.0.0` > `2.0,0`
-   * Passing `--bump minor` bumps minor version, eg: `1.0.0` > `1.1.0`
-   * Passing `--bump patch` bumps patch version, eg: `1.0.0` > `1.0.1`
+   *
+   * 1. Passing `--bump major` bumps main version, eg: `1.0.0` > `2.0,0`
+   * 2. Passing `--bump minor` bumps minor version, eg: `1.0.0` > `1.1.0`
+   * 3. Passing `--bump patch` bumps patch version, eg: `1.0.0` > `1.0.1`
    *
    * ---
    *
    * Example:
    *
    * ```bash
-   * $ syncify --clean -b -i some/directory
+   * $ syncify --bump major
+   * $ syncify --bump minor
+   * $ syncify --bump patch
    * ```
    */
   bump?: string;

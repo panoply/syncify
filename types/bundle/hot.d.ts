@@ -1,4 +1,3 @@
-
 /* -------------------------------------------- */
 /* LIVE RELOADS                                 */
 /* -------------------------------------------- */
@@ -42,6 +41,14 @@ export interface HOT {
    * @default true
    */
   label?: 'visible' | 'hidden';
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * Whether or not to record changes. When enabled, Syncify
+   * will keep track of the last 25 changes applied and allow
+   * you to walk through the stack.
+   */
+  history?: boolean;
   /**
    * Whether or not Syncify should inject the required HOT snippet
    * at runtime layout/s. When `false` you will need to manually place

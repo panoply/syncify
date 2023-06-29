@@ -253,21 +253,6 @@ export interface Commands {
    */
   pull?: boolean;
   /**
-   * Pushes a resource from local to remote shop. This is different from `-u` or `--upload`
-   * flags as it can be used to push targets assets, files or resources and can be used
-   * together with the `-f` filter flag.
-   *
-   * ---
-   *
-   * Example:
-   *
-   * ```bash
-   * $ syncify store_1 -t dev_theme -f assets/file --push
-   * $ syncify store_1 -f metafields/namespace/*.json --push
-   * ```
-   */
-  push?: boolean;
-  /**
    * Generator flag for automatically applying JSON schema specifications
    * for VS Code users.
    *
@@ -291,13 +276,13 @@ export interface Commands {
    *
    * ```bash
    * # Uploads only .css assets
-   * $ syncify store_1 -t dev_theme -f assets/*.css --push
+   * $ syncify store_1 -t dev_theme -f assets/*.css -u
    *
    * # Builds locales in production mode
    * $ syncify -f locales/*.json --prod
    *
    * # Uploads specific page
-   * $ syncify store_1 -u -f pages/shipping-info.md --prod --push
+   * $ syncify store_1 -u -f pages/shipping-info.md --prod
    * ```
    */
   filter?: string;
@@ -367,7 +352,7 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --strap dusk
+   * $ syncify --strap dawn
    * $ syncify --strap silk
    * ```
    */
@@ -401,6 +386,7 @@ export interface Commands {
 
    * $ syncify --spawn spawn-name
    * $ syncify --spawn spawn-name,some-other-spawn
+   *
    * ```
    */
    spawn?: string;
@@ -448,10 +434,23 @@ export interface Commands {
    */
   output?: string;
   /**
+   * Force overwrite of a theme file
+   *
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify store_1 -t dev_theme -f section/file.liquid -u --force
+   * ```
+   */
+  force?: boolean;
+  /**
    * Version control. The bump flag accepts 3 different arguments.
-   * Passing `--bump major` bumps main version, eg: `1.0.0` > `2.0,0`
-   * Passing `--bump minor` bumps minor version, eg: `1.0.0` > `1.1.0`
-   * Passing `--bump patch` bumps patch version, eg: `1.0.0` > `1.0.1`
+   *
+   * 1. Passing `--bump major` bumps main version, eg: `1.0.0` > `2.0,0`
+   * 2. Passing `--bump minor` bumps minor version, eg: `1.0.0` > `1.1.0`
+   * 3. Passing `--bump patch` bumps patch version, eg: `1.0.0` > `1.0.1`
    *
    * ---
    *

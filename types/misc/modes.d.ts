@@ -27,6 +27,7 @@ export interface BuildModeReport {
    *
    * @example
    * 'skipped file'
+   *
    * @default
    * null
    */

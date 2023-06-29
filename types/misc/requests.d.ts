@@ -14,7 +14,7 @@ export type Client = (method: Methods, file: File, content?: string) => Promise<
 /**
  * Client Request as parameter
  */
-export type ClientParam<T> = (method: Methods, file: File<T>, content?: string) => Promise<void>
+export type ClientParam<T = any> = (method: Methods, file: File<T>, content?: string) => Promise<void>
 
 /**
  * Resources
@@ -34,7 +34,7 @@ export type GetAsset = (
   `templates/${string}${'.liquid' | '.json'}` |
   `templates/customer/${string}${'.liquid' | '.json'}` |
   `assets/${string}` |
-  `sections/${string}${'.liquid'}` |
+  `sections/${string}${'-group.json' | '.liquid'}` |
   `snippets/${string}${'.liquid'}` |
   `layout/${string}${'.liquid'}` |
   `locales/${string}${'.json'}` |

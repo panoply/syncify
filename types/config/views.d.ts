@@ -58,7 +58,9 @@ export interface Snippets {
    *
    * @example
    *
-   * // Take the following structure
+   * // Assuming the separator is '_'
+   * // Take the following structure:
+   *
    * snippets
    * │
    * ├─ head
@@ -67,7 +69,8 @@ export interface Snippets {
    *    ├─ bar.liquid
    *    └─ baz.liquid
    *
-   * // The output result will be
+   * // The output result will be:
+   *
    * theme
    * └─ snippets
    *   ├─ head_foo.liquid
@@ -124,7 +127,9 @@ export interface Sections {
    *
    * @example
    *
-   * // Take the following structure
+  * // Assuming the separator is '_'
+  * // Take the following structure:
+  *
    * sections
    * │
    * ├─ index
@@ -134,7 +139,8 @@ export interface Sections {
    *    ├─ header.liquid
    *    └─ footer.liquid
    *
-   * // The output result will be
+   * // The output result will be:
+   *
    * theme
    * └─ sections
    *   ├─ index_slideshow.liquid
@@ -167,7 +173,9 @@ export interface Sections {
    * A list section sub-directories or relative files that should
    * pass through or snip prefixing
    *
-   * _cannot contain glob (`*`) stars_
+   * **NOTE:**
+   *
+   * **Cannot contain glob (`*`) stars**
    *
    * @default []
    *

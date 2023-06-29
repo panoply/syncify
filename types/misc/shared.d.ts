@@ -9,7 +9,7 @@ export type Namespacing = (
 /**
  * Namespaced Paths
  */
-export type NamespacePaths = `${'assets' | 'snippets'}/${Namespacing}${string}${Namespacing}`
+export type NamespacePaths = `${'assets' | 'snippets'}/${string}`
 
 /**
  * Directory Paths
@@ -19,7 +19,7 @@ export type DirPaths = `${'assets' | 'snippets'}/${string}`
 /**
  * Rename Paths
  */
-export type RenamePaths = NamespacePaths | DirPaths
+export type RenamePaths = NamespacePaths;
 
 /**
  * Rename input type

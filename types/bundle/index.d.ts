@@ -2,7 +2,7 @@
 
 import type { Tester } from 'anymatch';
 import type { Options as HTMLTerserOptions } from 'html-minifier-terser';
-import type { BuildOptions as ESBuildConfig } from 'esbuild';
+import type { Config as TailwindProcessor } from 'tailwindcss';
 import type { Merge, PackageJson } from 'type-fest';
 import type { Markdown } from '../misc/markdown';
 import type { Paths, Directories, Views, Config, Logger, Processors } from '../config/index';
@@ -14,6 +14,7 @@ import type { SVGBundle, SVGOProcesser, SVGSpriteProcesser } from '../transforms
 import type { HOT } from './hot';
 import type { JSONMinify, ESBuildMinify, ViewMinify } from '../config/minify';
 import type { JSONBundle } from '../transforms/json';
+import type { FSWatcher } from 'chokidar';
 
 /* -------------------------------------------- */
 /* RE-EXPORT                                    */
@@ -39,9 +40,13 @@ export interface ProcessorConfig {
    */
   postcss: PostCSSProcesser;
   /**
-   *  [SASS Dart](https://sass-lang.com/documentation/js-api/) Pre-Processor
+   * [SASS Dart](https://sass-lang.com/documentation/js-api/) Pre-Processor
    */
   sass: SASSProcesser;
+  /**
+   * [TailwindCSS](https://tailwindcss.com/) Pre-Processor
+   */
+  tailwind: TailwindProcessor;
   /**
    * [Sharp](https://sharp.pixelplumbing.com) Pre-Processor
    */
@@ -63,6 +68,26 @@ export interface ProcessorConfig {
 /* -------------------------------------------- */
 /* SPAWNED PROCESSES                            */
 /* -------------------------------------------- */
+
+export interface SpawnCommand {
+  /**
+   * The base command, For example `esbuild` would be the
+   * _base_ command in `esbuild src/file.js --watch`. If an
+   * array command was provided in config then this value would
+   * represent the first item in that array.
+   */
+  cmd: string;
+  /**
+   * The command arguments. For example, all commands following
+   * the base command. The value here will be passed to spawn.
+   */
+  args: string[];
+  /**
+   * The process id (pid) assigned to the spawn. This is dynamically
+   * assigned and will be `NaN` until spawn has been invoked.
+   */
+  pid: number;
+}
 
 /**
  * **INTERNAL USE**
@@ -94,25 +119,7 @@ export interface SpawnBundle {
     /**
      * The name of the process that will run, eg: `esbuild`
      */
-    [name: string]: {
-      /**
-       * The base command, For example `esbuild` would be the
-       * _base_ command in `esbuild src/file.js --watch`. If an
-       * array command was provided in config then this value would
-       * represent the first item in that array.
-       */
-      cmd: string;
-      /**
-       * The command arguments. For example, all commands following
-       * the base command. The value here will be passed to spawn.
-       */
-      args: string[];
-      /**
-       * The process id (pid) assigned to the spawn. This is dynamically
-       * assigned and will be `NaN` until spawn has been invoked.
-       */
-      pid: number;
-    }
+    [name: string]: SpawnCommand
   }
 }
 
@@ -276,11 +283,11 @@ export interface Modes {
   /**
    * Pull data from remote store, `--pull`
    */
-  pull: boolean
+  pull: boolean;
   /**
-   * merge data from remote store, `--merge`
+   * Force upload and overwrite, `--force`
    */
-  push: boolean;
+  force: boolean;
   /**
    * Invoke HOT reloads, `--hot`
    */
@@ -363,7 +370,7 @@ export interface Bundle {
    * Directory structure paths.
    *
    * Includes a special `transforms` Map reference for transform related files
-   * which may potentially be using an extension which would lead to it being identified
+   * which may potentially be using an extension that would lead to it being identified
    * as a different file type. This occurs when (for example) snippet generated transforms
    * are inferred. The `transform` option will point to resolved file names and the values
    * for each entry will equal an enum `Type` number. The following transforms are identifiable:
@@ -412,10 +419,20 @@ export interface Bundle {
     * The operation to run
     */
   mode: Modes;
-   /**
-    * List of paths to watch or build from
-    */
-  watch: Set<string>
+  /**
+   * Produces an instance of FSWatcher, we use chokidar, this instance sets
+   * the options.
+   */
+  watch: Merge<FSWatcher, {
+    /**
+     * Private method of chokidar
+     */
+    _watched: Map<string, { items: Set<string> }>;
+    /**
+     * Check whether or not a path is being watched
+     */
+    has (path: string, dir?: string): boolean;
+  }>;
   /**
    * Snippet handling
    */
@@ -456,6 +473,10 @@ export interface Bundle {
     script: boolean;
     get options(): Minify
   }
+  /**
+   * Error store, holds reference to errors
+   */
+  errors: Set<string>
   /**
    * Processor Configurations
    */
