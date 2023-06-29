@@ -7,6 +7,7 @@ import { lastPath } from '~utils/paths';
 import { Partial } from 'rambdax';
 import * as context from '~process/context';
 import { bundle } from '~config';
+import merge from 'mergerino';
 import { Tester } from 'anymatch';
 
 /* -------------------------------------------- */
@@ -118,7 +119,9 @@ export function renameFile<T> ({ name, dir, ext, namespace }: File<T>, rename: s
  * @param input The file path which is being processed
  * @param output The output base directory path
  */
-export function setFile (file: Partial<File>, input: string, output: string) {
+export function setFile (parsedFile: Partial<File>, input: string, output: string) {
+
+  const file = <File>parsedFile;
 
   return <T extends unknown>(namespace: string, type: Type, kind?: Kind): File<T> => {
 
@@ -128,11 +131,13 @@ export function setFile (file: Partial<File>, input: string, output: string) {
       key = join(lastPath(file.dir), file.base);
       output = null;
     } else {
+
       key = join(namespace, file.base);
       output = join(output, key);
+
     }
 
-    return assign({}, file as File, {
+    return assign({}, file, {
       type,
       input,
       output,
@@ -162,77 +167,76 @@ export function parseFile (paths: Bundle['paths'], output: string) {
   return (path: string) => {
 
     const file: Partial<File> = parse(path);
-    const merge = setFile(file, path, output);
+    const define = setFile(file, path, output);
 
     if (file.ext === '.liquid') {
 
       if (paths.sections(path)) {
-        return context.section(merge('sections', Type.Section, Kind.Liquid));
+        return context.section(define('sections', Type.Section, Kind.Liquid));
       } else if (paths.snippets(path)) {
-        return merge('snippets', Type.Snippet, Kind.Liquid);
+        return context.snippet(define('snippets', Type.Snippet, Kind.Liquid));
       } else if (paths.layout(path)) {
-        return merge('layout', Type.Layout, Kind.Liquid);
+        return define('layout', Type.Layout, Kind.Liquid);
       } else if (paths.templates(path)) {
-        return merge('templates', Type.Template, Kind.Liquid);
+        return define('templates', Type.Template, Kind.Liquid);
       } else if (paths.customers(path)) {
-        return merge('templates/customers', Type.Template, Kind.Liquid);
+        return define('templates/customers', Type.Template, Kind.Liquid);
       } else if (paths.transforms.has(path)) {
         switch (paths.transforms.get(path)) {
-          case Type.Script: return context.script(merge('snippets', Type.Script, Kind.JavaScript));
-          case Type.Style: return context.script(merge('snippets', Type.Style, Kind.CSS));
+          case Type.Style: return context.style(define('snippets', Type.Style, Kind.CSS));
         }
       }
 
     } else if (file.ext === '.md' || file.ext === '.html') {
 
-      return merge('pages', Type.Page, file.ext === '.html' ? Kind.HTML : Kind.Markdown);
+      return define('pages', Type.Page, file.ext === '.html' ? Kind.HTML : Kind.Markdown);
 
     } else if (file.ext === '.json') {
 
       if (paths.metafields(path)) {
-        return merge('metafields', Type.Metafield, Kind.JSON);
+        return define('metafields', Type.Metafield, Kind.JSON);
       } else if (paths.sections(path)) {
-        return context.section(merge('sections', Type.Section, Kind.JSON));
+        return context.section(define('sections', Type.Section, Kind.JSON));
       } else if (paths.templates(path)) {
-        return merge('templates', Type.Template, Kind.JSON);
+        return define('templates', Type.Template, Kind.JSON);
       } else if (paths.config(path)) {
-        return merge('config', Type.Config, Kind.JSON);
+        return define('config', Type.Config, Kind.JSON);
       } else if (paths.locales(path)) {
-        return merge('locales', Type.Locale, Kind.JSON);
+        return define('locales', Type.Locale, Kind.JSON);
       } else if (paths.customers(path)) {
-        return merge('templates/customers', Type.Template, Kind.JSON);
+        return define('templates/customers', Type.Template, Kind.JSON);
       }
 
     } else if (file.ext === '.svg') {
-      return context.svg(merge('assets', Type.Svg, Kind.SVG));
+      return context.svg(define('assets', Type.Svg, Kind.SVG));
     } else if (file.ext === '.css') {
-      return context.style(merge('assets', Type.Style, Kind.CSS));
+      return context.style(define('assets', Type.Style, Kind.CSS));
     } else if (file.ext === '.scss') {
-      return context.style(merge('assets', Type.Style, Kind.SCSS));
+      return context.style(define('assets', Type.Style, Kind.SCSS));
     } else if (file.ext === '.sass') {
-      return context.style(merge('assets', Type.Style, Kind.SASS));
+      return context.style(define('assets', Type.Style, Kind.SASS));
 
-    } else if (file.ext === '.js') {
-      return context.script(merge('assets', Type.Script, Kind.JavaScript));
+    } else if (file.ext === '.js' || file.ext === '.mjs') {
+      return context.script(define('assets', Type.Script, Kind.JavaScript));
     } else if (file.ext === '.ts') {
-      return context.script(merge('assets', Type.Script, Kind.TypeScript));
+      return context.script(define('assets', Type.Script, Kind.TypeScript));
     } else if (file.ext === '.jsx') {
-      return context.script(merge('assets', Type.Script, Kind.JSX));
+      return context.script(define('assets', Type.Script, Kind.JSX));
     } else if (file.ext === '.tsx') {
-      return context.script(merge('assets', Type.Script, Kind.TSX));
+      return context.script(define('assets', Type.Script, Kind.TSX));
 
     } else if (paths.assets(path)) {
 
       if (bundle.spawn.invoked) {
-        return merge('assets', Type.Spawn);
+        return define('assets', Type.Spawn);
       } else if (file.ext === '.jpg' || file.ext === '.png' || file.ext === '.gif' || file.ext === '.pjpg') {
-        return merge('assets', Type.Asset, Kind.Image);
+        return define('assets', Type.Asset, Kind.Image);
       } else if (file.ext === '.mov' || file.ext === '.mp4' || file.ext === '.webm' || file.ext === '.ogg') {
-        return merge('assets', Type.Asset, Kind.Video);
+        return define('assets', Type.Asset, Kind.Video);
       } else if (file.ext === '.pdf') {
-        return merge('assets', Type.Asset, Kind.PDF);
+        return define('assets', Type.Asset, Kind.PDF);
       } else if (file.ext === '.eot' || file.ext === '.ttf' || file.ext === '.woff' || file.ext === '.woff2') {
-        return merge('assets', Type.Asset, Kind.Font);
+        return define('assets', Type.Asset, Kind.Font);
       }
     }
 
