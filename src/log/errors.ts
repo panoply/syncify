@@ -202,8 +202,8 @@ export function esbuild (e: Message) {
       stack: false,
       entries: {
         file: e.location.file,
-        column: e.location.column,
         line: e.location.line,
+        column: e.location.column,
         plugin: e.pluginName
       }
     })
