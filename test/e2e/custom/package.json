@@ -6,7 +6,7 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "dev": "syncify syncify -t custom --watch --hot",
+    "dev": "syncify syncify -t custom --watch",
     "build": "syncify --build --prod --clean",
     "upload": "syncify custom --upload",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,20 +29,20 @@
     "@sissel/eslint-config": "^1.1.0",
     "@sissel/prettier-config": "^1.1.0",
     "@syncify/cli": "link:../../..",
-    "autoprefixer": "^10.4.8",
-    "bootstrap": "^5.2.0",
-    "esbuild": "^0.15.3",
-    "eslint": "^8.22.0",
-    "postcss": "^8.4.16",
-    "prettier": "^2.7.1",
-    "sass": "^1.54.4",
-    "sharp": "^0.30.7",
-    "svg-sprite": "^1.5.4",
-    "svgo": "^2.8.0",
-    "tsup": "^6.2.2"
+    "autoprefixer": "^10.4.14",
+    "bootstrap": "^5.2.3",
+    "esbuild": "^0.17.19",
+    "eslint": "^8.40.0",
+    "postcss": "^8.4.23",
+    "prettier": "^2.8.8",
+    "sass": "^1.62.1",
+    "sharp": "^0.32.1",
+    "svg-sprite": "^2.0.2",
+    "svgo": "^3.0.2",
+    "tsup": "^6.7.0"
   },
   "dependencies": {
-    "@hotwired/stimulus": "^3.1.0",
+    "@hotwired/stimulus": "^3.2.1",
     "lazysizes": "^5.3.2",
     "mithril": "^2.2.2"
   }

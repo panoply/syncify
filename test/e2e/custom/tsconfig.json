@@ -1,35 +1,52 @@
 {
-  "exclude": ["node_modules/**/*", "dist"],
-  "include": ["./src/scripts/**/*.ts"],
-  "typeAcquisition": {
-    "enable": true,
-    "include": ["node"]
-  },
+  "exclude": [
+    "node_modules/**",
+    "export",
+    "dist"
+  ],
+  "include": [
+    "src/scripts/**/*"
+  ],
   "compilerOptions": {
-    "types": ["node"],
-    "incremental": true,
     "target": "ES6",
-    "removeComments": true,
-    "lib": ["es2020", "DOM"],
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable"
+    ],
     "module": "ESNext",
-    "alwaysStrict": true,
-    "allowUmdGlobalAccess": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "importsNotUsedAsValues": "remove",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
+    "allowUnreachableCode": true,
+    "checkJs": false,
+    "allowJs": true,
+    "incremental": true,
+    "outDir": "theme/assets",
+    "declaration": false,
     "preserveSymlinks": true,
-    "skipDefaultLibCheck": false,
+    "allowSyntheticDefaultImports": true,
+    "keyofStringsOnly": true,
+    "esModuleInterop": true,
+    "ignoreDeprecations": "5.0",
+    "resolveJsonModule": true,
     "moduleResolution": "node",
-    "noEmitOnError": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": true,
-    "pretty": true,
+    "noImplicitThis": false,
+    "skipDefaultLibCheck": true,
+    "noStrictGenericChecks": true,
+    "noEmit": true,
+    "suppressExcessPropertyErrors": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
     "baseUrl": ".",
+    "pretty": true,
     "paths": {
-      "globs": ["./src/scripts/globs/*.ts"],
-      "@components": ["./src/scripts/components/*.ts"]
+      "qux-alias": [
+        "./src/scripts/globs/a.ts"
+      ],
+      "globs": [
+        "./src/scripts/globs/*"
+      ],
+      "@components": [
+        "./src/scripts/components/*"
+      ]
     }
   }
 }

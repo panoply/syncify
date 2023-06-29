@@ -8,7 +8,7 @@ export default defineConfig({
   stores: {
     domain: 'syncify',
     themes: {
-      dev: 129457717489
+      dev: 136656060657
     }
   },
   paths: {
@@ -19,7 +19,7 @@ export default defineConfig({
     pages: 'views/pages/*',
     customers: 'views/customer/*',
     templates: 'views/*',
-    snippets: 'views/snippets/*',
+    snippets: [ 'views/snippets/*', 'scripts/markets.js.liquid' ],
     assets: [ 'assets/images/*', 'assets/fonts/*' ],
     sections: [ 'views/layout/*', 'views/sections/**/*' ]
   },
@@ -27,6 +27,7 @@ export default defineConfig({
     script: {
       'assets/bundle.min.js': 'scripts/bundle.ts',
       'snippets/i18n.liquid': 'scripts/vars.js.liquid'
+
     },
     svg: {
       'snippets/icons.liquid': 'assets/icons/*.svg'
