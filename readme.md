@@ -2,7 +2,7 @@
 
 <hr>
 
-# **_SYNCIFY_**
+# SYNCIFY
 
 A lightening fast, extensible and superior alternative Shopify CLI (Theme Development) tool. Syncify provides developers with a powerful CLI and employs an intuitive approach for creating Shopify themes.
 
