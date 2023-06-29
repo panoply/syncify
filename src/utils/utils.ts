@@ -146,6 +146,18 @@ export function toUpcase <T extends string> (value: T) {
 };
 
 /**
+ * Sugar helper which runs `byteConvert` and `byteSize` and
+ * returns a string, e.g: `20kb`
+ *
+ * @param string
+ * The string to determine
+ */
+export function getSizeStr (value: string) {
+
+  return byteConvert(byteSize(value));
+}
+
+/**
  * Returns the byte size of a string value
  *
  * @param string The string to determine
@@ -175,6 +187,17 @@ export function byteConvert (bytes: number): string {
     : `${bold((bytes / 1024 ** size).toFixed(1))}${(UNITS[size])}`;
 };
 
+/**
+ * Returns an object containing size analysis of a string.
+ * Requires a `beforeSize` value be provided to perform diff
+ * analysis
+ *
+ * @param content
+ * The content to measure
+ *
+ * @param beforeSize
+ * The size to compare
+ */
 export function fileSize (content: string | Buffer, beforeSize: number) {
 
   const size = byteSize(content);
@@ -283,7 +306,7 @@ export function addSuffix (i: number): string {
 /**
  * Returns the byte size of a string value
  */
-export function getSize (string: string | Buffer): number {
+export function getSizeInteger (string: string | Buffer): number {
 
   return isString(string)
     ? Buffer.from(string).toString().length
@@ -313,4 +336,34 @@ export function uuid (): string {
 
   return Math.random().toString(36).slice(2);
 
+}
+
+export function debouncePromise<T extends unknown[]> (
+  fn: (...args: T) => Promise<void>,
+  delay: number,
+  onError: (err: unknown) => void
+) {
+
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  let transit: Promise<void> | undefined;
+  let pending: (() => void) | undefined;
+
+  return function debounced (...args: Parameters<typeof fn>) {
+    if (transit) {
+      pending = () => {
+        debounced(...args);
+        pending = undefined;
+      };
+    } else {
+      if (timeout != null) clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        timeout = undefined;
+        transit = fn(...args).catch(onError).finally(() => {
+          transit = undefined;
+          if (pending) pending();
+        });
+      }, delay);
+    }
+  };
 }
