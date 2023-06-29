@@ -70,8 +70,8 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   /* -------------------------------------------- */
 
   process.on('SIGINT', signal);
-  process.on('uncaughtException', exception);
-  process.on('unhandledRejection', rejection);
+  //process.on('uncaughtException', exception);
+  //process.on('unhandledRejection', rejection);
 
   if (bundle.mode.hot) {
 

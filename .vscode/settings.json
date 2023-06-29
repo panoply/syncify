@@ -17,32 +17,42 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
-    "tests": true
+    "tests": true,
     // "test": true
-    //"**/node_modules": true,
+    "**/node_modules": true,
     // "**/node_modules/.syncify": false
     //"**/example": true
   },
-  "html.customData": [".vscode/icon.html-data.json"],
+  "html.customData": [
+    ".vscode/icon.html-data.json"
+  ],
   "json.schemas": [
     {
-      "fileMatch": ["package.json"],
+      "fileMatch": [
+        "package.json"
+      ],
       "url": "./.vscode/schema/tsup.json"
     },
     {
-      "fileMatch": ["package.json", "syncify.package.json"],
+      "fileMatch": [
+        "package.json",
+        "syncify.package.json"
+      ],
       "url": "/schema/syncify.package.json"
     },
     {
-      "fileMatch": ["syncify.env.json"],
+      "fileMatch": [
+        "syncify.env.json"
+      ],
       "url": "/schema/syncify.env.json"
     },
     {
-      "fileMatch": ["syncify.config.json"],
+      "fileMatch": [
+        "syncify.config.json"
+      ],
       "url": "/schema/syncify.config.json"
     }
   ],
-
   "highlight.regexes": {
     "(\\$)([a-z:(]*\\b)": {
       "regexFlags": "g",
@@ -57,13 +67,19 @@
   "vsicons.associations.files": [
     {
       "icon": "svg",
-      "extensions": ["svgo.config.js", "svgo.config.cjs"],
+      "extensions": [
+        "svgo.config.js",
+        "svgo.config.cjs"
+      ],
       "filename": true,
       "format": "svg"
     },
     {
       "icon": "sass",
-      "extensions": ["sass.config.js", "sass.config.cjs"],
+      "extensions": [
+        "sass.config.js",
+        "sass.config.cjs"
+      ],
       "filename": true,
       "format": "svg"
     },
@@ -89,7 +105,9 @@
     "imgmin",
     "linkify",
     "obfucss",
+    "pnpx",
     "purgecss",
-    "Spriter"
+    "Spriter",
+    "tailwindcss"
   ]
 }

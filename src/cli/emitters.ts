@@ -24,7 +24,7 @@ export function rejection (reason: any, p: Promise<any>) {
   log.nwl();
   log.err(`Unhandled Promise Rejection at: ${p}`);
   log.nwl('red');
-  log.out(gray(reason));
+  log.out(reason ? gray(reason) : 'Unkown Reason');
 
 };
 
