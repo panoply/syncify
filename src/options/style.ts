@@ -108,7 +108,12 @@ export async function setStyleConfig (config: Config, pkg: Package) {
 
         }
       } else {
-        typeError('style', 'postcss', compile.postcss, 'boolean | {}');
+        typeError({
+          option: 'style',
+          name: 'postcss',
+          provided: compile.postcss,
+          expects: 'boolean | {}'
+        });
       }
     }
 
@@ -135,12 +140,24 @@ export async function setStyleConfig (config: Config, pkg: Package) {
               if (u.isBoolean(style.sass[option])) {
                 compile.sass[option] = style.sass[option];
               } else {
-                typeError('sass', option, style.sass[option], 'boolean');
+                typeError({
+                  option: 'sass',
+                  name: option,
+                  provided: style.sass[option],
+                  expects: 'boolean'
+                });
               }
 
             } else if (option === 'style') {
 
-              if (!u.isString(style.sass[option])) typeError('sass', option, style.sass[option], 'string');
+              if (!u.isString(style.sass[option])) {
+                typeError({
+                  option: 'sass',
+                  name: option,
+                  provided: style.sass[option],
+                  expects: 'string'
+                });
+              }
 
               if (style.sass[option] === 'expanded' || style.sass[option] === 'compressed') {
                 compile.sass[option] = style.sass[option];
@@ -154,14 +171,24 @@ export async function setStyleConfig (config: Config, pkg: Package) {
                 // Full path relative to CWD
                 compile.sass[option] = uniq<string>(style.sass[option]).map(p => join(bundle.cwd, p));
               } else {
-                typeError('sass', option, style.sass[option], 'string[]');
+                typeError({
+                  option: 'sass',
+                  name: option,
+                  provided: style.sass[option],
+                  expects: 'string[]'
+                });
               }
             }
 
           };
         }
       } else {
-        typeError('style', 'sass', style.sass, 'boolean | {}');
+        typeError({
+          option: 'style',
+          name: 'sass',
+          provided: style.sass,
+          expects: 'boolean | {}'
+        });
       }
 
       // Warn if input is not using sass or scss extension
@@ -178,12 +205,26 @@ export async function setStyleConfig (config: Config, pkg: Package) {
     if (has('rename', style) && !isNil(style)) {
 
       // Ensure the rename value is a string
-      if (!u.isString(style.rename)) typeError('styles', 'rename', style.rename, 'string');
+      if (!u.isString(style.rename)) {
+        typeError({
+          option: 'styles',
+          name: 'rename',
+          provided: style.rename,
+          expects: 'string'
+        });
+      }
 
       rename = renameFile(compile.input, style.rename);
 
       // Validate the file new name.
-      if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) typeError('sass', 'rename', rename, 'Invalid rename augment');
+      if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) {
+        typeError({
+          option: 'sass',
+          name: 'rename',
+          provided: rename,
+          expects: 'Characters: [a-zA-Z0-9_.-]'
+        });
+      }
 
       // We are dealing with a .css file
       if (rename.name.endsWith('.css')) {
@@ -204,7 +245,14 @@ export async function setStyleConfig (config: Config, pkg: Package) {
 
     if (bundle.mode.watch && has('watch', style)) {
 
-      if (!u.isArray(style.watch)) typeError('styles', 'watch', style.watch, 'string[]');
+      if (!u.isArray(style.watch)) {
+        typeError({
+          option: 'styles',
+          name: 'watch',
+          provided: style.watch,
+          expects: 'string[]'
+        });
+      }
 
       for (const uri of style.watch as unknown as string[]) {
 
@@ -243,7 +291,16 @@ export async function setStyleConfig (config: Config, pkg: Package) {
     }
 
     if (has('snippet', style)) {
-      if (!u.isBoolean(style.snippet)) typeError('styles', 'snippet', style.snippet, 'boolean');
+
+      if (!u.isBoolean(style.snippet)) {
+        typeError({
+          option: 'styles',
+          name: 'snippet',
+          provided: style.snippet,
+          expects: 'boolean'
+        });
+      }
+
       compile.snippet = style.snippet;
     }
 
@@ -256,12 +313,12 @@ export async function setStyleConfig (config: Config, pkg: Package) {
       }
 
       bundle.paths.transforms.set(compile.input, Type.Style);
-      bundle.watch.add(`!${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
+      bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
 
     } else {
 
       compile.rename = rename.name;
-      bundle.watch.add(`!${join(bundle.cwd, config.output, 'assets', rename.name)}`);
+      bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'assets', rename.name)}`);
     }
 
     bundle.style.push(compile as any);
