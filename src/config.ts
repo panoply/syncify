@@ -51,7 +51,8 @@ export const minify: Minify = {
     mangleProps: undefined,
     legalComments: 'none',
     mangleQuoted: false,
-    keepNames: false
+    keepNames: false,
+    exclude: []
   },
   liquid: {
     minifyScript: true,
@@ -93,8 +94,7 @@ export const minify: Minify = {
 /**
  * Processor Configuration
  *
- * This model is the default options for
- * the transform processors.
+ * This model is the default options for the transform processors.
  */
 export const processor: PartialDeep<ProcessorConfig> = {
   json: {
@@ -127,8 +127,13 @@ export const processor: PartialDeep<ProcessorConfig> = {
     config: {
       bundle: true,
       format: 'esm',
+      globalName: undefined,
+      target: 'es2016',
+      metafile: true,
+      external: [],
+      platform: 'browser',
       splitting: false,
-      sourcemap: true,
+      sourcemap: 'linked',
       write: false,
       logLevel: 'silent',
       plugins: []
@@ -189,20 +194,15 @@ export const processor: PartialDeep<ProcessorConfig> = {
 /**
  * Preset Configuration
  *
- * This model is merged with the users config file
- * settings and options. This is reflective of the
- * `syncify.config.js` or `syncify.json` file schema.
+ * This model is merged with the users config file settings and options.
+ * This is reflective of the `syncify.config.js` or `syncify.json` file.
  *
  * **Notes:**
  *
- * This model will assert defaults to be merged with
- * the `bundle`, `transform` and `terser` models.
- *
- * The defined settings will hold reference to the user
- * defined options, the model is immutable and as such
- * we can reference it.
+ * This model will assert defaults to be merged with the `bundle`, `transform` and `terser` models.
+ * The defined settings will hold reference to the user defined options, the model is immutable.
  */
-export const options: Config = {
+export const presets: Config = {
   input: 'source',
   output: 'theme',
   import: 'import',
@@ -225,10 +225,13 @@ export const options: Config = {
     config: 'config/*.json',
     layout: 'layout/*.liquid',
     locales: 'locales/*.json',
-    sections: 'sections/**/*.liquid',
     snippets: 'snippets/*.liquid',
     metafields: 'metafields/**/*.json',
     redirects: 'redirects.yaml',
+    sections: [
+      'sections/**/*.json',
+      'sections/**/*.liquid'
+    ],
     pages: [
       'pages/*.html',
       'pages/*.md'
@@ -288,9 +291,8 @@ export const plugins: Plugins = {
 /**
  * Bundle Configuration
  *
- * This model represents bundle specific configuration
- * options and settings. This is typically merged with
- * the CLI defined options.
+ * This model represents bundle specific configuration options and settings.
+ * This will merged with the CLI defined options.
  */
 export const bundle = {
   version: null,
@@ -329,7 +331,7 @@ export const bundle = {
     hot: false,
     pages: false,
     pull: false,
-    push: false,
+    force: false,
     vsc: false,
     script: false,
     image: false,
@@ -343,7 +345,7 @@ export const bundle = {
     invoked: false,
     commands: {}
   },
-  watch: new Set(),
+  watch: null,
   logger: {},
   paths: {
     transforms: new Map()
@@ -353,6 +355,12 @@ export const bundle = {
     separator: '-',
     global: []
   },
+  snippet: {
+    prefixDir: false,
+    separator: '-',
+    global: []
+  },
+  errors: new Set(),
   cmd: {},
   json: {},
   page: {
@@ -381,10 +389,9 @@ export const bundle = {
   style: [],
   script: [],
   svg: [],
-  set config (merge: Config) { assign(options, merge); },
-  get config () { return options; },
+  set config (merge: Config) { assign(presets, merge); },
+  get config () { return presets; },
   get processor () { return processor; },
-
   minify: {
     json: false,
     views: false,
