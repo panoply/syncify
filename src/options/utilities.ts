@@ -14,6 +14,7 @@ import { typeError, invalidError, unknownError, warnOption, throwError } from '~
 import { cyan } from '~cli/ansi';
 import { CONFIG_FILE_EXT } from '~const';
 import { bundle } from '~config';
+import { hasRenamespace } from '~utils/utils';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -32,13 +33,15 @@ const enum EnvType {
 
 interface NormalizeTransform {
   /**
-   * Whether or not to flatten inputs, when `true`
-   * a transform model will be created for every
-   * resolved input. Also note that when true, then
-   * the `anymatch` tester will not be assigned.
+   * Whether or not to flatten inputs, when `true`a transform model will be created
+   * for every resolved input. Also note that when `true`, then the `anymatch` tester
+   * will not be assigned.
    *
    * @default false
+   *
    * @example
+   *
+   * // syncify.config.ts
    * { input: ['dir/glob/*'], rename: 'foo-[file]' }
    *
    * // A model will be created for every glob:
@@ -50,11 +53,33 @@ interface NormalizeTransform {
    */
   flatten?: boolean;
   /**
-   * Whether or not the input should be added to
-   * the bundle _watch_ `Set<string>` - when `true`
-   * the resolved globs are added to `bundle.watch`
+   * Whether or not the input should be added to the bundle _watch_ `Set<string>` reference.
+   * When `true` the resolved globs are added to `bundle.watch` model.
    */
   addWatch?: boolean;
+  /**
+   * Whether or not snippet assertion should be applied. When `true`, the retuning value
+   * will include a `snippet` boolean property to signal whether or not the transform output
+   * should export as a snippet.
+   *
+   * @default true
+   *
+   * @example
+   *
+   * // syncify.config.ts
+   * {
+   *   'snippets/[file]-xxxx': 'dir/file-1.js',
+   *   'assets/some-new-name': 'dir/file-2.js'
+   * }
+   *
+   * // The return value will assert snippet boolean
+   * return [
+   *   { input: 'dir/file-1.js', rename: 'file-1-xxxx.js', snippet: true },
+   *   { input: 'dir/file-2.js', rename: 'some-new-name.js', snippet: false }
+   * ]
+   *
+   */
+  assertSnippet?: boolean;
 }
 
 interface Resolver {
@@ -116,15 +141,13 @@ export function authURL (domain: string, env: object, type: EnvType): AxiosReque
 /**
  * Path Resovler
  *
- * Returns absolute paths and validates all provided URI
- * path locations. Before passing entries to this function,
- * it is assumed existence was confirmed.
+ * Returns absolute paths and validates all provided URI path locations.
+ * Before passing entries to this function, it is assumed existence was confirmed.
  *
- * The resolver also provides an optional hook function which
- * will pass the resolved input path as a parameter, when the
- * hook exists and returns a `string[]` or `string` value then
- * the resolver will return an object type containing resolved
- * inputs and an anymatch tester containing the `filePath`
+ * The resolver also provides an optional hook function which will pass the resolved
+ * input path as a parameter, when the hook exists and returns a `string[]` or `string`
+ * value then the resolver will return an object type containing resolved inputs and an
+ * anymatch tester containing the `filePath`
  *
  * @param filePath The path/s we need to resolve
  * @param hook An optional callback hook which passed resolved input
@@ -202,8 +225,14 @@ export function getResolvedPaths<R extends string[] | Resolver> (
  *
  * Determines the transform schema which was provided and normalizes
  * it into a standardized model that we can work with. The function accepts
- * a couple of options which can be used to apply additional context to
- * the bundle model and each transfrom.
+ * a couple of options which can be used to obtain additional context to the bundle
+ * model for each transform to be applied.
+ *
+ * **Returning Value**
+ *
+ * The function will return the provided config options with the `input` property
+ * adjusted to a full resolution uri. Depending on the options provided, the return
+ * value type might differ. See the `NormalizeTransform` interface for more information.
  *
  * Transform options can be provided in a multitude of different
  * formats / structures, such as:
@@ -211,6 +240,7 @@ export function getResolvedPaths<R extends string[] | Resolver> (
  * **String Transform**
  *
  * ```ts
+ * // syncify.config.ts
  * {
  *   svg: 'path/to/input' | ['path/to/input']
  * }
@@ -218,7 +248,8 @@ export function getResolvedPaths<R extends string[] | Resolver> (
  *
  * **Object Transfrom**
  *
- * ```js
+ * ```ts
+ * // syncify.config.ts
  * {
  *   style: {
  *     input: 'path/to/input' | ['path/to/input']
@@ -229,7 +260,8 @@ export function getResolvedPaths<R extends string[] | Resolver> (
  *
  * **Array Object Inputs**
  *
- * ```js
+ * ```ts
+ * // syncify.config.ts
  * {
  *   style: [
  *     {
@@ -246,9 +278,10 @@ export function getResolvedPaths<R extends string[] | Resolver> (
  *
  * **Raname Transfrom**
  *
- * ```js
+ * ```ts
+ * // syncify.config.ts
  * {
- *   'snippets/rename': 'path/to/input' | ['path/to/input']
+ *   'snippets/rename': 'path/to/input' | ['path/to/input'],
  *   'assets/rename': {
  *     input: 'path/to/input' | ['path/to/input']
  *     // ....
@@ -257,6 +290,8 @@ export function getResolvedPaths<R extends string[] | Resolver> (
  * ```
  */
 export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
+
+  if (!has('assertSnippet', opts)) opts.assertSnippet = true;
 
   if (isString(transforms)) {
 
@@ -267,22 +302,33 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
     if (paths) {
       if (opts.flatten) {
-        return paths.map(
-          input => ({
-            input,
-            rename: basename(input),
-            snippet: false
-          })
-        ) as T;
+
+        return <T>paths.map(input => (opts.assertSnippet ? {
+          input,
+          rename: basename(input),
+          snippet: false
+        } : {
+          input,
+          rename: basename(input)
+        }));
+
       } else {
-        return [
-          {
-            input: paths,
-            snippet: false,
-            rename: '[name].[ext]',
-            match
-          }
-        ] as T;
+
+        const returnValue = <{
+          input: string[];
+          rename: string;
+          match: Tester;
+          snippet?: boolean
+        }>{
+          input: paths,
+          rename: '[name].[ext]',
+          match
+        };
+
+        if (opts.assertSnippet) returnValue.snippet = false;
+
+        return <T>returnValue;
+
       }
     }
 
@@ -295,28 +341,39 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
         return globPath(watch);
       });
 
-      if (paths) {
-        if (opts.flatten) {
-          return paths.map(input => ({
-            input,
-            rename: basename(input),
-            snippet: false
-          })) as T;
-        } else {
-          return [
-            {
-              input: paths,
-              snippet: false,
-              rename: '[name].[ext]',
-              match
-            }
-          ] as T;
-        }
+      if (opts.flatten) {
+
+        return <T>paths.map(input => (opts.assertSnippet ? {
+          input,
+          rename: basename(input),
+          snippet: false
+        } : {
+          input,
+          rename: basename(input)
+        }));
+
+      } else {
+
+        const returnValue = <{
+          input: string[];
+          rename: string;
+          match: Tester;
+          snippet?: boolean
+        }>{
+          input: paths,
+          rename: '[name].[ext]',
+          match
+        };
+
+        if (opts.assertSnippet) returnValue.snippet = false;
+
+        return <T>returnValue;
+
       }
 
     } else if (transforms.every(isObject)) {
 
-      return transforms.map(option => {
+      return <T>transforms.map(option => {
 
         if (!has('input', option)) {
           invalidError('tranform', 'input', option, '{ input: string | string[] }');
@@ -331,9 +388,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
         option.input = paths;
 
         // apply snippet default is not defined
-        if (!has('snippet', option)) {
-          option.snippet = false;
-        }
+        if (opts.assertSnippet && !has('snippet', option)) option.snippet = false;
 
         // apply namespaced rename if no rename is defined
         if (!has('rename', option)) {
@@ -342,7 +397,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
         return option;
 
-      }) as T;
+      });
 
     }
 
@@ -358,8 +413,8 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
         return globPath(watch);
       });
 
-      // apply snippet default is not defined
-      if (!has('snippet', transforms)) {
+      // apply snippet default if not defined
+      if (opts.assertSnippet && !has('snippet', transforms)) {
         transforms.snippet = false;
       }
 
@@ -370,7 +425,9 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
       if (opts.flatten) {
 
-        for (const input of paths) config.push(assign(transforms, { input }));
+        for (const input of paths) {
+          config.push(assign(transforms, { input }));
+        }
 
       } else {
 
@@ -440,11 +497,15 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
               return globPath(watch);
             });
 
+            if (hasRenamespace(prop)) o.rename = basename(prop);
+
             if (paths) {
               if (opts.flatten) {
-                for (const input of paths) config.push(assign({}, o, option, { input }));
+                for (const input of paths) {
+                  config.push(assign({}, o, { input }));
+                }
               } else {
-                config.push(assign({}, o, option, { input: paths, match }));
+                config.push(assign({}, o, { input: paths, match }));
               }
             }
 
@@ -459,7 +520,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
       }
     }
 
-    return config as T;
+    return <T>config;
 
   }
 
@@ -533,7 +594,7 @@ export async function readConfigFile <T> (filename: string): Promise<{ config: T
  * Rename File
  *
  * String parser for file renaming. Uses the common braced
- * reference structures find in most bundlers.
+ * reference structures found in most bundlers.
  */
 export function renameFile (src: string, rename?: string) {
 
@@ -552,7 +613,7 @@ export function renameFile (src: string, rename?: string) {
 
   if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);
   if (/(\[file\])/.test(name)) name = name.replace('[file]', file);
-  if (/(\[ext\])/.test(name)) name = name.replace('.[ext]', ext);
+  if (/(\.?\[ext\])/.test(name)) name = name.replace(/\.?\[ext\]/, ext);
 
   return {
     ext,
