@@ -3,7 +3,7 @@ import { basename } from 'node:path';
 import { allFalse, anyTrue } from 'rambdax';
 import { getTime, plural, toUpcase } from '../utils/utils';
 import { keys, nil, values, nl, ws, wsr, log, toArray } from '../utils/native';
-import { warnings } from './validate';
+import { warnings, severities } from './validate';
 import { spawns } from '../cli/spawn';
 import * as c from '../cli/ansi';
 
@@ -24,6 +24,13 @@ import * as c from '../cli/ansi';
  * │ Warnings:
  * │
  * │ 2 Terser rule warnings
+ * │
+ * │ Option is not allowed: minifyJS
+ * │ Option is not allowed: minifyCSS
+ * │
+ * │ Errors:
+ * │
+ * │ 2 Path resolver errors
  * │
  * │ Option is not allowed: minifyJS
  * │ Option is not allowed: minifyCSS
@@ -109,9 +116,37 @@ export function start (bundle: Bundle) {
   /* CONFIG WARNINGS                              */
   /* -------------------------------------------- */
 
+  let hasSeverity: boolean = false;
   let hasWarning: boolean = false;
 
   const cf = basename(bundle.file);
+
+  for (const prop in severities) {
+
+    const issue = severities[prop];
+
+    if (issue.length > 0) {
+
+      if (!hasSeverity) {
+        hasSeverity = true;
+        text.push(
+          c.line.gray +
+            nl + c.line.red +
+            c.redBright(`${c.bold('Errors')} in ${c.bold(cf)}`) +
+            c.colon
+        );
+      }
+
+      const title = c.red.bold(`${issue.length} ${prop} ${plural('error', issue.length)}`);
+
+      text.push(
+        c.line.red + nl + c.line.red +
+          title +
+          nl + c.line.red + nl +
+          issue.join(nl)
+      );
+    }
+  }
 
   for (const prop in warnings) {
 
