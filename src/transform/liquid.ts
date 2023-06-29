@@ -152,7 +152,12 @@ const transform = (file: File) => async (data: string) => {
 
     htmlmin = data
       .replace(ScriptJsonWhitespace, nil)
-      .replace(/(?<=[:,]) +(?=['"{[])/g, nil);
+      .replace(/(?<=[:,]) +(?=['"{[])/g, nil)
+      .replace(/{{%/g, '{ {%')
+      .replace(/%}}/g, '%} }')
+      .replace(/(?<=[%}]})\s+(?=[\]}])/g, ' ')
+      .replace(/>\s+(?=[{[])/, '>')
+      .replace(/(?<=[}\]])\s<\//g, '</');
 
   } else if (file.base.endsWith('.json.liquid')) {
 
