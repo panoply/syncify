@@ -6,7 +6,7 @@
 
 A lightening fast, extensible and superior alternative Shopify CLI (Theme Development) tool. Syncify provides developers with a powerful CLI and employs an intuitive approach for creating Shopify themes.
 
-**Syncify will exists as part of the [Liquify](https://liquify.dev) project**
+**Syncify will exist as part of the [Liquify](https://liquify.dev) project**
 
 ### Key Features
 
