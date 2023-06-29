@@ -1,5 +1,4 @@
 import type { Syncify, File, Pages, StyleTransform, SVGBundle } from 'types';
-import chokidar from 'chokidar';
 import { inject } from '~hot/inject';
 import { client, queue } from '~requests/client';
 import { compile as liquid } from '~transform/liquid';
@@ -9,7 +8,7 @@ import { compile as asset } from '~transform/asset';
 import { compile as json } from '~transform/json';
 import { compile as pages } from '~transform/pages';
 import { compile as svgs } from '~transform/svgs';
-import { isUndefined, toArray } from '~utils/native';
+import { isUndefined } from '~utils/native';
 import { Kind, parseFile, Type } from '~process/files';
 import { bundle } from '~config';
 import { log } from '~log';
@@ -26,16 +25,8 @@ export function watch (callback: Syncify) {
   const wss = socket();
   const request = client(bundle.sync);
   const parse = parseFile(bundle.paths, bundle.dirs.output);
-  const watcher = chokidar.watch(toArray(bundle.watch.values()), {
-    persistent: true,
-    ignoreInitial: true,
-    usePolling: true,
-    interval: 75,
-    binaryInterval: 100,
-    ignored: [ '**/*.map' ]
-  });
 
-  watcher.on('all', function (event, path) {
+  bundle.watch.on('all', function (event, path) {
 
     const file: File = parse(path);
 
@@ -67,7 +58,7 @@ export function watch (callback: Syncify) {
 
       if (file.type === Type.Script) {
 
-        return script.apply(wss, [ file, request.assets, callback ]);
+        return script.bind(wss)(file, request.assets, callback);
 
       } else if (file.type === Type.Page) {
 
@@ -75,17 +66,13 @@ export function watch (callback: Syncify) {
 
       } else if (file.type === Type.Svg) {
 
-        return svgs(file as File<SVGBundle[]>, request.assets, callback);
+        return svgs(file, request.assets as any, callback);
 
       } else if (file.type === Type.Style) {
 
         value = await styles(file as File<StyleTransform>, callback);
 
-        if (bundle.mode.hot) {
-
-          wss.stylesheet(file.key);
-
-        }
+        if (bundle.mode.hot) wss.stylesheet(file.key);
 
       } else if (file.type === Type.Section) {
 
@@ -95,11 +82,7 @@ export function watch (callback: Syncify) {
 
         value = await liquid(file, callback);
 
-        if (bundle.mode.hot) {
-
-          value = inject(value);
-
-        };
+        if (bundle.mode.hot) value = inject(value);
 
       } else if (file.type === Type.Snippet) {
 
@@ -146,9 +129,8 @@ export function watch (callback: Syncify) {
 
     } catch (e) {
 
-      log.err(e);
-
       console.error(e);
+      log.err(e);
 
     }
 
