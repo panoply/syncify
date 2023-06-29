@@ -42,6 +42,7 @@ export function style (file: File<StyleBundle>) {
 
   const config = bundle.style.find(x => x.watch(file.input));
 
+  console.log(config);
   if (isUndefined(config)) return file;
 
   defineProperty(file, 'config', { get () { return config; } });
@@ -53,12 +54,18 @@ export function style (file: File<StyleBundle>) {
     file.key = join('assets', config.rename);
   }
 
-  if (file.config.rename !== basename(file.output)) {
-    if (config.snippet) {
-      file.output = join(bundle.dirs.output, file.key);
-    } else {
-      file.output = join(parentPath(file.output), file.config.rename);
+  if (file.output) {
+    if (file.config.rename !== basename(file.output)) {
+      if (config.snippet) {
+        file.output = join(bundle.dirs.output, file.key);
+      } else {
+        file.output = join(parentPath(file.output), file.config.rename);
+      }
     }
+  } else {
+
+    file.output = join(bundle.dirs.output, file.key);
+
   }
 
   return file;
@@ -70,32 +77,17 @@ export function style (file: File<StyleBundle>) {
  *
  * Locate the entry and apply context to the script change
  */
-export function script (file: File<ScriptBundle>) {
+export function script (file: File<ScriptBundle[]>) {
 
-  const config = bundle.script.find(x => x.watch(file.input));
+  const config = bundle.script.filter(config => config.watch.has(file.input));
 
-  if (isUndefined(config)) return file;
+  if (config.length === 0) return file;
 
-  defineProperty(file, 'config', { get () { return config; } });
-
-  if (config.snippet) {
-    file.namespace = 'snippets';
-    if (/\.liquid$/.test(config.rename)) {
-      file.key = join('snippets', config.rename);
-    } else {
-      file.key = join('snippets', config.rename + '.liquid');
+  defineProperty(file, 'config', {
+    get () {
+      return config;
     }
-  } else {
-    file.key = join('assets', config.rename);
-  }
-
-  if (config.rename !== basename(file.output)) {
-    if (config.snippet) {
-      file.output = join(bundle.dirs.output, file.key);
-    } else {
-      file.output = join(parentPath(file.output), config.rename);
-    }
-  }
+  });
 
   return file;
 
@@ -109,9 +101,32 @@ export function section (file: File) {
 
   if (bundle.section.prefixDir) {
 
+    if (file.base.endsWith('-group.json')) return file;
     if (isRegex(bundle.section.global) && bundle.section.global.test(file.input)) return file;
 
     const rename = lastPath(file.input) + bundle.section.separator + file.base;
+
+    file.name = rename;
+    file.key = join(file.namespace, rename);
+    file.output = join(dirname(file.output), rename);
+
+  }
+
+  return file;
+
+};
+
+/**
+ * Augment the file configuration to accept
+ * metafield types.
+ */
+export function snippet (file: File) {
+
+  if (bundle.snippet.prefixDir) {
+
+    if (isRegex(bundle.snippet.global) && bundle.snippet.global.test(file.input)) return file;
+
+    const rename = lastPath(file.input) + bundle.snippet.separator + file.base;
 
     file.name = rename;
     file.key = join(file.namespace, rename);
