@@ -34,7 +34,9 @@ type Loggers = (
 type Prefixes = (
   | 'changed'
   | 'process'
+  | 'exports'
   | 'skipped'
+  | 'importer'
   | 'transform'
   | 'minified'
   | 'reloaded'
@@ -264,17 +266,19 @@ export function context (data: {
   let output: string = c.line.red + nl;
 
   for (const key in data.entries) {
-    if (space < key.length) space = key.length;
+    if (space < key.length && data.entries[key]) space = key.length;
   }
 
   for (const key in data.entries) {
-    output += (
-      c.line.red +
-      c.red(key) +
-      c.colon +
-      wsr(space - key.length) +
-      c.gray(`${data.entries[key]}`) + nl
-    );
+    if (data.entries[key]) {
+      output += (
+        c.line.red +
+        c.red(key) +
+        c.colon +
+        wsr(space - key.length) +
+        c.gray(`${data.entries[key]}`) + nl
+      );
+    }
   }
 
   if (data.stack) {
@@ -288,7 +292,7 @@ export function context (data: {
     );
   }
 
-  return output;
+  return output.trimEnd();
 
 };
 
