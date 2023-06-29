@@ -14,7 +14,7 @@ import { isArray, keys, assign, nil, isString, isObject, ws, defineProperty, isB
 import { normalPath } from '~utils/paths';
 import { configFile, getPackageJson } from '~options/files';
 import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from '~options/dirs';
-import { setJsonOptions, setViewOptions } from '~options/transforms';
+import { setJsonOptions, setSectionOptions, setSnippetOptions } from '~options/transforms';
 import { setScriptOptions } from '~options/script';
 import { setStyleConfig } from '~options/style';
 import { setSvgOptions } from '~options/svgs';
@@ -23,7 +23,7 @@ import { authURL } from '~options/utilities';
 import { PATH_KEYS, HOT_SNIPPET_FILE } from '~const';
 import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError } from '~log/validate';
 import { log } from '~log';
-import { bundle, cache, processor, plugins, options } from '~config';
+import { bundle, cache, processor, plugins, presets } from '~config';
 import { FSWatcher } from 'chokidar';
 
 /**
@@ -49,29 +49,30 @@ export async function define (cli: Commands, _options?: Config) {
   bundle.silent = cli.silent;
   bundle.prod = cli.prod;
   bundle.dev = cli.dev && !cli.prod;
-  bundle.logger = options.logger;
+  bundle.logger = presets.logger;
 
   process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
   const promise = await Promise.all([
     setChokidar(cli.watch, cli.cwd),
-    setBaseDirs(cli, options),
+    setBaseDirs(cli, presets),
     setCaches(bundle.cwd),
     setThemeDirs(bundle.dirs.output),
     setImportDirs(bundle),
-    setStores(cli, options),
-    setPaths(options),
-    setProcessors(options),
-    setMinifyOptions(options),
-    setViewOptions(options),
-    setJsonOptions(options),
-    setScriptOptions(options, pkg),
-    setStyleConfig(options, pkg),
-    setSvgOptions(options, pkg),
-    setSpawns(options, bundle),
-    setPlugins(options, bundle),
-    setHotReloads(options)
+    setStores(cli, presets),
+    setPaths(presets),
+    setProcessors(presets),
+    setSectionOptions(presets),
+    setSnippetOptions(presets),
+    setJsonOptions(presets),
+    setScriptOptions(presets, pkg),
+    setStyleConfig(presets, pkg),
+    setSvgOptions(presets, pkg),
+    setMinifyOptions(presets),
+    setSpawns(presets, bundle),
+    setPlugins(presets, bundle),
+    setHotReloads(presets)
   ]).catch(e => {
 
     console.log(e);
@@ -141,7 +142,12 @@ async function setHotReloads (config: Config) {
   }
 
   if (allFalse(isObject(config.hot), isBoolean(config.hot), isNil(config.hot))) {
-    typeError('hot', 'hot', config.hot, 'boolean | {}');
+    typeError({
+      option: 'config',
+      name: 'hot',
+      provided: config.hot,
+      expects: 'boolean | {}'
+    });
   }
 
   const { hot } = bundle;
@@ -173,11 +179,16 @@ async function setHotReloads (config: Config) {
         } else if (typeof hot[prop] === typeof config.hot[prop]) {
           hot[prop] = config.hot[prop];
         } else {
-          typeError('hot', prop, config.hot[prop], typeof hot[prop]);
+          typeError({
+            option: 'hot',
+            name: prop,
+            provided: config.hot[prop],
+            expects: typeof hot[prop]
+          });
         }
 
       } else {
-        unknownError(`hot > ${prop}`, config.hot[prop]);
+        unknownError(`hot.${prop}`, config.hot[prop]);
       }
 
     }
@@ -194,8 +205,7 @@ async function setHotReloads (config: Config) {
 /**
  * Set Processors
  *
- * Merges processor defaults with defaults provided
- * in configuration.
+ * Merges processor defaults with defaults provided in configuration.
  */
 function setProcessors (config: Config) {
 
@@ -281,7 +291,12 @@ function setSpawns (config: Config, bundle: Bundle) {
   if (!has('spawn', config) || isNil(config.spawn)) return;
 
   if (!isObject(config.spawn)) {
-    typeError('config', 'spawn', config.spawn, '{ build: {}, watch: {} }');
+    typeError({
+      option: 'config',
+      name: 'spawn',
+      provided: config.spawn,
+      expects: '{ build: {}, watch: {} }'
+    });
   }
 
   let mode: 'build' | 'watch' = null;
@@ -291,7 +306,12 @@ function setSpawns (config: Config, bundle: Bundle) {
   if (isNil(mode) || isNil(config.spawn[mode])) return;
 
   if (!isObject(config.spawn[mode])) {
-    typeError('spawn', mode, config.spawn.build, 'string | string[]');
+    typeError({
+      option: 'spawn',
+      name: mode,
+      provided: config.spawn[mode],
+      expects: '{ build: {}, watch: {} }'
+    });
   }
 
   const props = keys(config.spawn[mode]);
@@ -330,7 +350,12 @@ function setSpawns (config: Config, bundle: Bundle) {
       spawned(name, bundle.spawn.commands[name], log.spawn(name));
 
     } else {
-      typeError('spawn', mode, config.spawn[mode], 'string | string[]');
+      typeError({
+        option: 'spawn',
+        name: mode,
+        provided: config.spawn[mode],
+        expects: 'string | string[]'
+      });
     }
 
   }
@@ -427,9 +452,9 @@ async function getConfig (pkg: Package, cli: Commands) {
 
   const cfg = await configFile(cli.cwd);
 
-  if (cfg !== null) return merge(options, cfg);
+  if (cfg !== null) return merge(presets, cfg);
 
-  if (has('syncify', pkg)) return merge(options, pkg.syncify);
+  if (has('syncify', pkg)) return merge(presets, pkg.syncify);
 
   missingConfig(cli.cwd);
 
