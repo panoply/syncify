@@ -65,7 +65,7 @@ Syncify has a low level API for building plugins that is very loosely based on t
 
 ### Example
 
-Each hook method fires a different points in the bundle process.
+Each hook method fires at different points in the bundle process.
 
 <!--prettier-ignore-->
 ```typescript
