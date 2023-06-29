@@ -5,7 +5,7 @@ import { join } from 'path';
 import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
 import Turndown from 'turndown';
-import { stringify } from 'markdown-it';
+import markdown from 'markdown-it';
 
 import { pathExistsSync, stat, writeFile } from 'fs-extra';
 import { assign, is } from '../utils/native';
@@ -57,7 +57,7 @@ export async function merge (store: IStore, config: IConfig): Promise<{
 
     if (Math.floor(updated.getTime()) > Math.ceil(stats.mtimeMs)) {
 
-      const string = isMD ? md(prop.body_html) : prop.body_html;
+      const string = isMD ? md.render(prop.body_html) : prop.body_html;
       const title = name + ext;
       const data = stringify(string, {
         title: prop.title,
@@ -311,9 +311,7 @@ export async function create <T extends IPage> (store: IStore, page?: T) {
  * Updates an existing page using its unique `id`.
  * This is applied only when a metafield reference exists.
  */
-export async function update <T extends IPage> (store: IStore, id?: number, page?: T) {
-
-  if (is(arguments.length, 1)) return (_id: number, _page: IPage) => update(store, _id, _page);
+export async function sync <T extends IPage> (store: IStore, id?: number, page?: T) {
 
   return axios.put<{ page: T }>(`pages/${id}.json`, { page }, store.client).then(({ data }) => {
 
