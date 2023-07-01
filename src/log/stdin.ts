@@ -1,6 +1,8 @@
-import { warning } from '../config';
-import { warn } from '../utils/native';
-import { log } from '~log';
+import { bundle, warning } from '../config';
+import { errors } from '~log/errors';
+import { log, c, tui } from '~log';
+import { error, keys, nl } from '~utils/native';
+import { out } from './loggers';
 
 export const stacks: Set<string> = new Set();
 
@@ -8,7 +10,36 @@ export function stdin (data: Buffer) {
 
   const input = data.toString().trim().toLowerCase();
 
-  if (input === 's') {
+  if (input === 'v') {
+
+    const items = keys(errors);
+
+    for (let i = 0, l = items.length; i < l; i++) {
+
+      const prop = items[i];
+
+      if (errors[prop].size === 0) continue;
+
+      if (i > 0) log.hline(10);
+
+      log.write(c.bold.whiteBright(prop));
+
+      for (const message of errors[prop].values()) {
+        if (typeof message === 'string' && message.length > 0) {
+          error(message);
+        }
+      }
+
+      errors[prop].clear();
+
+    }
+
+    if (bundle.mode.upload) {
+
+      out(tui.closer('Upload'), nl);
+      process.exit(0);
+
+    }
 
   } else if (input === 'w') {
 
@@ -17,16 +48,17 @@ export function stdin (data: Buffer) {
       if (warning.process[prop].size === 0) continue;
 
       log.nwl();
-      // warn(log.message('yellowBright', prop));
+      log.write(c.bold.yellow(prop));
       log.nwl();
 
       for (const message of warning.process[prop].values()) {
         if (typeof message === 'string' && message.length > 0) {
-          //  log.multiline('warning', message);
+          log.write(tui.multiline('warning', message));
         }
       }
 
       warning.process[prop].clear();
+
     }
 
     warning.count = 0;
