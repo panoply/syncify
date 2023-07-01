@@ -1,9 +1,10 @@
-import type { Bundle } from 'types';
+import type { Bundle, Theme } from 'types';
+import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import { basename } from 'node:path';
 import { allFalse, anyTrue } from 'rambdax';
 import { getTime, plural, toUpcase } from '../utils/utils';
-import { keys, nil, values, nl, ws, wsr, log, toArray } from '../utils/native';
-import { warnings, severities } from './validate';
+import { keys, nil, nl, wsr, log, toArray } from '../utils/native';
+import { warnings } from './validate';
 import { spawns } from '../cli/spawn';
 import * as c from '../cli/ansi';
 import { size } from '~cli/size';
@@ -69,18 +70,7 @@ export function start (bundle: Bundle) {
     `${c.line.gray}`
   );
 
-  const cs = size().columns;
-
-  if (cs < 100) {
-    text.push(
-    `${c.line.gray}${c.red.bold('TERMINAL WIDTH WARNING')}`,
-    `${c.line.gray}`,
-    `${c.line.gray}${c.red(`Your terminal width is below ${c.bold(`${100}`)} columns (currently ${c.bold(`${cs}`)})`)}`,
-    `${c.line.gray}${c.red('This is not recommended for usage with Syncify (size matters).')}`,
-    `${c.line.gray}${c.red('Expand your terminal wider for optimal usage and logging.')}`,
-    `${c.line.gray}`
-    );
-  }
+  getTerminalWarning(text);
 
   text.push(
     `${c.line.gray}${c.whiteBright.bold(`v${bundle.version}`)}`,
@@ -133,105 +123,37 @@ export function start (bundle: Bundle) {
   /* CONFIG WARNINGS                              */
   /* -------------------------------------------- */
 
-  let hasSeverity: boolean = false;
-  let hasWarning: boolean = false;
+  if (bundle.logger.warnings) getRuntimeWarnings(bundle, text);
 
-  const cf = basename(bundle.file);
-
-  if (bundle.logger.warnings) {
-
-    for (const prop in severities) {
-
-      const issue = severities[prop];
-
-      if (issue.length > 0) {
-
-        if (!hasSeverity) {
-          hasSeverity = true;
-          text.push(
-            c.line.gray +
-            nl + c.line.red +
-            c.redBright(`${c.bold('Errors')} in ${c.bold(cf)}`) +
-            c.COL + ws
-          );
-        }
-
-        const title = c.red.bold(`${issue.length} ${prop} ${plural('error', issue.length)}`);
-
-        text.push(
-          c.line.red + nl + c.line.red +
-          title +
-          nl + c.line.red + nl +
-          issue.join(nl)
-        );
-      }
-    }
-
-    for (const prop in warnings) {
-
-      const warn = warnings[prop];
-
-      if (warn.length > 0) {
-
-        if (!hasWarning) {
-
-          hasWarning = true;
-
-          text.push(
-            c.line.gray +
-            nl + c.line.yellow +
-            c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`) +
-            c.COL + ws
-          );
-
-        }
-
-        const title = c.yellow.bold(`${warn.length} ${prop} ${plural('warning', warn.length)}`);
-
-        text.push(
-          c.line.yellow + nl + c.line.yellow +
-          title +
-          nl + c.line.yellow + nl +
-          warn.join(nl)
-        );
-
-      }
-    }
-
-  }
+  /* -------------------------------------------- */
+  /* SPAWNED PROCESSES                            */
+  /* -------------------------------------------- */
 
   if (anyTrue(mode.build, mode.watch) && _ss > 0) {
-    text.push(`Spawned ${c.cyan.bold(`${_ss}`)} child ${_ss > 1 ? 'processes' : 'process'}${nl}`);
+
+    text.push(
+      `${c.line.gray}Spawned ${c.cyan.bold(`${_ss}`)} child ${_ss > 1 ? 'processes' : 'process'}`,
+      `${c.line.gray}`
+    );
+
   } else {
+
     text.push(c.line.gray);
+
   }
 
-  if (allFalse(
-    mode.upload,
-    mode.download,
-    mode.build,
-    mode.clean,
-    mode.vsc
-  )) {
+  if (allFalse(mode.upload, mode.download, mode.build, mode.clean, mode.vsc)) {
 
     /* -------------------------------------------- */
     /* CHILD PROCESSES                              */
     /* -------------------------------------------- */
 
     if (_ss > 0) {
-
-      const spwns = toArray(spawns);
-      const width = spwns.reduce((size, [ name ]) => (name.length > size ? name.length : size), 0);
-      const pids = spwns.map(([ name, child ]) => (
-        c.line.gray +
-        ws.repeat(width - name.length) +
-        c.whiteBright(toUpcase(name)) + c.gray(':') + ws +
-        c.gray('PID') + ' → ' + c.gray('#') +
-        c.pink(`${child.pid}`)
-      ));
-
-      text.push(`${c.line.gray}${c.bold('Processes:')}${c.newline}${pids.join(nl)}${_th > 0 ? nl : nil}`);
-
+      text.push(
+        `${c.line.gray}${c.bold('Child Processes:')}`,
+        `${c.line.gray}${getSpawnProcessors(toArray(spawns))}`,
+        `${c.line.gray}`
+      );
     }
 
     /* -------------------------------------------- */
@@ -239,22 +161,16 @@ export function start (bundle: Bundle) {
     /* -------------------------------------------- */
 
     if (_th > 0) {
-
-      const themes = values(bundle.sync.themes);
-      const width = themes.reduce((size, { target }) => (target.length > size ? target.length : size), 0);
-      const urls = themes.map(({ id, store, target }) => (
-        wsr(width - target.length) + c.newline + c.line.gray +
-        c.pink(`${store.slice(0, store.indexOf('.'))} → `) +
-        c.pink.bold(target) + c.pink(' → ') +
-        c.gray.underline(`https://${store}/admin/themes/${id}/editor`)
-      ));
-
-      text.push(`${c.line.gray}${c.bold('Theme Editors:')}${urls.join(nl)}${nl}${c.line.gray}`);
+      text.push(
+        `${c.line.gray}${c.bold('Theme Editors:')}`,
+        `${c.line.gray}${getThemeURLS(bundle.sync.themes, 'editor')}`,
+        `${c.line.gray}`
+      );
     }
 
   }
 
-  if (mode.upload || mode.watch) {
+  if (anyTrue(mode.upload, mode.download, mode.watch)) {
 
     /* -------------------------------------------- */
     /* THEME PREVIEWS                               */
@@ -262,23 +178,145 @@ export function start (bundle: Bundle) {
 
     if (_th > 0) {
 
-      const themes = values(bundle.sync.themes);
-      const width = themes.reduce((size, { target }) => (target.length > size ? target.length : size), 0);
-      const urls = themes.map(({ id, store, target }) => (
-        wsr(width - target.length) + c.newline + c.line.gray +
-        c.pink(`${store.slice(0, store.indexOf('.'))} → `) +
-        c.pink.bold(target) + c.pink(' → ') +
-        c.gray.underline('https://' + store + '?preview_theme_id=' + id)
-      ));
+      text.push(
+        `${c.line.gray}${c.bold((mode.upload || mode.download) ? 'Theme Targets:' : 'Theme Previews:')}`,
+        `${c.line.gray}${getThemeURLS(bundle.sync.themes, 'preview')}`
+      );
 
-      if (mode.upload) {
-        text.push(`${c.line.gray}${c.bold('Theme Targets:')}${urls.join(nl)}${nl}${c.line.gray}`);
-      } else {
-        text.push(`${c.line.gray}${c.bold('Theme Previews:')}${urls.join(nl)}${nl}${c.line.gray}`);
-      }
     }
   }
+
+  // Ensure an addition trunk line if in HOT mode
+  if (bundle.mode.hot) text.push(`${c.line.gray}`);
 
   log(text.join(nl));
 
 };
+
+/**
+ * Terminal Width Warning
+ *
+ * Populates the output when terminal width is less than 100 columns
+ * in width. This is important so we apply the message first.
+ */
+function getTerminalWarning (text: string[]) {
+
+  const cs = size().columns;
+
+  if (cs >= 100) return;
+
+  text.push(
+    `${c.line.gray}${c.red.bold('TERMINAL WIDTH WARNING')}`,
+    `${c.line.gray}`,
+    `${c.line.gray}${c.red(`Your terminal width is below ${c.bold(`${100}`)} columns (currently ${c.bold(`${cs}`)})`)}`,
+    `${c.line.gray}${c.red('This is not recommended for usage with Syncify (size matters).')}`,
+    `${c.line.gray}${c.red('Expand your terminal wider for an optimal logging experience.')}`,
+    `${c.line.gray}`
+  );
+
+}
+
+function getRuntimeWarnings (bundle: Bundle, text: string[]) {
+
+  let title: boolean = false;
+
+  const cfile = basename(bundle.file);
+
+  for (const prop in warnings) {
+
+    const warn = warnings[prop];
+
+    if (warn.length > 0) {
+
+      if (title === false) {
+
+        title = true;
+
+        text.push(
+          `${c.line.gray}`,
+          `${c.line.yellow}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cfile)}`)}`
+        );
+
+      }
+
+      text.push(
+        c.line.yellow,
+        c.line.yellow + c.yellow.bold(`${warn.length} ${prop} ${plural('warning', warn.length)}`),
+        c.line.yellow,
+        warn.join(nl)
+      );
+
+    }
+  }
+}
+
+/**
+ * Spawn Processors
+ *
+ * Generates the spawn process id runtime list
+ */
+function getSpawnProcessors (spwns: [string, ChildProcessWithoutNullStreams][]) {
+
+  const width = spwns.reduce((size, [ name ]) => (name.length > size ? name.length : size), 0);
+
+  return spwns.reduce<string>((string, [ name, child ]) => {
+
+    string += (
+      nl +
+      c.line.gray +
+      wsr(width - name.length) +
+      c.neonCyan(toUpcase(name)) + `${c.COL} ` +
+      c.gray('PID') + ' → ' + c.gray('#') +
+      c.pink(`${child.pid}`)
+    );
+
+    return string;
+
+  }, nil);
+
+}
+
+/**
+ * Theme Previews
+ *
+ * Generates the theme previews/targets runtime list
+ */
+function getThemeURLS (themes: Theme[], url: 'preview' | 'editor'): string {
+
+  const width = themes.reduce<{
+    store: number;
+    theme: number
+  }>((size, { target, store }) => {
+
+    const name = store.indexOf('.');
+
+    if (name > size.store) size.store = name;
+    if (target.length > size.theme) size.theme = target.length;
+
+    return size;
+
+  }, {
+    store: 0,
+    theme: 0
+  });
+
+  return themes.reduce<string>((string, { target, store, id }) => {
+
+    const name = store.slice(0, store.indexOf('.'));
+    const type = url === 'editor'
+      ? `https://${store}/admin/themes/${id}/editor`
+      : `https://${store}?preview_theme_id=${id}`;
+
+    string += (
+      nl +
+      c.line.gray +
+      c.pink(name) + wsr(width.store - name.length) + c.white(' → ') +
+      c.pink.bold(target) + wsr(width.theme - target.length) + c.white(' → ') +
+      c.gray.underline(type)
+    );
+
+    return string;
+
+  }, nil);
+
+}
