@@ -187,7 +187,9 @@ const transform = (file: File) => async (data: string) => {
   await writeFile(file.output, postmin);
 
   if (!bundle.mode.build) {
+
     const size = fileSize(data, file.size);
+
     if (size.isSmaller) {
       log.transform(`${file.namespace} ${size.before} → gzip ${size.gzip}`);
     } else {
