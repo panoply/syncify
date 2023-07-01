@@ -1,16 +1,15 @@
-import { BuildReport, File, Group, Theme } from 'types';
-// import { join } from 'node:path';
+import type { BuildReport, File, Group, Theme } from 'types';
 import { has, isEmpty } from 'rambdax';
-import notifier from 'node-notifier';
 import { bundle, warning } from '~config';
 import { queue } from '~requests/queue';
 import { addSuffix, sanitize, plural } from '~utils/utils';
 import { error, isArray, log, nil, nl } from '~utils/native';
+import { intercept } from '~cli/intercept';
 import * as timer from '~utils/timer';
 import * as errors from '~log/errors';
 import * as c from '~cli/ansi';
-import { intercept } from '~cli/intercept';
 import * as tui from '~log/tui';
+import notifier from 'node-notifier';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -18,7 +17,8 @@ import * as tui from '~log/tui';
 
 export { default as update } from 'log-update';
 export { start } from '~log/start';
-export { clear } from '~log/tui';
+export { clear, hline } from '~log/tui';
+export { spinner } from '~log/spinner';
 export { log as out } from '~utils/native';
 
 /* -------------------------------------------- */
@@ -176,6 +176,31 @@ export function unhook () {
 };
 
 /**
+ * New Group
+ *
+ * Changes the log group
+ *
+ * @example
+ * │
+ * └─ Name ~ 01:59:20
+ */
+export function newGroup (name: string, clear = false) {
+
+  // close previous group
+  log(tui.closer(group));
+
+  // do not clear if first run
+  if (clear) tui.clear();
+
+  log(tui.opener(name));
+
+  group = name;
+
+  nwl();
+
+}
+
+/**
  * Log Changed - `neonCyan`
  *
  * @example '│ changed → source/dir/file.ext'
@@ -221,25 +246,33 @@ export function changed (file: File) {
  */
 export function upload (theme: Theme) {
 
-  uploads.add([ theme.target, theme.store, timer.stop() ]);
+  if (bundle.mode.watch) {
 
-  if (idle) return;
+    uploads.add([ theme.target, theme.store, timer.stop() ]);
 
-  idle = true;
+    if (idle) return;
 
-  queue.onIdle().then(() => {
+    idle = true;
 
-    uploads.forEach(([ target, store, time ]) => {
+    queue.onIdle().then(() => {
 
-      log(tui.suffix('neonGreen', 'uploaded', `${c.bold(target)} → ${store}` + c.time(time)));
+      uploads.forEach(([ target, store, time ]) => {
+
+        log(tui.suffix('neonGreen', 'uploaded', `${c.bold(target)} → ${store}` + c.time(time)));
+
+      });
+
+      uploads.clear();
+
+      idle = false;
 
     });
 
-    uploads.clear();
+  } else {
 
-    idle = false;
+    log(tui.suffix('neonGreen', 'uploaded', `${c.bold(theme.target)} → ${theme.store}` + c.time(timer.stop())));
 
-  });
+  }
 
 };
 
@@ -279,12 +312,31 @@ export function syncing (path: string) {
 /**
  * Log Process - `whiteBright`
  *
- * @example '│ process → esbuild ~ 500ms'
+ * The `message` parameter spread accepts either a message and time
+ * append or simply a time append.
+ *
+ * When both message and time are passed:
+ *
+ * ```js
+ * '│ process → ESBuild ‣ lorem ipsum ~ 500ms'
+ * ```
+ *
+ * @example '│ process → ESBuild ~ 500ms'
  */
-export function process (name: string, time: string) {
+export function process (name: string, ...message: [message?: string, time?: string]) {
 
-  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'process', name + c.time(time)));
+  if (!bundle.mode.build) {
 
+    let time: string = message[0];
+    let text: string = nil;
+
+    if (message.length === 2) {
+      text = ` ${c.CHV} ${message[0]}`;
+      time = message[1];
+    }
+
+    log(tui.suffix('whiteBright', 'process', c.bold(name) + text + c.time(time)));
+  }
 };
 
 /**
@@ -349,7 +401,7 @@ export function deleted (file: string, theme: Theme) {
  */
 export function minified (kind: string, before: string, after: string, saved: string) {
 
-  const suffix = `${c.bold(kind)} ${c.arrow}${before} > ${after} ${c.gray(`~ saved ${saved}`)}`;
+  const suffix = `${c.bold(kind)} ${c.ARR} ${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`;
 
   log(tui.suffix('whiteBright', 'minified', suffix));
 
