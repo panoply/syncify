@@ -1,5 +1,48 @@
 import { File } from 'types/bundle';
 
+export interface UploadModeReport {
+  /**
+   * The file name that was build (including extension)
+   *
+   * @example
+   * 'index.liquid'
+   */
+  name: string;
+  /**
+   * The upload time for this specific file
+   *
+   * @example
+   * '1ms'
+   */
+  time: string;
+  /**
+   * The upload error (if occurred)
+   *
+   * @default
+   * null
+   */
+  error: any;
+}
+
+export interface UploadReport {
+  /**
+   * List of files in the upload group
+   */
+  files: File[];
+  /**
+   * The amount of time the group took to upload
+   */
+  time: string;
+  /**
+   * The upload report for each file handled
+   */
+  report: UploadModeReport[]
+}
+
+/* -------------------------------------------- */
+/* BUILD MODE REPORTING                         */
+/* -------------------------------------------- */
+
 export interface BuildModeReport {
   /**
    * The file name that was build (including extension)
