@@ -4,13 +4,21 @@ import type { Exception } from 'sass';
 import type { NodeErrorOptions } from 'postcss';
 import type { Message } from 'esbuild';
 import { hasPath } from 'rambdax';
-import { nil, nl, error } from '~utils/native';
+import { nil, nl, error, glue } from '~utils/native';
 import cleanStack from 'clean-stack';
 import wrap from 'wrap-ansi';
 import { SHOPIFY_REQUEST_ERRORS } from '~const';
 import * as tui from '~log/tui';
 import * as c from '~cli/ansi';
 import { bundle } from '~config';
+
+/**
+ * Error Reporting
+ *
+ * The is a store model used for delayed logging of
+ * errors encountered. Typically used when performing uploads.
+ */
+export const errors: { [file: string]: Set<string> } = {};
 
 /**
  * Spawned Logging
@@ -70,7 +78,7 @@ export function spawn (data: string) {
  * or is rejected. The response data returned by Shopify is parsed
  * and additional information is appended.
  */
-export function request (file: string, e: AxiosResponse) {
+export function request <T> (file: string, e: AxiosResponse, logError = true): T {
 
   const message = hasPath('error.asset', e.data)
     ? e.data.error.asset
@@ -78,49 +86,59 @@ export function request (file: string, e: AxiosResponse) {
 
   if (e.status === 422) {
 
-    error(
-      c.line.red + nl +
-      tui.shopify(message) +
+    const output = glue([
+      c.line.red,
+      nl,
+      tui.shopify(message),
       tui.context({
         stack: false,
         entries: {
-          source: `~${file}`,
+          details: 'File did not sync because Shopify rejected the request',
           status: e.status,
           message: e.statusText,
-          details: 'Shopify has not accepted the request.'
+          source: `${file}`
         }
       })
-    );
+    ]);
+
+    return <T>(logError ? error(output) : output);
 
   } else if (e.status in SHOPIFY_REQUEST_ERRORS) {
 
-    error(
-      c.line.red + nl +
+    const output = glue([
+      c.line.red,
+      nl,
       tui.multiline('error', SHOPIFY_REQUEST_ERRORS[e.status]) +
       tui.context({
         stack: false,
         entries: {
-          source: `~${file}`,
           status: e.status,
-          message: e.statusText
+          message: e.statusText,
+          source: `${file}`
         }
       })
-    );
+    ]);
+
+    return <T>(logError ? error(output) : output);
 
   } else {
 
-    error(
-      c.line.red + nl +
+    const output = glue([
+      c.line.red,
+      nl,
       c.red('Unknown error has occured') +
       tui.context({
         stack: false,
         entries: {
-          source: `~${file}`,
           status: e.status,
-          message: e.statusText
+          message: e.statusText,
+          source: `${file}`
         }
       })
-    );
+    ]);
+
+    return <T>(logError ? error(output) : output);
+
   }
 }
 
