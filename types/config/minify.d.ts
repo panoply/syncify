@@ -52,6 +52,12 @@ export interface JSONMinify {
    */
   metafields: boolean;
   /**
+   * Minify section group `.json` files
+   *
+   * @default true
+   */
+  sectionGroups: boolean;
+  /**
    * Minify `template` and `.json` files.
    *
    * @default true
