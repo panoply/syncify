@@ -42,7 +42,6 @@ export function style (file: File<StyleBundle>) {
 
   const config = bundle.style.find(x => x.watch(file.input));
 
-  console.log(config);
   if (isUndefined(config)) return file;
 
   defineProperty(file, 'config', { get () { return config; } });
@@ -83,11 +82,7 @@ export function script (file: File<ScriptBundle[]>) {
 
   if (config.length === 0) return file;
 
-  defineProperty(file, 'config', {
-    get () {
-      return config;
-    }
-  });
+  defineProperty(file, 'config', { get () { return config; } });
 
   return file;
 
