@@ -20,8 +20,8 @@ export const axios = connect.create({
  */
 export const queue = new Queue({
   concurrency: 5,
-  interval: 0,
-  intervalCap: 1
+  interval: 250,
+  intervalCap: 2
 });
 
 /**
