@@ -92,37 +92,9 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     'snippet'
   ]);
 
-  // Set global plugins
-  // if (esbuild.config.plugins.length > 0) {
-  //   esbuild.config.plugins.unshift(pluginPaths(), pluginWatch());
-  // } else {
-  //   esbuild.config.plugins.push(pluginPaths(), pluginWatch());
-  // }
-
-  /*
-  {
-      uuid: uuid(),
-      format: 'esm',
-      target: 'es2016',
-      snippet,
-      input: transform.input as string,
-      output: join(bundle.dirs.output, snippet ? 'snippets' : 'assets'),
-      external: [],
-      rename: null,
-      key: '',
-      namespace: transform.snippet ? 'snippets' : 'assets',
-      watch: null,
-      esbuild: null
-    };
-
-  */
   if (!has('absWorkingDir', esbuild.config)) esbuild.config.absWorkingDir = bundle.cwd;
 
   for (const transform of transforms) {
-
-    // if (bundle.watch.has(transform.input as string)) {
-    //   warn('input already in use', relative(bundle.cwd, transform.input as string));
-    // }
 
     const { snippet } = transform;
 
@@ -162,7 +134,9 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       esbuild: null
     };
 
-    bundle.watch.unwatch(scriptBundle.output);
+    if (bundle.mode.watch) {
+      bundle.watch.unwatch(scriptBundle.output);
+    }
 
     if (has('esbuild', transform)) {
       if (u.isBoolean(transform.esbuild) || isNil(transform.esbuild)) {
