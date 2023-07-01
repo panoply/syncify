@@ -60,17 +60,17 @@ export const clear = () => {
  */
 export function stop (now = false) {
 
-  const gt = now ? mark[mark.length - 2] : mark.pop();
+  const gt = now ? mark[mark.length - 1] : mark.pop();
   const ms = performance.now() - gt;
 
   if (ms < 1000) return `${ms.toFixed(0)}ms`;
 
   const s = ms / 1000;
 
-  if (s < 60) return `${s.toFixed(0)}s ${+ms.toFixed(0).slice(1)}ms`;
+  if (s < 60) return `${s.toFixed(0)}s ${+ms.toFixed(0).slice(1, 4)}ms`;
 
   const m = (s / 60).toFixed(0);
 
-  return `${m}m ${(s - (60 * Number(m)))}s ${+ms.toFixed(0).slice(1)}ms`;
+  return `${m}m ${(s - (60 * Number(m))).toFixed(0)}s ${+ms.toFixed(0).slice(1, 4)}ms`;
 
 };
