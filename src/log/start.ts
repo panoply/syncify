@@ -6,6 +6,7 @@ import { keys, nil, values, nl, ws, wsr, log, toArray } from '../utils/native';
 import { warnings, severities } from './validate';
 import { spawns } from '../cli/spawn';
 import * as c from '../cli/ansi';
+import { size } from '~cli/size';
 
 /**
  * Log Heading
@@ -65,7 +66,23 @@ export function start (bundle: Bundle) {
 
   text.push(
     `${c.open}${c.gray('Syncify')} ${c.gray('~')} ${c.gray(getTime())}`,
+    `${c.line.gray}`
+  );
+
+  const cs = size().columns;
+
+  if (cs < 100) {
+    text.push(
+    `${c.line.gray}${c.red.bold('TERMINAL WIDTH WARNING')}`,
     `${c.line.gray}`,
+    `${c.line.gray}${c.red(`Your terminal width is below ${c.bold(`${100}`)} columns (currently ${c.bold(`${cs}`)})`)}`,
+    `${c.line.gray}${c.red('This is not recommended for usage with Syncify (size matters).')}`,
+    `${c.line.gray}${c.red('Expand your terminal wider for optimal usage and logging.')}`,
+    `${c.line.gray}`
+    );
+  }
+
+  text.push(
     `${c.line.gray}${c.whiteBright.bold(`v${bundle.version}`)}`,
     `${c.line.gray}`
   );
@@ -121,58 +138,66 @@ export function start (bundle: Bundle) {
 
   const cf = basename(bundle.file);
 
-  for (const prop in severities) {
+  if (bundle.logger.warnings) {
 
-    const issue = severities[prop];
+    for (const prop in severities) {
 
-    if (issue.length > 0) {
+      const issue = severities[prop];
 
-      if (!hasSeverity) {
-        hasSeverity = true;
-        text.push(
-          c.line.gray +
+      if (issue.length > 0) {
+
+        if (!hasSeverity) {
+          hasSeverity = true;
+          text.push(
+            c.line.gray +
             nl + c.line.red +
             c.redBright(`${c.bold('Errors')} in ${c.bold(cf)}`) +
-            c.colon
-        );
-      }
+            c.COL + ws
+          );
+        }
 
-      const title = c.red.bold(`${issue.length} ${prop} ${plural('error', issue.length)}`);
+        const title = c.red.bold(`${issue.length} ${prop} ${plural('error', issue.length)}`);
 
-      text.push(
-        c.line.red + nl + c.line.red +
+        text.push(
+          c.line.red + nl + c.line.red +
           title +
           nl + c.line.red + nl +
           issue.join(nl)
-      );
-    }
-  }
-
-  for (const prop in warnings) {
-
-    const warn = warnings[prop];
-
-    if (warn.length > 0) {
-
-      if (!hasWarning) {
-        hasWarning = true;
-        text.push(
-          c.line.gray +
-            nl + c.line.yellow +
-            c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`) +
-            c.colon
         );
       }
+    }
 
-      const title = c.yellow.bold(`${warn.length} ${prop} ${plural('warning', warn.length)}`);
+    for (const prop in warnings) {
 
-      text.push(
-        c.line.yellow + nl + c.line.yellow +
+      const warn = warnings[prop];
+
+      if (warn.length > 0) {
+
+        if (!hasWarning) {
+
+          hasWarning = true;
+
+          text.push(
+            c.line.gray +
+            nl + c.line.yellow +
+            c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cf)}`) +
+            c.COL + ws
+          );
+
+        }
+
+        const title = c.yellow.bold(`${warn.length} ${prop} ${plural('warning', warn.length)}`);
+
+        text.push(
+          c.line.yellow + nl + c.line.yellow +
           title +
           nl + c.line.yellow + nl +
           warn.join(nl)
-      );
+        );
+
+      }
     }
+
   }
 
   if (anyTrue(mode.build, mode.watch) && _ss > 0) {
@@ -227,6 +252,10 @@ export function start (bundle: Bundle) {
       text.push(`${c.line.gray}${c.bold('Theme Editors:')}${urls.join(nl)}${nl}${c.line.gray}`);
     }
 
+  }
+
+  if (mode.upload || mode.watch) {
+
     /* -------------------------------------------- */
     /* THEME PREVIEWS                               */
     /* -------------------------------------------- */
@@ -242,9 +271,12 @@ export function start (bundle: Bundle) {
         c.gray.underline('https://' + store + '?preview_theme_id=' + id)
       ));
 
-      text.push(`${c.line.gray}${c.bold('Theme Previews:')}${urls.join(nl)}${nl}${c.line.gray}`);
+      if (mode.upload) {
+        text.push(`${c.line.gray}${c.bold('Theme Targets:')}${urls.join(nl)}${nl}${c.line.gray}`);
+      } else {
+        text.push(`${c.line.gray}${c.bold('Theme Previews:')}${urls.join(nl)}${nl}${c.line.gray}`);
+      }
     }
-
   }
 
   log(text.join(nl));
