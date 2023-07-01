@@ -20,7 +20,6 @@ export async function injectSnippet () {
   const [ theme ] = bundle.sync.themes;
 
   const snippet = await readFile(bundle.hot.snippet);
-
   const upload = await request.upload(snippet.toString(), { theme, key });
 
   log.update(tui.message('gray', `${key} uploaded snippet injection`));
