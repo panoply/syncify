@@ -313,12 +313,17 @@ export async function setStyleConfig (config: Config, pkg: Package) {
       }
 
       bundle.paths.transforms.set(compile.input, Type.Style);
-      bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
 
+      if (bundle.mode.watch) {
+        bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
+      }
     } else {
 
       compile.rename = rename.name;
-      bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'assets', rename.name)}`);
+
+      if (bundle.mode.watch) {
+        bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'assets', rename.name)}`);
+      }
     }
 
     bundle.style.push(compile as any);
