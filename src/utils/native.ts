@@ -1,4 +1,4 @@
-import { isType } from 'rambdax';
+import { isType, join } from 'rambdax';
 
 /**
  * Native Console Log
@@ -16,19 +16,29 @@ export const nil = '';
 export const ws = ' ';
 
 /**
- * Repeat Whitespacing
- */
-export const wsr = (i: number) => ws.repeat(i);
-
-/**
  * Newline
  */
 export const nl = '\n';
 
 /**
+ * Repeat Whitespacing
+ */
+export const wsr = (i: number) => ws.repeat(i);
+
+/**
  * Newline Repeat
  */
 export const nlr = (i: number) => nl.repeat(i);
+
+/**
+ * Newline Join from an array list
+ */
+export const nlj = join(nl);
+
+/**
+ * Join array list of strings
+ */
+export const glue = join(nil);
 
 /**
  * Native Object assign
