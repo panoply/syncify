@@ -1,12 +1,12 @@
 import type { SVGBundle, File, Syncify, SVGSpriteConfig, SVGOConfig } from 'types';
 import type { SVGSpriter, SVGSpriterConstructor } from 'svg-sprite';
 import type { AssetRequest } from '~requests/client';
-import type SVGO from 'svgo';
+import SVGO from 'svgo';
 import { join } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, mapParallelAsync } from 'rambdax';
 import { toArray, assign } from '~utils/native';
-import { log, error, bold, arrow } from '~log';
+import { log, error } from '~log';
 import { bundle, processor } from '~config';
 import { Kind, renameFile } from '~process/files';
 import { byteSize, fileSize, plural } from '~utils/utils';
@@ -18,7 +18,7 @@ import * as timer from '~utils/timer';
 /**
  * SVGO Module
  */
-export let svgo: typeof SVGO = null;
+export let Svgo: typeof SVGO = null;
 
 /**
  * SVG Sprite Module
@@ -40,8 +40,8 @@ export async function load (id: 'svg-sprite' | 'svgo') {
   }
 
   if (id === 'svgo') {
-    svgo = (await import('svgo')).default;
-    return isNil(svgo) === false;
+    Svgo = (await import('svgo')).default;
+    return isNil(Svgo) === false;
   }
 
 };
@@ -123,8 +123,9 @@ export function compileSprite (context: File<SVGBundle[]>, request: AssetRequest
       }
 
       const content = await getSprite(sprite);
+      const length = svgs.length;
 
-      log.process(`${bold('SVG Sprite')} ${arrow}${svgs.length} ${plural('SVG', svgs.length)}`, timer.stop());
+      log.process('SVG Sprite', `${length} ${plural('SVG', length)}`, timer.stop());
 
       await writeFile(file.output, content).catch(
         error.write('Error writing SVG Sprite', {
@@ -187,13 +188,13 @@ export function compileInline (context: File<SVGBundle[]>, request: AssetRequest
     let svg: SVGO.Output;
 
     try {
-      svg = svgo.optimize(read.toString(), options);
+      svg = Svgo.optimize(read.toString(), options);
     } catch (error) {
       log.err(error.toString());
       return null;
     }
 
-    if (bundle.mode.watch) log.process(bold('SVGO'), timer.stop());
+    if (bundle.mode.watch) log.process('SVGO', timer.stop());
 
     const { data } = svg;
 
