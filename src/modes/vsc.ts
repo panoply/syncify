@@ -1,4 +1,4 @@
-import { Bundle } from 'types';
+wimport { Bundle } from 'types';
 import { mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { join } from 'path';
 import { allTrue, has } from 'rambdax';
