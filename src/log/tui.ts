@@ -3,9 +3,11 @@ import { has, hasPath } from 'rambdax';
 import readline from 'node:readline';
 import wrap from 'wrap-ansi';
 import { REGEX_LINE_NO, REGEX_ADDRESS, REGEX_OBJECT, REGEX_QUOTES, REGEX_STRING } from '~const';
-import { isArray, log, nil, nl, nlr, wsr } from '~utils/native';
+import { glue, isArray, log, nil, nl, nlr, ws, wsr } from '~utils/native';
 import { getTime } from '~utils/utils';
 import * as c from '~cli/ansi';
+import { LiteralUnion } from 'type-fest';
+import { size } from '~cli/size';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -31,7 +33,7 @@ type Loggers = (
  * Depending on the prefix name character length of the arrow separator
  * will equally distributed.
  */
-type Prefixes = (
+type Prefixes = LiteralUnion<string, (
   | 'changed'
   | 'process'
   | 'exports'
@@ -51,7 +53,7 @@ type Prefixes = (
   | 'warning'
   | 'deleted'
   | 'ignored'
-)
+)>
 
 export let stack: string = nil;
 
@@ -78,6 +80,24 @@ export function clear () {
 
 }
 
+/**
+ * TUI Horizontal Row
+ *
+ * Prints a horizontal line separator. Will span the length
+ * of the terminal pane.
+ *
+ * ```
+ * │
+ * ├────────────────────────────────────────────────
+ * │
+ * ```
+ */
+export function hline (minus = 15) {
+
+  log(c.hr(minus));
+
+}
+
 /* -------------------------------------------- */
 /* WRITE LOGS                                   */
 /* -------------------------------------------- */
@@ -85,8 +105,7 @@ export function clear () {
 /**
  * String Suffix
  *
- * Generates a formated string with prefix group that
- * has an equally distributed spacing.
+ * Generates a formated string with prefix group that has an equally distributed spacing.
  *
  * ```
  * │ prefix → operation message
@@ -104,7 +123,8 @@ export function suffix (color: Colors, prefix: Prefixes, message: string) {
     line +
     c[color](prefix) +
     wsr(10 - prefix.length) +
-    c.arrow +
+    c.ARR +
+    ws +
     c[color](message)
   );
 
@@ -169,16 +189,18 @@ export function message (color: Colors, message: string) {
  */
 export function shopify (message: string | string[]) {
 
-  const output: string = isArray(message) ? message.map(shopify).join(nl) : c.red(message)
-    .replace(REGEX_LINE_NO, c.gray('$1') + c.white('$2') + c.gray('$3') + c.white('$4') + nlr(2))
-    .replace(REGEX_QUOTES, c.yellowBright.bold('$1'))
-    .replace(REGEX_OBJECT, c.cyan('$1') + c.whiteBright('$2') + c.cyan('$3'))
-    .replace(REGEX_ADDRESS, c.underline('$1'))
-    .replace(REGEX_STRING, c.magenta('$1') + c.cyan('$2') + c.magenta('$3'));
+  if (isArray(message)) return glue(message.map(shopify));
 
-  return indent(output, {
-    line: c.line.red
-  });
+  let output: string = message;
+
+  output = output.replace(REGEX_LINE_NO, c.gray('$1') + c.white('$2') + c.gray('$3') + c.white('$4') + nlr(2));
+  output = output.replace(REGEX_QUOTES, c.yellowBright.bold('$1'));
+  output = output.replace(REGEX_OBJECT, c.cyan('$1') + c.whiteBright('$2') + c.cyan('$3'));
+  output = output.replace(REGEX_ADDRESS, c.underline('$1'));
+  output = output.replace(REGEX_STRING, c.magenta('$1') + c.cyan('$2') + c.magenta('$3'));
+
+  return indent(c.red(wrap(output, size().columns - 15)), { line: c.line.red });
+
 }
 
 export function sample (code: string, data: {
@@ -194,13 +216,12 @@ export function sample (code: string, data: {
   if (hasPath('span.start', data)) {
 
     const end = has('end', data.span) ? data.span.end : data.span.start + 1;
-    const output = (
-      `${line}${c.blue(`${data.span.start - 1}`)}${c.colon + nl}` +
-      `${line}${c.blue(`${data.span.start}`)}${c.colon} ${code + nl}` +
-      `${line}${c.blue(`${end}`)}${c.colon + nl}`
-    );
 
-    return line + nl + output;
+    return line + nl + glue([
+      `${line}${c.blue(`${data.span.start - 1}`)}${c.COL + nl}` +
+      `${line}${c.blue(`${data.span.start}`)}${c.COL} ${code + nl}` +
+      `${line}${c.blue(`${end}`)}${c.COL + nl}`
+    ]);
 
   }
 
@@ -214,7 +235,7 @@ export function indent (message: string | string[], ansi: {
   line?: typeof c.line.red,
 } = {}) {
 
-  const lines = isArray(message) ? message : message.split(nl);
+  const lines = isArray(message) ? message : message.split(nl).filter(Boolean);
   const line = has('line', ansi) ? ansi.line : c.line.gray;
 
   let output: string = has('nwl', ansi) ? `${line + nl}` : nil;
@@ -265,31 +286,33 @@ export function context (data: {
   let space: number = 0;
   let output: string = c.line.red + nl;
 
-  for (const key in data.entries) {
-    if (space < key.length && data.entries[key]) space = key.length;
-  }
+  // equalize indent spaces
+  for (const k in data.entries) if (space < k.length && data.entries[k]) space = k.length;
 
-  for (const key in data.entries) {
-    if (data.entries[key]) {
-      output += (
-        c.line.red +
-        c.red(key) +
-        c.colon +
-        wsr(space - key.length) +
-        c.gray(`${data.entries[key]}`) + nl
-      );
+  // generate output
+  for (const k in data.entries) {
+
+    if (data.entries[k]) {
+      output += glue([
+        c.line.red,
+        c.red(k),
+        c.COL + ws,
+        wsr(space - k.length),
+        c.gray(`${data.entries[k]}`) + nl
+      ]);
     }
   }
 
   if (data.stack) {
     stack = data.stack;
-    output += (
-      c.line.red +
-      c.red('stack') +
-      c.colon +
-      wsr(space - 5) +
-      c.gray(`Type ${c.bold('s')} and press ${c.bold('enter')} to view stack trace`) + nl + c.line.gray
-    );
+    output += glue([
+      c.line.red,
+      c.red('stack'),
+      c.COL + ws,
+      wsr(space - 5),
+      c.gray(`Type ${c.bold('s')} and press ${c.bold('enter')} to view stack trace`),
+      nl + c.line.gray
+    ]);
   }
 
   return output.trimEnd();
@@ -321,9 +344,8 @@ export function multiline (type: Loggers, message: string): string {
   }
 
   const stdout = [];
-  const limit = process.stdout.columns - 5;
   const input = message.trim();
-  const lines = wrap(input, limit).split(nl);
+  const lines = wrap(input, size().columns - 15).split(nl);
 
   while (lines.length !== 0) {
     const text = lines.shift();
