@@ -1,5 +1,6 @@
 import ansis from 'ansis';
 import { nil, nl } from '~utils/native';
+import { size } from '~cli/size';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -33,6 +34,20 @@ export type Colors = (
   | 'orange'
   | 'pink'
 )
+
+/* -------------------------------------------- */
+/* HELPER UTILITIES                             */
+/* -------------------------------------------- */
+
+/**
+ * Clear console but preserve history
+ */
+export const clear = '\x1B[H\x1B[2J';
+
+/**
+ * Clear console and history
+ */
+export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
 
 /* -------------------------------------------- */
 /* STANDARD COLORS                              */
@@ -150,22 +165,22 @@ export const newline = lightGray(`${nl}│${nl}`);
  */
 export const close = lightGray('└─ ');
 
-/* -------------------------------------------- */
-/* HELPER UTILITIES                             */
-/* -------------------------------------------- */
-
 /**
- * Clear console but preserve history
+ * TUI Horizontal Row
+ *
+ * Prints a horizontal line separator. Will span the length
+ * of the terminal pane.
+ *
+ * ```
+ * │
+ * ├────────────────────────────────────────────────
+ * │
+ * ```
  */
-export const clear = '\x1B[H\x1B[2J';
-
-/**
- * Clear console and history
- */
-export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
+export const hr = (minus: number) => lightGray(`│${nl}├${'─'.repeat(size().columns - minus)}${nl}│`);
 
 /* -------------------------------------------- */
-/* EXTENDED HELPERS                             */
+/* CHARACTER HELPERS                            */
 /* -------------------------------------------- */
 
 /**
@@ -175,7 +190,7 @@ export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
  * ✓
  * ```
  */
-export const check = neonGreen('✓ ');
+export const CHK = neonGreen('✓ ');
 
 /**
  * Colon character in gray suffixed with single space
@@ -184,16 +199,52 @@ export const check = neonGreen('✓ ');
  * :
  * ```
  */
-export const colon = gray(': ');
+export const COL = gray(':');
 
 /**
- * Arrow character in gray
+ * Right Arrow character in gray
  *
  * ```
  * →
  * ```
  */
-export const arrow = gray(' →  ');
+export const ARR = gray('→');
+
+/**
+ * Right Chevron solid character in gray
+ *
+ * ```
+ * ‣
+ * ```
+ */
+export const CHV = gray('‣');
+
+/**
+ * Right + Small Left Arrow character in gray
+ *
+ * ```
+ * ⥂
+ * ```
+ */
+export const ARL = gray('⥂');
+
+/**
+ * Tilde character in gray
+ *
+ * ```
+ * ~
+ * ```
+ */
+export const TLD = gray('~');
+
+/**
+ * Long EnDash character in gray
+ *
+ * ```
+ * —
+ * ```
+ */
+export const DSH = gray('—');
 
 /**
  * Left Parenthesis in gray
@@ -202,7 +253,7 @@ export const arrow = gray(' →  ');
  * (
  * ```
  */
-export const lpr = gray('(');
+export const LPR = gray('(');
 
 /**
  * Right Parenthesis in gray
@@ -211,7 +262,11 @@ export const lpr = gray('(');
  * )
  * ```
  */
-export const rpr = gray(')');
+export const RPR = gray(')');
+
+/* -------------------------------------------- */
+/* EXTENDED HELPERS                             */
+/* -------------------------------------------- */
 
 /**
  * Warning stdin suffix
@@ -221,6 +276,15 @@ export const rpr = gray(')');
  * ```
  */
 export const warning = yellowBright(` ~ Type ${bold('w')} and press ${bold('enter')} to view`);
+
+/**
+ * Error stdin suffix
+ *
+ * ```
+ *  ~ Type v and press enter to view
+ * ```
+ */
+export const error = redBright(` ~ Type ${bold('v')} and press ${bold('enter')} to view`);
 
 /**
  * Time Suffix

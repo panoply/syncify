@@ -3,7 +3,7 @@ import type { Request, Theme, File, FileKeys } from 'types';
 import { queue, axios } from '~requests/queue';
 import { assign } from '~utils/native';
 import * as timer from '~utils/timer';
-import { log, error } from '~log';
+import { log, error, tui } from '~log';
 import { bundle } from '~config';
 
 /**
@@ -79,9 +79,8 @@ export async function upload (asset: string, config: { theme: Theme, key: FileKe
 /**
  * Request Handler
  *
- * Executes a request to a Shopify resource
- * REST endpoint. When request rates are exceeded
- * the handler will re-queue them.
+ * Executes a request to a Shopify resource REST endpoint.
+ * When request rates are exceeded the handler will re-queue them.
  */
 export async function get <T> (url: string, config: AxiosRequestConfig<Request>): Promise<T> {
 
@@ -118,29 +117,40 @@ export async function sync (theme: Theme, file: File, config: Request) {
     queue.concurrency++;
   }
 
-  timer.start();
+  if (!bundle.mode.upload) timer.start();
 
-  const promise = axios(config).then(({ headers, data }) => {
+  const promise = await axios(config).then(({ headers, data }) => {
 
     if (config.method === 'get') return data;
     if (config.method === 'delete') {
       log.deleted(file.relative, theme);
     } else {
-      log.upload(theme);
+
+      // log.update(tui.message('blue', file.key));
+      // log.upload(theme);
     }
 
     limit = parseInt(headers['x-shopify-shop-api-call-limit'].slice(0, 2), 10);
 
   }).catch((e: AxiosError) => {
 
-    // if (!sync.queue) return error(file.key, e.response);
+    // if (!queue) return log.error(file.key, e.response);
 
     if (e.response && (e.response.status === 429 || e.response.status === 500)) {
       log.retrying(file.key, theme);
       queue.add(() => sync(theme, file, config));
     } else {
-      log.failed(file.key);
-      error.request(file.relative, e.response);
+
+      if (bundle.mode.upload) {
+
+        throw e.response;
+
+      } else {
+
+        log.failed(file.key);
+        error.request(file.relative, e.response);
+      }
+
     }
 
   });
