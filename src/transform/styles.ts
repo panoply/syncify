@@ -36,8 +36,7 @@ export async function load (id: 'postcss' | 'sass') {
   }
 
   if (id === 'sass') {
-    const dart = await import('sass');
-    sass = dart.default;
+    sass = require('sass');
     return isNil(sass) === false;
   }
 
@@ -127,7 +126,7 @@ async function sassProcess (file: File<StyleTransform>) {
         );
       }
 
-      if (bundle.mode.watch) log.process(`${bold('SASS Dart')}`, timer.stop());
+      if (bundle.mode.watch) log.process('SASS Dart', timer.stop());
 
       file.size = byteSize(css);
 
@@ -187,7 +186,7 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
       map: map ? { prev: map, inline: false } : null
     });
 
-    if (bundle.mode.watch) log.process(`${bold('PostCSS')}`, timer.stop());
+    if (bundle.mode.watch) log.process('PostCSS', timer.stop());
 
     const issues = result.warnings();
 
@@ -211,7 +210,7 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
  */
 function snippet (css: string) {
 
-  return `<style type="text/css">${nl + wsr(2) + css}</style>`;
+  return `<style>${nl + wsr(2) + css}</style>`;
 
 };
 
