@@ -228,7 +228,9 @@ export async function build (callback?: Syncify) {
     }
   }
 
+  log.nwl();
   log.update(`${line.gray}Build Completed ${gray(`~ ${timer.stop()}`)}`);
+  log.nwl();
 
   process.exit(0);
   // log.info(c.greenBright.bold('Completed in ' + timer.stop()));
