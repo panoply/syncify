@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
+import { argv } from 'node:process';
 import { log } from '~log';
 import { run } from '.';
 import mm from 'minimist';
 
-run(mm(process.argv.slice(1), {
+run(mm(argv.slice(1), {
   alias: {
     config: 'c',
     build: 'b',
