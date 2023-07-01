@@ -9,7 +9,7 @@ import { pathExists, readJson } from 'fs-extra';
 import { queue } from '~requests/queue';
 import { spawned, spawns } from '~cli/spawn';
 import { kill } from '~cli/exit';
-import { gray } from '~cli/ansi';
+import { blue, gray } from '~cli/ansi';
 import { isArray, keys, assign, nil, isString, isObject, ws, defineProperty, isBoolean, error } from '~utils/native';
 import { normalPath } from '~utils/paths';
 import { configFile, getPackageJson } from '~options/files';
@@ -21,7 +21,7 @@ import { setSvgOptions } from '~options/svgs';
 import { setMinifyOptions } from '~options/minify';
 import { authURL } from '~options/utilities';
 import { PATH_KEYS, HOT_SNIPPET_FILE } from '~const';
-import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError } from '~log/validate';
+import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError, invalidCommand } from '~log/validate';
 import { log } from '~log';
 import { bundle, cache, processor, plugins, presets } from '~config';
 import { FSWatcher } from 'chokidar';
@@ -93,8 +93,10 @@ export async function define (cli: Commands, _options?: Config) {
  */
 function setChokidar (watch: boolean, cwd: string) {
 
-  if (!watch) return;
-
+  if (!watch) {
+    bundle.watch = new Set() as any;
+    return;
+  }
   bundle.watch = new FSWatcher({
     persistent: true,
     ignoreInitial: true,
@@ -469,7 +471,45 @@ async function getConfig (pkg: Package, cli: Commands) {
  */
 function setStores (cli: Commands, config: Config) {
 
-  if (cli._.length === 0) return;
+  /**
+   * Modes which require store arguments
+   */
+  const storeRequired = anyTrue(
+    bundle.mode.metafields,
+    bundle.mode.pages,
+    bundle.mode.redirects
+  );
+
+  /**
+   * Modes which require theme arguments
+   */
+  const themeRequired = anyTrue(
+    bundle.mode.watch,
+    bundle.mode.upload,
+    bundle.mode.download
+  );
+
+  if (cli._.length === 0) {
+
+    if (storeRequired) {
+
+      invalidCommand({
+        message: [
+          'You have not provided store to target, which is required',
+          'when running in a resource mode that syncs to a remote source'
+        ],
+        expected: 'syncify <store>',
+        fix: [
+          'Provide the store target name as the first command argument',
+          'followed by themes target/s and other flags.'
+        ]
+      });
+
+    }
+
+    return;
+
+  }
 
   const stores = cli._[0].split(',');
   const file = dotenv.config({ path: join(bundle.cwd, '.env') });
@@ -523,11 +563,46 @@ function setStores (cli: Commands, config: Config) {
 
   }
 
-  if (bundle.sync.stores.length === 0 && bundle.mode.build === true) {
+  if (storeRequired) {
+    if (bundle.sync.stores.length === 0) {
+      return invalidCommand({
+        expected: 'syncify <store>',
+        message: [
+          'You have not provided store to target, which is required',
+          'when running in a resource mode that syncs to a remote source'
+        ],
+        fix: [
+          'Provide the store target name as the first command argument',
+          'followed by themes target/s and other flags.'
+        ]
+      });
+    }
+  }
+
+  if (bundle.sync.themes.length === 0) {
+    if (themeRequired) {
+      return invalidCommand({
+        expected: '-t <theme>',
+        message: [
+          'You have not provided a theme to target, which is required',
+          'when running this resource mode.'
+        ],
+        fix: [
+          `Provide a theme name to target following a ${blue('-t')} or ${blue('--theme')} flag.`,
+          'Theme targets should be passed as the 2nd argument, the 1st',
+          'argument should be store name/s.'
+        ]
+      });
+    }
+  }
+
+  if (bundle.sync.stores.length === 0) {
+
     throwError(
       'Unknown, missing or invalid store/theme targets',
       'Check your store config'
     );
+
   }
 
 };
