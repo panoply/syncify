@@ -41,6 +41,7 @@ export const minify: Minify = {
     config: true,
     locales: true,
     metafields: true,
+    sectionGroups: true,
     templates: true,
     exclude: []
   },
