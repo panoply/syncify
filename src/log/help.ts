@@ -1,4 +1,4 @@
-import { gray, bold, colon } from '../cli/ansi';
+import { gray, bold, COL } from '../cli/ansi';
 
 /**
  * Help Text
@@ -10,7 +10,7 @@ export const examples = `
   ${bold('Syncify CLI Examples')}                                             ${gray('by Panoply')}
   ${gray('-----------------------------------------------------------------------------')}
 
-  ${bold('Watching' + colon)}
+  ${bold('Watching' + COL)}
 
   ${gray('Targeting 1 store and 1 theme')}:
   $ sync your-store${gray('=')}theme-1 --watch
@@ -45,37 +45,37 @@ export const help = `
   Welcome to the Syncify CLI. The command line utility assumes that
   you have defined stores, themes and setup credentials within a ${gray('.env')} file.
 
-  ${bold('Aliases' + colon)}
+  ${bold('Aliases' + COL)}
 
   $ sync
 
-  ${bold('Commands' + colon)}
+  ${bold('Commands' + COL)}
 
   $ syncify                    ${gray.italic('Interactive prompt')}
   $ syncify {store} [theme]    ${gray.italic('Prints list of connected stores')}
 
-  ${bold('Themes' + colon)}
+  ${bold('Themes' + COL)}
 
        --<store>    [theme]     ${gray.italic('A store reference command (run examples)')}
     -t, --theme     [theme]     ${gray.italic('A comma seprated list of themes')}
 
-  ${bold('Paths' + colon)}
+  ${bold('Paths' + COL)}
 
     -c, --config    <path>     ${gray.italic('Set configs path')}
     -i, --input     <path>     ${gray.italic('Set input path')}
     -o, --output    <path>     ${gray.italic('Set output path')}
 
-  ${bold('Utility' + colon)}
+  ${bold('Utility' + COL)}
 
     -f, --filter    <path>     ${gray.italic('Glob path, use with pull or push triggers')}
 
-  ${bold('Environment' + colon)}
+  ${bold('Environment' + COL)}
 
     --dev                      ${gray.italic('Build in development mode (default)')}
     --prod                     ${gray.italic('Build in production mode')}
     --hot                      ${gray.italic('Run watch with hot-reloads')}
 
-  ${bold('Modes' + colon)}
+  ${bold('Modes' + COL)}
 
     -w, --watch                ${gray.italic('Run watch mode')}
     -b, --build                ${gray.italic('Run build mode from input')}
@@ -85,25 +85,25 @@ export const help = `
     -p, --pages                ${gray.italic('Run pages resource mode')}
     -r, --redirects            ${gray.italic('Run redirects resource mode')}
 
-  ${bold('Resource' + colon)}
+  ${bold('Resource' + COL)}
 
     --pull                     ${gray.italic('Pull a resource from a shop or theme')}
     --push                     ${gray.italic('Push a resource to a shop or theme')}
     --silent                   ${gray.italic('Silent logs, only warnings or errors are printed')}
 
-  ${bold('Trigger' + colon)}
+  ${bold('Trigger' + COL)}
 
     --spawn   [list]           ${gray.italic('Invoke a defined spawn child process/s')}
     --delete  [list]           ${gray.italic('Delete a remote and local file')}
     --minify  [list]           ${gray.italic('invoke minify mode, accepts resource/s')}
 
-  ${bold('Other' + colon)}
+  ${bold('Other' + COL)}
 
     --strap                    ${gray.italic('Import a strap into the project')}
     --vsc                      ${gray.italic('Generate vscode specific settings')}
     --help                     ${gray.italic('Show the screen')}
 
-  ${bold('Help' + colon)}
+  ${bold('Help' + COL)}
 
     -h, --help                 ${gray.italic('Print this screen')}
     -h, --help  {examples}     ${gray.italic('Print a list of command examples')}
