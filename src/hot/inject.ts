@@ -29,6 +29,18 @@ export async function injectSnippet () {
 }
 
 /**
+ * Whether or not snippet exists
+ *
+ * Sugar helper for testing if string content contains
+ * a HOT snippet injection already or not.
+ */
+export function hasSnippet (content: string) {
+
+  return EXP.test(content);
+
+}
+
+/**
  * Write Render Tag
  *
  * Inserts the HOT reload render tag snippet. The tag
@@ -36,7 +48,7 @@ export async function injectSnippet () {
  */
 export function inject (content: string) {
 
-  if (!EXP.test(content)) return writeRender(content);
+  if (!hasSnippet(content)) return writeRender(content);
 
 }
 
