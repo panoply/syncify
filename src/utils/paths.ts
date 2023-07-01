@@ -2,7 +2,7 @@ import { last } from 'rambdax';
 import { join, dirname } from 'path';
 import { isArray } from '~utils/native';
 import { throwError } from '~log/validate';
-import { colon, yellowBright } from '~log';
+import { COL, yellowBright } from '~log';
 
 /**
  * Glob Path
@@ -109,7 +109,7 @@ export function normalPath (input: string) {
 
     if (path.charCodeAt(0) === 46 && path.charCodeAt(1) === 46 && path.charCodeAt(2) === 47) {
       throwError(
-        `Invalid path defined at: ${colon}${yellowBright(`"${path}"`)}`,
+        `Invalid path defined at: ${COL} ${yellowBright(`"${path}"`)}`,
         'Paths must be relative to source'
       );
     }
@@ -138,7 +138,7 @@ export const basePath = (cwd: string) => (path: string) => {
 
   if (path.indexOf('*') !== -1) {
     throwError(
-      `Base directory path cannot contain glob${colon}${yellowBright(`"${path}"`)}`,
+      `Base directory path cannot contain glob${COL} ${yellowBright(`"${path}"`)}`,
       'Ensure that path you are resolving is correctly formed'
     );
   }
@@ -155,7 +155,7 @@ export const basePath = (cwd: string) => (path: string) => {
       path = path.slice(1);
     } else {
       throwError(
-        `Directory path is invalid at${colon}${yellowBright(`"${path}"`)}`,
+        `Directory path is invalid at${COL} ${yellowBright(`"${path}"`)}`,
         'Ensure that path you are resolving is correctly formed'
       );
     }
@@ -178,7 +178,7 @@ export const basePath = (cwd: string) => (path: string) => {
     return last(path).charCodeAt(0) === 47 ? path : path + '/';
   } else {
     throwError(
-      `Directory path is invalid at${colon}${yellowBright(`"${path}"`)}`,
+      `Directory path is invalid at${COL} ${yellowBright(`"${path}"`)}`,
       'Ensure that path you are resolving is correctly formed'
     );
   }
