@@ -8,11 +8,9 @@ import * as c from '~cli/ansi';
 import { plural } from '~utils/utils';
 
 /**
- * Warning stacks, maintains a store of log messages
+ * Error stacks, maintains a store of log messages
  */
-export const warnings: {
-  [file: string]: Map<string, Set<string>>
-} = {};
+export const warnings: { [file: string]: Map<string, Set<string>> } = {};
 
 /**
  * File Write Errors
