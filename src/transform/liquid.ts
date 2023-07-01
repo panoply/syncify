@@ -8,6 +8,7 @@ import { byteConvert, byteSize, fileSize } from '~utils/utils';
 import { bundle, minify } from '~config';
 import * as timer from '~utils/timer';
 import { log } from '~log';
+import { hasSnippet, removeRender } from '~hot/inject';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -217,18 +218,26 @@ export async function compile (file: File, cb: Syncify) {
 
   const read = await readFile(file.input);
 
-  file.size = byteSize(read);
+  let input = read.toString();
 
+  if (bundle.mode.build) {
+    if (file.namespace === 'layout') {
+      if (hasSnippet(input)) {
+        input = removeRender(input);
+      }
+    }
+  }
+
+  file.size = byteSize(input);
   const edit = transform(file);
-  const data = read.toString();
 
-  if (!isType('Function', cb)) return edit(data);
+  if (!isType('Function', cb)) return edit(input);
 
-  const update = cb.apply({ ...file }, data);
+  const update = cb.apply({ ...file }, input);
 
   if (isType('Undefined', update) || update === false) {
 
-    return edit(data);
+    return edit(input);
 
   } else if (isType('String', update)) {
 
@@ -240,6 +249,6 @@ export async function compile (file: File, cb: Syncify) {
 
   }
 
-  return edit(data);
+  return edit(input);
 
 };

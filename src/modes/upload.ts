@@ -13,6 +13,7 @@ import { has } from 'rambdax';
 import { getSizeStr, toUpcase } from '~utils/utils';
 import { errors } from '~log/errors';
 import { AxiosResponse } from 'axios';
+import { hasSnippet, removeRender } from '~hot/inject';
 
 export async function upload (cb?: Syncify): Promise<void> {
 
@@ -90,6 +91,13 @@ export async function upload (cb?: Syncify): Promise<void> {
       const read = await readFile(file.input);
 
       input = read.toString();
+
+      // remove HOT snippet occurances
+      if (file.namespace === 'layout') {
+        if (hasSnippet(input)) {
+          input = removeRender(input);
+        }
+      }
 
       if (!hashook) {
 
