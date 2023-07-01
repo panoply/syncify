@@ -9,6 +9,22 @@ export const HOT_SNIPPET_FILE = 'hot.js.liquid';
 export const HOT_SNIPPET_NAME = 'hot.js';
 
 /**
+ * Log Snipper frames
+ */
+export const SPINNER_FRAMES = [
+  '⠋',
+  '⠙',
+  '⠹',
+  '⠸',
+  '⠼',
+  '⠴',
+  '⠦',
+  '⠧',
+  '⠇',
+  '⠏'
+];
+
+/**
  * Syncify configuration files
  */
 export const CONFIG_FILES = [
@@ -157,7 +173,7 @@ export const REGEX_LINE_NO = /(\()(line\s[0-9]+)(\))(:)/g;
 /**
  * Shopify response quoted words
  */
-export const REGEX_QUOTES = /(['"][\w\s]+['"])/g;
+export const REGEX_QUOTES = /('[\w\s.-]*?'|"[\w\s.-]*?")/g;
 
 /**
  * Shopify response object tag
