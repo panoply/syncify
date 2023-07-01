@@ -77,8 +77,9 @@ export function hasRenamespace (rename: string) {
  *
  * @param word The word to pluralize
  * @param length The length to determine
+ * @param zeroS Whether or not count `0` should be plural
  */
-export function plural (word: string, length: number) {
+export function plural (word: string, length: number, zeroS = false) {
 
   return length > 1 ? `${word}s` : word;
 
