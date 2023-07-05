@@ -1,10 +1,12 @@
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import type { Request, Theme, File, FileKeys } from 'types';
+import { pMapSkip } from 'p-map';
 import { queue, axios } from '~requests/queue';
-import { assign } from '~utils/native';
 import * as timer from '~utils/timer';
-import { log, error, tui } from '~log';
+import { log, error } from '~log';
 import { bundle } from '~config';
+import merge from 'mergerino';
+import { event, getSizeStr } from '~utils/utils';
 
 /**
  * Has Asset
@@ -49,7 +51,7 @@ export async function find (asset: FileKeys, theme: Theme): Promise<string> {
  */
 export async function upload (asset: string, config: { theme: Theme, key: FileKeys }): Promise<boolean> {
 
-  const request = assign({}, bundle.sync.stores[config.theme.sidx].client, {
+  const request = merge(bundle.sync.stores[config.theme.sidx].client, {
     method: 'put',
     url: config.theme.url,
     data: {
@@ -90,6 +92,23 @@ export async function get <T> (url: string, config: AxiosRequestConfig<Request>)
 
   }).catch((e: AxiosError) => {
 
+    if (e.response && (e.response.status === 429 || e.response.status === 500)) {
+      log.retrying(file.key, theme);
+      queue.add(() => sync(theme, file, config));
+    } else {
+
+      if (bundle.mode.upload) {
+
+        throw e.response;
+
+      } else {
+
+        log.failed(file.key);
+        error.request(file.relative, e.response);
+      }
+
+    }
+
     log.failed(url);
     error.request(url, e.response);
 
@@ -110,14 +129,16 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
   if (queue.isPaused) return;
 
-  if (queue.concurrency > 1) {
+  const { mode } = bundle;
+
+  if (queue.concurrency > 2) {
     if (limit >= 20) queue.concurrency--;
     if (limit >= 35) queue.concurrency--;
   } else if (queue.concurrency < 3 && limit < 30) {
     queue.concurrency++;
   }
 
-  if (!bundle.mode.upload) timer.start();
+  if (!mode.upload) timer.start();
 
   const promise = await axios(config).then(({ headers, data }) => {
 
@@ -126,8 +147,18 @@ export async function sync (theme: Theme, file: File, config: Request) {
       log.deleted(file.relative, theme);
     } else {
 
-      // log.update(tui.message('blue', file.key));
-      // log.upload(theme);
+      if (mode.watch) {
+        log.upload(theme);
+      } else if (mode.upload) {
+
+        event.emit('upload', 'uploaded', theme, {
+          key: file.key,
+          namespace: file.namespace,
+          fileSize: getSizeStr(config.data.asset.value)
+        });
+
+      }
+
     }
 
     limit = parseInt(headers['x-shopify-shop-api-call-limit'].slice(0, 2), 10);
@@ -137,21 +168,39 @@ export async function sync (theme: Theme, file: File, config: Request) {
     // if (!queue) return log.error(file.key, e.response);
 
     if (e.response && (e.response.status === 429 || e.response.status === 500)) {
-      log.retrying(file.key, theme);
+
+      if (!mode.upload) log.retrying(file.key, theme);
+
       queue.add(() => sync(theme, file, config));
+
     } else {
 
-      if (bundle.mode.upload) {
+      if (mode.upload) {
 
-        throw e.response;
+        event.emit('upload', 'failed', theme, {
+          key: file.key,
+          namespace: file.namespace,
+          fileSize: getSizeStr(config.data.asset.value),
+          get file () {
+            return file;
+          },
+          get error () {
+            return e.response;
+          }
+        });
+
+        //  throw e.response;
 
       } else {
 
         log.failed(file.key);
         error.request(file.relative, e.response);
+
       }
 
     }
+
+    return pMapSkip;
 
   });
 
