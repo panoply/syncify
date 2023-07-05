@@ -1,4 +1,4 @@
-import { File, Pages, Syncify } from 'types';
+import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { join } from 'path';
 import matter from 'gray-matter';
@@ -8,7 +8,6 @@ import gfm from 'turndown-plugin-gfm';
 import Markdown from 'markdown-it';
 import { bundle, cache } from '../config';
 import { log, error } from '~log';
-import { nil } from '~utils/native';
 
 export async function toMarkdown (content: string) {
 
@@ -33,7 +32,6 @@ export async function compile (file: File, cb: Syncify) {
 
   if (!has('title', data)) {
     data.title = '';
-    // throw log.write('Missing Title');
   }
 
   if (has('html', data)) {
