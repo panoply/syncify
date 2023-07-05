@@ -84,6 +84,10 @@ function write (file: File<StyleTransform>, cb: Syncify) {
       log.minified('CSS', size.before, size.after, size.saved);
     }
 
+    if (bundle.mode.hot) {
+      bundle.wss.stylesheet(file.key);
+    }
+
     return content;
 
   };
@@ -91,11 +95,11 @@ function write (file: File<StyleTransform>, cb: Syncify) {
 
 async function sassProcess (file: File<StyleTransform>) {
 
-  const { config } = file;
+  const { data } = file;
 
-  const opts = config.sass === true
+  const opts = data.sass === true
     ? processor.sass.config
-    : config.sass as Processors['sass'];
+    : data.sass as Processors['sass'];
 
   if (file.ext === '.scss' || file.ext === '.sass') {
 
@@ -103,7 +107,7 @@ async function sassProcess (file: File<StyleTransform>) {
 
     try {
 
-      const { css, sourceMap } = sass.compile(config.input as string, {
+      const { css, sourceMap } = sass.compile(data.input as string, {
         loadPaths: opts.include,
         sourceMapIncludeSources: false,
         sourceMap: opts.sourcemap,
@@ -126,7 +130,7 @@ async function sassProcess (file: File<StyleTransform>) {
         );
       }
 
-      if (bundle.mode.watch) log.process('SASS Dart', timer.stop());
+      log.process('SASS Dart', timer.stop());
 
       file.size = byteSize(css);
 
@@ -174,15 +178,15 @@ async function sassProcess (file: File<StyleTransform>) {
  */
 async function postcssProcess (file: File<StyleTransform>, css: string, map: any) {
 
-  const { config } = file;
+  const { data } = file;
 
   try {
 
     if (bundle.mode.watch) timer.start();
 
-    const result = await postcss(processor.postcss.config as any).process(css, {
-      from: config.rename,
-      to: config.rename,
+    const result = await postcss(processor.postcss.config).process(css, {
+      from: data.rename,
+      to: data.rename,
       map: map ? { prev: map, inline: false } : null
     });
 
@@ -229,17 +233,17 @@ export async function compile (file: File<StyleTransform>, cb: Syncify): Promise
 
     if (out === null) return null;
 
-    if (isNil(postcss) || (!file.config.postcss && !file.config.snippet)) {
+    if (isNil(postcss) || (!file.data.postcss && !file.data.snippet)) {
       return output(out.css);
     }
 
-    if (file.config.postcss) {
+    if (file.data.postcss) {
       const post = await postcssProcess(file, out.css, out.map);
       if (post === null) return null;
-      if (file.config.snippet) return output(snippet(post));
+      if (file.data.snippet) return output(snippet(post));
     }
 
-    return file.config.snippet ? output(snippet(out.css)) : output(out.css);
+    return file.data.snippet ? output(snippet(out.css)) : output(out.css);
 
   } catch (e) {
 
