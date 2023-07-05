@@ -149,13 +149,13 @@ export function request <T> (file: string, e: AxiosResponse, logError = true): T
  * `writeFile` functions
  */
 export const write = (
-  message: string | string[],
+  message: string,
   context: {
     [name: string]: string,
   }
 ) => (e: NodeJS.ErrnoException) => {
   error(
-    tui.indent(message, {
+    tui.indent(e.message, {
       nwl: true,
       line: c.line.red,
       text: c.red.bold
@@ -166,7 +166,7 @@ export const write = (
         ...context,
         code: e.code,
         name: e.name,
-        details: e.message
+        details: message
       }
     })
   );
