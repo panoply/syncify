@@ -1,5 +1,5 @@
-import { Config, ENV, Package, Tsconfig } from 'types';
-import { join } from 'node:path';
+import { Config, ENV, Tsconfig } from 'types';
+import { join, relative, basename } from 'node:path';
 import { pathExists, readFile, readJson } from 'fs-extra';
 import { bundleRequire } from '~utils/require';
 import { jsonc } from '~utils/utils';
@@ -28,10 +28,12 @@ export async function configFile (cwd: string): Promise<Config> {
     'syncify.config.ts',
     'syncify.config.json'
   ]) {
+
     path = join(cwd, file);
     const exists = await pathExists(path);
     if (exists) break;
     path = null;
+
   }
 
   if (path === null) return null;
@@ -40,14 +42,20 @@ export async function configFile (cwd: string): Promise<Config> {
 
     if (path.endsWith('.json')) {
 
-      bundle.file = path;
+      bundle.file.path = path;
+      bundle.file.relative = relative(cwd, path);
+      bundle.file.base = basename(path);
+
       const json = await readFile(path);
 
       return jsonc<Config>(json.toString());
 
     } else {
 
-      bundle.file = path;
+      bundle.file.path = path;
+      bundle.file.relative = relative(cwd, path);
+      bundle.file.base = basename(path);
+
       const config = await bundleRequire({ filepath: path });
 
       return config.mod.syncify || config.mod.default || config.mod;
@@ -110,7 +118,7 @@ export async function getTSConfig (cwd: string): Promise<Tsconfig> {
  * at runtime, the module requires the existence of
  * a `package.json` file.
  */
-export async function getPackageJson (cwd: string): Promise<Package> {
+export async function getPackageJson (cwd: string) {
 
   // Save path reference of package
   const uri = join(cwd, 'package.json');
@@ -119,10 +127,7 @@ export async function getPackageJson (cwd: string): Promise<Package> {
   if (!has) throw new Error('Missing "package.json" file');
 
   try {
-
-    const pkg: Package = await readJson(uri);
-    return pkg;
-
+    bundle.pkg = await readJson(uri);
   } catch (e) {
     throw new Error(e);
   }
