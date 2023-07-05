@@ -1,5 +1,5 @@
 import { Merge } from 'type-fest';
-import { Config, Package, StyleTransform, Processors } from 'types';
+import { Config, StyleTransform, Processors, WatchBundle } from 'types';
 import glob from 'fast-glob';
 import merge from 'mergerino';
 import anymatch, { Tester } from 'anymatch';
@@ -34,14 +34,14 @@ type StylesFlattened = Merge<StyleTransform, {
  * parses the `postcss.config.js` configuration file and
  * normalizes the configuration object.
  */
-export async function setStyleConfig (config: Config, pkg: Package) {
+export async function setStyleConfig (config: Config) {
 
   if (!has('style', config.transforms)) return;
 
   const { postcss, sass } = processor;
   const warn = warnOption('style transform option');
 
-  sass.installed = getModules(pkg, 'sass');
+  sass.installed = getModules(bundle.pkg, 'sass');
 
   // Load SASS Dart module
   if (sass.installed) {
@@ -52,7 +52,7 @@ export async function setStyleConfig (config: Config, pkg: Package) {
     }
   }
 
-  postcss.installed = getModules(pkg, 'postcss');
+  postcss.installed = getModules(bundle.pkg, 'postcss');
 
   if (postcss.installed) {
 
@@ -315,14 +315,14 @@ export async function setStyleConfig (config: Config, pkg: Package) {
       bundle.paths.transforms.set(compile.input, Type.Style);
 
       if (bundle.mode.watch) {
-        bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
+        (bundle.watch as WatchBundle).unwatch(`${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
       }
     } else {
 
       compile.rename = rename.name;
 
       if (bundle.mode.watch) {
-        bundle.watch.unwatch(`${join(bundle.cwd, config.output, 'assets', rename.name)}`);
+        (bundle.watch as WatchBundle).unwatch(`${join(bundle.cwd, config.output, 'assets', rename.name)}`);
       }
     }
 
