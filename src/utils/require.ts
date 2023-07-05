@@ -1,8 +1,9 @@
+// @ts-expect-error
+import { loadTsConfig } from 'load-tsconfig';
 import { readFile, unlink, writeFile } from 'fs-extra';
 import { isAbsolute, dirname, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build, BuildOptions, BuildFailure, BuildResult, Plugin as EsbuildPlugin } from 'esbuild';
-import { loadTsConfig } from 'load-tsconfig';
 import { inferLoader, dynamicImport, uuid } from './utils';
 import { keys } from './native';
 import { bundle } from '~config';
