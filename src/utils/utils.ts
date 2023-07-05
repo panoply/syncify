@@ -339,6 +339,21 @@ export function uuid (): string {
 
 }
 
+/**
+ * Returns a promise resolved in the next event loop
+ */
+export default function pNext () {
+
+  return new Promise(resolve => {
+    if (typeof setImmediate === 'function') {
+      setImmediate(resolve);
+    } else {
+      setTimeout(resolve);
+    }
+  });
+
+}
+
 export function debouncePromise<T extends unknown[]> (
   fn: (...args: T) => Promise<void>,
   delay: number,
