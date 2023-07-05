@@ -1,4 +1,4 @@
-import { Config, ESBuildConfig, Package, ScriptBundle, ScriptTransform } from 'types';
+import { Config, ESBuildConfig, ScriptBundle, ScriptTransform, WatchBundle } from 'types';
 import { join } from 'node:path';
 import { has, isEmpty, isNil, omit } from 'rambdax';
 import merge from 'mergerino';
@@ -10,6 +10,7 @@ import { bundle, processor } from '~config';
 import { esbuildModule, esbuildBundle } from '~transform/script';
 import { uuid } from '~utils/utils';
 import * as u from '~utils/native';
+import anymatch from 'anymatch';
 
 // import { log } from '~log';
 
@@ -19,7 +20,7 @@ import * as u from '~utils/native';
  * Normalizes and generates the configuration model which will
  * be used for script transformations using ESBuild.
  */
-export async function setScriptOptions (config: Config, pkg: Package) {
+export async function setScriptOptions (config: Config) {
 
   if (!has('script', config.transforms)) return;
   if (config.transforms.script === false) return;
@@ -29,7 +30,7 @@ export async function setScriptOptions (config: Config, pkg: Package) {
   const { esbuild } = processor;
   const { script } = config.transforms;
 
-  esbuild.installed = getModules(pkg, 'esbuild');
+  esbuild.installed = getModules(bundle.pkg, 'esbuild');
 
   if (esbuild.installed) {
 
@@ -92,7 +93,9 @@ export async function setScriptOptions (config: Config, pkg: Package) {
     'snippet'
   ]);
 
-  if (!has('absWorkingDir', esbuild.config)) esbuild.config.absWorkingDir = bundle.cwd;
+  if (!has('absWorkingDir', esbuild.config)) {
+    esbuild.config.absWorkingDir = bundle.cwd;
+  }
 
   for (const transform of transforms) {
 
@@ -130,12 +133,16 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       output: join(bundle.dirs.output, keyDir, rename),
       key: join(keyDir, rename),
       namespace: transform.snippet ? 'snippets' : 'assets',
+      size: NaN,
       watch: null,
+      watchCustom: null,
       esbuild: null
     };
 
     if (bundle.mode.watch) {
-      bundle.watch.unwatch(scriptBundle.output);
+
+      (bundle.watch as WatchBundle).unwatch(scriptBundle.output);
+
     }
 
     if (has('esbuild', transform)) {
@@ -199,24 +206,31 @@ export async function setScriptOptions (config: Config, pkg: Package) {
 
     scriptBundle.esbuild.entryPoints = [ scriptBundle.input as string ];
 
-    if (!has('watch', transform)) {
+    if (bundle.mode.watch) {
 
-      scriptBundle.watch = new Set();
+      if (!has('watch', transform)) {
 
+        scriptBundle.watch = new Set();
+
+      } else {
+
+        if (!isArray(transform.watch)) {
+          typeError({
+            option: 'script',
+            name: 'watch',
+            provided: transform.watch,
+            expects: 'string[]'
+          });
+        }
+
+        const watchers = getResolvedPaths<string[]>(transform.watch);
+        scriptBundle.watchCustom = anymatch(watchers);
+        scriptBundle.watch = new Set(watchers);
+
+      }
     } else {
 
-      if (!isArray(transform.watch)) {
-        typeError({
-          option: 'script',
-          name: 'watch',
-          provided: transform.watch,
-          expects: 'string[]'
-        });
-      }
-
-      const watchers = getResolvedPaths<string[]>(transform.watch);
-
-      scriptBundle.watch = new Set(watchers);
+      scriptBundle.watch = new Set();
 
     }
 
@@ -229,6 +243,13 @@ export async function setScriptOptions (config: Config, pkg: Package) {
       // TODO - HANDLE RUNTIME ERRORS
       throw new Error(e);
 
+    }
+
+    if (bundle.mode.terse) {
+      // @ts-expect-error
+      scriptBundle.esbuild = merge(scriptBundle.esbuild, bundle.terser.script, {
+        exclude: undefined
+      });
     }
 
     bundle.script.push(scriptBundle);
