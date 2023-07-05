@@ -1,5 +1,5 @@
-import { Bundle, Commands, Config } from 'types';
-import { uniq } from 'rambdax';
+import { Commands } from 'types';
+import { has, uniq } from 'rambdax';
 import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
 import { join } from 'node:path';
 import { assign, isArray, isString } from '~utils/native';
@@ -118,41 +118,75 @@ export async function setThemeDirs (basePath: string) {
  * also normalizes paths to ensure the mapping is
  * correct.
  */
-export function setBaseDirs (cli: Commands, config: Config) {
+export function setBaseDirs (cli: Commands) {
 
-  const base = basePath(cli.cwd);
+  const { config, cwd, mode, dirs } = bundle;
+  const base = basePath(cwd);
 
   for (const [ dir, def ] of BASE_DIRS) {
 
     let path: string | string[];
 
-    if (cli[dir] === def) {
+    if (dir === 'import') {
+
+      if (mode.download) {
+        if (has('output', cli)) {
+          bundle.dirs[dir] = base(cli.output);
+        } else {
+          bundle.dirs[dir] = base(config.import);
+        }
+      } else {
+        bundle.dirs[dir] = base(config.import);
+      }
+
+      continue;
+
+    } else if (dir === 'export') {
+
+      if (mode.download) {
+        if (has('output', cli)) {
+          bundle.dirs[dir] = base(cli.output);
+        } else {
+          bundle.dirs[dir] = base(config.export);
+        }
+      } else {
+        bundle.dirs[dir] = base(config.export);
+      }
+
+      continue;
+
+    } else if (has(dir, cli) && cli[dir] === def) {
+
       if (config[dir] === def) {
         bundle.dirs[dir] = base(cli[dir]);
         continue;
       } else {
         path = config[dir];
       }
-    } else {
+
+    } else if (isString(cli[dir])) {
       path = cli[dir];
+    } else {
+      path = config[dir];
     }
 
     if (isArray(path)) {
       const roots = uniq(path.map(base));
-      bundle.dirs[dir] = roots.length === 1 ? roots[0] : roots;
+      dirs[dir] = roots.length === 1 ? roots[0] : roots;
     } else if (isString(path)) {
-      bundle.dirs[dir] = base(path);
+      dirs[dir] = base(path);
     } else {
+      console.log(path, dir, def);
       typeError({
         option: 'config',
         name: dir,
-        provided: config[dir],
+        provided: path,
         expects: 'string'
       });
     }
   }
 
-  bundle.watch.add(bundle.file); // add config file to watch
+  bundle.watch.add(bundle.file.path); // add config file to watch
 
 };
 
@@ -163,7 +197,9 @@ export function setBaseDirs (cli: Commands, config: Config) {
  * mode. If the `--clean` flag is passed, existing dirs
  * are purged and then recreated.
  */
-export async function setImportDirs ({ dirs, sync, mode }: Bundle) {
+export async function setImportDirs () {
+
+  const { dirs, sync, mode } = bundle;
 
   if (!mode.download) return;
 
