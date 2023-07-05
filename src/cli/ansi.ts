@@ -31,8 +31,10 @@ export type Colors = (
   | 'neonCyan'
   | 'neonGreen'
   | 'neonRouge'
+  | 'neonMagenta'
   | 'orange'
   | 'pink'
+  | 'lavender'
 )
 
 /* -------------------------------------------- */
@@ -73,7 +75,8 @@ export const {
   bold,
   reset,
   italic,
-  strike
+  strike,
+  dim
 } = ansis;
 
 /* -------------------------------------------- */
@@ -96,6 +99,11 @@ export const pink = ansis.hex('#ff75d1');
 export const orange = ansis.hex('#FFAB40');
 
 /**
+ * Dark Pink
+ */
+export const lavender = ansis.hex('#8080FF');
+
+/**
  * Neon Green
  */
 export const neonGreen = ansis.hex('#56ef83');
@@ -108,7 +116,12 @@ export const neonCyan = ansis.hex('#69d5fd');
 /**
  * Neon Rouge
  */
-export const neonRouge = ansis.hex('#D47179');
+export const neonRouge = ansis.hex('#FF8095');
+
+/**
+ * Neon Magenta
+ */
+export const neonMagenta = ansis.hex('#B319FF');
 
 /* -------------------------------------------- */
 /* TREE CHARACTERS                              */
@@ -143,8 +156,8 @@ export const line = {
    * Yellow dim - used in warnings
    */
   yellow: yellow.dim('│  ')
-
 };
+
 /**
  * TUI Tree - newline lines, ie: `\n` are prepended and appended
  *
@@ -155,6 +168,36 @@ export const line = {
  * ```
  */
 export const newline = lightGray(`${nl}│${nl}`);
+
+/**
+ * TUI Branch - line
+ *
+ * ```
+ * ├─
+ * ```
+ */
+export const dash = lightGray('│  ├─ ');
+
+/**
+ * TUI Arrow - line
+ *
+ * ```
+ * │ ╭───────────────────────────
+ * ├─┤ line
+ * │ └─╮
+ *     ├─
+ * ```
+ */
+export const top = lightGray('├─ ');
+
+/**
+ * TUI Arrow - line
+ *
+ * ```
+ * │  ┌┘
+ * ```
+ */
+export const bottom = lightGray('│  └─ ');
 
 /**
  * TUI Tree - close
@@ -263,6 +306,24 @@ export const LPR = gray('(');
  * ```
  */
 export const RPR = gray(')');
+
+/**
+ * Left Curly Brace in gray
+ *
+ * ```
+ * {
+ * ```
+ */
+export const LCB = gray('{');
+
+/**
+ * Right Curly Brace in gray
+ *
+ * ```
+ * }
+ * ```
+ */
+export const RCB = gray('}');
 
 /* -------------------------------------------- */
 /* EXTENDED HELPERS                             */
