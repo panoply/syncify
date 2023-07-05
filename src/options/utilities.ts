@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 
-import type { Package } from 'types';
 import type { AxiosRequestConfig } from 'axios';
 import { basename, extname } from 'node:path';
 import glob from 'fast-glob';
@@ -216,7 +215,12 @@ export function getResolvedPaths<R extends string[] | Resolver> (
 
   }
 
-  typeError('uri', 'uri/path', filePath, 'string | string[]');
+  typeError({
+    option: 'uri',
+    name: 'uri/path',
+    provided: filePath,
+    expects: 'string | string[]'
+  });
 
 }
 
@@ -511,7 +515,12 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
 
           } else {
 
-            typeError('transform', prop, option, 'string[]');
+            typeError({
+              option: 'transform',
+              name: prop,
+              provided: option,
+              expects: 'string[]'
+            });
 
           }
 
@@ -532,7 +541,9 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
  * Ensures that peer dependencies exists for
  * the transform processors.
  */
-export function getModules (pkg: Package, name: string) {
+export function getModules (name: string) {
+
+  const { pkg } = bundle;
 
   return anyTrue(
     (has('devDependencies', pkg) && has(name, pkg.devDependencies)),
