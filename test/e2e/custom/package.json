@@ -6,9 +6,12 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "dev": "syncify syncify -t custom --watch",
+    "dev": "syncify syncify -t custom --watch --hot",
+    "dev:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --watch",
     "build": "syncify --build --prod --clean",
-    "upload": "syncify custom --upload",
+    "upload": "syncify syncify -t custom --upload",
+    "upload:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --upload",
+    "download": "syncify syncify -t custom --download",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "ISC",
@@ -35,11 +38,14 @@
     "eslint": "^8.40.0",
     "postcss": "^8.4.23",
     "prettier": "^2.8.8",
+    "rollup": "^3.26.0",
     "sass": "^1.62.1",
     "sharp": "^0.32.1",
     "svg-sprite": "^2.0.2",
     "svgo": "^3.0.2",
-    "tsup": "^6.7.0"
+    "tsup": "^6.7.0",
+    "webpack": "^5.88.1",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.1",

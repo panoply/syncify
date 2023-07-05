@@ -10,11 +10,30 @@ export default defineConfig({
   hot: {
 
   },
-  stores: {
-    domain: 'syncify',
-    themes: {
-      custom: 136656060657
+  stores: [
+    {
+      domain: 'syncify',
+      themes: {
+        custom: 136656060657
+      }
+    },
+    {
+      domain: 'boefje',
+      themes: {
+        dev: 43989205050,
+        prod: 43989205050
+      }
     }
+  ],
+  spawn: {
+    // build: {
+    //   rollup: 'rollup -c config/rollup.config.js'
+    // },
+    // watch: {
+    //   rollup: 'rollup -c config/rollup.config.js -w',
+    //   webpack: 'webpack --watch --color --config config/webpack.config.js',
+    //   esbuild: 'esbuild src/scripts/ts/index.ts --outfile=theme/assets/esbuild-bundle.js --bundle --watch --color=true'
+    // }
   },
   logger: {
     warnings: false,
@@ -29,7 +48,7 @@ export default defineConfig({
     metafields: 'data/metafields/**/*',
     layout: 'theme.liquid',
     pages: 'views/pages/*',
-    customers: 'views/customer/*',
+    customers: 'views/customers/*',
     templates: 'views/*.json',
     snippets: 'views/include/**/*',
     sections: ['views/sections/**/*']
@@ -96,11 +115,13 @@ export default defineConfig({
     },
     svg: {
       'snippets/icon.[file]': {
-        input: 'assets/icons/social/*',
+        input: 'assets/icons/dawn/*',
+        snippet: true,
         format: 'file'
       },
       'snippets/sprite.liquid': {
         input: 'assets/icons/feather/*',
+        format: 'sprite',
         sprite: {
           svg: {
             dimensionAttributes: true,
@@ -108,13 +129,6 @@ export default defineConfig({
             namespaceIDs: false
           }
         }
-      },
-      'snippets/social.liquid': {
-        format: 'sprite',
-        input: [
-          'assets/icons/social/facebook.svg',
-          'assets/icons/social/instagram.svg',
-        ],
       }
     },
   },
