@@ -1,10 +1,14 @@
-import { Request, Store, File, Methods, Sync, Requests, Theme } from 'types';
-import { mapAsync, mapParallelAsync } from 'rambdax';
+import { Request, Store, File, Methods, Sync, Requests } from 'types';
+import pMap from 'p-map';
+import { mapParallelAsync } from 'rambdax';
 import { queue } from '../requests/queue';
-import { assign, isUndefined } from '../utils/native';
+import { isUndefined } from '../utils/native';
 import * as asset from '../requests/assets';
 import * as metafields from '../requests/metafields';
 import merge from 'mergerino';
+import { bundle } from '~config';
+import * as timer from '~utils/timer';
+// import merge from 'mergerino';
 // import * as pages from '../requests/pages';
 
 /* -------------------------------------------- */
@@ -18,9 +22,6 @@ export { queue } from '../requests/queue';
 /* -------------------------------------------- */
 
 export type AssetRequest = (method: Methods, file: File, content?: any) => Promise<any[]>
-
-/* -------------------------------------------- */
-/* CLIENT                                       */
 
 export function client ({ stores, themes }: Sync) {
 
@@ -43,19 +44,19 @@ export function client ({ stores, themes }: Sync) {
         }
       };
 
-      await queue.add(() => mapAsync<Theme, any>(async function (theme) {
+      await queue.add(() => pMap(themes, async (theme) => {
+
+        if (bundle.mode.upload) {
+          timer.start();
+        }
 
         await asset.sync(
           theme,
           file,
-          assign<any, any, Partial<Request>>(
-            { url: theme.url },
-            stores[theme.sidx].client,
-            payload
-          )
+          merge({ url: theme.url }, stores[theme.sidx].client, payload)
         );
 
-      }, themes));
+      }));
 
     },
     pages: (content?: Requests.Page) => {
