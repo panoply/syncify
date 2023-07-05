@@ -9,7 +9,7 @@ import { bundle } from '~config';
 import { injectSnippet, injectRender } from './inject';
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { isArray } from '~utils/native';
-import { HOTSockets } from 'types';
+import { WSS } from 'types';
 
 async function injection () {
 
@@ -98,7 +98,7 @@ export async function server () {
  * Used in `watch` mode and faciliatates the hot reloading
  * by sending change events to the document.
  */
-export function socket (): HOTSockets {
+export function socket (): WSS {
 
   if (bundle.mode.hot === false) return;
 
