@@ -90,8 +90,7 @@ export function setSectionOptions (config: Config) {
 /**
  * Section Options
  *
- * This is a transform option, we will pass to pages
- * in the next validate check,
+ * Supports section sub-directories
  */
 export function setSnippetOptions (config: Config) {
 
