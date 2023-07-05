@@ -5,10 +5,10 @@ import { isNil, isType } from 'rambdax';
 import { Type } from '~process/files';
 import { nil } from '~utils/native';
 import { byteConvert, byteSize, fileSize } from '~utils/utils';
-import { bundle, minify } from '~config';
+import { bundle } from '~config';
 import * as timer from '~utils/timer';
 import { log } from '~log';
-import { hasSnippet, removeRender } from '~hot/inject';
+import { hasSnippet, inject, removeRender } from '~hot/inject';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -43,7 +43,7 @@ const ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
  */
 function removeComments (content: string) {
 
-  return minify.liquid.removeComments ? content
+  return bundle.terser.liquid.removeComments ? content
     .replace(LiquidBlockComments, nil)
     .replace(LiquidLineComments, nil) : content;
 
@@ -69,7 +69,7 @@ function minifyLiquidTag (content: string) {
  */
 function minifySchema (file: File, content: string) {
 
-  if (!minify.liquid.minifySchema) return removeComments(content);
+  if (!bundle.terser.liquid.minifySchema) return removeComments(content);
 
   const open = content.search(/{%-?\s*schema/);
 
@@ -103,7 +103,7 @@ function minifySchema (file: File, content: string) {
  */
 function removeDashes (content: string) {
 
-  if (!minify.liquid.stripDashes) return content;
+  if (!bundle.terser.liquid.stripDashes) return content;
 
   return content;
 
@@ -119,7 +119,7 @@ async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await terser(content, minify.html);
+    const htmlmin = await terser(content, bundle.terser.html);
 
     return htmlmin;
 
@@ -142,7 +142,11 @@ async function htmlMinify (file: File, content: string) {
  */
 const transform = (file: File) => async (data: string) => {
 
-  if (!bundle.mode.minify) {
+  if (file.type === Type.Layout && bundle.mode.hot) {
+    if (!hasSnippet(data)) data = inject(data);
+  }
+
+  if (!bundle.mode.terse) {
     await writeFile(file.output, data);
     log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
     return data;
@@ -187,15 +191,12 @@ const transform = (file: File) => async (data: string) => {
 
   await writeFile(file.output, postmin);
 
-  if (!bundle.mode.build) {
+  const size = fileSize(data, file.size);
 
-    const size = fileSize(data, file.size);
-
-    if (size.isSmaller) {
-      log.transform(`${file.namespace} ${size.before} → gzip ${size.gzip}`);
-    } else {
-      log.minified('Liquid', size.before, size.after, size.saved);
-    }
+  if (size.isSmaller) {
+    log.transform(`${file.namespace} ${size.before} → gzip ${size.gzip}`);
+  } else {
+    log.minified('Liquid', size.before, size.after, size.saved);
   }
 
   return postmin;
