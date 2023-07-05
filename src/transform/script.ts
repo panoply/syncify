@@ -1,13 +1,14 @@
-import type { Syncify, File, HOTSockets, ClientParam, ScriptBundle } from 'types';
-import ESBuild from 'esbuild';
+import type { Syncify, File, ClientParam, ScriptBundle } from 'types';
+import pNext, { getImport, getSizeStr, byteSize, fileSize } from '~utils/utils';
+import ESBuild, { Metafile } from 'esbuild';
 import { join, relative } from 'node:path';
 import { has, isNil, isType } from 'rambdax';
-import { keys } from '~utils/native';
+import { isBuffer } from '~utils/native';
 import { writeFile } from 'fs-extra';
 import { log, error, bold } from '~log';
-import { getImport, getSizeStr } from '~utils/utils';
-import * as timer from '~utils/timer';
 import { bundle, cache, processor } from '~config';
+import * as timer from '~utils/timer';
+import * as warn from '~log/warnings';
 
 /**
  * ESBuild Instance
@@ -43,24 +44,62 @@ export function esbuildModule (): boolean {
  *
  * A sub-build process used at runtime to collect all import paths.
  */
-export async function esbuildBundle (options: ScriptBundle): Promise<void> {
+export async function esbuildBundle (config: ScriptBundle): Promise<void> {
 
-  if (processor.esbuild.loaded) options.watch.clear();
+  if (processor.esbuild.loaded) config.watch.clear();
 
-  const result = await esbuild.build(options.esbuild);
+  const result = await esbuild.build(config.esbuild);
 
-  if (result.metafile && bundle.mode.watch) {
-    for (const file of keys(result.metafile.inputs)) {
-      if (!/node_modules/.test(file)) {
+  if (bundle.mode.terse && bundle.mode.build) {
+    config.size = byteSize(result.outputFiles[0].text);
+  }
 
-        const path = join(bundle.cwd, file);
+  if (bundle.mode.watch) {
+    getWatchPaths(config, result.metafile.inputs);
+  } else {
+    if (!config.watch.has(config.input)) config.watch.add(config.input);
+    if (!bundle.watch.has(config.input)) bundle.watch.add(config.input);
+  }
+}
 
-        options.watch.add(path);
+async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) {
 
-        if (!bundle.watch.has(path)) bundle.watch.add(path);
+  const store: string[] = [];
+  const { cwd, watch, mode } = bundle;
+
+  for (const file in inputs) {
+
+    if (file.indexOf('/node_modules/') > -1) continue;
+
+    const path = join(cwd, file);
+
+    if (!config.watch.has(path)) config.watch.add(path);
+    if (!watch.has(path)) watch.add(path);
+    if (mode.watch) store.push(path);
+
+  }
+
+  if (mode.watch && processor.esbuild.loaded) {
+
+    // Ensure that watched files of imported are aligned
+    // we execute this check in the next event loop to ensure
+    // that it does not impact performance.
+    await pNext().then(() => {
+
+      for (const path of config.watch) {
+
+        if (path.indexOf('/node_modules/') > -1) continue;
+        if (config.watchCustom !== null && config.watchCustom(path)) continue;
+
+        if (!has(path.slice(cwd.length + 1), inputs)) {
+          config.watch.delete(path);
+          watch.unwatch(path);
+        }
 
       }
-    }
+
+    });
+
   }
 }
 
@@ -70,180 +109,169 @@ export function createSnippet (string: string) {
 
 };
 
+function runHook (hook: Syncify) {
+
+  if (!isType('Function', hook)) return false;
+
+  return function (file: File, content: string) {
+
+    const update = hook.apply({ ...file }, content);
+
+    if (update === false) {
+      log.external('cancelled');
+      return null;
+    }
+
+    if (isType('String', update)) {
+      log.external('augment');
+      return update;
+    }
+
+    if (isBuffer(update)) {
+      log.external('augment');
+      return update.toString();
+    }
+
+    return content;
+
+  };
+
+};
+
 /**
  * TypeScript/JavaScript compile
  *
  * Used for Script transformations.
  */
 export async function compile <T extends ScriptBundle> (
-  this: HOTSockets,
   file: File<T[]>,
   sync: ClientParam<T>,
-  hook: Syncify
+  hooks: Syncify
 ): Promise<void> {
 
+  if (!file.data) return;
   if (bundle.mode.watch) timer.start();
 
-  const trigger = file.config.length;
-  const request: Promise<void | any[]>[] = [];
+  const hook = runHook(hooks);
+  const { errors, wss, mode, cwd } = bundle;
+  const trigger = file.data.length;
+  const req: Promise<void>[] = [];
 
-  if (!file.config) return;
+  for (const config of file.data) {
 
-  await build();
+    const {
+      key,
+      input,
+      output,
+      snippet,
+      esbuild: { format } } = config;
 
-  async function build () {
+    try {
 
-    for (let i = 0, l = file.config.length; i < l; i++) {
+      const { metafile, outputFiles, warnings } = await esbuild.build(config.esbuild);
 
-      const config = file.config[i];
-
-      try {
-
-        if (trigger > 1) {
-          log.nwl();
-          log.importer(relative(bundle.cwd, config.input));
-        }
-
-        const result = await esbuild.build(config.esbuild);
-
-        if (bundle.mode.watch) {
-          for (const file of keys(result.metafile.inputs).filter(file => !/node_modules/.test(file))) {
-            const path = join(bundle.cwd, file);
-            config.watch.add(path);
-            bundle.watch.add(path);
-          }
-        }
-
-        await handle(result.outputFiles, config);
-
-        log.process(bold('ESBuild'), timer.now());
-
-        if (bundle.mode.hot) {
-          log.syncing(config.key);
-          this.script(config.key);
-        }
-
-      } catch (e) {
-
-        log.invalid(file.relative);
-
-        if (has('errors', e)) {
-
-          bundle.errors.add(config.input);
-
-          e.errors.forEach(error.esbuild);
-
-        }
-
+      if (trigger > 1) {
+        log.nwl();
+        log.importer(relative(cwd, input));
       }
 
-    }
+      if (mode.watch) {
+        await getWatchPaths(config, metafile.inputs);
+      }
 
-    if (trigger > 1) log.nwl();
+      if (warnings.length > 0) {
+        warn.esbuild(warnings);
+      }
 
-    return Promise.all(request);
+      for (const { text, path } of outputFiles) {
 
-  }
+        if (path.endsWith('.map')) {
 
-  async function handle (output: ESBuild.OutputFile[], config: ScriptBundle) {
+          const map = join(cache.script.uri, file.base);
 
-    const esb = config.esbuild;
-
-    for (const { text, path } of output) {
-
-      if (/\.map$/.test(path)) {
-
-        const map = join(cache.script.uri, file.base);
-
-        writeFile(map, text).catch(
-          error.write('Error writing JavaScript Source Map to cache', {
-            file: relative(bundle.cwd, map),
-            source: file.relative
-          })
-        );
-
-      } else {
-
-        log.transform(`${bold(esb.format.toUpperCase())} bundle → ${bold(getSizeStr(text))}`);
-
-        let data: string;
-
-        if (config.snippet) {
-
-          data = createSnippet(text);
-
-          if (isType('Function', hook)) {
-
-            const update = hook.apply({ ...file }, data);
-
-            if (update === false) {
-              log.external('cancelled');
-              continue;
-            } else if (isType('String', update)) {
-              log.external('augment');
-              data = update;
-            } else if (Buffer.isBuffer(update)) {
-              log.external('augment');
-              data = update.toString();
-            }
-
-          }
-
-          await writeFile(config.output, data).catch(
-            error.write('Error writing inline <script> snippet', {
-              file: file.relative
+          writeFile(map, text).catch(
+            error.write('Error writing JavaScript Source Map to cache', {
+              file: relative(cwd, map),
+              source: file.relative
             })
           );
-
-          log.exported(config.key);
-
-          if (!bundle.mode.build) {
-            if (bundle.mode.hot) {
-              sync('put', config as any, data);
-            } else {
-              request.push(sync('put', config as any, data));
-            }
-          }
 
         } else {
 
-          data = text;
+          if (mode.terse) {
+            const { before, after, saved } = fileSize(text, config.size);
+            log.transform(`${bold(format.toUpperCase())} bundle`);
+            log.minified(null, before, after, saved);
+          } else {
+            log.transform(`${bold(format.toUpperCase())} bundle → ${bold(getSizeStr(text))}`);
+          }
 
-          if (isType('Function', hook)) {
+          let content: string;
 
-            const update = hook.apply({ ...file }, text);
+          if (snippet) {
 
-            if (update === false) {
-              log.external('cancelled');
-              continue;
-            } else if (isType('String', update)) {
-              log.external('augment');
-              data = update;
-            } else if (Buffer.isBuffer(update)) {
-              log.external('augment');
-              data = update.toString();
+            content = createSnippet(text);
+
+            if (hook) {
+              content = hook(file, content);
+              if (content === null) continue;
             }
+
+            await writeFile(output, content).catch(
+              error.write('Error writing inline <script> snippet', {
+                file: file.relative
+              })
+            );
+
+            log.transform(`exported as ${bold('snippet')}`);
+
+          } else {
+
+            content = text;
+
+            if (hook) {
+              content = hook(file, content);
+              if (content === null) continue;
+            }
+
+            await writeFile(output, content).catch(
+              error.write('Error writing JavaScript asset', {
+                file: file.relative
+              })
+            );
 
           }
 
-          await writeFile(config.output, text).catch(
-            error.write('Error writing JavaScript asset', {
-              file: file.relative
-            })
-          );
+          if (mode.hot) {
+            log.syncing(key);
+            wss.script(key);
+          } else
 
-          if (!bundle.mode.build) {
-            if (bundle.mode.hot) {
-              sync('put', config as any, text);
-            } else {
-              request.push(sync('put', config as any, text));
-            }
+          if (!mode.build) {
+            log.syncing(key);
+            req.push(sync('put', config as any, content));
           }
+
         }
 
+      };
+
+    } catch (e) {
+
+      if (has('errors', e)) {
+
+        log.invalid(file.relative);
+        errors.add(input);
+        e.errors.forEach(error.esbuild);
+
       }
+
     }
 
   }
+
+  if (trigger > 1) log.nwl();
+
+  await Promise.all(req);
 
 };
