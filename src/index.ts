@@ -72,8 +72,8 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   process.on('SIGINT', signal);
   process.stdin.on('data', stdin);
 
-  // process.on('uncaughtException', exception);
-  // process.on('unhandledRejection', rejection);
+  process.on('uncaughtException', exception);
+  process.on('unhandledRejection', rejection);
 
   if (bundle.mode.hot) await server();
 
