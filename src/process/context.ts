@@ -14,19 +14,17 @@ export function svg (file: File<SVGBundle>) {
   const config = bundle.svg.filter(context => {
 
     if (context.input.has(file.input)) return true;
+    if (!context.match(file.input)) return false;
 
-    if (context.match(file.input)) {
-      context.input.add(file.input);
-      return true;
-    }
+    context.input.add(file.input);
+    return true;
 
-    return false;
   });
 
   if (isUndefined(config)) return file;
 
-  // Assign the bundle configuration to a getter
-  defineProperty(file, 'config', { get () { return config; } });
+  // Assign the bundle configuration to a "data" getter
+  defineProperty(file, 'data', { get () { return config; } });
 
   return file;
 
@@ -35,8 +33,7 @@ export function svg (file: File<SVGBundle>) {
 /**
  * Style Context
  *
- * Augment the file configuration to accept
- * style types.
+ * Augment the file configuration to accept style types.
  */
 export function style (file: File<StyleBundle>) {
 
@@ -44,7 +41,8 @@ export function style (file: File<StyleBundle>) {
 
   if (isUndefined(config)) return file;
 
-  defineProperty(file, 'config', { get () { return config; } });
+  // Assign the bundle configuration to a "data" getter
+  defineProperty(file, 'data', { get () { return config; } });
 
   if (config.snippet) {
     file.namespace = 'snippets';
@@ -54,11 +52,11 @@ export function style (file: File<StyleBundle>) {
   }
 
   if (file.output) {
-    if (file.config.rename !== basename(file.output)) {
+    if (file.data.rename !== basename(file.output)) {
       if (config.snippet) {
         file.output = join(bundle.dirs.output, file.key);
       } else {
-        file.output = join(parentPath(file.output), file.config.rename);
+        file.output = join(parentPath(file.output), file.data.rename);
       }
     }
   } else {
@@ -82,7 +80,8 @@ export function script (file: File<ScriptBundle[]>) {
 
   if (config.length === 0) return file;
 
-  defineProperty(file, 'config', { get () { return config; } });
+  // Assign the bundle configuration to a "data" getter
+  defineProperty(file, 'data', { get () { return config; } });
 
   return file;
 
