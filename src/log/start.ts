@@ -56,10 +56,18 @@ import { size } from '~cli/size';
  * │ dev:  https://shop.myshopify.com?preview_theme_id=123456789
  * │ prod: https://shop.myshopify.com?preview_theme_id=123456789
  * │
- * │ Live Reloading:
+ * │ HOT Reloading:
  * │
  * │ Assets:   http://localhost:8080
  * │ External: http://192.168.2.8:8080
+ * │
+ * │ HOT Reloading Failed:
+ * │
+ * │ 8080 Server address already in use
+ * │ 3000 Server address already in use
+ * │
+ * │ Change the socket and server ports or kill the session occupying them.
+ * │ This error typically occurs when multiple Syncify instances are active.
  * │
  * ```
  */
