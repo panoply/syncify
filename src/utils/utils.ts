@@ -1,3 +1,6 @@
+/* eslint-disable prefer-promise-reject-errors */
+/* eslint-disable n/handle-callback-err */
+
 import strip from 'strip-json-comments';
 import { bold, gray } from '~log';
 import { isString, isBuffer, isArray, isObject, ws, isFunction } from './native';
