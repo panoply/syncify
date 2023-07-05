@@ -9,7 +9,14 @@ import { performance } from 'node:perf_hooks';
  *
  * Holds reference to different running timers
  */
-export const mark = [];
+export const marks = [];
+
+/**
+ * Timer Reference
+ *
+ * Similar to `mark[]` but provides identifer timers.
+ */
+export const time: { [id: string]: number } = {};
 
 /* -------------------------------------------- */
 /* FUNCTIONS                                    */
@@ -20,17 +27,20 @@ export const mark = [];
  *
  * Sugar for the `stop` function.
  */
-export const now = () => stop(true);
+export const now = (id?: string) => stop(id || true);
 
 /**
  * Start timer
  *
  * Captures the current timestamp and applies it to the mark model.
  */
-export const start = () => {
+export const start = (id?: string) => {
 
-  mark.push(performance.now());
-
+  if (id) {
+    time[id] = performance.now();
+  } else {
+    marks.push(performance.now());
+  }
 };
 
 /**
@@ -38,10 +48,13 @@ export const start = () => {
  *
  * Removes all the timing references from the mark model.
  */
-export const clear = () => {
+export const clear = (id?: string) => {
 
-  while (mark.length !== 0) mark.pop();
-
+  if (id) {
+    if (id in time) delete time[id];
+  } else {
+    while (marks.length !== 0) marks.pop();
+  }
 };
 
 /**
@@ -58,9 +71,21 @@ export const clear = () => {
  * - Seconds and Miliseconds: `2s 45ms`
  * - Minutes, Seconds and Miliseconds: `2m 35sec 33ms`
  */
-export function stop (now = false) {
+export function stop (now: boolean | string = false, end = false) {
 
-  const gt = now ? mark[mark.length - 1] : mark.pop();
+  let gt: number;
+
+  if (typeof now === 'boolean') {
+    gt = now ? marks[marks.length - 1] : marks.pop();
+  } else if (now) {
+    if (end) {
+      gt = time[now];
+      delete time[now];
+    } else {
+      gt = time[now];
+    }
+  }
+
   const ms = performance.now() - gt;
 
   if (ms < 1000) return `${ms.toFixed(0)}ms`;
