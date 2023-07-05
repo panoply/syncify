@@ -1,5 +1,4 @@
-import type { Syncify, File, Pages, StyleTransform, SVGBundle } from 'types';
-import { inject } from '~hot/inject';
+import type { Syncify, File } from 'types';
 import { client, queue } from '~requests/client';
 import { compile as liquid } from '~transform/liquid';
 import { compile as styles } from '~transform/styles';
@@ -12,7 +11,6 @@ import { isUndefined } from '~utils/native';
 import { Kind, parseFile, Type } from '~process/files';
 import { bundle } from '~config';
 import { log } from '~log';
-import { socket } from '~hot/server';
 import { isNil } from 'rambdax';
 
 /**
@@ -22,11 +20,10 @@ import { isNil } from 'rambdax';
  */
 export function watch (callback: Syncify) {
 
-  const wss = socket();
   const request = client(bundle.sync);
   const parse = parseFile(bundle.paths, bundle.dirs.output);
 
-  bundle.watch.on('all', function (event, path) {
+  bundle.watch.on('all', async function (event, path) {
 
     const file: File = parse(path);
 
@@ -56,33 +53,39 @@ export function watch (callback: Syncify) {
 
       let value: Buffer | string | void | { title: any; body_html: any; } = null;
 
+      /* -------------------------------------------- */
+      /* DISPATCH REQUEST IN TRANSFORM                */
+      /* -------------------------------------------- */
+
       if (file.type === Type.Script) {
 
-        return script.bind(wss)(file, request.assets, callback);
+        return script(file, request.assets, callback);
 
       } else if (file.type === Type.Page) {
 
-        return pages(file as File<Pages>, callback);
+        return pages(file, callback);
 
       } else if (file.type === Type.Svg) {
 
-        return svgs(file, request.assets as any, callback);
+        return svgs(file, request.assets, callback);
 
-      } else if (file.type === Type.Style) {
+      }
 
-        value = await styles(file as File<StyleTransform>, callback);
+      if (file.type === Type.Style) {
 
-        if (bundle.mode.hot) wss.stylesheet(file.key);
+        value = await styles(file, callback);
 
-      } else if (file.type === Type.Section) {
+      } else if (file.type === Type.Section && file.kind === Kind.Liquid) {
 
         value = await liquid(file, callback);
+
+      } if (file.type === Type.Section && file.kind === Kind.JSON) {
+
+        value = await json(file, callback);
 
       } else if (file.type === Type.Layout) {
 
         value = await liquid(file, callback);
-
-        if (bundle.mode.hot) value = inject(value);
 
       } else if (file.type === Type.Snippet) {
 
@@ -119,10 +122,14 @@ export function watch (callback: Syncify) {
         await request.assets('put', file, value);
 
         if (bundle.mode.hot) {
-          if (file.type === Type.Section) {
-            wss.section(file.name);
+          if (file.type === Type.Section && file.kind === Kind.Liquid) {
+
+            bundle.wss.section(file.name);
+
           } else if (file.type !== Type.Script && file.type !== Type.Style) {
-            await queue.onIdle().then(() => wss.replace());
+
+            await queue.onIdle().then(() => bundle.wss.replace());
+
           }
         }
       }
