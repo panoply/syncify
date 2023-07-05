@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup';
 import { build } from 'esbuild';
+import * as pkg from './package.json';
 
 const noExternal = [
   'ansis',
@@ -7,6 +8,7 @@ const noExternal = [
   'mergerino',
   'log-update',
   'p-queue',
+  'p-map',
   'rambdax',
   'strip-json-comments',
   'tiny-spinner',
@@ -68,6 +70,9 @@ export default defineConfig(options => ([
     treeshake: true,
     noExternal,
     external,
+    define: {
+      VERSION: `"${pkg.version}"`
+    },
     esbuildOptions (options) {
       options.chunkNames = 'cjs';
     },
