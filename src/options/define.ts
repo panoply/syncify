@@ -9,7 +9,7 @@ import { pathExists, readJson } from 'fs-extra';
 import { queue } from '~requests/queue';
 import { spawned } from '~cli/spawn';
 import { kill } from '~cli/exit';
-import { blue, bold, cyan, gray, white } from '~cli/ansi';
+import { DSH, blue, bold, gray, white } from '~cli/ansi';
 import { normalPath } from '~utils/paths';
 import { configFile, getPackageJson } from '~options/files';
 import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from '~options/dirs';
@@ -31,7 +31,6 @@ import {
   isString,
   isObject,
   ws,
-  defineProperty,
   isBoolean,
   error,
   toArray,
@@ -235,11 +234,11 @@ async function setHotReloads (config: Config) {
 
   const warn = warnOption('HOT Reloads');
 
-  if (bundle.sync.stores.length > 1) {
-    warn('HOT Reload can only be used on 1 store');
+  if (bundle.env.sync > 1) {
+    warn('HOT Reloads can only be used on 1 store');
     return;
   } else if (bundle.sync.themes.length > 1) {
-    warn('HOT Reload can only be used on 1 theme');
+    warn('HOT Reloads can only be used on 1 theme');
     return;
   }
 
@@ -313,9 +312,7 @@ async function setHotReloads (config: Config) {
     hot.alive[join(bundle.dirs.output, 'layout', layout)] = false;
   }
 
-  const wss = socket();
-
-  defineProperty(bundle, 'wss', { get () { return wss; } });
+  bundle.wss = socket();
 
 }
 
@@ -773,11 +770,15 @@ function setStores (cli: Commands, config: Config) {
           expected: keys(store.themes).join(','),
           provided: target,
           message: [
-            `Unknown theme target (${cyan(target)}) provided to ${cyan(store.domain)} store`,
-            `Your ${cyan(bundle.file.base)} file contains no such theme using this name.`
+            `Unknown theme target (${blue(target)}) provided to ${blue(store.domain)} store`,
+            `Your ${blue(bundle.file.base)} file contains no such theme using this name.`
           ],
           fix: [
-            `Provide an ${cyan('expected')} theme target or update/add an existing target.`
+            `Provide an ${blue('expected')} theme target or update/add an existing target.`,
+            `You have ${blue(`${themes.length}`)} theme targets defined for ${blue(store.domain)}:`,
+            '',
+            `${DSH} ${themes.join(`\n${DSH} `)}`,
+            ''
           ]
 
         });
@@ -805,8 +806,11 @@ function setStores (cli: Commands, config: Config) {
           'when running in a resource mode that syncs to a remote source'
         ],
         fix: [
-          'Provide the store target name as the first command argument',
-          'followed by themes target/s and other flags.'
+          'Provide the store target name as the first command argument followed by themes',
+          'target/s and other flags. Based on your current configuration:',
+          '',
+          `${DSH} ${white('$')} syncify ${array.join(`\n${DSH} ${white('$')} syncify `)}`,
+          ''
         ]
       });
     }
@@ -822,8 +826,7 @@ function setStores (cli: Commands, config: Config) {
         ],
         fix: [
           `Provide a theme name to target following a ${blue('-t')} or ${blue('--theme')} flag.`,
-          'Theme targets should be passed as the 2nd argument, the 1st',
-          'argument should be store name/s.'
+          'Theme targets should be passed as the 2nd argument, the 1st argument should be store name/s.'
         ]
       });
     }
