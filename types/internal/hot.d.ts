@@ -2,7 +2,14 @@
 /* LIVE RELOADS                                 */
 /* -------------------------------------------- */
 
+import type { Server, WebSocket } from 'ws';
+import type { IncomingMessage } from 'http';
+
 export interface WSS {
+  /**
+   * The `wss` instance
+   */
+  get http(): Server<typeof WebSocket, typeof IncomingMessage>
   /**
    * Hot Socket for `<script>` tags
    */
