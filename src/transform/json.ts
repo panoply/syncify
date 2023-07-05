@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'fs-extra';
 import { isBuffer, isArray, isObject, isUndefined, isString, isFunction } from '~utils/native';
 import { Type } from '~process/files';
 import { byteSize, byteConvert, fileSize } from '~utils/utils';
-import { bundle, minify } from '~config';
+import { bundle } from '~config';
 import * as timer from '~utils/timer';
 import { log, error } from '~log';
 
@@ -69,13 +69,11 @@ export async function jsonCompile (file: File, data: string, space = 0) {
     return data;
   }
 
-  if (!bundle.mode.build) {
-    if (space === 0) {
-      const size = fileSize(minified, file.size);
-      log.minified('JSON', size.before, size.after, size.saved);
-    } else {
-      log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
-    }
+  if (space === 0) {
+    const size = fileSize(minified, file.size);
+    log.minified('JSON', size.before, size.after, size.saved);
+  } else {
+    log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
   }
 
   if (file.type === Type.Metafield) return minified;
@@ -127,17 +125,19 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
 
     let space: number = bundle.processor.json.indent;
 
-    if (bundle.mode.minify) {
+    const { mode, terser } = bundle;
+
+    if (mode.terse) {
       if (file.type === Type.Asset) {
-        if (minify.json.assets) space = 0;
+        if (terser.json.assets) space = 0;
       } else if (file.type === Type.Locale) {
-        if (minify.json.locales) space = 0;
+        if (terser.json.locales) space = 0;
       } else if (file.type === Type.Template) {
-        if (minify.json.templates) space = 0;
+        if (terser.json.templates) space = 0;
       } else if (file.type === Type.Metafield) {
-        if (minify.json.metafields) space = 0;
+        if (terser.json.metafields) space = 0;
       } else if (file.type === Type.Config) {
-        if (minify.json.config) space = 0;
+        if (terser.json.config) space = 0;
       }
     }
 
