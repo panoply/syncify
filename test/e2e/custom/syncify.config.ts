@@ -66,6 +66,7 @@ export default defineConfig({
     },
     snippets: {
       global: [],
+      foo: '',
       prefixDir: true,
       separator: '-'
     },
