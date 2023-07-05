@@ -161,6 +161,11 @@ export const FILENAME_VAR_NAME = '__injected_filename__';
 export const IMPORT_META_URL_VAR_NAME = '__injected_import_meta_url__';
 
 /**
+ * Log error validations for or type characters
+ */
+export const REGEX_OR_CHARS = /([|,])/g;
+
+/**
  * Bundle Require esbuild extension validation
  */
 export const REGEX_EXTJS = /\.(mjs|cjs|ts|js|tsx|jsx)$/;
