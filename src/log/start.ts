@@ -1,11 +1,10 @@
-import type { Bundle, Theme } from 'types';
+import type { Filters, Theme } from 'types';
+import type { Bundle } from '~config';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
-import { basename } from 'node:path';
-import { allFalse, anyTrue } from 'rambdax';
+import { allFalse, anyTrue, isEmpty } from 'rambdax';
 import { getTime, plural, toUpcase } from '../utils/utils';
-import { keys, nil, nl, wsr, log, toArray } from '../utils/native';
+import { keys, nil, nl, wsr, log, toArray, values, ws } from '../utils/native';
 import { warnings } from './validate';
-import { spawns } from '../cli/spawn';
 import * as c from '../cli/ansi';
 import { size } from '~cli/size';
 
@@ -22,6 +21,11 @@ import { size } from '~cli/size';
  * │
  * │ Syncing 2 stores and 2 themes
  * │ Spawned 2 child processes
+ * │
+ * │ Filters:
+ * │
+ * │ snippets
+ * │ sections/file.liquid
  * │
  * │ Warnings:
  * │
@@ -90,7 +94,7 @@ export function start (bundle: Bundle) {
   /* BEGIN                                        */
   /* -------------------------------------------- */
 
-  const { mode } = bundle;
+  const { mode, spawn } = bundle;
 
   /** Prints store, eg: `1 store` or `2 stores` */
   const stores = c.cyan.bold(String(_st)) + (_st > 1 ? ' stores' : ' store');
@@ -99,7 +103,7 @@ export function start (bundle: Bundle) {
   const themes = c.cyan.bold(String(_th)) + (_th > 1 ? ' themes' : ' theme');
 
   /** Prints Environment, eg: `(development)` or `(production)` */
-  const env = c.cyan.bold(`${bundle.dev ? 'development' : 'production'}`);
+  const env = c.cyan.bold(`${bundle.env.dev ? 'development' : 'production'}`);
 
   if (mode.build) {
     text.push(`${c.line.gray}Running ${c.cyan.bold('build')} in ${env}`);
@@ -118,6 +122,17 @@ export function start (bundle: Bundle) {
   }
 
   text.push(`${c.line.gray}${(_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : nil)}`);
+
+  /* -------------------------------------------- */
+  /* APPLIED FILTERS                              */
+  /* -------------------------------------------- */
+
+  if (!isEmpty(bundle.filters)) {
+    text.push(
+      `${c.line.gray}${c.whiteBright.bold('Filters')}`,
+      `${c.line.gray}` + getFilters(bundle.filters)
+    );
+  }
 
   /* -------------------------------------------- */
   /* CONFIG WARNINGS                              */
@@ -151,7 +166,7 @@ export function start (bundle: Bundle) {
     if (_ss > 0) {
       text.push(
         `${c.line.gray}${c.bold('Child Processes:')}`,
-        `${c.line.gray}${getSpawnProcessors(toArray(spawns))}`,
+        `${c.line.gray}${getSpawnProcessors(toArray(spawn.streams))}`,
         `${c.line.gray}`
       );
     }
@@ -194,6 +209,28 @@ export function start (bundle: Bundle) {
 };
 
 /**
+ * Spawn Processors
+ *
+ * Generates the spawn process id runtime list
+ */
+function getFilters (filters: Filters) {
+
+  return values(filters).flat().reduce<string>((string, path) => {
+
+    string += (
+      nl +
+      c.line.gray +
+      c.DSH + ws +
+      c.whiteBright(path)
+    );
+
+    return string;
+
+  }, nil);
+
+}
+
+/**
  * Terminal Width Warning
  *
  * Populates the output when terminal width is less than 100 columns
@@ -220,8 +257,6 @@ function getRuntimeWarnings (bundle: Bundle, text: string[]) {
 
   let title: boolean = false;
 
-  const cfile = basename(bundle.file);
-
   for (const prop in warnings) {
 
     const warn = warnings[prop];
@@ -234,7 +269,7 @@ function getRuntimeWarnings (bundle: Bundle, text: string[]) {
 
         text.push(
           `${c.line.gray}`,
-          `${c.line.yellow}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold(cfile)}`)}`
+          `${c.line.yellow}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold(bundle.file.base)}`)}`
         );
 
       }
@@ -310,8 +345,8 @@ function getThemeURLS (themes: Theme[], url: 'preview' | 'editor'): string {
     string += (
       nl +
       c.line.gray +
-      c.pink(name) + wsr(width.store - name.length) + c.white(' → ') +
-      c.pink.bold(target) + wsr(width.theme - target.length) + c.white(' → ') +
+      c.pink(name) + wsr(width.store - name.length) + c.white('  →  ') +
+      c.pink.bold(target) + wsr(width.theme - target.length) + c.white(' →  ') +
       c.gray.underline(type)
     );
 

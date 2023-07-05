@@ -7,14 +7,14 @@ import { compile as json } from '~transform/json';
 import { compile as pages } from '~transform/pages';
 import { compile as script } from '~transform/script';
 import { compile as styles } from '~transform/styles';
+import { compile as svg } from '~transform/svgs';
 import { isUndefined, nil, toArray } from '~utils/native';
 import { parseFile, Type } from '~process/files';
 import { bundle } from '~config';
-import { log, line, gray, bold, newline } from '~log';
+import { log, line, gray, tui, c } from '~log';
+import { has, isEmpty, mapAsync } from 'rambdax';
+import { fileSize } from '~utils/utils';
 import * as timer from '~utils/timer';
-import { mapAsync } from 'rambdax';
-import { fileSize, toUpcase } from '~utils/utils';
-import { lastPath } from '~utils/paths';
 
 /**
  * Build Function
@@ -27,15 +27,19 @@ export async function build (callback?: Syncify) {
 
   timer.start();
 
-  const parse = parseFile(bundle.paths, bundle.dirs.output);
-  const match = anymatch(toArray(bundle.watch.values()));
-  const paths = await glob('**', {
+  const { paths, dirs, watch, filters, mode } = bundle;
+  const hasFilter = isEmpty(filters) === false;
+  const parse = parseFile(paths, dirs.output);
+  const match = anymatch(toArray((watch as Set<string>).values()));
+  const files = await glob('**', {
     onlyFiles: true,
     absolute: true,
-    cwd: bundle.dirs.input
+    cwd: dirs.input
   });
 
-  const source = paths.filter(match).reduce((acc, path) => {
+  const SVG: { [uuid: string]: boolean } = {};
+
+  const source = files.filter(match).reduce((acc, path) => {
 
     const file = parse(path);
 
@@ -64,8 +68,24 @@ export async function build (callback?: Syncify) {
         acc.assets.files.push(file); break;
       case Type.Metafield:
         acc.metafields.files.push(file); break;
-      case Type.Svg:
-        acc.svgs.files.push(file); break;
+      case Type.Svg: {
+
+        // Special handling for SVG build
+        for (const { uuid, format, input } of file.data) {
+
+          if (!has(uuid, SVG)) {
+            SVG[uuid] = true;
+            if (format === 'sprite') {
+              acc.svgs.files.push(file);
+            } else {
+              for (const snippet of input) acc.svgs.files.push(parse(snippet));
+            }
+          }
+
+        }
+
+        break;
+      }
     }
 
     return acc;
@@ -133,44 +153,54 @@ export async function build (callback?: Syncify) {
     }
   });
 
-  const handle = (call: Function) => async (file: File) => {
+  const handle = (
+    group: string,
+    count: number,
+    call: Function
+  ) => async (file: File):Promise<BuildModeReport> => {
 
     timer.start();
 
     try {
 
+      log.build(group, count, file);
+
       const value = await (file.ext === '.json' ? json(file, callback) : call(file, callback));
 
+      log.out(tui.tree('bottom', c.neonGreen(file.key)));
+
       if (value === null || isNaN(file.size)) {
+
         return {
           name: file.base,
+          input: file.relative,
           time: timer.stop(),
           output: file.key,
           error: 'Skipped File'
         };
+
       }
 
-      const { before, after, saved, gzip } = fileSize(value, file.size);
-
-      return {
+      const done = {
         name: file.base,
-        time: timer.stop(),
-        output: lastPath(file.output),
+        input: file.relative,
+        output: file.key,
         error: null,
-        size: {
-          before,
-          after,
-          saved,
-          gzip
-        }
+        time: '',
+        size: fileSize(value, file.size)
       };
+
+      return done;
 
     } catch (e) {
 
+      log.out(tui.tree('bottom', c.redBright(file.key)));
+
       return {
         name: file.base,
+        input: file.relative,
+        output: file.key,
         time: timer.stop(),
-        output: lastPath(file.output),
         error: e.message
       };
     }
@@ -179,52 +209,58 @@ export async function build (callback?: Syncify) {
 
   for (const id in source) {
 
-    log.write(bold(`${newline + line.gray}${source[id].files.length} ${toUpcase(id)}`));
-
     timer.start();
 
-    if (id === 'styles') {
+    const item = source[id].files;
+    const size = item.length;
 
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(styles), source[id].files);
+    if (!hasFilter) {
+
+      if (id === 'styles' && mode.script) {
+        source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, styles), item);
+        source[id].time = timer.stop();
+      } else if (id === 'scripts' && mode.script) {
+        source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, script), item);
+        source[id].time = timer.stop();
+      }
+
+    }
+
+    if (id === 'layouts' || id === 'snippets' || id === 'sections' || id === 'templates') {
+
+      if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, liquid), item);
       source[id].time = timer.stop();
-
-      log.build(id, source[id]);
-
-    } else if (id === 'scripts') {
-
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(script), source[id].files);
-      source[id].time = timer.stop();
-      log.build(id, source[id]);
-
-    } else if (id === 'layouts' || id === 'snippets' || id === 'sections' || id === 'templates') {
-
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(liquid), source[id].files);
-      source[id].time = timer.stop();
-      log.build(id, source[id]);
 
     } else if (id === 'locales' || id === 'configs' || id === 'metafields') {
 
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(json), source[id].files);
+      if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, json), item);
       source[id].time = timer.stop();
-      log.build(id, source[id]);
 
     } else if (id === 'pages') {
 
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(pages), source[id].files);
+      if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, pages), item);
       source[id].time = timer.stop();
-      log.build(id, source[id]);
 
     } else if (id === 'assets') {
 
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(assets), source[id].files);
-      source[id].time = timer.stop();
-      log.build(id, source[id]);
+      if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
 
-    } else if (id === 'svgs') {
-
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(pages), source[id].files);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, assets), item);
       source[id].time = timer.stop();
-      log.build(id, source[id]);
+
+    } else if (id === 'svgs' && mode.svg) {
+
+      if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, svg), item);
+      source[id].time = timer.stop();
+
     }
   }
 
@@ -233,7 +269,5 @@ export async function build (callback?: Syncify) {
   log.nwl();
 
   process.exit(0);
-  // log.info(c.greenBright.bold('Completed in ' + timer.stop()));
-  // await logger(bundle.spawn, { clear: true });
 
 };

@@ -1,18 +1,19 @@
 'use strict';
 
-var notifier = require('node-notifier');
+var process2 = require('process');
 var connect = require('axios');
 var events = require('events');
 var module$1 = require('module');
 var zlib = require('zlib');
+var stream = require('stream');
+var console$1 = require('console');
 var perf_hooks = require('perf_hooks');
 var os = require('os');
 var readline = require('readline');
-var stream = require('stream');
-var console$1 = require('console');
-var process7 = require('process');
+var child_process = require('child_process');
 var path$1 = require('path');
-var spawn2 = require('cross-spawn');
+var url = require('url');
+var notifier = require('node-notifier');
 var glob3 = require('fast-glob');
 var fsExtra = require('fs-extra');
 require('prompts');
@@ -26,21 +27,20 @@ var ws$1 = require('ws');
 var statics = require('serve-static');
 var handler = require('finalhandler');
 var http = require('http');
-var dotenv = require('dotenv');
-var url = require('url');
-var esbuild$1 = require('esbuild');
-var loadTsconfig = require('load-tsconfig');
 var chokidar = require('chokidar');
+var dotenv = require('dotenv');
+var spawn3 = require('cross-spawn');
+var loadTsconfig = require('load-tsconfig');
+var esbuild$1 = require('esbuild');
 
 function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 
-var notifier__default = /*#__PURE__*/_interopDefault(notifier);
+var process2__default = /*#__PURE__*/_interopDefault(process2);
 var connect__default = /*#__PURE__*/_interopDefault(connect);
 var zlib__default = /*#__PURE__*/_interopDefault(zlib);
 var os__default = /*#__PURE__*/_interopDefault(os);
 var readline__default = /*#__PURE__*/_interopDefault(readline);
-var process7__default = /*#__PURE__*/_interopDefault(process7);
-var spawn2__default = /*#__PURE__*/_interopDefault(spawn2);
+var notifier__default = /*#__PURE__*/_interopDefault(notifier);
 var glob3__default = /*#__PURE__*/_interopDefault(glob3);
 var anymatch3__default = /*#__PURE__*/_interopDefault(anymatch3);
 var matter__default = /*#__PURE__*/_interopDefault(matter);
@@ -49,6 +49,7 @@ var statics__default = /*#__PURE__*/_interopDefault(statics);
 var handler__default = /*#__PURE__*/_interopDefault(handler);
 var http__default = /*#__PURE__*/_interopDefault(http);
 var dotenv__default = /*#__PURE__*/_interopDefault(dotenv);
+var spawn3__default = /*#__PURE__*/_interopDefault(spawn3);
 
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -540,11 +541,11 @@ var require_signals = __commonJS({
 // node_modules/.pnpm/signal-exit@3.0.7/node_modules/signal-exit/index.js
 var require_signal_exit = __commonJS({
   "node_modules/.pnpm/signal-exit@3.0.7/node_modules/signal-exit/index.js"(exports, module) {
-    var process8 = global.process;
-    var processOk = function(process9) {
-      return process9 && typeof process9 === "object" && typeof process9.removeListener === "function" && typeof process9.emit === "function" && typeof process9.reallyExit === "function" && typeof process9.listeners === "function" && typeof process9.kill === "function" && typeof process9.pid === "number" && typeof process9.on === "function";
+    var process9 = global.process;
+    var processOk = function(process10) {
+      return process10 && typeof process10 === "object" && typeof process10.removeListener === "function" && typeof process10.emit === "function" && typeof process10.reallyExit === "function" && typeof process10.listeners === "function" && typeof process10.kill === "function" && typeof process10.pid === "number" && typeof process10.on === "function";
     };
-    if (!processOk(process8)) {
+    if (!processOk(process9)) {
       module.exports = function() {
         return function() {
         };
@@ -552,15 +553,15 @@ var require_signal_exit = __commonJS({
     } else {
       assert = __require("assert");
       signals = require_signals();
-      isWin = /^win/i.test(process8.platform);
+      isWin = /^win/i.test(process9.platform);
       EE = __require("events");
       if (typeof EE !== "function") {
         EE = EE.EventEmitter;
       }
-      if (process8.__signal_exit_emitter__) {
-        emitter = process8.__signal_exit_emitter__;
+      if (process9.__signal_exit_emitter__) {
+        emitter = process9.__signal_exit_emitter__;
       } else {
-        emitter = process8.__signal_exit_emitter__ = new EE();
+        emitter = process9.__signal_exit_emitter__ = new EE();
         emitter.count = 0;
         emitter.emitted = {};
       }
@@ -597,12 +598,12 @@ var require_signal_exit = __commonJS({
         loaded = false;
         signals.forEach(function(sig) {
           try {
-            process8.removeListener(sig, sigListeners[sig]);
+            process9.removeListener(sig, sigListeners[sig]);
           } catch (er) {
           }
         });
-        process8.emit = originalProcessEmit;
-        process8.reallyExit = originalProcessReallyExit;
+        process9.emit = originalProcessEmit;
+        process9.reallyExit = originalProcessReallyExit;
         emitter.count -= 1;
       };
       module.exports.unload = unload;
@@ -619,7 +620,7 @@ var require_signal_exit = __commonJS({
           if (!processOk(global.process)) {
             return;
           }
-          var listeners = process8.listeners(sig);
+          var listeners = process9.listeners(sig);
           if (listeners.length === emitter.count) {
             unload();
             emit("exit", null, sig);
@@ -627,7 +628,7 @@ var require_signal_exit = __commonJS({
             if (isWin && sig === "SIGHUP") {
               sig = "SIGINT";
             }
-            process8.kill(process8.pid, sig);
+            process9.kill(process9.pid, sig);
           }
         };
       });
@@ -643,36 +644,36 @@ var require_signal_exit = __commonJS({
         emitter.count += 1;
         signals = signals.filter(function(sig) {
           try {
-            process8.on(sig, sigListeners[sig]);
+            process9.on(sig, sigListeners[sig]);
             return true;
           } catch (er) {
             return false;
           }
         });
-        process8.emit = processEmit;
-        process8.reallyExit = processReallyExit;
+        process9.emit = processEmit;
+        process9.reallyExit = processReallyExit;
       };
       module.exports.load = load3;
-      originalProcessReallyExit = process8.reallyExit;
+      originalProcessReallyExit = process9.reallyExit;
       processReallyExit = function processReallyExit2(code) {
         if (!processOk(global.process)) {
           return;
         }
-        process8.exitCode = code || /* istanbul ignore next */
+        process9.exitCode = code || /* istanbul ignore next */
         0;
-        emit("exit", process8.exitCode, null);
-        emit("afterexit", process8.exitCode, null);
-        originalProcessReallyExit.call(process8, process8.exitCode);
+        emit("exit", process9.exitCode, null);
+        emit("afterexit", process9.exitCode, null);
+        originalProcessReallyExit.call(process9, process9.exitCode);
       };
-      originalProcessEmit = process8.emit;
+      originalProcessEmit = process9.emit;
       processEmit = function processEmit2(ev, arg) {
         if (ev === "exit" && processOk(global.process)) {
           if (arg !== void 0) {
-            process8.exitCode = arg;
+            process9.exitCode = arg;
           }
           var ret = originalProcessEmit.apply(this, arguments);
-          emit("exit", process8.exitCode, null);
-          emit("afterexit", process8.exitCode, null);
+          emit("exit", process9.exitCode, null);
+          emit("afterexit", process9.exitCode, null);
           return ret;
         } else {
           return originalProcessEmit.apply(this, arguments);
@@ -950,6 +951,17 @@ function mapAsync(fn, listOrObject) {
   });
 }
 
+// node_modules/.pnpm/rambdax@9.1.1/node_modules/rambdax/src/mergeRight.js
+function mergeRight(target, newProps) {
+  if (arguments.length === 1)
+    return (_newProps) => mergeRight(target, _newProps);
+  return Object.assign(
+    {},
+    target || {},
+    newProps || {}
+  );
+}
+
 // node_modules/.pnpm/rambdax@9.1.1/node_modules/rambdax/src/isType.js
 function isType(xType, x) {
   if (arguments.length === 1) {
@@ -1071,6 +1083,13 @@ function isNil(x) {
   return x === void 0 || x === null;
 }
 
+// node_modules/.pnpm/rambdax@9.1.1/node_modules/rambdax/src/join.js
+function join(glue2, list) {
+  if (arguments.length === 1)
+    return (_list) => join(glue2, _list);
+  return list.join(glue2);
+}
+
 // node_modules/.pnpm/rambdax@9.1.1/node_modules/rambdax/src/last.js
 function last(listOrString) {
   if (typeof listOrString === "string") {
@@ -1083,9 +1102,11 @@ function last(listOrString) {
 var { error, log, warn } = console;
 var nil = "";
 var ws = " ";
-var wsr = (i) => ws.repeat(i);
 var nl = "\n";
+var wsr = (i) => ws.repeat(i);
 var nlr = (i) => nl.repeat(i);
+join(nl);
+var glue = join(nil);
 var assign = Object.assign;
 var defineProperty = Object.defineProperty;
 var keys = Object.keys;
@@ -1114,18 +1135,22 @@ __export(loggers_exports, {
   exported: () => exported,
   external: () => external,
   failed: () => failed,
+  hline: () => hline,
   hook: () => hook,
   ignored: () => ignored,
   importer: () => importer,
   invalid: () => invalid,
   minified: () => minified,
+  newGroup: () => newGroup,
   nwl: () => nwl,
   out: () => log,
-  process: () => process5,
+  process: () => process6,
+  progress: () => progress,
   reloaded: () => reloaded,
   retrying: () => retrying,
   skipped: () => skipped,
-  spawn: () => spawn3,
+  spawn: () => spawn2,
+  spinner: () => spinner,
   start: () => start2,
   syncing: () => syncing,
   throws: () => throws,
@@ -1135,8 +1160,6 @@ __export(loggers_exports, {
   upload: () => upload,
   write: () => write2
 });
-
-// src/config.ts
 var cache = {
   /* DYNAMICALLY POPULATED */
 };
@@ -1145,12 +1168,13 @@ var warning = {
   count: 0,
   process: {}
 };
-var minify = {
+var terser = {
   json: {
     assets: true,
     config: true,
     locales: true,
     metafields: true,
+    sectionGroups: true,
     templates: true,
     exclude: []
   },
@@ -1171,6 +1195,11 @@ var minify = {
     removeComments: true,
     stripDashes: true,
     exclude: []
+  },
+  style: {
+    exclude: [],
+    format: false,
+    inline: false
   },
   html: {
     caseSensitive: false,
@@ -1289,12 +1318,60 @@ var processor = {
       },
       plugins: [
         "preset-default",
-        "prefixIds"
+        {
+          name: "pluginName",
+          fn: () => {
+            return {
+              root: {
+                enter: (node) => {
+                },
+                exit: (node) => {
+                }
+              },
+              element: {
+                enter: (node) => {
+                },
+                exit: (node) => {
+                }
+              },
+              doctype: {
+                enter: (node) => {
+                },
+                exit: (node) => {
+                }
+              },
+              instruction: {
+                enter: (node) => {
+                },
+                exit: (node) => {
+                }
+              },
+              comment: {
+                enter: (node) => {
+                },
+                exit: (node) => {
+                }
+              },
+              cdata: {
+                enter: (node) => {
+                },
+                exit: (node) => {
+                }
+              },
+              text: {
+                enter: (node) => {
+                },
+                exit: (node) => {
+                }
+              }
+            };
+          }
+        }
       ]
     }
   }
 };
-var presets = {
+var defaults = {
   input: "source",
   output: "theme",
   import: "import",
@@ -1358,7 +1435,7 @@ var presets = {
     style: null,
     script: null
   },
-  minify: {
+  terser: {
     json: false,
     views: false,
     script: false
@@ -1371,17 +1448,101 @@ var plugins = {
   onTransform: [],
   onWatch: []
 };
-var bundle = {
-  version: null,
-  cli: false,
-  cwd: null,
-  silent: false,
-  prod: false,
-  dev: true,
-  hot: {
+var bundle = new class Bundle {
+  /**
+   * The users configuration settings merged with defaults
+   */
+  static defaults = defaults;
+  /**
+   * The parsed contents of `package.json` file
+   */
+  static package = {};
+  /**
+   * The terse minification configuration settings
+   */
+  static terser = terser;
+  /**
+   * Websockets HOT reloading
+   */
+  wss = null;
+  /**
+   * CLI provided filters
+   *
+   * @default null
+   */
+  filters = {};
+  /**
+   * Cache copy of the invoked commands in which syncify was started
+   *
+   * @default null
+   */
+  commands = null;
+  /**
+   * The version defined in the package.json
+   *
+   * @default null
+   */
+  version = null;
+  /**
+   * The current working directory
+   *
+   * @default null
+   */
+  cwd = null;
+  /**
+   * The provided command passed on the CLI.
+   *
+   * @default null
+   */
+  argv = process2.argv.slice(2).join(" ");
+  /**
+   * Error store, holds reference to errors
+   *
+   * @default Set<string>
+   */
+  errors = /* @__PURE__ */ new Set();
+  /**
+   * Execution options which describe the invocation and operation
+   * instructions which Syncify was initialised.
+   *
+   * @default
+   * {
+   *  cli: false,
+   *  dev: true,
+   *  prod: false
+   *  sync: 0
+   * }
+   */
+  env = {
+    cli: false,
+    dev: true,
+    prod: false,
+    sync: 0
+  };
+  /**
+   * Hot reload mode options - Use the `mode.hot` reference to
+   * determine whether or not HOT reloading is enabled.
+   *
+   * @default
+   * {
+   *  inject: true,
+   *  server: 3000,
+   *  socket: 8089,
+   *  method: 'hot',
+   *  scroll: 'preserved',
+   *  layouts: [ 'theme.liquid' ],
+   *  label: 'visible',
+   *  renderer: '{% render \'hot.js\', server: 3000, socket: 8089 %}',
+   *  snippet: null,
+   *  output: null,
+   *  alive: {}
+   * }
+   */
+  hot = {
     inject: true,
     server: 3e3,
     socket: 8089,
+    history: false,
     method: "hot",
     scroll: "preserved",
     layouts: ["theme.liquid"],
@@ -1390,21 +1551,30 @@ var bundle = {
     snippet: null,
     output: null,
     alive: {}
-  },
-  dirs: {},
-  sync: {
-    themes: [],
-    stores: []
-  },
-  mode: {
+  };
+  /**
+   * Logger Options
+   */
+  logger = {
+    clear: true,
+    silent: false,
+    stats: true,
+    warnings: true
+  };
+  /**
+   * The operation mode executing
+   *
+   * @default false // all modes are false by default
+   */
+  mode = {
     build: false,
-    prompt: false,
+    interactive: false,
     watch: false,
     clean: false,
     upload: false,
     download: false,
     metafields: false,
-    minify: false,
+    terse: false,
     hot: false,
     pages: false,
     pull: false,
@@ -1416,31 +1586,135 @@ var bundle = {
     svg: false,
     redirects: false,
     export: false
-  },
-  spawn: {
+  };
+  /**
+   * The configuration file name resolution
+   *
+   * @default
+   * {
+   *  base: null,
+   *  ext: null,
+   *  path: null,
+   *  relative: null
+   *  type: null
+   * }
+   */
+  file = {
+    base: null,
+    path: null,
+    relative: null
+  };
+  /**
+   * Base directory path references
+   */
+  dirs = {};
+  /**
+   * Passed commands that may be of importance in the transform or build processes.
+   *
+   * @default
+   * {
+   *   config: null,
+   *   delete: null,
+   *   filter: null,
+   *   input: null,
+   *   output: null
+   * }
+   */
+  cmd = {
+    config: null,
+    delete: null,
+    filter: null,
+    input: null,
+    output: null
+  };
+  /**
+   * The sync clients. Multiple stores and themes can run concurrently.
+   *
+   * @default
+   * {
+   *   themes: [],
+   *   stores: []
+   * }
+   */
+  sync = {
+    themes: [],
+    stores: []
+  };
+  /**
+   * Spawn related configuration operations
+   */
+  spawn = {
     paths: /* @__PURE__ */ new Set(),
+    streams: /* @__PURE__ */ new Map(),
     invoked: false,
     commands: {}
-  },
-  watch: null,
-  logger: {},
-  paths: {
+  };
+  /**
+   * Section sub-directory configuration
+   *
+   * @todo
+   * Allow anymatch global patterns
+   *
+   * @default
+   * {
+   *   prefixDir: false,
+   *   separator: '-',
+   *   global: null
+   * }
+   */
+  section = {
+    prefixDir: false,
+    separator: "-",
+    global: null
+  };
+  /**
+   * Snippet sub-directory configuration
+   *
+   * @todo
+   * Allow anymatch global patterns
+   *
+   * @default
+   * {
+   *   prefixDir: false,
+   *   separator: '-',
+   *   global: null
+   * }
+   */
+  snippet = {
+    prefixDir: false,
+    separator: "-",
+    global: null
+  };
+  /**
+   * Holds an instance of FSWatcher. Chokidar is leveraged in for watching,
+   * and this value exposes the instance and it can be used anywhere in the
+   * module. In addition, the main Chokidar is extended to support `.has()`
+   *
+   *  @default null // defaults to null unless watch mode is invoked
+   */
+  watch = /* @__PURE__ */ new Set();
+  /**
+   * Directory structure paths.
+   *
+   * Includes a special `transforms` Map reference for transform related files
+   * which may potentially be using an extension that would lead to it being identified
+   * as a different file type. This occurs when (for example) snippet generated transforms
+   * are inferred. The `transform` option will point to resolved file names and the values
+   * for each entry will equal an enum `Type` number. The following transforms are identifiable:
+   *
+   * - `7` > `Type.Style`
+   * - `8` > `Type.Script`
+   * - `9` > `Type.SVG`
+   */
+  paths = {
     transforms: /* @__PURE__ */ new Map()
-  },
-  section: {
-    prefixDir: false,
-    separator: "-",
-    global: []
-  },
-  snippet: {
-    prefixDir: false,
-    separator: "-",
-    global: []
-  },
-  errors: /* @__PURE__ */ new Set(),
-  cmd: {},
-  json: {},
-  page: {
+  };
+  /**
+   * Page transforms
+   *
+   * @default []
+   */
+  page = {
     export: {
       quotes: "\u201C\u201D\u2018\u2019",
       html: true,
@@ -1461,29 +1735,103 @@ var bundle = {
       strongDelimiter: "**",
       bulletListMarker: "-"
     }
-  },
-  image: [],
-  style: [],
-  script: [],
-  svg: [],
-  set config(merge) {
-    assign(presets, merge);
-  },
-  get config() {
-    return presets;
-  },
+  };
+  /**
+   * Script transforms
+   *
+   * @default []
+   */
+  script = [];
+  /**
+   * Style tranforms
+   *
+   * @default []
+   */
+  style = [];
+  /**
+   * SVG transforms
+   *
+   * @default []
+   */
+  svg = [];
+  /**
+   * Image transforms
+   */
+  image;
+  /**
+   * Terser Minification Options
+   */
+  terse = {
+    /**
+     * Terse JSON Minification
+     *
+     * @default false
+     */
+    json: false,
+    /**
+      * View minification
+      */
+    views: false,
+    /**
+      * **NOTE YET AVAILABLE**
+      *
+      * Terse Style (CSS) Minification
+      */
+    style: false,
+    /**
+      * Terse Script (JS/TS) Minification
+      */
+    script: false
+  };
+  /**
+  * Merged terse minification configuration
+  */
+  get terser() {
+    return Bundle.terser;
+  }
+  /**
+    * Merged terse minification configuration
+    */
+  set terser(options) {
+    Bundle.terser = mergeRight(Bundle.terser, options);
+  }
+  /**
+   * Processor Configurations
+   */
   get processor() {
     return processor;
-  },
-  minify: {
-    json: false,
-    views: false,
-    script: false,
-    get options() {
-      return minify;
-    }
   }
-};
+  /**
+   * Merge users configuration with default
+   */
+  set config(data) {
+    Bundle.defaults = mergeRight(Bundle.defaults, data);
+  }
+  /**
+   * Returns the merged configuration of users syncify configuration with defaults
+   */
+  get config() {
+    return Bundle.defaults;
+  }
+  /**
+   * Merge the `package.json` contents
+   */
+  set pkg(data) {
+    Bundle.package = mergeRight(Bundle.package, data);
+  }
+  /**
+   * Returns the `package.json` contents
+   */
+  get pkg() {
+    return Bundle.package;
+  }
+  /**
+   * Plugins
+   */
+  get plugins() {
+    return plugins;
+  }
+}();
 
 // node_modules/.pnpm/p-queue@7.3.4/node_modules/p-queue/dist/index.js
 var import_eventemitter3 = __toESM(require_eventemitter3(), 1);
@@ -1534,8 +1882,8 @@ function pTimeout(promise, milliseconds, fallback, options) {
       if (typeof fallback === "function") {
         try {
           resolve(fallback());
-        } catch (error2) {
-          reject(error2);
+        } catch (error4) {
+          reject(error4);
         }
         return;
       }
@@ -1549,8 +1897,8 @@ function pTimeout(promise, milliseconds, fallback, options) {
     (async () => {
       try {
         resolve(await promise);
-      } catch (error2) {
-        reject(error2);
+      } catch (error4) {
+        reject(error4);
       } finally {
         options.customTimers.clearTimeout.call(void 0, timer);
       }
@@ -1755,13 +2103,13 @@ var PQueue = class extends import_eventemitter3.default {
           const result = await operation;
           resolve(result);
           this.emit("completed", result);
-        } catch (error2) {
-          if (error2 instanceof TimeoutError && !options.throwOnTimeout) {
+        } catch (error4) {
+          if (error4 instanceof TimeoutError && !options.throwOnTimeout) {
             resolve();
             return;
           }
-          reject(error2);
-          this.emit("error", error2);
+          reject(error4);
+          this.emit("error", error4);
         } finally {
           __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_next).call(this);
         }
@@ -1957,8 +2305,8 @@ var axios = connect__default.default.create({
 });
 var queue = new PQueue({
   concurrency: 5,
-  interval: 0,
-  intervalCap: 1
+  interval: 250,
+  intervalCap: 2
 });
 function requeue(status) {
   if (status === 429 || status === 500)
@@ -2059,6 +2407,18 @@ function stripJsonComments(jsonString, { whitespace = true, trailingCommas = fal
 // src/const.ts
 var HOT_SNIPPET_FILE = "hot.js.liquid";
 var HOT_SNIPPET_NAME = "hot.js";
+var SPINNER_FRAMES = [
+  "\u280B",
+  "\u2819",
+  "\u2839",
+  "\u2838",
+  "\u283C",
+  "\u2834",
+  "\u2826",
+  "\u2827",
+  "\u2807",
+  "\u280F"
+];
 var CACHE_DIRS = [
   "style",
   "script",
@@ -2134,9 +2494,10 @@ var ESBUILD_NOT_INSTALLED = [
 var DIRNAME_VAR_NAME = "__injected_dirname__";
 var FILENAME_VAR_NAME = "__injected_filename__";
 var IMPORT_META_URL_VAR_NAME = "__injected_import_meta_url__";
+var REGEX_OR_CHARS = /([|,])/g;
 var REGEX_EXTJS = /\.(mjs|cjs|ts|js|tsx|jsx)$/;
 var REGEX_LINE_NO = /(\()(line\s[0-9]+)(\))(:)/g;
-var REGEX_QUOTES = /(['"][\w\s]+['"])/g;
+var REGEX_QUOTES = /('[\w\s.-]*?'|"[\w\s.-]*?")/g;
 var REGEX_OBJECT = /({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g;
 var REGEX_ADDRESS = /((?:www|http:|https:)+[^\s]+[\w])/g;
 var REGEX_STRING = /(\/)(.*?)(\/)/g;
@@ -2184,7 +2545,7 @@ var SHOPIFY_REQUEST_ERRORS = {
 };
 
 // src/utils/utils.ts
-new events.EventEmitter();
+var event = new events.EventEmitter();
 function jsonc(data) {
   try {
     return JSON.parse(stripJsonComments(data).trim());
@@ -2195,7 +2556,7 @@ function jsonc(data) {
 function hasRenamespace(rename) {
   return /\[(?:file|dir|ext)\]/.test(rename);
 }
-function plural(word, length) {
+function plural(word, length, zeroS = false) {
   return length > 1 ? `${word}s` : word;
 }
 function sanitize(message2) {
@@ -2207,7 +2568,7 @@ function sanitize(message2) {
 }
 async function dynamicImport(id, { format }) {
   if (format === "esm") {
-    return (file) => import(file);
+    return (file2) => import(file2);
   } else {
     return getImport(id);
   }
@@ -2229,17 +2590,17 @@ function byteSize(string) {
 function byteConvert(bytes) {
   if (bytes === 0)
     return "0b";
-  const size = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
-  return size === 0 ? `${bold(String(bytes))}${UNITS[size]}` : `${bold((bytes / 1024 ** size).toFixed(1))}${UNITS[size]}`;
+  const size2 = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
+  return size2 === 0 ? `${bold(String(bytes))}${UNITS[size2]}` : `${bold((bytes / 1024 ** size2).toFixed(1))}${UNITS[size2]}`;
 }
 function fileSize(content, beforeSize) {
-  const size = byteSize(content);
+  const size2 = byteSize(content);
   const gzip = byteConvert(zlib__default.default.gzipSync(content).length);
   const before = byteConvert(beforeSize);
-  const after = byteConvert(size);
-  const saved = byteConvert(beforeSize - size);
+  const after = byteConvert(size2);
+  const saved = byteConvert(beforeSize - size2);
   return {
-    isSmaller: size > beforeSize || size === beforeSize,
+    isSmaller: size2 > beforeSize || size2 === beforeSize,
     gzip,
     before,
     after,
@@ -2268,26 +2629,68 @@ function getImport(id) {
 function uuid() {
   return Math.random().toString(36).slice(2);
 }
-var mark = [];
-var now = () => stop(true);
-var start = () => {
-  mark.push(perf_hooks.performance.now());
+function pNext() {
+  return new Promise((resolve) => {
+    if (typeof setImmediate === "function") {
+      setImmediate(resolve);
+    } else {
+      setTimeout(resolve);
+    }
+  });
+}
+var native = /* @__PURE__ */ new Map();
+function intercept(callback) {
+  const stdout = new stream.PassThrough();
+  const stderr = new stream.PassThrough();
+  stdout.write = (data) => callback("stdout", data);
+  stderr.write = (data) => callback("stderr", data);
+  const internal = new console$1.Console(stdout, stderr);
+  for (const method of CONSOLE_METHODS) {
+    native.set(method, console[method]);
+    console[method] = internal[method];
+  }
+  return () => {
+    for (const method of CONSOLE_METHODS)
+      console[method] = native.get(method);
+    native.clear();
+  };
+}
+var marks = [];
+var time = {};
+var now = (id) => stop(id || true);
+var start = (id) => {
+  if (id) {
+    time[id] = perf_hooks.performance.now();
+  } else {
+    marks.push(perf_hooks.performance.now());
+  }
 };
-function stop(now2 = false) {
-  const gt = now2 ? mark[mark.length - 2] : mark.pop();
+function stop(now2 = false, end = false) {
+  let gt;
+  if (typeof now2 === "boolean") {
+    gt = now2 ? marks[marks.length - 1] : marks.pop();
+  } else if (now2) {
+    if (end) {
+      gt = time[now2];
+      delete time[now2];
+    } else {
+      gt = time[now2];
+    }
+  }
   const ms = perf_hooks.performance.now() - gt;
   if (ms < 1e3)
     return `${ms.toFixed(0)}ms`;
   const s = ms / 1e3;
   if (s < 60)
-    return `${s.toFixed(0)}s ${+ms.toFixed(0).slice(1)}ms`;
+    return `${s.toFixed(0)}s ${+ms.toFixed(0).slice(1, 4)}ms`;
   const m = (s / 60).toFixed(0);
-  return `${m}m ${s - 60 * Number(m)}s ${+ms.toFixed(0).slice(1)}ms`;
+  return `${m}m ${(s - 60 * Number(m)).toFixed(0)}s ${+ms.toFixed(0).slice(1, 4)}ms`;
 }
 
 // src/log/errors.ts
 var errors_exports = {};
 __export(errors_exports, {
+  errors: () => errors,
   esbuild: () => esbuild,
   postcss: () => postcss,
   request: () => request,
@@ -2739,6 +3142,7 @@ __export(tui_exports, {
   clear: () => clear2,
   closer: () => closer,
   context: () => context,
+  hline: () => hline,
   indent: () => indent,
   message: () => message,
   multiline: () => multiline,
@@ -2746,33 +3150,48 @@ __export(tui_exports, {
   sample: () => sample,
   shopify: () => shopify,
   stack: () => stack,
-  suffix: () => suffix
+  suffix: () => suffix,
+  tree: () => tree
 });
 
 // src/cli/ansi.ts
 var ansi_exports = {};
 __export(ansi_exports, {
-  arrow: () => arrow,
+  ARL: () => ARL,
+  ARR: () => ARR,
+  CHK: () => CHK,
+  CHV: () => CHV,
+  COL: () => COL,
+  DSH: () => DSH,
+  LCB: () => LCB,
+  LPR: () => LPR,
+  RCB: () => RCB,
+  RPR: () => RPR,
+  TLD: () => TLD,
   blue: () => blue,
   blueBright: () => blueBright,
   bold: () => bold,
-  check: () => check,
+  bottom: () => bottom,
   clear: () => clear,
   close: () => close,
-  colon: () => colon,
   cyan: () => cyan,
   cyanBright: () => cyanBright,
+  dash: () => dash,
+  dim: () => dim,
+  error: () => error2,
   gray: () => gray,
   green: () => green,
   greenBright: () => greenBright,
+  hr: () => hr,
   italic: () => italic,
+  lavender: () => lavender,
   lightGray: () => lightGray,
   line: () => line,
-  lpr: () => lpr,
   magenta: () => magenta,
   magentaBright: () => magentaBright,
   neonCyan: () => neonCyan,
   neonGreen: () => neonGreen,
+  neonMagenta: () => neonMagenta,
   neonRouge: () => neonRouge,
   newline: () => newline,
   open: () => open,
@@ -2782,9 +3201,9 @@ __export(ansi_exports, {
   red: () => red,
   redBright: () => redBright,
   reset: () => reset,
-  rpr: () => rpr,
   strike: () => strike,
-  time: () => time,
+  time: () => time2,
+  top: () => top,
   underline: () => underline,
   warning: () => warning2,
   white: () => white,
@@ -2793,6 +3212,67 @@ __export(ansi_exports, {
   yellowBright: () => yellowBright
 });
 var import_ansis = __toESM(require_ansis());
+function exec2(command, args, shell) {
+  return child_process.execFileSync(command, args, {
+    encoding: "utf8",
+    shell,
+    stdio: ["ignore", "pipe", "ignore"]
+  }).trim();
+}
+function execNative(command, shell) {
+  const __dirname = path$1.dirname(url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('out.js', document.baseURI).href))));
+  return exec2(path$1.join(__dirname, command), [], shell).split(/\r?\n/);
+}
+var create = (columns, rows) => ({
+  columns: Number.parseInt(columns, 10),
+  rows: Number.parseInt(rows, 10)
+});
+function size() {
+  const { env: env2, stdout, stderr } = process2__default.default;
+  if (stdout && stdout.columns && stdout.rows)
+    return create(stdout.columns, stdout.rows);
+  if (stderr && stderr.columns && stderr.rows)
+    return create(stderr.columns, stderr.rows);
+  if (env2.COLUMNS && env2.LINES)
+    return create(env2.COLUMNS, env2.LINES);
+  if (process2__default.default.platform === "win32") {
+    try {
+      const size2 = execNative("vendor/windows/term-size.exe", false);
+      if (size2.length === 2)
+        return create(size2[0], size2[1]);
+    } catch {
+    }
+  } else {
+    if (process2__default.default.platform === "darwin") {
+      try {
+        const size2 = execNative("vendor/macos/term-size", true);
+        if (size2.length === 2)
+          return create(size2[0], size2[1]);
+      } catch {
+      }
+    }
+    try {
+      const size2 = exec2("resize", ["-u"]).match(/\d+/g);
+      if (size2.length === 2)
+        return create(size2[0], size2[1]);
+    } catch {
+    }
+    if (process2__default.default.env.TERM) {
+      try {
+        const columns = exec2("tput", ["cols"]);
+        const rows = exec2("tput", ["lines"]);
+        if (columns && rows)
+          return create(columns, rows);
+      } catch {
+      }
+    }
+  }
+  return create(80, 24);
+}
+
+// src/cli/ansi.ts
+var clear = "\x1B[H\x1B[2J";
+var purge = "\x1B[2J\x1B[3J\x1B[H\x1Bc";
 var {
   cyan,
   cyanBright,
@@ -2813,14 +3293,17 @@ var {
   bold,
   reset,
   italic,
-  strike
+  strike,
+  dim
 } = import_ansis.default;
 var lightGray = import_ansis.default.hex("#2a2a2e");
 var pink = import_ansis.default.hex("#ff75d1");
 var orange = import_ansis.default.hex("#FFAB40");
+var lavender = import_ansis.default.hex("#8080FF");
 var neonGreen = import_ansis.default.hex("#56ef83");
 var neonCyan = import_ansis.default.hex("#69d5fd");
-var neonRouge = import_ansis.default.hex("#D47179");
+var neonRouge = import_ansis.default.hex("#FF8095");
+var neonMagenta = import_ansis.default.hex("#B319FF");
 var open = lightGray("\u250C\u2500 ");
 var line = {
   /**
@@ -2837,16 +3320,25 @@ var line = {
   yellow: yellow.dim("\u2502  ")
 };
 var newline = lightGray(`${nl}\u2502${nl}`);
+var dash = lightGray("\u2502  \u251C\u2500 ");
+var top = lightGray("\u251C\u2500 ");
+var bottom = lightGray("\u2502  \u2514\u2500 ");
 var close = lightGray("\u2514\u2500 ");
-var clear = "\x1B[H\x1B[2J";
-var purge = "\x1B[2J\x1B[3J\x1B[H\x1Bc";
-var check = neonGreen("\u2713 ");
-var colon = gray(": ");
-var arrow = gray(" \u2192  ");
-var lpr = gray("(");
-var rpr = gray(")");
+var hr = (minus) => lightGray(`\u2502${nl}\u251C${"\u2500".repeat(size().columns - minus)}${nl}\u2502`);
+var CHK = neonGreen("\u2713 ");
+var COL = gray(":");
+var ARR = gray("\u2192");
+var CHV = gray("\u2023");
+var ARL = gray("\u2942");
+var TLD = gray("~");
+var DSH = gray("\u2014");
+var LPR = gray("(");
+var RPR = gray(")");
+var LCB = gray("{");
+var RCB = gray("}");
 var warning2 = yellowBright(` ~ Type ${bold("w")} and press ${bold("enter")} to view`);
-var time = (now2) => now2 ? reset.gray(` ~ ${now2}`) : nil;
+var error2 = redBright(` ~ Type ${bold("v")} and press ${bold("enter")} to view`);
+var time2 = (now2) => now2 ? reset.gray(` ~ ${now2}`) : nil;
 
 // src/log/tui.ts
 var stack = nil;
@@ -2857,12 +3349,18 @@ function clear2() {
   readline__default.default.cursorTo(process.stdout, 0, 0);
   readline__default.default.clearScreenDown(process.stdout);
 }
+function hline(minus = 15) {
+  log(hr(minus));
+}
 function suffix(color, prefix, message2) {
-  const line2 = prefix === "invalid" || prefix === "failed" ? line.red : prefix === "warning" ? line.yellow : line.gray;
-  return line2 + ansi_exports[color](prefix) + wsr(10 - prefix.length) + arrow + ansi_exports[color](message2);
+  const line2 = bundle.mode.build ? dash : prefix === "invalid" || prefix === "failed" ? line.red : prefix === "warning" ? line.yellow : line.gray;
+  return line2 + ansi_exports[color](prefix) + wsr(10 - prefix.length) + ARR + ws + ansi_exports[color](message2);
 }
 function opener(name) {
   return nl + open + gray(`${name} ~ ${getTime()}`);
+}
+function tree(direction, name) {
+  return direction === "top" ? top + name : bottom + name;
 }
 function closer(name) {
   return line.gray + nl + close + gray(`${name} ~ ${getTime()}`);
@@ -2871,22 +3369,28 @@ function message(color, message2) {
   return line.gray + ansi_exports[color](message2);
 }
 function shopify(message2) {
-  const output = isArray2(message2) ? message2.map(shopify).join(nl) : red(message2).replace(REGEX_LINE_NO, gray("$1") + white("$2") + gray("$3") + white("$4") + nlr(2)).replace(REGEX_QUOTES, yellowBright.bold("$1")).replace(REGEX_OBJECT, cyan("$1") + whiteBright("$2") + cyan("$3")).replace(REGEX_ADDRESS, underline("$1")).replace(REGEX_STRING, magenta("$1") + cyan("$2") + magenta("$3"));
-  return indent(output, {
-    line: line.red
-  });
+  if (isArray2(message2))
+    return glue(message2.map(shopify));
+  let output = message2;
+  output = output.replace(REGEX_LINE_NO, gray("$1") + white("$2") + gray("$3") + white("$4") + nlr(2));
+  output = output.replace(REGEX_QUOTES, yellowBright.bold("$1"));
+  output = output.replace(REGEX_OBJECT, cyan("$1") + whiteBright("$2") + cyan("$3"));
+  output = output.replace(REGEX_ADDRESS, underline("$1"));
+  output = output.replace(REGEX_STRING, magenta("$1") + cyan("$2") + magenta("$3"));
+  return indent(red(wrapAnsi(output, size().columns - 15)), { line: line.red });
 }
 function sample(code, data = {}) {
   const line2 = has("line", data) ? data.line : line.gray;
   if (hasPath("span.start", data)) {
     const end = has("end", data.span) ? data.span.end : data.span.start + 1;
-    const output = `${line2}${blue(`${data.span.start - 1}`)}${colon + nl}${line2}${blue(`${data.span.start}`)}${colon} ${code + nl}${line2}${blue(`${end}`)}${colon + nl}`;
-    return line2 + nl + output;
+    return line2 + nl + glue([
+      `${line2}${blue(`${data.span.start - 1}`)}${COL + nl}${line2}${blue(`${data.span.start}`)}${COL} ${code + nl}${line2}${blue(`${end}`)}${COL + nl}`
+    ]);
   }
   return line2 + nl + line2 + code;
 }
 function indent(message2, ansi = {}) {
-  const lines = isArray2(message2) ? message2 : message2.split(nl);
+  const lines = isArray2(message2) ? message2 : message2.split(nl).filter(Boolean);
   const line2 = has("line", ansi) ? ansi.line : line.gray;
   let output = has("nwl", ansi) ? `${line2 + nl}` : nil;
   while (lines.length !== 0) {
@@ -2906,18 +3410,30 @@ function indent(message2, ansi = {}) {
 function context(data) {
   let space = 0;
   let output = line.red + nl;
-  for (const key in data.entries) {
-    if (space < key.length && data.entries[key])
-      space = key.length;
-  }
-  for (const key in data.entries) {
-    if (data.entries[key]) {
-      output += line.red + red(key) + colon + wsr(space - key.length) + gray(`${data.entries[key]}`) + nl;
+  for (const k in data.entries)
+    if (space < k.length && data.entries[k])
+      space = k.length;
+  for (const k in data.entries) {
+    if (data.entries[k]) {
+      output += glue([
+        line.red,
+        red(k),
+        COL + ws,
+        wsr(space - k.length),
+        gray(`${data.entries[k]}`) + nl
+      ]);
     }
   }
   if (data.stack) {
     stack = data.stack;
-    output += line.red + red("stack") + colon + wsr(space - 5) + gray(`Type ${bold("s")} and press ${bold("enter")} to view stack trace`) + nl + line.gray;
+    output += glue([
+      line.red,
+      red("stack"),
+      COL + ws,
+      wsr(space - 5),
+      gray(`Type ${bold("s")} and press ${bold("enter")} to view stack trace`),
+      nl + line.gray
+    ]);
   }
   return output.trimEnd();
 }
@@ -2932,9 +3448,8 @@ function multiline(type2, message2) {
     color = yellowBright;
   }
   const stdout = [];
-  const limit2 = process.stdout.columns - 5;
   const input = message2.trim();
-  const lines = wrapAnsi(input, limit2).split(nl);
+  const lines = wrapAnsi(input, size().columns - 15).split(nl);
   while (lines.length !== 0) {
     const text = lines.shift();
     if (text.trim().length > 0)
@@ -2944,6 +3459,7 @@ function multiline(type2, message2) {
 }
 
 // src/log/errors.ts
+var errors = {};
 function spawn(data) {
   const stdout = [];
   const stderr = [line.red];
@@ -2970,47 +3486,57 @@ function spawn(data) {
   }
   error(`${stdout.join(nl)}${stderr.length > 1 ? stderr.join(nl) : nil}`);
 }
-function request(file, e2) {
+function request(file2, e2, logError = true) {
   const message2 = hasPath("error.asset", e2.data) ? e2.data.error.asset : hasPath("errors.asset", e2.data) ? e2.data.errors.asset : null;
   if (e2.status === 422) {
-    error(
-      line.red + nl + shopify(message2) + context({
+    const output = glue([
+      line.red,
+      nl,
+      shopify(message2),
+      context({
         stack: false,
         entries: {
-          source: `~${file}`,
+          details: "File did not sync because Shopify rejected the request",
           status: e2.status,
           message: e2.statusText,
-          details: "Shopify has not accepted the request."
+          source: `${file2}`
         }
       })
-    );
+    ]);
+    return logError ? error(output) : output;
   } else if (e2.status in SHOPIFY_REQUEST_ERRORS) {
-    error(
-      line.red + nl + multiline("error", SHOPIFY_REQUEST_ERRORS[e2.status]) + context({
+    const output = glue([
+      line.red,
+      nl,
+      multiline("error", SHOPIFY_REQUEST_ERRORS[e2.status]) + context({
         stack: false,
         entries: {
-          source: `~${file}`,
           status: e2.status,
-          message: e2.statusText
+          message: e2.statusText,
+          source: `${file2}`
         }
       })
-    );
+    ]);
+    return logError ? error(output) : output;
   } else {
-    error(
-      line.red + nl + red("Unknown error has occured") + context({
+    const output = glue([
+      line.red,
+      nl,
+      red("Unknown error has occured") + context({
         stack: false,
         entries: {
-          source: `~${file}`,
           status: e2.status,
-          message: e2.statusText
+          message: e2.statusText,
+          source: `${file2}`
         }
       })
-    );
+    ]);
+    return logError ? error(output) : output;
   }
 }
 var write = (message2, context2) => (e2) => {
   error(
-    indent(message2, {
+    indent(e2.message, {
       nwl: true,
       line: line.red,
       text: red.bold
@@ -3020,12 +3546,12 @@ var write = (message2, context2) => (e2) => {
         ...context2,
         code: e2.code,
         name: e2.name,
-        details: e2.message
+        details: message2
       }
     })
   );
 };
-function sass(file, e2) {
+function sass(file2, e2) {
   error(
     indent(e2.message, {
       nwl: true,
@@ -3034,7 +3560,7 @@ function sass(file, e2) {
     }) + context({
       stack: e2.sassStack,
       entries: {
-        input: file.relative,
+        input: file2.relative,
         message: e2.sassMessage
       }
     })
@@ -3064,23 +3590,6 @@ function esbuild(e2) {
   );
 }
 function postcss(e2) {
-}
-var native = /* @__PURE__ */ new Map();
-function intercept(callback) {
-  const stdout = new stream.PassThrough();
-  const stderr = new stream.PassThrough();
-  stdout.write = (data) => callback("stdout", data);
-  stderr.write = (data) => callback("stderr", data);
-  const internal = new console$1.Console(stdout, stderr);
-  for (const method of CONSOLE_METHODS) {
-    native.set(method, console[method]);
-    console[method] = internal[method];
-  }
-  return () => {
-    for (const method of CONSOLE_METHODS)
-      console[method] = native.get(method);
-    native.clear();
-  };
 }
 
 // node_modules/.pnpm/ansi-escapes@5.0.0/node_modules/ansi-escapes/index.js
@@ -3210,7 +3719,7 @@ var import_onetime = __toESM(require_onetime(), 1);
 var import_signal_exit = __toESM(require_signal_exit(), 1);
 var restoreCursor = (0, import_onetime.default)(() => {
   (0, import_signal_exit.default)(() => {
-    process7__default.default.stderr.write("\x1B[?25h");
+    process2__default.default.stderr.write("\x1B[?25h");
   }, { alwaysLast: true });
 });
 var restore_cursor_default = restoreCursor;
@@ -3218,14 +3727,14 @@ var restore_cursor_default = restoreCursor;
 // node_modules/.pnpm/cli-cursor@4.0.0/node_modules/cli-cursor/index.js
 var isHidden = false;
 var cliCursor = {};
-cliCursor.show = (writableStream = process7__default.default.stderr) => {
+cliCursor.show = (writableStream = process2__default.default.stderr) => {
   if (!writableStream.isTTY) {
     return;
   }
   isHidden = false;
   writableStream.write("\x1B[?25h");
 };
-cliCursor.hide = (writableStream = process7__default.default.stderr) => {
+cliCursor.hide = (writableStream = process2__default.default.stderr) => {
   if (!writableStream.isTTY) {
     return;
   }
@@ -3412,13 +3921,10 @@ function createLogUpdate(stream, { showCursor = false } = {}) {
   };
   return render;
 }
-var logUpdate = createLogUpdate(process7__default.default.stdout);
+var logUpdate = createLogUpdate(process2__default.default.stdout);
 var log_update_default = logUpdate;
-createLogUpdate(process7__default.default.stderr);
-
-// src/log/validate.ts
+createLogUpdate(process2__default.default.stderr);
 var warnings = {};
-var severities = {};
 function warnOption(group2) {
   if (!has(group2, warnings))
     warnings[group2] = [];
@@ -3426,7 +3932,7 @@ function warnOption(group2) {
     if (isUndefined(value)) {
       warnings[group2].push(line.yellow + yellowBright(message2));
     } else {
-      warnings[group2].push(line.yellow + yellowBright(message2 + colon + ws + bold(value)));
+      warnings[group2].push(line.yellow + yellowBright(message2 + COL + ws + bold(value)));
     }
   };
 }
@@ -3440,14 +3946,63 @@ function typeError({
     nlr(2),
     red(`${bold(`Invalid ${cyan(option)} type value provided`)}`) + nlr(2),
     red(`The ${cyan(name)} option has an incorrect type value`) + nlr(2),
-    red(`provided${colon}${yellowBright(type(provided).toLowerCase())}`) + nl,
-    red(`expected${colon}${blue(expects.replace(/([|,])/g, gray("$1")))}`) + nlr(2),
-    red(`at${colon}${gray.underline(bundle.file)}`) + nlr(2),
-    white.bold("How to fix?") + colon + nl,
+    red(`provided${COL} ${yellowBright(type(provided).toLowerCase())}`) + nl,
+    red(`expected${COL} ${blue(expects.replace(/([|,])/g, gray("$1")))}`) + nlr(2),
+    red(`in${COL} ${gray.underline(bundle.file.base)}`) + nlr(2),
+    white.bold("How to fix?") + nl,
     `
     ${gray("You need to change the option value to use the")} ${blue("expected")} ${gray("type.")}
     ${gray(`Use the ${cyan("defineConfig")} named export for type checking`)}
     `
+  );
+  process.exit(0);
+}
+function invalidCommand({
+  message: message2,
+  expected,
+  fix
+}) {
+  const provided = process2.argv.slice(2).join(" ");
+  expected = white("syncify " + provided + " ") + blue(expected.replace(/([|,])/g, gray("$1")));
+  error(
+    nlr(2),
+    red(`${bold("Invalid or incomplete command passed")}`) + nlr(2),
+    red(isArray2(message2) ? message2.join("\n ") : message2) + nlr(2),
+    red(`provided${COL} ${white("$")} ${white("syncify " + provided)}`) + nl,
+    red(`expected${COL} ${white("$")} ${expected}`) + nlr(2),
+    white.bold("How to fix?") + nl,
+    `
+   ${gray(isArray2(fix) ? fix.join("\n   ") : fix)}
+   `
+  );
+  process.exit(0);
+}
+function invalidTarget({
+  type: type2,
+  message: message2,
+  provided,
+  expected,
+  fix
+}) {
+  if (REGEX_OR_CHARS.test(provided)) {
+    provided = provided.replace(REGEX_OR_CHARS, gray("$1"));
+  }
+  if (REGEX_OR_CHARS.test(expected)) {
+    expected = expected.replace(REGEX_OR_CHARS, gray("$1"));
+  }
+  if (isArray2(message2)) {
+    message2 = message2.join("\n ");
+  }
+  error(
+    nlr(2),
+    red(bold(`Invalid ${cyan(type2)} target provided`)) + nlr(2),
+    red(message2) + nlr(2),
+    red(`provided${COL} ${yellowBright(expected)}`) + nl,
+    red(`expected${COL} ${blue(provided)}`) + nlr(2),
+    white.bold("How to fix?") + nl,
+    `
+   ${gray(isArray2(fix) ? fix.join("\n   ") : fix)}
+   `
   );
   process.exit(0);
 }
@@ -3457,11 +4012,11 @@ function missingDependency(deps) {
       nlr(2),
       red(`${bold(`Missing ${cyan(deps)} dependency`)}`) + nlr(2),
       red(`You need to install ${cyan(deps)} to use it as a processor`) + nlr(2),
-      white.bold("How to fix?") + colon + nl,
+      white.bold("How to fix?") + nl,
       `
       $ ${blue.bold("pnpm add " + deps + " -D")}
 
-      ${gray("If you are using a different package manager (ie: Yarn or NPM) then")}
+      ${gray("If you are using a different package manager (i.e: Yarn or NPM) then")}
       ${gray("please consider adopting pnpm. Pnpm is dope and does dope shit.")}
       `
     );
@@ -3471,11 +4026,11 @@ function missingDependency(deps) {
       red(`${bold(`Missing ${cyan(`${deps.length}`)} dependencies`)}`) + nlr(2),
       red("You are attempting to use processors which are not yet installed!") + nlr(2),
       whiteBright(gray("-") + ws + deps.join(nl + gray(" -") + ws)) + nlr(2),
-      white.bold("How to fix?") + colon + nl,
+      white.bold("How to fix?") + nl,
       `
      $ ${blueBright("pnpm add " + deps.join(ws) + " -D")}
 
-     ${gray("If you are using a different package manager (ie: Yarn or NPM) then")}
+     ${gray("If you are using a different package manager (i.e: Yarn or NPM) then")}
      ${gray("please consider adopting pnpm. Pnpm is dope and does dope shit.")}
      `
     );
@@ -3483,16 +4038,15 @@ function missingDependency(deps) {
   process.exit(0);
 }
 function missingOption(option, name, expects, why) {
+  if (option.indexOf(".") > -1)
+    option = option.split(".").filter(Boolean).join(gray(" \u2192 "));
   error(
     nlr(2),
-    red(`${bold(`Missing ${cyan(option)} configuration option`)}`) + nlr(2),
+    red(`${bold(`Missing ${LCB} ${cyan(option)} ${RCB} configuration option`)}`) + nlr(2),
     red(`The ${cyan(name)} option needs to be defined`) + nlr(2),
-    red(`expects${colon}${blue(expects.replace(/([|,])/g, gray("$1")))}`) + nlr(2),
-    red(`at${colon}${gray.underline(bundle.file)}`) + nlr(2),
-    white.bold("Why?") + colon + nl,
-    `
-    ${gray(why)}
-    `
+    red(`expects${COL} ${blue(expects.replace(/([|,])/g, gray("$1")))}`) + nlr(2),
+    red(`at${COL} ${gray.underline(bundle.file.base)}`) + nlr(2),
+    white.bold("Why?") + nl + nl + gray(isArray2(why) ? ` ${why.join("\n ")}` : ` ${why}`) + nl + nl
   );
   process.exit(0);
 }
@@ -3503,9 +4057,9 @@ function invalidError(option, name, value, expects) {
     nlr(2),
     red(`${bold(`Invalid ${cyan(option)} configuration`)}`) + nlr(2),
     red(`The ${cyan(name)} option has an invalid or missing value`) + nlr(2),
-    red(`provided${colon}${yellowBright(value)}`) + nl,
-    red(`expected${colon}${blue(expects.replace(/([|,])/g, gray("$1")))}`) + nlr(2),
-    white.bold("How to fix?") + colon + nl,
+    red(`provided${COL} ${yellowBright(value)}`) + nl,
+    red(`expected${COL} ${blue(expects.replace(/([|,])/g, gray("$1")))}`) + nlr(2),
+    white.bold("How to fix?") + nl,
     `
     ${gray("You need to update the option and use one of the expected values.")}
     ${gray(`Use the ${cyan("defineConfig")} named export for type checking`)}
@@ -3520,10 +4074,10 @@ function missingConfig(cwd) {
     nlr(2),
     red(`${bold(`Missing ${cyan("syncify.config.js")} configuration`)}`) + nlr(2),
     red("Unable to resolve a configuration file within the workspace") + nlr(2),
-    red(`at${colon + gray.underline(cwd)}`) + nlr(2),
-    white.bold("How to fix?") + colon + nl,
+    red(`at${COL} ${gray.underline(cwd)}`) + nlr(2),
+    white.bold("How to fix?") + nl,
     `
-    ${gray("You need to add one the following files to your project" + colon)}
+    ${gray("You need to add one the following files to your project")}
 
     ${gray("-")} ${white("syncify.config.ts")}
     ${gray("-")} ${white("syncify.config.js")}
@@ -3532,7 +4086,7 @@ function missingConfig(cwd) {
     ${gray("-")} ${white("syncify.config.json")}
 
     ${gray("You can also provide configuration in your")} ${white("package.json")}
-    ${gray("file using a")} ${yellowBright("syncify")} ${gray("property.")}
+    ${gray("file using on a")} ${yellowBright('"syncify": {}')} ${gray("property.")}
     `
   );
   process.exit(0);
@@ -3543,7 +4097,7 @@ function throwError(message2, solution) {
     redBright.bold("(!) ERROR"),
     nlr(2),
     red.bold(message2) + nlr(2),
-    white.bold("How to fix?") + colon + nl,
+    white.bold("How to fix?") + nl,
     gray(isArray2(solution) ? solution.join(nl).trimStart() : solution),
     nlr(2)
   );
@@ -3553,25 +4107,19 @@ function unknownError(option, value) {
   if (option.indexOf(".") > -1) {
     option = gray.bold("{ ") + option.split(".").filter(Boolean).join(gray(" \u2192 ")) + gray(" \u2192 ") + redBright.bold(value) + gray.bold(" }");
   }
+  const cfile = bundle.file.base === "package.json" ? `${blue("syncify")} config in the ${blue("package.json")} file.` : `${blue(bundle.file.base)} file.`;
   error(
     nlr(2),
     redBright.bold("ERROR (!)"),
     nlr(2),
     redBright(`Unknown ${option} option provided.`) + nlr(2),
-    white.bold("How to fix?") + colon + nl,
-    white(`The ${redBright(value)} option in invalid, remove it from the config.`),
-    nlr(2)
+    white.bold("How to fix?") + nl,
+    `
+    ${gray(`The ${blue(value)} option is invalid or unsupported.`)}
+    ${gray(`You need to remove it from the ${cfile}`)}
+    `
   );
   process.exit(0);
-}
-var spawns = /* @__PURE__ */ new Map();
-function spawned(name, command, callback) {
-  const child = spawn2__default.default(command.cmd, command.args, { stdio: "pipe" });
-  child.stdio[0].on("data", callback);
-  child.stdio[1].on("data", callback);
-  child.stdio[2].on("data", callback);
-  command.pid = child.pid;
-  spawns.set(name, child);
 }
 
 // src/log/start.ts
@@ -3581,17 +4129,20 @@ function start2(bundle2) {
     return nil;
   text.push(
     `${open}${gray("Syncify")} ${gray("~")} ${gray(getTime())}`,
-    `${line.gray}`,
+    `${line.gray}`
+  );
+  getTerminalWarning(text);
+  text.push(
     `${line.gray}${whiteBright.bold(`v${bundle2.version}`)}`,
     `${line.gray}`
   );
   const _st = bundle2.sync.stores.length;
   const _th = keys(bundle2.sync.themes).length;
   const _ss = keys(bundle2.spawn.commands).length;
-  const { mode } = bundle2;
+  const { mode, spawn: spawn4 } = bundle2;
   const stores = cyan.bold(String(_st)) + (_st > 1 ? " stores" : " store");
   const themes = cyan.bold(String(_th)) + (_th > 1 ? " themes" : " theme");
-  const env2 = cyan.bold(`${bundle2.dev ? "development" : "production"}`);
+  const env2 = cyan.bold(`${bundle2.env.dev ? "development" : "production"}`);
   if (mode.build) {
     text.push(`${line.gray}Running ${cyan.bold("build")} in ${env2}`);
   } else if (mode.watch) {
@@ -3608,71 +4159,190 @@ function start2(bundle2) {
     text.push(`${line.gray}Running ${cyan.bold("export")} mode`);
   }
   text.push(`${line.gray}${_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : nil}`);
-  let hasSeverity = false;
-  let hasWarning = false;
-  const cf = path$1.basename(bundle2.file);
-  for (const prop in severities) {
-    const issue = severities[prop];
-    if (issue.length > 0) {
-      if (!hasSeverity) {
-        hasSeverity = true;
-        text.push(
-          line.gray + nl + line.red + redBright(`${bold("Errors")} in ${bold(cf)}`) + colon
-        );
-      }
-      const title2 = red.bold(`${issue.length} ${prop} ${plural("error", issue.length)}`);
-      text.push(
-        line.red + nl + line.red + title2 + nl + line.red + nl + issue.join(nl)
-      );
-    }
+  if (!isEmpty(bundle2.filters)) {
+    text.push(
+      `${line.gray}${whiteBright.bold("Filters")}`,
+      `${line.gray}` + getFilters(bundle2.filters)
+    );
   }
-  for (const prop in warnings) {
-    const warn2 = warnings[prop];
-    if (warn2.length > 0) {
-      if (!hasWarning) {
-        hasWarning = true;
-        text.push(
-          line.gray + nl + line.yellow + yellowBright(`${bold("Warnings")} in ${bold(cf)}`) + colon
-        );
-      }
-      const title2 = yellow.bold(`${warn2.length} ${prop} ${plural("warning", warn2.length)}`);
-      text.push(
-        line.yellow + nl + line.yellow + title2 + nl + line.yellow + nl + warn2.join(nl)
-      );
-    }
-  }
+  if (bundle2.logger.warnings)
+    getRuntimeWarnings(bundle2, text);
   if (anyTrue(mode.build, mode.watch) && _ss > 0) {
-    text.push(`Spawned ${cyan.bold(`${_ss}`)} child ${_ss > 1 ? "processes" : "process"}${nl}`);
+    text.push(
+      `${line.gray}Spawned ${cyan.bold(`${_ss}`)} child ${_ss > 1 ? "processes" : "process"}`,
+      `${line.gray}`
+    );
   } else {
     text.push(line.gray);
   }
-  if (allFalse(
-    mode.upload,
-    mode.download,
-    mode.build,
-    mode.clean,
-    mode.vsc
-  )) {
+  if (allFalse(mode.upload, mode.download, mode.build, mode.clean, mode.vsc)) {
     if (_ss > 0) {
-      const spwns = toArray(spawns);
-      const width = spwns.reduce((size, [name]) => name.length > size ? name.length : size, 0);
-      const pids = spwns.map(([name, child]) => line.gray + ws.repeat(width - name.length) + whiteBright(toUpcase(name)) + gray(":") + ws + gray("PID") + " \u2192 " + gray("#") + pink(`${child.pid}`));
-      text.push(`${line.gray}${bold("Processes:")}${newline}${pids.join(nl)}${_th > 0 ? nl : nil}`);
+      text.push(
+        `${line.gray}${bold("Child Processes:")}`,
+        `${line.gray}${getSpawnProcessors(toArray(spawn4.streams))}`,
+        `${line.gray}`
+      );
     }
     if (_th > 0) {
-      const themes2 = values(bundle2.sync.themes);
-      const width = themes2.reduce((size, { target }) => target.length > size ? target.length : size, 0);
-      const urls = themes2.map(({ id, store, target }) => wsr(width - target.length) + newline + line.gray + pink(`${store.slice(0, store.indexOf("."))} \u2192 `) + pink.bold(target) + pink(" \u2192 ") + gray.underline(`https://${store}/admin/themes/${id}/editor`));
-      text.push(`${line.gray}${bold("Theme Editors:")}${urls.join(nl)}${nl}${line.gray}`);
-    }
-    if (_th > 0) {
-      const themes2 = values(bundle2.sync.themes);
-      const width = themes2.reduce((size, { target }) => target.length > size ? target.length : size, 0);
-      const urls = themes2.map(({ id, store, target }) => wsr(width - target.length) + newline + line.gray + pink(`${store.slice(0, store.indexOf("."))} \u2192 `) + pink.bold(target) + pink(" \u2192 ") + gray.underline("https://" + store + "?preview_theme_id=" + id));
-      text.push(`${line.gray}${bold("Theme Previews:")}${urls.join(nl)}${nl}${line.gray}`);
+      text.push(
+        `${line.gray}${bold("Theme Editors:")}`,
+        `${line.gray}${getThemeURLS(bundle2.sync.themes, "editor")}`,
+        `${line.gray}`
+      );
     }
   }
+  if (anyTrue(mode.upload, mode.download, mode.watch)) {
+    if (_th > 0) {
+      text.push(
+        `${line.gray}${bold(mode.upload || mode.download ? "Theme Targets:" : "Theme Previews:")}`,
+        `${line.gray}${getThemeURLS(bundle2.sync.themes, "preview")}`
+      );
+    }
+  }
+  if (bundle2.mode.hot)
+    text.push(`${line.gray}`);
   log(text.join(nl));
+}
+function getFilters(filters) {
+  return values(filters).flat().reduce((string, path2) => {
+    string += nl + line.gray + DSH + ws + whiteBright(path2);
+    return string;
+  }, nil);
+}
+function getTerminalWarning(text) {
+  const cs = size().columns;
+  if (cs >= 100)
+    return;
+  text.push(
+    `${line.gray}${red.bold("TERMINAL WIDTH WARNING")}`,
+    `${line.gray}`,
+    `${line.gray}${red(`Your terminal width is below ${bold(`${100}`)} columns (currently ${bold(`${cs}`)})`)}`,
+    `${line.gray}${red("This is not recommended for usage with Syncify (size matters).")}`,
+    `${line.gray}${red("Expand your terminal wider for an optimal logging experience.")}`,
+    `${line.gray}`
+  );
+}
+function getRuntimeWarnings(bundle2, text) {
+  let title2 = false;
+  for (const prop in warnings) {
+    const warn2 = warnings[prop];
+    if (warn2.length > 0) {
+      if (title2 === false) {
+        title2 = true;
+        text.push(
+          `${line.gray}`,
+          `${line.yellow}${yellowBright(`${bold("Warnings")} in ${bold(bundle2.file.base)}`)}`
+        );
+      }
+      text.push(
+        line.yellow,
+        line.yellow + yellow.bold(`${warn2.length} ${prop} ${plural("warning", warn2.length)}`),
+        line.yellow,
+        warn2.join(nl)
+      );
+    }
+  }
+}
+function getSpawnProcessors(spwns) {
+  const width = spwns.reduce((size2, [name]) => name.length > size2 ? name.length : size2, 0);
+  return spwns.reduce((string, [name, child]) => {
+    string += nl + line.gray + wsr(width - name.length) + neonCyan(toUpcase(name)) + `${COL} ` + gray("PID") + " \u2192 " + gray("#") + pink(`${child.pid}`);
+    return string;
+  }, nil);
+}
+function getThemeURLS(themes, url) {
+  const width = themes.reduce((size2, { target, store }) => {
+    const name = store.indexOf(".");
+    if (name > size2.store)
+      size2.store = name;
+    if (target.length > size2.theme)
+      size2.theme = target.length;
+    return size2;
+  }, {
+    store: 0,
+    theme: 0
+  });
+  return themes.reduce((string, { target, store, id }) => {
+    const name = store.slice(0, store.indexOf("."));
+    const type2 = url === "editor" ? `https://${store}/admin/themes/${id}/editor` : `https://${store}?preview_theme_id=${id}`;
+    string += nl + line.gray + pink(name) + wsr(width.store - name.length) + white("  \u2192  ") + pink.bold(target) + wsr(width.theme - target.length) + white(" \u2192  ") + gray.underline(type2);
+    return string;
+  }, nil);
+}
+
+// src/log/spinner.ts
+var interval;
+var active = false;
+var spinner = function spinner2(text, color = "pink") {
+  active = true;
+  let f = 0;
+  const size2 = SPINNER_FRAMES.length;
+  interval = setInterval(() => {
+    if (!active)
+      return;
+    log_update_default(`${line.gray} ${ansi_exports[color](`${SPINNER_FRAMES[f = ++f % size2]}`)}${text ? ` ${text}` : nil}`);
+  }, 50);
+};
+spinner.stop = (text) => {
+  if (!active)
+    return;
+  active = false;
+  if (text) {
+    log_update_default(line.gray + text);
+    log_update_default.done();
+  } else {
+    log_update_default.clear();
+  }
+  clearInterval(interval);
+  interval = void 0;
+};
+
+// src/cli/progress.ts
+function progress(total, opts = {}) {
+  let current = 0;
+  const options = assign({
+    showPercentage: true,
+    barColor: "neonGreen",
+    percentColor: "whiteBright",
+    barSize: 40,
+    clearOnComplete: false
+  }, opts);
+  function align(output) {
+    const paddingSize = Math.max(0, options.barSize - output.length);
+    const padding = " ".repeat(paddingSize);
+    return ansi_exports.line.gray + output + padding;
+  }
+  function bar(length, empty = false) {
+    return (empty ? "\u25B1" : "\u25B0").repeat(length);
+  }
+  function stop2() {
+    if (options.clearOnComplete)
+      console.clear();
+  }
+  return {
+    stop: stop2,
+    increment: (incrementBy = 1) => {
+      const newProgress = current + incrementBy;
+      current = Math.min(newProgress, total);
+      if (current === total)
+        stop2();
+    },
+    decrement: (decrementBy = 1) => {
+      const newProgress = current - decrementBy;
+      current = Math.max(newProgress, 0);
+    },
+    render(er) {
+      const progress2 = Math.round(current / total * options.barSize);
+      const filledBar = bar(progress2);
+      const emptyBar = bar(options.barSize - progress2, true);
+      const progressBar = ansi_exports[options.barColor](filledBar) + ansi_exports.lightGray(emptyBar);
+      const percentage = Math.round(current / total * 100);
+      let output = progressBar;
+      if (options.showPercentage)
+        output += ` ${String(percentage)}%`;
+      return align(output);
+    }
+  };
 }
 
 // src/log/loggers.ts
@@ -3682,10 +4352,24 @@ var idle = false;
 var group = "Syncify";
 var title = nil;
 var uri = nil;
-function build(id, { report }) {
-  for (const { name } of report) {
-    log(line.gray + " - " + neonCyan(name));
+function build(id, count, file2) {
+  const close2 = title !== id;
+  start();
+  if (close2) {
+    log(closer(group));
   }
+  if (group === "Syncify")
+    clear2();
+  group = id;
+  if (close2) {
+    log(opener(group));
+    nwl();
+    log(line.gray + bold(`${count} ${toUpcase(id)}`));
+    nwl();
+    title = id;
+  }
+  nwl();
+  log(tree("top", neonCyan(typeof file2 === "string" ? file2 : file2.relative)));
 }
 function nwl(entry = "gray") {
   if (isEmpty(entry)) {
@@ -3720,7 +4404,7 @@ function hook(name) {
   }
   listen = intercept((stream, data) => {
     if (data.charCodeAt(0) === 9474) {
-      process5[stream].write(data);
+      process6[stream].write(data);
     } else {
       warning.count += 1;
       const text = data.split("\n");
@@ -3734,47 +4418,63 @@ function unhook() {
   listen();
   listen = null;
 }
-function changed(file) {
-  const close2 = title !== file.relative;
+function newGroup(name, clear3 = false) {
+  log(closer(group));
+  if (clear3)
+    clear2();
+  log(opener(name));
+  group = name;
+  nwl();
+}
+function changed(file2) {
+  const close2 = title !== file2.relative;
   start();
   if (close2)
     log(closer(group));
   if (group !== "Syncify" && close2)
     clear2();
-  group = file.namespace;
+  group = file2.namespace;
   if (close2) {
     clear2();
-    log(opener(file.kind));
-    title = file.relative;
+    log(opener(file2.kind));
+    title = file2.relative;
   }
-  if (!has(file.relative, warning))
-    warning[file.relative] = /* @__PURE__ */ new Set();
-  if (uri !== file.relative)
-    uri = file.relative;
+  if (!has(file2.relative, warning))
+    warning[file2.relative] = /* @__PURE__ */ new Set();
+  if (uri !== file2.relative)
+    uri = file2.relative;
   if (bundle.mode.watch) {
     nwl();
-    log(suffix("neonCyan", "changed", file.relative));
+    log(suffix("neonCyan", "changed", file2.relative));
   }
 }
-function upload(theme) {
-  uploads.add([theme.target, theme.store, stop()]);
-  if (idle)
-    return;
-  idle = true;
-  queue.onIdle().then(() => {
-    uploads.forEach(([target, store, time2]) => {
-      log(suffix("neonGreen", "uploaded", `${bold(target)} \u2192 ${store}` + time(time2)));
+function upload(theme2) {
+  if (bundle.mode.watch) {
+    uploads.add([
+      theme2.target,
+      theme2.store,
+      stop()
+    ]);
+    if (idle)
+      return;
+    idle = true;
+    queue.onIdle().then(() => {
+      for (const [target, store, time3] of uploads) {
+        log(suffix("neonGreen", "uploaded", `${bold(target)} \u2192 ${store}` + time2(time3)));
+      }
+      uploads.clear();
+      idle = false;
     });
-    uploads.clear();
-    idle = false;
-  });
+  } else {
+    log(suffix("neonGreen", "uploaded", `${bold(theme2.target)} \u2192 ${theme2.store}` + time2(stop())));
+  }
 }
 function syncing(path2) {
   if (warning.count > 0) {
     suffix("yellowBright", "warning", `${warning.count} ${plural("warning", warning.count)}`);
   }
   if (bundle.mode.hot) {
-    log(suffix("neonRouge", "reloaded", `${bold("HOT RELOAD")}${time(now())}`));
+    log(suffix("neonRouge", "reloaded", `${bold("HOT RELOAD")}${time2(now())}`));
     log(suffix("magentaBright", "syncing", path2));
     if (queue.pending > 2) {
       log(suffix("orange", "queued", `${path2} ~ ${bold(addSuffix(queue.pending))} in queue`));
@@ -3786,39 +4486,41 @@ function syncing(path2) {
     }
   }
 }
-function process5(name, time2) {
-  if (!bundle.mode.build)
-    log(suffix("whiteBright", "process", name + time(time2)));
+function process6(name, ...message2) {
+  let time3 = message2[0];
+  let text = nil;
+  if (message2.length === 2) {
+    text = ` ${CHV} ${message2[0]}`;
+    time3 = message2[1];
+  }
+  log(suffix("whiteBright", "process", bold(name) + text + time2(time3)));
 }
-function exported(file) {
-  if (!bundle.mode.build)
-    log(suffix("whiteBright", "exports", file));
+function exported(file2) {
+  log(suffix("whiteBright", "exports", file2));
 }
 function importer(message2) {
-  if (!bundle.mode.build)
-    log(suffix("whiteBright", "importer", message2));
+  if (!bundle.mode.build) {
+    log(suffix("lavender", "importer", message2));
+  }
 }
 function transform(message2) {
-  if (!bundle.mode.build)
-    log(suffix("whiteBright", "transform", message2));
+  log(suffix("whiteBright", "transform", message2));
 }
-function retrying(file, theme) {
-  log(suffix("orange", "retrying", `${file} \u2192 ${theme.target} ${gray(`~ ${theme.store}`)}`));
+function retrying(file2, theme2) {
+  log(suffix("orange", "retrying", `${file2} \u2192 ${theme2.target} ${gray(`~ ${theme2.store}`)}`));
 }
-function deleted(file, theme) {
-  log(suffix("blueBright", "deleted", `${file} \u2192 ${theme.target} ${gray(`~ ${theme.store}`)}`));
+function deleted(file2, theme2) {
+  log(suffix("blueBright", "deleted", `${file2} \u2192 ${theme2.target} ${gray(`~ ${theme2.store}`)}`));
 }
 function minified(kind, before, after, saved) {
-  const suffix2 = `${bold(kind)} ${arrow}${before} > ${after} ${gray(`~ saved ${saved}`)}`;
+  const suffix2 = kind ? `${bold(kind)} ${ARR} ${before} ${ARL} ${after} ${gray(`~ saved ${saved}`)}` : `${before} ${ARL} ${after} ${gray(`~ saved ${saved}`)}`;
   log(suffix("whiteBright", "minified", suffix2));
 }
-function reloaded(path2, time2) {
-  log(suffix("whiteBright", "reloaded", path2 + time2));
+function reloaded(path2, time3) {
+  log(suffix("whiteBright", "reloaded", path2 + time3));
 }
-function skipped(file, reason) {
-  if (!bundle.mode.build) {
-    log(line.gray + gray(`${file.key} ~ ${reason}`));
-  }
+function skipped(file2, reason) {
+  log(suffix("gray", "skipped", `${typeof file2 === "string" ? file2 : file2.key} ~ ${reason}`));
 }
 function ignored(path2) {
   log(suffix("gray", "ignored", path2));
@@ -3848,7 +4550,7 @@ function failed(path2) {
 function throws(data) {
   throw new Error(data);
 }
-function spawn3(name) {
+function spawn2(name) {
   return (...message2) => {
     if (!bundle.spawn.invoked)
       bundle.spawn.invoked = true;
@@ -3870,21 +4572,22 @@ function spawn3(name) {
 // src/log/warnings.ts
 var warnings_exports = {};
 __export(warnings_exports, {
+  esbuild: () => esbuild2,
   postcss: () => postcss2,
   sass: () => sass2,
   warnings: () => warnings2
 });
 var warnings2 = {};
-var sass2 = (file) => (message2, options) => {
+var sass2 = (file2) => (message2, options) => {
   let output = nil;
-  if (!has(file.input, warnings2)) {
-    warnings2[file.input] = /* @__PURE__ */ new Map([["sass", /* @__PURE__ */ new Set()]]);
+  if (!has(file2.input, warnings2)) {
+    warnings2[file2.input] = /* @__PURE__ */ new Map([["sass", /* @__PURE__ */ new Set()]]);
   } else {
-    if (!warnings2[file.input].has("sass")) {
-      warnings2[file.input].set("sass", /* @__PURE__ */ new Set());
+    if (!warnings2[file2.input].has("sass")) {
+      warnings2[file2.input].set("sass", /* @__PURE__ */ new Set());
     }
   }
-  const cache2 = warnings2[file.input].get("sass");
+  const cache2 = warnings2[file2.input].get("sass");
   output += indent(message2, {
     nwl: true,
     line: line.yellow,
@@ -3910,7 +4613,7 @@ var sass2 = (file) => (message2, options) => {
   output += context({
     stack: options.stack,
     entries: {
-      file: file.relative,
+      file: file2.relative,
       deprecated: options.deprecation ? "Yes" : "No"
     }
   });
@@ -3921,16 +4624,18 @@ var sass2 = (file) => (message2, options) => {
     log(suffix("yellowBright", "warning", `${cache2.size} ${plural("warning", cache2.size) + warning2}`));
   }
 };
-var postcss2 = (file, data) => {
+function esbuild2(data) {
+}
+function postcss2(file2, data) {
   let output = nil;
-  if (!has(file.input, warnings2)) {
-    warnings2[file.input] = /* @__PURE__ */ new Map([["postcss", /* @__PURE__ */ new Set()]]);
+  if (!has(file2.input, warnings2)) {
+    warnings2[file2.input] = /* @__PURE__ */ new Map([["postcss", /* @__PURE__ */ new Set()]]);
   } else {
-    if (!warnings2[file.input].has("postcss")) {
-      warnings2[file.input].set("postcss", /* @__PURE__ */ new Set());
+    if (!warnings2[file2.input].has("postcss")) {
+      warnings2[file2.input].set("postcss", /* @__PURE__ */ new Set());
     }
   }
-  const cache2 = warnings2[file.input].get("postcss");
+  const cache2 = warnings2[file2.input].get("postcss");
   output += sample(data.node.toString(), {
     line: line.yellow,
     span: isNumber(data.endLine) ? {
@@ -3945,7 +4650,7 @@ var postcss2 = (file, data) => {
     stack: false,
     entries: {
       column: data.column,
-      file: file.relative,
+      file: file2.relative,
       plugin: data.plugin
     }
   });
@@ -3953,7 +4658,7 @@ var postcss2 = (file, data) => {
     cache2.add(output);
     warn(output);
   }
-};
+}
 
 // src/cli/emitters.ts
 function signal() {
@@ -3962,19 +4667,168 @@ function signal() {
   process.exit();
 }
 
+// node_modules/.pnpm/p-map@6.0.0/node_modules/p-map/index.js
+var AbortError3 = class extends Error {
+  constructor(message2) {
+    super();
+    this.name = "AbortError";
+    this.message = message2;
+  }
+};
+var getDOMException2 = (errorMessage) => globalThis.DOMException === void 0 ? new AbortError3(errorMessage) : new DOMException(errorMessage);
+var getAbortedReason2 = (signal2) => {
+  const reason = signal2.reason === void 0 ? getDOMException2("This operation was aborted.") : signal2.reason;
+  return reason instanceof Error ? reason : getDOMException2(reason);
+};
+async function pMap(iterable, mapper, {
+  concurrency = Number.POSITIVE_INFINITY,
+  stopOnError = true,
+  signal: signal2
+} = {}) {
+  return new Promise((resolve, reject_) => {
+    if (iterable[Symbol.iterator] === void 0 && iterable[Symbol.asyncIterator] === void 0) {
+      throw new TypeError(`Expected \`input\` to be either an \`Iterable\` or \`AsyncIterable\`, got (${typeof iterable})`);
+    }
+    if (typeof mapper !== "function") {
+      throw new TypeError("Mapper function is required");
+    }
+    if (!((Number.isSafeInteger(concurrency) || concurrency === Number.POSITIVE_INFINITY) && concurrency >= 1)) {
+      throw new TypeError(`Expected \`concurrency\` to be an integer from 1 and up or \`Infinity\`, got \`${concurrency}\` (${typeof concurrency})`);
+    }
+    const result = [];
+    const errors2 = [];
+    const skippedIndexesMap = /* @__PURE__ */ new Map();
+    let isRejected = false;
+    let isResolved = false;
+    let isIterableDone = false;
+    let resolvingCount = 0;
+    let currentIndex = 0;
+    const iterator = iterable[Symbol.iterator] === void 0 ? iterable[Symbol.asyncIterator]() : iterable[Symbol.iterator]();
+    const reject = (reason) => {
+      isRejected = true;
+      isResolved = true;
+      reject_(reason);
+    };
+    if (signal2) {
+      if (signal2.aborted) {
+        reject(getAbortedReason2(signal2));
+      }
+      signal2.addEventListener("abort", () => {
+        reject(getAbortedReason2(signal2));
+      });
+    }
+    const next = async () => {
+      if (isResolved) {
+        return;
+      }
+      const nextItem = await iterator.next();
+      const index = currentIndex;
+      currentIndex++;
+      if (nextItem.done) {
+        isIterableDone = true;
+        if (resolvingCount === 0 && !isResolved) {
+          if (!stopOnError && errors2.length > 0) {
+            reject(new AggregateError(errors2));
+            return;
+          }
+          isResolved = true;
+          if (skippedIndexesMap.size === 0) {
+            resolve(result);
+            return;
+          }
+          const pureResult = [];
+          for (const [index2, value] of result.entries()) {
+            if (skippedIndexesMap.get(index2) === pMapSkip) {
+              continue;
+            }
+            pureResult.push(value);
+          }
+          resolve(pureResult);
+        }
+        return;
+      }
+      resolvingCount++;
+      (async () => {
+        try {
+          const element = await nextItem.value;
+          if (isResolved) {
+            return;
+          }
+          const value = await mapper(element, index);
+          if (value === pMapSkip) {
+            skippedIndexesMap.set(index, value);
+          }
+          result[index] = value;
+          resolvingCount--;
+          await next();
+        } catch (error4) {
+          if (stopOnError) {
+            reject(error4);
+          } else {
+            errors2.push(error4);
+            resolvingCount--;
+            try {
+              await next();
+            } catch (error5) {
+              reject(error5);
+            }
+          }
+        }
+      })();
+    };
+    (async () => {
+      for (let index = 0; index < concurrency; index++) {
+        try {
+          await next();
+        } catch (error4) {
+          reject(error4);
+          break;
+        }
+        if (isIterableDone || isRejected) {
+          break;
+        }
+      }
+    })();
+  });
+}
+var pMapSkip = Symbol("skip");
+
+// node_modules/.pnpm/mergerino@0.4.0/node_modules/mergerino/dist/mergerino.min.js
+var e = Object.assign || ((e2, t2) => (t2 && Object.keys(t2).forEach((o2) => e2[o2] = t2[o2]), e2));
+var t = (e2, r, s) => {
+  const c = typeof s;
+  if (s && "object" === c)
+    if (Array.isArray(s))
+      for (const o2 of s)
+        r = t(e2, r, o2);
+    else
+      for (const c2 of Object.keys(s)) {
+        const f = s[c2];
+        "function" == typeof f ? r[c2] = f(r[c2], o) : void 0 === f ? e2 && !isNaN(c2) ? r.splice(c2, 1) : delete r[c2] : null === f || "object" != typeof f || Array.isArray(f) ? r[c2] = f : "object" == typeof r[c2] ? r[c2] = f === r[c2] ? f : o(r[c2], f) : r[c2] = t(false, {}, f);
+      }
+  else
+    "function" === c && (r = s(r, o));
+  return r;
+};
+var o = (o2, ...r) => {
+  const s = Array.isArray(o2);
+  return t(s, s ? o2.slice() : e({}, o2), r);
+};
+var mergerino_min_default = o;
+
 // src/requests/assets.ts
-async function find(asset, theme) {
+async function find(asset, theme2) {
   return axios({
-    ...bundle.sync.stores[theme.sidx].client,
+    ...bundle.sync.stores[theme2.sidx].client,
     method: "get",
-    url: theme.url,
+    url: theme2.url,
     params: {
       "asset[key]": asset
     }
   }).then(({ data }) => data.asset).catch(() => false);
 }
 async function upload2(asset, config) {
-  const request2 = assign({}, bundle.sync.stores[config.theme.sidx].client, {
+  const request2 = mergerino_min_default(bundle.sync.stores[config.theme.sidx].client, {
     method: "put",
     url: config.theme.url,
     data: {
@@ -3996,15 +4850,27 @@ async function get(url, config) {
   return axios.get(url, config).then(({ data }) => {
     return data;
   }).catch((e2) => {
+    if (e2.response && (e2.response.status === 429 || e2.response.status === 500)) {
+      loggers_exports.retrying(file.key, theme);
+      queue.add(() => sync(theme, file, config));
+    } else {
+      if (bundle.mode.upload) {
+        throw e2.response;
+      } else {
+        loggers_exports.failed(file.key);
+        errors_exports.request(file.relative, e2.response);
+      }
+    }
     loggers_exports.failed(url);
     errors_exports.request(url, e2.response);
   });
 }
 var limit;
-async function sync(theme, file, config) {
+async function sync(theme2, file2, config) {
   if (queue.isPaused)
     return;
-  if (queue.concurrency > 1) {
+  const { mode } = bundle;
+  if (queue.concurrency > 2) {
     if (limit >= 20)
       queue.concurrency--;
     if (limit >= 35)
@@ -4012,24 +4878,49 @@ async function sync(theme, file, config) {
   } else if (queue.concurrency < 3 && limit < 30) {
     queue.concurrency++;
   }
-  start();
-  const promise = axios(config).then(({ headers, data }) => {
+  if (!mode.upload)
+    start();
+  const promise = await axios(config).then(({ headers, data }) => {
     if (config.method === "get")
       return data;
     if (config.method === "delete") {
-      loggers_exports.deleted(file.relative, theme);
+      loggers_exports.deleted(file2.relative, theme2);
     } else {
-      loggers_exports.upload(theme);
+      if (mode.watch) {
+        loggers_exports.upload(theme2);
+      } else if (mode.upload) {
+        event.emit("upload", "uploaded", theme2, {
+          key: file2.key,
+          namespace: file2.namespace,
+          fileSize: getSizeStr(config.data.asset.value)
+        });
+      }
     }
     limit = parseInt(headers["x-shopify-shop-api-call-limit"].slice(0, 2), 10);
   }).catch((e2) => {
     if (e2.response && (e2.response.status === 429 || e2.response.status === 500)) {
-      loggers_exports.retrying(file.key, theme);
-      queue.add(() => sync(theme, file, config));
+      if (!mode.upload)
+        loggers_exports.retrying(file2.key, theme2);
+      queue.add(() => sync(theme2, file2, config));
     } else {
-      loggers_exports.failed(file.key);
-      errors_exports.request(file.relative, e2.response);
+      if (mode.upload) {
+        event.emit("upload", "failed", theme2, {
+          key: file2.key,
+          namespace: file2.namespace,
+          fileSize: getSizeStr(config.data.asset.value),
+          get file() {
+            return file2;
+          },
+          get error() {
+            return e2.response;
+          }
+        });
+      } else {
+        loggers_exports.failed(file2.key);
+        errors_exports.request(file2.relative, e2.response);
+      }
     }
+    return pMapSkip;
   });
   return promise;
 }
@@ -4082,8 +4973,8 @@ new blocker_default();
 var ENV = globalThis.process?.env || {};
 var ARGV = globalThis.process?.argv || [];
 !("NO_COLOR" in ENV) && ENV.TERM !== "dumb" && !ARGV.includes("--no-color") && !ARGV.includes("--no-colors");
-var IS_LINUX = process7__default.default.platform === "linux";
-var IS_WINDOWS = process7__default.default.platform === "win32";
+var IS_LINUX = process2__default.default.platform === "linux";
+var IS_WINDOWS = process2__default.default.platform === "win32";
 
 // node_modules/.pnpm/when-exit@2.1.0/node_modules/when-exit/dist/node/signals.js
 var Signals = ["SIGABRT", "SIGALRM", "SIGHUP", "SIGINT", "SIGTERM"];
@@ -4109,16 +5000,16 @@ var Interceptor = class {
         callback();
       }
       if (signal2) {
-        process7__default.default.kill(process7__default.default.pid, signal2);
+        process2__default.default.kill(process2__default.default.pid, signal2);
       }
     };
     this.hook = () => {
       if (this.hooked)
         return;
       this.hooked = true;
-      process7__default.default.once("exit", () => this.exit());
+      process2__default.default.once("exit", () => this.exit());
       for (const signal2 of signals_default) {
-        process7__default.default.once(signal2, () => this.exit(signal2));
+        process2__default.default.once(signal2, () => this.exit(signal2));
       }
     };
     this.register = (callback) => {
@@ -4181,9 +5072,9 @@ async function find2(store, field) {
     return void 0;
   });
 }
-async function create(store, metafield) {
+async function create2(store, metafield) {
   if (is(arguments.length, 1))
-    return (_metafield) => create(store, _metafield);
+    return (_metafield) => create2(store, _metafield);
   metafield.type = "json";
   metafield.namespace = "email";
   metafield.value_type = "json_string";
@@ -4196,7 +5087,7 @@ async function create(store, metafield) {
     if (!store.queue)
       return errors_exports(metafield.namespace, e2.response);
     if (requeue(e2.response.status)) {
-      queue.add(() => create(store, metafield));
+      queue.add(() => create2(store, metafield));
       return void 0;
     } else {
       return errors_exports(store.store, e2.response);
@@ -4224,7 +5115,7 @@ async function sync2(store, field) {
     return (_field) => sync2(store, _field);
   const data = await find2(store, field);
   if (!data)
-    return create(store, field);
+    return create2(store, field);
   return update(store, data.id, assign(field, { id: data.id, type: "json" })).catch((e2) => {
     if (!store.queue)
       return errors_exports(field.namespace, e2.response);
@@ -4239,32 +5130,31 @@ async function sync2(store, field) {
 // src/requests/client.ts
 function client({ stores, themes }) {
   return {
-    assets: async (method, file, content) => {
+    assets: async (method, file2, content) => {
       const payload = isUndefined(content) ? {
         method,
         params: {
-          "asset[key]": file.key
+          "asset[key]": file2.key
         }
       } : {
         method,
         data: {
           asset: {
-            key: file.key,
+            key: file2.key,
             value: content
           }
         }
       };
-      await queue.add(() => mapAsync(async function(theme) {
+      await queue.add(() => pMap(themes, async (theme2) => {
+        if (bundle.mode.upload) {
+          start();
+        }
         await sync(
-          theme,
-          file,
-          assign(
-            { url: theme.url },
-            stores[theme.sidx].client,
-            payload
-          )
+          theme2,
+          file2,
+          mergerino_min_default({ url: theme2.url }, stores[theme2.sidx].client, payload)
         );
-      }, themes));
+      }));
     },
     pages: (content) => {
       return queue.add(function() {
@@ -4314,7 +5204,7 @@ function normalPath(input) {
       return ignore ? "!" + path2 : path2;
     if (path2.charCodeAt(0) === 46 && path2.charCodeAt(1) === 46 && path2.charCodeAt(2) === 47) {
       throwError(
-        `Invalid path defined at: ${colon}${yellowBright(`"${path2}"`)}`,
+        `Invalid path defined at: ${COL} ${yellowBright(`"${path2}"`)}`,
         "Paths must be relative to source"
       );
     }
@@ -4324,7 +5214,7 @@ function normalPath(input) {
 var basePath = (cwd) => (path2) => {
   if (path2.indexOf("*") !== -1) {
     throwError(
-      `Base directory path cannot contain glob${colon}${yellowBright(`"${path2}"`)}`,
+      `Base directory path cannot contain glob${COL} ${yellowBright(`"${path2}"`)}`,
       "Ensure that path you are resolving is correctly formed"
     );
   }
@@ -4335,7 +5225,7 @@ var basePath = (cwd) => (path2) => {
       path2 = path2.slice(1);
     } else {
       throwError(
-        `Directory path is invalid at${colon}${yellowBright(`"${path2}"`)}`,
+        `Directory path is invalid at${COL} ${yellowBright(`"${path2}"`)}`,
         "Ensure that path you are resolving is correctly formed"
       );
     }
@@ -4352,89 +5242,85 @@ var basePath = (cwd) => (path2) => {
     return last(path2).charCodeAt(0) === 47 ? path2 : path2 + "/";
   } else {
     throwError(
-      `Directory path is invalid at${colon}${yellowBright(`"${path2}"`)}`,
+      `Directory path is invalid at${COL} ${yellowBright(`"${path2}"`)}`,
       "Ensure that path you are resolving is correctly formed"
     );
   }
 };
-function svg(file) {
+function svg(file2) {
   const config = bundle.svg.filter((context2) => {
-    if (context2.input.has(file.input))
+    if (context2.input.has(file2.input))
       return true;
-    if (context2.match(file.input)) {
-      context2.input.add(file.input);
-      return true;
-    }
-    return false;
+    if (!context2.match(file2.input))
+      return false;
+    context2.input.add(file2.input);
+    return true;
   });
   if (isUndefined(config))
-    return file;
-  defineProperty(file, "config", { get() {
+    return file2;
+  defineProperty(file2, "data", { get() {
     return config;
   } });
-  return file;
+  return file2;
 }
-function style(file) {
-  const config = bundle.style.find((x) => x.watch(file.input));
-  console.log(config);
+function style(file2) {
+  const config = bundle.style.find((x) => x.watch(file2.input));
   if (isUndefined(config))
-    return file;
-  defineProperty(file, "config", { get() {
+    return file2;
+  defineProperty(file2, "data", { get() {
     return config;
   } });
   if (config.snippet) {
-    file.namespace = "snippets";
-    file.key = path$1.join("snippets", config.rename);
+    file2.namespace = "snippets";
+    file2.key = path$1.join("snippets", config.rename);
   } else {
-    file.key = path$1.join("assets", config.rename);
+    file2.key = path$1.join("assets", config.rename);
   }
-  if (file.output) {
-    if (file.config.rename !== path$1.basename(file.output)) {
+  if (file2.output) {
+    if (file2.data.rename !== path$1.basename(file2.output)) {
       if (config.snippet) {
-        file.output = path$1.join(bundle.dirs.output, file.key);
+        file2.output = path$1.join(bundle.dirs.output, file2.key);
       } else {
-        file.output = path$1.join(parentPath(file.output), file.config.rename);
+        file2.output = path$1.join(parentPath(file2.output), file2.data.rename);
       }
     }
   } else {
-    file.output = path$1.join(bundle.dirs.output, file.key);
+    file2.output = path$1.join(bundle.dirs.output, file2.key);
   }
-  return file;
+  return file2;
 }
-function script(file) {
-  const config = bundle.script.filter((config2) => config2.watch.has(file.input));
+function script(file2) {
+  const config = bundle.script.filter((config2) => config2.watch.has(file2.input));
   if (config.length === 0)
-    return file;
-  defineProperty(file, "config", {
-    get() {
-      return config;
-    }
-  });
-  return file;
+    return file2;
+  defineProperty(file2, "data", { get() {
+    return config;
+  } });
+  return file2;
 }
-function section(file) {
+function section(file2) {
   if (bundle.section.prefixDir) {
-    if (file.base.endsWith("-group.json"))
-      return file;
-    if (isRegex(bundle.section.global) && bundle.section.global.test(file.input))
-      return file;
-    const rename = lastPath(file.input) + bundle.section.separator + file.base;
-    file.name = rename;
-    file.key = path$1.join(file.namespace, rename);
-    file.output = path$1.join(path$1.dirname(file.output), rename);
+    if (file2.base.endsWith("-group.json"))
+      return file2;
+    if (isRegex(bundle.section.global) && bundle.section.global.test(file2.input))
+      return file2;
+    const rename = lastPath(file2.input) + bundle.section.separator + file2.base;
+    file2.name = rename;
+    file2.key = path$1.join(file2.namespace, rename);
+    file2.output = path$1.join(path$1.dirname(file2.output), rename);
   }
-  return file;
+  return file2;
 }
-function snippet(file) {
+function snippet(file2) {
   if (bundle.snippet.prefixDir) {
-    if (isRegex(bundle.snippet.global) && bundle.snippet.global.test(file.input))
-      return file;
-    const rename = lastPath(file.input) + bundle.snippet.separator + file.base;
-    file.name = rename;
-    file.key = path$1.join(file.namespace, rename);
-    file.output = path$1.join(path$1.dirname(file.output), rename);
+    if (isRegex(bundle.snippet.global) && bundle.snippet.global.test(file2.input))
+      return file2;
+    const rename = lastPath(file2.input) + bundle.snippet.separator + file2.base;
+    file2.name = rename;
+    file2.key = path$1.join(file2.namespace, rename);
+    file2.output = path$1.join(path$1.dirname(file2.output), rename);
   }
-  return file;
+  return file2;
 }
 
 // src/process/files.ts
@@ -4454,17 +5340,18 @@ function renameFile({ name, dir, ext, namespace }, rename) {
   return newName;
 }
 function setFile(parsedFile, input, output) {
-  const file = parsedFile;
+  const file2 = parsedFile;
   return (namespace, type2, kind) => {
     let key;
     if (type2 === 13 /* Metafield */ || type2 === 14 /* Page */) {
-      key = path$1.join(lastPath(file.dir), file.base);
+      key = path$1.join(lastPath(file2.dir), file2.base);
       output = null;
     } else {
-      key = path$1.join(namespace, file.base);
+      key = path$1.join(namespace, file2.base);
       output = path$1.join(output, key);
     }
-    return assign({}, file, {
+    return assign({}, file2, {
+      uuid: uuid(),
       type: type2,
       input,
       output,
@@ -4472,16 +5359,16 @@ function setFile(parsedFile, input, output) {
       namespace,
       kind,
       relative: path$1.relative(bundle.cwd, input),
-      config: void 0,
-      size: NaN
+      size: NaN,
+      data: void 0
     });
   };
 }
 function parseFile(paths, output) {
   return (path2) => {
-    const file = path$1.parse(path2);
-    const define2 = setFile(file, path2, output);
-    if (file.ext === ".liquid") {
+    const file2 = path$1.parse(path2);
+    const define2 = setFile(file2, path2, output);
+    if (file2.ext === ".liquid") {
       if (paths.sections(path2)) {
         return section(define2("sections", 4 /* Section */, "Liquid" /* Liquid */));
       } else if (paths.snippets(path2)) {
@@ -4498,9 +5385,9 @@ function parseFile(paths, output) {
             return style(define2("snippets", 7 /* Style */, "CSS" /* CSS */));
         }
       }
-    } else if (file.ext === ".md" || file.ext === ".html") {
-      return define2("pages", 14 /* Page */, file.ext === ".html" ? "HTML" /* HTML */ : "Markdown" /* Markdown */);
-    } else if (file.ext === ".json") {
+    } else if (file2.ext === ".md" || file2.ext === ".html") {
+      return define2("pages", 14 /* Page */, file2.ext === ".html" ? "HTML" /* HTML */ : "Markdown" /* Markdown */);
+    } else if (file2.ext === ".json") {
       if (paths.metafields(path2)) {
         return define2("metafields", 13 /* Metafield */, "JSON" /* JSON */);
       } else if (paths.sections(path2)) {
@@ -4514,32 +5401,32 @@ function parseFile(paths, output) {
       } else if (paths.customers(path2)) {
         return define2("templates/customers", 1 /* Template */, "JSON" /* JSON */);
       }
-    } else if (file.ext === ".svg") {
+    } else if (file2.ext === ".svg") {
       return svg(define2("assets", 9 /* Svg */, "SVG" /* SVG */));
-    } else if (file.ext === ".css") {
+    } else if (file2.ext === ".css") {
       return style(define2("assets", 7 /* Style */, "CSS" /* CSS */));
-    } else if (file.ext === ".scss") {
+    } else if (file2.ext === ".scss") {
       return style(define2("assets", 7 /* Style */, "SCSS" /* SCSS */));
-    } else if (file.ext === ".sass") {
+    } else if (file2.ext === ".sass") {
       return style(define2("assets", 7 /* Style */, "SASS" /* SASS */));
-    } else if (file.ext === ".js" || file.ext === ".mjs") {
+    } else if (file2.ext === ".js" || file2.ext === ".mjs") {
       return script(define2("assets", 8 /* Script */, "JavaScript" /* JavaScript */));
-    } else if (file.ext === ".ts") {
+    } else if (file2.ext === ".ts") {
       return script(define2("assets", 8 /* Script */, "TypeScript" /* TypeScript */));
-    } else if (file.ext === ".jsx") {
+    } else if (file2.ext === ".jsx") {
       return script(define2("assets", 8 /* Script */, "JSX" /* JSX */));
-    } else if (file.ext === ".tsx") {
+    } else if (file2.ext === ".tsx") {
       return script(define2("assets", 8 /* Script */, "TSK" /* TSX */));
     } else if (paths.assets(path2)) {
       if (bundle.spawn.invoked) {
         return define2("assets", 15 /* Spawn */);
-      } else if (file.ext === ".jpg" || file.ext === ".png" || file.ext === ".gif" || file.ext === ".pjpg") {
+      } else if (file2.ext === ".jpg" || file2.ext === ".png" || file2.ext === ".gif" || file2.ext === ".pjpg") {
         return define2("assets", 12 /* Asset */, "Image" /* Image */);
-      } else if (file.ext === ".mov" || file.ext === ".mp4" || file.ext === ".webm" || file.ext === ".ogg") {
+      } else if (file2.ext === ".mov" || file2.ext === ".mp4" || file2.ext === ".webm" || file2.ext === ".ogg") {
         return define2("assets", 12 /* Asset */, "Video" /* Video */);
-      } else if (file.ext === ".pdf") {
+      } else if (file2.ext === ".pdf") {
         return define2("assets", 12 /* Asset */, "PDF" /* PDF */);
-      } else if (file.ext === ".eot" || file.ext === ".ttf" || file.ext === ".woff" || file.ext === ".woff2") {
+      } else if (file2.ext === ".eot" || file2.ext === ".ttf" || file2.ext === ".woff" || file2.ext === ".woff2") {
         return define2("assets", 12 /* Asset */, "Font" /* Font */);
       }
     }
@@ -4547,9 +5434,9 @@ function parseFile(paths, output) {
   };
 }
 var outputFile = (output) => (path2) => {
-  const file = path$1.parse(path2);
-  const merge = setFile(file, path2, output);
-  switch (path$1.basename(file.dir)) {
+  const file2 = path$1.parse(path2);
+  const merge = setFile(file2, path2, output);
+  switch (path$1.basename(file2.dir)) {
     case "sections":
       return merge("sections", 4 /* Section */);
     case "snippets":
@@ -4568,44 +5455,177 @@ var outputFile = (output) => (path2) => {
       return merge("assets", 12 /* Asset */);
   }
 };
+var EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET_NAME}['"][,\\slablsockvetr:0-9'"]+?-?%}\\s+`);
+async function injectSnippet() {
+  const key = `snippets/${HOT_SNIPPET_FILE}`;
+  const [theme2] = bundle.sync.themes;
+  const snippet3 = await fsExtra.readFile(bundle.hot.snippet);
+  const upload4 = await upload2(snippet3.toString(), { theme: theme2, key });
+  loggers_exports.update(tui_exports.message("gray", `${key} uploaded snippet injection`));
+  return upload4;
+}
+function hasSnippet(content) {
+  return EXP.test(content);
+}
+function inject(content) {
+  if (!hasSnippet(content))
+    return writeRender(content);
+}
+function removeRender(content) {
+  const render = content.search(EXP);
+  if (render > -1) {
+    const start3 = content.slice(0, render);
+    const slice = content.slice(content.indexOf("%}") + 2);
+    return start3 + slice;
+  }
+  return content;
+}
+function writeRender(content) {
+  const ender = content.indexOf("<head>") + 6;
+  const start3 = content.slice(0, ender);
+  return start3 + nl + bundle.hot.renderer + nl + content.slice(ender);
+}
+async function injectRender(path2) {
+  const exists = await fsExtra.pathExists(path2);
+  if (!exists)
+    return null;
+  const local = await fsExtra.readFile(path2);
+  let content = local.toString();
+  if (!EXP.test(content)) {
+    content = writeRender(content);
+    await fsExtra.writeFile(path2, content);
+    loggers_exports.update(tui_exports.message("gray", "injected render tag in output layout"));
+  }
+  const [theme2] = bundle.sync.themes;
+  const name = path$1.basename(path2);
+  const key = `layout/${name}`;
+  const string = await find(`layout/${name}`, theme2);
+  if (EXP.test(string))
+    content = removeRender(content);
+  const upload4 = await upload2(content, { theme: theme2, key });
+  if (upload4) {
+    loggers_exports.update(tui_exports.message("gray", "uploaded and inject render tag"));
+    return true;
+  }
+  return false;
+}
 
 // src/modes/upload.ts
 async function upload3(cb) {
-  start();
+  loggers_exports.newGroup("Upload");
+  loggers_exports.spinner("Preparing");
+  start("upload");
+  const $ = {
+    files: [],
+    sync: {}
+  };
   const parse3 = outputFile(bundle.dirs.output);
   const files = glob3__default.default.sync(`${bundle.dirs.output}/**`).sort();
   const request2 = client(bundle.sync);
   const hashook = isFunction(cb);
-  await mapParallelAsync(async (path2) => {
-    const file = parse3(path2);
-    const read = await fsExtra.readFile(path2);
-    loggers_exports.write(file.key);
-    if (!hashook)
-      return request2.assets("put", file, read.toString());
-    const update2 = cb.apply({ ...file }, read.toString());
-    if (isUndefined(update2) || update2 === false) {
-      return request2.assets("put", file, read.toString());
-    } else if (isString(update2)) {
-      return request2.assets("put", file, update2);
-    } else if (isBuffer(update2)) {
-      return request2.assets("put", file, update2.toString());
+  const errs = /* @__PURE__ */ new Map();
+  let pass = 0;
+  let width = 0;
+  const size2 = files.length;
+  for (const { store, target } of bundle.sync.themes) {
+    if (target.length > width)
+      width = target.length;
+    if (!has(store, $.sync))
+      $.sync[store] = [];
+    $.sync[store].push({
+      theme: target,
+      uploaded: 0,
+      failed: 0,
+      progress: loggers_exports.progress(size2)
+    });
+  }
+  event.on("upload", function(type2, { target, store }, item) {
+    loggers_exports.spinner.stop();
+    const isErr = type2 === "failed";
+    const items = [
+      tui_exports.message("whiteBright", bold(item.namespace)),
+      newline,
+      tui_exports.message(type2 === "failed" ? "redBright" : "neonGreen", item.key),
+      newline,
+      tui_exports.suffix("white", "size ", `  ${item.fileSize}`),
+      nl,
+      tui_exports.suffix("white", "duration ", `  ${stop()}`),
+      nl,
+      tui_exports.suffix("white", "elapsed ", `  ${now("upload")}`),
+      newline
+    ];
+    for (const prop in $.sync) {
+      for (const th of $.sync[prop]) {
+        if (prop === store && target === th.theme) {
+          th[type2] += 1;
+          th.progress.increment(1);
+        }
+        const title2 = `${bold(th.theme.toUpperCase()) + wsr(width - target.length)}  ${ARR}  ${prop}`;
+        items.push(
+          tui_exports.message("neonCyan", title2),
+          newline,
+          tui_exports.suffix("whiteBright", "uploaded ", `  ${bold(`${th.uploaded}`)} ${white("of")} ${bold(`${size2}`)}`),
+          nl,
+          tui_exports.suffix(th.failed > 0 ? "redBright" : "white", "failed ", `  ${bold(`${th.failed}`)}`),
+          newline,
+          th.progress.render(false),
+          newline
+        );
+        if (isErr) {
+          if (errs.has([prop, target])) {
+            errs.get([prop, target]).push([item.file, item.error]);
+          } else {
+            errs.set([prop, target], [[item.file, item.error]]);
+          }
+        }
+      }
     }
-    return request2.assets("put", file, read.toString());
-  }, files);
-  return queue.onIdle().then(() => loggers_exports.write("Completed Upload"));
+    loggers_exports.update(glue(items));
+  });
+  for (const path2 of files) {
+    const file2 = parse3(path2);
+    let input;
+    try {
+      const read = await fsExtra.readFile(file2.input);
+      input = read.toString();
+      if (file2.namespace === "layout") {
+        if (hasSnippet(input)) {
+          input = removeRender(input);
+        }
+      }
+      if (!hashook) {
+        await request2.assets("put", file2, input);
+      } else {
+        const update2 = cb.apply({ ...file2 }, input);
+        if (isUndefined(update2) || update2 === false) {
+          await request2.assets("put", file2, input);
+        } else if (isString(update2)) {
+          await request2.assets("put", file2, update2);
+        } else if (isBuffer(update2)) {
+          await request2.assets("put", file2, update2.toString());
+        } else {
+          await request2.assets("put", file2, input);
+        }
+      }
+      pass++;
+    } catch (e2) {
+      console.log(e2);
+    }
+  }
 }
 async function download(cb) {
   start();
   const hashook = isFunction(cb);
-  for (const store of bundle.sync.stores) {
-    const theme = bundle.sync.themes[store.domain];
-    const { assets } = await get(theme.url, store.client);
+  for (const theme2 of bundle.sync.themes) {
+    const store = bundle.sync.stores[theme2.sidx];
+    const { assets } = await get(theme2.url, store.client);
     for (const { key } of assets) {
       try {
-        const data = assign({}, store.client, { params: { "asset[key]": key } });
-        const { asset } = await get(theme.url, data);
-        const output = path$1.join(bundle.dirs.import, store.domain, theme.target, key);
+        const data = mergerino_min_default(store.client, { params: { "asset[key]": key } });
+        const { asset } = await get(theme2.url, data);
+        const output = path$1.join(bundle.dirs.import, store.domain, theme2.target, key);
         const buffer = has("attachment", asset) ? Buffer.from(asset.attachment, "base64") : Buffer.from(asset.value || null, "utf8");
+        loggers_exports.write(`${ansi_exports.neonCyan(key)}`);
         if (hashook) {
           const update2 = cb.apply({ asset, output }, buffer);
           if (isUndefined(update2) || update2 === false) {
@@ -4619,34 +5639,34 @@ async function download(cb) {
           await fsExtra.writeFile(output, buffer);
         }
       } catch (e2) {
-        loggers_exports.error(e2);
+        loggers_exports.failed(key);
       }
     }
   }
 }
-var passthrough = (file) => async (data) => {
-  if (file.type !== 15 /* Spawn */) {
-    await fsExtra.writeFile(file.output, data).catch(
+var passthrough = (file2) => async (data) => {
+  if (file2.type !== 15 /* Spawn */) {
+    await fsExtra.writeFile(file2.output, data).catch(
       errors_exports.write("Error writing asset to output", {
-        file: file.relative,
-        source: file.relative
+        file: file2.relative,
+        source: file2.relative
       })
     );
   }
   return data;
 };
-async function compile(file, cb) {
-  const copy = passthrough(file);
-  const data = await fsExtra.readFile(file.input).catch(
+async function compile(file2, cb) {
+  const copy = passthrough(file2);
+  const data = await fsExtra.readFile(file2.input).catch(
     errors_exports.write("Error reading asset file", {
-      file: file.relative,
-      source: file.relative
+      file: file2.relative,
+      source: file2.relative
     })
   );
   if (data) {
     if (!isFunction(cb))
       return copy(data);
-    const update2 = cb.apply({ ...file }, data);
+    const update2 = cb.apply({ ...file2 }, data);
     if (isUndefined(update2) || update2 === false) {
       return copy(data);
     } else if (isType(update2)) {
@@ -4662,13 +5682,13 @@ var LiquidBlockComments = /{%-?\s*comment\s*-?%}[\s\S]+?{%-?\s*endcomment\s*-?%}
 var LiquidTag = /{%-?\s*liquid[\s\S]+?%}/g;
 var ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
 function removeComments(content) {
-  return minify.liquid.removeComments ? content.replace(LiquidBlockComments, nil).replace(LiquidLineComments, nil) : content;
+  return bundle.terser.liquid.removeComments ? content.replace(LiquidBlockComments, nil).replace(LiquidLineComments, nil) : content;
 }
 function minifyLiquidTag(content) {
   return content.replace(LiquidTag, (tag) => "\n" + tag.replace(/#.*?$/gm, nil) + "\n");
 }
-function minifySchema(file, content) {
-  if (!minify.liquid.minifySchema)
+function minifySchema(file2, content) {
+  if (!bundle.terser.liquid.minifySchema)
     return removeComments(content);
   const open2 = content.search(/{%-?\s*schema/);
   if (open2 > -1) {
@@ -4681,76 +5701,85 @@ function minifySchema(file, content) {
       const schema = content.slice(0, begin) + minified2 + content.slice(ender);
       return removeComments(schema);
     }
-    loggers_exports.invalid(file.relative);
+    loggers_exports.invalid(file2.relative);
   }
   return removeComments(content);
 }
 function removeDashes(content) {
-  if (!minify.liquid.stripDashes)
+  if (!bundle.terser.liquid.stripDashes)
     return content;
   return content;
 }
-async function htmlMinify(file, content) {
+async function htmlMinify(file2, content) {
   try {
-    const htmlmin = await htmlMinifierTerser.minify(content, minify.html);
+    const htmlmin = await htmlMinifierTerser.minify(content, bundle.terser.html);
     return htmlmin;
   } catch (e2) {
-    loggers_exports.invalid(file.relative);
+    loggers_exports.invalid(file2.relative);
     console.error(e2);
     return null;
   }
 }
-var transform2 = (file) => async (data) => {
-  if (!bundle.mode.minify) {
-    await fsExtra.writeFile(file.output, data);
-    loggers_exports.transform(`${file.namespace} \u2192 ${byteConvert(file.size)}`);
+var transform2 = (file2) => async (data) => {
+  if (file2.type === 2 /* Layout */ && bundle.mode.hot) {
+    if (!hasSnippet(data))
+      data = inject(data);
+  }
+  if (!bundle.mode.terse) {
+    await fsExtra.writeFile(file2.output, data);
+    loggers_exports.transform(`${file2.namespace} \u2192 ${byteConvert(file2.size)}`);
     return data;
   }
   let htmlmin;
-  if (file.base.endsWith(".js.liquid")) {
+  if (file2.base.endsWith(".js.liquid")) {
     htmlmin = data.replace(ScriptJsonWhitespace, nil).replace(/(?<=[:,]) +(?=['"{[])/g, nil).replace(/{{%/g, "{ {%").replace(/%}}/g, "%} }").replace(/(?<=[%}]})\s+(?=[\]}])/g, " ").replace(/>\s+(?=[{[])/, ">").replace(/(?<=[}\]])\s<\//g, "</");
-  } else if (file.base.endsWith(".json.liquid")) {
+  } else if (file2.base.endsWith(".json.liquid")) {
     htmlmin = JSON.stringify(JSON.parse(data), null, 0);
   } else {
-    const content = file.type === 4 /* Section */ ? minifySchema(file, data) : removeComments(data);
-    const htmlterser = await htmlMinify(file, content);
+    const content = file2.type === 4 /* Section */ ? minifySchema(file2, data) : removeComments(data);
+    const htmlterser = await htmlMinify(file2, content);
     htmlmin = minifyLiquidTag(htmlterser);
   }
   loggers_exports.process("HTML Terser", now());
   if (isNil(htmlmin)) {
-    await fsExtra.writeFile(file.output, data);
+    await fsExtra.writeFile(file2.output, data);
     return data;
   }
   const postmin = removeDashes(htmlmin).replace(/^\s+/gm, nil);
-  await fsExtra.writeFile(file.output, postmin);
-  if (!bundle.mode.build) {
-    const size = fileSize(data, file.size);
-    if (size.isSmaller) {
-      loggers_exports.transform(`${file.namespace} ${size.before} \u2192 gzip ${size.gzip}`);
-    } else {
-      loggers_exports.minified("Liquid", size.before, size.after, size.saved);
-    }
+  await fsExtra.writeFile(file2.output, postmin);
+  const size2 = fileSize(data, file2.size);
+  if (size2.isSmaller) {
+    loggers_exports.transform(`${file2.namespace} ${size2.before} \u2192 gzip ${size2.gzip}`);
+  } else {
+    loggers_exports.minified("Liquid", size2.before, size2.after, size2.saved);
   }
   return postmin;
 };
-async function compile2(file, cb) {
+async function compile2(file2, cb) {
   if (bundle.mode.watch)
     start();
-  const read = await fsExtra.readFile(file.input);
-  file.size = byteSize(read);
-  const edit = transform2(file);
-  const data = read.toString();
+  const read = await fsExtra.readFile(file2.input);
+  let input = read.toString();
+  if (bundle.mode.build) {
+    if (file2.namespace === "layout") {
+      if (hasSnippet(input)) {
+        input = removeRender(input);
+      }
+    }
+  }
+  file2.size = byteSize(input);
+  const edit = transform2(file2);
   if (!isType("Function", cb))
-    return edit(data);
-  const update2 = cb.apply({ ...file }, data);
+    return edit(input);
+  const update2 = cb.apply({ ...file2 }, input);
   if (isType("Undefined", update2) || update2 === false) {
-    return edit(data);
+    return edit(input);
   } else if (isType("String", update2)) {
     return edit(update2);
   } else if (Buffer.isBuffer(update2)) {
     return edit(update2.toString());
   }
-  return edit(data);
+  return edit(input);
 }
 function parse2(data) {
   try {
@@ -4768,89 +5797,88 @@ function minifyJSON(data, space = 0) {
     return null;
   }
 }
-async function jsonCompile(file, data, space = 0) {
+async function jsonCompile(file2, data, space = 0) {
   const minified2 = minifyJSON(data, space);
   if (isNil(minified2)) {
     if (bundle.mode.watch)
       stop();
     return data;
   }
-  if (!bundle.mode.build) {
-    if (space === 0) {
-      const size = fileSize(minified2, file.size);
-      loggers_exports.minified("JSON", size.before, size.after, size.saved);
-    } else {
-      loggers_exports.transform(`${file.namespace} \u2192 ${byteConvert(file.size)}`);
-    }
+  if (space === 0) {
+    const size2 = fileSize(minified2, file2.size);
+    loggers_exports.minified("JSON", size2.before, size2.after, size2.saved);
+  } else {
+    loggers_exports.transform(`${file2.namespace} \u2192 ${byteConvert(file2.size)}`);
   }
-  if (file.type === 13 /* Metafield */)
+  if (file2.type === 13 /* Metafield */)
     return minified2;
-  fsExtra.writeFile(file.output, minified2).catch(
+  fsExtra.writeFile(file2.output, minified2).catch(
     errors_exports.write("Error writing JSON", {
-      file: file.relative
+      file: file2.relative
     })
   );
   return minified2;
 }
-async function compile3(file, cb) {
+async function compile3(file2, cb) {
   if (bundle.mode.watch)
     start();
-  const json = await fsExtra.readFile(file.input).catch(
+  const json = await fsExtra.readFile(file2.input).catch(
     errors_exports.write("Error reading JSON file", {
-      file: file.relative
+      file: file2.relative
     })
   );
   if (isBuffer(json)) {
     const read = json.toString();
-    file.size = byteSize(read);
+    file2.size = byteSize(read);
     if (read.trim().length === 0) {
-      loggers_exports.skipped(file, "empty file");
+      loggers_exports.skipped(file2, "empty file");
       return null;
     }
     const data = parse2(read);
     if (isEmpty(data)) {
-      loggers_exports.skipped(file, "empty file");
+      loggers_exports.skipped(file2, "empty file");
       return null;
     }
     let space = bundle.processor.json.indent;
-    if (bundle.mode.minify) {
-      if (file.type === 12 /* Asset */) {
-        if (minify.json.assets)
+    const { mode, terser: terser3 } = bundle;
+    if (mode.terse) {
+      if (file2.type === 12 /* Asset */) {
+        if (terser3.json.assets)
           space = 0;
-      } else if (file.type === 6 /* Locale */) {
-        if (minify.json.locales)
+      } else if (file2.type === 6 /* Locale */) {
+        if (terser3.json.locales)
           space = 0;
-      } else if (file.type === 1 /* Template */) {
-        if (minify.json.templates)
+      } else if (file2.type === 1 /* Template */) {
+        if (terser3.json.templates)
           space = 0;
-      } else if (file.type === 13 /* Metafield */) {
-        if (minify.json.metafields)
+      } else if (file2.type === 13 /* Metafield */) {
+        if (terser3.json.metafields)
           space = 0;
-      } else if (file.type === 5 /* Config */) {
-        if (minify.json.config)
+      } else if (file2.type === 5 /* Config */) {
+        if (terser3.json.config)
           space = 0;
       }
     }
     if (!isFunction(cb))
-      return jsonCompile(file, data, space);
-    const update2 = cb.apply({ ...file }, data);
+      return jsonCompile(file2, data, space);
+    const update2 = cb.apply({ ...file2 }, data);
     if (isUndefined(update2)) {
-      return jsonCompile(file, data, space);
+      return jsonCompile(file2, data, space);
     } else if (isArray2(update2) || isObject(update2)) {
-      return jsonCompile(file, update2, space);
+      return jsonCompile(file2, update2, space);
     } else if (isString(update2)) {
-      return jsonCompile(file, parse2(update2), space);
+      return jsonCompile(file2, parse2(update2), space);
     } else if (isBuffer(update2)) {
-      return jsonCompile(file, parse2(update2.toString()), space);
+      return jsonCompile(file2, parse2(update2.toString()), space);
     }
-    return jsonCompile(file, data, space);
+    return jsonCompile(file2, data, space);
   }
 }
-async function compile4(file, cb) {
-  const read = await fsExtra.readFile(file.input);
+async function compile4(file2, cb) {
+  const read = await fsExtra.readFile(file2.input);
   if (isEmpty(read.toString())) {
     if (bundle.mode.watch)
-      loggers_exports.skipped(file, "empty file");
+      loggers_exports.skipped(file2, "empty file");
     return null;
   }
   const { data, content } = matter__default.default(read);
@@ -4867,9 +5895,9 @@ async function compile4(file, cb) {
     bundle.page.export.breaks = data.breaks;
   }
   const body_html = Markdown__default.default(bundle.page.export).render(content);
-  fsExtra.writeFile(path$1.join(cache.pages.uri, file.base), body_html).catch(
+  fsExtra.writeFile(path$1.join(cache.pages.uri, file2.base), body_html).catch(
     errors_exports.write("Error writing Page reference", {
-      file: file.relative
+      file: file2.relative
     })
   );
   return bundle.mode.build ? body_html : {
@@ -4877,147 +5905,176 @@ async function compile4(file, cb) {
     body_html
   };
 }
-var esbuild2 = null;
+var esbuild3 = null;
 function esbuildModule() {
-  esbuild2 = getImport("esbuild");
-  if (isNil(esbuild2)) {
-    esbuild2 = null;
+  esbuild3 = getImport("esbuild");
+  if (isNil(esbuild3)) {
+    esbuild3 = null;
     return false;
   }
   return true;
 }
-async function esbuildBundle(options) {
+async function esbuildBundle(config) {
   if (processor.esbuild.loaded)
-    options.watch.clear();
-  const result = await esbuild2.build(options.esbuild);
-  if (result.metafile) {
-    for (const file of keys(result.metafile.inputs)) {
-      if (!/node_modules/.test(file)) {
-        const path2 = path$1.join(bundle.cwd, file);
-        options.watch.add(path2);
-        console.log(path2);
-        if (!bundle.watch.has(path2))
-          bundle.watch.add(path2);
+    config.watch.clear();
+  const result = await esbuild3.build(config.esbuild);
+  if (bundle.mode.terse && bundle.mode.build) {
+    config.size = byteSize(result.outputFiles[0].text);
+  }
+  if (bundle.mode.watch) {
+    getWatchPaths(config, result.metafile.inputs);
+  } else {
+    if (!config.watch.has(config.input))
+      config.watch.add(config.input);
+    if (!bundle.watch.has(config.input))
+      bundle.watch.add(config.input);
+  }
+}
+async function getWatchPaths(config, inputs) {
+  const { cwd, watch: watch2, mode } = bundle;
+  for (const file2 in inputs) {
+    if (file2.indexOf("/node_modules/") > -1)
+      continue;
+    const path2 = path$1.join(cwd, file2);
+    if (!config.watch.has(path2))
+      config.watch.add(path2);
+    if (!watch2.has(path2))
+      watch2.add(path2);
+    if (mode.watch)
+      ;
+  }
+  if (mode.watch && processor.esbuild.loaded) {
+    await pNext().then(() => {
+      for (const path2 of config.watch) {
+        if (path2.indexOf("/node_modules/") > -1)
+          continue;
+        if (config.watchCustom !== null && config.watchCustom(path2))
+          continue;
+        if (!has(path2.slice(cwd.length + 1), inputs)) {
+          config.watch.delete(path2);
+          watch2.unwatch(path2);
+        }
       }
-    }
+    });
   }
 }
 function createSnippet(string) {
   return "<script>" + string + "</script>";
 }
-async function compile5(file, sync3, hook2) {
+function runHook(hook2) {
+  if (!isType("Function", hook2))
+    return false;
+  return function(file2, content) {
+    const update2 = hook2.apply({ ...file2 }, content);
+    if (update2 === false) {
+      loggers_exports.external("cancelled");
+      return null;
+    }
+    if (isType("String", update2)) {
+      loggers_exports.external("augment");
+      return update2;
+    }
+    if (isBuffer(update2)) {
+      loggers_exports.external("augment");
+      return update2.toString();
+    }
+    return content;
+  };
+}
+async function compile5(file2, sync3, hooks2) {
+  if (!file2.data)
+    return;
   if (bundle.mode.watch)
     start();
-  const trigger2 = file.config.length;
-  const request2 = [];
-  if (!file.config)
-    return;
-  await build4();
-  async function build4() {
-    for (let i = 0, l = file.config.length; i < l; i++) {
-      const config = file.config[i];
-      try {
-        if (trigger2 > 1) {
-          loggers_exports.nwl();
-          loggers_exports.importer(path$1.relative(bundle.cwd, config.input));
-        }
-        const result = await esbuild2.build(config.esbuild);
-        for (const file2 of keys(result.metafile.inputs).filter((file3) => !/node_modules/.test(file3))) {
-          const path2 = path$1.join(bundle.cwd, file2);
-          config.watch.add(path2);
-          bundle.watch.add(path2);
-        }
-        await handle(result.outputFiles, config);
-        loggers_exports.process(bold("ESBuild"), now());
-        if (bundle.mode.hot) {
-          loggers_exports.syncing(config.key);
-          this.script(config.key);
-        }
-      } catch (e2) {
-        loggers_exports.invalid(file.relative);
-        if (has("errors", e2)) {
-          bundle.errors.add(config.input);
-          e2.errors.forEach(errors_exports.esbuild);
-        }
+  const hook2 = runHook(hooks2);
+  const { errors: errors2, wss, mode, cwd } = bundle;
+  const trigger2 = file2.data.length;
+  const req = [];
+  for (const config of file2.data) {
+    const {
+      key,
+      input,
+      output,
+      snippet: snippet3,
+      esbuild: { format }
+    } = config;
+    try {
+      const { metafile, outputFiles, warnings: warnings3 } = await esbuild3.build(config.esbuild);
+      if (trigger2 > 1) {
+        loggers_exports.nwl();
+        loggers_exports.importer(path$1.relative(cwd, input));
       }
-    }
-    if (trigger2 > 1)
-      loggers_exports.nwl();
-    return Promise.all(request2);
-  }
-  async function handle(output, config) {
-    const esb = config.esbuild;
-    for (const { text, path: path2 } of output) {
-      if (/\.map$/.test(path2)) {
-        const map = path$1.join(cache.script.uri, file.base);
-        fsExtra.writeFile(map, text).catch(
-          errors_exports.write("Error writing JavaScript Source Map to cache", {
-            file: path$1.relative(bundle.cwd, map),
-            source: file.relative
-          })
-        );
-      } else {
-        loggers_exports.transform(`${bold(esb.format.toUpperCase())} bundle \u2192 ${bold(getSizeStr(text))}`);
-        let data;
-        if (config.snippet) {
-          data = createSnippet(text);
-          if (isType("Function", hook2)) {
-            const update2 = hook2.apply({ ...file }, data);
-            if (update2 === false) {
-              loggers_exports.external("cancelled");
-              continue;
-            } else if (isType("String", update2)) {
-              loggers_exports.external("augment");
-              data = update2;
-            } else if (Buffer.isBuffer(update2)) {
-              loggers_exports.external("augment");
-              data = update2.toString();
-            }
-          }
-          await fsExtra.writeFile(config.output, data).catch(
-            errors_exports.write("Error writing inline <script> snippet", {
-              file: file.relative
+      if (mode.watch) {
+        await getWatchPaths(config, metafile.inputs);
+      }
+      if (warnings3.length > 0) {
+        esbuild2(warnings3);
+      }
+      for (const { text, path: path2 } of outputFiles) {
+        if (path2.endsWith(".map")) {
+          const map = path$1.join(cache.script.uri, file2.base);
+          fsExtra.writeFile(map, text).catch(
+            errors_exports.write("Error writing JavaScript Source Map to cache", {
+              file: path$1.relative(cwd, map),
+              source: file2.relative
             })
           );
-          loggers_exports.exported(config.key);
-          if (!bundle.mode.build) {
-            if (bundle.mode.hot) {
-              sync3("put", config, data);
-            } else {
-              request2.push(sync3("put", config, data));
-            }
-          }
         } else {
-          data = text;
-          if (isType("Function", hook2)) {
-            const update2 = hook2.apply({ ...file }, text);
-            if (update2 === false) {
-              loggers_exports.external("cancelled");
-              continue;
-            } else if (isType("String", update2)) {
-              loggers_exports.external("augment");
-              data = update2;
-            } else if (Buffer.isBuffer(update2)) {
-              loggers_exports.external("augment");
-              data = update2.toString();
-            }
+          if (mode.terse) {
+            const { before, after, saved } = fileSize(text, config.size);
+            loggers_exports.transform(`${bold(format.toUpperCase())} bundle`);
+            loggers_exports.minified(null, before, after, saved);
+          } else {
+            loggers_exports.transform(`${bold(format.toUpperCase())} bundle \u2192 ${bold(getSizeStr(text))}`);
           }
-          await fsExtra.writeFile(config.output, text).catch(
-            errors_exports.write("Error writing JavaScript asset", {
-              file: file.relative
-            })
-          );
-          if (!bundle.mode.build) {
-            if (bundle.mode.hot) {
-              sync3("put", config, text);
-            } else {
-              request2.push(sync3("put", config, text));
+          let content;
+          if (snippet3) {
+            content = createSnippet(text);
+            if (hook2) {
+              content = hook2(file2, content);
+              if (content === null)
+                continue;
             }
+            await fsExtra.writeFile(output, content).catch(
+              errors_exports.write("Error writing inline <script> snippet", {
+                file: file2.relative
+              })
+            );
+            loggers_exports.transform(`exported as ${bold("snippet")}`);
+          } else {
+            content = text;
+            if (hook2) {
+              content = hook2(file2, content);
+              if (content === null)
+                continue;
+            }
+            await fsExtra.writeFile(output, content).catch(
+              errors_exports.write("Error writing JavaScript asset", {
+                file: file2.relative
+              })
+            );
+          }
+          if (mode.hot) {
+            loggers_exports.syncing(key);
+            wss.script(key);
+          } else if (!mode.build) {
+            loggers_exports.syncing(key);
+            req.push(sync3("put", config, content));
           }
         }
       }
+      ;
+    } catch (e2) {
+      if (has("errors", e2)) {
+        loggers_exports.invalid(file2.relative);
+        errors2.add(input);
+        e2.errors.forEach(errors_exports.esbuild);
+      }
     }
   }
+  if (trigger2 > 1)
+    loggers_exports.nwl();
+  await Promise.all(req);
 }
 var postcss3 = null;
 var sass3 = null;
@@ -5028,19 +6085,18 @@ async function load(id) {
     return isNil(postcss3) === false;
   }
   if (id === "sass") {
-    const dart = await import('sass');
-    sass3 = dart.default;
+    sass3 = __require("sass");
     return isNil(sass3) === false;
   }
 }
-function write3(file, cb) {
-  const scope = isFunction(cb) ? { ...file } : false;
+function write3(file2, cb) {
+  const scope = isFunction(cb) ? { ...file2 } : false;
   return async function(data) {
     if (isNil(data))
       return null;
     let content;
     if (scope !== false) {
-      const update2 = cb.apply({ ...file }, Buffer.from(data));
+      const update2 = cb.apply({ ...file2 }, Buffer.from(data));
       if (isUndefined(update2) || update2 === false) {
         content = data;
       } else if (isString(update2) || isBuffer(update2)) {
@@ -5049,175 +6105,363 @@ function write3(file, cb) {
     } else {
       content = data;
     }
-    fsExtra.writeFile(file.output, content).catch(
+    fsExtra.writeFile(file2.output, content).catch(
       errors_exports.write("Error writing stylesheet to output", {
-        input: file.relative,
-        output: path$1.relative(bundle.cwd, file.output)
+        input: file2.relative,
+        output: path$1.relative(bundle.cwd, file2.output)
       })
     );
-    const size = fileSize(data, file.size);
-    if (size.isSmaller) {
-      loggers_exports.transform(`${bold("CSS")} ${size.before} \u2192 gzip ${size.gzip}`);
+    const size2 = fileSize(data, file2.size);
+    if (size2.isSmaller) {
+      loggers_exports.transform(`${bold("CSS")} ${size2.before} \u2192 gzip ${size2.gzip}`);
     } else {
-      loggers_exports.minified("CSS", size.before, size.after, size.saved);
+      loggers_exports.minified("CSS", size2.before, size2.after, size2.saved);
+    }
+    if (bundle.mode.hot) {
+      bundle.wss.stylesheet(file2.key);
     }
     return content;
   };
 }
-async function sassProcess(file) {
-  const { config } = file;
-  const opts = config.sass === true ? processor.sass.config : config.sass;
-  if (file.ext === ".scss" || file.ext === ".sass") {
+async function sassProcess(file2) {
+  const { data } = file2;
+  const opts = data.sass === true ? processor.sass.config : data.sass;
+  if (file2.ext === ".scss" || file2.ext === ".sass") {
     if (bundle.mode.watch)
       start();
     try {
-      const { css, sourceMap } = sass3.compile(config.input, {
+      const { css, sourceMap } = sass3.compile(data.input, {
         loadPaths: opts.include,
         sourceMapIncludeSources: false,
         sourceMap: opts.sourcemap,
         style: opts.style,
         logger: {
           debug: (msg) => console.log("DEBUG", msg),
-          warn: warnings_exports.sass(file)
+          warn: warnings_exports.sass(file2)
         }
       });
       if (opts.sourcemap) {
-        const map = path$1.join(cache.style.uri, file.base + ".map");
+        const map = path$1.join(cache.style.uri, file2.base + ".map");
         fsExtra.writeFile(map, JSON.stringify(sourceMap)).catch(
           errors_exports.write("Error writing SASS Source Map file to the cache directory", {
             file: path$1.relative(bundle.cwd, map),
-            source: file.relative
+            source: file2.relative
           })
         );
       }
-      if (bundle.mode.watch)
-        loggers_exports.process(`${bold("SASS Dart")}`, stop());
-      file.size = byteSize(css);
+      loggers_exports.process("SASS Dart", stop());
+      file2.size = byteSize(css);
       return {
         css,
         map: sourceMap
       };
     } catch (e2) {
-      loggers_exports.invalid(file.relative);
-      errors_exports.sass(file, e2);
+      loggers_exports.invalid(file2.relative);
+      errors_exports.sass(file2, e2);
       return null;
     }
   }
   try {
-    const css = await fsExtra.readFile(file.input);
-    file.size = byteSize(css);
+    const css = await fsExtra.readFile(file2.input);
+    file2.size = byteSize(css);
     return {
       css: css.toString(),
       map: null
     };
   } catch (e2) {
-    loggers_exports.invalid(file.relative);
+    loggers_exports.invalid(file2.relative);
     loggers_exports.throws(e2);
     return null;
   }
 }
-async function postcssProcess(file, css, map) {
-  const { config } = file;
+async function postcssProcess(file2, css, map) {
+  const { data } = file2;
   try {
     if (bundle.mode.watch)
       start();
     const result = await postcss3(processor.postcss.config).process(css, {
-      from: config.rename,
-      to: config.rename,
+      from: data.rename,
+      to: data.rename,
       map: map ? { prev: map, inline: false } : null
     });
     if (bundle.mode.watch)
-      loggers_exports.process(`${bold("PostCSS")}`, stop());
+      loggers_exports.process("PostCSS", stop());
     const issues = result.warnings();
     if (issues.length > 0)
       for (const warn2 of issues)
-        warnings_exports.postcss(file, warn2);
+        warnings_exports.postcss(file2, warn2);
     return result.toString();
   } catch (e2) {
-    loggers_exports.invalid(file.relative);
+    loggers_exports.invalid(file2.relative);
     console.log(e2);
     return null;
   }
 }
 function snippet2(css) {
-  return `<style type="text/css">${nl + wsr(2) + css}</style>`;
+  return `<style>${nl + wsr(2) + css}</style>`;
 }
-async function compile6(file, cb) {
+async function compile6(file2, cb) {
   if (bundle.mode.watch)
     start();
-  const output = write3(file, cb);
+  const output = write3(file2, cb);
   try {
-    const out = await sassProcess(file);
+    const out = await sassProcess(file2);
     if (out === null)
       return null;
-    if (isNil(postcss3) || !file.config.postcss && !file.config.snippet) {
+    if (isNil(postcss3) || !file2.data.postcss && !file2.data.snippet) {
       return output(out.css);
     }
-    if (file.config.postcss) {
-      const post = await postcssProcess(file, out.css, out.map);
+    if (file2.data.postcss) {
+      const post = await postcssProcess(file2, out.css, out.map);
       if (post === null)
         return null;
-      if (file.config.snippet)
+      if (file2.data.snippet)
         return output(snippet2(post));
     }
-    return file.config.snippet ? output(snippet2(out.css)) : output(out.css);
+    return file2.data.snippet ? output(snippet2(out.css)) : output(out.css);
   } catch (e2) {
     console.log(e2);
     return null;
+  }
+}
+var Svgo = null;
+var SVGSprite = null;
+async function load2(id) {
+  if (id === "svg-sprite") {
+    SVGSprite = (await import('svg-sprite')).default;
+    return isNil(SVGSprite) === false;
+  }
+  if (id === "svgo") {
+    Svgo = (await import('svgo')).default;
+    return isNil(Svgo) === false;
+  }
+}
+async function getFile(path2) {
+  const svg2 = await fsExtra.readFile(path2);
+  return [
+    path2,
+    svg2.toString(),
+    byteSize(svg2)
+  ];
+}
+function getSprite(sprite) {
+  return new Promise(function(resolve, reject) {
+    sprite.compile((error4, svg2) => {
+      if (error4)
+        return reject(error4);
+      for (const m in svg2) {
+        for (const p in svg2[m]) {
+          resolve(svg2[m][p].contents.toString());
+        }
+      }
+    });
+  });
+}
+function compileSprite(context2, request2, _cb) {
+  async function run2(config) {
+    const file2 = assign({}, context2);
+    if (bundle.mode.watch)
+      start();
+    file2.kind = "SVG Sprite" /* Sprite */;
+    if (config.snippet) {
+      file2.namespace = "snippets";
+      file2.key = path$1.join("snippets", renameFile(file2, config.rename));
+      file2.output = path$1.join(bundle.dirs.output, file2.key);
+    } else {
+      file2.key = path$1.join("assets", renameFile(file2, config.rename));
+      file2.output = path$1.join(bundle.dirs.output, file2.key);
+    }
+    const options = config.sprite === true ? processor.sprite.config : config.sprite;
+    const sprite = new SVGSprite(options);
+    const items = await mapAsync(getFile, toArray(config.input)).catch(
+      errors_exports.write("Error reading an SVG file", {
+        file: file2.base,
+        source: file2.relative
+      })
+    );
+    if (items) {
+      const svgs = items.filter(([path2, svg2]) => {
+        if (hasLiquid(svg2)) {
+          loggers_exports.skipped(path$1.relative(bundle.cwd, path2), "Liquid Detected");
+          return false;
+        }
+        return true;
+      });
+      file2.size = 0;
+      for (const [path2, svg2, size3] of svgs) {
+        sprite.add(path2, null, svg2);
+        file2.size = file2.size + size3;
+      }
+      const content = await getSprite(sprite);
+      const length = svgs.length;
+      loggers_exports.process("SVG Sprite", `${length} ${plural("SVG", length)}`, stop());
+      await fsExtra.writeFile(file2.output, content).catch(
+        errors_exports.write("Error writing SVG Sprite", {
+          file: file2.key,
+          caller: context2.relative
+        })
+      );
+      const size2 = fileSize(content, file2.size);
+      if (size2.isSmaller) {
+        loggers_exports.transform(`${file2.kind} ${size2.before} \u2192 gzip ${size2.gzip}`);
+      } else {
+        loggers_exports.minified(file2.kind, size2.before, size2.after, size2.saved);
+      }
+      if (request2) {
+        loggers_exports.syncing(file2.key);
+        await request2("put", file2, content);
+      }
+    }
+  }
+  return run2;
+}
+function hasLiquid(svg2) {
+  return /^(?:{{[\s\S]+?}}|{%[\s\S]+?%})|[^"'](?:{{[\s\S]+?}}|{%[\s\S]+?%})[^'"]/m.test(svg2);
+}
+function patchPathVoids(svg2) {
+  const patch = /<path[^>]*[a-zA-Z"'\s](>)(?!\s*<\/path>)/g;
+  if (patch.test(svg2)) {
+    const before = `${ansi_exports.redBright(`<${ansi_exports.white("path")}>`)}`;
+    const after = `${ansi_exports.greenBright(`<${ansi_exports.white("path")} />`)}`;
+    loggers_exports.transform(`${before} ${ansi_exports.ARR} ${after} ${ansi_exports.TLD} ${ansi_exports.gray("patched solidus")}`);
+    return svg2.replace(/(<path[^>]*[a-zA-Z"'\s])(>)(?!\s*<\/path>)/g, "$1 /$2");
+  }
+  return svg2;
+}
+function compileInline(context2, request2, _cb) {
+  const file2 = assign({}, context2);
+  async function run2(config) {
+    if (bundle.mode.watch)
+      start();
+    if (config.snippet) {
+      file2.namespace = "snippets";
+      file2.key = path$1.join("snippets", renameFile(file2, config.rename));
+      file2.output = path$1.join(bundle.dirs.output, file2.key);
+    } else {
+      file2.key = path$1.join("assets", renameFile(file2, config.rename));
+      file2.output = path$1.join(bundle.dirs.output, file2.key);
+    }
+    const options = config.svgo === true ? processor.svgo : config.svgo;
+    const read = await fsExtra.readFile(file2.input);
+    const node = read.toString();
+    if (hasLiquid(node)) {
+      loggers_exports.skipped(file2, "Liquid Detected");
+      return null;
+    }
+    const patch = patchPathVoids(node);
+    file2.size = byteSize(patch);
+    let svg2;
+    try {
+      svg2 = Svgo.optimize(patch, options);
+    } catch (error4) {
+      loggers_exports.err(error4.toString());
+      return null;
+    }
+    loggers_exports.process("SVGO", stop());
+    const { data } = svg2;
+    const size2 = fileSize(data, file2.size);
+    if (size2.isSmaller) {
+      loggers_exports.transform(`${file2.kind} ${size2.before} \u2192 gzip ${size2.gzip}`);
+    } else {
+      loggers_exports.minified(file2.kind, size2.before, size2.after, size2.saved);
+    }
+    await fsExtra.writeFile(file2.output, data).catch(
+      errors_exports.write("Error writing SVG", {
+        file: file2.key,
+        caller: context2.relative
+      })
+    );
+    if (request2) {
+      loggers_exports.syncing(file2.key);
+      await request2("put", file2, data);
+    }
+  }
+  return run2;
+}
+async function compile7(file2, request2, cb) {
+  if (bundle.mode.watch)
+    start();
+  const sprite = compileSprite(file2, request2);
+  const inline = compileInline(file2, request2);
+  const length = file2.data.length;
+  for (let i = 0; i < length; i++) {
+    const config = file2.data[i];
+    if (i > 0 && bundle.mode.watch)
+      loggers_exports.changed(file2);
+    if (config.format === "sprite") {
+      await sprite(config);
+    }
+    if (config.format === "file") {
+      await inline(config);
+    }
   }
 }
 
 // src/modes/build.ts
 async function build2(callback) {
   start();
-  const parse3 = parseFile(bundle.paths, bundle.dirs.output);
-  const match2 = anymatch3__default.default(toArray(bundle.watch.values()));
-  const paths = await glob3__default.default("**", {
+  const { paths, dirs, watch: watch2, filters, mode } = bundle;
+  const hasFilter = isEmpty(filters) === false;
+  const parse3 = parseFile(paths, dirs.output);
+  const match2 = anymatch3__default.default(toArray(watch2.values()));
+  const files = await glob3__default.default("**", {
     onlyFiles: true,
     absolute: true,
-    cwd: bundle.dirs.input
+    cwd: dirs.input
   });
-  const source = paths.filter(match2).reduce((acc, path2) => {
-    const file = parse3(path2);
-    if (isUndefined(file))
+  const SVG = {};
+  const source = files.filter(match2).reduce((acc, path2) => {
+    const file2 = parse3(path2);
+    if (isUndefined(file2))
       return acc;
-    switch (file.type) {
+    switch (file2.type) {
       case 7 /* Style */:
-        acc.styles.files.push(file);
+        acc.styles.files.push(file2);
         break;
       case 8 /* Script */:
-        acc.scripts.files.push(file);
+        acc.scripts.files.push(file2);
         break;
       case 4 /* Section */:
-        acc.sections.files.push(file);
+        acc.sections.files.push(file2);
         break;
       case 2 /* Layout */:
-        acc.layouts.files.push(file);
+        acc.layouts.files.push(file2);
         break;
       case 3 /* Snippet */:
-        acc.snippets.files.push(file);
+        acc.snippets.files.push(file2);
         break;
       case 6 /* Locale */:
-        acc.locales.files.push(file);
+        acc.locales.files.push(file2);
         break;
       case 5 /* Config */:
-        acc.configs.files.push(file);
+        acc.configs.files.push(file2);
         break;
       case 1 /* Template */:
-        acc.templates.files.push(file);
+        acc.templates.files.push(file2);
         break;
       case 14 /* Page */:
-        acc.pages.files.push(file);
+        acc.pages.files.push(file2);
         break;
       case 12 /* Asset */:
-        acc.assets.files.push(file);
+        acc.assets.files.push(file2);
         break;
       case 13 /* Metafield */:
-        acc.metafields.files.push(file);
+        acc.metafields.files.push(file2);
         break;
-      case 9 /* Svg */:
-        acc.svgs.files.push(file);
+      case 9 /* Svg */: {
+        for (const { uuid: uuid2, format, input } of file2.data) {
+          if (!has(uuid2, SVG)) {
+            SVG[uuid2] = true;
+            if (format === "sprite") {
+              acc.svgs.files.push(file2);
+            } else {
+              for (const snippet3 of input)
+                acc.svgs.files.push(parse3(snippet3));
+            }
+          }
+        }
         break;
+      }
     }
     return acc;
   }, {
@@ -5282,266 +6526,150 @@ async function build2(callback) {
       report: null
     }
   });
-  const handle = (call) => async (file) => {
+  const handle = (group2, count, call) => async (file2) => {
     start();
     try {
-      const value = await (file.ext === ".json" ? compile3(file, callback) : call(file, callback));
-      if (value === null || isNaN(file.size)) {
+      loggers_exports.build(group2, count, file2);
+      const value = await (file2.ext === ".json" ? compile3(file2, callback) : call(file2, callback));
+      loggers_exports.out(tui_exports.tree("bottom", ansi_exports.neonGreen(file2.key)));
+      if (value === null || isNaN(file2.size)) {
         return {
-          name: file.base,
+          name: file2.base,
+          input: file2.relative,
           time: stop(),
-          output: file.key,
+          output: file2.key,
           error: "Skipped File"
         };
       }
-      const { before, after, saved, gzip } = fileSize(value, file.size);
-      return {
-        name: file.base,
-        time: stop(),
-        output: lastPath(file.output),
+      const done = {
+        name: file2.base,
+        input: file2.relative,
+        output: file2.key,
         error: null,
-        size: {
-          before,
-          after,
-          saved,
-          gzip
-        }
+        time: "",
+        size: fileSize(value, file2.size)
       };
+      return done;
     } catch (e2) {
+      loggers_exports.out(tui_exports.tree("bottom", ansi_exports.redBright(file2.key)));
       return {
-        name: file.base,
+        name: file2.base,
+        input: file2.relative,
+        output: file2.key,
         time: stop(),
-        output: lastPath(file.output),
         error: e2.message
       };
     }
   };
   for (const id in source) {
-    loggers_exports.write(bold(`${newline + line.gray}${source[id].files.length} ${toUpcase(id)}`));
     start();
-    if (id === "styles") {
-      source[id].report = await mapAsync(handle(compile6), source[id].files);
+    const item = source[id].files;
+    const size2 = item.length;
+    if (!hasFilter) {
+      if (id === "styles" && mode.script) {
+        source[id].report = await mapAsync(handle(id, size2, compile6), item);
+        source[id].time = stop();
+      } else if (id === "scripts" && mode.script) {
+        source[id].report = await mapAsync(handle(id, size2, compile5), item);
+        source[id].time = stop();
+      }
+    }
+    if (id === "layouts" || id === "snippets" || id === "sections" || id === "templates") {
+      if (hasFilter && !(has(id, filters) && filters[id].includes(id)))
+        continue;
+      source[id].report = await mapAsync(handle(id, size2, compile2), item);
       source[id].time = stop();
-      loggers_exports.build(id, source[id]);
-    } else if (id === "scripts") {
-      source[id].report = await mapAsync(handle(compile5), source[id].files);
-      source[id].time = stop();
-      loggers_exports.build(id, source[id]);
-    } else if (id === "layouts" || id === "snippets" || id === "sections" || id === "templates") {
-      source[id].report = await mapAsync(handle(compile2), source[id].files);
-      source[id].time = stop();
-      loggers_exports.build(id, source[id]);
     } else if (id === "locales" || id === "configs" || id === "metafields") {
-      source[id].report = await mapAsync(handle(compile3), source[id].files);
+      if (hasFilter && !(has(id, filters) && filters[id].includes(id)))
+        continue;
+      source[id].report = await mapAsync(handle(id, size2, compile3), item);
       source[id].time = stop();
-      loggers_exports.build(id, source[id]);
     } else if (id === "pages") {
-      source[id].report = await mapAsync(handle(compile4), source[id].files);
+      if (hasFilter && !(has(id, filters) && filters[id].includes(id)))
+        continue;
+      source[id].report = await mapAsync(handle(id, size2, compile4), item);
       source[id].time = stop();
-      loggers_exports.build(id, source[id]);
     } else if (id === "assets") {
-      source[id].report = await mapAsync(handle(compile), source[id].files);
+      if (hasFilter && !(has(id, filters) && filters[id].includes(id)))
+        continue;
+      source[id].report = await mapAsync(handle(id, size2, compile), item);
       source[id].time = stop();
-      loggers_exports.build(id, source[id]);
-    } else if (id === "svgs") {
-      source[id].report = await mapAsync(handle(compile4), source[id].files);
+    } else if (id === "svgs" && mode.svg) {
+      if (hasFilter && !(has(id, filters) && filters[id].includes(id)))
+        continue;
+      source[id].report = await mapAsync(handle(id, size2, compile7), item);
       source[id].time = stop();
-      loggers_exports.build(id, source[id]);
     }
   }
+  loggers_exports.nwl();
   loggers_exports.update(`${line.gray}Build Completed ${gray(`~ ${stop()}`)}`);
+  loggers_exports.nwl();
   process.exit(0);
 }
-var EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET_NAME}['"][,\\slablsockvetr:0-9'"]+?-?%}\\s+`);
-async function injectSnippet() {
-  const key = `snippets/${HOT_SNIPPET_FILE}`;
-  const [theme] = bundle.sync.themes;
-  const snippet3 = await fsExtra.readFile(bundle.hot.snippet);
-  const upload4 = await upload2(snippet3.toString(), { theme, key });
-  loggers_exports.update(tui_exports.message("gray", `${key} uploaded snippet injection`));
-  return upload4;
-}
-function inject(content) {
-  if (!EXP.test(content))
-    return writeRender(content);
-}
-function removeRender(content) {
-  const render = content.search(EXP);
-  if (render > -1) {
-    const start3 = content.slice(0, render);
-    const slice = content.slice(content.indexOf("%}") + 2);
-    return start3 + slice;
-  }
-  return content;
-}
-function writeRender(content) {
-  const ender = content.indexOf("<head>") + 6;
-  const start3 = content.slice(0, ender);
-  return start3 + nl + bundle.hot.renderer + nl + content.slice(ender);
-}
-async function injectRender(path2) {
-  const exists = await fsExtra.pathExists(path2);
-  if (!exists)
-    return null;
-  const local = await fsExtra.readFile(path2);
-  let content = local.toString();
-  if (!EXP.test(content)) {
-    content = writeRender(content);
-    await fsExtra.writeFile(path2, content);
-    loggers_exports.update(tui_exports.message("gray", "injected render tag in output layout"));
-  }
-  const [theme] = bundle.sync.themes;
-  const name = path$1.basename(path2);
-  const key = `layout/${name}`;
-  const string = await find(`layout/${name}`, theme);
-  if (EXP.test(string))
-    content = removeRender(content);
-  const upload4 = await upload2(content, { theme, key });
-  if (upload4) {
-    loggers_exports.update(tui_exports.message("gray", "uploaded and inject render tag"));
-    return true;
-  }
-  return false;
-}
-var svgo = null;
-var SVGSprite = null;
-async function load2(id) {
-  if (id === "svg-sprite") {
-    SVGSprite = (await import('svg-sprite')).default;
-    return isNil(SVGSprite) === false;
-  }
-  if (id === "svgo") {
-    svgo = (await import('svgo')).default;
-    return isNil(svgo) === false;
-  }
-}
-async function getFile(path2) {
-  const svg2 = await fsExtra.readFile(path2);
-  return [
-    path2,
-    svg2.toString(),
-    byteSize(svg2)
-  ];
-}
-function getSprite(sprite) {
-  return new Promise(function(resolve, reject) {
-    sprite.compile((error2, svg2) => {
-      if (error2)
-        return reject(error2);
-      for (const m in svg2)
-        for (const p in svg2[m])
-          resolve(svg2[m][p].contents.toString());
-    });
+
+// src/modes/watch.ts
+function watch(callback) {
+  const request2 = client(bundle.sync);
+  const parse3 = parseFile(bundle.paths, bundle.dirs.output);
+  bundle.watch.on("all", async function(event2, path2) {
+    const file2 = parse3(path2);
+    if (isUndefined(file2))
+      return;
+    if (file2.type !== 15 /* Spawn */)
+      loggers_exports.changed(file2);
+    if (event2 === "change" || event2 === "add") {
+      handler2(file2);
+    } else if (event2 === "unlink") {
+      return request2.assets("delete", file2);
+    }
   });
-}
-function compileSprite(context2, request2, cb) {
-  async function run2(config) {
-    const file = assign({}, context2);
-    if (bundle.mode.watch)
-      start();
-    file.kind = "SVG Sprite" /* Sprite */;
-    if (config.snippet) {
-      file.namespace = "snippets";
-      file.key = path$1.join("snippets", renameFile(file, config.rename));
-      file.output = path$1.join(bundle.dirs.output, file.key);
-    } else {
-      file.key = path$1.join("assets", renameFile(file, config.rename));
-      file.output = path$1.join(bundle.dirs.output, file.key);
-    }
-    const options = config.sprite === true ? processor.sprite.config : config.sprite;
-    const sprite = new SVGSprite(options);
-    const svgs = await mapParallelAsync(getFile, toArray(config.input)).catch(
-      errors_exports.write("Error reading an SVG file", {
-        file: file.base,
-        source: file.relative
-      })
-    );
-    if (svgs) {
-      file.size = 0;
-      for (const [path2, svg2, size2] of svgs) {
-        sprite.add(path2, null, svg2);
-        file.size = file.size + size2;
-      }
-      const content = await getSprite(sprite);
-      loggers_exports.process(`${bold("SVG Sprite")} ${arrow}${svgs.length} ${plural("SVG", svgs.length)}`, stop());
-      await fsExtra.writeFile(file.output, content).catch(
-        errors_exports.write("Error writing SVG Sprite", {
-          file: file.key,
-          caller: context2.relative
-        })
-      );
-      const size = fileSize(content, file.size);
-      if (size.isSmaller) {
-        loggers_exports.transform(`${file.kind} ${size.before} \u2192 gzip ${size.gzip}`);
-      } else {
-        loggers_exports.minified(file.kind, size.before, size.after, size.saved);
-      }
-      loggers_exports.syncing(file.key);
-      await request2("put", file, content);
-    }
-  }
-  return run2;
-}
-function compileInline(context2, request2, cb) {
-  const file = assign({}, context2);
-  async function run2(config) {
-    if (bundle.mode.watch)
-      start();
-    if (config.snippet) {
-      file.namespace = "snippets";
-      file.key = path$1.join("snippets", renameFile(file, config.rename));
-      file.output = path$1.join(bundle.dirs.output, file.key);
-    } else {
-      file.key = path$1.join("assets", renameFile(file, config.rename));
-      file.output = path$1.join(bundle.dirs.output, file.key);
-    }
-    const options = config.svgo === true ? processor.svgo : config.svgo;
-    const read = await fsExtra.readFile(file.input);
-    file.size = byteSize(read);
-    let svg2;
+  async function handler2(file2) {
     try {
-      svg2 = svgo.optimize(read.toString(), options);
-    } catch (error2) {
-      loggers_exports.err(error2.toString());
-      return null;
-    }
-    if (bundle.mode.watch)
-      loggers_exports.process(bold("SVGO"), stop());
-    const { data } = svg2;
-    if (!bundle.mode.build) {
-      const size = fileSize(data, file.size);
-      if (size.isSmaller) {
-        loggers_exports.transform(`${file.kind} ${size.before} \u2192 gzip ${size.gzip}`);
-      } else {
-        loggers_exports.minified(file.kind, size.before, size.after, size.saved);
+      let value = null;
+      if (file2.type === 8 /* Script */) {
+        return compile5(file2, request2.assets, callback);
+      } else if (file2.type === 14 /* Page */) {
+        return compile4(file2, callback);
+      } else if (file2.type === 9 /* Svg */) {
+        return compile7(file2, request2.assets, callback);
       }
-    }
-    await fsExtra.writeFile(file.output, data).catch(
-      errors_exports.write("Error writing SVG", {
-        file: file.key,
-        caller: context2.relative
-      })
-    );
-    loggers_exports.syncing(file.key);
-    await request2("put", file, data);
-  }
-  return run2;
-}
-async function compile7(file, request2, cb) {
-  if (bundle.mode.watch)
-    start();
-  const sprite = compileSprite(file, request2);
-  const inline = compileInline(file, request2);
-  const length = file.config.length;
-  for (let i = 0; i < length; i++) {
-    const config = file.config[i];
-    if (i > 0)
-      loggers_exports.changed(file);
-    if (config.format === "sprite") {
-      await sprite(config);
-    }
-    if (config.format === "file") {
-      await inline(config);
+      if (file2.type === 7 /* Style */) {
+        value = await compile6(file2, callback);
+      } else if (file2.type === 4 /* Section */ && file2.kind === "Liquid" /* Liquid */) {
+        value = await compile2(file2, callback);
+      }
+      if (file2.type === 4 /* Section */ && file2.kind === "JSON" /* JSON */) {
+        value = await compile3(file2, callback);
+      } else if (file2.type === 2 /* Layout */) {
+        value = await compile2(file2, callback);
+      } else if (file2.type === 3 /* Snippet */) {
+        value = await compile2(file2, callback);
+      } else if (file2.type === 6 /* Locale */ || file2.type === 5 /* Config */) {
+        value = await compile3(file2, callback);
+      } else if (file2.type === 13 /* Metafield */) {
+        value = await compile3(file2, callback);
+        return request2.metafields({ value, namespace: file2.namespace, key: file2.key });
+      } else if (file2.type === 1 /* Template */ && file2.kind === "JSON" /* JSON */) {
+        value = await compile3(file2, callback);
+      } else if (file2.type === 1 /* Template */ && file2.kind === "Liquid" /* Liquid */) {
+        value = await compile2(file2, callback);
+      } else if (file2.type === 12 /* Asset */ || file2.type === 15 /* Spawn */) {
+        value = await compile(file2, callback);
+      }
+      if (!isNil(value)) {
+        loggers_exports.syncing(file2.key);
+        await request2.assets("put", file2, value);
+        if (bundle.mode.hot) {
+          if (file2.type === 4 /* Section */ && file2.kind === "Liquid" /* Liquid */) {
+            bundle.wss.section(file2.name);
+          } else if (file2.type !== 8 /* Script */ && file2.type !== 7 /* Style */) {
+            await queue.onIdle().then(() => bundle.wss.replace());
+          }
+        }
+      }
+    } catch (e2) {
+      console.error(e2);
+      loggers_exports.err(e2);
     }
   }
 }
@@ -5644,85 +6772,40 @@ function socket() {
   };
 }
 
-// src/modes/watch.ts
-function watch(callback) {
-  const wss = socket();
-  const request2 = client(bundle.sync);
-  const parse3 = parseFile(bundle.paths, bundle.dirs.output);
-  bundle.watch.on("all", function(event2, path2) {
-    const file = parse3(path2);
-    if (isUndefined(file))
-      return;
-    if (file.type !== 15 /* Spawn */)
-      loggers_exports.changed(file);
-    if (event2 === "change" || event2 === "add") {
-      handler2(file);
-    } else if (event2 === "unlink") {
-      return request2.assets("delete", file);
-    }
-  });
-  async function handler2(file) {
-    try {
-      let value = null;
-      if (file.type === 8 /* Script */) {
-        return compile5.bind(wss)(file, request2.assets, callback);
-      } else if (file.type === 14 /* Page */) {
-        return compile4(file, callback);
-      } else if (file.type === 9 /* Svg */) {
-        return compile7(file, request2.assets, callback);
-      } else if (file.type === 7 /* Style */) {
-        value = await compile6(file, callback);
-        if (bundle.mode.hot)
-          wss.stylesheet(file.key);
-      } else if (file.type === 4 /* Section */) {
-        value = await compile2(file, callback);
-      } else if (file.type === 2 /* Layout */) {
-        value = await compile2(file, callback);
-        if (bundle.mode.hot)
-          value = inject(value);
-      } else if (file.type === 3 /* Snippet */) {
-        value = await compile2(file, callback);
-      } else if (file.type === 6 /* Locale */ || file.type === 5 /* Config */) {
-        value = await compile3(file, callback);
-      } else if (file.type === 13 /* Metafield */) {
-        value = await compile3(file, callback);
-        return request2.metafields({ value, namespace: file.namespace, key: file.key });
-      } else if (file.type === 1 /* Template */ && file.kind === "JSON" /* JSON */) {
-        value = await compile3(file, callback);
-      } else if (file.type === 1 /* Template */ && file.kind === "Liquid" /* Liquid */) {
-        value = await compile2(file, callback);
-      } else if (file.type === 12 /* Asset */ || file.type === 15 /* Spawn */) {
-        value = await compile(file, callback);
-      }
-      if (!isNil(value)) {
-        loggers_exports.syncing(file.key);
-        await request2.assets("put", file, value);
-        if (bundle.mode.hot) {
-          if (file.type === 4 /* Section */) {
-            wss.section(file.name);
-          } else if (file.type !== 8 /* Script */ && file.type !== 7 /* Style */) {
-            await queue.onIdle().then(() => wss.replace());
-          }
-        }
-      }
-    } catch (e2) {
-      console.error(e2);
-      loggers_exports.err(e2);
-    }
-  }
-}
-
 // src/log/stdin.ts
 function stdin(data) {
   const input = data.toString().trim().toLowerCase();
-  if (input === "s") ; else if (input === "w") {
+  if (input === "v") {
+    const items = keys(errors);
+    for (let i = 0, l = items.length; i < l; i++) {
+      const prop = items[i];
+      if (errors[prop].size === 0)
+        continue;
+      if (i > 0)
+        loggers_exports.hline(10);
+      loggers_exports.write(ansi_exports.bold.whiteBright(prop));
+      for (const message2 of errors[prop].values()) {
+        if (typeof message2 === "string" && message2.length > 0) {
+          error(message2);
+        }
+      }
+      errors[prop].clear();
+    }
+    if (bundle.mode.upload) {
+      log(tui_exports.closer("Upload"), nl);
+      process.exit(0);
+    }
+  } else if (input === "w") {
     for (const prop in warning.process) {
       if (warning.process[prop].size === 0)
         continue;
       loggers_exports.nwl();
+      loggers_exports.write(ansi_exports.bold.yellow(prop));
       loggers_exports.nwl();
       for (const message2 of warning.process[prop].values()) {
-        if (typeof message2 === "string" && message2.length > 0) ;
+        if (typeof message2 === "string" && message2.length > 0) {
+          loggers_exports.write(tui_exports.multiline("warning", message2));
+        }
       }
       warning.process[prop].clear();
     }
@@ -5736,7 +6819,7 @@ function stdin(data) {
   ${bold("Syncify CLI Examples")}                                             ${gray("by Panoply")}
   ${gray("-----------------------------------------------------------------------------")}
 
-  ${bold("Watching" + colon)}
+  ${bold("Watching" + COL)}
 
   ${gray("Targeting 1 store and 1 theme")}:
   $ sync your-store${gray("=")}theme-1 --watch
@@ -5765,37 +6848,37 @@ var help = `
   Welcome to the Syncify CLI. The command line utility assumes that
   you have defined stores, themes and setup credentials within a ${gray(".env")} file.
 
-  ${bold("Aliases" + colon)}
+  ${bold("Aliases" + COL)}
 
   $ sync
 
-  ${bold("Commands" + colon)}
+  ${bold("Commands" + COL)}
 
   $ syncify                    ${gray.italic("Interactive prompt")}
   $ syncify {store} [theme]    ${gray.italic("Prints list of connected stores")}
 
-  ${bold("Themes" + colon)}
+  ${bold("Themes" + COL)}
 
        --<store>    [theme]     ${gray.italic("A store reference command (run examples)")}
     -t, --theme     [theme]     ${gray.italic("A comma seprated list of themes")}
 
-  ${bold("Paths" + colon)}
+  ${bold("Paths" + COL)}
 
     -c, --config    <path>     ${gray.italic("Set configs path")}
     -i, --input     <path>     ${gray.italic("Set input path")}
     -o, --output    <path>     ${gray.italic("Set output path")}
 
-  ${bold("Utility" + colon)}
+  ${bold("Utility" + COL)}
 
     -f, --filter    <path>     ${gray.italic("Glob path, use with pull or push triggers")}
 
-  ${bold("Environment" + colon)}
+  ${bold("Environment" + COL)}
 
     --dev                      ${gray.italic("Build in development mode (default)")}
     --prod                     ${gray.italic("Build in production mode")}
     --hot                      ${gray.italic("Run watch with hot-reloads")}
 
-  ${bold("Modes" + colon)}
+  ${bold("Modes" + COL)}
 
     -w, --watch                ${gray.italic("Run watch mode")}
     -b, --build                ${gray.italic("Run build mode from input")}
@@ -5805,25 +6888,25 @@ var help = `
     -p, --pages                ${gray.italic("Run pages resource mode")}
     -r, --redirects            ${gray.italic("Run redirects resource mode")}
 
-  ${bold("Resource" + colon)}
+  ${bold("Resource" + COL)}
 
     --pull                     ${gray.italic("Pull a resource from a shop or theme")}
     --push                     ${gray.italic("Push a resource to a shop or theme")}
     --silent                   ${gray.italic("Silent logs, only warnings or errors are printed")}
 
-  ${bold("Trigger" + colon)}
+  ${bold("Trigger" + COL)}
 
     --spawn   [list]           ${gray.italic("Invoke a defined spawn child process/s")}
     --delete  [list]           ${gray.italic("Delete a remote and local file")}
     --minify  [list]           ${gray.italic("invoke minify mode, accepts resource/s")}
 
-  ${bold("Other" + colon)}
+  ${bold("Other" + COL)}
 
     --strap                    ${gray.italic("Import a strap into the project")}
     --vsc                      ${gray.italic("Generate vscode specific settings")}
     --help                     ${gray.italic("Show the screen")}
 
-  ${bold("Help" + colon)}
+  ${bold("Help" + COL)}
 
     -h, --help                 ${gray.italic("Print this screen")}
     -h, --help  {examples}     ${gray.italic("Print a list of command examples")}
@@ -5831,29 +6914,14 @@ var help = `
  ${gray("-----------------------------------------------------------------------------")}
 
 `;
-
-// node_modules/.pnpm/mergerino@0.4.0/node_modules/mergerino/dist/mergerino.min.js
-var e = Object.assign || ((e2, t2) => (t2 && Object.keys(t2).forEach((o2) => e2[o2] = t2[o2]), e2));
-var t = (e2, r, s) => {
-  const c = typeof s;
-  if (s && "object" === c)
-    if (Array.isArray(s))
-      for (const o2 of s)
-        r = t(e2, r, o2);
-    else
-      for (const c2 of Object.keys(s)) {
-        const f = s[c2];
-        "function" == typeof f ? r[c2] = f(r[c2], o) : void 0 === f ? e2 && !isNaN(c2) ? r.splice(c2, 1) : delete r[c2] : null === f || "object" != typeof f || Array.isArray(f) ? r[c2] = f : "object" == typeof r[c2] ? r[c2] = f === r[c2] ? f : o(r[c2], f) : r[c2] = t(false, {}, f);
-      }
-  else
-    "function" === c && (r = s(r, o));
-  return r;
-};
-var o = (o2, ...r) => {
-  const s = Array.isArray(o2);
-  return t(s, s ? o2.slice() : e({}, o2), r);
-};
-var mergerino_min_default = o;
+function spawned(name, command, callback) {
+  const child = spawn3__default.default(command.cmd, command.args, { stdio: "pipe" });
+  child.stdio[0].on("data", callback);
+  child.stdio[1].on("data", callback);
+  child.stdio[2].on("data", callback);
+  command.pid = child.pid;
+  bundle.spawn.streams.set(name, child);
+}
 function defaultGetOutputFile(filepath, format) {
   return filepath.replace(REGEX_EXTJS, `.bundled_${uuid()}.${format === "esm" ? "mjs" : "cjs"}`);
 }
@@ -5981,14 +7049,14 @@ async function bundleRequire(options) {
 // src/options/files.ts
 async function configFile(cwd) {
   let path2 = null;
-  for (const file of [
+  for (const file2 of [
     "syncify.config.js",
     "syncify.config.mjs",
     "syncify.config.cjs",
     "syncify.config.ts",
     "syncify.config.json"
   ]) {
-    path2 = path$1.join(cwd, file);
+    path2 = path$1.join(cwd, file2);
     const exists = await fsExtra.pathExists(path2);
     if (exists)
       break;
@@ -5998,11 +7066,15 @@ async function configFile(cwd) {
     return null;
   try {
     if (path2.endsWith(".json")) {
-      bundle.file = path2;
+      bundle.file.path = path2;
+      bundle.file.relative = path$1.relative(cwd, path2);
+      bundle.file.base = path$1.basename(path2);
       const json = await fsExtra.readFile(path2);
       return jsonc(json.toString());
     } else {
-      bundle.file = path2;
+      bundle.file.path = path2;
+      bundle.file.relative = path$1.relative(cwd, path2);
+      bundle.file.base = path$1.basename(path2);
       const config = await bundleRequire({ filepath: path2 });
       return config.mod.syncify || config.mod.default || config.mod;
     }
@@ -6021,8 +7093,7 @@ async function getPackageJson(cwd) {
   if (!has2)
     throw new Error('Missing "package.json" file');
   try {
-    const pkg = await fsExtra.readJson(uri2);
-    return pkg;
+    bundle.pkg = await fsExtra.readJson(uri2);
   } catch (e2) {
     throw new Error(e2);
   }
@@ -6092,37 +7163,64 @@ async function setThemeDirs(basePath2) {
     }
   }
 }
-function setBaseDirs(cli, config) {
-  const base = basePath(cli.cwd);
+function setBaseDirs(cli) {
+  const { config, cwd, mode, dirs } = bundle;
+  const base = basePath(cwd);
   for (const [dir, def] of BASE_DIRS) {
     let path2;
-    if (cli[dir] === def) {
+    if (dir === "import") {
+      if (mode.download) {
+        if (has("output", cli)) {
+          bundle.dirs[dir] = base(cli.output);
+        } else {
+          bundle.dirs[dir] = base(config.import);
+        }
+      } else {
+        bundle.dirs[dir] = base(config.import);
+      }
+      continue;
+    } else if (dir === "export") {
+      if (mode.download) {
+        if (has("output", cli)) {
+          bundle.dirs[dir] = base(cli.output);
+        } else {
+          bundle.dirs[dir] = base(config.export);
+        }
+      } else {
+        bundle.dirs[dir] = base(config.export);
+      }
+      continue;
+    } else if (has(dir, cli) && cli[dir] === def) {
       if (config[dir] === def) {
         bundle.dirs[dir] = base(cli[dir]);
         continue;
       } else {
         path2 = config[dir];
       }
-    } else {
+    } else if (isString(cli[dir])) {
       path2 = cli[dir];
+    } else {
+      path2 = config[dir];
     }
     if (isArray2(path2)) {
       const roots = uniq(path2.map(base));
-      bundle.dirs[dir] = roots.length === 1 ? roots[0] : roots;
+      dirs[dir] = roots.length === 1 ? roots[0] : roots;
     } else if (isString(path2)) {
-      bundle.dirs[dir] = base(path2);
+      dirs[dir] = base(path2);
     } else {
+      console.log(path2, dir, def);
       typeError({
         option: "config",
         name: dir,
-        provided: config[dir],
+        provided: path2,
         expects: "string"
       });
     }
   }
-  bundle.watch.add(bundle.file);
+  bundle.watch.add(bundle.file.path);
 }
-async function setImportDirs({ dirs, sync: sync3, mode }) {
+async function setImportDirs() {
+  const { dirs, sync: sync3, mode } = bundle;
   if (!mode.download)
     return;
   const hasBase = await fsExtra.pathExists(dirs.import);
@@ -6133,8 +7231,8 @@ async function setImportDirs({ dirs, sync: sync3, mode }) {
       throw new Error(e2);
     }
   }
-  for (const theme in sync3.themes) {
-    const { store, target } = sync3.themes[theme];
+  for (const theme2 in sync3.themes) {
+    const { store, target } = sync3.themes[theme2];
     const dir = path$1.join(dirs.import, store);
     const has2 = await fsExtra.pathExists(dir);
     if (has2) {
@@ -6363,18 +7461,18 @@ function renameFile2(src, rename) {
   let name = rename;
   const dir = lastPath(src);
   const ext = path$1.extname(src);
-  const file = path$1.basename(src, ext);
+  const file2 = path$1.basename(src, ext);
   if (isUndefined(rename))
-    return { dir, ext, file, name: file };
+    return { dir, ext, file: file2, name: file2 };
   if (/(\[dir\])/.test(name))
     name = name.replace("[dir]", dir);
   if (/(\[file\])/.test(name))
-    name = name.replace("[file]", file);
+    name = name.replace("[file]", file2);
   if (/(\.?\[ext\])/.test(name))
     name = name.replace(/\.?\[ext\]/, ext);
   return {
     ext,
-    file,
+    file: file2,
     dir,
     name: rename.replace(rename, name)
   };
@@ -6460,7 +7558,12 @@ function getResolvedPaths(filePath, hook2) {
     }
     return match2 ? { paths, match: anymatch3__default.default(match2) } : paths;
   }
-  typeError("uri");
+  typeError({
+    option: "uri",
+    name: "uri/path",
+    provided: filePath,
+    expects: "string | string[]"
+  });
 }
 function getTransform(transforms, opts) {
   if (!has("assertSnippet", opts))
@@ -6620,7 +7723,12 @@ function getTransform(transforms, opts) {
               }
             }
           } else {
-            typeError("transform");
+            typeError({
+              option: "transform",
+              name: prop,
+              provided: option,
+              expects: "string[]"
+            });
           }
         }
       }
@@ -6628,7 +7736,8 @@ function getTransform(transforms, opts) {
     return config;
   }
 }
-function getModules2(pkg, name) {
+function getModules2(name) {
+  const { pkg } = bundle;
   return anyTrue(
     has("devDependencies", pkg) && has(name, pkg.devDependencies),
     has("dependencies", pkg) && has(name, pkg.dependencies),
@@ -6640,34 +7749,32 @@ function renameFile3(src, rename) {
   let name = rename;
   const dir = lastPath(src);
   const ext = path$1.extname(src);
-  const file = path$1.basename(src, ext);
+  const file2 = path$1.basename(src, ext);
   if (isUndefined(rename))
-    return { dir, ext, file, name: file };
+    return { dir, ext, file: file2, name: file2 };
   if (/(\[dir\])/.test(name))
     name = name.replace("[dir]", dir);
   if (/(\[file\])/.test(name))
-    name = name.replace("[file]", file);
+    name = name.replace("[file]", file2);
   if (/(\.?\[ext\])/.test(name))
     name = name.replace(/\.?\[ext\]/, ext);
   return {
     ext,
-    file,
+    file: file2,
     dir,
     name: rename.replace(rename, name)
   };
 }
-
-// src/options/script.ts
-async function setScriptOptions(config, pkg) {
+async function setScriptOptions(config) {
   if (!has("script", config.transforms))
     return;
   if (config.transforms.script === false)
     return;
   const warn2 = warnOption("script transform option");
-  const { esbuild: esbuild3 } = processor;
+  const { esbuild: esbuild4 } = processor;
   const { script: script2 } = config.transforms;
-  esbuild3.installed = getModules(pkg, "esbuild");
-  if (esbuild3.installed) {
+  esbuild4.installed = getModules(bundle.pkg, "esbuild");
+  if (esbuild4.installed) {
     const loaded = esbuildModule();
     if (!loaded) {
       throwError(
@@ -6677,15 +7784,15 @@ async function setScriptOptions(config, pkg) {
     }
     const esbuildConfigFile = await readConfigFile("esbuild.config");
     if (esbuildConfigFile !== null) {
-      esbuild3.file = esbuildConfigFile.path;
-      esbuild3.config = mergerino_min_default(esbuild3.config, esbuildConfigFile.config);
+      esbuild4.file = esbuildConfigFile.path;
+      esbuild4.config = mergerino_min_default(esbuild4.config, esbuildConfigFile.config);
     }
   } else {
     missingDependency("esbuild");
   }
-  if (has("entryPoints", esbuild3.config)) {
+  if (has("entryPoints", esbuild4.config)) {
     warn2("processor option is not allowed and was omitted", "entryPoints");
-    delete esbuild3.config.entryPoints;
+    delete esbuild4.config.entryPoints;
   }
   const transforms = getTransform(script2, {
     addWatch: false,
@@ -6697,8 +7804,9 @@ async function setScriptOptions(config, pkg) {
     "rename",
     "snippet"
   ]);
-  if (!has("absWorkingDir", esbuild3.config))
-    esbuild3.config.absWorkingDir = bundle.cwd;
+  if (!has("absWorkingDir", esbuild4.config)) {
+    esbuild4.config.absWorkingDir = bundle.cwd;
+  }
   for (const transform3 of transforms) {
     const { snippet: snippet3 } = transform3;
     const keyDir = snippet3 ? "snippets" : "assets";
@@ -6720,16 +7828,20 @@ async function setScriptOptions(config, pkg) {
       output: path$1.join(bundle.dirs.output, keyDir, rename),
       key: path$1.join(keyDir, rename),
       namespace: transform3.snippet ? "snippets" : "assets",
+      size: NaN,
       watch: null,
+      watchCustom: null,
       esbuild: null
     };
-    bundle.watch.unwatch(scriptBundle.output);
+    if (bundle.mode.watch) {
+      bundle.watch.unwatch(scriptBundle.output);
+    }
     if (has("esbuild", transform3)) {
       if (isBoolean(transform3.esbuild) || isNil(transform3.esbuild)) {
         if (isEmpty(esbuildOptions)) {
-          scriptBundle.esbuild = mergerino_min_default(esbuild3.config);
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config);
         } else {
-          scriptBundle.esbuild = mergerino_min_default(esbuild3.config, esbuildOptions);
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config, esbuildOptions);
         }
       } else if (typeof transform3.esbuild === "object") {
         for (const prop in [
@@ -6752,13 +7864,13 @@ async function setScriptOptions(config, pkg) {
             warn2("Option is not allowed and will be ignored", prop);
           }
         }
-        if (has("plugins", transform3.esbuild) && has("plugins", esbuild3.config)) {
-          transform3.esbuild.plugins.unshift(...esbuild3.config.plugins);
+        if (has("plugins", transform3.esbuild) && has("plugins", esbuild4.config)) {
+          transform3.esbuild.plugins.unshift(...esbuild4.config.plugins);
         }
         if (isEmpty(esbuildOptions)) {
-          scriptBundle.esbuild = mergerino_min_default(esbuild3.config, transform3.esbuild);
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config, transform3.esbuild);
         } else {
-          scriptBundle.esbuild = mergerino_min_default(esbuild3.config, transform3.esbuild, esbuildOptions);
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config, transform3.esbuild, esbuildOptions);
         }
       } else {
         typeError({
@@ -6770,48 +7882,58 @@ async function setScriptOptions(config, pkg) {
       }
     } else {
       if (isEmpty(esbuildOptions)) {
-        scriptBundle.esbuild = esbuild3.config;
+        scriptBundle.esbuild = esbuild4.config;
       } else {
-        scriptBundle.esbuild = mergerino_min_default(esbuild3.config, esbuildOptions);
+        scriptBundle.esbuild = mergerino_min_default(esbuild4.config, esbuildOptions);
       }
     }
     scriptBundle.esbuild.entryPoints = [scriptBundle.input];
-    if (!has("watch", transform3)) {
-      scriptBundle.watch = /* @__PURE__ */ new Set();
-    } else {
-      if (!isArray2(transform3.watch)) {
-        typeError({
-          option: "script",
-          name: "watch",
-          provided: transform3.watch,
-          expects: "string[]"
-        });
+    if (bundle.mode.watch) {
+      if (!has("watch", transform3)) {
+        scriptBundle.watch = /* @__PURE__ */ new Set();
+      } else {
+        if (!isArray2(transform3.watch)) {
+          typeError({
+            option: "script",
+            name: "watch",
+            provided: transform3.watch,
+            expects: "string[]"
+          });
+        }
+        const watchers = getResolvedPaths(transform3.watch);
+        scriptBundle.watchCustom = anymatch3__default.default(watchers);
+        scriptBundle.watch = new Set(watchers);
       }
-      const watchers = getResolvedPaths(transform3.watch);
-      scriptBundle.watch = new Set(watchers);
+    } else {
+      scriptBundle.watch = /* @__PURE__ */ new Set();
     }
     try {
       await esbuildBundle(scriptBundle);
     } catch (e2) {
       throw new Error(e2);
     }
+    if (bundle.mode.terse) {
+      scriptBundle.esbuild = mergerino_min_default(scriptBundle.esbuild, bundle.terser.script, {
+        exclude: void 0
+      });
+    }
     bundle.script.push(scriptBundle);
   }
-  esbuild3.loaded = true;
+  esbuild4.loaded = true;
 }
-async function setStyleConfig(config, pkg) {
+async function setStyleConfig(config) {
   if (!has("style", config.transforms))
     return;
   const { postcss: postcss4, sass: sass4 } = processor;
   const warn2 = warnOption("style transform option");
-  sass4.installed = getModules(pkg, "sass");
+  sass4.installed = getModules(bundle.pkg, "sass");
   if (sass4.installed) {
     const loaded = await load("sass");
     if (!loaded) {
       throwError("Unable to dynamically import SASS", "Ensure you have installed sass");
     }
   }
-  postcss4.installed = getModules(pkg, "postcss");
+  postcss4.installed = getModules(bundle.pkg, "postcss");
   if (postcss4.installed) {
     const loaded = await load("postcss");
     if (!loaded) {
@@ -7000,32 +8122,36 @@ async function setStyleConfig(config, pkg) {
         compile8.rename = rename.name + ".liquid";
       }
       bundle.paths.transforms.set(compile8.input, 7 /* Style */);
-      bundle.watch.unwatch(`${path$1.join(bundle.cwd, config.output, "snippets", compile8.rename)}`);
+      if (bundle.mode.watch) {
+        bundle.watch.unwatch(`${path$1.join(bundle.cwd, config.output, "snippets", compile8.rename)}`);
+      }
     } else {
       compile8.rename = rename.name;
-      bundle.watch.unwatch(`${path$1.join(bundle.cwd, config.output, "assets", rename.name)}`);
+      if (bundle.mode.watch) {
+        bundle.watch.unwatch(`${path$1.join(bundle.cwd, config.output, "assets", rename.name)}`);
+      }
     }
     bundle.style.push(compile8);
   }
 }
-async function setSvgOptions(config, pkg) {
+async function setSvgOptions(config) {
   if (!has("svg", config.transforms))
     return;
-  const { sprite, svgo: svgo2 } = processor;
+  const { sprite, svgo } = processor;
   const warn2 = warnOption("svg transform");
-  svgo2.installed = getModules2(pkg, "svgo");
-  if (svgo2.installed) {
+  svgo.installed = getModules2("svgo");
+  if (svgo.installed) {
     const loaded = await load2("svgo");
     if (!loaded)
       throwError("Unable to dynamically import SVGO", "Ensure you have installed svgo");
   }
-  sprite.installed = getModules2(pkg, "svg-sprite");
+  sprite.installed = getModules2("svg-sprite");
   if (sprite.installed) {
     const loaded = await load2("svg-sprite");
     if (!loaded)
       throwError("Unable to dynamically import SVG Sprite", "Ensure you have installed svg-sprite");
   }
-  if (!sprite.installed && !svgo2.installed) {
+  if (!sprite.installed && !svgo.installed) {
     missingDependency(["svgo", "svg-sprite"]);
   }
   const svgs = getTransform(config.transforms.svg, {
@@ -7058,26 +8184,26 @@ async function setSvgOptions(config, pkg) {
     }
     if (!has("format", svg2)) {
       if (has("svgo", svg2)) {
-        if (!svgo2.installed)
+        if (!svgo.installed)
           missingDependency("svgo");
         o2.format = "file";
-        o2.svgo = isObject(svg2.svgo) ? mergerino_min_default(svgo2.config, svg2.svgo) : true;
+        o2.svgo = isObject(svg2.svgo) ? mergerino_min_default(svgo.config, svg2.svgo) : true;
       } else if (has("sprite", svg2)) {
         if (!sprite.installed)
           missingDependency("svg-sprite");
         o2.format = "sprite";
         o2.sprite = isObject(svg2.sprite) ? mergerino_min_default(sprite.config, svg2.sprite) : true;
       } else {
-        if (svgo2.installed && sprite.installed) {
-          missingOption("transform > svg", "format", "sprite | file", [
+        if (svgo.installed && sprite.installed) {
+          missingOption("transform.svg", "format", "sprite | file", [
             `SVG transforms require you to define ${cyan("format")} when both SVGO and SVG Sprite`,
             "processors are installed. Syncify needs to knows how is should handle the input and",
             "which processor to use for the transform."
-          ].join(nl));
-        } else if (svgo2.installed && !sprite.installed) {
+          ]);
+        } else if (svgo.installed && !sprite.installed) {
           o2.format = "file";
           o2.svgo = true;
-        } else if (sprite.installed && !svgo2.installed) {
+        } else if (sprite.installed && !svgo.installed) {
           o2.format = "sprite";
           o2.sprite = true;
         } else {
@@ -7089,7 +8215,7 @@ async function setSvgOptions(config, pkg) {
         o2.format = svg2.format;
         if (svg2.format === "file") {
           o2.svgo = true;
-          if (!svgo2.installed)
+          if (!svgo.installed)
             missingDependency("svgo");
         } else {
           o2.sprite = true;
@@ -7104,62 +8230,62 @@ async function setSvgOptions(config, pkg) {
   }
 }
 
-// src/options/minify.ts
+// src/options/terser.ts
 function setMinifyOptions(config) {
-  if (isBoolean(config.minify)) {
-    if (bundle.mode.minify === false && config.minify === false)
+  if (isBoolean(config.terser)) {
+    if (bundle.mode.terse === false && config.terser === false)
       return;
-    if (bundle.mode.minify === false && config.minify === true) {
-      bundle.mode.minify = true;
+    if (bundle.mode.terse === false && config.terser === true) {
+      bundle.mode.terse = true;
     }
   }
-  const warn2 = warnOption("minify configuration");
-  if (isObject(config.minify)) {
-    for (const key in config.minify) {
-      if (config.minify[key] === false || isNil(config.minify[key])) {
-        if (bundle.mode.minify === true)
-          bundle.minify[key] = true;
+  const warn2 = warnOption("terser configuration");
+  if (typeof config.terser === "object") {
+    for (const key in config.terser) {
+      if (config.terser[key] === false || isNil(config.terser[key])) {
+        if (bundle.mode.terse === true)
+          bundle.terse[key] = true;
         continue;
       }
       if (key === "script") {
-        if (processor.esbuild.installed === false && (isObject(config.minify[key]) && isEmpty(config.minify[key]) === false || isBoolean(config.minify[key]) && config.minify[key] === true)) {
+        if (processor.esbuild.installed === false && (isObject(config.terser[key]) && isEmpty(config.terser[key]) === false || isBoolean(config.terser[key]) && config.terser[key] === true)) {
           throwError("esbuild is not installed", ESBUILD_NOT_INSTALLED);
         }
       }
-      if (isBoolean(config.minify[key])) {
-        bundle.minify[key] = config.minify[key];
-      } else if (isObject(minify[key])) {
-        if (isEmpty(minify[key]))
+      if (isBoolean(config.terser[key])) {
+        bundle.terser[key] = config.terser[key];
+      } else if (isObject(terser[key])) {
+        if (isEmpty(terser[key]))
           continue;
-        for (const opt in config.minify[key]) {
+        for (const opt in config.terser[key]) {
           const p = key === "views" ? "liquid" : key;
-          if (!has(opt, minify[p]))
-            unknownError(`minify.${key}`, opt);
+          if (!has(opt, terser[p]))
+            unknownError(`terser.${key}`, opt);
           if (opt === "mangleProps") {
-            if (!isNil(config.minify[key][opt]) && !isRegex(minify[p][opt])) {
+            if (!isNil(config.terser[key][opt]) && !isRegex(terser[p][opt])) {
               typeError({
-                option: `minify.${key}`,
+                option: `terser.${key}`,
                 name: opt,
-                provided: `${typeof config.minify[key][opt]} (${config.minify[key][opt]})`,
+                provided: `${typeof config.terser[key][opt]} (${config.terser[key][opt]})`,
                 expects: "Regex | string | undefined"
               });
             }
           } else {
-            if (!isNil(config.minify[key][opt]) && typeof minify[p][opt] !== typeof config.minify[key][opt]) {
+            if (!isNil(config.terser[key][opt]) && typeof terser[p][opt] !== typeof config.terser[key][opt]) {
               typeError({
-                option: `minify.${key}`,
+                option: `terser.${key}`,
                 name: opt,
-                provided: typeof config.minify[key][opt],
-                expects: typeof minify[p][opt]
+                provided: typeof config.terser[key][opt],
+                expects: typeof terser[p][opt]
               });
             }
           }
-          if (opt === "exclude" && !isEmpty(config.minify[key][opt])) {
-            minify[key][opt] = getResolvedPaths(config.minify[key][opt]);
+          if (opt === "exclude" && !isEmpty(config.terser[key][opt])) {
+            terser[key][opt] = getResolvedPaths(config.terser[key][opt]);
           } else if (opt === "collapseWhitespace") {
-            minify.html.collapseWhitespace = config.minify[key][opt];
+            terser.html.collapseWhitespace = config.terser[key][opt];
           } else {
-            minify[key][opt] = config.minify[key][opt];
+            terser[key][opt] = config.terser[key][opt];
           }
         }
       } else {
@@ -7168,72 +8294,135 @@ function setMinifyOptions(config) {
     }
   }
 }
+
+// src/options/define.ts
 async function define(cli, _options) {
   loggers_exports.clear();
-  const pkg = await getPackageJson(cli.cwd);
-  defineProperty(bundle, "pkg", { get() {
-    return pkg;
-  } });
-  bundle.config = await getConfig(pkg, cli);
+  await getPackageJson(cli.cwd);
+  await getConfig(cli);
+  bundle.version = "0.1.3-beta";
   bundle.mode = setModes(cli);
-  bundle.cli = cli.cli;
-  bundle.version = pkg.version;
   bundle.cwd = cli.cwd;
-  bundle.silent = cli.silent;
-  bundle.prod = cli.prod;
-  bundle.dev = cli.dev && !cli.prod;
-  bundle.logger = presets.logger;
-  process.env.SYNCIFY_ENV = bundle.dev ? "dev" : "prod";
+  bundle.env.cli = cli.cli;
+  bundle.env.prod = cli.prod;
+  bundle.env.dev = cli.dev && !cli.prod;
+  bundle.logger.silent = cli.silent;
+  process.env.SYNCIFY_ENV = bundle.env.dev ? "dev" : "prod";
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
+  const { config, cwd } = bundle;
   const promise = await Promise.all([
-    setChokidar(cli.watch, cli.cwd),
-    setBaseDirs(cli, presets),
-    setCaches(bundle.cwd),
+    setChokidar(cli.watch, cwd),
+    setBaseDirs(cli),
+    setCaches(cwd),
     setThemeDirs(bundle.dirs.output),
-    setImportDirs(bundle),
-    setStores(cli, presets),
-    setPaths(presets),
-    setProcessors(presets),
-    setSectionOptions(presets),
-    setSnippetOptions(presets),
-    setJsonOptions(presets),
-    setScriptOptions(presets, pkg),
-    setStyleConfig(presets, pkg),
-    setSvgOptions(presets, pkg),
-    setMinifyOptions(presets),
-    setSpawns(presets, bundle),
-    setPlugins(presets, bundle),
-    setHotReloads(presets)
+    setImportDirs(),
+    setStores(cli, config),
+    setPaths(config),
+    setFilters(cli),
+    setProcessors(config),
+    setSectionOptions(config),
+    setSnippetOptions(config),
+    setJsonOptions(config),
+    setScriptOptions(config),
+    setStyleConfig(config),
+    setSvgOptions(config),
+    setMinifyOptions(config),
+    setSpawns(config),
+    setPlugins(config),
+    setHotReloads(config)
   ]).catch((e2) => {
     console.log(e2);
   });
   loggers_exports.start(bundle);
   return promise;
 }
-function setChokidar(watch2, cwd) {
-  if (!watch2)
-    return;
-  bundle.watch = new chokidar.FSWatcher({
-    persistent: true,
-    ignoreInitial: true,
-    usePolling: true,
-    interval: 75,
-    binaryInterval: 100,
-    ignored: ["**/*.map"],
-    ignorePermissionErrors: true
+function setModes(cli) {
+  const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
+  const transfrom = anyTrue(cli.style, cli.script, cli.image, cli.svg);
+  const watch2 = anyTrue(resource, cli.upload, cli.download) ? false : cli.watch;
+  const modes = assign(bundle.mode, {
+    watch: watch2,
+    hot: watch2 && cli.hot,
+    vsc: cli.vsc,
+    interactive: cli.interactive,
+    export: cli.export,
+    import: cli.import,
+    redirects: cli.redirects,
+    metafields: cli.metafields,
+    pages: cli.pages,
+    pull: cli.pull,
+    force: cli.force,
+    script: transfrom ? cli.script : false,
+    style: transfrom ? cli.style : false,
+    image: transfrom ? cli.image : false,
+    svg: transfrom ? cli.svg : false,
+    terse: anyTrue(cli.terse, cli.prod),
+    clean: anyTrue(resource, transfrom, cli.upload) ? false : cli.clean,
+    build: anyTrue(cli.export, cli.watch, cli.download) ? false : cli.build,
+    upload: anyTrue(transfrom, watch2) ? false : cli.upload,
+    download: anyTrue(resource, transfrom, cli.upload, cli.watch, cli.build) ? false : cli.download
   });
-  Object.defineProperties(bundle.watch, {
-    has: {
-      value(path2, dir = cwd) {
-        return bundle.watch._watched.get(dir).items.has(path2);
-      }
-    },
-    watching: {
-      get() {
-        return bundle.watch._watched;
-      }
+  if (allFalse(...values(modes))) {
+    invalidCommand({
+      message: [
+        "Execution is unclear, you have not provided Syncify a operation mode to run."
+      ],
+      expected: "--<cmd>",
+      fix: [
+        "Syncify requires that you provide an operation. In most cases, this",
+        "error occurs when you have forgotten to pass the mode, for example:",
+        "",
+        `${white("$")} ${white(`syncify ${bundle.argv} ${blue("--watch")}`)}`,
+        `${white("$")} ${white(`syncify ${bundle.argv} ${blue("--build")}`)}`,
+        `${white("$")} ${white(`syncify ${bundle.argv} ${blue("--upload")}`)}`,
+        "",
+        `Run ${blue("syncify --help")} for more information, or pass an execution`,
+        `operation mode as per the ${blue("expected")} value and ensure to replace ${blue("--<cmd>")}`,
+        "with one the examples provided or a supported mode."
+      ]
+    });
+  }
+  if (modes.build) {
+    if (allFalse(modes.script, modes.style, modes.svg, modes.pages, modes.metafields, modes.image)) {
+      modes.script = true;
+      modes.style = true;
+      modes.svg = true;
+      modes.image = true;
     }
-  });
+  }
+  return modes;
+}
+function setChokidar(watch2, cwd) {
+  if (!watch2) {
+    bundle.watch = /* @__PURE__ */ new Set();
+  } else {
+    bundle.watch = new chokidar.FSWatcher({
+      persistent: true,
+      ignoreInitial: true,
+      usePolling: true,
+      interval: 75,
+      binaryInterval: 100,
+      ignored: ["**/*.map"],
+      ignorePermissionErrors: true
+    });
+    Object.defineProperties(bundle.watch, {
+      has: {
+        value(path2, dir = cwd) {
+          return bundle.watch._watched.get(dir).items.has(path2);
+        }
+      },
+      paths: {
+        get() {
+          return toArray(bundle.watch.values());
+        }
+      },
+      watching: {
+        get() {
+          return bundle.watch._watched;
+        }
+      }
+    });
+  }
 }
 async function setHotReloads(config) {
   if (bundle.mode.watch !== true)
@@ -7250,7 +8439,11 @@ async function setHotReloads(config) {
     warn2("HOT Reload can only be used on 1 theme");
     return;
   }
-  if (allFalse(isObject(config.hot), isBoolean(config.hot), isNil(config.hot))) {
+  if (allFalse(
+    isObject(config.hot),
+    isBoolean(config.hot),
+    isNil(config.hot)
+  )) {
     typeError({
       option: "config",
       name: "hot",
@@ -7261,37 +8454,35 @@ async function setHotReloads(config) {
   const { hot } = bundle;
   if (isObject(config.hot) && isEmpty(config.hot) === false) {
     for (const prop in config.hot) {
-      if (has(prop, bundle.hot)) {
-        if (prop === "label") {
-          if (config.hot[prop] === "visible" || config.hot[prop] === "hidden") {
-            hot[prop] = config.hot[prop];
-          } else {
-            invalidError("hot", prop, config.hot[prop], "visible | hidden");
-          }
-        } else if (prop === "method") {
-          if (config.hot[prop] === "hot" || config.hot[prop] === "refresh") {
-            hot[prop] = config.hot[prop];
-          } else {
-            invalidError("hot", prop, config.hot[prop], "hot | refresh");
-          }
-        } else if (prop === "scroll") {
-          if (config.hot[prop] === "preserved" || config.hot[prop] === "top") {
-            hot[prop] = config.hot[prop];
-          } else {
-            invalidError("hot", prop, config.hot[prop], "preserved | top");
-          }
-        } else if (typeof hot[prop] === typeof config.hot[prop]) {
+      if (!has(prop, bundle.hot))
+        unknownError(`hot.${prop}`, config.hot[prop]);
+      if (prop === "label") {
+        if (config.hot[prop] === "visible" || config.hot[prop] === "hidden") {
           hot[prop] = config.hot[prop];
         } else {
-          typeError({
-            option: "hot",
-            name: prop,
-            provided: config.hot[prop],
-            expects: typeof hot[prop]
-          });
+          invalidError("hot", prop, config.hot[prop], "visible | hidden");
         }
+      } else if (prop === "method") {
+        if (config.hot[prop] === "hot" || config.hot[prop] === "refresh") {
+          hot[prop] = config.hot[prop];
+        } else {
+          invalidError("hot", prop, config.hot[prop], "hot | refresh");
+        }
+      } else if (prop === "scroll") {
+        if (config.hot[prop] === "preserved" || config.hot[prop] === "top") {
+          hot[prop] = config.hot[prop];
+        } else {
+          invalidError("hot", prop, config.hot[prop], "preserved | top");
+        }
+      } else if (typeof hot[prop] === typeof config.hot[prop]) {
+        hot[prop] = config.hot[prop];
       } else {
-        unknownError(`hot.${prop}`, config.hot[prop]);
+        typeError({
+          option: "hot",
+          name: prop,
+          provided: config.hot[prop],
+          expects: typeof hot[prop]
+        });
       }
     }
   }
@@ -7300,20 +8491,24 @@ async function setHotReloads(config) {
   for (const layout of hot.layouts) {
     hot.alive[path$1.join(bundle.dirs.output, "layout", layout)] = false;
   }
+  const wss = socket();
+  defineProperty(bundle, "wss", { get() {
+    return wss;
+  } });
 }
 function setProcessors(config) {
   for (const prop in config.processors) {
     processor[prop].config = isArray2(config.processors[prop]) ? config.processors[prop] : assign(processor[prop].config, config.processors[prop]);
   }
 }
-function setPlugins(config, bundle2) {
+function setPlugins(config) {
   if (!has("plugins", config))
     return;
   if (!isArray2(config.plugins))
     return;
   for (const plugin of config.plugins) {
     if (has("onInit", plugin))
-      plugin.onInit.call({ ...bundle2 }, config);
+      plugin.onInit.call({ ...bundle }, config);
     if (has("onChange", plugin)) {
       plugins.onChange.push([
         plugin.name,
@@ -7326,7 +8521,7 @@ function setPlugins(config, bundle2) {
         plugin.onTransform
       ]);
     }
-    if (bundle2.mode.watch) {
+    if (bundle.mode.watch) {
       if (has("onWatch", plugin)) {
         plugins.onWatch.push([
           plugin.name,
@@ -7340,7 +8535,7 @@ function setPlugins(config, bundle2) {
         ]);
       }
     }
-    if (bundle2.mode.build) {
+    if (bundle.mode.build) {
       if (has("onBuild", plugin)) {
         plugins.onBuild.push([
           plugin.name,
@@ -7350,7 +8545,8 @@ function setPlugins(config, bundle2) {
     }
   }
 }
-function setSpawns(config, bundle2) {
+function setSpawns(config) {
+  const { mode, spawn: spawn4 } = bundle;
   if (!has("spawn", config) || isNil(config.spawn))
     return;
   if (!isObject(config.spawn)) {
@@ -7361,45 +8557,45 @@ function setSpawns(config, bundle2) {
       expects: "{ build: {}, watch: {} }"
     });
   }
-  let mode = null;
-  if (bundle2.mode.build && has("build", config.spawn))
-    mode = "build";
-  if (bundle2.mode.watch && has("watch", config.spawn))
-    mode = "watch";
-  if (isNil(mode) || isNil(config.spawn[mode]))
+  let run2 = null;
+  if (mode.build && has("build", config.spawn))
+    run2 = "build";
+  if (mode.watch && has("watch", config.spawn))
+    run2 = "watch";
+  if (isNil(mode) || isNil(config.spawn[run2]))
     return;
-  if (!isObject(config.spawn[mode])) {
+  if (!isObject(config.spawn[run2])) {
     typeError({
       option: "spawn",
-      name: mode,
-      provided: config.spawn[mode],
+      name: run2,
+      provided: config.spawn[run2],
       expects: "{ build: {}, watch: {} }"
     });
   }
-  const props = keys(config.spawn[mode]);
+  const props = keys(config.spawn[run2]);
   if (props.length === 0)
     return;
-  for (const name in config.spawn[mode]) {
-    const command = config.spawn[mode][name];
+  for (const name in config.spawn[run2]) {
+    const command = config.spawn[run2][name];
     if (isString(command)) {
-      bundle2.spawn.commands[name] = {
+      bundle.spawn.commands[name] = {
         cmd: nil,
         args: [],
         pid: NaN
       };
       const cmd = command.trimStart().indexOf(ws) > -1 ? command.trimStart().split(ws) : [command];
-      bundle2.spawn.commands[name].cmd = cmd.shift();
-      bundle2.spawn.commands[name].args = cmd;
-      spawned(name, bundle2.spawn.commands[name], loggers_exports.spawn(name));
+      bundle.spawn.commands[name].cmd = cmd.shift();
+      bundle.spawn.commands[name].args = cmd;
+      spawned(name, bundle.spawn.commands[name], loggers_exports.spawn(name));
     } else if (isArray2(command)) {
       const cmd = command.shift();
-      bundle2.spawn.commands[name] = { cmd, args: command, pid: NaN };
-      spawned(name, bundle2.spawn.commands[name], loggers_exports.spawn(name));
+      bundle.spawn.commands[name] = { cmd, args: command, pid: NaN };
+      spawned(name, bundle.spawn.commands[name], loggers_exports.spawn(name));
     } else {
       typeError({
         option: "spawn",
-        name: mode,
-        provided: config.spawn[mode],
+        name: run2,
+        provided: config.spawn[run2],
         expects: "string | string[]"
       });
     }
@@ -7408,40 +8604,108 @@ function setSpawns(config, bundle2) {
     queue.pause();
     queue.clear();
     loggers_exports.nwl(nil);
-    spawns.forEach((child, name) => {
+    spawn4.streams.forEach((child, name) => {
       error(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
       child.kill();
     });
     loggers_exports.nwl(nil);
-    spawns.clear();
+    spawn4.streams.clear();
     process.exit(0);
   });
 }
-function setModes(cli) {
-  const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
-  const transfrom = anyTrue(cli.style, cli.script, cli.image, cli.svg);
-  const watch2 = anyTrue(resource, cli.upload, cli.download) ? false : cli.watch;
-  return {
-    watch: watch2,
-    hot: watch2 && cli.hot,
-    vsc: cli.vsc,
-    export: cli.export,
-    redirects: cli.redirects,
-    metafields: cli.metafields,
-    pages: cli.pages,
-    prompt: cli.prompt,
-    pull: cli.pull,
-    force: cli.force,
-    script: transfrom ? cli.script : false,
-    style: transfrom ? cli.style : false,
-    image: transfrom ? cli.image : false,
-    svg: transfrom ? cli.svg : false,
-    minify: anyTrue(cli.minify, cli.prod),
-    clean: anyTrue(resource, transfrom, cli.upload) ? false : cli.clean,
-    build: anyTrue(transfrom, cli.upload, cli.watch, cli.download) ? false : cli.build,
-    upload: anyTrue(transfrom, watch2) ? false : cli.upload,
-    download: anyTrue(resource, transfrom, cli.upload, cli.watch, cli.build) ? false : cli.download
-  };
+function setFilters(cli) {
+  if (!has("filter", cli))
+    return;
+  const exp = new RegExp(`^(${[
+    "assets",
+    "config",
+    "locales",
+    "metafields",
+    "layout",
+    "pages",
+    "customers",
+    "templates",
+    "snippets",
+    "sections"
+  ].join("|")})`);
+  const parse3 = cli.filter.replace(/\s+/g, " ").trim();
+  if (parse3.indexOf(",") > -1) {
+    const multiple = parse3.split(",").filter(Boolean).map((entry) => entry.trim());
+    for (const cmd of multiple) {
+      if (cmd[0] === "!") {
+        if (!exp.test(cmd.slice(1)))
+          throwCommandError("dir", cmd);
+      } else if (cmd[0] === "*" || cmd[0] === "/" || cmd[0] === ".") {
+        throwCommandError("pattern", parse3);
+      } else {
+        if (!exp.test(cmd))
+          throwCommandError("dir", cmd);
+        if (cmd.indexOf("/") > -1) ; else {
+          if (!isArray2(bundle.filters[cmd]))
+            bundle.filters[cmd] = [];
+          bundle.filters[cmd].push(cmd);
+        }
+      }
+    }
+  } else if (parse3[0] === "*" || parse3[0] === "/" || parse3[0] === ".") {
+    throwCommandError("pattern", parse3);
+  } else if (parse3.indexOf("/") > -1) ; else {
+    if (!isArray2(bundle.filters[parse3]))
+      bundle.filters[parse3] = [];
+    bundle.filters[parse3].push(parse3);
+  }
+  function throwCommandError(type2, cmd) {
+    const pattern = [];
+    if (type2 === "pattern") {
+      pattern.push(`Invalid ${blue("--filter")} pattern provided. You cannot pass starting point`);
+      if (cmd[0] === "*") {
+        pattern.push(`glob (${blue("*")}) stars as filters, Syncify does not support this.`);
+      } else if (cmd[0] === "/") {
+        pattern.push(`path (${blue("/")}) roots as filters, Syncify does not support this.`);
+      } else if (cmd[0] === ".") {
+        pattern.push(`dot paths (${blue(".")})  as filters, Syncify does not support this.`);
+      }
+      pattern.push(
+        `Use a starting point directory name based on the ${blue("paths")} key property`,
+        `in your ${blue(bundle.file.base)} file.`
+      );
+    } else {
+      pattern.push(
+        `Invalid directory provided. The ${blue("--filter")} pattern expects the starting point`,
+        "directory path be one of the following:",
+        "",
+        `${white("-")} ${blue("assets")}`,
+        `${white("-")} ${blue("config")}`,
+        `${white("-")} ${blue("locales")}`,
+        `${white("-")} ${blue("metafields")}`,
+        `${white("-")} ${blue("layout")}`,
+        `${white("-")} ${blue("pages")}`,
+        `${white("-")} ${blue("customers")}`,
+        `${white("-")} ${blue("templates")}`,
+        `${white("-")} ${blue("snippets")}`,
+        `${white("-")} ${blue("sections`")}`,
+        ""
+      );
+    }
+    invalidCommand({
+      message: pattern,
+      expected: "--filter <dir>",
+      fix: [
+        `The ${blue("--filter")} (or ${blue("-f")}) flag command argument expects you`,
+        "provide a theme output directory as the starting point. Filtering begins with",
+        "a Shopify output directory name, for example:",
+        "",
+        `${white("$")} ${white(`syncify --filter ${blue("sections/file.liquid")}`)}`,
+        `${white("$")} ${white(`syncify --filter ${blue("snippets/*")}`)}`,
+        `${white("$")} ${white(`syncify --filter ${blue("templates/*.json")}`)}`,
+        `${white("$")} ${white(`syncify --filter ${blue("!assets/some-file.ext")}`)}`,
+        "",
+        `Syncify will automatically resolve files from within your defined ${bold("input")} directory`,
+        "based on the starting point directory name. You can pass glob star matches following the",
+        `directory namespace or starting point ignores (${blue("!")}) as long the directory can match.`
+      ]
+    });
+  }
 }
 async function setCaches(cwd) {
   const dir = path$1.join(cwd, "node_modules/.syncify");
@@ -7453,37 +8717,75 @@ async function setCaches(cwd) {
   const read = await fsExtra.readJson(map);
   assign(cache, read);
 }
-async function getConfig(pkg, cli) {
+async function getConfig(cli) {
   const cfg = await configFile(cli.cwd);
-  if (cfg !== null)
-    return mergerino_min_default(presets, cfg);
-  if (has("syncify", pkg))
-    return mergerino_min_default(presets, pkg.syncify);
-  missingConfig(cli.cwd);
+  if (cfg !== null) {
+    bundle.config = cfg;
+  } else if (has("syncify", bundle.pkg)) {
+    bundle.config = bundle.pkg.syncify;
+  } else {
+    missingConfig(cli.cwd);
+  }
 }
 function setStores(cli, config) {
-  if (cli._.length === 0)
+  const storeRequired = anyTrue(
+    bundle.mode.metafields,
+    bundle.mode.pages,
+    bundle.mode.redirects
+  );
+  const themeRequired = anyTrue(
+    bundle.mode.watch,
+    bundle.mode.upload,
+    bundle.mode.download
+  );
+  if (cli._.length === 0) {
+    if (storeRequired) {
+      invalidCommand({
+        message: [
+          "You have not provided store to target, which is required",
+          "when running in a resource mode that syncs to a remote source"
+        ],
+        expected: "syncify <store>",
+        fix: [
+          "Provide the store target name as the first command argument",
+          "followed by themes target/s and other flags."
+        ]
+      });
+    }
     return;
+  }
   const stores = cli._[0].split(",");
-  const file = dotenv__default.default.config({ path: path$1.join(bundle.cwd, ".env") });
+  const file2 = dotenv__default.default.config({ path: path$1.join(bundle.cwd, ".env") });
   const array = isArray2(config.stores) ? config.stores : [config.stores];
   const items = array.filter(({ domain }) => includes(domain, stores));
-  const queue2 = items.length > 1;
+  const queue3 = items.length > 1;
   for (const store of items) {
     const domain = `${store.domain}.myshopify.com`.toLowerCase();
-    const client2 = file.error ? authURL(store.domain, process.env, 2) : authURL(store.domain, file.parsed, 1);
+    const client2 = file2.error ? authURL(store.domain, process.env, 2) : authURL(store.domain, file2.parsed, 1);
     const sidx = bundle.sync.stores.push({
       store: store.domain,
       domain,
       client: client2,
-      queue: queue2
+      queue: queue3
     }) - 1;
     if (bundle.mode.metafields || bundle.mode.pages)
       return;
     const themes = has("theme", cli) ? cli.theme.split(",") : has(store.domain, cli) ? cli[store.domain].split(",") : keys(store.themes);
     for (const target of themes) {
-      if (!has(target, store.themes))
-        invalidError("theme", "target", target, "string");
+      if (!has(target, store.themes)) {
+        invalidTarget({
+          type: "theme",
+          expected: keys(store.themes).join(","),
+          provided: target,
+          message: [
+            `Unknown theme target (${cyan(target)}) provided to ${cyan(store.domain)} store`,
+            `Your ${cyan(bundle.file.base)} file contains no such theme using this name.`
+          ],
+          fix: [
+            `Provide an ${cyan("expected")} theme target or update/add an existing target.`
+          ]
+        });
+      }
       bundle.sync.themes.push({
         target,
         sidx,
@@ -7493,11 +8795,47 @@ function setStores(cli, config) {
       });
     }
   }
-  if (bundle.sync.stores.length === 0 && bundle.mode.build === true) {
+  if (storeRequired) {
+    if (bundle.sync.stores.length === 0) {
+      return invalidCommand({
+        expected: "syncify <store>",
+        message: [
+          "You have not provided store to target, which is required",
+          "when running in a resource mode that syncs to a remote source"
+        ],
+        fix: [
+          "Provide the store target name as the first command argument",
+          "followed by themes target/s and other flags."
+        ]
+      });
+    }
+  }
+  if (bundle.sync.themes.length === 0) {
+    if (themeRequired) {
+      return invalidCommand({
+        expected: "-t <theme>",
+        message: [
+          "You have not provided a theme to target, which is required",
+          "when running this resource mode."
+        ],
+        fix: [
+          `Provide a theme name to target following a ${blue("-t")} or ${blue("--theme")} flag.`,
+          "Theme targets should be passed as the 2nd argument, the 1st",
+          "argument should be store name/s."
+        ]
+      });
+    }
+  }
+  if (bundle.sync.stores.length === 0) {
     throwError(
       "Unknown, missing or invalid store/theme targets",
       "Check your store config"
     );
+  }
+  if (bundle.sync.stores.length === 1 && bundle.sync.themes.length === 1) {
+    bundle.env.sync = 1;
+  } else if (bundle.sync.stores.length > 1 || bundle.sync.themes.length > 1) {
+    bundle.env.sync = 2;
   }
 }
 async function setPaths(config) {
@@ -7511,7 +8849,7 @@ async function setPaths(config) {
       uri2 = isArray2(config.paths[key]) ? config.paths[key].map(path2) : [path2(config.paths[key])];
       if (key === "assets")
         uri2.push(path$1.join(bundle.dirs.output, "assets/*"));
-    } else if (key === "redirects") {
+    } else if (key === "redirects" && has(key, config.paths)) {
       uri2 = [path$1.join(bundle.cwd, config.paths[key])];
     } else {
       uri2 = [path2(key)];
@@ -7549,9 +8887,9 @@ async function run(options, config, callback) {
     return console.info(help);
   await define(options);
   process.on("SIGINT", signal);
-  if (bundle.mode.hot) {
+  process.stdin.on("data", stdin);
+  if (bundle.mode.hot)
     await server();
-  }
   try {
     if (bundle.mode.build) {
       return build2(callback);
@@ -7561,8 +8899,11 @@ async function run(options, config, callback) {
       return upload3(callback);
     } else if (bundle.mode.download) {
       return download(callback);
+    } else if (bundle.mode.export) {
+      return console.log("TODO");
     }
   } catch (e2) {
+    console.log(e2);
     loggers_exports.throws(e2);
   }
 }

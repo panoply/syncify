@@ -885,13 +885,15 @@ In order to provide HOT replacements Syncify employs a mild form of DOM hydratio
 
 # Spawn
 
-The spawn option accepts a **key** > **value** list of commands (ie: scripts) which you can be used when we are running `watch` or `build` modes. Spawn allows you to leverage additional build tools and have them execute in parallel with Syncify. Spawned processes allow you use your preferred asset bundlers, like [Rollup](#), [Webpack](#), [Gulp](#) and many more without having to run multiple npm-scripts.
+The spawn option accepts a **key** > **value** list of commands (i.e: scripts) which can be used when running in **watch** (`--watch`) or **build** (`--build`) modes. The Spawn configuration option allows you to leverage additional build tools and have them execute in parallel with Syncify as child processes.
+
+Spawned processes allow you use your preferred asset bundlers such as [Rollup](#), [Webpack](#), [Gulp](#) and many more without having to run multiple npm-scripts.
 
 ### Overview
 
 There are 2 available modes from which you can trigger a spawned process. When a process is spawned in `watch` mode it will run along side Syncify in parallel and execute sequentially in the order of which each spawn is defined. You need to provide any --flags your command (build tool or bundler) requires when running. Spawning a process in `build` mode will trigger spawned commands only 1 time, so it is here where you would provide the compile-only or build-only command, ie: not using watch flags/arguments.
 
-The Syncify **build** mode re-builds the entire theme and you might choose to run this mode using the Syncify `--prod` flag, if you require context of the environment, mode or action taking place within spawned config files, then take a look at the available [Utilities](#utilities) Syncify exposes to help you conditionally load plugins or trigger different build types in accordance with Syncify.
+The Syncify **build** mode re-builds the entire theme and you might choose to run this mode using the Syncify `--prod` flag, if you require context of the environment, mode or action taking place within spawned config files, then take a look at the available [Utilities](#utilities) which Syncify exposes to help conditionally load plugins or trigger different build types in accordance with the Syncify execution cycle.
 
 ### CLI
 
@@ -899,13 +901,16 @@ The Syncify **build** mode re-builds the entire theme and you might choose to ru
 --spawn, -s <name>   # spawn targeting
 ```
 
-### API
+### Configuration
 
 <!-- prettier-ignore -->
 ```ts
 import { defineConfig } from '@syncify/syncify';
 
 export default defineConfig({
+
+    // ...
+
     spawn: {
       build: {},
       watch: {}
@@ -916,11 +921,13 @@ export default defineConfig({
 
 ## Usage
 
-In most situations you will leverage the spawn option to compile TypeScript or JavaScript assets, but it is important to note that this capability is not specific to these assets types. Syncify is using [cross-spawn](https://www.npmjs.com/package/cross-spawn) under the hood to help negate any cross-platform issues that may arise. Please note that all stdout/stderr/stdio from spawned processes will be piped through and intercepted by Syncify, which might result in output being stripped of color. Below are a couple examples where we spawn up 2 well known JavaScript bundlers and lastly we illustrate how to spawn multiple processes.
+In most situations you will leverage the spawn option to compile something like TypeScript or JavaScript but it is important to note that this capability is not specific to these assets types. Syncify is using [cross-spawn](https://www.npmjs.com/package/cross-spawn) under the hood to help negate any cross-platform issues that may arise. Below are a couple examples where we spawn up 2 well known JavaScript bundlers and lastly we illustrate how to spawn multiple processes.
+
+> All stdout/stderr/stdio from spawned processes will be piped through and intercepted by Syncify, which might result in output being stripped of color.
 
 ### Rollup Example
 
-If you are processing JavaScript asset files using the [Rollup](https://rollupjs.org/) bundler you can spawn build and watch processes by providing the rollup commands to each mode accordingly. Rollup is a fantastic choice for handling `.js` files and is the preferred option for processing these asset types. In this example, it is assumed that a `rollup.config.js` file is located in the root of your project.
+If you are processing JavaScript asset files using the [Rollup](https://rollupjs.org/) bundler you can spawn build and watch processes by providing the rollup commands to each mode accordingly. Rollup is a fantastic choice for handling `.js` files. In this example, it is assumed that a `rollup.config.js` file is located in the root of your project.
 
 <!-- prettier-ignore -->
 ```ts
@@ -1457,15 +1464,114 @@ PostCSS options
 
 # Processors
 
-As per the [Transform](#transform) section of this readme, Syncify digests _third party_ preprocessor tooling. For each transform compiler available Syncify has a preset configuration in-place to be used as defaults. The `processors` configuration option exposes these preset defaults for you to control and customize but you may also prefer to use designated config files which Syncify also supports.
+In Syncify, **processors** refer to the external tools used in [Transforms](#transform) (i.e: SVGO, ESBuild SASS etc). The `processors` configuration option provides developers a point of control for configuring these (supported) _third party_ modules. The configurations defined in processors will used as the defaults bundling options of each transform and allows developers to retain a single point of control from which all _third party_ processor operations will refer, this saves you having to include multiple external config files in your projects workspace.
 
-You can overwrite processor defaults on a per-file basis on the transform level but in most cases you will want to use a common configuration model. The `processors` option allows developers to retain a single point of control from which all _third party_ processor tooling refers.
+<!-- prettier-ignore -->
+```ts
+import { defineConfig } from '@syncify/cli'
+
+export default defineConfig({
+
+  // ...
+
+  processors: {
+    json: {},       // applied to json transforms
+    esbuild: {},    // applied to script transforms
+    sass: {},       // applied to style transforms
+    postcss: [],    // applied to style transforms
+    tailwind: {},   // applied to style transforms
+    svgo: {},       // applied to svg transforms
+    sprite: {},     // applied to svg transforms
+    sharp: {},      // applied to img transforms
+  }
+})
+```
 
 > Using processors requires installing the relative module you'd like to leverage. This is an opt-in capability.
 
 ### External Config Files
 
-Some third party tools allow config file usage. Syncify will check for the existence of processor configuration files in the workspace and use them as the processor defaults. In situations where an external config file is detected and you've defined custom `processor` settings which differ from the Syncify defaults then options of the external config will overwritten by those defined in `processor` configuration.
+Some third party tools allow (or require) config file usage (e.g: `postcss.config.js`, `tailwind.config.js` etc etc). Syncify will check for the existence of configuration files in the workspace and use them as the processor defaults. In situations where an external config file is detected and you've defined custom `processor` settings which differ from the Syncify defaults then options of the external config will overwritten (or merged) by those defined on `processor` configuration.
+
+Say you're using a `postcss.config.js` file to provide a couple of plugins in your project, for example:
+
+<!-- prettier-ignore -->
+```js
+// postcss.config.js
+
+module.exports = {
+  plugins: [
+    require('postcss-nested')(),
+    require('autoprefixer')()
+  ]
+};
+
+```
+
+Syncify will automatically detect and digest this file at runtime. It will use the export value when processing CSS with PostCSS and will consider it the **default** value, assigning it to `processors.postcss`. Instead of providing a `postcss.config.js` file, you _could_ instead just pass this to the **postcss** processor option, for example:
+
+<!-- prettier-ignore -->
+```js
+// syncify.config.ts
+
+import { defineConfig } from '@syncify/cli';
+
+export default defineConfig({
+  // ...
+  processors: {
+    postcss: [
+      require('postcss-nested')(),
+      require('autoprefixer')()
+    ]
+  }
+});
+```
+
+### Transform Overrides
+
+You can overwrite processor defaults on a per-file basis at the transform level. Each transform exposes a processor property which accepts the same options which will apply an immutable merge with processor defaults. This is helpful when you require file specific transforms.
+
+Take the following code sample, notice how we've passed an SASS override on certain files. In this example the `style.scss` transform will use the `processor.sass` configuration, whereas the the `example.scss` file will override the `processor.sass` defaults and use a different set of configuration options.
+
+<!-- prettier-ignore -->
+```js
+// syncify.config.ts
+
+import { defineConfig } from '@syncify/cli';
+
+export default defineConfig({
+  // ...
+  processor: {
+    sass: {
+      sourcemap: true,
+      style: 'compressed',
+      include: ['node_modules/'],  // the style.scss include path
+    }
+  },
+  transform: {
+    style: [
+      {
+        input: 'styles/style.scss',
+        postcss: true
+      },
+      {
+        input: 'styles/example.scss',
+        snippet: true,
+        sass: {
+          style: 'expanded',     // we override the output style
+          include: ['some/dir']  // we override the include path
+        }
+      }
+    ]
+  }
+});
+```
+
+### Usage Proposition
+
+Processors (and transforms) are optional in Syncify and may not fit your use case but there is an added benefit to using them. If you are leveraging HOT reloads or require different outputs be generated, then they are a great help. They also take a lot of the guess work out of bundling, so you can focus on writing code without worrying about bundler configurations.
+
+[Spawn](#spawn) processes are another option available for cases where you require a different complier which is not supported by Syncify, but please note that spawned processes will not apply HOT reloads and execute in child process. Whatever the case may be, it is important you weigh up the usage proposition for your project and determine which works best for you and your development workflow.
 
 ### Supported Processors
 
@@ -1945,7 +2051,7 @@ Syncify can be initialized within scripts. This approach is a little more featur
 Syncify exports a function that has several methods which you can use to trigger specific modes. The default export can also target multiple hooks in accordance with what was passed from the command line.
 
 ```ts
-import { syncify } from '@liquify/syncify';
+import { syncify } from '@syncify/cli';
 
 // Build hook
 syncify.build(options: {}, async function(content?: Buffer): Promise<Buffer|string|void|false>);
@@ -1971,7 +2077,7 @@ syncify(options: {})({
 
 ### Utilities
 
-Utilities will return some basic information about the Syncify instance. These are extremely helpful when when you are executing spawned processes and need to control what feature to load. For example, if you are spawning a webpack process for compiling JavaScript assets and need to inform upon watch mode you'd use `util.resource('watch')` which returns a boolean value when running in watch mode.
+Utilities will return some basic information about the Syncify instance. These are extremely helpful when when you are executing [spawned](#spawn) processes and need to control what feature to load. For example, if you are spawning a webpack process for compiling JavaScript assets and need to inform upon watch mode you'd use `util.resource('watch')` utility which returns a boolean value when running in watch mode.
 
 ```typescript
 import { util, env } from '@syncify/cli'
@@ -1992,20 +2098,6 @@ util.mode('build' | 'watch' | 'upload' | 'download'): boolean
 
 // Returns spawns
 util.spawned(): string[]
-
-```
-
-### Backwards Compatibility
-
-Syncify supports backward compatibility for [shopify-sync](#). This allows you to use it as you would have in earlier versions with build tools like [Gulp](https://gulpjs.com).
-
-> Please note this support for this will eventually be deprecated.
-
-```typescript
-import { shopifysync as sync } from '@liquify/syncify';
-
-// Backward compatible, ie: shopify-sync
-sync(mode: string, options: {}, function() {})
 
 ```
 

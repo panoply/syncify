@@ -2,88 +2,125 @@
 'use strict';
 
 var cjs_js = require('./cjs.js');
+var process$1 = require('process');
 var mm = require('minimist');
 
 function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 
 var mm__default = /*#__PURE__*/_interopDefault(mm);
 
-cjs_js.run(mm__default.default(process.argv.slice(1), {
+cjs_js.run(mm__default.default(process$1.argv.slice(1), {
   alias: {
+    /* DIRECTORIES -------------------------------- */
     config: "c",
+    input: "i",
+    output: "o",
+    /* MODES -------------------------------------- */
     build: "b",
     watch: "w",
     upload: "u",
     download: "d",
+    /* RESOURCE ----------------------------------- */
     theme: "t",
-    input: "i",
-    output: "o",
     help: "h",
-    metafields: "m",
-    pages: "p",
-    redirects: "r",
-    filter: "f",
     spawn: "s",
+    /* OPERATIONS --------------------------------- */
+    filter: "f",
     delete: "del"
   },
   default: {
     cwd: process.cwd(),
+    /* DIRECTORIES -------------------------------- */
     config: ".",
     input: "source",
-    output: "theme",
-    import: "import",
-    export: "export",
+    /* ENV ---------------------------------------- */
     cli: true,
     dev: true,
     prod: false,
+    /* MODES -------------------------------------- */
+    import: false,
+    export: false,
+    build: false,
+    watch: false,
+    upload: false,
+    download: false,
+    terse: false,
     hot: false,
     help: false,
-    setup: false,
-    strap: false,
-    silent: false,
-    minify: false,
+    interactive: false,
+    /* TRANSFORMS --------------------------------- */
     script: false,
     style: false,
     svg: false,
-    image: false
+    image: false,
+    /* RESOURCES ---------------------------------- */
+    metafields: false,
+    pages: false,
+    redirects: false,
+    /* OPERATIONS --------------------------------- */
+    clean: false,
+    silent: false,
+    force: false,
+    /* TODO --------------------------------------- */
+    setup: false,
+    strap: false
   },
   boolean: [
-    "vsc",
+    /* MODES -------------------------------------- */
+    "build",
+    "watch",
+    "download",
+    "upload",
+    "import",
+    "export",
+    "hot",
+    "terse",
+    "help",
+    "interactive",
+    /* ENV ---------------------------------------- */
     "dev",
     "prod",
-    "hot",
-    "build",
-    "prompt",
-    "watch",
-    "upload",
-    "setup",
-    "server",
+    /* RESOURCE ----------------------------------- */
     "metafields",
     "pages",
     "redirects",
-    "download",
+    /* OPERATIONS --------------------------------- */
     "clean",
     "silent",
-    "help",
     "pull",
-    "push",
-    "minify",
+    "force",
+    "test",
+    /* GENERATORS --------------------------------- */
+    "vsc",
+    "strap",
+    /* TRANSFORMS --------------------------------- */
     "script",
     "style",
     "svg",
     "image"
   ],
   string: [
-    "theme",
-    "config",
+    /* DIRECTORIES -------------------------------- */
     "input",
+    // --input ./path/dir | -i ./path/dir
     "output",
-    "export",
-    "import",
-    "strap",
-    "filter",
+    // --output ./path/dir | -o ./path/dir
+    "config",
+    // --config ./path/dir | -c ./path/dir
+    /* MODES -------------------------------------- */
+    "theme",
+    // --theme foo | -t foo | (comma lists: foo,bar,baz)
     "spawn",
+    // --spawn foo | (comma lists: foo,bar,baz)
     "del",
-    "bump"
+    // --delete file.liquid | --del file.ext | (comma lists: foo,bar,baz)
+    /* OPERATIONS --------------------------------- */
+    "bump",
+    // --bump major | --bump minor | --bump patch
+    /* FILTERING ---------------------------------- */
+    "filter",
+    /* TODO --------------------------------------- */
+    "strap"
+    // --strap silk | --strap dawn
   ]
 })).catch(cjs_js.loggers_exports.throws);

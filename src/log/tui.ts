@@ -8,6 +8,7 @@ import { getTime } from '~utils/utils';
 import * as c from '~cli/ansi';
 import { LiteralUnion } from 'type-fest';
 import { size } from '~cli/size';
+import { bundle } from '~config';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -113,20 +114,13 @@ export function hline (minus = 15) {
  */
 export function suffix (color: Colors, prefix: Prefixes, message: string) {
 
-  const line = (prefix === 'invalid' || prefix === 'failed')
+  const line = bundle.mode.build ? c.dash : (prefix === 'invalid' || prefix === 'failed')
     ? c.line.red
     : prefix === 'warning'
       ? c.line.yellow
       : c.line.gray;
 
-  return (
-    line +
-    c[color](prefix) +
-    wsr(10 - prefix.length) +
-    c.ARR +
-    ws +
-    c[color](message)
-  );
+  return line + c[color](prefix) + wsr(10 - prefix.length) + c.ARR + ws + c[color](message);
 
 };
 
@@ -143,6 +137,22 @@ export function opener (name: string) {
     nl +
     c.open +
     c.gray(`${name} ~ ${getTime()}`)
+  );
+}
+
+/**
+ * TUI Opener
+ *
+ * ```
+ * ┌─ Name ~ 01:59:20
+ * ```
+ */
+export function tree (direction: 'top' | 'bottom', name: string) {
+
+  return direction === 'top' ? (
+    c.top + name
+  ) : (
+    c.bottom + name
   );
 }
 

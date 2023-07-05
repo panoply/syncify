@@ -2,11 +2,12 @@ import { Syncify, Requests } from 'types';
 import { join } from 'path';
 import { has } from 'rambdax';
 import { writeFile } from 'fs-extra';
-import { isFunction, assign, isUndefined, isString, isBuffer } from '../utils/native';
+import { isFunction, isUndefined, isString, isBuffer } from '../utils/native';
 import { bundle } from '../config';
-import { log } from '~log';
+import { log, c } from '~log';
 import * as timer from '../utils/timer';
 import * as request from '../requests/assets';
+import merge from 'mergerino';
 
 export async function download (cb?: Syncify): Promise<void> {
 
@@ -14,21 +15,23 @@ export async function download (cb?: Syncify): Promise<void> {
 
   const hashook = isFunction(cb);
 
-  for (const store of bundle.sync.stores) {
+  for (const theme of bundle.sync.themes) {
 
-    const theme = bundle.sync.themes[store.domain];
+    const store = bundle.sync.stores[theme.sidx];
     const { assets } = await request.get<Requests.Assets>(theme.url, store.client);
 
     for (const { key } of assets) {
 
       try {
 
-        const data = assign({}, store.client, { params: { 'asset[key]': key } });
+        const data = merge(store.client, { params: { 'asset[key]': key } });
         const { asset } = await request.get<Requests.Asset>(theme.url, data);
         const output = join(bundle.dirs.import, store.domain, theme.target, key);
         const buffer = has('attachment', asset)
           ? Buffer.from(asset.attachment, 'base64')
           : Buffer.from(asset.value || null, 'utf8');
+
+        log.write(`${c.neonCyan(key)}`);
 
         if (hashook) {
 
@@ -50,7 +53,7 @@ export async function download (cb?: Syncify): Promise<void> {
 
       } catch (e) {
 
-        log.error(e);
+        log.failed(key);
 
       }
 

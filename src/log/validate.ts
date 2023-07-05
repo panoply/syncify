@@ -1,9 +1,9 @@
 import { type, has } from 'rambdax';
 import { argv } from 'node:process';
-import { basename } from 'node:path';
 import { isArray, isUndefined, nl, ws, error, nlr, isString } from '../utils/native';
 import * as c from '~cli/ansi';
 import { bundle } from '~config';
+import { REGEX_OR_CHARS } from '~const';
 
 /**
  * Warning Store
@@ -116,7 +116,7 @@ export function typeError ({
     c.red(`The ${c.cyan(name)} option has an incorrect type value`) + nlr(2),
     c.red(`provided${c.COL} ${c.yellowBright(type(provided).toLowerCase())}`) + nl,
     c.red(`expected${c.COL} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}`) + nlr(2),
-    c.red(`in${c.COL} ${c.gray.underline(bundle.file)}`) + nlr(2),
+    c.red(`in${c.COL} ${c.gray.underline(bundle.file.base)}`) + nlr(2),
     c.white.bold('How to fix?') + nl,
     `
     ${c.gray('You need to change the option value to use the')} ${c.blue('expected')} ${c.gray('type.')}
@@ -161,6 +161,57 @@ export function invalidCommand ({
   );
 
   process.exit(0);
+
+}
+
+/**
+ * Invalid Command
+ *
+ * Throws an error when an invalid command expression was passed.
+ * Will show possible solutions and hints.
+ */
+export function invalidTarget ({
+  type,
+  message,
+  provided,
+  expected,
+  fix
+}: {
+  type: 'theme' | 'store';
+  message: string | string[];
+  expected: string;
+  provided: string;
+  fix: string | string[];
+}) {
+
+  if (REGEX_OR_CHARS.test(provided)) {
+    provided = provided.replace(REGEX_OR_CHARS, c.gray('$1'));
+  }
+
+  if (REGEX_OR_CHARS.test(expected)) {
+    expected = expected.replace(REGEX_OR_CHARS, c.gray('$1'));
+  }
+
+  if (isArray(message)) {
+    message = message.join('\n ');
+  }
+
+  error(
+    nlr(2),
+    c.red(c.bold(`Invalid ${c.cyan(type)} target provided`)) + nlr(2),
+    c.red(message) + nlr(2),
+
+    c.red(`provided${c.COL} ${c.yellowBright(expected)}`) + nl,
+    c.red(`expected${c.COL} ${c.blue(provided)}`) + nlr(2),
+
+    c.white.bold('How to fix?') + nl,
+   `
+   ${c.gray(isArray(fix) ? fix.join('\n   ') : fix)}
+   `
+  );
+
+  process.exit(0);
+
 }
 
 /**
@@ -212,18 +263,18 @@ export function missingDependency (deps: string | string[]) {
  *
  * Throws an error when an option is required but not defined
  */
-export function missingOption (option: string, name: any, expects: string, why: string) {
+export function missingOption (option: string, name: any, expects: string, why: string | string[]) {
+
+  if (option.indexOf('.') > -1) option = option.split('.').filter(Boolean).join(c.gray(' → '));
 
   error(
     nlr(2),
-    c.red(`${c.bold(`Missing ${c.cyan(option)} configuration option`)}`) + nlr(2),
+    c.red(`${c.bold(`Missing ${c.LCB} ${c.cyan(option)} ${c.RCB} configuration option`)}`) + nlr(2),
     c.red(`The ${c.cyan(name)} option needs to be defined`) + nlr(2),
     c.red(`expects${c.COL} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}`) + nlr(2),
-    c.red(`at${c.COL} ${c.gray.underline(bundle.file)}`) + nlr(2),
-    c.white.bold('Why?') + nl,
-    `
-    ${c.gray(why)}
-    `
+    c.red(`at${c.COL} ${c.gray.underline(bundle.file.base)}`) + nlr(2),
+    c.white.bold('Why?') + nl + nl +
+    c.gray(isArray(why) ? ` ${why.join('\n ')}` : ` ${why}`) + nl + nl
   );
 
   process.exit(0);
@@ -363,13 +414,9 @@ export function unknownError (option: string, value: any) {
     );
   }
 
-  let cfile = basename(bundle.file);
-
-  if (cfile === 'package.json') {
-    cfile = `${c.blue('syncify')} config in the ${c.blue('package.json')} file.`;
-  } else {
-    cfile = `${c.blue(cfile)} file.`;
-  }
+  const cfile = bundle.file.base === 'package.json'
+    ? `${c.blue('syncify')} config in the ${c.blue('package.json')} file.`
+    : `${c.blue(bundle.file.base)} file.`;
 
   error(
     nlr(2),

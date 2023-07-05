@@ -1,6 +1,7 @@
 import type { File } from 'types';
 import type { Warning } from 'postcss';
 import type { SourceSpan } from 'sass';
+import type { Message } from 'esbuild';
 import { has } from 'rambdax';
 import { isNumber, nil, warn, log } from '~utils/native';
 import * as tui from '~log/tui';
@@ -85,11 +86,18 @@ export const sass = (file: File) => (message: string, options: {
 };
 
 /**
+ * ESBuild Warning Parser
+ */
+export function esbuild (data: Message[]) {
+
+}
+
+/**
  * PostCSS Warning Parser
  *
  * Pretty formatted log for postcss warnings.
  */
-export const postcss = (file: File, data: Warning) => {
+export function postcss (file: File, data: Warning) {
 
   let output: string = nil;
 

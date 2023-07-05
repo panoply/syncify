@@ -1,86 +1,182 @@
 #!/usr/bin/env node
 
+/* eslint key-spacing: ["error", {
+  "multiLine": {
+    "beforeColon": true,
+    "afterColon":true
+  },
+  "align": {
+      "beforeColon": true,
+      "afterColon": true,
+      "on": "colon"
+  }
+}] */
+
 import { argv } from 'node:process';
 import { log } from '~log';
 import { run } from '.';
 import mm from 'minimist';
 
 run(mm(argv.slice(1), {
-  alias: {
-    config: 'c',
-    build: 'b',
-    watch: 'w',
-    upload: 'u',
-    download: 'd',
-    theme: 't',
-    input: 'i',
-    output: 'o',
-    help: 'h',
-    metafields: 'm',
-    pages: 'p',
-    redirects: 'r',
-    filter: 'f',
-    spawn: 's',
-    delete: 'del'
+  alias : {
+
+    /* DIRECTORIES -------------------------------- */
+
+    config : 'c',
+    input  : 'i',
+    output : 'o',
+
+    /* MODES -------------------------------------- */
+
+    build    : 'b',
+    watch    : 'w',
+    upload   : 'u',
+    download : 'd',
+
+    /* RESOURCE ----------------------------------- */
+
+    theme : 't',
+    help  : 'h',
+    spawn : 's',
+
+    /* OPERATIONS --------------------------------- */
+
+    filter : 'f',
+    delete : 'del'
+
   },
-  default: {
-    cwd: process.cwd(),
-    config: '.',
-    input: 'source',
-    output: 'theme',
-    import: 'import',
-    export: 'export',
-    cli: true,
-    dev: true,
-    prod: false,
-    hot: false,
-    help: false,
-    setup: false,
-    strap: false,
-    silent: false,
-    minify: false,
-    script: false,
-    style: false,
-    svg: false,
-    image: false
+  default : {
+
+    cwd : process.cwd(),
+
+    /* DIRECTORIES -------------------------------- */
+
+    config : '.',
+    input  : 'source',
+
+    /* ENV ---------------------------------------- */
+
+    cli  : true,
+    dev  : true,
+    prod : false,
+
+    /* MODES -------------------------------------- */
+
+    import      : false,
+    export      : false,
+    build       : false,
+    watch       : false,
+    upload      : false,
+    download    : false,
+    terse       : false,
+    hot         : false,
+    help        : false,
+    interactive : false,
+
+    /* TRANSFORMS --------------------------------- */
+
+    script : false,
+    style  : false,
+    svg    : false,
+    image  : false,
+
+    /* RESOURCES ---------------------------------- */
+
+    metafields : false,
+    pages      : false,
+    redirects  : false,
+
+    /* OPERATIONS --------------------------------- */
+    clean  : false,
+    silent : false,
+    force  : false,
+
+    /* TODO --------------------------------------- */
+
+    setup : false,
+    strap : false
   },
-  boolean: [
-    'vsc',
+  boolean : [
+
+    /* MODES -------------------------------------- */
+
+    'build',
+    'watch',
+    'download',
+    'upload',
+    'import',
+    'export',
+    'hot',
+    'terse',
+    'help',
+    'interactive',
+
+    /* ENV ---------------------------------------- */
+
     'dev',
     'prod',
-    'hot',
-    'build',
-    'prompt',
-    'watch',
-    'upload',
-    'setup',
-    'server',
+
+    /* RESOURCE ----------------------------------- */
+
     'metafields',
     'pages',
     'redirects',
-    'download',
+
+    /* OPERATIONS --------------------------------- */
+
     'clean',
     'silent',
-    'help',
     'pull',
-    'push',
-    'minify',
+    'force',
+    'test',
+
+    /* GENERATORS --------------------------------- */
+
+    'vsc',
+    'strap',
+
+    /* TRANSFORMS --------------------------------- */
+
     'script',
     'style',
     'svg',
     'image'
   ],
-  string: [
-    'theme',
-    'config',
-    'input',
-    'output',
-    'export',
-    'import',
-    'strap',
-    'filter',
-    'spawn',
-    'del',
+  string : [
+
+    /* DIRECTORIES -------------------------------- */
+
+    'input'
+    , // --input ./path/dir | -i ./path/dir
+    'output'
+    , // --output ./path/dir | -o ./path/dir
+    'config'
+    , // --config ./path/dir | -c ./path/dir
+
+    /* MODES -------------------------------------- */
+
+    'theme'
+    , // --theme foo | -t foo | (comma lists: foo,bar,baz)
+    'spawn'
+    , // --spawn foo | (comma lists: foo,bar,baz)
+    'del'
+    , // --delete file.liquid | --del file.ext | (comma lists: foo,bar,baz)
+
+    /* OPERATIONS --------------------------------- */
+
     'bump'
+    , // --bump major | --bump minor | --bump patch
+
+    /* FILTERING ---------------------------------- */
+
+    'filter'
+    // --filter snippets | -f sections
+    // --filter templates/theme.liquid
+    // --filter /**/* | -f /**/*
+    ,
+    /* TODO --------------------------------------- */
+
+    'strap'
+    // --strap silk | --strap dawn
   ]
 })).catch(log.throws);

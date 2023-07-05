@@ -70,14 +70,12 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   /* -------------------------------------------- */
 
   process.on('SIGINT', signal);
-  //process.on('uncaughtException', exception);
-  //process.on('unhandledRejection', rejection);
+  process.stdin.on('data', stdin);
 
-  if (bundle.mode.hot) {
+  // process.on('uncaughtException', exception);
+  // process.on('unhandledRejection', rejection);
 
-    await server();
-
-  }
+  if (bundle.mode.hot) await server();
 
   // console.log(bundle);
 
@@ -95,9 +93,13 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
       return upload(callback);
     } else if (bundle.mode.download) {
       return download(callback);
+    } else if (bundle.mode.export) {
+      return console.log('TODO');
     }
 
   } catch (e) {
+
+    console.log(e);
 
     log.throws(e);
 

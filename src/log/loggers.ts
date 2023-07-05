@@ -1,8 +1,8 @@
-import type { BuildReport, File, Group, Theme } from 'types';
+import type { File, Group, Theme } from 'types';
 import { has, isEmpty } from 'rambdax';
 import { bundle, warning } from '~config';
 import { queue } from '~requests/queue';
-import { addSuffix, sanitize, plural } from '~utils/utils';
+import { addSuffix, sanitize, plural, toUpcase } from '~utils/utils';
 import { error, isArray, log, nil, nl } from '~utils/native';
 import { intercept } from '~cli/intercept';
 import * as timer from '~utils/timer';
@@ -19,6 +19,7 @@ export { default as update } from 'log-update';
 export { start } from '~log/start';
 export { clear, hline } from '~log/tui';
 export { spinner } from '~log/spinner';
+export { progress } from '~cli/progress';
 export { log as out } from '~utils/native';
 
 /* -------------------------------------------- */
@@ -59,15 +60,44 @@ let uri: string = nil;
 /* FUNCTIONS                                    */
 /* -------------------------------------------- */
 
-export function build (id: string, { report }: BuildReport) {
+let ii = 1;
+/**
+ * Log Building - `neonCyan`
+ *
+ * @example '│ building → source/dir/file.ext'
+ */
+export function build (id: string, count: number, file: File | string) {
 
-  for (const { name } of report) {
+  const close = (title !== id);
 
-    log(c.line.gray + ' - ' + c.neonCyan(name));
+  timer.start();
 
+  // close previous group
+  if (close) {
+    log(tui.closer(group));
+    ii = 0;
   }
 
-}
+  // clear if first run
+  if (group === 'Syncify') tui.clear();
+
+  // update group
+  group = id;
+
+  // open new group
+  if (close) {
+    log(tui.opener(group));
+    nwl();
+    log(c.line.gray + c.bold(`${count} ${toUpcase(id)}`));
+    nwl();
+
+    title = id;
+  }
+
+  nwl();
+  log(tui.tree('top', c.neonCyan(typeof file === 'string' ? file : file.relative)));
+
+};
 
 /**
  * TUI Newline
@@ -92,7 +122,7 @@ export function nwl (entry: '' | 'red' | 'yellow' | 'gray' | undefined = 'gray')
  * Log Error - `red`
  *
  * Equivalent of `console.error` but applies line prefix
- * and sanitizes the input. Does not apply operation prexfix.
+ * and sanitizes the input. Does not apply operation prefix.
  *
  */
 export function err (input: string | string[]) {
@@ -108,6 +138,8 @@ export function err (input: string | string[]) {
  * Log Write
  *
  * Writes a standard stdout message with line prefix.
+ *
+ * @example '│ lorem ipsum'
  */
 export function write (input: string | string[]) {
 
@@ -248,7 +280,11 @@ export function upload (theme: Theme) {
 
   if (bundle.mode.watch) {
 
-    uploads.add([ theme.target, theme.store, timer.stop() ]);
+    uploads.add([
+      theme.target,
+      theme.store,
+      timer.stop()
+    ]);
 
     if (idle) return;
 
@@ -256,14 +292,11 @@ export function upload (theme: Theme) {
 
     queue.onIdle().then(() => {
 
-      uploads.forEach(([ target, store, time ]) => {
-
+      for (const [ target, store, time ] of uploads) {
         log(tui.suffix('neonGreen', 'uploaded', `${c.bold(target)} → ${store}` + c.time(time)));
-
-      });
+      }
 
       uploads.clear();
-
       idle = false;
 
     });
@@ -325,18 +358,16 @@ export function syncing (path: string) {
  */
 export function process (name: string, ...message: [message?: string, time?: string]) {
 
-  if (!bundle.mode.build) {
+  let time: string = message[0];
+  let text: string = nil;
 
-    let time: string = message[0];
-    let text: string = nil;
-
-    if (message.length === 2) {
-      text = ` ${c.CHV} ${message[0]}`;
-      time = message[1];
-    }
-
-    log(tui.suffix('whiteBright', 'process', c.bold(name) + text + c.time(time)));
+  if (message.length === 2) {
+    text = ` ${c.CHV} ${message[0]}`;
+    time = message[1];
   }
+
+  log(tui.suffix('whiteBright', 'process', c.bold(name) + text + c.time(time)));
+
 };
 
 /**
@@ -346,19 +377,29 @@ export function process (name: string, ...message: [message?: string, time?: str
  */
 export function exported (file: string) {
 
-  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'exports', file));
+  log(tui.suffix('whiteBright', 'exports', file));
 
 };
 
 /**
  * Log Transfrom `whiteBright`
  *
+ * ```
+ * │  src/scripts/snippet.ts
+ * │  └┐
+ * │   ├→ transform → ESM bundle → 72.8kb
+ * │   ├→ transform → exported as snippet
+ * │  ┌┘
+ * │  src/scripts/snippet.ts
+ * ```
+ *
  * @example '│ importer → source/dir/file.ext'
  */
 export function importer (message: string) {
 
-  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'importer', message));
-
+  if (!bundle.mode.build) {
+    log(tui.suffix('lavender', 'importer', message));
+  }
 };
 
 /**
@@ -368,7 +409,7 @@ export function importer (message: string) {
  */
 export function transform (message: string) {
 
-  if (!bundle.mode.build) log(tui.suffix('whiteBright', 'transform', message));
+  log(tui.suffix('whiteBright', 'transform', message));
 
 };
 
@@ -401,7 +442,9 @@ export function deleted (file: string, theme: Theme) {
  */
 export function minified (kind: string, before: string, after: string, saved: string) {
 
-  const suffix = `${c.bold(kind)} ${c.ARR} ${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`;
+  const suffix = kind
+    ? `${c.bold(kind)} ${c.ARR} ${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`
+    : `${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`;
 
   log(tui.suffix('whiteBright', 'minified', suffix));
 
@@ -423,11 +466,10 @@ export function reloaded (path: string, time: string) {
  *
  * @example '│ skipped → dir/file.ext'
  */
-export function skipped (file: File, reason: string) {
+export function skipped (file: File | string, reason: string) {
 
-  if (!bundle.mode.build) {
-    log(c.line.gray + c.gray(`${file.key} ~ ${reason}`));
-  }
+  log(tui.suffix('gray', 'skipped', `${typeof file === 'string' ? file : file.key} ~ ${reason}`));
+
 };
 
 /**

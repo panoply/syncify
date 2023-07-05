@@ -17,6 +17,9 @@ importers:
       chokidar:
         specifier: ^3.5.3
         version: 3.5.3
+      clean-css:
+        specifier: ^5.3.2
+        version: 5.3.2
       cross-spawn:
         specifier: ^7.0.3
         version: 7.0.3
@@ -53,6 +56,9 @@ importers:
       node-notifier:
         specifier: ^10.0.1
         version: 10.0.1
+      p-map:
+        specifier: ^6.0.0
+        version: 6.0.0
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
@@ -3791,6 +3797,11 @@ packages:
     dependencies:
       aggregate-error: 4.0.1
     dev: true
+
+  /p-map@6.0.0:
+    resolution: {integrity: sha512-T8BatKGY+k5rU+Q/GTYgrEf2r4xRMevAN5mtXc2aPc4rS1j3s+vWTaO2Wag94neXuCAUAs8cxBL9EeB5EA6diw==}
+    engines: {node: '>=16'}
+    dev: false
 
   /p-queue@7.3.4:
     resolution: {integrity: sha512-esox8CWt0j9EZECFvkFl2WNPat8LN4t7WWeXq73D9ha0V96qPRufApZi4ZhPwXAln1uVVal429HVVKPa2X0yQg==}
