@@ -1,4 +1,4 @@
-wimport { Bundle } from 'types';
+import { Bundle } from 'types';
 import { mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { join } from 'path';
 import { allTrue, has } from 'rambdax';
@@ -22,13 +22,13 @@ export async function createVSCodeDir (config: Bundle) {
 
 }
 
-export const vsc = async (config: Bundle) => {
+export async function vsc (config: Bundle) {
 
   timer.start();
 
   const file = await createVSCodeDir(config);
 
-  log.info(c.blueBright(`${c.bold('+')} created ${c.bold('.vscode')} directory`));
+  log.write(c.blueBright(`${c.bold('+')} created ${c.bold('.vscode')} directory`));
 
   if (!pathExistsSync(file)) {
 
@@ -54,9 +54,9 @@ export const vsc = async (config: Bundle) => {
       spaces: 2
     });
 
-    log.info(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
-    log.info(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
-    log.info(c.gray('Completed Sucessfully'));
+    log.write(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
+    log.write(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
+    log.write(c.gray('Completed Sucessfully'));
 
     return true;
 
@@ -96,8 +96,8 @@ export const vsc = async (config: Bundle) => {
 
   if (allTrue(rcfile, schema)) {
 
-    log.info(c.yellowBright(`${c.bold('!')} JSON Schemas exists`));
-    log.info(c.gray('Generation Skipped'));
+    log.write(c.yellowBright(`${c.bold('!')} JSON Schemas exists`));
+    log.write(c.gray('Generation Skipped'));
 
     return true;
   }
@@ -110,7 +110,7 @@ export const vsc = async (config: Bundle) => {
       }
     );
 
-    log.info(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`));
+    log.write(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`));
 
   }
 
@@ -123,19 +123,19 @@ export const vsc = async (config: Bundle) => {
       }
     );
 
-    log.info(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`));
+    log.write(c.magentaBright(`✓ extended ${c.bold('package.json')} Syncify schema`));
 
   }
 
   if (!has('file.associations')) settings['file.associations'] = {};
   if (!has('.syncifyrc', settings['file.associations'])) {
     settings['file.associations']['.syncifyrc'] = 'json';
-    log.info(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
+    log.write(c.greenBright(`✓ applied ${c.bold('File Associations')} to ${c.bold('.vscode/settings.json')} file`));
   }
 
   await writeJson(file, settings);
 
-  log.info(c.gray('Completed Sucessfully'));
+  log.write(c.gray('Completed Sucessfully'));
 
   return true;
 
