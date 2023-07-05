@@ -1,6 +1,6 @@
 import { SpawnCommand } from 'types';
-import { ChildProcessWithoutNullStreams } from 'node:child_process';
 import spawn from 'cross-spawn';
+import { bundle } from '~config';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -14,14 +14,6 @@ type Callback = (...data: string[]) => void
 /* -------------------------------------------- */
 /* EXPORTS                                      */
 /* -------------------------------------------- */
-
-/**
- * Child Processes
- *
- * Collection of spawned child proccesses. We need to hold reference of these
- * to kill when ending the session.
- */
-export const spawns: Map<string, ChildProcessWithoutNullStreams> = new Map();
 
 /**
  * Spawn Processes
@@ -46,6 +38,6 @@ export function spawned (name: string, command: SpawnCommand, callback: Callback
 
   command.pid = child.pid;
 
-  spawns.set(name, child);
+  bundle.spawn.streams.set(name, child);
 
 };
