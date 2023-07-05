@@ -509,6 +509,7 @@ export const bundle = new class Bundle {
     pull: false,
     force: false,
     vsc: false,
+    views: false,
     script: false,
     image: false,
     style: false,

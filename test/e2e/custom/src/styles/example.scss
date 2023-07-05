@@ -1,0 +1,15 @@
+@import 'bootstrap/scss/bootstrap';
+
+@import 'example/test-1.scss';
+@import 'example/test-2.scss';
+
+body {
+  padding: 0 0px;
+  background-color: white;
+}
+
+.example {
+  text-align: center;
+  background-color: blue;
+  display: block;
+}

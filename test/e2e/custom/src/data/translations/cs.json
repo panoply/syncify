@@ -36,11 +36,13 @@
       "previous": "Předchozí stránka"
     },
     "search": {
-      "search": "Hledání"
+      "search": "Hledání",
+      "reset": "Vymazat hledaný termín"
     },
     "cart": {
       "view": "Zobrazit košík ({{ count }})",
-      "item_added": "Položka byla přidána do košíku"
+      "item_added": "Položka byla přidána do košíku",
+      "view_empty_cart": "Zobrazit košík"
     },
     "share": {
       "copy_to_clipboard": "Kopírovat odkaz",
@@ -51,7 +53,8 @@
     "slider": {
       "of": "z",
       "next_slide": "Snímek vpravo",
-      "previous_slide": "Snímek vlevo"
+      "previous_slide": "Snímek vlevo",
+      "name": "Posuvník"
     }
   },
   "newsletter": {
@@ -74,7 +77,8 @@
     "skip_to_product_info": "Přejít na informace o produktu",
     "total_reviews": "celkový počet recenzí",
     "star_reviews_info": "{{ rating_value }} z {{ rating_max }} hvězdiček",
-    "collapsible_content_title": "Sbalitelný obsah"
+    "collapsible_content_title": "Sbalitelný obsah",
+    "complementary_products": "Doplňkové produkty"
   },
   "blogs": {
     "article": {
@@ -119,7 +123,11 @@
         "label": "Množství",
         "input_label": "Množství produktu {{ product }}",
         "increase": "Zvýšit množství produktu {{ product }}",
-        "decrease": "Snížit množství produktu {{ product }}"
+        "decrease": "Snížit množství produktu {{ product }}",
+        "minimum_of": "Minimum: {{ quantity }}",
+        "maximum_of": "Maximum: {{ quantity }}",
+        "multiples_of": "Přírůstky: {{ quantity }}",
+        "in_cart_html": "<span class=\"quantity-cart\">{{ quantity }}</span> v košíku"
       },
       "price": {
         "from_price_html": "Od {{ price }}",
@@ -148,7 +156,18 @@
       },
       "view_full_details": "Zobrazit veškeré podrobnosti",
       "include_taxes": "Včetně daní.",
-      "shipping_policy_html": "<a href=\"{{ link }}\">Poštovné</a> se vypočítá na pokladně."
+      "shipping_policy_html": "<a href=\"{{ link }}\">Poštovné</a> se vypočítá na pokladně.",
+      "choose_options": "Výběr možností",
+      "choose_product_options": "Zvolte možnosti pro: {{ product_name }}",
+      "value_unavailable": "{{ option_value }} – není k dispozici",
+      "variant_sold_out_or_unavailable": "Vyprodaná nebo nedostupná varianta",
+      "inventory_in_stock": "Skladem",
+      "inventory_in_stock_show_count": "{{ quantity }} skladem",
+      "inventory_low_stock": "Skladové zásoby docházejí",
+      "inventory_low_stock_show_count": "Skladové zásoby docházejí, zbývající množství: {{ quantity }}",
+      "inventory_out_of_stock": "Není skladem",
+      "sku": "SKU",
+      "inventory_out_of_stock_continue_selling": "Skladem"
     },
     "modal": {
       "label": "Galerie multimédií"
@@ -156,7 +175,7 @@
     "facets": {
       "apply": "Použít",
       "clear": "Vymazat",
-      "clear_all": "Vymazat vše",
+      "clear_all": "Odebrat vše",
       "from": "Od",
       "filter_and_sort": "Filtrování a řazení",
       "filter_by_label": "Filtrovat:",
@@ -184,7 +203,10 @@
         "few": "Počet produktů: {{ count }}",
         "many": "Počet produktů: {{ count }}"
       },
-      "clear_filter": "Vymazat filtr"
+      "clear_filter": "Odebrat filtr",
+      "filter_selected_accessibility": "{{ type }} (počet vybraných filtrů: {{ count }})",
+      "show_more": "Zobrazit více",
+      "show_less": "Zobrazit méně"
     }
   },
   "templates": {
@@ -205,6 +227,26 @@
         "other": "Pro dotaz {{ terms }} byl nalezen tento počet výsledků: {{ count }}",
         "few": "Pro dotaz {{ terms }} byl nalezen tento počet výsledků: {{ count }}",
         "many": "Pro dotaz {{ terms }} byl nalezen tento počet výsledků: {{ count }}"
+      },
+      "results_pages_with_count": {
+        "one": "{{ count }} stránka",
+        "other": "{{ count }} str.",
+        "few": "{{ count }} str.",
+        "many": "{{ count }} str."
+      },
+      "results_products_with_count": {
+        "one": "{{ count }} produkt",
+        "other": "{{ count }} prod.",
+        "few": "{{ count }} prod.",
+        "many": "{{ count }} prod."
+      },
+      "suggestions": "Návrhy",
+      "pages": "Stránky",
+      "results_suggestions_with_count": {
+        "one": "Počet návrhů: {{ count }}",
+        "other": "Počet návrhů: {{ count }}",
+        "few": "Počet návrhů: {{ count }}",
+        "many": "Počet návrhů: {{ count }}"
       }
     },
     "cart": {
@@ -218,7 +260,8 @@
         "comment": "Komentář",
         "send": "Odeslat",
         "post_success": "Děkujeme, že jste nás kontaktovali. Ozveme se vám co možná nejdříve.",
-        "error_heading": "Upravte prosím následující informace:"
+        "error_heading": "Upravte prosím následující informace:",
+        "title": "Kontaktní formulář"
       }
     },
     "404": {
@@ -257,7 +300,8 @@
         "product": "Produkt",
         "price": "Cena",
         "total": "Celkem",
-        "quantity": "Množství"
+        "quantity": "Množství",
+        "image": "Obrázek produktu"
       },
       "login": {
         "title": "Máte účet?",
@@ -282,7 +326,7 @@
     "collection_template": {
       "title": "Kolekce",
       "empty": "Nenalezeny žádné produkty",
-      "use_fewer_filters_html": "Můžete použít méně filtrů nebo <a class=\"{{ class }}\" href=\"{{ link }}\">vymazat vše</a>."
+      "use_fewer_filters_html": "Můžete použít méně filtrů nebo <a class=\"{{ class }}\" href=\"{{ link }}\">všechny odebrat</a>"
     },
     "video": {
       "load_video": "Načíst video: {{ description }}"
@@ -295,6 +339,16 @@
       "play_slideshow": "Přehrát prezentaci",
       "carousel": "Karusel",
       "slide": "Snímek"
+    },
+    "page": {
+      "title": "Název stránky"
+    },
+    "announcements": {
+      "previous_announcement": "Předchozí oznámení",
+      "next_announcement": "Další oznámení",
+      "carousel": "Karusel",
+      "announcement": "Oznámení",
+      "announcement_bar": "Panel oznámení"
     }
   },
   "localization": {
@@ -381,7 +435,7 @@
     },
     "reset_password": {
       "title": "Resetujte heslo účtu",
-      "subtext": "Zadejte nové heslo pro {{ email }}",
+      "subtext": "Zadejte nové heslo",
       "password": "Heslo",
       "password_confirm": "Potvrdit heslo",
       "submit": "Resetovat heslo"
@@ -408,22 +462,41 @@
       "tracking_url": "Odkaz pro sledování",
       "tracking_company": "Dopravce",
       "tracking_number": "Číslo pro sledování",
-      "subtotal": "Mezisoučet"
+      "subtotal": "Mezisoučet",
+      "total_duties": "Cla",
+      "total_refunded": "Vrácená částka"
     }
   },
   "gift_cards": {
     "issued": {
-      "title": "Zde je vaše dárková karta v hodnotě {{ value }} pro obchod {{ shop }}!",
+      "title": "Zůstatek vaší dárkové karty pro obchod {{ shop }} je: {{ value }}!",
       "subtext": "Vaše dárková karta",
       "gift_card_code": "Kód dárkové karty",
-      "shop_link": "Pokračovat v nákupu",
-      "remaining_html": "Zbývající částka: {{ balance }}",
+      "shop_link": "Navštívit online obchod",
       "add_to_apple_wallet": "Přidat do Apple Wallet",
       "qr_image_alt": "QR kód: po naskenování můžete uplatnit svou dárkovou kartu",
-      "copy_code": "Kopírovat kód",
+      "copy_code": "Zkopírovat kód dárkové karty",
       "expired": "Platnost vypršela",
       "copy_code_success": "Kód byl úspěšně zkopírován",
-      "print_gift_card": "Vytisknout"
+      "how_to_use_gift_card": "Použijte kód dárkové karty online nebo QR kód na prodejně",
+      "expiration_date": "Platnost skončí {{ expires_on }}"
+    }
+  },
+  "recipient": {
+    "form": {
+      "checkbox": "Chci zboží poslat jako dárek",
+      "email_label": "E-mail příjemce",
+      "email": "E-mail",
+      "name_label": "Jméno příjemce (volitelné)",
+      "name": "Jméno",
+      "message_label": "Zpráva (volitelné)",
+      "message": "Zpráva",
+      "max_characters": "Maximální počet znaků: {{ max_chars }}",
+      "email_label_optional_for_no_js_behavior": "E-mail příjemce (volitelné)",
+      "send_on": "RRRR-MM-DD",
+      "send_on_label": "Datum odeslání (volitelné)",
+      "expanded": "Formulář pro příjemce dárkové karty se rozbalil.",
+      "collapsed": "Formulář pro příjemce dárkové karty se sbalil."
     }
   }
 }

@@ -214,40 +214,49 @@ export async function build (callback?: Syncify) {
     const item = source[id].files;
     const size = item.length;
 
-    if (!hasFilter) {
-
-      if (id === 'styles' && mode.script) {
-        source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, styles), item);
-        source[id].time = timer.stop();
-      } else if (id === 'scripts' && mode.script) {
-        source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, script), item);
-        source[id].time = timer.stop();
-      }
-
-    }
-
-    if (id === 'layouts' || id === 'snippets' || id === 'sections' || id === 'templates') {
+    if (id === 'styles' && mode.style) {
 
       if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
 
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, liquid), item);
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, styles), item);
       source[id].time = timer.stop();
+
+    } else if (id === 'scripts' && mode.script) {
+
+      if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+
+      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, script), item);
+      source[id].time = timer.stop();
+
+    } else if (id === 'layouts' || id === 'snippets' || id === 'sections' || id === 'templates') {
+
+      if (mode.views) {
+
+        if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+
+        source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, liquid), item);
+        source[id].time = timer.stop();
+
+      }
 
     } else if (id === 'locales' || id === 'configs' || id === 'metafields') {
 
-      if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+      if (mode.views) {
 
-      source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, json), item);
-      source[id].time = timer.stop();
+        if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
 
-    } else if (id === 'pages') {
+        source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, json), item);
+        source[id].time = timer.stop();
+
+      }
+    } else if (id === 'pages' && mode.views) {
 
       if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
 
       source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, pages), item);
       source[id].time = timer.stop();
 
-    } else if (id === 'assets') {
+    } else if (id === 'assets' && mode.views) {
 
       if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
 

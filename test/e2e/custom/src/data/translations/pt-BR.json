@@ -36,11 +36,13 @@
       "previous": "Página anterior"
     },
     "search": {
-      "search": "Pesquisar"
+      "search": "Pesquisar",
+      "reset": "Limpar termo de pesquisa"
     },
     "cart": {
-      "view": "Ver o carrinho ({{ count }})",
-      "item_added": "Item adicionado ao carrinho"
+      "view": "Ver carrinho ({{ count }})",
+      "item_added": "Item adicionado ao carrinho",
+      "view_empty_cart": "Ver carrinho"
     },
     "share": {
       "copy_to_clipboard": "Copiar link",
@@ -51,7 +53,8 @@
     "slider": {
       "of": "de",
       "next_slide": "Deslizar para a direita",
-      "previous_slide": "Deslizar para a esquerda"
+      "previous_slide": "Deslizar para a esquerda",
+      "name": "Controle deslizante"
     }
   },
   "newsletter": {
@@ -74,7 +77,8 @@
     "skip_to_product_info": "Pular para as informações do produto",
     "total_reviews": "total de avaliações",
     "star_reviews_info": "{{ rating_value }} de {{ rating_max }} estrelas",
-    "collapsible_content_title": "Conteúdo recolhível"
+    "collapsible_content_title": "Conteúdo recolhível",
+    "complementary_products": "Produtos complementares"
   },
   "blogs": {
     "article": {
@@ -82,7 +86,8 @@
       "read_more_title": "Saiba mais: {{ title }}",
       "comments": {
         "one": "{{ count }} comentário",
-        "other": "{{ count }} comentários"
+        "other": "{{ count }} comentários",
+        "many": "{{ count }} comentários"
       },
       "moderated": "Os comentários precisam ser aprovados antes da publicação.",
       "comment_form_title": "Deixe um comentário",
@@ -110,7 +115,11 @@
         "label": "Quantidade",
         "input_label": "Quantidade de {{ product }}",
         "increase": "Aumentar a quantidade de {{ product }}",
-        "decrease": "Diminuir a quantidade de {{ product }}"
+        "decrease": "Diminuir a quantidade de {{ product }}",
+        "minimum_of": "Mínimo de {{ quantity }}",
+        "maximum_of": "Máximo de {{ quantity }}",
+        "multiples_of": "Pacote com {{ quantity }}",
+        "in_cart_html": "<span class=\"quantity-cart\">{{ quantity }}</span> no carrinho"
       },
       "price": {
         "from_price_html": "De {{ price }}",
@@ -146,7 +155,18 @@
       },
       "view_full_details": "Ver informações completas",
       "include_taxes": "Tributo incluído.",
-      "shipping_policy_html": "<a href=\"{{ link }}\">Frete</a> calculado no checkout."
+      "shipping_policy_html": "<a href=\"{{ link }}\">Frete</a> calculado no checkout.",
+      "choose_options": "Escolher opções",
+      "choose_product_options": "Escolha opções para {{ product_name }}",
+      "value_unavailable": "{{ option_value }} – indisponível",
+      "variant_sold_out_or_unavailable": "Variante esgotada ou indisponível",
+      "inventory_in_stock": "Em estoque",
+      "inventory_in_stock_show_count": "{{ quantity }} em estoque",
+      "inventory_low_stock": "Estoque baixo",
+      "inventory_low_stock_show_count": "Estoque baixo: {{ quantity }} restante(s)",
+      "inventory_out_of_stock": "Fora de estoque",
+      "inventory_out_of_stock_continue_selling": "Em estoque",
+      "sku": "SKU"
     },
     "modal": {
       "label": "Galeria de mídia"
@@ -154,29 +174,35 @@
     "facets": {
       "apply": "Aplicar",
       "clear": "Limpar",
-      "clear_all": "Limpar tudo",
+      "clear_all": "Remover tudo",
       "from": "De",
       "filter_and_sort": "Filtrar e organizar",
       "filter_by_label": "Filtrar:",
       "filter_button": "Filtrar",
       "filters_selected": {
         "one": "{{ count }} selecionado",
-        "other": "{{ count }} selecionados"
+        "other": "{{ count }} selecionados",
+        "many": "{{ count }} selecionados"
       },
       "max_price": "O maior preço é {{ price }}",
       "product_count": {
         "one": "{{ product_count }} de {{ count }} produto",
-        "other": "{{ product_count }} de {{ count }} produtos"
+        "other": "{{ product_count }} de {{ count }} produtos",
+        "many": "{{ product_count }} de {{ count }} produtos"
       },
       "product_count_simple": {
         "one": "{{ count }} produto",
-        "other": "{{ count }} produtos"
+        "other": "{{ count }} produtos",
+        "many": "{{ count }} produtos"
       },
       "reset": "Reinicializar",
       "sort_button": "Organizar",
       "sort_by_label": "Ordenar por:",
       "to": "Para",
-      "clear_filter": "Limpar filtro"
+      "clear_filter": "Remover filtro",
+      "filter_selected_accessibility": "{{ type }} ({{ count }} filtros selecionados)",
+      "show_more": "Exibir mais",
+      "show_less": "Exibir menos"
     }
   },
   "templates": {
@@ -184,7 +210,8 @@
       "no_results": "Não foram encontrados resultados para “{{ terms }}”. Verifique a ortografia ou use uma palavra ou frase diferente.",
       "results_with_count": {
         "one": "{{ count }} resultado",
-        "other": "{{ count }} resultados"
+        "other": "{{ count }} resultados",
+        "many": "{{ count }} resultados"
       },
       "title": "Resultados da pesquisa",
       "page": "Página",
@@ -192,8 +219,26 @@
       "search_for": "Pesquisar \"{{ terms }}\"",
       "results_with_count_and_term": {
         "one": "{{ count }} resultado encontrado para “{{ terms }}”",
-        "other": "{{ count }} resultados encontrados para “{{ terms }}”"
-      }
+        "other": "{{ count }} resultados encontrados para “{{ terms }}”",
+        "many": "{{ count }} resultados encontrados para “{{ terms }}”"
+      },
+      "results_pages_with_count": {
+        "one": "{{ count }} página",
+        "other": "{{ count }} páginas",
+        "many": "{{ count }} páginas"
+      },
+      "results_suggestions_with_count": {
+        "one": "{{ count }} sugestão",
+        "other": "{{ count }} sugestões",
+        "many": "{{ count }} sugestões"
+      },
+      "results_products_with_count": {
+        "one": "{{ count }} produto",
+        "other": "{{ count }} produtos",
+        "many": "{{ count }} produtos"
+      },
+      "suggestions": "Sugestões",
+      "pages": "Páginas"
     },
     "cart": {
       "cart": "Carrinho"
@@ -206,7 +251,8 @@
         "comment": "Comentário",
         "send": "Enviar",
         "post_success": "Agradecemos seu contato. Retornaremos o mais rápido possível.",
-        "error_heading": "Ajuste o seguinte:"
+        "error_heading": "Ajuste o seguinte:",
+        "title": "Formulário de contato"
       }
     },
     "404": {
@@ -220,7 +266,8 @@
       "menu": "Menu",
       "cart_count": {
         "one": "{{ count }} item",
-        "other": "{{ count }} itens"
+        "other": "{{ count }} itens",
+        "many": "{{ count }} itens"
       }
     },
     "cart": {
@@ -242,7 +289,8 @@
         "product": "Produto",
         "price": "Preço",
         "total": "Total",
-        "quantity": "Quantidade"
+        "quantity": "Quantidade",
+        "image": "Imagem do produto"
       },
       "update": "Atualizar",
       "login": {
@@ -268,7 +316,7 @@
     "collection_template": {
       "title": "Coleção",
       "empty": "Nenhum produto encontrado",
-      "use_fewer_filters_html": "Usar menos filtros ou <a class=\"{{ class }}\" href=\"{{ link }}\">limpar tudo</a>"
+      "use_fewer_filters_html": "Usar menos filtros ou <a class=\"{{ class }}\" href=\"{{ link }}\">remover tudo</a>"
     },
     "video": {
       "load_video": "Carregar vídeo: {{ description }}"
@@ -281,6 +329,16 @@
       "play_slideshow": "Reproduzir apresentação de slides",
       "carousel": "Carrossel",
       "slide": "Slide"
+    },
+    "page": {
+      "title": "Título da página"
+    },
+    "announcements": {
+      "previous_announcement": "Comunicado anterior",
+      "next_announcement": "Próximo comunicado",
+      "carousel": "Carrossel",
+      "announcement": "Comunicado",
+      "announcement_bar": "Barra de comunicados"
     }
   },
   "localization": {
@@ -367,7 +425,7 @@
     },
     "reset_password": {
       "title": "Redefinir senha da conta",
-      "subtext": "Insira uma nova senha para {{ email }}",
+      "subtext": "Insira uma nova senha",
       "password": "Senha",
       "password_confirm": "Confirmar senha",
       "submit": "Redefinir senha"
@@ -394,22 +452,41 @@
       "tracking_url": "Link de rastreamento",
       "tracking_company": "Transportadora",
       "tracking_number": "Número de rastreamento",
-      "subtotal": "Subtotal"
+      "subtotal": "Subtotal",
+      "total_duties": "Tributos de importação",
+      "total_refunded": "Reembolsado"
     }
   },
   "gift_cards": {
     "issued": {
-      "title": "Aqui está seu cartão-presente da {{ shop }} no valor de {{ value }}.",
+      "title": "O saldo no cartão-presente da loja {{ shop }} é de {{ value }}.",
       "subtext": "Seu cartão-presente",
       "gift_card_code": "Código do cartão-presente",
-      "shop_link": "Voltar à loja",
-      "remaining_html": "{{ balance }} restantes",
+      "shop_link": "Visitar loja virtual",
       "add_to_apple_wallet": "Adicionar ao app Wallet da Apple",
       "qr_image_alt": "Código QR — faça a leitura para resgatar o cartão-presente",
-      "copy_code": "Copiar código",
+      "copy_code": "Copiar código do cartão-presente",
       "expired": "Expirado",
       "copy_code_success": "Código copiado",
-      "print_gift_card": "Imprimir"
+      "how_to_use_gift_card": "Use o código do cartão-presente online ou o código QR na loja",
+      "expiration_date": "Expira em {{ expires_on }}"
+    }
+  },
+  "recipient": {
+    "form": {
+      "checkbox": "Quero enviar como presente",
+      "email_label": "E-mail do destinatário",
+      "email": "E-mail",
+      "name_label": "Nome do destinatário (opcional)",
+      "name": "Nome",
+      "message_label": "Mensagem (opcional)",
+      "message": "Mensagem",
+      "max_characters": "Máximo de {{ max_chars }} caracteres",
+      "email_label_optional_for_no_js_behavior": "E-mail do destinatário (opcional)",
+      "send_on": "AAAA-MM-DD",
+      "send_on_label": "Enviar em (opcional)",
+      "expanded": "Formulário de destinatário do cartão-presente expandido",
+      "collapsed": "Formulário de destinatário do cartão-presente recolhido"
     }
   }
 }

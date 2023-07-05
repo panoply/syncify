@@ -1,5 +1,5 @@
 import foo  from './foo'
-import qux from '../components/qux';
+import qux from './qux';
 
 export default function () {
 

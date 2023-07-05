@@ -1,17 +1,35 @@
-# E2E Test ~ Syncify Custom
+# E2E Test ~ Syncify Dawn
 
-An E2E structure and output test wires up a customized architecture. The case takes advantage of various features shipped with Syncify and aims to match the requirements of a common project.
+An E2E structure and output test wires up a customized architecture. The case takes advantage of various features shipped with Syncify and aims to match the requirements of a common project. Containing theme files are from [Dawn](https://github.com/Shopify/dawn) and files contained directories named using a single `_` character are **test examples**.
+
+**You can use any directory name, the E2E just uses underscore for the sake of brevity**
+
+# Instructions
+
+Fork or download this repository. You should use install [pnpm](https://pnpm.js.org/en/cli/install) and use it instead of npm or yarn (though they are also supported). The first things you need to do is simply install the dependencies. Given this a test case sample, there are additional modules installed which you probably wont needs if you're using this as a strap starting point.
+
+### Requirements
+
+You will need to update the `env.example` file first. Say (for example) your myshopify store name is `awesome-jeans` then you will need to set this information:
+
+Rename the `.env.example` file to `.env` and enter this:
+
+```bash
+# EXAMPLE STOREFRONT API TOKEN
+#
+awesome-jeans_api_token = 'TOKEN-GOES-HERE'
+```
 
 ### Commands
 
-The E2E case has wired up some low level commands:
+The following commands are already wired up:
 
 ```bash
-pnpm syncify           # Runs the Syncify executable, ie: $ syncify
 pnpm dev               # Runs Syncify in development mode with hot reloads
+pnpm dev:multi         # Runs Syncify in development targeting multiple themes
 pnpm build             # Runs Syncify in build mode and applied minification
 pnpm upload            # Runs Syncify in upload mode and publishes it online
-pnpm bump              # Runs version control manager and launches the prompt
+pnpm build:multi       # Runs Syncify in upload mode to many stores and themes
 ```
 
 ### Structure

@@ -273,6 +273,10 @@ export interface Modes {
    */
   hot: boolean;
   /**
+   * Run the views transform, `--views`
+   */
+  views: boolean;
+  /**
    * Run the style transform, `--style`
    */
   style: boolean;

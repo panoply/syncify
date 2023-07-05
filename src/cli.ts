@@ -75,6 +75,7 @@ run(mm(argv.slice(1), {
 
     /* TRANSFORMS --------------------------------- */
 
+    views  : false,
     script : false,
     style  : false,
     svg    : false,
@@ -137,6 +138,7 @@ run(mm(argv.slice(1), {
 
     /* TRANSFORMS --------------------------------- */
 
+    'views',
     'script',
     'style',
     'svg',

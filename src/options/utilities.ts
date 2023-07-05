@@ -486,7 +486,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
               : assign({}, o, option);
 
             if (opts.flatten) {
-              for (const input of paths) config.push(assign(merge, { input }));
+              for (const input of paths) config.push(assign({}, merge, { input }));
             } else {
               config.push(assign(merge, { input: paths, match }));
             }

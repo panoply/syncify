@@ -117,7 +117,7 @@ export async function setStyleConfig (config: Config) {
       }
     }
 
-    if ((has('sass', style) && style.sass !== false) || sass.installed === true) {
+    if ((has('sass', style) && style.sass !== false) && sass.installed === true) {
 
       const override = u.isObject(style.sass);
 
@@ -275,8 +275,10 @@ export async function setStyleConfig (config: Config) {
       compile.watch = anymatch(watch);
 
     } else {
+
       compile.watch = anymatch([ compile.input ]);
       bundle.watch.add(compile.input);
+
     }
 
     if (typeof compile.sass === 'object') {

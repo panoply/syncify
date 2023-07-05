@@ -36,11 +36,13 @@
       "previous": "Предыдущая страница"
     },
     "search": {
-      "search": "Поиск"
+      "search": "Поиск",
+      "reset": "Удалить поисковый запрос"
     },
     "cart": {
       "view": "Просмотреть корзину ({{ count }})",
-      "item_added": "Товар добавлен в корзину."
+      "item_added": "Товар добавлен в корзину.",
+      "view_empty_cart": "Просмотреть корзину"
     },
     "share": {
       "copy_to_clipboard": "Копировать ссылку",
@@ -51,7 +53,8 @@
     "slider": {
       "of": "из",
       "next_slide": "Листать вперед",
-      "previous_slide": "Листать назад"
+      "previous_slide": "Листать назад",
+      "name": "Ползунок"
     }
   },
   "newsletter": {
@@ -74,7 +77,8 @@
     "skip_to_product_info": "Перейти к информации о продукте",
     "total_reviews": "всего отзывов",
     "star_reviews_info": "{{ rating_value }} из {{ rating_max }} звезд",
-    "collapsible_content_title": "Контент, который можно свернуть"
+    "collapsible_content_title": "Контент, который можно свернуть",
+    "complementary_products": "Дополнительные товары"
   },
   "blogs": {
     "article": {
@@ -119,7 +123,11 @@
         "label": "Количество",
         "input_label": "Количество: {{ product }}",
         "increase": "Увеличить количество {{ product }}",
-        "decrease": "Уменьшить количество {{ product }}"
+        "decrease": "Уменьшить количество {{ product }}",
+        "minimum_of": "Минимум {{ quantity }}",
+        "maximum_of": "Максимум {{ quantity }}",
+        "multiples_of": "Прирост: {{ quantity }}",
+        "in_cart_html": "В корзине: <span class=\"quantity-cart\">{{ quantity }}</span>"
       },
       "price": {
         "from_price_html": "От {{ price }}",
@@ -148,7 +156,18 @@
       },
       "view_full_details": "Просмотреть всю информацию",
       "include_taxes": "Сумма налога включена.",
-      "shipping_policy_html": "<a href=\"{{ link }}\">Стоимость доставки</a> рассчитывается при оформлении заказа."
+      "shipping_policy_html": "<a href=\"{{ link }}\">Стоимость доставки</a> рассчитывается при оформлении заказа.",
+      "choose_options": "Выберите варианты",
+      "choose_product_options": "Выберите варианты для {{ product_name }}",
+      "value_unavailable": "{{ option_value }} — Недоступно",
+      "variant_sold_out_or_unavailable": "Вариант распродан или недоступен",
+      "inventory_in_stock": "В наличии",
+      "inventory_in_stock_show_count": "В наличии: {{ quantity }}",
+      "inventory_low_stock": "Заканчивается",
+      "inventory_low_stock_show_count": "Заканчивается. Осталось: {{ quantity }}",
+      "inventory_out_of_stock": "Нет в наличии",
+      "inventory_out_of_stock_continue_selling": "В наличии",
+      "sku": "Артикул"
     },
     "modal": {
       "label": "Галерея мультимедиа"
@@ -184,7 +203,10 @@
         "few": "Продуктов: {{ count }}",
         "many": "Продуктов: {{ count }}"
       },
-      "clear_filter": "Удалить фильтр"
+      "clear_filter": "Снять фильтр",
+      "filter_selected_accessibility": "{{ type }} (установлены фильтры: {{ count }})",
+      "show_more": "Показать больше",
+      "show_less": "Показать меньше"
     }
   },
   "templates": {
@@ -205,7 +227,27 @@
         "other": "{{ count }} рез. по запросу «{{ terms }}»",
         "few": "{{ count }} рез. по запросу «{{ terms }}»",
         "many": "{{ count }} рез. по запросу «{{ terms }}»"
-      }
+      },
+      "results_pages_with_count": {
+        "one": "Количество страниц: {{ count }}",
+        "other": "Количество страниц: {{ count }}",
+        "few": "Количество страниц: {{ count }}",
+        "many": "Количество страниц: {{ count }}"
+      },
+      "results_suggestions_with_count": {
+        "one": "Рекомендации: {{ count }}",
+        "other": "Рекомендации: {{ count }}",
+        "few": "Рекомендации: {{ count }}",
+        "many": "Рекомендации: {{ count }}"
+      },
+      "results_products_with_count": {
+        "one": "Продукты: {{ count }}",
+        "other": "Продукты: {{ count }}",
+        "few": "Продукты: {{ count }}",
+        "many": "Продукты: {{ count }}"
+      },
+      "suggestions": "Рекомендации",
+      "pages": "Страницы"
     },
     "cart": {
       "cart": "Корзина"
@@ -218,7 +260,8 @@
         "comment": "Комментарий",
         "send": "Отправить",
         "post_success": "Спасибо за обращение. Мы свяжемся с вами как можно скорее.",
-        "error_heading": "Измените следующие элементы:"
+        "error_heading": "Измените следующие элементы:",
+        "title": "Форма для связи"
       }
     },
     "404": {
@@ -257,7 +300,8 @@
         "product": "Товар",
         "price": "Цена",
         "total": "Всего",
-        "quantity": "Количество"
+        "quantity": "Количество",
+        "image": "Изображение продукта"
       },
       "login": {
         "title": "Уже есть учетная запись?",
@@ -282,7 +326,7 @@
     "collection_template": {
       "title": "Коллекция",
       "empty": "Продукты не найдены",
-      "use_fewer_filters_html": "Используйте меньше фильтров или <a class=\"{{ class }}\" href=\"{{ link }}\">удалите фильтры</a>"
+      "use_fewer_filters_html": "Используйте меньше фильтров или <a class=\"{{ class }}\" href=\"{{ link }}\">удалите все</a>"
     },
     "video": {
       "load_video": "Загрузить видео: {{ description }}"
@@ -295,6 +339,16 @@
       "play_slideshow": "Воспроизвести слайд-шоу",
       "carousel": "Карусель",
       "slide": "Слайд"
+    },
+    "page": {
+      "title": "Название страницы"
+    },
+    "announcements": {
+      "previous_announcement": "Предыдущее объявление",
+      "next_announcement": "Следующее объявление",
+      "carousel": "Карусель",
+      "announcement": "Объявление",
+      "announcement_bar": "Строка объявления"
     }
   },
   "localization": {
@@ -381,7 +435,7 @@
     },
     "reset_password": {
       "title": "Сбросьте пароль учетной записи",
-      "subtext": "Введите новый пароль для {{ email }}",
+      "subtext": "Введите новый пароль",
       "password": "Пароль",
       "password_confirm": "Подтвердить пароль",
       "submit": "Сбросить пароль"
@@ -408,22 +462,41 @@
       "tracking_url": "Ссылка для отслеживания",
       "tracking_company": "Перевозчик",
       "tracking_number": "Номер для отслеживания",
-      "subtotal": "Промежуточный итог"
+      "subtotal": "Промежуточный итог",
+      "total_duties": "Пошлины",
+      "total_refunded": "Средства возвращены"
     }
   },
   "gift_cards": {
     "issued": {
-      "title": "Вот ваша подарочная карта на {{ value }} для магазина {{ shop }}!",
+      "title": "Вот ваша подарочная карта с номиналом {{ value }} для магазина {{ shop }}!",
       "subtext": "Ваша подарочная карта",
       "gift_card_code": "Код подарочной карты",
-      "shop_link": "Продолжить покупки",
-      "remaining_html": "Остаток на счету: {{ balance }}",
+      "shop_link": "Посетить онлайн-магазин",
       "add_to_apple_wallet": "Добавить в Apple Wallet",
       "qr_image_alt": "Отсканируйте QR-код, чтобы использовать подарочную карту",
-      "copy_code": "Копировать код",
+      "copy_code": "Скопировать код подарочной карты",
       "expired": "Срок действия истек",
       "copy_code_success": "Код скопирован",
-      "print_gift_card": "Печать"
+      "how_to_use_gift_card": "Используйте код подарочной карты онлайн или отсканируйте QR-код в магазине",
+      "expiration_date": "Срок действия истекает {{ expires_on }}"
+    }
+  },
+  "recipient": {
+    "form": {
+      "checkbox": "Я хочу отправить это в качестве подарка",
+      "email_label": "Электронный адрес получателя",
+      "email": "Электронный адрес",
+      "name_label": "Имя получателя (необязательно)",
+      "name": "Имя",
+      "message_label": "Сообщение (необязательно)",
+      "message": "Сообщение",
+      "max_characters": "Не больше {{ max_chars }} симв.",
+      "email_label_optional_for_no_js_behavior": "Электронный адрес получателя (необязательно)",
+      "send_on": "ГГГГ-ММ-ДД",
+      "send_on_label": "Дата отправки (необязательно)",
+      "expanded": "Форма с данными получателя подарочной карты развернута",
+      "collapsed": "Форма с данными получателя подарочной карты свернута"
     }
   }
 }

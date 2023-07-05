@@ -1,15 +1,46 @@
 //@ts-nocheck
 import { defineConfig } from '@syncify/cli';
 
-
+// COMMENTED OUT OPTIONS ARE NOT YET AVAILABLE
+// BUT WILL BE MADE POSSIBLE IN FUTURE VERSIONS
+// ALL CONFIG OPTIONS ARE TYPED AND WELL ANNOTATED
 
 export default defineConfig({
-  clean: false,
-  input: 'src',
-  output: 'dist',
-  hot: {
 
+  clean: true,
+  input: 'src',
+  output: 'theme',
+  hot: {},
+  paths: {
+
+    // metafields: 'metafields/**/*',
+    // pages: 'pages/*',
+    // redirects: 'redirects.yaml'
+
+    assets: 'assets/images/**/*',
+    config: 'data/settings/*',
+    locales: 'data/translations/*',
+    snippets: [
+      'views/snippets/**/*'
+    ],
+    sections: [
+      'views/sections/**/*'
+    ],
+    customers: [
+      'views/customers/*'
+    ],
+    templates: [
+      'views/templates/json/*',
+      'views/templates/liquid/*',
+    ],
+    layout: [
+      'views/theme.liquid',
+      'views/password.liquid'
+    ],
   },
+
+  // ADD YOUR STORE/S + THEME/S
+
   stores: [
     {
       domain: 'syncify',
@@ -25,6 +56,9 @@ export default defineConfig({
       }
     }
   ],
+
+  // EXAMPLE: SPAWNED PROCESSES
+
   spawn: {
     // build: {
     //   rollup: 'rollup -c config/rollup.config.js'
@@ -35,55 +69,56 @@ export default defineConfig({
     //   esbuild: 'esbuild src/scripts/ts/index.ts --outfile=theme/assets/esbuild-bundle.js --bundle --watch --color=true'
     // }
   },
-  logger: {
-    warnings: false,
-    clear: true,
-    silent: false,
-    stats: true
-  },
-  paths: {
-    assets: 'assets/images/*',
-    config: 'data/settings/*',
-    locales: 'data/translations/*',
-    metafields: 'data/metafields/**/*',
-    layout: 'theme.liquid',
-    pages: 'views/pages/*',
-    customers: 'views/customers/*',
-    templates: 'views/*.json',
-    snippets: 'views/include/**/*',
-    sections: ['views/sections/**/*']
-  },
   views: {
+
+    // pages: {}
+
+    // EXAMPLE: SUB-DIRECTORY SECTION SUPPORT
+
     sections: {
       prefixDir: true,
       separator: '-',
       global: [
+        '_',
         'layout',
-        'collection',
-        'product',
-        'index'
+        'blocks'
       ]
     },
+
+    // EXAMPLE: SUB-DIRECTORY SNIPPET SUPPORT
+
     snippets: {
-      global: [],
-      foo: '',
       prefixDir: true,
-      separator: '-'
+      separator: '-',
+      global: [
+        '_',
+        'example',
+        'misc'
+      ]
     },
-    pages: {
-      language: 'markdown',
-      author: 'Syncify'
-    }
   },
+
   transforms: {
+
     script: {
+
+      // DAWN JS
+
+      'assets/[file]': 'scripts/dawn/*.js',
+
+      // EXAMPLE: BELOW IS AN EXAMPLE OF TS/JS
+
+      'assets/bundle.min.js': 'scripts/bundle.ts',
+
+      // EXAMPLE: MULTIPLE FILES WITH RENAME
+
       'assets/output-[file]': [
         'scripts/components/test.ts',
         'scripts/modules/lazysizes.ts'
       ],
-      'assets/bundle.min.js': 'scripts/bundle.ts',
-//      'assets/lazysizes.min.js': 'scripts/modules/lazysizes.ts',
-//      'snippets/[dir]-[file]': 'scripts/globs/*.ts',
+
+      // EXAMPLE: GENERATING A SNIPPET
+
       'snippets/foo-snippet': {
         input: 'scripts/snippet.ts',
         format: 'esm',
@@ -91,35 +126,50 @@ export default defineConfig({
         target: 'es2016',
         external: [],
         watch: [],
-        esbuild: {
+        esbuild: {}
+      }
+    },
 
-        }
-      }
-    },
     style: {
-      'assets/stylesheet.min.css': {
-        input: 'styles/stylesheet.scss',
-        watch: ['styles/sections/*'],
+
+      // DAWN CSS
+
+      'assets/[file]': {
+        input: 'styles/dawn/*.css',
+        postcss: true,
+        sass: false,
+      },
+
+      // EXAMPLE: BUNDLING BOOTSTRAP
+
+      'assets/example.min.css': {
+        input: 'styles/example.scss',
+        watch: ['styles/example/*'],
         postcss: true,
         sass: true
       },
-      'snippets/css.liquid': {
-        input: 'styles/vars.css.liquid',
+
+      // EXAMPLE: GENERATING A SNIPPET
+
+      'snippets/example.css.liquid': {
+        input: 'styles/snippet.scss',
         postcss: true,
         sass: true
-      },
-      'snippets/testing.css': {
-        input: 'styles/snippet.css',
-        postcss: true,
-        sass: false
       }
     },
+
     svg: {
+
+      // DAWN ICONS
+
       'snippets/icon.[file]': {
         input: 'assets/icons/dawn/*',
         snippet: true,
         format: 'file'
       },
+
+      // EXAMPLE: BUILDING A SPRITE FROM FEATHER ICONS
+
       'snippets/sprite.liquid': {
         input: 'assets/icons/feather/*',
         format: 'sprite',
@@ -136,7 +186,7 @@ export default defineConfig({
   processors: {
     esbuild: {
       bundle: true,
-      sourcemap: false,
+      sourcemap: true,
     },
     sass: {
       sourcemap: true,
@@ -145,9 +195,17 @@ export default defineConfig({
     },
     postcss: []
   },
-  minify: {
+  terser: {
+    json: {
+      assets: true,
+      config: true,
+      locales: true,
+      metafields: true,
+      templates: true,
+      sectionGroups: true,
+      exclude: []
+    },
     script: {
-
       keepNames: false,
       legalComments: "inline",
       minifyIdentifiers: true,
@@ -155,18 +213,6 @@ export default defineConfig({
       minifyWhitespace: true,
       mangleQuoted: true,
       exclude: []
-    },
-    json: {
-      assets: true,
-      config: true,
-      locales: true,
-      metafields: true,
-      templates: true,
-      exclude: []
-
-    },
-    style: {
-
     },
     views: {
       collapseWhitespace: true,
@@ -177,6 +223,5 @@ export default defineConfig({
       stripDashes: true,
       exclude: []
     }
-  },
-  plugins: []
+  }
 });

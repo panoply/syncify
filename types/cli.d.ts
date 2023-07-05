@@ -469,6 +469,20 @@ export interface Commands {
    */
   bump?: string;
   /**
+   * Runs view transforms only (i.e: `.liquid` and `.json` files)
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify --views         # executes build
+   * $ syncify -w --views       # executes in watch mode
+   * $ syncify --views --prod   # executes build with minify
+   * $ syncify --views --terse # executes build with minify
+   * ```
+   */
+  views?: boolean;
+  /**
    * Runs the script transform only
    * ---
    *
@@ -478,7 +492,7 @@ export interface Commands {
    * $ syncify --script          # executes build
    * $ syncify -w --script       # executes in watch mode
    * $ syncify --script --prod   # executes build with minify
-   * $ syncify --script --minify # executes build with minify
+   * $ syncify --script --terse # executes build with minify
    * ```
    */
   script?: boolean;
@@ -492,7 +506,7 @@ export interface Commands {
    * $ syncify --style           # executes build
    * $ syncify -w --style        # executes in watch mode
    * $ syncify --style --prod    # executes build with minify
-   * $ syncify --style --minify  # executes build with minify
+   * $ syncify --style --terse  # executes build with minify
    * ```
    */
   style?: boolean;
@@ -506,7 +520,7 @@ export interface Commands {
    * $ syncify --svg           # executes build
    * $ syncify -w --svg        # executes in watch mode
    * $ syncify --svg --prod    # executes build with minify
-   * $ syncify --svg --minify  # executes build with minify
+   * $ syncify --svg --terse  # executes build with minify
    * ```
    */
   svg?: boolean;
@@ -520,7 +534,7 @@ export interface Commands {
    * $ syncify --image           # executes build
    * $ syncify -w --image        # executes in watch mode
    * $ syncify --image --prod    # executes build with minify
-   * $ syncify --image --minify  # executes build with minify
+   * $ syncify --image --terse  # executes build with minify
    * ```
    */
   image?: boolean;

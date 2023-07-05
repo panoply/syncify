@@ -131,6 +131,7 @@ function setModes (cli: Commands) {
     pages: cli.pages,
     pull: cli.pull,
     force: cli.force,
+    views: cli.views,
     script: transfrom ? cli.script : false,
     style: transfrom ? cli.style : false,
     image: transfrom ? cli.image : false,
@@ -171,6 +172,7 @@ function setModes (cli: Commands) {
       modes.style = true;
       modes.svg = true;
       modes.image = true;
+      modes.views = true;
     }
   }
 

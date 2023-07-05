@@ -36,11 +36,13 @@
       "previous": "หน้าก่อนหน้านี้"
     },
     "search": {
-      "search": "ค้นหา"
+      "search": "ค้นหา",
+      "reset": "ล้างคำที่ใช้ค้นหา"
     },
     "cart": {
-      "view": "ดูรถตะกร้าสินค้าของฉัน ({{ count }})",
-      "item_added": "รายการที่เพิ่มในตะกร้าสินค้าของคุณ"
+      "view": "ดูตะกร้าสินค้า ({{ count }})",
+      "item_added": "รายการที่เพิ่มในตะกร้าสินค้าของคุณ",
+      "view_empty_cart": "ดูตะกร้าสินค้า"
     },
     "share": {
       "copy_to_clipboard": "คัดลอกลิงก์",
@@ -51,7 +53,8 @@
     "slider": {
       "of": "จาก",
       "next_slide": "ไปสไลด์ขวา",
-      "previous_slide": "ไปสไลด์ซ้าย"
+      "previous_slide": "ไปสไลด์ซ้าย",
+      "name": "แถบเลื่อน"
     }
   },
   "newsletter": {
@@ -74,7 +77,8 @@
     "skip_to_product_info": "ข้ามไปยังข้อมูลสินค้า",
     "total_reviews": "รีวิวทั้งหมด",
     "star_reviews_info": "{{ rating_value }} จาก {{ rating_max }} ดาว",
-    "collapsible_content_title": "เนื้อหาที่ย่อได้"
+    "collapsible_content_title": "เนื้อหาที่ย่อได้",
+    "complementary_products": "สินค้าเสริม"
   },
   "blogs": {
     "article": {
@@ -104,18 +108,22 @@
     "product": {
       "add_to_cart": "เพิ่มลงในตะกร้าสินค้า",
       "description": "คำอธิบาย",
-      "on_sale": "การลดราคา",
+      "on_sale": "ลดราคา",
       "product_variants": "ตัวเลือกสินค้า",
       "quantity": {
         "label": "ปริมาณ",
         "input_label": "ปริมาณสำหรับ {{ product }}",
         "increase": "เพิ่มปริมาณสำหรับ {{ product }}",
-        "decrease": "ลดปริมาณสำหรับ {{ product }}"
+        "decrease": "ลดปริมาณสำหรับ {{ product }}",
+        "minimum_of": "จำนวนต่ำสุดของ {{ quantity }}",
+        "maximum_of": "จำนวนสูงสุดของ {{ quantity }}",
+        "multiples_of": "เพิ่มขึ้นได้ทีละ {{ quantity }}",
+        "in_cart_html": "จำนวน <span class=\"quantity-cart\">{{ quantity }}</span> ในตะกร้าสินค้า"
       },
       "price": {
         "from_price_html": "จาก {{ price }}",
         "regular_price": "ราคาปกติ",
-        "sale_price": "ราคาช่วงลดราคา",
+        "sale_price": "ราคาโปรโมชัน",
         "unit_price": "ราคาต่อหน่วย"
       },
       "share": "แชร์สินค้ารายการนี้",
@@ -124,7 +132,7 @@
       "vendor": "ผู้ขาย",
       "video_exit_message": "{{ title }} เปิดวิดีโอแบบเต็มหน้าจอในหน้าต่างเดียวกัน",
       "xr_button": "ดูในพื้นที่ของคุณ",
-      "xr_button_label": "ดูในพื้นที่ของคุณ โหลดรายการในหน้าต่างการสร้างวัตถุเสมือน",
+      "xr_button_label": "ดูในพื้นที่ของคุณ โหลดรายการในหน้าต่างความเป็นจริงเสริม",
       "pickup_availability": {
         "view_store_info": "ดูข้อมูลร้านค้า",
         "check_other_stores": "ตรวจสอบความพร้อมที่ร้านค้าอื่นๆ",
@@ -146,7 +154,18 @@
       },
       "view_full_details": "ดูรายละเอียดทั้งหมด",
       "include_taxes": "รวมภาษี",
-      "shipping_policy_html": "<a href=\"{{ link }}\">ค่าจัดส่ง</a>ที่คำนวณในขั้นตอนการชำระเงิน"
+      "shipping_policy_html": "<a href=\"{{ link }}\">ค่าจัดส่ง</a>ที่คำนวณในขั้นตอนการชำระเงิน",
+      "choose_options": "เลือกตัวเลือก",
+      "choose_product_options": "เลือกตัวเลือกสำหรับ {{ product_name }}",
+      "value_unavailable": "{{ option_value }} ไม่พร้อมจำหน่าย",
+      "variant_sold_out_or_unavailable": "ตัวเลือกสินค้าขายหมดแล้วหรือไม่พร้อมจำหน่าย",
+      "inventory_in_stock": "มีในสต็อก",
+      "inventory_in_stock_show_count": "มี {{ quantity }} รายการในสต็อกสินค้า",
+      "inventory_low_stock": "สต็อกสินค้าเหลือน้อย",
+      "inventory_low_stock_show_count": "สต็อกสินค้าเหลือน้อย: เหลือ {{ quantity }} ชิ้น",
+      "inventory_out_of_stock": "หมดสต็อก",
+      "sku": "SKU",
+      "inventory_out_of_stock_continue_selling": "มีในสต็อก"
     },
     "modal": {
       "label": "แกลเลอรีสื่อ"
@@ -154,7 +173,7 @@
     "facets": {
       "apply": "นำไปใช้",
       "clear": "ล้าง",
-      "clear_all": "ล้างทั้งหมด",
+      "clear_all": "ลบออกทั้งหมด",
       "from": "จาก",
       "filter_and_sort": "กรองและจัดเรียง",
       "filter_by_label": "ตัวกรอง:",
@@ -176,7 +195,10 @@
       "sort_button": "จัดเรียง",
       "sort_by_label": "เรียงตาม:",
       "to": "ไปยัง",
-      "clear_filter": "ล้างตัวกรอง"
+      "clear_filter": "ลบตัวกรองออก",
+      "filter_selected_accessibility": "{{ type }} (เลือกตัวกรองแล้ว {{ count }} รายการ)",
+      "show_more": "แสดงมากขึ้น",
+      "show_less": "แสดงน้อยลง"
     }
   },
   "templates": {
@@ -191,9 +213,23 @@
       "products": "สินค้า",
       "search_for": "ค้นหา “{{ terms }}”",
       "results_with_count_and_term": {
-        "one": "พบผลลัพธ์ {{ count }} รายการสำหรับ \"{{ terms }}\"",
-        "other": "พบผลลัพธ์ {{ count }} รายการสำหรับ \"{{ terms }}\""
-      }
+        "one": "พบผลลัพธ์ {{ count }} รายการสำหรับ “{{ terms }}”",
+        "other": "พบผลลัพธ์ {{ count }} รายการสำหรับ “{{ terms }}”"
+      },
+      "results_pages_with_count": {
+        "one": "{{ count }} หน้า",
+        "other": "{{ count }} หน้า"
+      },
+      "results_suggestions_with_count": {
+        "one": "คำแนะนำ {{ count }} รายการ",
+        "other": "{{ count }} คำแนะนำ"
+      },
+      "results_products_with_count": {
+        "one": "สินค้า {{ count }} รายการ",
+        "other": "สินค้า {{ count }} รายการ"
+      },
+      "suggestions": "คำแนะนำ",
+      "pages": "หน้า"
     },
     "cart": {
       "cart": "ตะกร้าสินค้า"
@@ -206,7 +242,8 @@
         "comment": "ความคิดเห็น",
         "send": "ส่ง",
         "post_success": "ขอขอบคุณที่ติดต่อเรา เราจะติดต่อกลับไปหาคุณโดยเร็วที่สุด",
-        "error_heading": "โปรดแก้ไขข้อมูลดังต่อไปนี้:"
+        "error_heading": "โปรดแก้ไขข้อมูลดังต่อไปนี้:",
+        "title": "แบบฟอร์มการติดต่อ"
       }
     },
     "404": {
@@ -242,7 +279,8 @@
         "product": "สินค้า",
         "price": "ราคา",
         "total": "ยอดรวม",
-        "quantity": "ปริมาณ"
+        "quantity": "ปริมาณ",
+        "image": "รูปภาพสินค้า"
       },
       "update": "อัปเดต",
       "login": {
@@ -268,7 +306,7 @@
     "collection_template": {
       "title": "คอลเลกชัน",
       "empty": "ไม่พบสินค้า",
-      "use_fewer_filters_html": "ใช้ตัวกรองให้น้อยลง หรือ<a class=\"{{ class }}\" href=\"{{ link }}\">ล้างทั้งหมด</a>"
+      "use_fewer_filters_html": "ใช้ตัวกรองให้น้อยลง หรือ<a class=\"{{ class }}\" href=\"{{ link }}\">ลบทั้งหมด</a>"
     },
     "video": {
       "load_video": "โหลดวิดีโอ: {{ description }}"
@@ -281,6 +319,16 @@
       "play_slideshow": "เล่นสไลด์โชว์",
       "carousel": "ภาพสไลด์",
       "slide": "สไลด์"
+    },
+    "page": {
+      "title": "ชื่อหน้า"
+    },
+    "announcements": {
+      "previous_announcement": "การประกาศก่อนหน้า",
+      "next_announcement": "การประกาศถัดไป",
+      "carousel": "ภาพสไลด์",
+      "announcement": "การประกาศ",
+      "announcement_bar": "แถบประกาศ"
     }
   },
   "localization": {
@@ -367,7 +415,7 @@
     },
     "reset_password": {
       "title": "รีเซ็ตรหัสผ่านของบัญชีผู้ใช้",
-      "subtext": "ป้อนรหัสผ่านใหม่สำหรับ {{ email }}",
+      "subtext": "ป้อนรหัสผ่านใหม่",
       "password": "รหัสผ่าน",
       "password_confirm": "ยืนยันรหัสผ่าน",
       "submit": "รีเซ็ตรหัสผ่าน"
@@ -394,22 +442,41 @@
       "tracking_url": "ลิงก์ติดตาม",
       "tracking_company": "ผู้ให้บริการขนส่ง",
       "tracking_number": "หมายเลขติดตามพัสดุ",
-      "subtotal": "ยอดรวม"
+      "subtotal": "ยอดรวม",
+      "total_duties": "อากร",
+      "total_refunded": "คืนเงินแล้ว"
     }
   },
   "gift_cards": {
     "issued": {
-      "title": "นี่คือบัตรของขวัญมูลค่า {{ value }} สำหรับใช้ที่ {{ shop }}!",
+      "title": "นี่คือยอดคงเหลือในบัตรของขวัญมูลค่า {{ value }} สำหรับใช้ที่ {{ shop }}!",
       "subtext": "บัตรของขวัญของคุณ",
       "gift_card_code": "รหัสบัตรของขวัญ",
-      "shop_link": "เลือกซื้อต่อ",
-      "remaining_html": "คงเหลือ {{ balance }}",
+      "shop_link": "เยี่ยมชมร้านค้าออนไลน์",
       "add_to_apple_wallet": "เพิ่มลงใน Apple Wallet",
       "qr_image_alt": "คิวอาร์โค้ด — สแกนเพื่อแลกใช้บัตรของขวัญ",
-      "copy_code": "คัดลอกโค้ด",
+      "copy_code": "คัดลอกรหัสบัตรของขวัญ",
       "expired": "หมดอายุแล้ว",
       "copy_code_success": "คัดลอกรหัสสำเร็จ",
-      "print_gift_card": "พิมพ์"
+      "how_to_use_gift_card": "ใช้รหัสบัตรของขวัญทางออนไลน์หรือใช้คิวอาร์โค้ดในร้านค้า",
+      "expiration_date": "หมดอายุเมื่อ {{ expires_on }}"
+    }
+  },
+  "recipient": {
+    "form": {
+      "checkbox": "ฉันต้องการส่งสิ่งนี้เป็นของขวัญ",
+      "email_label": "อีเมลผู้รับ",
+      "email": "อีเมล",
+      "name_label": "ชื่อผู้รับ (ระบุหรือไม่ก็ได้)",
+      "name": "ชื่อ",
+      "message_label": "ข้อความ (ระบุหรือไม่ก็ได้)",
+      "message": "ข้อความ",
+      "max_characters": "สูงสุด {{ max_chars }} อักขระ",
+      "email_label_optional_for_no_js_behavior": "อีเมลผู้รับ (ระบุหรือไม่ก็ได้)",
+      "send_on": "ปปปป-ดด-วว",
+      "send_on_label": "ส่งเมื่อ (ไม่บังคับ)",
+      "expanded": "ขยายแบบฟอร์มผู้รับบัตรของขวัญแล้ว",
+      "collapsed": "ย่อแบบฟอร์มผู้รับบัตรของขวัญแล้ว"
     }
   }
 }
