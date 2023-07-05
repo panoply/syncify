@@ -1,16 +1,15 @@
-import { Commands, Config, Package, Bundle, Modes, HOTConfig } from 'types';
+import { Commands, Config, Modes, HOTConfig, WatchBundle } from 'types';
 import { join, relative } from 'node:path';
 import { anyTrue, isNil, has, includes, isEmpty, allFalse } from 'rambdax';
+import { FSWatcher } from 'chokidar';
 import glob from 'fast-glob';
-import merge from 'mergerino';
 import dotenv from 'dotenv';
 import anymatch from 'anymatch';
 import { pathExists, readJson } from 'fs-extra';
 import { queue } from '~requests/queue';
-import { spawned, spawns } from '~cli/spawn';
+import { spawned } from '~cli/spawn';
 import { kill } from '~cli/exit';
-import { blue, gray } from '~cli/ansi';
-import { isArray, keys, assign, nil, isString, isObject, ws, defineProperty, isBoolean, error } from '~utils/native';
+import { blue, bold, cyan, gray, white } from '~cli/ansi';
 import { normalPath } from '~utils/paths';
 import { configFile, getPackageJson } from '~options/files';
 import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from '~options/dirs';
@@ -18,13 +17,36 @@ import { setJsonOptions, setSectionOptions, setSnippetOptions } from '~options/t
 import { setScriptOptions } from '~options/script';
 import { setStyleConfig } from '~options/style';
 import { setSvgOptions } from '~options/svgs';
-import { setMinifyOptions } from '~options/minify';
+import { setMinifyOptions } from '~options/terser';
 import { authURL } from '~options/utilities';
 import { PATH_KEYS, HOT_SNIPPET_FILE } from '~const';
-import { warnOption, invalidError, missingConfig, throwError, typeError, unknownError, invalidCommand } from '~log/validate';
 import { log } from '~log';
-import { bundle, cache, processor, plugins, presets } from '~config';
-import { FSWatcher } from 'chokidar';
+import { bundle, cache, processor, plugins } from '~config';
+import { socket } from '~hot/server';
+import {
+  isArray,
+  keys,
+  assign,
+  nil,
+  isString,
+  isObject,
+  ws,
+  defineProperty,
+  isBoolean,
+  error,
+  toArray,
+  values
+} from '~utils/native';
+import {
+  warnOption,
+  invalidError,
+  missingConfig,
+  throwError,
+  typeError,
+  unknownError,
+  invalidCommand,
+  invalidTarget
+} from '~log/validate';
 
 /**
  * Resolve Paths
@@ -37,42 +59,43 @@ export async function define (cli: Commands, _options?: Config) {
 
   log.clear();
 
-  const pkg = await getPackageJson(cli.cwd);
+  await getPackageJson(cli.cwd);
+  await getConfig(cli);
 
-  defineProperty(bundle, 'pkg', { get () { return pkg; } });
-
-  bundle.config = await getConfig(pkg, cli);
+  // @ts-expect-error
+  bundle.version = VERSION;
   bundle.mode = setModes(cli);
-  bundle.cli = cli.cli;
-  bundle.version = pkg.version;
   bundle.cwd = cli.cwd;
-  bundle.silent = cli.silent;
-  bundle.prod = cli.prod;
-  bundle.dev = cli.dev && !cli.prod;
-  bundle.logger = presets.logger;
+  bundle.env.cli = cli.cli;
+  bundle.env.prod = cli.prod;
+  bundle.env.dev = cli.dev && !cli.prod;
+  bundle.logger.silent = cli.silent;
 
-  process.env.SYNCIFY_ENV = bundle.dev ? 'dev' : 'prod';
+  process.env.SYNCIFY_ENV = bundle.env.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String(bundle.mode.watch);
 
+  const { config, cwd } = bundle;
+
   const promise = await Promise.all([
-    setChokidar(cli.watch, cli.cwd),
-    setBaseDirs(cli, presets),
-    setCaches(bundle.cwd),
+    setChokidar(cli.watch, cwd),
+    setBaseDirs(cli),
+    setCaches(cwd),
     setThemeDirs(bundle.dirs.output),
-    setImportDirs(bundle),
-    setStores(cli, presets),
-    setPaths(presets),
-    setProcessors(presets),
-    setSectionOptions(presets),
-    setSnippetOptions(presets),
-    setJsonOptions(presets),
-    setScriptOptions(presets, pkg),
-    setStyleConfig(presets, pkg),
-    setSvgOptions(presets, pkg),
-    setMinifyOptions(presets),
-    setSpawns(presets, bundle),
-    setPlugins(presets, bundle),
-    setHotReloads(presets)
+    setImportDirs(),
+    setStores(cli, config),
+    setPaths(config),
+    setFilters(cli),
+    setProcessors(config),
+    setSectionOptions(config),
+    setSnippetOptions(config),
+    setJsonOptions(config),
+    setScriptOptions(config),
+    setStyleConfig(config),
+    setSvgOptions(config),
+    setMinifyOptions(config),
+    setSpawns(config),
+    setPlugins(config),
+    setHotReloads(config)
   ]).catch(e => {
 
     console.log(e);
@@ -86,6 +109,76 @@ export async function define (cli: Commands, _options?: Config) {
 };
 
 /**
+ * Set Mode
+ *
+ * Identifies the execution modes which Syncify should
+ * invoke. Validates the CLI flags and options to determine
+ * the actions to be run.
+ */
+function setModes (cli: Commands) {
+
+  const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
+  const transfrom = anyTrue(cli.style, cli.script, cli.image, cli.svg);
+  const watch = anyTrue(resource, cli.upload, cli.download) ? false : cli.watch;
+  const modes = <Modes> assign(bundle.mode, {
+    watch,
+    hot: watch && cli.hot,
+    vsc: cli.vsc,
+    interactive: cli.interactive,
+    export: cli.export,
+    import: cli.import,
+    redirects: cli.redirects,
+    metafields: cli.metafields,
+    pages: cli.pages,
+    pull: cli.pull,
+    force: cli.force,
+    script: transfrom ? cli.script : false,
+    style: transfrom ? cli.style : false,
+    image: transfrom ? cli.image : false,
+    svg: transfrom ? cli.svg : false,
+    terse: anyTrue(cli.terse, cli.prod),
+    clean: anyTrue(resource, transfrom, cli.upload) ? false : cli.clean,
+    build: anyTrue(cli.export, cli.watch, cli.download) ? false : cli.build,
+    upload: anyTrue(transfrom, watch) ? false : cli.upload,
+    download: anyTrue(resource, transfrom, cli.upload, cli.watch, cli.build) ? false : cli.download
+  });
+
+  if (allFalse(...values(modes))) {
+
+    invalidCommand({
+      message: [
+        'Execution is unclear, you have not provided Syncify a operation mode to run.'
+      ],
+      expected: '--<cmd>',
+      fix: [
+        'Syncify requires that you provide an operation. In most cases, this',
+        'error occurs when you have forgotten to pass the mode, for example:',
+        '',
+        `${white('$')} ${white(`syncify ${bundle.argv} ${blue('--watch')}`)}`,
+        `${white('$')} ${white(`syncify ${bundle.argv} ${blue('--build')}`)}`,
+        `${white('$')} ${white(`syncify ${bundle.argv} ${blue('--upload')}`)}`,
+        '',
+        `Run ${blue('syncify --help')} for more information, or pass an execution`,
+        `operation mode as per the ${blue('expected')} value and ensure to replace ${blue('--<cmd>')}`,
+        'with one the examples provided or a supported mode.'
+
+      ]
+    });
+  }
+
+  if (modes.build) {
+    if (allFalse(modes.script, modes.style, modes.svg, modes.pages, modes.metafields, modes.image)) {
+      modes.script = true;
+      modes.style = true;
+      modes.svg = true;
+      modes.image = true;
+    }
+  }
+
+  return modes;
+
+};
+/**
  * Set Chokidar
  *
  * Creates an instance of chodkidar FSWatcher, we will assign watch paths
@@ -95,32 +188,39 @@ function setChokidar (watch: boolean, cwd: string) {
 
   if (!watch) {
     bundle.watch = new Set() as any;
-    return;
+
+  } else {
+
+    bundle.watch = new FSWatcher({
+      persistent: true,
+      ignoreInitial: true,
+      usePolling: true,
+      interval: 75,
+      binaryInterval: 100,
+      ignored: [ '**/*.map' ],
+      ignorePermissionErrors: true
+    });
+
+    Object.defineProperties(bundle.watch, {
+      has: {
+        value (path: string, dir = cwd) {
+          return (bundle.watch as WatchBundle)._watched.get(dir).items.has(path);
+        }
+      },
+      paths: {
+        get () {
+          return toArray(bundle.watch.values());
+        }
+      },
+      watching: {
+        get () {
+          return (bundle.watch as WatchBundle)._watched;
+        }
+      }
+    });
   }
-  bundle.watch = new FSWatcher({
-    persistent: true,
-    ignoreInitial: true,
-    usePolling: true,
-    interval: 75,
-    binaryInterval: 100,
-    ignored: [ '**/*.map' ],
-    ignorePermissionErrors: true
-  });
-
-  Object.defineProperties(bundle.watch, {
-    has: {
-      value (path: string, dir = cwd) {
-        return bundle.watch._watched.get(dir).items.has(path);
-      }
-    },
-    watching: {
-      get () {
-        return bundle.watch._watched;
-      }
-    }
-  });
-
 }
+
 /**
  * Hot Reloading Setup
  *
@@ -143,7 +243,11 @@ async function setHotReloads (config: Config) {
     return;
   }
 
-  if (allFalse(isObject(config.hot), isBoolean(config.hot), isNil(config.hot))) {
+  if (allFalse(
+    isObject(config.hot),
+    isBoolean(config.hot),
+    isNil(config.hot)
+  )) {
     typeError({
       option: 'config',
       name: 'hot',
@@ -158,39 +262,45 @@ async function setHotReloads (config: Config) {
 
     for (const prop in config.hot as HOTConfig) {
 
-      if (has(prop, bundle.hot)) {
+      if (!has(prop, bundle.hot)) unknownError(`hot.${prop}`, config.hot[prop]);
 
-        if (prop === 'label') {
-          if (config.hot[prop] === 'visible' || config.hot[prop] === 'hidden') {
-            hot[prop] = config.hot[prop];
-          } else {
-            invalidError('hot', prop, config.hot[prop], 'visible | hidden');
-          }
-        } else if (prop === 'method') {
-          if (config.hot[prop] === 'hot' || config.hot[prop] === 'refresh') {
-            hot[prop] = config.hot[prop];
-          } else {
-            invalidError('hot', prop, config.hot[prop], 'hot | refresh');
-          }
-        } else if (prop === 'scroll') {
-          if (config.hot[prop] === 'preserved' || config.hot[prop] === 'top') {
-            hot[prop] = config.hot[prop];
-          } else {
-            invalidError('hot', prop, config.hot[prop], 'preserved | top');
-          }
-        } else if (typeof hot[prop] === typeof config.hot[prop]) {
+      if (prop === 'label') {
+
+        if (config.hot[prop] === 'visible' || config.hot[prop] === 'hidden') {
           hot[prop] = config.hot[prop];
         } else {
-          typeError({
-            option: 'hot',
-            name: prop,
-            provided: config.hot[prop],
-            expects: typeof hot[prop]
-          });
+          invalidError('hot', prop, config.hot[prop], 'visible | hidden');
         }
 
+      } else if (prop === 'method') {
+
+        if (config.hot[prop] === 'hot' || config.hot[prop] === 'refresh') {
+          hot[prop] = config.hot[prop];
+        } else {
+          invalidError('hot', prop, config.hot[prop], 'hot | refresh');
+        }
+
+      } else if (prop === 'scroll') {
+
+        if (config.hot[prop] === 'preserved' || config.hot[prop] === 'top') {
+          hot[prop] = config.hot[prop];
+        } else {
+          invalidError('hot', prop, config.hot[prop], 'preserved | top');
+        }
+
+      } else if (typeof hot[prop] === typeof config.hot[prop]) {
+
+        hot[prop] = config.hot[prop];
+
       } else {
-        unknownError(`hot.${prop}`, config.hot[prop]);
+
+        typeError({
+          option: 'hot',
+          name: prop,
+          provided: config.hot[prop],
+          expects: typeof hot[prop]
+        });
+
       }
 
     }
@@ -202,6 +312,11 @@ async function setHotReloads (config: Config) {
   for (const layout of hot.layouts) {
     hot.alive[join(bundle.dirs.output, 'layout', layout)] = false;
   }
+
+  const wss = socket();
+
+  defineProperty(bundle, 'wss', { get () { return wss; } });
+
 }
 
 /**
@@ -225,7 +340,7 @@ function setProcessors (config: Config) {
  * Sets and constructs the Syncify plugin model of all
  * plugins defined in the configuration.
  */
-function setPlugins (config: Config, bundle: Bundle) {
+function setPlugins (config: Config) {
 
   if (!has('plugins', config)) return;
   if (!isArray(config.plugins)) return; // TODO: Throw error if not array
@@ -288,7 +403,9 @@ function setPlugins (config: Config, bundle: Bundle) {
  *
  * > See the `cli/spawn.ts` which is used to normalize the log output.
  */
-function setSpawns (config: Config, bundle: Bundle) {
+function setSpawns (config: Config) {
+
+  const { mode, spawn } = bundle;
 
   if (!has('spawn', config) || isNil(config.spawn)) return;
 
@@ -301,28 +418,28 @@ function setSpawns (config: Config, bundle: Bundle) {
     });
   }
 
-  let mode: 'build' | 'watch' = null;
+  let run: 'build' | 'watch' = null;
 
-  if (bundle.mode.build && has('build', config.spawn)) mode = 'build';
-  if (bundle.mode.watch && has('watch', config.spawn)) mode = 'watch';
-  if (isNil(mode) || isNil(config.spawn[mode])) return;
+  if (mode.build && has('build', config.spawn)) run = 'build';
+  if (mode.watch && has('watch', config.spawn)) run = 'watch';
+  if (isNil(mode) || isNil(config.spawn[run])) return;
 
-  if (!isObject(config.spawn[mode])) {
+  if (!isObject(config.spawn[run])) {
     typeError({
       option: 'spawn',
-      name: mode,
-      provided: config.spawn[mode],
+      name: run,
+      provided: config.spawn[run],
       expects: '{ build: {}, watch: {} }'
     });
   }
 
-  const props = keys(config.spawn[mode]);
+  const props = keys(config.spawn[run]);
 
   if (props.length === 0) return;
 
-  for (const name in config.spawn[mode]) {
+  for (const name in config.spawn[run]) {
 
-    const command = config.spawn[mode][name];
+    const command = config.spawn[run][name];
 
     if (isString(command)) {
 
@@ -354,8 +471,8 @@ function setSpawns (config: Config, bundle: Bundle) {
     } else {
       typeError({
         option: 'spawn',
-        name: mode,
-        provided: config.spawn[mode],
+        name: run,
+        provided: config.spawn[run],
         expects: 'string | string[]'
       });
     }
@@ -369,7 +486,7 @@ function setSpawns (config: Config, bundle: Bundle) {
 
     log.nwl(nil);
 
-    spawns.forEach((child, name) => {
+    spawn.streams.forEach((child, name) => {
 
       error(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
       child.kill();
@@ -378,48 +495,150 @@ function setSpawns (config: Config, bundle: Bundle) {
 
     log.nwl(nil);
 
-    spawns.clear();
+    spawn.streams.clear();
     process.exit(0);
 
   });
 
 };
 
-/**
- * Set Mode
- *
- * Identifies the execution modes which Syncify should
- * invoke. Validates the CLI flags and options to determine
- * the actions to be run.
- */
-function setModes (cli: Commands) {
+function setFilters (cli: Commands) {
 
-  const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
-  const transfrom = anyTrue(cli.style, cli.script, cli.image, cli.svg);
-  const watch = anyTrue(resource, cli.upload, cli.download) ? false : cli.watch;
+  if (!has('filter', cli)) return;
 
-  return <Modes>{
-    watch,
-    hot: watch && cli.hot,
-    vsc: cli.vsc,
-    export: cli.export,
-    redirects: cli.redirects,
-    metafields: cli.metafields,
-    pages: cli.pages,
-    prompt: cli.prompt,
-    pull: cli.pull,
-    force: cli.force,
-    script: transfrom ? cli.script : false,
-    style: transfrom ? cli.style : false,
-    image: transfrom ? cli.image : false,
-    svg: transfrom ? cli.svg : false,
-    minify: anyTrue(cli.minify, cli.prod),
-    clean: anyTrue(resource, transfrom, cli.upload) ? false : cli.clean,
-    build: anyTrue(transfrom, cli.upload, cli.watch, cli.download) ? false : cli.build,
-    upload: anyTrue(transfrom, watch) ? false : cli.upload,
-    download: anyTrue(resource, transfrom, cli.upload, cli.watch, cli.build) ? false : cli.download
-  };
-};
+  const exp = new RegExp(`^(${[
+    'assets',
+    'config',
+    'locales',
+    'metafields',
+    'layout',
+    'pages',
+    'customers',
+    'templates',
+    'snippets',
+    'sections'
+  ].join('|')})`);
+
+  const parse = cli.filter.replace(/\s+/g, ' ').trim();
+
+  if (parse.indexOf(',') > -1) {
+
+    const multiple = parse
+      .split(',')
+      .filter(Boolean)
+      .map(entry => entry.trim());
+
+    for (const cmd of multiple) {
+
+      if (cmd[0] === '!') {
+
+        if (!exp.test(cmd.slice(1))) throwCommandError('dir', cmd);
+
+        // TODO - Support ignore filters
+
+      } else if (cmd[0] === '*' || cmd[0] === '/' || cmd[0] === '.') {
+
+        throwCommandError('pattern', parse);
+
+      } else {
+
+        if (!exp.test(cmd)) throwCommandError('dir', cmd);
+
+        if (cmd.indexOf('/') > -1) {
+
+          // TODO - Support file anymatches
+
+        } else {
+
+          if (!isArray(bundle.filters[cmd])) bundle.filters[cmd] = [];
+
+          bundle.filters[cmd].push(cmd);
+
+        }
+      }
+    }
+
+  } else if (parse[0] === '*' || parse[0] === '/' || parse[0] === '.') {
+
+    throwCommandError('pattern', parse);
+
+  } else if (parse.indexOf('/') > -1) {
+
+    // TODO - Support file anymatches
+
+  } else {
+
+    if (!isArray(bundle.filters[parse])) bundle.filters[parse] = [];
+
+    bundle.filters[parse].push(parse);
+
+  }
+
+  function throwCommandError (type: 'pattern' | 'dir', cmd: string) {
+
+    const pattern: string[] = [];
+
+    if (type === 'pattern') {
+
+      pattern.push(`Invalid ${blue('--filter')} pattern provided. You cannot pass starting point`);
+
+      if (cmd[0] === '*') {
+        pattern.push(`glob (${blue('*')}) stars as filters, Syncify does not support this.`);
+      } else if (cmd[0] === '/') {
+        pattern.push(`path (${blue('/')}) roots as filters, Syncify does not support this.`);
+      } else if (cmd[0] === '.') {
+        pattern.push(`dot paths (${blue('.')})  as filters, Syncify does not support this.`);
+      }
+
+      pattern.push(
+        `Use a starting point directory name based on the ${blue('paths')} key property`,
+        `in your ${blue(bundle.file.base)} file.`
+      );
+
+    } else {
+
+      pattern.push(
+        `Invalid directory provided. The ${blue('--filter')} pattern expects the starting point`,
+        'directory path be one of the following:',
+        '',
+        `${white('-')} ${blue('assets')}`,
+        `${white('-')} ${blue('config')}`,
+        `${white('-')} ${blue('locales')}`,
+        `${white('-')} ${blue('metafields')}`,
+        `${white('-')} ${blue('layout')}`,
+        `${white('-')} ${blue('pages')}`,
+        `${white('-')} ${blue('customers')}`,
+        `${white('-')} ${blue('templates')}`,
+        `${white('-')} ${blue('snippets')}`,
+        `${white('-')} ${blue('sections`')}`,
+        ''
+      );
+
+    }
+
+    invalidCommand({
+      message: pattern,
+      expected: '--filter <dir>',
+      fix: [
+        `The ${blue('--filter')} (or ${blue('-f')}) flag command argument expects you`,
+        'provide a theme output directory as the starting point. Filtering begins with',
+        'a Shopify output directory name, for example:',
+        '',
+        `${white('$')} ${white(`syncify --filter ${blue('sections/file.liquid')}`)}`,
+        `${white('$')} ${white(`syncify --filter ${blue('snippets/*')}`)}`,
+        `${white('$')} ${white(`syncify --filter ${blue('templates/*.json')}`)}`,
+        `${white('$')} ${white(`syncify --filter ${blue('!assets/some-file.ext')}`)}`,
+        '',
+        `Syncify will automatically resolve files from within your defined ${bold('input')} directory`,
+        'based on the starting point directory name. You can pass glob star matches following the',
+        `directory namespace or starting point ignores (${blue('!')}) as long the directory can match.`
+
+      ]
+    });
+
+  }
+
+}
 
 /**
  * Set Cache
@@ -450,16 +669,17 @@ async function setCaches (cwd: string) {
  * Resolves the `syncify.config.js` file or configuration
  * property contained in the _package.json_ file.
  */
-async function getConfig (pkg: Package, cli: Commands) {
+async function getConfig (cli: Commands) {
 
   const cfg = await configFile(cli.cwd);
 
-  if (cfg !== null) return merge(presets, cfg);
-
-  if (has('syncify', pkg)) return merge(presets, pkg.syncify);
-
-  missingConfig(cli.cwd);
-
+  if (cfg !== null) {
+    bundle.config = cfg;
+  } else if (has('syncify', bundle.pkg)) {
+    bundle.config = bundle.pkg.syncify as unknown as Config;
+  } else {
+    missingConfig(cli.cwd);
+  }
 };
 
 /**
@@ -492,7 +712,6 @@ function setStores (cli: Commands, config: Config) {
   if (cli._.length === 0) {
 
     if (storeRequired) {
-
       invalidCommand({
         message: [
           'You have not provided store to target, which is required',
@@ -504,7 +723,6 @@ function setStores (cli: Commands, config: Config) {
           'followed by themes target/s and other flags.'
         ]
       });
-
     }
 
     return;
@@ -548,7 +766,22 @@ function setStores (cli: Commands, config: Config) {
 
     for (const target of themes) {
 
-      if (!has(target, store.themes)) invalidError('theme', 'target', target, 'string');
+      if (!has(target, store.themes)) {
+
+        invalidTarget({
+          type: 'theme',
+          expected: keys(store.themes).join(','),
+          provided: target,
+          message: [
+            `Unknown theme target (${cyan(target)}) provided to ${cyan(store.domain)} store`,
+            `Your ${cyan(bundle.file.base)} file contains no such theme using this name.`
+          ],
+          fix: [
+            `Provide an ${cyan('expected')} theme target or update/add an existing target.`
+          ]
+
+        });
+      }
 
       // Let populate the model with theme
       bundle.sync.themes.push({
@@ -597,14 +830,17 @@ function setStores (cli: Commands, config: Config) {
   }
 
   if (bundle.sync.stores.length === 0) {
-
     throwError(
       'Unknown, missing or invalid store/theme targets',
       'Check your store config'
     );
-
   }
 
+  if (bundle.sync.stores.length === 1 && bundle.sync.themes.length === 1) {
+    bundle.env.sync = 1;
+  } else if (bundle.sync.stores.length > 1 || bundle.sync.themes.length > 1) {
+    bundle.env.sync = 2;
+  }
 };
 
 /**
@@ -642,7 +878,7 @@ async function setPaths (config: Config) {
 
       if (key === 'assets') uri.push(join(bundle.dirs.output, 'assets/*'));
 
-    } else if (key === 'redirects') {
+    } else if (key === 'redirects' && has(key, config.paths)) {
 
       uri = [ join(bundle.cwd, config.paths[key]) ];
 
