@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import { join, parse, relative, extname, basename } from 'node:path';
-import { Bundle, File, Paths } from 'types';
+import { File, Paths, PathsBundle } from 'types';
 import { assign, nil } from '~utils/native';
 import { lastPath } from '~utils/paths';
 import { Partial } from 'rambdax';
@@ -9,6 +9,7 @@ import * as context from '~process/context';
 import { bundle } from '~config';
 import merge from 'mergerino';
 import { Tester } from 'anymatch';
+import { uuid } from '~utils/utils';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -131,13 +132,12 @@ export function setFile (parsedFile: Partial<File>, input: string, output: strin
       key = join(lastPath(file.dir), file.base);
       output = null;
     } else {
-
       key = join(namespace, file.base);
       output = join(output, key);
-
     }
 
     return assign({}, file, {
+      uuid: uuid(),
       type,
       input,
       output,
@@ -145,8 +145,8 @@ export function setFile (parsedFile: Partial<File>, input: string, output: strin
       namespace,
       kind,
       relative: relative(bundle.cwd, input),
-      config: undefined,
-      size: NaN
+      size: NaN,
+      data: undefined
     });
 
   };
@@ -162,7 +162,7 @@ export function setFile (parsedFile: Partial<File>, input: string, output: strin
  * @param paths The Anymatch tester
  * @param output The output base directory path
  */
-export function parseFile (paths: Bundle['paths'], output: string) {
+export function parseFile (paths: PathsBundle, output: string) {
 
   return (path: string) => {
 
