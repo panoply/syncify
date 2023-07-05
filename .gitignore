@@ -12,6 +12,7 @@ test/e2e/custom/dist
 .tmp
 dump.rdb
 docs/
+tests/
 
 lib-cov
 *.seed
