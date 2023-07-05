@@ -1,4 +1,4 @@
-import { File } from 'types/bundle';
+import { File } from './file';
 
 export interface UploadModeReport {
   /**
@@ -52,19 +52,26 @@ export interface BuildModeReport {
    */
   name: string;
   /**
+   * The relative input path of the file
+   *
+   * @example
+   * 'src/template/index.liquid'
+   */
+  input: string;
+  /**
+   * The relative output directory path of the file
+   *
+   * @example
+   * 'templates/index.liquid'
+   */
+   output: string;
+  /**
    * The processing time it took to build
    *
    * @example
    * '1ms'
    */
   time: string;
-  /**
-   * The output directory the file written.
-   *
-   * @example
-   * 'templates' // if file is something like index.json
-   */
-  output: string;
   /**
    * A readable error string inferring any issues which may have occured.
    *

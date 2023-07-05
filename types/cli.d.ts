@@ -47,6 +47,12 @@ export interface Commands {
    * @default true
    */
   cli?: boolean;
+ /**
+   * Whether or not syncify interactive command prompt
+   *
+   * @default false
+   */
+  interactive?: boolean;
   /**
    * The current working directory, this a reference to `process.cwd()`
    */
@@ -109,22 +115,10 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --minify
+   * $ syncify --terse
    * ```
    */
-  minify?: boolean
-  /**
-   * Show the command prompt interactive shell
-   *
-   * ---
-   *
-   * Example:
-   *
-   * ```bash
-   * $ syncify --prompt
-   * ```
-   */
-  prompt?: boolean;
+  terse?: boolean
   /**
    * Run in watch mode (chokidar). This requires a store target be passed.
    *
@@ -178,7 +172,21 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --export
+   * $ syncify --import # import to the defined directory in syncify config
+   * $ syncify --import -o ./some-dir # override and import to a specific directory
+   * ```
+   */
+  import?: boolean;
+  /**
+   * Exports the theme and generates a `.zip` compressed directory.
+   *
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify --import # export to the defined directory in syncify config
+   * $ syncify --import -o ./some-dir # override and export to a specific directory
    * ```
    */
   export?: boolean;
@@ -205,7 +213,6 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify store_1 -m
    * $ syncify store_1 --metafields
    * ```
    */
@@ -219,7 +226,6 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify store_1 -p
    * $ syncify store_1 --pages
    * ```
    */
@@ -233,7 +239,6 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify store_1 -r
    * $ syncify store_1 --redirects
    * ```
    */
@@ -247,8 +252,8 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify store_1 -m --pull
-   * $ syncify store_1 -p --pull
+   * $ syncify store_1 --metafields --pull
+   * $ syncify store_1 --pages --pull
    * ```
    */
   pull?: boolean;
@@ -419,7 +424,7 @@ export interface Commands {
    * $ syncify --clean -b -i some/directory
    * ```
    */
-   input?: string;
+  input?: string;
   /**
    * An optional output path. This will overwrite the configuration predefined
    * in settings.

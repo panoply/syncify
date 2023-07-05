@@ -1,20 +1,18 @@
-import { Bundle } from '.';
 import { File } from './file';
-import { Config, Transforms } from '../config';
+import { Transforms, Config } from '../config';
 import { WebSocketServer } from 'ws';
-import { Merge } from 'type-fest';
 
 /* -------------------------------------------- */
 /* PLUGIN SCOPE                                 */
 /* -------------------------------------------- */
 
-export type PluginScope = Merge<Bundle, {
+export type PluginScope = {
   log: {
     info: (...message: string[]) => void;
     warn: (...message: string[]) => void;
     error: (...message: string[]) => void;
   }
-}>
+}
 
 /* -------------------------------------------- */
 /* PLUGIN HOOKS                                 */

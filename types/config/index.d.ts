@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 
 import type { Pages, Sections, Snippets } from './views';
-import type { HOTConfig } from '../bundle/hot';
-import type { ESBuildMinify, JSONMinify, ViewMinify } from './minify';
-import type { PluginHooks } from '../bundle/plugin';
+import type { HOTConfig } from '../internal/hot';
+import type { ScriptTerse, JSONTerse, ViewTerse } from './terser';
+import type { PluginHooks } from '../internal/plugin';
 import type { JSONConfig } from '../transforms/json';
 import type { SharpConfig } from '../transforms/image';
 import type { ScriptTransformer, ESBuildConfig } from '../transforms/script';
@@ -229,13 +229,13 @@ export interface Transforms {
 /* MINIFY                                       */
 /* -------------------------------------------- */
 
-export interface MinifyConfig {
+export interface Terser {
   /**
    * JSON minification options. You can disable all JSON files from
    * being minified by passing a boolean `false`. Optionally, you can
    * exclude certain types of JSON from being minified.
    */
-  json?: boolean | JSONMinify;
+  json?: boolean | JSONTerse;
   /**
    * View minification options. You can disable all views from
    * being minified by passing a boolean `false`.
@@ -245,13 +245,13 @@ export interface MinifyConfig {
    * of options are exposed in order to prevent invalid or broken
    * output from being generated.
    */
-  views?: boolean | ViewMinify;
+  views?: boolean | ViewTerse;
   /**
    * JavaScript minification options. Script minification is only
    * available for projects with `esbuild` installed and configured
    * as a processor.
    */
-  script?: boolean | ESBuildMinify;
+  script?: boolean | ScriptTerse;
 }
 
 /* -------------------------------------------- */
@@ -516,9 +516,15 @@ export interface Config extends Directories {
    */
   transforms?: Transforms;
   /**
-   * Minify options - Invoked when in **production** `--prod` mode or
-   * if the `--minify` flag was passed. Options will default to `false`
-   * when either of these conditionals are not met.
+   * Terse options (minification)
+   *
+   * Invoked when in **production** (`--prod`) mode or when the `--terse` flag is passed.
+   * Options will default to `false`when either of these conditionals are not met.
    */
-  minify?: boolean | MinifyConfig
+  terser?: boolean | Terser;
+  /**
+   * @deprecated
+   *  Use `terser` option instead
+   */
+  minify?: undefined;
 }

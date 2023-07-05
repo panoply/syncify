@@ -31,16 +31,12 @@ export type RenameInput = {
 /**
  * Rename input paths type
  */
-export type RenameInputPaths = {
-  [filename: RenamePaths]: string | string[]
-}
+export type RenameInputPaths = { [filename: RenamePaths]: string | string[] }
 
 /**
  * Rename config type
  */
-export type RenameConfig<T> = {
-  [filename: RenamePaths]: string | string[] | T
-}
+export type RenameConfig<T> = { [filename: RenamePaths]: string | string[] | T}
 
 /**
  * Processor Configuration
@@ -58,9 +54,9 @@ export type GetProcessorConfigs<T> = {
   /**
    * Whether or not a config file exists for the processor,
    * When one exists the URI path location to the file will
-   * applied as the value.
+   * be applied as the value.
    */
-  file: false | string;
+  file: boolean | string;
   /**
    * Configuration of the processor, Initialized with defaults
    */

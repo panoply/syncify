@@ -3,7 +3,7 @@ import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Tsconfig } from 'tsconfig-type';
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
-import type { GetProcessorConfigs, RenamePaths } from '../misc/shared';
+import type { GetProcessorConfigs, RenamePaths } from '../internal/shared';
 
 type TargetBrowser = (
   | 'chrome'
@@ -87,6 +87,9 @@ export type Target = (
   | TargetESVersion
 );
 
+/**
+ * Public exposed configurations
+ */
 export type ESBuildConfig = Merge<ESBuildAllowedOptions, {
     /**
      * The format to be generated. Because we are targeting
@@ -254,7 +257,7 @@ export type ESBuildProcesser = Merge<GetProcessorConfigs<ESBuildOptions>, {
  *
  * Bundling Configuration for scripts
  */
-export type ScriptBundle = {
+export interface ScriptBundle {
   /**
    * A UUID reference for this bundle.
    */
@@ -286,8 +289,20 @@ export type ScriptBundle = {
    */
   watch: Set<string>;
   /**
+   * The size in bytes of the generated file. This metric is obtained
+   * on the pre-complile at runtime when importer paths are collected.
+   * The value will be `NaN` unless executing in `--terse` (or `--prod`).
+   */
+  size: number;
+  /**
+   * Watch extendables - This `Set` accounts for watch paths defined
+   * by the user. We keep them isolated to ensure they are not removed
+   * when importers are adjusted during re-builds.
+   */
+  watchCustom: Tester;
+  /**
    * ESBuild options which will either use the processor defaults or
    * if defined on script bundle, will be merged with processor defaults.
    */
   esbuild: ESBuildOptions
-};
+}

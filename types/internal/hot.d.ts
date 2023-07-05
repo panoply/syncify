@@ -2,7 +2,7 @@
 /* LIVE RELOADS                                 */
 /* -------------------------------------------- */
 
-export interface HOTSockets {
+export interface WSS {
   /**
    * Hot Socket for `<script>` tags
    */
@@ -34,7 +34,10 @@ export interface HOTSockets {
 
 }
 
-export interface HOT {
+/**
+ * **INTERNAL USE**
+ */
+export interface HOTBundle {
   /**
    * Whether or not Syncify hot reloads UI labels should render.
    *
@@ -133,7 +136,7 @@ export interface HOT {
   alive?: { [template: string]: boolean; };
 }
 
-export type HOTConfig = Pick<HOT,
+export type HOTConfig = Pick<HOTBundle,
   | 'inject'
   | 'label'
   | 'layouts'

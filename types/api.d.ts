@@ -1,7 +1,7 @@
 import { PartialDeep } from 'type-fest';
 import { Config } from './config';
-import { Asset } from './misc/requests';
-import { File } from './bundle/file';
+import { Asset } from './internal/requests';
+import { File } from './internal/file';
 
 type Download = (
   this: {

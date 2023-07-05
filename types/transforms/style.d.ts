@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
 
-import type { Merge } from 'type-fest';
+import type { LiteralUnion, Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
+import type { Config as TailwindConfig } from 'tailwindcss';
 import type { Plugin as PostCSSPlugin, Transformer, TransformCallback } from 'postcss';
-import type { GetProcessorConfigs, RenamePaths } from '../misc/shared';
+import type { GetProcessorConfigs, RenamePaths } from '../internal/shared';
 
 /* -------------------------------------------- */
 /* PROCESSOR CONFIGS                            */
@@ -14,6 +15,21 @@ export type PostCSSConfig = (
   | Transformer
   | TransformCallback
 );
+
+export interface TailwindCSSConfig {
+  important: TailwindConfig['important'];
+  prefix: TailwindConfig['PrefixConfig'];
+  separator: TailwindConfig['SeparatorConfig'];
+  safelist: TailwindConfig['SafelistConfig'];
+  blocklist: TailwindConfig['BlocklistConfig'];
+  presets: TailwindConfig['presets'];
+  future: TailwindConfig['future'];
+  experimental: TailwindConfig['experimental'];
+  darkMode: TailwindConfig['darkMode'];
+  theme: TailwindConfig['theme'];
+  corePlugins: TailwindConfig['corePlugins'];
+  plugins: TailwindConfig['plugins'];
+}
 
 export interface SASSConfig {
   /**
@@ -82,6 +98,21 @@ export interface StyleTransform {
    */
   snippet?: boolean;
   /**
+   * **NOT YET AVAILABLE**
+   *
+   * [TailwindCSS](https://tailwindcss.com/) Override
+   *
+   * Tailwind transforms will use the `tailwind.config.js` configuration
+   * file in your projects root (or defined `config` path). If you have not
+   * provided a tailwind config file, then syncify will use options defined
+   * via `processor.tailwind`. You can optionally override configuration
+   * on a per-transform basis and any options defined here will be merged with
+   * those defined in your `tailwind.config.js` or `processor.tailwind`.
+   *
+   * @default true // if tailwind is not installed this is false
+   */
+  tailwind?: boolean | TailwindCSSConfig;
+  /**
    * [PostCSS](https://postcss.org/) Override
    *
    * CSS File transforms will use the options provided to `processor.postcss`
@@ -96,7 +127,7 @@ export interface StyleTransform {
    *
    * @default true // if postcss is not installed this is false
    */
-  postcss?: boolean | PostCSSConfig[]
+  postcss?: boolean | PostCSSConfig[];
   /**
    * [SASS Dart](https://sass-lang.com/documentation/js-api/) Override
    *
@@ -105,10 +136,13 @@ export interface StyleTransform {
    * basis. Any configuration options defined here will be merged with
    * the options defined in `processor.sass`.
    *
-   * You can also skip pre-processing with postcss by passing a _boolean_
-   * `false` which will inform Syncify to not pass output to PostCSS. By
-   * default, Syncify will forward all input files using `.scss` or `.sass`
-   * or extension to SASS Dart.
+   * You can also skip SASS transfroms by passing a _boolean_ `false` which will
+   * inform Syncify to not pass output to SASS, which is the default if SASS is not
+   * installed.
+   *
+   * By default, Syncify will forward all input files using `.scss` or `.sass`
+   * or extension to SASS Dart. If you have PostCSS installed then Syncify will
+   * automatically pass SASS files to PostCSS in the post-process.
    *
    * @default true // if sass is not installed this is false
    */
@@ -146,14 +180,21 @@ export type StyleTransformer = (
 /**
  * **INTERNAL USE**
  *
- * Processor Configuration
+ * PostCSS Processor Configuration
  */
-export type PostCSSProcesser = GetProcessorConfigs<PostCSSConfig[]>
+export type PostCSSProcesser = GetProcessorConfigs<PostCSSConfig[]>;
 
 /**
  * **INTERNAL USE**
  *
- * Processor Configuration
+ * Tailwind Processor Configuration
+ */
+export type TailwindCSSProcesser = GetProcessorConfigs<TailwindCSSConfig>
+
+/**
+ * **INTERNAL USE**
+ *
+ * SASS Processor Configuration
  */
 export type SASSProcesser = GetProcessorConfigs<SASSConfig>
 
