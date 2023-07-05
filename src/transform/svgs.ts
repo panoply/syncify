@@ -1,12 +1,11 @@
-import type { SVGBundle, File, Syncify, SVGSpriteConfig, SVGOConfig } from 'types';
+import type { SVGBundle, File, Syncify, SVGSpriteConfig, SVGOConfig, ClientParam } from 'types';
 import type { SVGSpriter, SVGSpriterConstructor } from 'svg-sprite';
-import type { AssetRequest } from '~requests/client';
-import SVGO from 'svgo';
-import { join } from 'node:path';
+import type SVGO from 'svgo';
+import { join, relative } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
-import { isNil, mapParallelAsync } from 'rambdax';
+import { isNil, mapAsync } from 'rambdax';
 import { toArray, assign } from '~utils/native';
-import { log, error } from '~log';
+import { log, error, c } from '~log';
 import { bundle, processor } from '~config';
 import { Kind, renameFile } from '~process/files';
 import { byteSize, fileSize, plural } from '~utils/utils';
@@ -70,8 +69,13 @@ function getSprite (sprite: SVGSpriter): Promise<string> {
 
     sprite.compile((error, svg) => {
       if (error) return reject(error);
-      for (const m in svg) for (const p in svg[m]) resolve(svg[m][p].contents.toString());
+      for (const m in svg) {
+        for (const p in svg[m]) {
+          resolve(svg[m][p].contents.toString());
+        }
+      }
     });
+
   });
 }
 
@@ -85,7 +89,11 @@ function getSprite (sprite: SVGSpriter): Promise<string> {
  * @param request The Shipify request client
  * @param cb The Syncify callback hook for API usage
  */
-export function compileSprite (context: File<SVGBundle[]>, request: AssetRequest, cb: Syncify) {
+export function compileSprite (
+  context: File<SVGBundle[]>,
+  request: ClientParam<SVGBundle[]>,
+  _cb: Syncify
+) {
 
   async function run (config: SVGBundle) {
 
@@ -106,14 +114,25 @@ export function compileSprite (context: File<SVGBundle[]>, request: AssetRequest
 
     const options = (config.sprite === true ? processor.sprite.config : config.sprite) as SVGSpriteConfig;
     const sprite = new SVGSprite(options);
-    const svgs = await mapParallelAsync(getFile, toArray(config.input)).catch(
+    const items = await mapAsync(getFile, toArray(config.input)).catch(
       error.write('Error reading an SVG file', {
         file: file.base,
         source: file.relative
       })
     );
 
-    if (svgs) {
+    if (items) {
+
+      const svgs = items.filter(([ path, svg ]) => {
+
+        if (hasLiquid(svg)) {
+          log.skipped(relative(bundle.cwd, path), 'Liquid Detected');
+          return false;
+        }
+
+        return true;
+
+      });
 
       file.size = 0;
 
@@ -142,15 +161,53 @@ export function compileSprite (context: File<SVGBundle[]>, request: AssetRequest
         log.minified(file.kind, size.before, size.after, size.saved);
       }
 
-      log.syncing(file.key);
-
-      await request('put', file, content);
-
+      if (request) {
+        log.syncing(file.key);
+        await request('put', file, content);
+      }
     }
   };
 
   return run;
 
+}
+
+/**
+ * Has Liquid
+ *
+ * Quickly validates SVGs for occurances of Liquid synxtax.
+ * SVGO cannot digest such occurances, so we will skip tokens
+ * which contain Liquid code.
+ *
+ * Again, the animals who created Dawn popularized this shit,
+ * so nothing but workarounds. smh.
+ */
+function hasLiquid (svg: string) {
+
+  return /^(?:{{[\s\S]+?}}|{%[\s\S]+?%})|[^"'](?:{{[\s\S]+?}}|{%[\s\S]+?%})[^'"]/m.test(svg);
+
+}
+
+/**
+ * Patch Solidus
+ *
+ * Fixes invalid paths on SVGs, converting unclosed `<path>` occurances
+ * with `<path />` self closers. SVGO apparently couldn't digest these
+ * and Dawn being the absolute shit show that it is was shipping unclosed
+ * SVG tokens, which despite being valid was causing headaches.
+ */
+function patchPathVoids (svg: string) {
+
+  const patch = /<path[^>]*[a-zA-Z"'\s](>)(?!\s*<\/path>)/g;
+
+  if (patch.test(svg)) {
+    const before = `${c.redBright(`<${c.white('path')}>`)}`;
+    const after = `${c.greenBright(`<${c.white('path')} />`)}`;
+    log.transform(`${before} ${c.ARR} ${after} ${c.TLD} ${c.gray('patched solidus')}`);
+    return svg.replace(/(<path[^>]*[a-zA-Z"'\s])(>)(?!\s*<\/path>)/g, '$1 /$2');
+  }
+
+  return svg;
 }
 
 /**
@@ -163,7 +220,11 @@ export function compileSprite (context: File<SVGBundle[]>, request: AssetRequest
  * @param request The Shipify request client
  * @param cb The Syncify callback hook for API usage
  */
-export function compileInline (context: File<SVGBundle[]>, request: AssetRequest, cb: Syncify) {
+export function compileInline (
+  context: File<SVGBundle[]>,
+  request: ClientParam<SVGBundle[]>,
+  _cb: Syncify
+) {
 
   const file = assign({}, context); // clone the file context
 
@@ -182,31 +243,41 @@ export function compileInline (context: File<SVGBundle[]>, request: AssetRequest
 
     const options = (config.svgo === true ? processor.svgo : config.svgo) as SVGOConfig;
     const read = await readFile(file.input);
+    const node = read.toString();
 
-    file.size = byteSize(read);
+    if (hasLiquid(node)) {
+      log.skipped(file, 'Liquid Detected');
+      return null;
+    }
+
+    const patch = patchPathVoids(node);
+
+    file.size = byteSize(patch);
 
     let svg: SVGO.Output;
 
     try {
-      svg = Svgo.optimize(read.toString(), options);
+
+      svg = Svgo.optimize(patch, options);
+
     } catch (error) {
+
       log.err(error.toString());
+
       return null;
+
     }
 
-    if (bundle.mode.watch) log.process('SVGO', timer.stop());
+    log.process('SVGO', timer.stop());
 
     const { data } = svg;
 
-    if (!bundle.mode.build) {
+    const size = fileSize(data, file.size);
 
-      const size = fileSize(data, file.size);
-
-      if (size.isSmaller) {
-        log.transform(`${file.kind} ${size.before} → gzip ${size.gzip}`);
-      } else {
-        log.minified(file.kind, size.before, size.after, size.saved);
-      }
+    if (size.isSmaller) {
+      log.transform(`${file.kind} ${size.before} → gzip ${size.gzip}`);
+    } else {
+      log.minified(file.kind, size.before, size.after, size.saved);
     }
 
     await writeFile(file.output, data).catch(
@@ -216,9 +287,10 @@ export function compileInline (context: File<SVGBundle[]>, request: AssetRequest
       })
     );
 
-    log.syncing(file.key);
-
-    await request('put', file, data);
+    if (request) {
+      log.syncing(file.key);
+      await request('put', file, data);
+    }
 
   };
 
@@ -235,19 +307,19 @@ export function compileInline (context: File<SVGBundle[]>, request: AssetRequest
  * @param request The Shipify request client
  * @param cb The Syncify callback hook for API usage
  */
-export async function compile (file: File<SVGBundle[]>, request: AssetRequest, cb: Syncify) {
+export async function compile (file: File<SVGBundle[]>, request?: ClientParam<SVGBundle[]>, cb?: Syncify) {
 
   if (bundle.mode.watch) timer.start();
 
   const sprite = compileSprite(file, request, cb);
   const inline = compileInline(file, request, cb);
-  const length = file.config.length;
+  const length = file.data.length;
 
   for (let i = 0; i < length; i++) {
 
-    const config = file.config[i];
+    const config = file.data[i];
 
-    if (i > 0) log.changed(file);
+    if (i > 0 && bundle.mode.watch) log.changed(file);
 
     if (config.format === 'sprite') {
       await sprite(config);
