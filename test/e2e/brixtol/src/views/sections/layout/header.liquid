@@ -1,0 +1,269 @@
+{%- comment -%}
+
+  NAVBAR
+
+  The main navigation (navbar) multi-level
+  menu. This is a desktop rendered element.
+  The childlink references can be customized
+  via the section schema.
+
+{%- endcomment -%}
+<nav class="row jc-between ai-center px-1 px-md-3">
+  <div class="col-auto col-sm d-none d-lg-flex fs-sm" id="navigation">
+    <nav id="navbar" class="navv">
+  <ul class="p-0 m-0">
+    {%- for link in linklists[section.settings.main_menu].links -%}
+      {%- if link.links != blank -%}
+        <li class="{% if link.active -%}active{%- endif -%}">
+          <a href=" {{- link.url -}}" title=" {{- link.title }}" data-spx-proximity>
+            {{- link.title -}}
+          </a>
+          <ul class="text-left">
+            {%- for childlink in link.links -%}
+              <li>
+                  <a href="{{- childlink.url -}}">
+                    {{- childlink.title -}}
+                  </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      {%- else -%}
+        <li>
+          <a href="{{ link.url }}" data-spx-proximity>
+            {{ link.title }}
+          </a>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</nav>
+  </div>
+  <div class="col-auto col-sm d-flex d-lg-none fs-sm">
+    <button
+      class="btn btn-sm upper p-0"
+      aria-expanded="false"
+      aria-label=" {{- 'layout.drawers.open_menu' | t }}"
+      type="button"
+      data-drawer="mobile-menu">
+      {{- 'layout.navigation.menu' | t }}
+    </button>
+  </div>
+  <div class="col-auto col-sm mt-0 tc">
+    <a href="/" class="d-inline-flex">
+      <svg class="icon icon-logo">
+        <use xlink:href="#logo"></use>
+      </svg>
+    </a>
+  </div>
+  <div class="col-auto col-sm tr">
+    <a href="/search" class="d-none d-md-inline-flex navbar-link mr-4">
+      SEARCH
+    </a>
+    <a
+      aria-expanded="false"
+      aria-label=" {{- 'header.cart.aria_label' | t -}}"
+      class="navbar-link "
+      data-drawer="bag"
+      href="/cart"
+      title=" {{- 'header.cart.title' }}"
+      data-spx-disable="true">
+      {{ 'header.cart.label' | t -}}
+      <span class="cart-count pl-1">
+        {{- cart.item_count -}}
+      </span>
+    </a>
+
+  </div>
+</nav>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "header",
+  "class": "navbar container-fluid d-grid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Sticky",
+      "info": "Enables sticky header. Sticky header will fix the position of component links and the main menu navbar when scrolling"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Sticky",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "sticky_bg",
+      "label": "Sticky Background",
+      "default": "transparent"
+    },
+    {
+      "type": "range",
+      "id": "sticky_opacity",
+      "label": "Opacity",
+      "min": 0.1,
+      "max": 1,
+      "step": 0.1,
+      "default": 1,
+      "info": "Sticky background colour opacity"
+    },
+    {
+      "type": "header",
+      "content": "Header Spacing",
+      "info": "Controls the X and Y radius spacing of the heading block. This setting is global and will be applied to every page."
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Spacing",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "info": "Spacing of top, right, bottom and left"
+    },
+    {
+      "type": "header",
+      "content": "Discount",
+      "info": "Controls the discount link button which allows users to apply a site wide discount."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_discount",
+      "label": "Discount",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "flip_symbol",
+      "label": "Flip $",
+      "info": "When enabled the letter \"s\" in discount is replaced with a rotating $",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Logo",
+      "info": "The size of the logo in Desktop devices"
+    },
+    {
+      "type": "range",
+      "id": "logo_desktop_size",
+      "min": 50,
+      "max": 300,
+      "step": 5,
+      "default": 150,
+      "unit": "px",
+      "label": "Desktop Logo Size"
+    },
+    {
+      "type": "range",
+      "id": "logo_mobile_size",
+      "min": 50,
+      "max": 300,
+      "step": 5,
+      "default": 150,
+      "unit": "px",
+      "label": "Mobile Logo Size"
+    },
+    {
+      "type": "header",
+      "content": "Main Menu",
+      "info": "The navigation to be used for the main menu."
+    },
+    {
+      "type": "link_list",
+      "id": "main_menu",
+      "default": "main-menu",
+      "label": "Select navigation"
+    },
+    {
+      "type": "header",
+      "content": "Linked Components",
+      "info": "Configuration styles for component links like Search and shopping cart."
+    },
+    {
+      "type": "select",
+      "id": "locale_style",
+      "label": "Locale Style",
+      "default": "text_and_flag",
+      "options": [
+        {
+          "value": "text_only",
+          "label": "Text Only"
+        },
+        {
+          "value": "flag_only",
+          "label": "Flag Only"
+        },
+        {
+          "value": "text_and_flag",
+          "label": "Text and Flag"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "search_style",
+      "label": "Search",
+      "default": "text_only",
+      "options": [
+        {
+          "value": "text_only",
+          "label": "Text Only"
+        },
+        {
+          "value": "icon_only",
+          "label": "Icon Only"
+        },
+        {
+          "value": "text_and_icon",
+          "label": "Text and Icon"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "cart_style",
+      "label": "Shopping Cart",
+      "default": "text_only",
+      "options": [
+        {
+          "value": "text_only",
+          "label": "Text Only"
+        },
+        {
+          "value": "icon_only",
+          "label": "Icon Only"
+        },
+        {
+          "value": "text_and_icon",
+          "label": "Text and Icon"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "account_style",
+      "label": "Account Style",
+      "default": "text_only",
+      "options": [
+        {
+          "value": "text_only",
+          "label": "Text Only"
+        },
+        {
+          "value": "icon_only",
+          "label": "Icon Only"
+        },
+        {
+          "value": "text_and_icon",
+          "label": "Text and Icon"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

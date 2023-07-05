@@ -1,0 +1,46 @@
+{%- assign current_first_item = paginate.current_offset | plus: 1 -%}
+{%- if paginate.pages == paginate.current_page -%}
+  {%- assign current_displayed = paginate.items | modulo: paginate.page_size -%}
+  {%- assign current_last_item = paginate.items -%}
+{%- else -%}
+  {%- assign current_displayed = paginate.page_size -%}
+  {%- assign current_last_item = paginate.current_offset | plus: paginate.page_size -%}
+{%- endif -%}
+
+<div class="row ac-center jc-center">
+  <div class="col-4 py-5">
+    <ul class="pagination pagination-md jc-center mb-3 text-center">
+      {%- if paginate.previous -%}
+        <li class="page-item d-inline">
+          <a class="page-link prev-url d-inline" href="{{ paginate.previous.url }}" data-turbo-preload="true">
+            <svg class="icon">
+              <use xlink:href="#chevron-left"></use>
+            </svg>
+          </a>
+        </li>
+      {%- endif -%}
+      {%- for part in paginate.parts -%}
+        {%- if part.is_link -%}
+          <li class="page-item d-inline">
+            <a class="page-link" href="{{ part.url }}" data-turbo-preload="true">
+              {{ part.title }}
+            </a>
+          </li>
+        {%- else -%}
+          <li class="page-item d-inline active">
+            <a class="page-link" href="#">{{ part.title }}</a>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if paginate.next -%}
+        <li class="page-item d-inline">
+          <a class="page-link next-url d-inline" href="{{ paginate.next.url }}" data-turbo-preload="true">
+            <svg class="icon">
+              <use xlink:href="#chevron-right"></use>
+            </svg>
+          </a>
+        </li>
+      {%- endif -%}
+    </ul>
+  </div>
+</div>

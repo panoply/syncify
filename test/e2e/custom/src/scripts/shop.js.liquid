@@ -1,0 +1,17 @@
+window.shop = {
+  customer_id: "{{ customer.id | default: 'unknown' }}",
+  asset_url: "{{ 'path' | asset_url }}",
+  script: {
+    framework: "{{ 'framework.js' | asset_url }}",
+    polyfills: "{{ 'polyfills.js' | asset_url }}"
+  },
+  cart: {
+    charity: {
+      enabled: {{ settings.cart_charity }},
+      organization: "{{ settings.cart_charity_organization }}",
+      amount: {{ settings.cart_charity_amount }},
+      subtext: '{{ settings.cart_charity_subtext }}',
+      logo: "{{ settings.cart_charity_logo | img_url: 'master' }}"
+    }
+  }
+}

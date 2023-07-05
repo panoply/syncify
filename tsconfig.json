@@ -1,0 +1,53 @@
+{
+  "exclude": [
+    "node_modules/**/*",
+    "dist",
+    "tests",
+    "test",
+    "docs"
+  ],
+  "include": ["src/**/*.ts"],
+  "typeAcquisition": {
+    "enable": true,
+    "include": ["node"]
+  },
+  "compilerOptions": {
+    "types": ["node"],
+    "incremental": true,
+    "target": "ESNext",
+    "removeComments": true,
+    "lib": ["es2020", "DOM"],
+    "module": "CommonJS",
+    "alwaysStrict": true,
+    "allowUmdGlobalAccess": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "remove",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true,
+    "skipDefaultLibCheck": false,
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "pretty": true,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "types": ["./types/index.d.ts"],
+      "~config": ["./src/config.ts"],
+      "~const": ["./src/const.ts"],
+      "~process/*": ["./src/process/*"],
+      "~cli/*": ["./src/cli/*"],
+      "~options/*": ["./src/options/*"],
+      "~transform/*": ["./src/transform/*"],
+      "~modes/*": ["./src/modes/*"],
+      "~requests/*": ["./src/requests/*"],
+      "~hot/*": ["./src/hot/*"],
+      "~log": ["./src/log/index.ts"],
+      "~log/*": ["./src/log/*.ts", "!./src/log/index.ts"],
+      "~utils/*": ["src/utils/*"]
+    }
+  }
+}

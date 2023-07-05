@@ -1,0 +1,52 @@
+<aside
+  id="mobile-menu"
+  aria-hidden="true"
+  class="drawer-panel drawer-left pb-3 px-3 d-none"
+  data-controller="drawer">
+  <div class="mobile-menu-container">
+    <nav class="mobile-menu as-center py-3">
+      <div
+        class="mm-drawer mt-3"
+        data-accordion-persist-value="true"
+        data-accordion-multiple-value="false"
+        data-controller="accordion">
+        {%- for link in linklists.aw22-mobile-menu.links -%}
+          {%- if link.links != blank -%}
+            <button class="mm-drawer-btn upper mb-2 pl-0 link">
+              {{- link.title -}}
+            </button>
+            <div class="mm-drawer-fold">
+              <ul
+                class="list-clear py-3"
+                id="{{ link.title | handleize }}">
+                {%- for childlink in link.links -%}
+                  <li class="link pt-1 pb-1 {% if childlink.active %}active{%- endif -%}">
+                    <a
+                      href="{{ childlink.url }}"
+                      class="link">
+                      {{- childlink.title -}}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {%- for link in linklists.aw22-mobile-menu.links -%}
+        {%- if link.links == blank -%}
+          {% if link.active -%}
+            {%- assign link_class = 'link mb-2 d-block ' | append: 'active' -%}
+          {%- else -%}
+            {%- assign link_class = 'link mb-2 d-block' -%}
+          {%- endif -%}
+          <a
+            href="{{- link.url }}"
+            class="{{ link_class }}">
+            {{ link.title }}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </nav>
+  </div>
+</aside>

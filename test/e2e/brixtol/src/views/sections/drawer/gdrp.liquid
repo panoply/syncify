@@ -1,0 +1,154 @@
+<div
+  class="d-none"
+  data-controller="gdrp"
+  data-gdrp-consent-value="true"
+  data-gdrp-tracking-value="allow tracking"
+  data-gdrp-no-tracking-value="do not track me"
+  data-gdrp-show-class="d-none"
+  data-gdrp-overlay-class=" {{- overlay }}">
+  <section
+    id="gdrp"
+    aria-hidden="true"
+    class="drawer-panel drawer-bottom p-2 py-3 p-sm-4"
+    data-controller="drawer"
+    data-drawer-overlay-class="drawer-overlay">
+
+    <div class="container-fluid gdrp-settings ">
+
+      <div class="row ai-center jc-center">
+        <div class="col-12 col-lg-10 col-xl-8 text-left bd-gray">
+          <h5>
+            Cookie Settings
+          </h5>
+          <p class="fs-1 fs-sm-2 mb-4">
+            We use cookies to give you a personalized content experience. Cookies allow us
+            to analyze traffic, customer behavior and personalize digital marketing more
+            effectively. We take privacy and security very seriously and we don't use
+            cookies for storing personal information nor do we share collected information
+            with any third parties that you have not explictly agreed. You can read more
+            about our
+            <a
+              href="/pages/privacy-policy"
+              class="text-underline">Privacy Policy</a>
+            and
+            <a
+              href="/pages/terms-and-conditions/"
+              class="text-underline">Terms and Conditions</a>.
+          </p>
+
+          <div class="row ai-between bd-gray pb-4">
+            <div class="col-12 col-md-8 col-lg-9 fs-1 fs-sm-2">
+              <h5 class="mb-2">
+                ESSENTIAL COOKIES
+              </h5>
+              Allows us to automatically localize you and keep track of items in your shopping
+              cart.
+            </div>
+
+            <div class="col-12 col-md-4 col-lg-3 as-end pt-3 pt-sm-0">
+              <fieldset class="d-flex ai-center">
+                <label
+                  for="accepts_marketing"
+                  class="switch">
+                  <input
+                    id="accepts_marketing"
+                    name="accepts_marketing"
+                    type="checkbox"
+                    checked="checked"
+                    class="switch"
+                    disabled
+                    data-action="input->gdrp#oninput">
+                  <icon svg="checkmark"/>
+                </label>
+                <span class="pl-3">
+                  ALWAYS ENABLED
+                </span>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="row ai-between bd-top bd-gray pb-3">
+            <div class="col-12 col-md-8 col-lg-9 fs-1 fs-sm-2">
+              <h5 class="mt-4 my-b">
+                TRACKING CONSENT
+              </h5>
+              We use these cookies to personalize your shopping experience, analytics, provide
+              cross channel advertising, marketing and improve our webshop. Read the
+              <a
+                href="/pages/privacy-policy"
+                class="text-underline">Privacy Policy
+              </a>
+              for more information.
+            </div>
+
+            <div class="col-12 col-md-4 col-lg-3 as-end pt-3 pt-sm-0">
+              <fieldset class="d-flex ai-center mb-2">
+                <label
+                  for="cookie_consent"
+                  class="switch">
+                  <input
+                    id="cookie_consent"
+                    name="cookie_consent"
+                    type="checkbox"
+                    class="switch"
+                    checked="checked"
+                    data-action="input->gdrp#oninput">
+                  <icon svg="checkmark"/>
+                </label>
+                <span
+                  data-gdrp-target="consent"
+                  class="pl-3">
+                  ALLOW TRACKING
+                </span>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="row bd-top bd-gray jc-center jc-sm-end py-3">
+            <div class="col-10 col-sm-6 col-md-4 col-lg-3">
+              <button
+                class="btn btn-radius btn-shadow bg-dark"
+                data-action="click->gdrp#onconfirm"
+                data-drawer="gdrp">
+                Confirm Settings
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="row ai-center gdrp-banner jc-center">
+    <div class="col-11 col-sm-10 col-lg-11 col-xl-8 pt-2 inner">
+      <div class="row ai-center jc-center jc-sm-between">
+        <div class="col-12 col-sm pr-sm-3 text-left fs-2">
+          We use cookies to provide you with a personalize shopping, content and
+          advertising experience. By clicking accept you consent to our use of cookies.
+          Read our
+          <a
+            href="/pages/privacy-policy"
+            class="text-underline">Privacy Policy
+          </a>
+          for more information.
+        </div>
+        <div class="col col-sm-3 text-center text-sm-right">
+          <div class="row ai-center pt-3 pb-1 pt-sm-0">
+            <button
+              type="button"
+              class="col-12 col-sm-auto btn-black btn-sm mb-3 mb-sm-0 mr-sm-2"
+              data-drawer="gdrp">
+              {{- 'gdrp.cookie_settings' | t -}}
+            </button>
+            <button
+              type="button"
+              class="col-9 col-sm-auto btn bg-dark btn-shadow btn-radius m-auto"
+              data-action="click->gdrp#onaccept">
+              {{- 'general.words.accept' | t -}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

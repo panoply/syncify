@@ -1,0 +1,592 @@
+{
+  "words": {
+    "only": "Only",
+    "male": "Male",
+    "men": "Men",
+    "women": "Women",
+    "wmn": "Wmn",
+    "female": "Female",
+    "message": "Message",
+    "accept": "Accept",
+    "send": "Send",
+    "details": "Details",
+    "collection": "Collection",
+    "or": "or"
+  },
+  "general": {
+    "words": {
+      "only": "Only",
+      "male": "Male",
+      "men": "Men",
+      "women": "Women",
+      "wmn": "Wmn",
+      "female": "Female",
+      "message": "Message",
+      "accept": "Accept",
+      "send": "Send",
+      "details": "Details",
+      "collection": "Collection",
+      "or": "or"
+    },
+    "meta": {
+      "tags": "Tagged \"{{ tags }}\"",
+      "page": "Page {{ page }}"
+    },
+    "404": {
+      "title": "404 Page Not Found",
+      "subtext_html": "The page you requested does not exist. Click <a href=\"/collections/all\">here</a> to continue shopping."
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "home_link_title": "Back to the home page"
+    },
+    "locale": {
+      "enter_country": "Enter Country"
+    },
+    "search": {
+      "no_results_html": "Your search for \"{{ terms }}\" did not yield any results.",
+      "results_for_html": "Your search for \"{{ terms }}\" revealed the following:",
+      "title": "Search for products on our site",
+      "placeholder": "Search our store",
+      "submit": "Search"
+    }
+  },
+  "offer": {
+    "free_shipping": "Free Shipping",
+    "free_shipping_and_returns": "Free Shipping and Returns",
+    "free_return": "Free Return",
+    "paid_return": "Return cost is deducted on your refund",
+    "paid_shipping": "Shipping cost will be added to your order total"
+  },
+  "blogs": {
+    "article": {
+      "author_on_date_html": "Posted by {{ author }} on {{ date }}",
+      "older_post": "Older Post",
+      "newer_post": "Newer Post",
+      "tags": "Tags",
+      "comment_meta_html": "{{ author }} on {{ date }}",
+      "read_more": "Read more"
+    },
+    "comments": {
+      "title": "Leave a comment",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "post": "Post comment",
+      "moderated": "Please note, comments must be approved before they are published",
+      "success_moderated": "Your comment was posted successfully. We will publish it in a little while, as our blog is moderated.",
+      "success": "Your comment was posted successfully! Thank you!",
+      "with_count": {
+        "one": "{{ count }} comment",
+        "other": "{{ count }} comments"
+      }
+    },
+    "sidebar": {
+      "recent_articles": "Recent Articles",
+      "categories": "Categories"
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Shopping Cart",
+      "remove": "Remove",
+      "note": "Special instructions for seller",
+      "subtotal": "Subtotal",
+      "shipping_at_checkout": "Shipping & taxes calculated at checkout",
+      "update": "Update Cart",
+      "checkout": "Check Out",
+      "empty": "Your cart is currently empty.",
+      "continue_browsing_html": "Continue browsing <a href=\"/collections/all\">here</a>.",
+      "close_cart": "Close Cart",
+      "savings_html": "You're saving {{ price }}",
+      "reduce_quantity": "Reduce item quantity by one",
+      "increase_quantity": "Increase item quantity by one"
+    },
+    "label": {
+      "shipping": "Shipping",
+      "product": "Product",
+      "price": "Price",
+      "quantity": "Quantity",
+      "total": "Total"
+    }
+  },
+  "collections": {
+    "general": {
+      "all_of_collection": "All {{ collection }}",
+      "no_matches": "Sorry, there are no products in this collection",
+      "link_title": "Browse our {{ title }} collection",
+      "grid_view": "Grid view",
+      "list_view": "List view",
+      "items_with_count": {
+        "one": "{{ count }} item",
+        "other": "{{ count }} items"
+      }
+    },
+    "sidebar": {
+      "tags": "Tags"
+    },
+    "filter": {
+      "active_title": "Active Filters",
+      "apply": "Apply",
+      "clear": "Clear All Filters"
+    },
+    "sorting": {
+      "title": "Sort by",
+      "manual": "New Arrivals",
+      "best_selling": "Most Popular",
+      "alphabetical_az": "A-Z",
+      "alphabetical_za": "Z-A",
+      "price_ascending": "Highest Price",
+      "price_descending": "Lowest Price",
+      "date_descending": "Newest",
+      "date_ascending": "Oldest"
+    },
+    "onboarding": {
+      "modal_title": "This page will show all of your store's products",
+      "no_products_html": "There are no products yet, but once you begin adding them they will show up here regardless if they are in a collection.",
+      "add_product": "Add Product"
+    }
+  },
+  "forms": {
+    "name": "Your Name",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "gender": "Gender",
+    "email_address": "Email Address",
+    "order_no": "Order No"
+  },
+  "contact": {
+    "form": {
+      "name": "Your Name",
+      "email": "Your Email",
+      "order_no": "Order No",
+      "phone": "Phone Number",
+      "message": "Message",
+      "send": "Send",
+      "post_success": "Thanks for contacting us. We'll get back to you as soon as possible."
+    }
+  },
+  "customer": {
+    "account": {
+      "title": "My Account",
+      "details": "Account Details",
+      "view_addresses": "View Addresses",
+      "view_cart": "View Cart",
+      "return": "Return to Account Details"
+    },
+    "activate_account": {
+      "title": "Activate Account",
+      "subtext": "Create your password to activate your account.",
+      "password": "Password",
+      "password_confirm": "Confirm Password",
+      "submit": "Activate Account",
+      "cancel": "Decline Invitation"
+    },
+    "addresses": {
+      "title": "Your Addresses",
+      "default": "Default",
+      "add_new": "Add a New Address",
+      "edit_address": "Edit address",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "company": "Company",
+      "address1": "Address1",
+      "address2": "Address2",
+      "city": "City",
+      "country": "Country",
+      "province": "Province",
+      "zip": "Postal/Zip Code",
+      "phone": "Phone",
+      "set_default": "Set as default address",
+      "add": "Add Address",
+      "update": "Update Address",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "login": {
+      "title": "Sign In",
+      "email": "Email Address",
+      "password": "Password",
+      "forgot_password": "Forgot password?",
+      "sign_in": "Sign In",
+      "cancel": "Return to Store",
+      "guest_title": "Continue as a guest",
+      "guest_continue": "Continue",
+      "continue_to_checkout": "Continue to Checkout",
+      "sign_in_with_facebook": "Login with Facebook",
+      "sign_in_with_google": "Login with Google",
+      "signing_in": "Signing In",
+      "redirecting": "Redirecting"
+    },
+    "orders": {
+      "title": "Your Orders",
+      "order_number": "Order",
+      "date": "Date",
+      "payment_status": "Payment Status",
+      "fulfillment_status": "Fulfillment Status",
+      "total": "Total",
+      "none": "You haven't placed any orders yet."
+    },
+    "order": {
+      "title": "Order {{ name }}",
+      "date": "Placed on {{ date }}",
+      "cancelled": "Order Cancelled on {{ date }}",
+      "cancelled_reason": "Reason: {{ reason }}",
+      "billing_address": "Billing Address",
+      "payment_status": "Payment Status",
+      "shipping_address": "Shipping Address",
+      "fulfillment_status": "Fulfillment Status",
+      "discount": "Discount",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "product": "Product",
+      "sku": "SKU",
+      "price": "Price",
+      "quantity": "Quantity",
+      "total": "Total",
+      "fulfilled_at": "Fulfilled {{ date }}",
+      "subtotal": "Subtotal"
+    },
+    "recover_password": {
+      "title": "Reset your password",
+      "email": "Email",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "subtext": "We will send you an email to reset your password.",
+      "success": "We've sent you an email with a link to update your password.",
+      "back_to_login": "Back to Login"
+    },
+    "reset_password": {
+      "title": "Reset account password",
+      "subtext": "Enter a new password for {{ email }}",
+      "password": "Password",
+      "password_confirm": "Confirm Password",
+      "submit": "Reset Password"
+    },
+    "register": {
+      "title": "Create Account",
+      "accept_marketing": "Keep me up to date on news and exclusive offers.",
+      "accept_terms_html": "I hereby understand and agree to the conditions stipulated in the <a href=\"/pages/privacy-policy\">Privacy Policy</a> and <a href=\"/pages/terms-and-conditions\">Terms and Conditions</a>.",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Create",
+      "cancel": "Return to Store",
+      "back_to_options": "Back to Options",
+      "sign_up_with_email": "Register with Email",
+      "sign_up_with_facebook": "Continue with Facebook",
+      "sign_up_with_google": "Continue with Google",
+      "creating_account": "Creating Account",
+      "gender_placeholder": "Select Gender",
+      "gender_male": "Male",
+      "gender_female": "Female",
+      "country_placeholder": "Select Country"
+    }
+  },
+  "homepage": {
+    "title": "Home page",
+    "sections": {
+      "frontpage_title": "Frontpage Collection",
+      "featured_title": "Featured Collections",
+      "news_title": "Latest News"
+    },
+    "onboarding": {
+      "modal_title": "Almost there...",
+      "no_products_html": "You have no products in your home page collection. This placeholder will appear until you <a href=\"/admin/collections?tutorial=Frontpage\">add a product to this collection</a>.",
+      "add_product": "Add a Product",
+      "product_title": "Example Product Title",
+      "no_collections_html": "You don't have any collections to show here. <a href=\"/admin/custom_collections\">Add some collections</a> to go along with the default home page.",
+      "add_collection": "Add a Collection",
+      "collection_title": "Example Collection Title"
+    }
+  },
+  "header": {
+    "search": {
+      "label": "Search",
+      "title": "Search Store",
+      "aria_label": "Press here search the Brixtol Textiles webshop"
+    },
+    "cart": {
+      "label": "Cart",
+      "title": "Shopping Cart",
+      "aria_label": "Press here to open your shopping cart"
+    },
+    "main_menu": {
+      "title": "Main Menu"
+    },
+    "support": {
+      "title": "Help",
+      "support": "Customer Support",
+      "contact": "Contact",
+      "messenger": "Messenger",
+      "twitter": "Tweet Us",
+      "information": "Information",
+      "response": "Hour Response"
+    }
+  },
+  "layout": {
+    "header": {
+      "main_menu": {
+        "ariatitle": "Main Menu"
+      },
+      "title": {
+        "title": "Help",
+        "support": "Customer Support",
+        "contact": "Contact",
+        "messenger": "Messenger",
+        "twitter": "Tweet Us",
+        "information": "Information",
+        "response": "Hour Response"
+      },
+      "help": {
+        "link_title": "Help",
+        "block_title": "Customer Support"
+      }
+    },
+    "navigation": {
+      "menu": "Menu"
+    },
+    "drawers": {
+      "browse": "Browse",
+      "open_menu": "Open menu",
+      "open_cart": "Open cart",
+      "close_menu": "Close menu",
+      "close_cart": "Close Cart"
+    },
+    "cart": {
+      "title": "Cart",
+      "items_count": {
+        "one": "item",
+        "other": "items"
+      }
+    },
+    "customer": {
+      "account": "Account",
+      "logged_in_as_html": "Logged in as {{ first_name }}",
+      "log_out": "Log out",
+      "log_in": "Log in",
+      "create_account": "Create account"
+    },
+    "footer": {
+      "social_title": "Get Connected",
+      "newsletter_title": "Newsletter",
+      "accepted_payments": "Accepted Payments",
+      "payment_methods": "Payment methods accepted",
+      "vat_number": "VAT no:",
+      "trademark_number": "Trademark no:",
+      "phone": "Phone:",
+      "copyright": "Copyright",
+      "of": "of",
+      "all_rights_reserved": "All rights reserved."
+    }
+  },
+  "ajax_cart": {
+    "free": "Free",
+    "save": "Save",
+    "empty": "Your cart is empty",
+    "shipping_to": "Shipping to",
+    "payment": "Payment",
+    "securing_checkout": "Securing Checkout",
+    "loading": "Loading",
+    "apply_discount": "Apply Discount",
+    "discount": "Discount",
+    "note": "Special instructions for seller",
+    "goto_checkout": "Goto Checkout",
+    "redirecting": "Redirecting",
+    "sub_total": "Subtotal",
+    "total": "Total"
+  },
+  "product_item": {
+    "sold_out": "Sold Out",
+    "on_sale": "Sale",
+    "percent_off": "% OFF",
+    "low_stock": "Left",
+    "on_sale_from_html": "<strong>On Sale</strong> from {{ price }}",
+    "unavailable": "Unavailable",
+    "compare_at": "Compare at",
+    "quantity": "Quantity",
+    "add_to_cart": "Add to Cart",
+    "collection": "This product was produced for the {{ season }} collection.",
+    "fabric": {
+      "shell": "Shell",
+      "shell_outer_jacket": "Shell Outer",
+      "shell_inner_jacket": "Shell Inner",
+      "padding": "Padding",
+      "lining": "Lining",
+      "lining_outer_jacket": "Lining Outer",
+      "lining_inner_jacket": "Lining Inner",
+      "quilted_lining": "Lining"
+    },
+    "highlight": {
+      "carry_over": "Carry Over",
+      "fishing_nets": "Made from Recycled Fishing Nets",
+      "made_in_england": "Made in England",
+      "made_in_europe": "Made in Europe",
+      "organic_cotton": "Organic Cotton",
+      "pfas_free": "PFAS Free",
+      "recycled_padding": "Recycled Padding",
+      "recycled_pet": "Recycled PET",
+      "recycled": "Recycled",
+      "stretch": "Stretch",
+      "vegan": "Vegan",
+      "washable": "Washable",
+      "water_repellent": "Water Repellent",
+      "water_resistant": "Water Resistant",
+      "waterproof": "waterproof"
+    },
+    "certificate": {
+      "bci": {
+        "title": "The Better Cotton Initiative",
+        "description": "The Better Cotton Initiative (BCI) is a global not-for-profit organisation and the largest cotton sustainability programme in the world. BCI exists to make global cotton production better for the people who produce it, better for the environment it grows in and better for the sectorʼs future."
+      },
+      "grs": {
+        "title": "Global Recycle Standard",
+        "description": "Global Recycle Standard (GRS) - The objectives of the GRS are to define requirements to ensure accurate content claims and good working conditions, and that harmful environmental and chemical impacts are minimised."
+      },
+      "gots": {
+        "title": "Global Organic Textile Standard",
+        "description": "Global Organic Textile Standard (GOTS) - Certified organic cotton is recognised as the world's leading processing standard for textiles made from organic fibres. It defines high-level environmental criteria along the entire organic textiles supply chain and requires compliance with social criteria as well."
+      }
+    },
+    "production": {
+      "GOTS": {
+        "title": "Certified Organic Cotton Standard",
+        "body": "The Global Organic Textile Standard (GOTS) is recognised as the world's leading processing standard for textiles made from organic fibres. It defines high-level environmental criteria along the entire organic textiles supply chain and requires compliance with social criteria as well."
+      },
+      "GRS": {
+        "title": "Global Recycle Standard",
+        "body": "The objectives of the GRS are to define requirements to ensure accurate content claims and good working conditions, and that harmful environmental and chemical impacts are minimised."
+      }
+    }
+  },
+  "products": {
+    "general": {
+      "previous_product_html": "&larr; Previous Product",
+      "next_product_html": "Next Product &rarr;",
+      "from_text_html": "From {{ price }}",
+      "sale_price": "Sale price",
+      "regular_price": "Regular price"
+    }
+  },
+  "pages": {
+    "sidebar": {
+      "brand_group": "The Brand",
+      "online_group": "Online Shopping",
+      "legal_group": "Legal Information"
+    }
+  },
+  "collection_page": {
+    "load_more": "Load More",
+    "loading": "Loading"
+  },
+  "rewaxing_page": {
+    "goto_checkout": "Proceed to Payment",
+    "loading": "Loading"
+  },
+  "product_page": {
+    "add_to_cart": "Add to Cart",
+    "select_size": "Select Size",
+    "size_required": "Size Required",
+    "out_of_stock": "Out of Stock",
+    "subscribe": "Subscribe",
+    "enter_email": "Enter Email",
+    "email_required": "Email Required",
+    "stock_left": "{{ q }} Available",
+    "view_more": "View Product",
+    "tabs": {
+      "description": "About",
+      "sustainable": "Sustainable",
+      "measurements": "Fit / Size",
+      "material": "Fabric",
+      "customer_help": "Help"
+    },
+    "sizing": {
+      "group": "Size",
+      "arm": "Arm",
+      "chest": "½ Chest",
+      "bust": "Bust",
+      "back": "Back",
+      "model": "Model",
+      "height": "Height",
+      "weight": "Weight",
+      "wearing": "Wearing",
+      "fit_measurements": "Measurements",
+      "fit_reference": "Fit Reference",
+      "imperial": {
+        "title": "Imperial",
+        "tolerence": "All Measurements have a 0.60 inch Tolerence"
+      },
+      "metric": {
+        "title": "Metric",
+        "tolerence": "All Measurements have a 1 ½ cm Tolerence"
+      },
+      "x_small": {
+        "title": "X Small",
+        "abbreviation": "xs"
+      },
+      "small": {
+        "title": "Small",
+        "abbreviation": "sm"
+      },
+      "medium": {
+        "title": "Medium",
+        "abbreviation": "md"
+      },
+      "large": {
+        "title": "Large",
+        "abbreviation": "lg"
+      },
+      "x_large": {
+        "title": "X Large",
+        "abbreviation": "xl"
+      },
+      "xx_large": {
+        "title": "XX Large",
+        "abbreviation": "xxl"
+      }
+    }
+  },
+  "gift_cards": {
+    "issued": {
+      "title": "Here's your {{ value }} gift card for {{ shop }}!",
+      "subtext": "Here's your gift card!",
+      "disabled": "Disabled",
+      "expired": "Expired on {{ expiry }}",
+      "active": "Expires on {{ expiry }}",
+      "redeem": "Use this code at checkout to redeem your gift card",
+      "shop_link": "Start shopping",
+      "print": "Print",
+      "add_to_apple_wallet": "Add to Apple Wallet"
+    }
+  },
+  "date_formats": {
+    "month_day_year": "%B %d, %Y"
+  },
+  "incentive": {
+    "newsletter": {
+      "title": "Newsletter Discount",
+      "subtitle": "Join our mailing list and get {{ p }}% OFF your next order"
+    }
+  },
+  "gdrp": {
+    "cookie_settings": "Cookie Settings"
+  },
+  "newsletter": {
+    "title": "Newsletter",
+    "submit": "Subscribe",
+    "subscribed": "Subscribed",
+    "email_field": "Newsletter",
+    "pending": "You have a pending confirmation, please confirm your email or try another address",
+    "enter_email": "Enter Email",
+    "opt_in": "Thanks, We've sent a verification email to {e}. Check your inbox and confirm your address and newsletter subscription.",
+    "errors": {
+      "exists": "You are already subscribed",
+      "invalid": "Email address is invalid",
+      "team": "Hey colleague, Brixtol & Sunday Seven team members are already subscribed, you can try the brixtoltextiles.se address.",
+      "404": "Sorry, we are not accepting subscriptions right now"
+    },
+    "email_consent": "We take your privacy very seriously. The information you provide will be held under the General Data Protection Regulation (GDPR) (EU) 2016/679. By subscribing to our newsletter you agree to receive transactional and promotional emails from us. You can withdraw or change your promotional emails preferences anytime via the \"Unsubscribe\" link in your email."
+  }
+}

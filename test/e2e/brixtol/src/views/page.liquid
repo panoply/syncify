@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="{{ shop_locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <title>
+      {% liquid
+        echo page_title
+        if current_tags
+          assign meta_tags = current_tags | join: ', '
+          echo 'general.meta.tags' | t: tags: meta_tags | prepend: ' &ndash; '
+        endif
+        if current_page != 1
+          echo 'general.meta.page' | t: page: current_page | prepend: ' &ndash; '
+        endif
+        unless page_title contains shop.name
+          echo shop.name | prepend: ' | '
+        endunless
+      %}
+    </title>
+
+    {% render 'favicons' %}
+    {% render 'meta_tags' %}
+    {% render 'preloads' %}
+    {% render 'styles.css' %}
+    {% render 'scripts.js' %}
+
+    {{ content_for_header }}
+
+  </head>
+  <body>
+
+    {% render 'drawer_menu', overlay: 'drawer-overlay' %}
+    {% render 'drawer_cart', overlay: 'drawer-overlay' %}
+
+    {% section 'header' %}
+
+    <main id="main" class="container-fluid">
+      <div class="row jc-start ac-center">
+        {% section 'sidebar' %}
+        {{ content_for_layout }}
+      </div>
+    </main>
+
+    {% section 'footer' %}
+
+    {% render 'drawer_gdrp', overlay: 'bg-visible' %}
+    {% render 'nodes' %}
+    {% render 'icons' %}
+
+  </body>
+</html>

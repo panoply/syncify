@@ -1,0 +1,119 @@
+{
+  "version": 1.1,
+  "tags": [
+    {
+      "name": "a",
+      "attributes": [
+        {
+          "name": "data-spx-disable",
+          "description": "Disables pjax on this link. A normal page navigation will be executed and cache will be cleared when the href element is annotated with this attribute"
+        },
+        {
+          "name": "data-spx-hydrate",
+          "description": "Executes a replacement of the defined elements. Hydrate is different from `replace`, `append` and `prepend` methods in the sense that the those are combined with your defined `targets`. When calling Hydrate, it will run precedence over `targets` and for the visit it will replace only the element/s provided."
+        },
+        {
+          "name": "data-spx-replace",
+          "description": "Executes a replacement of defined targets, where each target defined in the array is replaced.",
+          "values": [
+            {
+              "name": "([''])",
+              "description": "Define a comma seperated list of element selectors"
+            }
+          ]
+        },
+        {
+          "name": "data-spx-prepend",
+          "description": "Executes a prepend visit.",
+          "values": [
+            {
+              "name": "(['',''])",
+              "description": "Where `[0]` will prepend itself to `[1]` defined in that value. Multiple prepend actions can be defined. Each prepend action is recorded are marked."
+            }
+          ]
+        },
+        {
+          "name": "data-spx-prefetch",
+          "description": "Prefetch option to execute. Accepts either `intersect` or `hover` value. When `intersect` is provided a request will be dispatched and cached upon visibility via Intersection Observer, whereas `hover` will dispatch a request upon a pointerover (mouseover) event.",
+          "values": [
+            {
+              "name": "intersect",
+              "description": "The `intersect` value will trigger a request that will be dispatched and cached upon visibility via Intersection Observer"
+            },
+            {
+              "name": "hover",
+              "description": "The `hover` value will dispatch a request upon a pointerover (mouseover) event. On mobile devices the `hover` value will execute on a `touchstart` event"
+            }
+          ]
+        },
+        {
+          "name": "data-spx-threshold",
+          "description": "Set the threshold delay timeout for hover prefetches. By default, this will be set to `100` or whatever preset configuration was defined in `pjax.connect()` but you can override those settings by annotating using this attribute."
+        },
+        {
+          "name": "data-spx-position",
+          "description": "Scroll position of the next navigation. Space separated expression with colon separated prop and value, for example:\n\n`<a href=\"*\" data-spx-position=\"y:1000 x:0\">`\n\nThis next navigation will load at 1000px from top of page"
+        },
+        {
+          "name": "data-spx-history",
+          "description": "Controls the history pushstate for the navigation.",
+          "values": [
+            {
+              "name": "false",
+              "description": "Passing in `false` will prevent this navigation from being added to history"
+            },
+            {
+              "name": "replace",
+              "description": "Passing in `replace` will execute its respective value to pushstate to history"
+            },
+            {
+              "name": "push",
+              "description": "Passing in `push` will execute its respective value to pushstate to history"
+            }
+          ]
+        },
+        {
+          "name": "data-spx-cache",
+          "description": "Controls the caching engine for the link navigation. Accepts `false`, `reset` or `clear` value. Passing in `false` will execute a pjax visit that will not be saved to cache and if the link exists in cache it will be removed. When passing `reset` the cache record will be removed, a new pjax visit will be executed and its result saved to cache. The `clear` option will clear the entire cache.",
+          "values": [
+            {
+              "name": "false",
+              "description": "A `false` value will execute a pjax visit that will not be saved to cache and if the link exists in cache it will be removed"
+            },
+            {
+              "name": "reset",
+              "description": "Passing in `reset` and the current cache record will be removed, a new pjax visit will be executed and its result saved to cache"
+            },
+            {
+              "name": "clear",
+              "description": "The `clear` value will clear the entire cache."
+            }
+          ]
+        },
+        {
+          "name": "data-spx-progress",
+          "description": "Controls the progress bar delay. By default, progress will use the threshold defined in configuration presets defined upon connection, else it will use the value defined on link attributes. Passing in a value of `false` will disable the progress from showing.\n\n`<a href=\"*\" data-spx-progress=\"100\">`\nProgress bar will be displayed if the request exceeds 500ms\n\n<a href=\"*\" data-spx-progress=\"false\">`\nProgress bar will not show."
+        },
+        {
+          "name": "data-spx-mouseover"
+        }
+      ]
+    }
+  ],
+  "globalAttributes": [
+    {
+      "name": "data-spx-track",
+      "description": "Track the element a per-page basis which is not be contained within targets"
+    },
+    {
+      "name": "data-spx-eval",
+      "description": "Used on resources contained within `<head>` fragment like styles and scripts. Use this attribute if you want pjax the evaluate scripts and/or stylesheets. This option accepts a `false` value so you can define which scripts to execute on each navigation. By default, pjax will run and evaluate all `<script>` tags it detects for every page visit but will not re-evaluate `<script src=\"*\"></script>` tags.",
+      "values": [
+        {
+          "name": "false",
+          "description": "Will execute evaluation only once upon the first visit but never again after that."
+        }
+      ]
+    }
+  ]
+}

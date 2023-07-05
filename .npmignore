@@ -1,0 +1,31 @@
+# DIRECTORIES
+
+example/
+test/
+tests/
+lib/
+docs/
+plugins/
+src/
+versions/
+.vscode/
+
+# DOT FILES
+
+.env
+.env.example
+.eslintrc
+.eslintignore
+.prettierrc.js
+.prettierignore
+.pnpm-debug.log
+
+# BUILD FILES
+
+tsconfig.json
+tsup.config.ts
+
+# MARKDOWN
+
+readme.md
+changelog.md
