@@ -1,6 +1,6 @@
 import { Config } from 'types';
 import anymatch from 'anymatch';
-import { has, isNil } from 'rambdax';
+import { has, isEmpty, isNil } from 'rambdax';
 import { typeError, unknownError, invalidError } from '~log/validate';
 import { bundle, processor } from '~config';
 import * as u from '~utils/native';
@@ -17,17 +17,21 @@ export function setSectionOptions (config: Config) {
 
   const { sections } = config.views;
 
+  if (isNil(config.views.sections)) return;
+  if (u.isObject(sections) && isEmpty(sections)) return;
+
   // Ensure the section option is an object
-  if (!u.isObject(config.views.sections) && !isNil(config.views.sections)) {
-    unknownError('sections', config.views.sections);
+  if (!u.isObject(sections)) {
+    typeError({
+      option: 'views',
+      name: 'sections',
+      expects: '{}',
+      provided: typeof sections
+    });
   }
 
   // Iterate over all the properties in sections option
   for (const option in bundle.section) {
-
-    // Throw if an undefined property is detected
-    // checks against the default model.
-    if (!has(option, sections)) unknownError('sections', option);
 
     // Validate the boolean type values of the option
     if (option === 'prefixDir') {
@@ -72,8 +76,10 @@ export function setSectionOptions (config: Config) {
       const globals = u.isString(sections[option]) ? [ sections[option] ] : sections[option];
 
       if (u.isArray(globals)) {
-        bundle.section[option] = new RegExp(`${globals.join('|')}`);
-        continue;
+        if (globals.length > 0) {
+          bundle.section[option] = new RegExp(`${globals.join('|')}`);
+          continue;
+        }
       } else {
         typeError({
           option: 'views.sections',
@@ -98,17 +104,20 @@ export function setSnippetOptions (config: Config) {
 
   const { snippets } = config.views;
 
-  // Ensure the section option is an object
-  if (!u.isObject(config.views.snippets) && !isNil(config.views.snippets)) {
-    unknownError('snippets', config.views.snippets);
-  }
+  if (isNil(snippets)) return;
+  if (u.isObject(snippets) && isEmpty(snippets)) return;
 
+  // Ensure the section option is an object
+  if (!u.isObject(snippets)) {
+    typeError({
+      option: 'views',
+      name: 'snippets',
+      expects: '{}',
+      provided: typeof snippets
+    });
+  }
   // Iterate over all the properties in sections option
   for (const option in bundle.snippet) {
-
-    // Throw if an undefined property is detected
-    // checks against the default model.
-    if (!has(option, snippets)) unknownError('sections', option);
 
     // Validate the boolean type values of the option
     if (option === 'prefixDir') {
@@ -153,9 +162,13 @@ export function setSnippetOptions (config: Config) {
       const globals = u.isString(snippets[option]) ? [ snippets[option] ] : snippets[option];
 
       if (u.isArray(globals)) {
-        bundle.snippet[option] = new RegExp(`${globals.join('|')}`);
-        continue;
+
+        if (globals.length > 0) {
+          bundle.snippet[option] = new RegExp(`${globals.join('|')}`);
+          continue;
+        }
       } else {
+
         typeError({
           option: 'views.snippets',
           name: option,
@@ -238,8 +251,18 @@ export function setJsonOptions (config: Config) {
 
   const { json } = config.processors;
 
+  if (isNil(json)) return;
+  if (u.isObject(json) && isEmpty(json)) return;
+
   // Ensure the section option is an object
-  if (!u.isObject(json)) unknownError('json', json);
+  if (!u.isObject(json)) {
+    typeError({
+      option: 'processors',
+      name: 'json',
+      expects: '{}',
+      provided: typeof json
+    });
+  }
 
   // Iterate over all the properties in sections option
   for (const option in json) {
