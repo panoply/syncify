@@ -236,6 +236,15 @@ export const hr = (minus: number) => lightGray(`│${nl}├${'─'.repeat(size()
 export const CHK = neonGreen('✓ ');
 
 /**
+ * Cross character in redBright
+ *
+ * ```
+ * 𐄂
+ * ```
+ */
+export const BAD = redBright('𐄂');
+
+/**
  * Colon character in gray suffixed with single space
  *
  * ```
