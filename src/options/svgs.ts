@@ -1,12 +1,12 @@
 import { Merge } from 'type-fest';
 import { Tester } from 'anymatch';
-import { Config, Package, SVGBundle, SVGOConfig, SVGSprite, SVGFile, SVGSpriteConfig } from 'types';
+import { Config, SVGBundle, SVGOConfig, SVGSprite, SVGFile, SVGSpriteConfig } from 'types';
 import { extname, relative } from 'node:path';
 import { has } from 'rambdax';
 import merge from 'mergerino';
 import { cyan } from '~log';
 import { unknownError, throwError, missingOption, invalidError, warnOption, missingDependency } from '~log/validate';
-import { isObject, nl } from '~utils/native';
+import { isObject } from '~utils/native';
 import { load } from '~transform/svgs';
 import { bundle, processor } from '~config';
 import { getTransform, getModules } from '~options/utilities';
@@ -18,14 +18,14 @@ import { uuid } from '~utils/utils';
  * Build the icons configuration for generating
  * SVG sprites and snippets.
  */
-export async function setSvgOptions (config: Config, pkg: Package) {
+export async function setSvgOptions (config: Config) {
 
   if (!has('svg', config.transforms)) return;
 
   const { sprite, svgo } = processor;
   const warn = warnOption('svg transform');
 
-  svgo.installed = getModules(pkg, 'svgo');
+  svgo.installed = getModules('svgo');
 
   // Load SVGO module
   if (svgo.installed) {
@@ -33,7 +33,7 @@ export async function setSvgOptions (config: Config, pkg: Package) {
     if (!loaded) throwError('Unable to dynamically import SVGO', 'Ensure you have installed svgo');
   }
 
-  sprite.installed = getModules(pkg, 'svg-sprite');
+  sprite.installed = getModules('svg-sprite');
 
   // Load SVG Sprite module
   if (sprite.installed) {
@@ -104,11 +104,11 @@ export async function setSvgOptions (config: Config, pkg: Package) {
       } else {
 
         if (svgo.installed && sprite.installed) {
-          missingOption('transform > svg', 'format', 'sprite | file', [
+          missingOption('transform.svg', 'format', 'sprite | file', [
             `SVG transforms require you to define ${cyan('format')} when both SVGO and SVG Sprite`,
             'processors are installed. Syncify needs to knows how is should handle the input and',
             'which processor to use for the transform.'
-          ].join(nl));
+          ]);
         } else if (svgo.installed && !sprite.installed) {
 
           o.format = 'file';
