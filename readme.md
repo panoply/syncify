@@ -6,7 +6,7 @@
 
 A lightening fast, extensible and superior alternative Shopify CLI (Theme Development) tool. Syncify provides developers with a powerful CLI and employs an intuitive approach for creating Shopify themes.
 
-**Syncify will exist as part of the [Liquify](https://liquify.dev) project**
+Real World Strap building Dawn: [syncify-strap](https://github.com/panoply/syncify-strap)
 
 ### Key Features
 
@@ -164,42 +164,6 @@ process.env['YOUR-SHOP-NAME_API_KEY'] = 'abcdefghijklmnopqrstuvwz';
 process.env['YOUR-SHOP-NAME_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
 ```
 
-# Package Schema
-
-Syncify exposes a large set of configuration options. If you are using a text editor like [VS Code](https://code.visualstudio.com/) or one which supports [JSON Schema Specs](https://json-schema.org/specification.html) then you can extend `package.json` schemas. JSON schema specs provide features like hover descriptions, validations, auto-completion and intellisense for JSON file types. Extending the package schema will enable these capabilities be provided to the `syncify` field.
-
-> It is **highly recommended** that you extend the `package.json` json specifications.
-
-### Generate Schemas (vscode users)
-
-Syncify can automatically generate the `package.json` schema specs for developers using the VSCode text editor. The settings reference will be written within the `.vscode` directory relative to root. Use the following command:
-
-```
-syncify --vsc
-```
-
-### Provide Manually
-
-If you wish to provide the specs manually you will need to create a `.vscode` directory and `settings.json` file within. The `settings.json` should contain the following configuration settings:
-
-```json
-{
-  "files.associations": {
-    ".syncifyrc": "json"
-  },
-  "json.schemas": [
-    {
-      "fileMatch": ["package.json"],
-      "url": "https://unpkg.com/@syncify/schema/package.json"
-    },
-    {
-      "fileMatch": [".syncifyrc", ".syncifyrc.json"],
-      "url": "https://unpkg.com/@syncify/schema/syncify.json"
-    }
-  ]
-}
-```
-
 # Configuration
 
 Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on the `syncify` property.
@@ -319,7 +283,7 @@ export default defineConfig({
     // sprite: {},
     // sharp: {},
   },
-  minify: {
+  terser: {
     json: {
       assets: true,
       config: true,
@@ -345,7 +309,7 @@ export default defineConfig({
 
 # Getting Started
 
-It is relatively easy to get started developing Shopify themes using Syncify. If you are converting an existing project and using Theme Kit or another build environment you can progressively adapt it into your workflow by manually configuring how Syncify should behave. Whatever the case, have a look at the [Syncify Examples](#) repository.
+It is relatively easy to get started developing Shopify themes using Syncify. If you are converting an existing project and using Theme Kit or another build environment you can progressively adapt it into your workflow by manually configuring how Syncify should behave. Whatever the case, have a look at the [Syncify Strap](https://github.com/panoply/syncify-strap) repository.
 
 ### Pre-requisites
 
@@ -660,8 +624,8 @@ export default defineConfig({
     snippets: 'snippets/*.liquid',
     templates: 'templates/*.liquid',
     customers: 'templates/customers/*',
-    pages: 'pages/*',
-    redirects: 'redirects.yaml',
+    // pages: 'pages/*',
+    // redirects: 'redirects.yaml',
   }
 })
 ```
@@ -1101,7 +1065,7 @@ Syncify provides SCSS/SASS transform support for `.scss` and `.sass` file types 
 pnpm add sass -D
 ```
 
-### Tailwind Support
+### Tailwind Support ~ COMING SOON
 
 Syncify supports TailwindCSS for CSS processing. If you require transform support for Tailwind, you need to install the TailwindCSS module as a development dependency in your project. Syncify will ignore Tailwind class name occurrences without the module installed.
 
@@ -1745,7 +1709,7 @@ When we are talking about Liquid syntax specifically, there is no real measurabl
 
 ### Usage
 
-Produce terse output by passing `--terse` (or `--minify`) command flag. The `--prod` flag will also produce terse output. You can pass a boolean `false` to options to skip minification.
+Produce terse output by passing `--terse` command flag. The `--prod` flag will also produce terse output. You can pass a boolean `false` to options to skip minification.
 
 ### Terse Options
 
@@ -1811,6 +1775,8 @@ If you are using a package manager like [pnpm](https://pnpm.js.org/en/cli/instal
 > If you are not using [pnpm](https://pnpm.js.org/en/cli/install) then you should really consider adopting it within your stack. It is a wonderful addition to any JavaScript project.
 
 ### Commands
+
+### PARTIALLY INCOMPLETE - NOT ALL COMMANDS WORK
 
 The Syncify CLI supports the following commands.
 

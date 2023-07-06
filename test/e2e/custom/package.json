@@ -31,7 +31,7 @@
   "devDependencies": {
     "@sissel/eslint-config": "^1.1.0",
     "@sissel/prettier-config": "^1.1.0",
-    "@syncify/cli": "link:../../..",
+    "@syncify/cli": "0.2.2-beta",
     "autoprefixer": "^10.4.14",
     "bootstrap": "^5.3.0",
     "esbuild": "^0.18.11",
