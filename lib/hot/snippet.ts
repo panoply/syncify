@@ -10,6 +10,32 @@ declare global {
        */
       ready: boolean;
       /**
+       * Page section maps
+       */
+      sections?: {
+        /**
+         * Returns the object where section ids are properties
+         * and the values are an array list of dynamic applied ids.
+         * Returns `null` if no section exist.
+         */
+        list: () => { [id: string]: string[]; };
+        /**
+         * Method for loading section id maps. Helpful when executing
+         * OTW (Over the wire) page replacements like SPX. When invoked,
+         * it will obtains all the section ids in the document body.
+         *
+         * This is called at runtime in HOT mode. Returns the object map
+         * of matches of `null` if no sections exist.
+         */
+        load: () => { [id: string]: string[]; };
+        /**
+         * Returns all elements matching the provided `id` which is obtained
+         * via the websocket `data` parameter. Query Selects all matches. If
+         * no matches are found, returns null.
+         */
+        get: (id: string) => NodeListOf<HTMLElement>
+      };
+      /**
        * Full page refresh
        */
       refresh?: () => void;
@@ -70,6 +96,54 @@ declare global {
   const server = `http://localhost:${syncify.server}/`;
   const socket = new WebSocket(`ws://localhost:${syncify.socket}/ws`);
   const parser = new DOMParser();
+  const morphing = {
+    onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
+      if (fromEl.id === 'syncify-hot-label-status') return false;
+      if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
+      if (fromEl.isEqualNode(toEl)) return false;
+      return true;
+    }
+  };
+
+  /* -------------------------------------------- */
+  /* SECTIONS                                     */
+  /* -------------------------------------------- */
+
+  function sections (map: { [id: string]: string[] }) {
+
+    return {
+      list: () => {
+        return Object.keys(map).length > 0 ? map : null;
+      },
+      get: (id: string) => {
+        if (id in map) return document.body.querySelectorAll<HTMLElement>(map[id].join(','));
+        return null;
+      },
+      load: () => {
+
+        map = {};
+
+        const elements = document.body.querySelectorAll('.shopify-section');
+        if (!elements) return null;
+
+        elements.forEach(section => {
+
+          const match = (/_{2}[\w-]+$/g).exec(section.id);
+          const id = match !== null ? match[0].slice(2) : section.id;
+
+          if (!(id in map)) {
+            map[id] = [ '#' + section.id ];
+          } else {
+            map[id].push('#' + section.id);
+          }
+        });
+
+        return map;
+
+      }
+    };
+
+  };
 
   /* -------------------------------------------- */
   /* HISTORY SNAPSHOTS                            */
@@ -93,6 +167,8 @@ declare global {
      * Virtual DOM Element
      */
     const node = document.createElement('div');
+
+    node.id = 'syncify-hot-label-status';
 
     /**
      * The dynamic nodes style - Exposed to user
@@ -158,7 +234,7 @@ declare global {
         return state;
       },
       render: (dom: HTMLElement) => {
-        dom.append(node);
+        if (!dom.contains(node)) dom.append(node);
       }
     };
 
@@ -330,13 +406,9 @@ declare global {
         const dom = parser.parseFromString(doc, 'text/html');
         const newDom = assets(dom);
 
-        morph(document.body, newDom.body, {
-          onBeforeElUpdated: function (fromEl, toEl) {
-            if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
-            if (fromEl.isEqualNode(toEl)) return false;
-            return true;
-          }
-        });
+        console.log(newDom.body);
+
+        morph(document.body, newDom.body, morphing);
 
         label.render(document.body);
         label.event(`Reloaded in ${timer.stop()}`);
@@ -351,14 +423,35 @@ declare global {
 
       if (type === 'section') {
 
+        const nodes = window.syncify.sections.get(uri);
         label.event(`Reloading Section: ${uri}`);
+
+        if (nodes === null) {
+          window.syncify.reload();
+          return;
+        }
 
         return req(`${location.pathname}?sections=${uri}`, 'json').then((value: {
           [prop: string]: string
         }) => {
-          const { firstElementChild } = parser.parseFromString(value[uri], 'text/html').body;
-          document.body.querySelector(`#shopify-section-${data}`).replaceWith(firstElementChild);
+
+          if (nodes === null) return;
+
+          nodes.forEach(node => {
+
+            morph(node, value[uri], {
+              childrenOnly: true,
+              onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
+                if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
+                if (fromEl.isEqualNode(toEl)) return false;
+                return true;
+              }
+            });
+
+          });
+
           label.event(`Reloaded in ${timer.stop()}`);
+
         });
 
       } else if (type === 'script') {
@@ -386,12 +479,18 @@ declare global {
   /* EXPOSED METHODS                              */
   /* -------------------------------------------- */
 
+  window.syncify.sections = sections({});
   window.syncify.assets = () => assets(document);
   window.syncify.refresh = () => top.location.reload();
   window.syncify.reload = () => req(location.href, 'text').then((doc: string) => {
+
     const dom = parser.parseFromString(doc, 'text/html');
-    document.body.replaceWith(assets(dom).body);
+
+    morph(document.body, assets(dom).body, morphing);
+
     label.render(document.body);
+    window.syncify.sections.load();
+
   });
 
   /* -------------------------------------------- */
@@ -401,6 +500,7 @@ declare global {
   document.addEventListener('DOMContentLoaded', () => {
 
     label.render(document.body);
+    window.syncify.sections.load();
     window.syncify.ready = true;
 
   });
