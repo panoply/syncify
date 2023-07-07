@@ -6,7 +6,8 @@ import test from './components/test';
 import b from './globs/b'
 import { d } from './globs/d'
 import { e } from './globs/e'
-console.log('hello sissel');
+
+console.log('hello sjsjsjjs ');
 
 b()
 d()

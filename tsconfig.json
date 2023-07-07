@@ -3,20 +3,30 @@
     "node_modules/**/*",
     "dist",
     "tests",
+    "straps",
     "test",
     "docs"
   ],
-  "include": ["src/**/*.ts"],
+  "include": [
+    "lib/**/*.ts"
+  ],
   "typeAcquisition": {
     "enable": true,
-    "include": ["node"]
+    "include": [
+      "node"
+    ]
   },
   "compilerOptions": {
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "incremental": true,
     "target": "ESNext",
     "removeComments": true,
-    "lib": ["es2020", "DOM"],
+    "lib": [
+      "es2020",
+      "DOM"
+    ],
     "module": "CommonJS",
     "alwaysStrict": true,
     "allowUmdGlobalAccess": true,
@@ -32,22 +42,49 @@
     "noUnusedLocals": false,
     "noUnusedParameters": true,
     "pretty": true,
-    "rootDir": "src",
+    "rootDir": "lib",
     "baseUrl": ".",
     "paths": {
-      "types": ["./types/index.d.ts"],
-      "~config": ["./src/config.ts"],
-      "~const": ["./src/const.ts"],
-      "~process/*": ["./src/process/*"],
-      "~cli/*": ["./src/cli/*"],
-      "~options/*": ["./src/options/*"],
-      "~transform/*": ["./src/transform/*"],
-      "~modes/*": ["./src/modes/*"],
-      "~requests/*": ["./src/requests/*"],
-      "~hot/*": ["./src/hot/*"],
-      "~log": ["./src/log/index.ts"],
-      "~log/*": ["./src/log/*.ts", "!./src/log/index.ts"],
-      "~utils/*": ["src/utils/*"]
+      "types": [
+        "./types/index.d.ts"
+      ],
+      "~config": [
+        "./lib/config.ts"
+      ],
+      "~const": [
+        "./lib/const.ts"
+      ],
+      "~process/*": [
+        "./lib/process/*"
+      ],
+      "~cli/*": [
+        "./lib/cli/*"
+      ],
+      "~options/*": [
+        "./lib/options/*"
+      ],
+      "~transform/*": [
+        "./lib/transform/*"
+      ],
+      "~modes/*": [
+        "./lib/modes/*"
+      ],
+      "~requests/*": [
+        "./lib/requests/*"
+      ],
+      "~hot/*": [
+        "./lib/hot/*"
+      ],
+      "~log": [
+        "./lib/log/index.ts"
+      ],
+      "~log/*": [
+        "./lib/log/*.ts",
+        "!./src/log/index.ts"
+      ],
+      "~utils/*": [
+        "./lib/utils/*"
+      ]
     }
   }
 }

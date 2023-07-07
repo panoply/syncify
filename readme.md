@@ -6,7 +6,10 @@
 
 A lightening fast, extensible and superior alternative Shopify CLI (Theme Development) tool. Syncify provides developers with a powerful CLI and employs an intuitive approach for creating Shopify themes.
 
-Real World Strap building Dawn: [syncify-strap](https://github.com/panoply/syncify-strap)
+### Demos
+
+- [Syncify Dawn Basic](https://github.com/panoply/syncify-dawn-basic)
+- [Syncify Dawn Advanced](https://github.com/panoply/syncify-dawn-advanced)
 
 ### Key Features
 
@@ -170,6 +173,7 @@ Syncify supports `syncify.config.js` and `package.json` configurations. Dependin
 
 ### Supported Files
 
+- `syncify.config.ts`
 - `syncify.config.js`
 - `syncify.config.ts`
 - `syncify.config.mjs`

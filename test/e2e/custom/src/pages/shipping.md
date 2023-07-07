@@ -1,1 +1,8 @@
-<!-- SYNCIFY WILL SOON SUPPORT MARKDOWN PAGES -->
+---
+author: 'Youness'
+meta_description: 'ddkkdkd'
+---
+
+# Shipping
+
+lorem ipsum

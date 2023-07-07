@@ -5,14 +5,14 @@ var cjs_js = require('./cjs.js');
 
 
 Object.defineProperty(exports, 'defineConfig', {
-	enumerable: true,
-	get: function () { return cjs_js.b; }
+  enumerable: true,
+  get: function () { return cjs_js.defineConfig; }
 });
 Object.defineProperty(exports, 'env', {
-	enumerable: true,
-	get: function () { return cjs_js.d; }
+  enumerable: true,
+  get: function () { return cjs_js.env; }
 });
 Object.defineProperty(exports, 'run', {
-	enumerable: true,
-	get: function () { return cjs_js.e; }
+  enumerable: true,
+  get: function () { return cjs_js.run; }
 });

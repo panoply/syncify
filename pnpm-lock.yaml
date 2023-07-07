@@ -41,6 +41,9 @@ importers:
       html-minifier-terser:
         specifier: 7.2.0
         version: 7.2.0
+      html-to-image:
+        specifier: ^1.11.11
+        version: 1.11.11
       load-tsconfig:
         specifier: ^0.2.5
         version: 0.2.5
@@ -53,6 +56,9 @@ importers:
       minimist:
         specifier: ^1.2.8
         version: 1.2.8
+      morphdom:
+        specifier: ^2.7.0
+        version: 2.7.0
       node-notifier:
         specifier: ^10.0.1
         version: 10.0.1
@@ -2976,6 +2982,10 @@ packages:
       terser: 5.18.1
     dev: false
 
+  /html-to-image@1.11.11:
+    resolution: {integrity: sha512-9gux8QhvjRO/erSnDPv28noDZcPZmYE7e1vFsBLKLlRlKDSqNJYebj6Qz1TGd5lsRV+X+xYyjCKjuZdABinWjA==}
+    dev: false
+
   /http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
     engines: {node: '>= 0.8'}
@@ -3557,6 +3567,10 @@ packages:
   /mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
     dev: true
+
+  /morphdom@2.7.0:
+    resolution: {integrity: sha512-8L8DwbdjjWwM/aNqj7BSoSn4G7SQLNiDcxCnMWbf506jojR6lNQ5YOmQqXEIE8u3C492UlkN4d0hQwz97+M1oQ==}
+    dev: false
 
   /ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}

@@ -58,9 +58,9 @@ const external = [
 export default defineConfig(options => ([
   {
     entry: [
-      'src/cli.ts',
-      'src/api.ts',
-      'src/index.ts'
+      'lib/cli.ts',
+      'lib/api.ts',
+      'lib/index.ts'
     ],
     outDir: 'dist',
     clean: [
@@ -79,7 +79,7 @@ export default defineConfig(options => ([
     async onSuccess () {
 
       await build({
-        entryPoints: [ 'src/hot/snippet.ts' ],
+        entryPoints: [ 'lib/hot/snippet.ts' ],
         bundle: true,
         minify: false,
         format: 'iife',

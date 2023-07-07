@@ -1,5 +1,4 @@
 @import 'bootstrap/scss/bootstrap';
-
 @import 'example/test-1.scss';
 @import 'example/test-2.scss';
 
@@ -10,6 +9,7 @@ body {
 
 .example {
   text-align: center;
-  background-color: blue;
+  background-color: pink;
   display: block;
+  padding: 70px;
 }

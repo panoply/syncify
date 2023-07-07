@@ -44,7 +44,7 @@ export default defineConfig({
     {
       domain: 'syncify',
       themes: {
-        custom: 136656060657
+        custom: 136656060657,
       }
     },
     {
@@ -84,7 +84,9 @@ export default defineConfig({
       ]
     },
   },
+  spawn: {
 
+  },
   transforms: {
 
     script: {
@@ -180,7 +182,9 @@ export default defineConfig({
       style: 'compressed',
       include: ['node_modules/'],
     },
-    postcss: []
+    postcss: [
+
+    ]
   },
   terser: {
     json: {
