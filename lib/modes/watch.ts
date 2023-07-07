@@ -1,4 +1,4 @@
-import type { Syncify, File } from 'types';
+import type { Syncify, File, WatchBundle } from 'types';
 import { client, queue } from '~requests/client';
 import { compile as liquid } from '~transform/liquid';
 import { compile as styles } from '~transform/styles';
@@ -23,7 +23,7 @@ export function watch (callback: Syncify) {
   const request = client(bundle.sync);
   const parse = parseFile(bundle.paths, bundle.dirs.output);
 
-  bundle.watch.on('all', async function (event, path) {
+  (bundle.watch as WatchBundle).on('all', async function (event, path) {
 
     const file: File = parse(path);
 
@@ -128,7 +128,7 @@ export function watch (callback: Syncify) {
 
           } else if (file.type !== Type.Script && file.type !== Type.Style) {
 
-            await queue.onIdle().then(() => bundle.wss.replace());
+            await queue.onEmpty().then(() => bundle.wss.replace());
 
           }
         }
