@@ -4,5 +4,5 @@ export default function () {
 
   mjs()
 
-  return 'fsssssssssssssss';
+  return 'Baz File';
 }

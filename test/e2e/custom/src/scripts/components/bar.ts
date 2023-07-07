@@ -4,6 +4,8 @@ export default function () {
 
   const node = document.querySelector('#some-vnode');
 
+  if(!node) return
+
   m.mount(node, {
     view: () => [
       m(
