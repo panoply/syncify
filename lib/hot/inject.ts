@@ -12,22 +12,11 @@ const EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET_NAME}['"][,\\slablso
  * Uploads Snippet
  *
  * Uploading the required HOT snippet to the store. This will execute at runtime.
- * Optionally accepts a `force` injection parameter which defaults to `false`.
- * This is used to skip uploads when a snippet injection already exists.
  */
 export async function injectSnippet (force = false) {
 
   const key = `snippets/${HOT_SNIPPET_FILE}`;
   const [ theme ] = bundle.sync.themes;
-
-  if (force === false) {
-    const exists = await request.has(key, theme);
-    if (exists) {
-      log.update(tui.message('gray', `${key} snippet injection exists`));
-      return true;
-    }
-  }
-
   const snippet = await readFile(bundle.hot.snippet);
   const upload = await request.upload(snippet.toString(), { theme, key });
 
