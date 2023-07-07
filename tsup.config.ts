@@ -81,7 +81,7 @@ export default defineConfig(options => ([
       await build({
         entryPoints: [ 'lib/hot/snippet.ts' ],
         bundle: true,
-        minify: false,
+        minify: true,
         format: 'iife',
         banner: { js: '<script>' },
         footer: { js: '</script>' },
