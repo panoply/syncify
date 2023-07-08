@@ -271,6 +271,17 @@ export function changed (file: File) {
 };
 
 /**
+ * Log HOT Reload - `neonRouge`
+ *
+ * @example '│ reloaded → HOT RELOAD ~ 500ms'
+ */
+export function hot () {
+
+  log(tui.suffix('neonRouge', 'reloaded', `${c.bold('HOT RELOAD')}${c.time(timer.now())}`));
+
+}
+
+/**
  * Log Uploaded - `neonGreen`
  *
  * @example '│ uploaded → theme → store.myshopify.com ~ 500ms'
@@ -313,15 +324,14 @@ export function upload (theme: Theme) {
  *
  * @example '│ syncing → dir/file.ext'
  */
-export function syncing (path: string) {
+export function syncing (path: string, hot = false) {
 
   if (warning.count > 0) {
     tui.suffix('yellowBright', 'warning', `${warning.count} ${plural('warning', warning.count)}`);
   }
 
-  if (bundle.mode.hot) {
+  if (hot) {
 
-    log(tui.suffix('neonRouge', 'reloaded', `${c.bold('HOT RELOAD')}${c.time(timer.now())}`));
     log(tui.suffix('magentaBright', 'syncing', path));
 
     // when hot reloads hold off on logging queues
