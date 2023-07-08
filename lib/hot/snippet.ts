@@ -10,6 +10,27 @@ declare global {
        */
       ready: boolean;
       /**
+       * Whether or not the websocket is connected
+       */
+      connected: boolean;
+      /**
+       * List of errors encountered
+       */
+      errors?: Array<{
+        /**
+         * Error title
+         */
+        title: string;
+        /**
+         * Description
+         */
+        description: string;
+        /**
+         * Group
+         */
+        group: string;
+      }>
+      /**
        * Page section maps
        */
       sections?: {
@@ -27,13 +48,14 @@ declare global {
          * This is called at runtime in HOT mode. Returns the object map
          * of matches of `null` if no sections exist.
          */
-        load: () => { [id: string]: string[]; };
+        load: (dom?: HTMLElement) => { [id: string]: string[]; };
         /**
          * Returns all elements matching the provided `id` which is obtained
          * via the websocket `data` parameter. Query Selects all matches. If
          * no matches are found, returns null.
          */
-        get: (id: string) => NodeListOf<HTMLElement>
+        get: (id: string) => NodeListOf<HTMLElement>;
+
       };
       /**
        * Full page refresh
@@ -87,16 +109,46 @@ declare global {
   label: string;
 }) {
 
-  window.syncify = window.syncify || { ready: false };
+  if (!document) return;
+
+  window.syncify = window.syncify || {
+    ready: false,
+    connected: true,
+    errors: []
+  };
+
+  /* -------------------------------------------- */
+  /* VIRTUAL NODE                                 */
+  /* -------------------------------------------- */
+
+  /**
+   * Virtual DOM Element
+   */
+  const node = document.createElement('div');
+
+  /**
+   * Set label `id="syncify-hot-label-status"`
+   */
+  node.id = 'syncify-hot-label-status';
+
+  /* -------------------------------------------- */
+  /* SOCKET                                       */
+  /* -------------------------------------------- */
+
+  function websocket () {
+    const socket = new WebSocket(`ws://localhost:${syncify.socket}/ws`);
+    ws(socket);
+  }
+
+  websocket();
 
   /* -------------------------------------------- */
   /* CONSTANTS                                    */
   /* -------------------------------------------- */
 
   const server = `http://localhost:${syncify.server}/`;
-  const socket = new WebSocket(`ws://localhost:${syncify.socket}/ws`);
   const parser = new DOMParser();
-  const morphing = {
+  const morphs = {
     onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
       if (fromEl.id === 'syncify-hot-label-status') return false;
       if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
@@ -109,7 +161,7 @@ declare global {
   /* SECTIONS                                     */
   /* -------------------------------------------- */
 
-  function sections (map: { [id: string]: string[] }) {
+  const sections = (function (map: { [id: string]: string[] }) {
 
     return {
       list: () => {
@@ -119,23 +171,66 @@ declare global {
         if (id in map) return document.body.querySelectorAll<HTMLElement>(map[id].join(','));
         return null;
       },
-      load: () => {
+      load: (dom: HTMLElement = document.body) => {
 
         map = {};
 
-        const elements = document.body.querySelectorAll('.shopify-section');
+        const elements = dom.querySelectorAll('.shopify-section');
+
         if (!elements) return null;
 
-        elements.forEach(section => {
+        elements.forEach(({ id }) => {
 
-          const match = (/_{2}[\w-]+$/g).exec(section.id);
-          const id = match !== null ? match[0].slice(2) : section.id;
+          /**
+           * Capture dynamic section ids, for example:
+           *
+           * ```js
+           * // Generated ID
+           * 'shopify-section-template--16744901378289__image_banner'
+           *
+           * // Capturing ID
+           * '16744901378289__image_banner'
+           *
+           * // Referenced ID
+           * 'image_banner'
+           * ```
+           *
+           */
+          const match = (/[0-9]+_{2}[\w-]+$/).exec(id);
 
-          if (!(id in map)) {
-            map[id] = [ '#' + section.id ];
+          /**
+           * Represents the section id without prefix
+           */
+          let prop: string;
+
+          if (match !== null) {
+
+            prop = match[0].slice(match[0].indexOf('__') + 2);
+
+          } else if (id.startsWith('shopify-section-')) {
+
+            prop = id.slice(16); // remove the "shopify-section-" portion
+
           } else {
-            map[id].push('#' + section.id);
+
+            window.syncify.errors.push({
+              title: 'Unknown Section',
+              description: `Syncify encountered an issue mapping the section id: ${id}`,
+              group: 'section'
+            });
+
+            return null;
+
           }
+
+          const selector = `#${id}`;
+
+          if (!(prop in map)) {
+            map[prop] = [ selector ];
+          } else if (map[prop].indexOf(selector) < 0) {
+            map[prop].push(selector);
+          }
+
         });
 
         return map;
@@ -143,7 +238,7 @@ declare global {
       }
     };
 
-  };
+  })({});
 
   /* -------------------------------------------- */
   /* HISTORY SNAPSHOTS                            */
@@ -162,13 +257,6 @@ declare global {
      * Local State Message
      */
     let state: string = 'Syncify Connected';
-
-    /**
-     * Virtual DOM Element
-     */
-    const node = document.createElement('div');
-
-    node.id = 'syncify-hot-label-status';
 
     /**
      * The dynamic nodes style - Exposed to user
@@ -234,7 +322,11 @@ declare global {
         return state;
       },
       render: (dom: HTMLElement) => {
-        if (!dom.contains(node)) dom.append(node);
+
+        if (dom.contains(node)) return;
+
+        dom.append(node);
+
       }
     };
 
@@ -364,7 +456,7 @@ declare global {
    * XHR Request - Reloads the page via XHR
    * and resolves the document as a string.
    */
-  function req (uri: string, type: 'json' | 'text') {
+  function req (uri: string, type: 'json' | 'text' | 'document') {
 
     return new Promise(function (resolve, reject) {
 
@@ -372,8 +464,7 @@ declare global {
 
       xhr.responseType = type;
       xhr.open('GET', uri);
-      xhr.setRequestHeader('X-Syncify-Reload', 'true');
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      xhr.setRequestHeader('X-Syncify-Request', 'true');
       xhr.onload = () => resolve(xhr.response);
       xhr.onerror = () => reject(xhr.statusText);
       xhr.send();
@@ -382,114 +473,168 @@ declare global {
 
   };
 
-  // status('Syncify Live (connected)');
+  function ws (socket: WebSocket) {
 
-  socket.addEventListener('message', function ({
-    data
-  }: {
-    data: LiteralUnion<'reload' | 'replace' | 'script' | 'style', string>
-  }) {
+    let timeout: number = NaN;
 
-    if (data === 'reload') {
+    socket.addEventListener('close', () => {
+      socket = null;
+      setTimeout(websocket, 5000);
+    });
 
-      label.event('Refreshing');
+    // status('Syncify Live (connected)');
 
-      return top.location.reload();
+    socket.addEventListener('message', function ({
+      data
+    }: {
+      data: LiteralUnion<'connected' | 'disconnect' | 'reload' | 'replace' | 'script' | 'style', string>
+    }) {
 
-    } else if (data === 'replace') {
+      if (data === 'connected') {
 
-      timer.start();
-      label.event('Reloading');
+        if (!window.syncify.connected) {
 
-      return req(location.href, 'text').then((doc: string) => {
+          timer.start();
+          label.event('Reconnecting');
 
-        const dom = parser.parseFromString(doc, 'text/html');
-        const newDom = assets(dom);
+          return req(location.href, 'document').then((doc: Document) => {
 
-        console.log(newDom.body);
+            morph(document.body, assets(doc).body, morphs);
 
-        morph(document.body, newDom.body, morphing);
+            sections.load(document.body);
+            label.render(document.body);
+            label.event(`Reconnected in ${timer.stop()}`);
+            window.syncify.connected = true;
 
-        label.render(document.body);
-        label.event(`Reloaded in ${timer.stop()}`);
+          });
 
-      });
-
-    } else {
-
-      timer.start();
-
-      const [ type, uri ] = data.split(',');
-
-      if (type === 'section') {
-
-        const nodes = window.syncify.sections.get(uri);
-        label.event(`Reloading Section: ${uri}`);
-
-        if (nodes === null) {
-          window.syncify.reload();
-          return;
         }
 
-        return req(`${location.pathname}?sections=${uri}`, 'json').then((value: {
-          [prop: string]: string
-        }) => {
+      } else if (data === 'disconnect') {
 
-          if (nodes === null) return;
+        window.syncify.connected = false;
+        label.event('Syncify Disconnected');
 
-          nodes.forEach(node => {
+      } else if (data === 'reload') {
 
-            morph(node, value[uri], {
+        label.event('Refreshing');
+
+        return top.location.reload();
+
+      } else if (data === 'replace') {
+
+        timer.start();
+        label.event('Reloading');
+
+        if (!isNaN(timeout)) clearTimeout(timeout);
+
+        timeout = window.setTimeout(() => {
+
+          req(location.href, 'document').then((doc: Document) => {
+
+            const newDom = assets(doc);
+
+            morph(document.body, newDom.body, morphs);
+
+            sections.load(document.body);
+            label.render(document.body);
+
+            label.event(`Reloaded in ${timer.stop()}`);
+
+            timeout = NaN;
+          });
+
+        }, 50);
+
+      } else {
+
+        timer.start();
+
+        const [ type, id ] = data.split(',');
+
+        if (type === 'section') {
+
+          const nodes = sections.get(id);
+
+          if (nodes === null) {
+            window.syncify.reload();
+            return;
+          }
+
+          if (nodes.length > 1) {
+            label.event(`Reloading ${nodes.length} Sections: ${id}`);
+          } else {
+            label.event(`Reloading Section: ${id}`);
+          }
+
+          const uri = `${location.pathname}?sections=${id}`;
+
+          return req(uri, 'json').then((value: { [prop: string]: string }) => {
+
+            if (nodes === null) return;
+
+            const options = {
               childrenOnly: true,
               onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
                 if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
                 if (fromEl.isEqualNode(toEl)) return false;
                 return true;
               }
+            };
+
+            nodes.forEach(node => morph(node, value[id], options));
+            label.event(`Reloaded in ${timer.stop()}`);
+
+          }).catch(e => {
+
+            window.syncify.errors.push({
+              title: 'XHR Error fetching section',
+              description: `Section with id: ${id} failed to return a response from Shopify`,
+              group: 'sections'
             });
+
+            console.error('SYNCIFY: ', e);
 
           });
 
+        } else if (type === 'script') {
+
+          label.event(`Reloading JavaScript: ${id}`);
+
+          scripts(document, id);
+
           label.event(`Reloaded in ${timer.stop()}`);
 
-        });
+        } else if (type === 'stylesheet') {
 
-      } else if (type === 'script') {
+          label.event(`Reloading Stylesheet: ${id}`);
 
-        label.event(`Reloading JavaScript: ${uri}`);
+          stylesheets(document, id);
 
-        scripts(document, uri);
+          label.event(`Reloaded in ${timer.stop()}`);
 
-        label.event(`Reloaded in ${timer.stop()}`);
-
-      } else if (type === 'stylesheet') {
-
-        label.event(`Reloading Stylesheet: ${uri}`);
-
-        stylesheets(document, uri);
-
-        label.event(`Reloaded in ${timer.stop()}`);
-
+        }
       }
-    }
 
-  });
+    });
+
+  }
 
   /* -------------------------------------------- */
   /* EXPOSED METHODS                              */
   /* -------------------------------------------- */
 
-  window.syncify.sections = sections({});
+  window.syncify.sections = sections;
   window.syncify.assets = () => assets(document);
   window.syncify.refresh = () => top.location.reload();
   window.syncify.reload = () => req(location.href, 'text').then((doc: string) => {
 
     const dom = parser.parseFromString(doc, 'text/html');
 
-    morph(document.body, assets(dom).body, morphing);
+    morph(document.body, assets(dom).body, morphs);
 
+    sections.load(document.body);
     label.render(document.body);
-    window.syncify.sections.load();
 
   });
 
@@ -499,8 +644,9 @@ declare global {
 
   document.addEventListener('DOMContentLoaded', () => {
 
+    sections.load(document.body);
     label.render(document.body);
-    window.syncify.sections.load();
+
     window.syncify.ready = true;
 
   });
