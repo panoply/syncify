@@ -8,6 +8,7 @@ import { log, error } from '~log';
 import { bundle } from '~config';
 import merge from 'mergerino';
 import { event, getSizeStr } from '~utils/utils';
+import { hasPath } from 'rambdax';
 
 /**
  * Has Asset
@@ -199,8 +200,10 @@ export async function sync (theme: Theme, file: File, config: Request) {
       } else {
 
         log.failed(file.key);
-        error.request(file.relative, e.response);
 
+        if (hasPath('response.data', e.response)) {
+          error.request(file.relative, e.response);
+        }
       }
 
     }

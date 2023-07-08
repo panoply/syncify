@@ -9,6 +9,7 @@ plugins/
 src/
 versions/
 .vscode/
+demos/
 
 # DOT FILES
 

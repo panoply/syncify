@@ -3,6 +3,7 @@ test
 lib
 bin
 package
+demos/**
 *.ts
 *.js
 *.mjs
