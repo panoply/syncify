@@ -1,5 +1,6 @@
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import type { Request, Theme, File, FileKeys } from 'types';
+import { Type } from '~process/files';
 import { pMapSkip } from 'p-map';
 import { queue, axios } from '~requests/queue';
 import * as timer from '~utils/timer';
@@ -148,7 +149,11 @@ export async function sync (theme: Theme, file: File, config: Request) {
     } else {
 
       if (mode.watch) {
+
+        if (file.type !== Type.Script && file.type !== Type.Style) log.hot();
+
         log.upload(theme);
+
       } else if (mode.upload) {
 
         event.emit('upload', 'uploaded', theme, {

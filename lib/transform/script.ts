@@ -243,13 +243,16 @@ export async function compile <T extends ScriptBundle> (
           }
 
           if (mode.hot) {
-            log.syncing(key);
-            wss.script(key);
-          } else
 
-          if (!mode.build) {
-            log.syncing(key);
+            log.syncing(key, true);
+            wss.script(key);
             req.push(sync('put', config as any, content));
+
+          } else {
+            if (!mode.build) {
+              log.syncing(key);
+              req.push(sync('put', config as any, content));
+            }
           }
 
         }

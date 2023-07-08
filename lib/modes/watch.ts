@@ -20,10 +20,14 @@ import { isNil } from 'rambdax';
  */
 export function watch (callback: Syncify) {
 
-  const request = client(bundle.sync);
-  const parse = parseFile(bundle.paths, bundle.dirs.output);
+  const { sync, watch, mode, paths, wss, dirs } = bundle;
 
-  (bundle.watch as WatchBundle).on('all', async function (event, path) {
+  const request = client(sync);
+  const parse = parseFile(paths, dirs.output);
+
+  if (mode.hot) bundle.wss.connected();
+
+  (watch as WatchBundle).on('all', async function (event, path) {
 
     const file: File = parse(path);
 
@@ -121,14 +125,15 @@ export function watch (callback: Syncify) {
 
         await request.assets('put', file, value);
 
-        if (bundle.mode.hot) {
-          if (file.type === Type.Section && file.kind === Kind.Liquid) {
+        if (mode.hot) {
 
-            bundle.wss.section(file.name);
+          if (file.type === Type.Section) {
+
+            wss.section(file.name);
 
           } else if (file.type !== Type.Script && file.type !== Type.Style) {
 
-            await queue.onEmpty().then(() => bundle.wss.replace());
+            await queue.onIdle().then(() => wss.replace());
 
           }
         }

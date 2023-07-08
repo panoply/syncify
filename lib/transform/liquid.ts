@@ -230,6 +230,7 @@ export async function compile (file: File, cb: Syncify) {
   }
 
   file.size = byteSize(input);
+
   const edit = transform(file);
 
   if (!isType('Function', cb)) return edit(input);
