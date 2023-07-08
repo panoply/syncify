@@ -1,10 +1,7 @@
 
-
-<h1 style="background-color:red">
-  Hello World
+<h1 style="background-color:green">
+  Hello World {{ section.settings.id }} {{ section.settings.xxx }}
 </h1>
-
-
 
 {% schema %}
   {
@@ -13,10 +10,18 @@
     "tag": "section",
     "settings": [
       {
-        "type": "article",
+        "type": "text",
+        "id": "xxx",
+        "label": "Xxx",
+        "default": "Foo Bar"
+      },
+      {
+        "type": "text",
         "id": "id",
-        "label": "Id"
+        "label": "Id",
+        "default": "fooooo"
       }
     ]
   }
 {% endschema %}
+

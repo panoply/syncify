@@ -32,10 +32,7 @@ export default defineConfig({
       'views/templates/json/*',
       'views/templates/liquid/*',
     ],
-    layout: [
-      'views/theme.liquid',
-      'views/password.liquid'
-    ],
+    layout: 'views/*',
   },
 
   // ADD YOUR STORE/S + THEME/S

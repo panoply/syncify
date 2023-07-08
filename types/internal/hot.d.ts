@@ -38,7 +38,14 @@ export interface WSS {
    * Hot Socket for view replacement
    */
   replace(): boolean;
-
+  /**
+   * Connected message
+   */
+  connected(): boolean;
+  /**
+   * Disconnect message
+   */
+  disconnect(): boolean;
 }
 
 /**
