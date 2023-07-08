@@ -3,12 +3,13 @@ import { Server } from 'ws';
 import statics from 'serve-static';
 import handler from 'finalhandler';
 import http from 'node:http';
+import glob from 'fast-glob';
 import { kill } from '~cli/exit';
 import { log, tui, bold, gray, line, redBright, ARR, neonCyan, COL } from '~log';
 import { bundle } from '~config';
 import { injectSnippet, injectRender } from './inject';
 import { pathExists, readFile, writeFile } from 'fs-extra';
-import { isArray, nl } from '~utils/native';
+import { nl } from '~utils/native';
 import { WSS } from 'types';
 
 export const HOTError: {
@@ -43,14 +44,16 @@ async function injection () {
 
         log.update(tui.message('gray', 'layout has not yet been bundled, building now...'));
 
-        const find = isArray(bundle.config.paths.layout)
-          ? bundle.config.paths.layout
-          : [ bundle.config.paths.layout ];
+        const files = glob.sync(bundle.config.paths.layout, {
+          cwd: bundle.dirs.input,
+          absolute: true
+        });
 
-        for (const input of find) {
-          const path = join(bundle.dirs.input, input);
-          const source = await readFile(path);
-          await writeFile(layout, source);
+        for (const input of files) {
+          if (basename(input) === basename(layout)) {
+            const source = await readFile(input);
+            await writeFile(layout, source);
+          }
         }
 
         log.update(tui.message('gray', 'layout was bundled from source, injecting hot snippet'));
