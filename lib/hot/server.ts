@@ -4,7 +4,7 @@ import statics from 'serve-static';
 import handler from 'finalhandler';
 import http from 'node:http';
 import { kill } from '~cli/exit';
-import { log, tui, bold, gray, line, redBright, ARR } from '~log';
+import { log, tui, bold, gray, line, redBright, ARR, neonCyan, COL } from '~log';
 import { bundle } from '~config';
 import { injectSnippet, injectRender } from './inject';
 import { pathExists, readFile, writeFile } from 'fs-extra';
@@ -141,6 +141,8 @@ export async function server () {
 
     log.update.done();
 
+    bundle.wss.connected();
+
     server.removeListener('error', onerror);
     server.removeListener('connect', onconnect);
 
@@ -150,7 +152,9 @@ export async function server () {
   server.on('connect', onconnect);
   server.listen(bundle.hot.server);
 
-  log.update(tui.message('pink', `server → ${bold('assets')} → ${gray.underline(localhost)}`));
+  const port = neonCyan('PORT') + COL + gray(`${bundle.hot.server}`);
+
+  log.update(tui.message('pink', `server ${ARR} ${bold('localhost')} ${ARR} ${port}`));
 
 };
 
@@ -166,10 +170,16 @@ export function socket (): WSS {
 
   const wss = new Server({
     port: bundle.hot.socket,
-    path: '/ws'
+    path: '/ws',
+    skipUTF8Validation: true
   });
 
-  kill(() => wss.close());
+  kill(() => {
+
+    wss.emit('disconnect');
+    wss.close();
+
+  });
 
   const onerror = (error: { code: 'EADDRINUSE'}) => {
     if (error.code === 'EADDRINUSE') {
@@ -184,6 +194,7 @@ export function socket (): WSS {
   };
 
   const onclose = () => {
+
     wss.removeAllListeners('script');
     wss.removeAllListeners('stylesheet');
     wss.removeAllListeners('section');
@@ -191,17 +202,32 @@ export function socket (): WSS {
     wss.removeAllListeners('assets');
     wss.removeAllListeners('reload');
     wss.removeAllListeners('replace');
+
   };
 
   const onconnection = (socket: WebSocket) => {
+
     wss.removeListener('error', onerror);
-    wss.on('script', (src) => socket.send(`script,${src}`));
-    wss.on('stylesheet', (href) => socket.send(`stylesheet,${href}`));
-    wss.on('section', (id) => socket.send(`section,${id}`));
-    wss.on('svg', (id) => socket.send(`svg,${id}`));
-    wss.on('assets', () => socket.send('assets'));
-    wss.on('reload', () => socket.send('reload'));
-    wss.on('replace', () => socket.send('replace'));
+
+    /* -------------------------------------------- */
+    /* WSS OPERATIONS                               */
+    /* -------------------------------------------- */
+
+    wss.prependListener('script', (src) => socket.send(`script,${src}`));
+    wss.prependListener('stylesheet', (href) => socket.send(`stylesheet,${href}`));
+    wss.prependListener('section', (id) => socket.send(`section,${id}`));
+    wss.prependListener('svg', (id) => socket.send(`svg,${id}`));
+    wss.prependListener('assets', () => socket.send('assets'));
+    wss.prependListener('reload', () => socket.send('reload'));
+    wss.prependListener('replace', () => socket.send('replace'));
+
+    /* -------------------------------------------- */
+    /* WSS SPECIFIC                                 */
+    /* -------------------------------------------- */
+
+    wss.prependListener('connected', () => socket.send('connected'));
+    wss.prependListener('disconnect', () => socket.send('disconnect'));
+
   };
 
   wss.on('close', onclose);
@@ -216,6 +242,8 @@ export function socket (): WSS {
     svg: (id: string) => wss.emit('svg', id),
     assets: () => wss.emit('assets'),
     reload: () => wss.emit('reload'),
-    replace: () => wss.emit('replace')
+    replace: () => wss.emit('replace'),
+    connected: () => wss.emit('connected'),
+    disconnect: () => wss.emit('disconnected')
   };
 };
