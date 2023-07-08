@@ -13,7 +13,7 @@ const EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET_NAME}['"][,\\slablso
  *
  * Uploading the required HOT snippet to the store. This will execute at runtime.
  */
-export async function injectSnippet (force = false) {
+export async function injectSnippet () {
 
   const key = `snippets/${HOT_SNIPPET_FILE}`;
   const [ theme ] = bundle.sync.themes;
