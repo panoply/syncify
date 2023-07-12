@@ -8,7 +8,7 @@ import { isFunction, isString, isUndefined, isBuffer, nl, wsr } from '~utils/nat
 import { byteSize, fileSize } from '~utils/utils';
 import * as timer from '~utils/timer';
 import { error, log, bold, warning } from '~log';
-import { bundle, cache, processor } from '~config';
+import { $ } from '~state';
 
 /**
  * PostCSS Module
@@ -72,7 +72,7 @@ function write (file: File<StyleTransform>, cb: Syncify) {
     writeFile(file.output, content).catch(
       error.write('Error writing stylesheet to output', {
         input: file.relative,
-        output: relative(bundle.cwd, file.output)
+        output: relative($.cwd, file.output)
       })
     ); ;
 
@@ -84,8 +84,8 @@ function write (file: File<StyleTransform>, cb: Syncify) {
       log.minified('CSS', size.before, size.after, size.saved);
     }
 
-    if (bundle.mode.hot) {
-      bundle.wss.stylesheet(file.key);
+    if ($.mode.hot) {
+      $.wss.stylesheet(file.key);
     }
 
     return content;
@@ -98,12 +98,12 @@ async function sassProcess (file: File<StyleTransform>) {
   const { data } = file;
 
   const opts = data.sass === true
-    ? processor.sass.config
+    ? $.processor.sass.config
     : data.sass as Processors['sass'];
 
   if (file.ext === '.scss' || file.ext === '.sass') {
 
-    if (bundle.mode.watch) timer.start();
+    if ($.mode.watch) timer.start();
 
     try {
 
@@ -120,11 +120,11 @@ async function sassProcess (file: File<StyleTransform>) {
 
       if (opts.sourcemap) {
 
-        const map = join(cache.style.uri, file.base + '.map');
+        const map = join($.cache.style.uri, file.base + '.map');
 
         writeFile(map, JSON.stringify(sourceMap)).catch(
           error.write('Error writing SASS Source Map file to the cache directory', {
-            file: relative(bundle.cwd, map),
+            file: relative($.cwd, map),
             source: file.relative
           })
         );
@@ -182,15 +182,15 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
 
   try {
 
-    if (bundle.mode.watch) timer.start();
+    if ($.mode.watch) timer.start();
 
-    const result = await postcss(processor.postcss.config).process(css, {
+    const result = await postcss($.processor.postcss.config).process(css, {
       from: data.rename,
       to: data.rename,
       map: map ? { prev: map, inline: false } : null
     });
 
-    if (bundle.mode.watch) log.process('PostCSS', timer.stop());
+    if ($.mode.watch) log.process('PostCSS', timer.stop());
 
     const issues = result.warnings();
 
@@ -223,7 +223,7 @@ function snippet (css: string) {
  */
 export async function compile (file: File<StyleTransform>, cb: Syncify): Promise<string> {
 
-  if (bundle.mode.watch) timer.start();
+  if ($.mode.watch) timer.start();
 
   const output = write(file, cb);
 

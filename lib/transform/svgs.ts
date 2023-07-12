@@ -6,7 +6,7 @@ import { readFile, writeFile } from 'fs-extra';
 import { isNil, mapAsync } from 'rambdax';
 import { toArray, assign } from '~utils/native';
 import { log, error, c } from '~log';
-import { bundle, processor } from '~config';
+import { $ } from '~state';
 import { Kind, renameFile } from '~process/files';
 import { byteSize, fileSize, plural } from '~utils/utils';
 import * as timer from '~utils/timer';
@@ -99,20 +99,20 @@ export function compileSprite (
 
     const file = assign({}, context); // clone the file context
 
-    if (bundle.mode.watch) timer.start();
+    if ($.mode.watch) timer.start();
 
     file.kind = Kind.Sprite;
 
     if (config.snippet) {
       file.namespace = 'snippets';
       file.key = join('snippets', renameFile(file, config.rename));
-      file.output = join(bundle.dirs.output, file.key);
+      file.output = join($.dirs.output, file.key);
     } else {
       file.key = join('assets', renameFile(file, config.rename));
-      file.output = join(bundle.dirs.output, file.key);
+      file.output = join($.dirs.output, file.key);
     }
 
-    const options = (config.sprite === true ? processor.sprite.config : config.sprite) as SVGSpriteConfig;
+    const options = (config.sprite === true ? $.processor.sprite.config : config.sprite) as SVGSpriteConfig;
     const sprite = new SVGSprite(options);
     const items = await mapAsync(getFile, toArray(config.input)).catch(
       error.write('Error reading an SVG file', {
@@ -126,7 +126,7 @@ export function compileSprite (
       const svgs = items.filter(([ path, svg ]) => {
 
         if (hasLiquid(svg)) {
-          log.skipped(relative(bundle.cwd, path), 'Liquid Detected');
+          log.skipped(relative($.cwd, path), 'Liquid Detected');
           return false;
         }
 
@@ -230,18 +230,18 @@ export function compileInline (
 
   async function run (config: SVGBundle) {
 
-    if (bundle.mode.watch) timer.start();
+    if ($.mode.watch) timer.start();
 
     if (config.snippet) {
       file.namespace = 'snippets';
       file.key = join('snippets', renameFile(file, config.rename));
-      file.output = join(bundle.dirs.output, file.key);
+      file.output = join($.dirs.output, file.key);
     } else {
       file.key = join('assets', renameFile(file, config.rename));
-      file.output = join(bundle.dirs.output, file.key);
+      file.output = join($.dirs.output, file.key);
     }
 
-    const options = (config.svgo === true ? processor.svgo : config.svgo) as SVGOConfig;
+    const options = (config.svgo === true ? $.processor.svgo : config.svgo) as SVGOConfig;
     const read = await readFile(file.input);
     const node = read.toString();
 
@@ -309,7 +309,7 @@ export function compileInline (
  */
 export async function compile (file: File<SVGBundle[]>, request?: ClientParam<SVGBundle[]>, cb?: Syncify) {
 
-  if (bundle.mode.watch) timer.start();
+  if ($.mode.watch) timer.start();
 
   const sprite = compileSprite(file, request, cb);
   const inline = compileInline(file, request, cb);
@@ -319,7 +319,7 @@ export async function compile (file: File<SVGBundle[]>, request?: ClientParam<SV
 
     const config = file.data[i];
 
-    if (i > 0 && bundle.mode.watch) log.changed(file);
+    if (i > 0 && $.mode.watch) log.changed(file);
 
     if (config.format === 'sprite') {
       await sprite(config);

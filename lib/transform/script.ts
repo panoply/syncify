@@ -6,7 +6,7 @@ import { has, isNil, isType } from 'rambdax';
 import { isBuffer } from '~utils/native';
 import { writeFile } from 'fs-extra';
 import { log, error, bold } from '~log';
-import { bundle, cache, processor } from '~config';
+import { $ } from '~state';
 import * as timer from '~utils/timer';
 import * as warn from '~log/warnings';
 
@@ -46,26 +46,26 @@ export function esbuildModule (): boolean {
  */
 export async function esbuildBundle (config: ScriptBundle): Promise<void> {
 
-  if (processor.esbuild.loaded) config.watch.clear();
+  if ($.processor.esbuild.loaded) config.watch.clear();
 
   const result = await esbuild.build(config.esbuild);
 
-  if (bundle.mode.terse && bundle.mode.build) {
+  if ($.mode.terse && $.mode.build) {
     config.size = byteSize(result.outputFiles[0].text);
   }
 
-  if (bundle.mode.watch) {
+  if ($.mode.watch) {
     getWatchPaths(config, result.metafile.inputs);
   } else {
     if (!config.watch.has(config.input)) config.watch.add(config.input);
-    if (!bundle.watch.has(config.input)) bundle.watch.add(config.input);
+    if (!$.watch.has(config.input)) $.watch.add(config.input);
   }
 }
 
 async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) {
 
   const store: string[] = [];
-  const { cwd, watch, mode } = bundle;
+  const { cwd, watch, mode } = $;
 
   for (const file in inputs) {
 
@@ -79,7 +79,7 @@ async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) 
 
   }
 
-  if (mode.watch && processor.esbuild.loaded) {
+  if (mode.watch && $.processor.esbuild.loaded) {
 
     // Ensure that watched files of imported are aligned
     // we execute this check in the next event loop to ensure
@@ -150,10 +150,10 @@ export async function compile <T extends ScriptBundle> (
 ): Promise<void> {
 
   if (!file.data) return;
-  if (bundle.mode.watch) timer.start();
+  if ($.mode.watch) timer.start();
 
   const hook = runHook(hooks);
-  const { errors, wss, mode, cwd } = bundle;
+  const { errors, wss, mode, cwd } = $;
   const trigger = file.data.length;
   const req: Promise<void>[] = [];
 
@@ -187,7 +187,7 @@ export async function compile <T extends ScriptBundle> (
 
         if (path.endsWith('.map')) {
 
-          const map = join(cache.script.uri, file.base + '.map');
+          const map = join($.cache.script.uri, file.base + '.map');
 
           writeFile(map, text).catch(
             error.write('Error writing JavaScript Source Map to cache', {
