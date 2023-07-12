@@ -1,4 +1,4 @@
-import { bundle, warning } from '../config';
+import { $, warning } from '~state';
 import { errors } from '~log/errors';
 import { log, c, tui } from '~log';
 import { error, keys, nl } from '~utils/native';
@@ -34,7 +34,7 @@ export function stdin (data: Buffer) {
 
     }
 
-    if (bundle.mode.upload) {
+    if ($.mode.upload) {
 
       out(tui.closer('Upload'), nl);
       process.exit(0);
