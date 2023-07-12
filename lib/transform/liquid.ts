@@ -5,7 +5,7 @@ import { isNil, isType } from 'rambdax';
 import { Type } from '~process/files';
 import { nil } from '~utils/native';
 import { byteConvert, byteSize, fileSize } from '~utils/utils';
-import { bundle } from '~config';
+import { $ } from '~state';
 import * as timer from '~utils/timer';
 import { log } from '~log';
 import { hasSnippet, inject, removeRender } from '~hot/inject';
@@ -39,11 +39,11 @@ const ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
  * Remove Liquid Comments
  *
  * Strips Liquid comments from file content.
- * This is executed before passing to HTML bundle.minify.
+ * This is executed before passing to HTML $.minify.
  */
 function removeComments (content: string) {
 
-  return bundle.terser.liquid.removeComments ? content
+  return $.terser.liquid.removeComments ? content
     .replace(LiquidBlockComments, nil)
     .replace(LiquidLineComments, nil) : content;
 
@@ -53,7 +53,7 @@ function removeComments (content: string) {
  * Remove Liquid Comments
  *
  * Strips Liquid comments from file content.
- * This is executed before passing to HTML bundle.minify.
+ * This is executed before passing to HTML $.minify.
  */
 function minifyLiquidTag (content: string) {
 
@@ -69,7 +69,7 @@ function minifyLiquidTag (content: string) {
  */
 function minifySchema (file: File, content: string) {
 
-  if (!bundle.terser.liquid.minifySchema) return removeComments(content);
+  if (!$.terser.liquid.minifySchema) return removeComments(content);
 
   const open = content.search(/{%-?\s*schema/);
 
@@ -103,7 +103,7 @@ function minifySchema (file: File, content: string) {
  */
 function removeDashes (content: string) {
 
-  if (!bundle.terser.liquid.stripDashes) return content;
+  if (!$.terser.liquid.stripDashes) return content;
 
   return content;
 
@@ -119,7 +119,7 @@ async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await terser(content, bundle.terser.html);
+    const htmlmin = await terser(content, $.terser.html);
 
     return htmlmin;
 
@@ -142,11 +142,11 @@ async function htmlMinify (file: File, content: string) {
  */
 const transform = (file: File) => async (data: string) => {
 
-  if (file.type === Type.Layout && bundle.mode.hot) {
+  if (file.type === Type.Layout && $.mode.hot) {
     if (!hasSnippet(data)) data = inject(data);
   }
 
-  if (!bundle.mode.terse) {
+  if (!$.mode.terse) {
     await writeFile(file.output, data);
     log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
     return data;
@@ -215,13 +215,13 @@ const transform = (file: File) => async (data: string) => {
  */
 export async function compile (file: File, cb: Syncify) {
 
-  if (bundle.mode.watch) timer.start();
+  if ($.mode.watch) timer.start();
 
   const read = await readFile(file.input);
 
   let input = read.toString();
 
-  if (bundle.mode.build) {
+  if ($.mode.build) {
     if (file.namespace === 'layout') {
       if (hasSnippet(input)) {
         input = removeRender(input);
