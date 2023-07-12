@@ -1,9 +1,11 @@
-import { File, Syncify } from 'types';
+import { ClientParam, File, Syncify, WatchBundle } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { isType } from 'rambdax';
+import { isEmpty, isType } from 'rambdax';
 import { isFunction, isBuffer, isUndefined } from '~utils/native';
-import { Type } from '~process/files';
-import { error } from '~log';
+import { Kind, Type } from '~process/files';
+import { error, log } from '~log';
+import { $ } from '~state';
+import { AssetRequest } from '~requests/client';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */
@@ -15,20 +17,44 @@ import { error } from '~log';
  * Catches spawned generated files and determines whether
  * the file should be written or just fall through.
  */
-const passthrough = (file: File) => async (data: Buffer | string) => {
+function passthrough (file: File, sync: ClientParam<AssetRequest>) {
 
-  if (file.type !== Type.Spawn) {
+  const { wss, mode, watch } = $;
+  const { type, relative, kind, key, output } = file;
 
-    await writeFile(file.output, data).catch(
-      error.write('Error writing asset to output', {
-        file: file.relative,
-        source: file.relative
-      })
-    );
-  } ;
+  return async (data: string) => {
 
-  return data;
+    if (type !== Type.Spawn) {
 
+      // Remove non-spawn references from watch mode
+      // this will prevent infinite loops from occuring.
+      //
+      (watch as WatchBundle).unwatch(output);
+
+      await writeFile(output, data).catch(
+        error.write('Error writing asset to output', {
+          file: relative,
+          source: relative
+        })
+      );
+
+    };
+
+    log.syncing(key, true);
+
+    if (mode.hot) {
+
+      if (kind === Kind.JavaScript) {
+        wss.script(key);
+      } else if (kind === Kind.CSS) {
+        wss.stylesheet(key);
+      }
+
+    }
+
+    return sync('put', file, data);
+
+  };
 };
 
 /**
@@ -37,9 +63,9 @@ const passthrough = (file: File) => async (data: Buffer | string) => {
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export async function compile (file: File, cb: Syncify) {
+export async function compile (file: File, sync: ClientParam<AssetRequest>, cb: Syncify) {
 
-  const copy = passthrough(file);
+  const copy = passthrough(file, sync);
   const data = await readFile(file.input).catch(
     error.write('Error reading asset file', {
       file: file.relative,
@@ -49,19 +75,29 @@ export async function compile (file: File, cb: Syncify) {
 
   if (data) {
 
-    if (!isFunction(cb)) return copy(data);
+    const value = data.toString();
 
-    const update = cb.apply({ ...file }, data);
+    if (isEmpty(value)) {
+      if ($.mode.watch) log.skipped(file, 'empty file');
+      return null;
+    }
+
+    if (!isFunction(cb)) return copy(value);
+
+    const update = cb.apply({ ...file }, value);
 
     if (isUndefined(update) || update === false) {
-      return copy(data);
+      return copy(value);
     } else if (isType(update)) {
       return copy(update);
     } else if (isBuffer(update)) {
       return copy(update.toString());
     }
 
-    return copy(data);
+    return copy(value);
 
   }
+
+  return null;
+
 };
