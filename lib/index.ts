@@ -12,7 +12,7 @@ import { stdin } from '~log/stdin';
 import { help } from '~log/help';
 import { log } from '~log';
 import { define } from './options/define';
-import { bundle } from '~config';
+import { $ } from '~state';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -37,7 +37,7 @@ export const env = {
     return process.env.SYNCIFY_WATCH === 'true';
   },
   get options () {
-    return bundle.config;
+    return $.config;
   }
 };
 
@@ -75,7 +75,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   process.on('uncaughtException', exception);
   process.on('unhandledRejection', rejection);
 
-  if (bundle.mode.hot) await server();
+  if ($.mode.hot) await server();
 
   // console.log(bundle);
 
@@ -85,15 +85,15 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
 
   try {
 
-    if (bundle.mode.build) {
+    if ($.mode.build) {
       return build(callback);
-    } else if (bundle.mode.watch) {
+    } else if ($.mode.watch) {
       return watch(callback);
-    } else if (bundle.mode.upload) {
+    } else if ($.mode.upload) {
       return upload(callback);
-    } else if (bundle.mode.download) {
+    } else if ($.mode.download) {
       return download(callback);
-    } else if (bundle.mode.export) {
+    } else if ($.mode.export) {
       return console.log('TODO');
     }
 
