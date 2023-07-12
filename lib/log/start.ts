@@ -1,12 +1,11 @@
 import type { Filters, Theme } from 'types';
-import type { Bundle } from '~config';
+import type { Bundle } from '~state';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import { allFalse, anyTrue, isEmpty } from 'rambdax';
-import { getTime, plural, toUpcase } from '../utils/utils';
-import { keys, nil, nl, wsr, log, toArray, values, ws } from '../utils/native';
+import { getTime, plural, toUpcase } from '~utils/utils';
+import { keys, nil, nl, wsr, log, toArray, values, ws } from '~utils/native';
 import { warnings } from '../options/validate';
-import * as c from '../cli/ansi';
-import { size } from '~cli/size';
+import * as c from '~cli/ansi';
 
 /**
  * Log Heading
@@ -71,38 +70,38 @@ import { size } from '~cli/size';
  * │
  * ```
  */
-export function start (bundle: Bundle) {
+export function start ($: Bundle) {
 
   const text: string[] = [];
 
-  if (bundle.mode.metafields) return nil;
+  if ($.mode.metafields) return nil;
 
   text.push(
     `${c.open}${c.gray('Syncify')} ${c.gray('~')} ${c.gray(getTime())}`,
     `${c.line.gray}`
   );
 
-  getTerminalWarning(text);
+  getTerminalWarning(text, $.terminal.cols);
 
   text.push(
-    `${c.line.gray}${c.whiteBright.bold(`v${bundle.version}`)}`,
+    `${c.line.gray}${c.whiteBright.bold(`v${$.version}`)}`,
     `${c.line.gray}`
   );
 
   /** Plural store/s length */
-  const _st = bundle.sync.stores.length;
+  const _st = $.sync.stores.length;
 
   /** Plural theme/s length */
-  const _th = keys(bundle.sync.themes).length;
+  const _th = keys($.sync.themes).length;
 
   /** Plural spawns/s length */
-  const _ss = keys(bundle.spawn.commands).length;
+  const _ss = keys($.spawn.commands).length;
 
   /* -------------------------------------------- */
   /* BEGIN                                        */
   /* -------------------------------------------- */
 
-  const { mode, spawn } = bundle;
+  const { mode, spawn, sync } = $;
 
   /** Prints store, eg: `1 store` or `2 stores` */
   const stores = c.cyan.bold(String(_st)) + (_st > 1 ? ' stores' : ' store');
@@ -111,7 +110,7 @@ export function start (bundle: Bundle) {
   const themes = c.cyan.bold(String(_th)) + (_th > 1 ? ' themes' : ' theme');
 
   /** Prints Environment, eg: `(development)` or `(production)` */
-  const env = c.cyan.bold(`${bundle.env.dev ? 'development' : 'production'}`);
+  const env = c.cyan.bold(`${$.env.dev ? 'development' : 'production'}`);
 
   if (mode.build) {
     text.push(`${c.line.gray}Running ${c.cyan.bold('build')} in ${env}`);
@@ -135,10 +134,10 @@ export function start (bundle: Bundle) {
   /* APPLIED FILTERS                              */
   /* -------------------------------------------- */
 
-  if (!isEmpty(bundle.filters)) {
+  if (!isEmpty($.filters)) {
     text.push(
       `${c.line.gray}${c.whiteBright.bold('Filters')}`,
-      `${c.line.gray}` + getFilters(bundle.filters)
+      `${c.line.gray}` + getFilters($.filters)
     );
   }
 
@@ -146,7 +145,7 @@ export function start (bundle: Bundle) {
   /* CONFIG WARNINGS                              */
   /* -------------------------------------------- */
 
-  if (bundle.logger.warnings) getRuntimeWarnings(bundle, text);
+  if ($.logger.warnings) getRuntimeWarnings($, text);
 
   /* -------------------------------------------- */
   /* SPAWNED PROCESSES                            */
@@ -186,7 +185,7 @@ export function start (bundle: Bundle) {
     if (_th > 0) {
       text.push(
         `${c.line.gray}${c.bold('Theme Editors:')}`,
-        `${c.line.gray}${getThemeURLS(bundle.sync.themes, 'editor')}`,
+        `${c.line.gray}${getThemeURLS(sync.themes, 'editor')}`,
         `${c.line.gray}`
       );
     }
@@ -203,14 +202,14 @@ export function start (bundle: Bundle) {
 
       text.push(
         `${c.line.gray}${c.bold((mode.upload || mode.download) ? 'Theme Targets:' : 'Theme Previews:')}`,
-        `${c.line.gray}${getThemeURLS(bundle.sync.themes, 'preview')}`
+        `${c.line.gray}${getThemeURLS(sync.themes, 'preview')}`
       );
 
     }
   }
 
   // Ensure an addition trunk line if in HOT mode
-  if (bundle.mode.hot) text.push(`${c.line.gray}`);
+  if ($.mode.hot) text.push(`${c.line.gray}`);
 
   log(text.join(nl));
 
@@ -244,9 +243,7 @@ function getFilters (filters: Filters) {
  * Populates the output when terminal width is less than 100 columns
  * in width. This is important so we apply the message first.
  */
-function getTerminalWarning (text: string[]) {
-
-  const cs = size().cols;
+function getTerminalWarning (text: string[], cs: number) {
 
   if (cs >= 100) return;
 
@@ -261,7 +258,7 @@ function getTerminalWarning (text: string[]) {
 
 }
 
-function getRuntimeWarnings (bundle: Bundle, text: string[]) {
+function getRuntimeWarnings ($: Bundle, text: string[]) {
 
   let title: boolean = false;
 
@@ -277,7 +274,7 @@ function getRuntimeWarnings (bundle: Bundle, text: string[]) {
 
         text.push(
           `${c.line.gray}`,
-          `${c.line.yellow}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold(bundle.file.base)}`)}`
+          `${c.line.yellow}${c.yellowBright(`${c.bold('Warnings')} in ${c.bold($.file.base)}`)}`
         );
 
       }
