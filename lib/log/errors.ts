@@ -10,7 +10,7 @@ import wrap from 'wrap-ansi';
 import { SHOPIFY_REQUEST_ERRORS } from '~const';
 import * as tui from '~log/tui';
 import * as c from '~cli/ansi';
-import { bundle } from '~config';
+import { $ } from '~state';
 
 /**
  * Error Reporting
@@ -41,7 +41,6 @@ export function spawn (data: string) {
   const stdout: string[] = [];
   const stderr: string[] = [ c.line.red ];
   const stackerr = data.search(/(?:\n {4}at .*)/);
-  const limit = process.stdout.columns - 5;
 
   let message: string[] = [];
 
@@ -49,8 +48,8 @@ export function spawn (data: string) {
 
     message = data.slice(0, stackerr).split(nl);
 
-    const stack = cleanStack(data.slice(stackerr), { pretty: true, basePath: bundle.cwd });
-    const lines = wrap(stack, limit).split(nl);
+    const stack = cleanStack(data.slice(stackerr), { pretty: true, basePath: $.cwd });
+    const lines = wrap(stack, $.terminal.wrap).split(nl);
 
     stderr.push(nl);
 
