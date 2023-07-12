@@ -1,14 +1,4 @@
 /**
- * HOT reload snippet filename
- */
-export const HOT_SNIPPET_FILE = 'hot.js.liquid';
-
-/**
- * HOT reload snippet filename
- */
-export const HOT_SNIPPET_NAME = 'hot.js';
-
-/**
  * Log Snipper frames
  */
 export const SPINNER_FRAMES = [
