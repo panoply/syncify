@@ -7,8 +7,7 @@ import { glue, isArray, log, nil, nl, nlr, ws, wsr } from '~utils/native';
 import { getTime } from '~utils/utils';
 import * as c from '~cli/ansi';
 import { LiteralUnion } from 'type-fest';
-import { size } from '~cli/size';
-import { bundle } from '~config';
+import { $ } from '~state';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -114,7 +113,7 @@ export function hline (minus = 15) {
  */
 export function suffix (color: Colors, prefix: Prefixes, message: string) {
 
-  const line = bundle.mode.build ? c.dash : (prefix === 'invalid' || prefix === 'failed')
+  const line = $.mode.build ? c.dash : (prefix === 'invalid' || prefix === 'failed')
     ? c.line.red
     : prefix === 'warning'
       ? c.line.yellow
@@ -209,7 +208,7 @@ export function shopify (message: string | string[]) {
   output = output.replace(REGEX_ADDRESS, c.underline('$1'));
   output = output.replace(REGEX_STRING, c.magenta('$1') + c.cyan('$2') + c.magenta('$3'));
 
-  return indent(c.red(wrap(output, size().columns - 15)), { line: c.line.red });
+  return indent(c.red(wrap(output, $.terminal.wrap)), { line: c.line.red });
 
 }
 
@@ -355,13 +354,13 @@ export function multiline (type: Loggers, message: string): string {
 
   const stdout = [];
   const input = message.trim();
-  const lines = wrap(input, size().columns - 15).split(nl);
+  const lines = wrap(input, $.terminal.wrap).split(nl);
 
   while (lines.length !== 0) {
     const text = lines.shift();
     if (text.trim().length > 0) stdout.push(line + color(text));
   }
 
-  return line + nl + stdout.join(nl);
+  return line + nl + stdout.join(nl) + nl;
 
 };
