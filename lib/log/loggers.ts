@@ -1,6 +1,6 @@
-import type { File, Group, Theme } from 'types';
+import type { File, Theme } from 'types';
 import { has, isEmpty } from 'rambdax';
-import { bundle, warning } from '~config';
+import { $, warning } from '~state';
 import { queue } from '~requests/queue';
 import { addSuffix, sanitize, plural, toUpcase } from '~utils/utils';
 import { error, isArray, log, nil, nl } from '~utils/native';
@@ -10,6 +10,8 @@ import * as errors from '~log/errors';
 import * as c from '~cli/ansi';
 import * as tui from '~log/tui';
 import notifier from 'node-notifier';
+import { Kind } from '~process/files';
+import { LiteralUnion } from 'type-fest';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -44,7 +46,7 @@ let idle: boolean = false;
 /**
  * Current Filename
  */
-let group: Group = 'Syncify';
+let group: LiteralUnion<Kind, string> = 'Syncify';
 
 /**
  * Current Filename
@@ -80,9 +82,6 @@ export function build (id: string, count: number, file: File | string) {
   // clear if first run
   if (group === 'Syncify') tui.clear();
 
-  // update group
-  group = id;
-
   // open new group
   if (close) {
     log(tui.opener(group));
@@ -90,6 +89,8 @@ export function build (id: string, count: number, file: File | string) {
     log(c.line.gray + c.bold(`${count} ${toUpcase(id)}`));
     nwl();
 
+    // update group
+    group = id;
     title = id;
   }
 
@@ -238,7 +239,7 @@ export function newGroup (name: string, clear = false) {
  */
 export function changed (file: File) {
 
-  const close = (title !== file.relative);
+  const close = (title !== file.namespace);
 
   timer.start();
 
@@ -248,14 +249,18 @@ export function changed (file: File) {
   // do not clear if first run
   if (group !== 'Syncify' && close) tui.clear();
 
-  // update group
-  group = file.namespace;
+  // Provides us better group context, for example:
+  //
+  // Liquid Snippet
+  // Liquid Template
+  //
+  group = `${file.kind} ${toUpcase(file.namespace)}`;
 
   // open new group
   if (close) {
     tui.clear();
-    log(tui.opener(file.kind));
-    title = file.relative;
+    log(tui.opener(group));
+    title = file.namespace;
   }
 
   // Create stack reference model
@@ -264,7 +269,7 @@ export function changed (file: File) {
   // Update the current records
   if (uri !== file.relative) uri = file.relative;
 
-  if (bundle.mode.watch) {
+  if ($.mode.watch) {
     nwl();
     log(tui.suffix('neonCyan', 'changed', file.relative));
   }
@@ -288,7 +293,7 @@ export function hot () {
  */
 export function upload (theme: Theme) {
 
-  if (bundle.mode.watch) {
+  if ($.mode.watch) {
 
     uploads.add([
       theme.target,
@@ -318,6 +323,25 @@ export function upload (theme: Theme) {
   }
 
 };
+
+/**
+ * Log Prompt - `blueBright`
+ *
+ * @example '│ prompt → dir/file.ext'
+ */
+export function prompt (message: string) {
+
+  // close previous group
+
+  log(tui.suffix('orange', 'prompt', message));
+  log(tui.closer(group) + nl);
+
+  return () => {
+    log(tui.opener(group));
+    nwl();
+  };
+
+}
 
 /**
  * Log Syncing - `magenta`
@@ -406,7 +430,7 @@ export function exported (file: string) {
  */
 export function importer (message: string) {
 
-  if (!bundle.mode.build) {
+  if (!$.mode.build) {
     log(tui.suffix('lavender', 'importer', message));
   }
 };
@@ -556,7 +580,7 @@ export function spawn (name: string) {
 
   return (...message: string[]) => {
 
-    if (!bundle.spawn.invoked) bundle.spawn.invoked = true;
+    if (!$.spawn.invoked) $.spawn.invoked = true;
 
     if (group !== 'Spawn') {
 
