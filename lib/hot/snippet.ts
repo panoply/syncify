@@ -103,13 +103,19 @@ declare global {
   }
 }
 
-(function syncify (syncify: {
+(function syncify (opts: {
   server: string;
   socket: string;
   label: string;
+  strategy: LiteralUnion<'hydrate' | 'replace', string>;
+  scroll: LiteralUnion<'top' | 'preserved', string>;
+  history: boolean;
+  method: LiteralUnion<'hot' |'refresh', string>
 }) {
 
   if (!document) return;
+
+  console.log(opts);
 
   window.syncify = window.syncify || {
     ready: false,
@@ -136,7 +142,7 @@ declare global {
   /* -------------------------------------------- */
 
   function websocket () {
-    const socket = new WebSocket(`ws://localhost:${syncify.socket}/ws`);
+    const socket = new WebSocket(`ws://localhost:${opts.socket}/ws`);
     ws(socket);
   }
 
@@ -146,7 +152,7 @@ declare global {
   /* CONSTANTS                                    */
   /* -------------------------------------------- */
 
-  const server = `http://localhost:${syncify.server}/`;
+  const server = `http://localhost:${opts.server}/`;
   const parser = new DOMParser();
   const morphs = {
     onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
@@ -323,8 +329,6 @@ declare global {
       },
       render: (dom: HTMLElement) => {
 
-        if (dom.contains(node)) return;
-
         dom.append(node);
 
       }
@@ -499,7 +503,13 @@ declare global {
 
           return req(location.href, 'document').then((doc: Document) => {
 
-            morph(document.body, assets(doc).body, morphs);
+            const newDom = assets(doc);
+
+            if (opts.strategy === 'hydrate') {
+              morph(document.body, newDom.body, morphs);
+            } else {
+              document.body.replaceWith(newDom.body);
+            }
 
             sections.load(document.body);
             label.render(document.body);
@@ -528,23 +538,23 @@ declare global {
 
         if (!isNaN(timeout)) clearTimeout(timeout);
 
-        timeout = window.setTimeout(() => {
+        return req(location.href, 'document').then((doc: Document) => {
 
-          req(location.href, 'document').then((doc: Document) => {
+          const newDom = assets(doc);
 
-            const newDom = assets(doc);
-
+          if (opts.strategy === 'hydrate') {
             morph(document.body, newDom.body, morphs);
+          } else {
+            document.body.replaceWith(newDom.body);
+          }
 
-            sections.load(document.body);
-            label.render(document.body);
+          sections.load(document.body);
+          label.render(document.body);
 
-            label.event(`Reloaded in ${timer.stop()}`);
+          label.event(`Reloaded in ${timer.stop()}`);
 
-            timeout = NaN;
-          });
-
-        }, 50);
+          timeout = NaN;
+        });
 
       } else {
 
@@ -573,16 +583,27 @@ declare global {
 
             if (nodes === null) return;
 
-            const options = {
-              childrenOnly: true,
-              onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
-                if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
-                if (fromEl.isEqualNode(toEl)) return false;
-                return true;
-              }
-            };
+            if (opts.strategy === 'hydrate') {
 
-            nodes.forEach(node => morph(node, value[id], options));
+              const options = {
+                childrenOnly: true,
+                onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
+                  if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
+                  if (fromEl.isEqualNode(toEl)) return false;
+                  return true;
+                }
+              };
+
+              nodes.forEach(node => morph(node, value[id], options));
+
+            } else {
+
+              nodes.forEach(node => {
+                const { firstElementChild } = parser.parseFromString(value[uri], 'text/html').body;
+                node.replaceWith(firstElementChild);
+              });
+            }
+
             label.event(`Reloaded in ${timer.stop()}`);
 
           }).catch(e => {
@@ -631,7 +652,11 @@ declare global {
 
     const dom = parser.parseFromString(doc, 'text/html');
 
-    morph(document.body, assets(dom).body, morphs);
+    if (opts.strategy === 'hydrate') {
+      morph(document.body, assets(dom).body, morphs);
+    } else {
+      document.body.replaceWith(dom.body);
+    }
 
     sections.load(document.body);
     label.render(document.body);
@@ -654,5 +679,9 @@ declare global {
 }({
   server: '{{- server | default: 3000 -}}',
   socket: '{{- socket | default: 8089 -}}',
-  label: '{{- label | default: "visible" -}}'
+  label: '{{- label | default: "visible" -}}',
+  history: Boolean('{{- history | default: false -}}'),
+  method: '{{- method | default: "hot" -}}',
+  scroll: '{{- scroll | default: "preserved" -}}',
+  strategy: '{{- strategy | default: "hydrate" -}}'
 }));
