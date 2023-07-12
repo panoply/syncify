@@ -1,6 +1,6 @@
 import { SpawnCommand } from 'types';
 import spawn from 'cross-spawn';
-import { bundle } from '~config';
+import { $ } from '~state';
 
 /**
  * Spawn Processes
@@ -25,6 +25,6 @@ export function spawned (name: string, command: SpawnCommand, callback: (...data
 
   command.pid = child.pid;
 
-  bundle.spawn.streams.set(name, child);
+  $.spawn.streams.set(name, child);
 
 };
