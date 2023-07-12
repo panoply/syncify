@@ -2,11 +2,10 @@ import { pathExists, readFile, writeFile } from 'fs-extra';
 import { basename } from 'node:path';
 import { nl } from '~utils/native';
 import { log, tui } from '~log';
-import { bundle } from '~config';
-import { HOT_SNIPPET_NAME, HOT_SNIPPET_FILE } from '~const';
+import { $ } from '~state';
 import * as request from '~requests/assets';
 
-const EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET_NAME}['"][,\\slablsockvetr:0-9'"]+?-?%}\\s+`);
+const EXP = /{%-?\s*render\s+['"]hot\.js['"]/;
 
 /**
  * Uploads Snippet
@@ -15,9 +14,9 @@ const EXP = new RegExp(`{%-?\\s*render\\s+['"]${HOT_SNIPPET_NAME}['"][,\\slablso
  */
 export async function injectSnippet () {
 
-  const key = `snippets/${HOT_SNIPPET_FILE}`;
-  const [ theme ] = bundle.sync.themes;
-  const snippet = await readFile(bundle.hot.snippet);
+  const key = 'snippets/hot.js.liquid';
+  const [ theme ] = $.sync.themes;
+  const snippet = await readFile($.hot.snippet);
   const upload = await request.upload(snippet.toString(), { theme, key });
 
   log.update(tui.message('gray', `${key} uploaded snippet injection`));
@@ -83,7 +82,7 @@ export function writeRender (content: string) {
   const ender = content.indexOf('<head>') + 6;
   const start = content.slice(0, ender);
 
-  return start + nl + bundle.hot.renderer + nl + content.slice(ender);
+  return start + nl + $.hot.renderer + nl + content.slice(ender);
 
 }
 
@@ -103,7 +102,7 @@ export async function ejectRender (path: string) {
 
   let content = local.toString();
 
-  const [ theme ] = bundle.sync.themes;
+  const [ theme ] = $.sync.themes;
   const name = basename(path);
   const key = `layout/${name}`;
   const string = await request.find(`layout/${name}`, theme);
@@ -143,7 +142,7 @@ export async function injectRender (path: string) {
     log.update(tui.message('gray', 'injected render tag in output layout'));
   }
 
-  const [ theme ] = bundle.sync.themes;
+  const [ theme ] = $.sync.themes;
   const name = basename(path);
   const key = `layout/${name}`;
   const string = await request.find(`layout/${name}`, theme);
