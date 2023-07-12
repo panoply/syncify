@@ -6,7 +6,7 @@ import http from 'node:http';
 import glob from 'fast-glob';
 import { kill } from '~cli/exit';
 import { log, tui, bold, gray, line, redBright, ARR, neonCyan, COL } from '~log';
-import { bundle } from '~config';
+import { $ } from '~state';
 import { injectSnippet, injectRender } from './inject';
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { nl } from '~utils/native';
@@ -36,7 +36,7 @@ async function injection () {
 
     log.update(tui.message('gray', 'validating layouts'));
 
-    for (const layout in bundle.hot.alive) {
+    for (const layout in $.hot.alive) {
 
       const exists = await pathExists(layout);
 
@@ -44,8 +44,8 @@ async function injection () {
 
         log.update(tui.message('gray', 'layout has not yet been bundled, building now...'));
 
-        const files = glob.sync(bundle.config.paths.layout, {
-          cwd: bundle.dirs.input,
+        const files = glob.sync($.config.paths.layout, {
+          cwd: $.dirs.input,
           absolute: true
         });
 
@@ -94,14 +94,14 @@ export async function server () {
       line.red + redBright('This error typically occurs when multiple Syncify instances are active.')
     );
 
-    log.err(redBright(`${bold('ERROR')} on ${bold(`${bundle.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reload:`)}`));
+    log.err(redBright(`${bold('ERROR')} on ${bold(`${$.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reload:`)}`));
     log.out(HOTError.output.join(nl));
 
     return null;
 
   }
 
-  log.out(tui.message('whiteBright', bold(`${bundle.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reloading:`)));
+  log.out(tui.message('whiteBright', bold(`${$.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reloading:`)));
   log.nwl();
   log.update(tui.message('gray', 'configuring HOT Reload'));
 
@@ -114,9 +114,9 @@ export async function server () {
 
   }
 
-  const assets = statics(join(bundle.dirs.output, 'assets'), { setHeaders });
+  const assets = statics(join($.dirs.output, 'assets'), { setHeaders });
   const server = http.createServer((req, res) => assets(req, res, handler(req, res) as any));
-  const localhost = `http://localhost:${bundle.hot.server}`;
+  const localhost = `http://localhost:${$.hot.server}`;
 
   const onerror = (e: { code: 'EADDRINUSE' }) => {
 
@@ -125,7 +125,7 @@ export async function server () {
       HOTError.output.push(
         line.red + redBright(`${bold('EADDRINUSE')} ${ARR} ${localhost}`),
         line.red,
-        line.red + redBright.bold(`Server Port ${bundle.hot.server} address already in use`),
+        line.red + redBright.bold(`Server Port ${$.hot.server} address already in use`),
         line.red,
         line.red + redBright('Change the server port address or kill the session occupying it.'),
         line.red + redBright('This error typically occurs when multiple Syncify instances are active.')
@@ -133,7 +133,7 @@ export async function server () {
 
       log.update.clear();
       log.out(HOTError.output.join(nl));
-      bundle.wss.http.close();
+      $.wss.http.close();
 
       return null;
     }
@@ -144,7 +144,7 @@ export async function server () {
 
     log.update.done();
 
-    bundle.wss.connected();
+    $.wss.connected();
 
     server.removeListener('error', onerror);
     server.removeListener('connect', onconnect);
@@ -153,9 +153,9 @@ export async function server () {
 
   server.on('error', onerror);
   server.on('connect', onconnect);
-  server.listen(bundle.hot.server);
+  server.listen($.hot.server);
 
-  const port = neonCyan('PORT') + COL + gray(`${bundle.hot.server}`);
+  const port = neonCyan('PORT') + COL + gray(`${$.hot.server}`);
 
   log.update(tui.message('pink', `server ${ARR} ${bold('localhost')} ${ARR} ${port}`));
 
@@ -169,10 +169,10 @@ export async function server () {
  */
 export function socket (): WSS {
 
-  if (bundle.mode.hot === false) return;
+  if ($.mode.hot === false) return;
 
   const wss = new Server({
-    port: bundle.hot.socket,
+    port: $.hot.socket,
     path: '/ws',
     skipUTF8Validation: true
   });
@@ -189,9 +189,9 @@ export function socket (): WSS {
       wss.close();
       HOTError.enable = false;
       HOTError.output.push(
-        line.red + redBright(`${bold('EADDRINUSE')} ${ARR} ws://localhost:${bundle.hot.server}`),
+        line.red + redBright(`${bold('EADDRINUSE')} ${ARR} ws://localhost:${$.hot.server}`),
         line.red,
-        line.red + redBright.bold(`Socket Port ${bundle.hot.server} address already in use`)
+        line.red + redBright.bold(`Socket Port ${$.hot.server} address already in use`)
       );
     }
   };
