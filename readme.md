@@ -13,25 +13,30 @@ A lightening fast, extensible and superior alternative Shopify CLI (Theme Develo
 
 ### Key Features
 
-- Watch, upload, download and export to multiple storefronts and themes.
-- Intelligent path mapping capabilities for custom directory structures.
-- HOT reloading of assets, section, snippets, templates and layouts.
-- Clear, concise, informative and beautiful CLI logging.
+- Watch, upload, import and export to multiple storefronts and themes.
+- Intelligent path mapping resolutions that support custom directory structures.
+- HOT Reloading of assets, section, snippets, templates and layouts.
+- Clear, concise, informative and beautiful TUI/CLI logging.
 - An elegant global directory based metafields sync approach using JSON files.
-- Digests and spawns existing build tools for asset transformations.
-- Prompt based CLI/TUI and exposed module API for script usage.
-- Pull, push and merge support for aligning local and remote sources.
-- Supports additional resources like Files, Pages and Redirects.
+- Supports spawned processing with existing build tools.
+- Provides resource control of store Files, Pages and Redirects.
+
+### Disclaimer
+
+Syncify is designed for advanced theme development. If you are new to Shopify theme dev then it might be better for you to leverage the [Shopify CLI](https://github.com/Shopify/cli) or [Adastra](https://github.com/blanklob/adastra). There are no plans to make this tool digestible for beginner developers. If you have any questions or want to chat with other developers already using Syncify, find us here:
+
+- [Twitter](https://twitter.com/niksavvidis)
+- [Discord](https://discord.gg/shopify-developers-597504637167468564)
 
 ### Why?
 
-I have been working on the Shopify platform for several years and nothing the Shopify team have produced has actually increased my productivity. Despite the advancements Shopify has made in recent years I still find that their developer tooling to be rather average. The Shopify CLI is cool and all but for theme development it fails to achieve fluidity.
+I have been working on the Shopify platform for several years and nothing the Shopify team have produced has actually increased my productivity. Despite the advancements Shopify has made in recent years I still find that their developer tooling to be rather average. The Shopify CLI is cool and all but for theme development it fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
 
-Syncify is how I believe theme creation, development and maintenance should be handled. It's fast, flexible, extensible, scalable and will not lock you into some restrictive low grade elementary workflow. It allows you to progressively enhance your development process and produce the most efficient and performant results with the tools you already love.
+Syncify provides you with essential stack tooling for producing lean, performant and refined themes. It's fast, flexible, extensible, scalable but most importantly, it will not lock you into a restrictive low grade elementary workflow.
 
-# Install
+# Installation
 
-Syncify is distributed as both an ESM and CJS module. It is recommended that you install as a development dependency in your project opposed to installing globally.
+Syncify is distributed as both an ESM and CJS module. It is recommended that you install as a development dependency in your project opposed to installing globally. Please consider choosing and adopting [pnpm](https://pnpm.js.org/en/cli/install) as your package manager for most optimal usage.
 
 **PNPM**
 
@@ -148,7 +153,11 @@ YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
 
-### Using `process.env` variables
+<details>
+<summary>
+  <h3>Using <code>process.env</code> variables</h3>
+</summary>
+<p>
 
 Syncify also supports runtime credential assignment. This approach allows you to set credentials via the command line or within a script executable. This is highly discouraged and rather insecure.
 
@@ -167,11 +176,16 @@ process.env['YOUR-SHOP-NAME_API_KEY'] = 'abcdefghijklmnopqrstuvwz';
 process.env['YOUR-SHOP-NAME_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
 ```
 
+</p>
+</details>
+
 # Configuration
 
-Syncify supports `syncify.config.js` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on the `syncify` property.
+Syncify supports `syncify.config.ts` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on the `syncify` property.
 
 ### Supported Files
+
+Syncify supports the following configuration file types. The recommended approach is a `syncify.config.ts` (TypeScript) configuration file type.
 
 - `syncify.config.ts`
 - `syncify.config.js`
@@ -182,7 +196,7 @@ Syncify supports `syncify.config.js` and `package.json` configurations. Dependin
 
 ### Default Options
 
-This is defaults used in a `syncify.config.js` file. Options commented out within [transforms](#transform), [processors](#processors) and [minify](#minify) require peer dependencies to be installed to be used.
+Below are the **default** configurations. Options commented out within [transforms](#transform), [processors](#processors) and [terser](#terser) require peer dependencies to be installed for usage.
 
 <!-- prettier-ignore -->
 ```ts
@@ -206,6 +220,7 @@ export default defineConfig({
     history: true,
     method: 'hot',
     inject: true,
+    strategy: 'hydrate',
     scroll: 'preserved',
     server: 3000,
     socket: 8089,
@@ -248,14 +263,16 @@ export default defineConfig({
   },
   views: {
     snippets: {
-      prefixDir: false,
       separator: '-',
-      global: []
+      global: [],
+      prefixDir: false,
+      renamePatterns: {}
     },
     sections: {
-      prefixDir: false,
       separator: '-',
-      global: []
+      prefixDir: false,
+      global: [],
+      renamePatterns: {}
     },
     pages: {
       suffixDir: true,
@@ -270,7 +287,8 @@ export default defineConfig({
   transforms: {
     script: {},
     style: {},
-    svg: {}
+    svg: {},
+    image: {}
   },
   processors: {
     json: {
@@ -278,7 +296,10 @@ export default defineConfig({
       indent: 2,
       useTab: false,
       exclude: []
-    },
+    }
+
+    // Refer to transforms section for usage
+    //
     // esbuild: {},
     // sass: {},
     // postcss: [],
@@ -286,6 +307,7 @@ export default defineConfig({
     // svgo: {},
     // sprite: {},
     // sharp: {},
+
   },
   terser: {
     json: {
@@ -305,6 +327,9 @@ export default defineConfig({
       stripDashes: true,
       exclude: []
     },
+
+    // Refer to terser section for usage
+    //
     // script: {},
     // style: {},
   }
@@ -313,7 +338,7 @@ export default defineConfig({
 
 # Getting Started
 
-It is relatively easy to get started developing Shopify themes using Syncify. If you are converting an existing project and using Theme Kit or another build environment you can progressively adapt it into your workflow by manually configuring how Syncify should behave. Whatever the case, have a look at the [Syncify Strap](https://github.com/panoply/syncify-strap) repository.
+It is relatively easy to get started developing Shopify themes using Syncify. If you are converting an existing project and using Theme Kit, Shopify CLI or another build environment you can progressively adapt it into your workflow by manually configuring how Syncify should behave. Whatever the case, have a look at the [Syncify Dawn (Basic)](https://github.com/panoply/syncify-dawn-basic) example repository as a starting point.
 
 ### Pre-requisites
 
@@ -335,16 +360,40 @@ Before going over the features Syncify provides, it is assumed that you have don
 - [Processors](#views)
 - [Terser](#views)
 
-## Directories
+# Directories
 
-In Syncify you define custom base directories for your theme files. The values you define refer to a directory name which is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`).
+Syncify requires you to define custom **base** directory paths that point to theme files. The values you provide will refer to a directory name that is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). You can pass these references within your syncify configuration file or via the CLI.
+
+> **Note**
+> References passed in via the CLI will overwrite those provided in syncify configuration files.
+
+### Input → Output
+
+Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can always be rebuilt from input. If you are used to working from a single directory (e.g: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
+
+Single directory structures are not a viable approach when building modern and performant Shopify themes. Client-side (front-end) development is not SaaS specific and thus, with the proper tooling, Shopify theme development does not require one to adhere to the imposed approach of Dawn (via Shopify CLI). The argument for multi-directory architecture rests upon the millions of projects which isolate source ~ distribution variations and appropriate such logic.
+
+### Default Structure
+
+Below is an example of a Syncify theme structure using the defaults. Syncify will assume this directory structure if you do not provide any customizations via the CLI or within your syncify config file.
+
+```bash
+├─ source              # The src directory where you develop and theme files exist
+├─ theme               # The output directory where source files will be written
+├─ .env                # Shop credentials, such as Admin API Token or API key and secret
+├─ .gitignore          # Files to be ignored by git, e.g: your .env file
+├─ package.json        # The package.json file common in all Node projects, self explanatory
+├─ syncify.config.ts   # The syncify config file, you can optionally use package.json
+└─ tsconfig.json       # TypeScript configurations, this is optional but preferred.
+
+```
 
 <!-- prettier-ignore -->
 <table>
   <thead>
     <tr>
-      <th width="500px">API</th>
-      <th width="500px">CLI</th>
+      <th width="500px">Config File</th>
+      <th width="500px">CLI Flags</th>
     </tr>
   </thead>
   <tbody>
@@ -352,14 +401,16 @@ In Syncify you define custom base directories for your theme files. The values y
       <td>
 
 <!-- prettier-ignore -->
-```json
-{
-  "input": "source",
-  "output": "theme",
-  "import": "import",
-  "export": "export",
-  "config": "."
-}
+```ts
+import { defineConfig } from '@syncify/cli';
+
+export default defineConfig({
+  input: 'source',
+  output: 'theme',
+  import: 'import',
+  export: 'export',
+  config: '.'
+})
 ```
 
 </td>
@@ -367,10 +418,10 @@ In Syncify you define custom base directories for your theme files. The values y
 
 <!-- prettier-ignore -->
 ```bash
---input  -i   # source
---output -o   # theme
---config -c   # config
---export -e   # config
+--input  -i   # Define the input directory
+--output -o   # Define the output directory
+--config -c   # Pass the path to syncify config
+--export -e   # export
 ```
 
 </td>
@@ -379,43 +430,53 @@ In Syncify you define custom base directories for your theme files. The values y
   </tbody>
 </table>
 
-### Input > Output
-
-Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can always be rebuilt from input.
-
-If you are used to working from a single directory (e.g: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
-
 # Stores (Required)
 
-The `stores` option accepts an **object** or **array** type. Each item will hold a _settings_ object that contains references to your shopify store/s and their theme/s. For each store you define, Syncify requires you provide the shop name and theme id/s you wish to sync. The `themes` object uses a **key** > **value** structure.
+The `stores` option is required and will be used to perform sync operations. The option accepts an **object** or **array** type. Each item will hold reference to your shopify store/s and their theme/s. For each store you define, you will provide the **shop** name, theme **target** name and **id**. The `themes` object uses a **key** > **value** structure, where the **key** represent a theme name (target) and the value a theme id.
 
-> Please see theme [commands](#commands) example for more information on how this is used with the CLI.
+The information you provide on this option can be used via the CLI when targeting and executing operations. Please see [commands](#commands) portion of this readme for more information on how CLI usage.
 
-### CLI
+> **Note**
+> The theme target name does need to match that defined in your online store and can be anything you like.
 
-```bash
---theme, -t <target>   # theme targeting
-```
+### Config File
 
-### API
+Below is an example of how a store reference can be defined. In the example, we have only provided a store domain `shop-1.myshopify.com` and 3 themes to connect and interface with. You can provide reference to multiple stores by passing an array list using the same structure.
 
+<!-- prettier-ignore -->
 ```ts
 import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
-  stores: [
-    {
-      domain: 'shop-1', // equivalent of shop-1.myshopify.com
-      themes: {
-        dev: 123456789,
-        prod: 123456789,
-        stage: 123456789,
-        test: 123456789
-      }
+  stores: {
+    domain: 'shop-1', // equivalent of shop-1.myshopify.com
+    themes: {
+      dev:  123456789,
+      prod: 123456789,
+      test: 123456789
     }
-  ]
+  }
 });
 ```
+
+### CLI Usage
+
+Based on the above example configuration, this is how we would target and perform operations with the store and its theme/s using the CLI. In Syncify, when performing a sync action, you pass the store name as the first argument, followed by any `--flags`.
+
+<!-- prettier-ignore -->
+```bash
+# FLAGS
+
+--theme, -t <target>  # Theme name or comma separated list of theme names to target
+
+# EXAMPLES
+
+$ syncify shop-1 -t dev --watch          # Running watch mode and targeting dev theme
+$ syncify shop-1 -t dev,prod --upload    # Uploading to the dev and prod themes of shop-1
+
+```
+
+### Options
 
 <details>
 <summary>
@@ -438,6 +499,288 @@ The `themes` option refers to theme ids the store contains. This option is an ob
 
 </p>
 </details>
+
+# Paths
+
+The `paths` option allows you to define your theme/projects structure within the defined `input` directory. Syncify does not require you set a development structure required by Shopify and you should begin to decouple from that logic as it is generally flawed and restrictive when building advanced or large scale stores.
+
+Each path key represents a theme directory or resource point. Path options accept either a `string` or `string[]` arraylist of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns and can point to files contained within sub-directories of infinite depth. All defined references will automatically resolve to the defined `input` directory starting point, so you do not need to include it within your path definitions.
+
+There is no restrictions or limitations imposed on structures other than **input** relativity. Syncify will obtain full resolution and build a valid theme structure that Shopify understands when generating an **output**.
+
+### Config File
+
+By default, Syncify assumes you are using the basic~bitch (defaults) structure. The basic~bitch structure is certainly not the preferred format and when leveraging Syncify you are encouraged to establish a structure which suits your project and adheres to your workflow or tastes.
+
+<!-- prettier-ignore -->
+```ts
+import { defineConfig } from '@syncify/syncify';
+
+export default defineConfig({
+  input: 'source',
+  output: 'theme',
+  paths: {
+    assets: 'assets/**',
+    config: 'config/*.json',
+    locales: 'locales/*.json',
+    layout: 'layout/.liquid',
+    metafields: 'metafields/**/*.json',
+    sections: 'sections/*.liquid',
+    snippets: 'snippets/*.liquid',
+    templates: 'templates/*.liquid',
+    customers: 'templates/customers/*',
+    // pages: 'pages/*',
+    // redirects: 'redirects.yaml',
+  }
+})
+```
+
+### Custom Structures
+
+Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration (the tool defaults to this). The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify can digest.
+
+<table>
+  <thead>
+    <tr>
+      <th width=330px>Default Structure</th>
+      <th width="330px">Customized Structure</th>
+      <th width="330px">Output Structure</th>
+    </tr>
+  </thead>
+  <tbody>
+          <td>
+      <pre>
+      <code>
+      ㅤ
+      ㅤ
+      ㅤ
+   source
+   └─┐
+     ├─ assets
+     ├─ config
+     ├─ layout
+     ├─ locales
+     ├─ pages
+     ├─ metafields
+     │  └─ namespace
+     │     └─ key.json ㅤ
+     ├─ sections
+     ├─ snippets
+     └─ templates
+        └─ customers
+       ㅤ
+             ㅤ
+       ㅤ
+</code>
+      </pre>
+      </td>
+      <td>
+        <pre>
+        <code>
+ source
+ └─┐
+   ├── assets
+   │  ├─ files
+   │  ├─ icons
+   │  └─ images
+   ├─ data
+   │  ├─ config
+   │  ├─ locales
+   │  └─ metafields
+   │     └─ namespace
+   │        └─ key.json ㅤ
+   ├─ styles
+   ├─ scripts
+   └─ views
+      ├─ customers
+      ├─ sections
+      ├─ snippets
+      ├─ templates
+      └─ theme.liquid
+      </code>
+        </pre>
+      </td>
+       <td>
+      <pre>
+      <code>
+      ㅤㅤ
+      ㅤ
+      ㅤ      ㅤ
+      ㅤ      ㅤ
+      ㅤ      ㅤ
+      ㅤ
+  output
+  └─┐
+    ├─ assets
+    ├─ config
+    ├─ locales
+    ├─ layout
+    ├─ sections
+    ├─ snippets
+    └─ template
+       └─ customers ㅤ
+       ㅤ
+       ㅤ
+       ㅤ
+       ㅤ
+</code>
+      </pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+There is no distributed difference between the **default** and **customized** structures illustrated above. Both would generate an **output** that Shopify understands, requires and reasons with. Only the **input** source locations differ. The **output** Syncify creates will always be written to a standard Shopify theme structure regardless of how you may decide to organize **input** paths. Custom structures give you creative freedom and does not impose a restrictive workflow you may have become behest to working with Dawn and the Shopify CLI.
+
+Welcome to the better approach, you're welcome.
+
+### Options
+
+<details>
+<summary>
+<strong><code>Assets</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns for **asset** files. These will be written in the `assets` directory of your defined `output` path. Please note that you if you transforming CSS, SCSS, SASS or SVG file types using Syncify then you do not need to define those paths here as the `transforms` option will automatically route them, this is the same for assets being processed by spawns.
+
+**Understanding Spawns in watch mode**
+
+Syncify will automatically set watch paths of assets when running in watch mode. It will glob match all files being written to your defined `{output}/assets` path but exclude those which you have set to be handled or transformed. For example, if you are using a JavaScript bundler like webpack of rollup, Syncify will watch for any files that are written and handled by these tools or any other spawned process for that matter and once written will trigger an upload.
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Customers</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.liquid` or `.json` **customer** template files. These will be written to the `{output}/templates/customers` directory of your defined `output` path.
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Locales</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.json` **locale** files. These will be written to the `{output}/locales` directory of your defined `output` path.
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Config</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.json` **config** files. These will be written to the `{output}/config` directory of your defined `output` path.
+
+</details>
+
+<details>
+<summary>
+<strong><code>Layout</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.liquid` **layout** files. These will be written to the `{output}/layout` directory of your defined `output` path.
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Sections</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.liquid` **section** files. These will be written to the `sections` directory of your defined `output` path. Sections can be structured within sub-directories. If a section file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the output filenames.
+
+**Understanding Section Processing**
+
+If the section input path is `source/sections/index/some-file.liquid` then the filename will be prefixed with `index` so when referencing it within themes you'd need to use `index-some-file.liquid` in `{% section %}` tags. Prefixing is helpful when you have a large number of sections and want to avoid name collusion.
+
+See also [Views](#views).
+
+</p>
+
+</details>
+
+<details>
+<summary>
+<strong><code>Snippets</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.liquid` **snippet** files. These will be written to the `snippets` directory of your defined `output` path.
+
+See also [Views](#views).
+
+</p>
+</details>
+
+<details>
+<summary>
+<strong><code>Templates</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.json` or `.liquid` **template** files. These will be written to the `templates` directory of your defined `output` path.
+
+</p>
+</details>
+
+# HOT
+
+Live reloading is supported in watch mode. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional tooling. No extensions and no complexities. Syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes. HOT Reloads can be enabled by passing the `--hot` flag via the CLI.
+
+> The HOT reload approach Syncify employs tends to be considerably faster than HOT reloading with the Shopify CLI.
+
+### Assets
+
+SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out the URL's or containing source with localhost equivalents served statically by Syncify.
+
+### Section
+
+Dynamic sections, static sections of a combination of both are fetched via the Ajax [Section rendering API](https://shopify.dev/docs/api/section-rendering). Replacements are applied to fragments in real-time and surrounding nodes are left intact.
+
+### Snippets, Layouts and Templates
+
+In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippets, templates and Liquid/JSON layout files will inject HTML comments `<!-- hot:1aa4f32cf9 -->` containing a UUID before they are uploaded to themes. Syncify will pass this UUID to the client via websocket and once received an XHR (fetch) will be triggered. The response of the XHR request is then parsed and all nodes which proceed the injected UUID comment/s are plucked and swapped in the persisted DOM while leaving unchanged elements intact. The approach employed by Syncify is a mild form DOM hydration that's 10x faster than invoking a hard-refresh.
+
+## Programmatic Control
+
+Running in HOT mode will result in Syncify injecting a snippet into layouts. The snippet is the socket receiver that is responsible for executing replacements/morphs and exposes programmatic control for developers who can to customize or hook into the HOT reload rendering cycles.
+
+```ts
+// STATUS
+//
+window.syncify.ready: boolean
+window.syncify.connected: boolean;
+
+// RELOADS
+//
+window.syncify.assets(): void;
+window.syncify.reload(): void;
+window.syncify.refresh(): void
+
+// SECTIONS
+//
+window.syncify.sections.get()
+window.syncify.sections.list()
+window.syncify.sections.load()
+
+// LABEL
+//
+window.syncify.style.parent({ /* CSS */ });
+window.syncify.style.label({ /* CSS */ });
+```
 
 # Metafields
 
@@ -601,256 +944,6 @@ The `metafields` option refers to a directory within your project which can cont
 </p>
 </details>
 
-# Paths
-
-The `paths` option allows you to define a custom set of path locations which point to theme specific files contained within the defined `input` directory. Syncify does not require you set a development structure consistent with that required by Shopify and you should begin to decouple from that logic as it is generally a flawed and borderline daft approach. The contents (files) contained within your **input** will be re-routed as a standard theme structure that Shopify understands when generating **output** distribution.
-
-Each path option accepts either a `string` or `string[]` array list of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns. Paths will automatically resolve to the `input` directory, so you do not need to include it within your configurations.
-
-### API
-
-By default, Syncify assumes you are using the basic-bitch (default) structure as follows:
-
-<!-- prettier-ignore -->
-```ts
-import { defineConfig } from '@syncify/syncify';
-
-export default defineConfig({
-  input: 'source',
-  output: 'theme',
-  paths: {
-    assets: 'assets/**',
-    config: 'config/*.json',
-    locales: 'locales/*.json',
-    layout: 'layout/.liquid',
-    metafields: 'metafields/**/*.json',
-    sections: 'sections/*.liquid',
-    snippets: 'snippets/*.liquid',
-    templates: 'templates/*.liquid',
-    customers: 'templates/customers/*',
-    // pages: 'pages/*',
-    // redirects: 'redirects.yaml',
-  }
-})
-```
-
-### Custom Structures
-
-Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration, the tool defaults to this. The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify can digest.
-
-<table>
-  <thead>
-    <tr>
-      <th width=330px>Default Structure</th>
-      <th width="330px">Customized Structure</th>
-      <th width="330px">Output Structure</th>
-    </tr>
-  </thead>
-  <tbody>
-          <td>
-      <pre>
-      <code>
-      ㅤ
-      ㅤ
-      ㅤ
-   source
-   └─┐
-     ├─ assets
-     ├─ config
-     ├─ layout
-     ├─ locales
-     ├─ pages
-     ├─ metafields
-     │  └─ namespace
-     │     └─ key.json ㅤ
-     ├─ sections
-     ├─ snippets
-     └─ templates
-        └─ customers
-       ㅤ
-             ㅤ
-       ㅤ
-</code>
-      </pre>
-      </td>
-      <td>
-        <pre>
-        <code>
- source
- └─┐
-   ├── assets
-   │  ├─ files
-   │  ├─ icons
-   │  └─ images
-   ├─ data
-   │  ├─ config
-   │  ├─ locales
-   │  └─ metafields
-   │     └─ namespace
-   │        └─ key.json ㅤ
-   ├─ styles
-   ├─ scripts
-   └─ views
-      ├─ customers
-      ├─ sections
-      ├─ snippets
-      ├─ templates
-      └─ theme.liquid
-      </code>
-        </pre>
-      </td>
-       <td>
-      <pre>
-      <code>
-      ㅤㅤ
-      ㅤ
-      ㅤ      ㅤ
-      ㅤ      ㅤ
-      ㅤ      ㅤ
-      ㅤ
-  output
-  └─┐
-    ├─ assets
-    ├─ config
-    ├─ locales
-    ├─ layout
-    ├─ sections
-    ├─ snippets
-    └─ template
-       └─ customers ㅤ
-       ㅤ
-       ㅤ
-       ㅤ
-       ㅤ
-</code>
-      </pre>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-There is no distributed difference between the **default** and **customized** structures illustrated above. Both would generate an **output** that Shopify understands, requires and reasons with. Only the **input** source locations differ. The **output** Syncify creates will always be written to a standard Shopify theme structure regardless of how you may decide to organize **input** paths. Custom structures give you creative freedom and does not impose a restrictive workflow you may have become behest to working with Dawn and the Shopify CLI. Welcome to the better approach, you're welcome.
-
-### Options
-
-<details>
-<summary>
-<strong><code>Assets</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns for **asset** files. These will be written in the `assets` directory of your defined `output` path. Please note that you if you transforming CSS, SCSS, SASS or SVG file types using Syncify then you do not need to define those paths here as the `transforms` option will automatically route them, this is the same for assets being processed by spawns.
-
-**Understanding Spawns in watch mode**
-
-Syncify will automatically set watch paths of assets when running in watch mode. It will glob match all files being written to your defined `{output}/assets` path but exclude those which you have set to be handled or transformed. For example, if you are using a JavaScript bundler like webpack of rollup, Syncify will watch for any files that are written and handled by these tools or any other spawned process for that matter and once written will trigger an upload.
-
-</p>
-</details>
-
-<details>
-<summary>
-<strong><code>Customers</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns to `.liquid` or `.json` **customer** template files. These will be written to the `{output}/templates/customers` directory of your defined `output` path.
-
-</p>
-</details>
-
-<details>
-<summary>
-<strong><code>Locales</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns to `.json` **locale** files. These will be written to the `{output}/locales` directory of your defined `output` path.
-
-</p>
-</details>
-
-<details>
-<summary>
-<strong><code>Config</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns to `.json` **config** files. These will be written to the `{output}/config` directory of your defined `output` path.
-
-</details>
-
-<details>
-<summary>
-<strong><code>Layout</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns to `.liquid` **layout** files. These will be written to the `{output}/layout` directory of your defined `output` path.
-
-</p>
-</details>
-
-<details>
-<summary>
-<strong><code>Sections</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns to `.liquid` **section** files. These will be written to the `sections` directory of your defined `output` path. Sections can be structured within sub-directories. If a section file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the output filenames.
-
-**Understanding Section Processing**
-
-If the section input path is `source/sections/index/some-file.liquid` then the filename will be prefixed with `index` so when referencing it within themes you'd need to use `index-some-file.liquid` in `{% section %}` tags. Prefixing is helpful when you have a large number of sections and want to avoid name collusion.
-
-See also [Views](#views).
-
-</p>
-
-</details>
-
-<details>
-<summary>
-<strong><code>Snippets</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns to `.liquid` **snippet** files. These will be written to the `snippets` directory of your defined `output` path.
-
-See also [Views](#views).
-
-</p>
-</details>
-
-<details>
-<summary>
-<strong><code>Templates</code></strong>
-</summary>
-<p>
-
-An array list of glob path patterns to `.json` or `.liquid` **template** files. These will be written to the `templates` directory of your defined `output` path.
-
-</p>
-</details>
-
-# HOT
-
-Live reloading is supported in watch mode. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional tooling. No extensions and no complexities. When you invoke `--hot` syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes.
-
-> The HOT reload approach Syncify employs tends to be considerably faster than HOT reloading with the Shopify CLI.
-
-### Assets
-
-SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out the URL's or containing source with localhost equivalents that Syncify will statically serve.
-
-### Sections
-
-Sections are fetched via the Ajax Section rendering API. Replacements are applied to fragments in real-time.
-
-### Snippets, Layouts and Templates
-
-In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippets, templated and liquid layout files will inject HTML comments `<!-- hot:1aa4f32cf9 -->` containing a UUID before they are uploaded to themes. Syncify will pass this UUID to the client via websocket and once received an XHR (fetch) will be triggered. The response of the XHR request is then parsed and all nodes which proceed the injected UUID comment/s are plucked and swapped in the persisted DOM while leaving unchanged elements intact. The approach employed by Syncify is a mild form DOM hydration that's 10x faster than invoking a hard-refresh.
-
 # Spawn
 
 The spawn option accepts a **key** > **value** list of commands (i.e: scripts) which can be used when running in **watch** (`--watch`) or **build** (`--build`) modes. The Spawn configuration option allows you to leverage additional build tools and have them execute in parallel with Syncify as child processes.
@@ -873,7 +966,7 @@ The Syncify **build** mode re-builds the entire theme and you might choose to ru
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
 
@@ -966,7 +1059,7 @@ export default defineConfig({
 
 # Transform
 
-In Syncify, asset files can be transformed before being written to the defined `output` directory and uploaded to your Shopify store. The `transform` option provides users with control of the "asset pipeline" and Syncify exposes configuration wrappers for handling files together with modern developer tooling.
+In Syncify, asset files can be transformed before being written to the defined `output` directory and uploaded to your Shopify store. The `transform` option provides users with control of the "asset pipeline" and Syncify exposes configuration wrappers for handling files together with modern developer tooling. Transforms are totally optional, and require you to provide additional modules in your project.
 
 Syncify supports built-in and partial processing for the following file types:
 
