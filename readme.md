@@ -21,13 +21,6 @@ A lightening fast, extensible and superior alternative Shopify CLI (Theme Develo
 - Supports spawned processing with existing build tools.
 - Provides resource control of store Files, Pages and Redirects.
 
-### Disclaimer
-
-Syncify is designed for advanced theme development. If you are new to Shopify theme dev then it might be better for you to leverage the [Shopify CLI](https://github.com/Shopify/cli) or [Adastra](https://github.com/blanklob/adastra). There are no plans to make this tool digestible for beginner developers. If you have any questions or want to chat with other developers already using Syncify, find us here:
-
-- [Twitter](https://twitter.com/niksavvidis)
-- [Discord](https://discord.gg/shopify-developers-597504637167468564)
-
 ### Why?
 
 I have been working on the Shopify platform for several years and nothing the Shopify team have produced has actually increased my productivity. Despite the advancements Shopify has made in recent years I still find that their developer tooling to be rather average. The Shopify CLI is cool and all but for theme development it fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
@@ -59,22 +52,6 @@ npm i @syncify/cli --save-dev
 ```bash
 yarn add @syncify/cli --dev
 ```
-
-# Overview
-
-The main purpose of Syncify is to facilitate seamless theme development between your local machine and Shopify store/s. It ships with build, watch, download, upload, merge and pull capabilities for interfacing with remote Shopify webshop's. Together with a prompt based execution model, Syncify provides developers with theme control that aims to exceed expectations.
-
-### Theme Files
-
-Syncify uses built-in capabilities when handling snippets, templates, layouts, locales, configs and sections. Files using a `.liquid` or `.json` extension are typically considered theme files in syncify and always determined before handling. Content transformations like minification and path mappings are applied to these files types either natively or with plugins.
-
-### Data Files
-
-Syncify exposes and introduces an elegant low-level method for interfacing with shop metafields, pages, redirects and files. Pull, push, merge and delete resource capabilities are provided for data identified files and for metafield resources a directory/file path based approach is employed which allows developers to advance their workflows in a controlled and extensible manner.
-
-### Asset Files
-
-Syncify does not want to re-create or impede on developer preferences and tool appropriation. Build tools and bundlers specifically designed for processing different asset types can be spawned and run in parallel with Syncify's `build` and `watch` instances, but for more advanced use cases, Syncify also provides developers with pre-processor capabilities via [transforms](#transform). Transform can be leveraged for processing TypeScript, JavaScript, CSS, SCSS and SVG file types by exposing integrated configuration wrappers around popular and performant modules like ESBuild, SASS Dart, SVGO Tailwind and more!
 
 # Setup
 
@@ -153,11 +130,7 @@ YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
 YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
 ```
 
-<details>
-<summary>
-  <h3>Using <code>process.env</code> variables</h3>
-</summary>
-<p>
+### Using `process.env` variables
 
 Syncify also supports runtime credential assignment. This approach allows you to set credentials via the command line or within a script executable. This is highly discouraged and rather insecure.
 
@@ -176,16 +149,13 @@ process.env['YOUR-SHOP-NAME_API_KEY'] = 'abcdefghijklmnopqrstuvwz';
 process.env['YOUR-SHOP-NAME_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
 ```
 
-</p>
-</details>
-
 # Configuration
 
 Syncify supports `syncify.config.ts` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on the `syncify` property.
 
 ### Supported Files
 
-Syncify supports the following configuration file types. The recommended approach is a `syncify.config.ts` (TypeScript) configuration file type.
+Syncify supports the following configuration file types. The recommended approach is the TypeScript `syncify.config.ts` configuration file type.
 
 - `syncify.config.ts`
 - `syncify.config.js`
@@ -365,6 +335,7 @@ Before going over the features Syncify provides, it is assumed that you have don
 Syncify requires you to define custom **base** directory paths that point to theme files. The values you provide will refer to a directory name that is relative to the root of your project. You **cannot** define multi-level directories (eg: `some/dir`) or reverse paths (eg: `../dir`). You can pass these references within your syncify configuration file or via the CLI.
 
 > **Note**
+>
 > References passed in via the CLI will overwrite those provided in syncify configuration files.
 
 ### Input → Output
@@ -418,10 +389,14 @@ export default defineConfig({
 
 <!-- prettier-ignore -->
 ```bash
+
+
 --input  -i   # Define the input directory
 --output -o   # Define the output directory
 --config -c   # Pass the path to syncify config
 --export -e   # export
+
+
 ```
 
 </td>
@@ -437,6 +412,7 @@ The `stores` option is required and will be used to perform sync operations. The
 The information you provide on this option can be used via the CLI when targeting and executing operations. Please see [commands](#commands) portion of this readme for more information on how CLI usage.
 
 > **Note**
+>
 > The theme target name does need to match that defined in your online store and can be anything you like.
 
 ### Config File
@@ -465,6 +441,7 @@ Based on the above example configuration, this is how we would target and perfor
 
 <!-- prettier-ignore -->
 ```bash
+
 # FLAGS
 
 --theme, -t <target>  # Theme name or comma separated list of theme names to target
@@ -504,13 +481,13 @@ The `themes` option refers to theme ids the store contains. This option is an ob
 
 The `paths` option allows you to define your theme/projects structure within the defined `input` directory. Syncify does not require you set a development structure required by Shopify and you should begin to decouple from that logic as it is generally flawed and restrictive when building advanced or large scale stores.
 
-Each path key represents a theme directory or resource point. Path options accept either a `string` or `string[]` arraylist of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns and can point to files contained within sub-directories of infinite depth. All defined references will automatically resolve to the defined `input` directory starting point, so you do not need to include it within your path definitions.
+Each path key represents a theme directory or resource point. Path options accept either a `string` or `string[]` array list of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns and can point to files contained within sub-directories of infinite depth. All defined references will automatically resolve to the defined `input` directory starting point, so you do not need to include it within your path definitions.
 
 There is no restrictions or limitations imposed on structures other than **input** relativity. Syncify will obtain full resolution and build a valid theme structure that Shopify understands when generating an **output**.
 
 ### Config File
 
-By default, Syncify assumes you are using the basic~bitch (defaults) structure. The basic~bitch structure is certainly not the preferred format and when leveraging Syncify you are encouraged to establish a structure which suits your project and adheres to your workflow or tastes.
+By default, Syncify assumes you are using the basic-bitch (defaults) structure. The basic-bitch structure is certainly not the preferred format and when leveraging Syncify you are encouraged to establish a structure which suits your project and adheres to your workflow or tastes.
 
 <!-- prettier-ignore -->
 ```ts
