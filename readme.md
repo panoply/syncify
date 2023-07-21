@@ -19,7 +19,8 @@ A lightening fast, extensible and superior alternative Shopify CLI (Theme Develo
 - Clear, concise, informative and beautiful TUI/CLI logging.
 - An elegant global directory based metafields sync approach using JSON files.
 - Supports spawned processing with existing build tools.
-- Provides resource control of store Files, Pages and Redirects.
+- Additional resource controls for syncing Files, Pages and Redirects.
+- Provides a simple Reusable Sections approach for shared section references
 
 ### Why?
 
@@ -391,10 +392,10 @@ export default defineConfig({
 ```bash
 
 
---input  -i   # Define the input directory
---output -o   # Define the output directory
---config -c   # Pass the path to syncify config
---export -e   # export
+--input  -i   # Input Path
+--output -o   # Output Path
+--config -c   # Config Path
+--export -e   # Export Path
 
 
 ```
@@ -487,7 +488,7 @@ There is no restrictions or limitations imposed on structures other than **input
 
 ### Config File
 
-By default, Syncify assumes you are using the basic-bitch (defaults) structure. The basic-bitch structure is certainly not the preferred format and when leveraging Syncify you are encouraged to establish a structure which suits your project and adheres to your workflow or tastes.
+By default, Syncify assumes you are using a basic (defaults) structure. This structure is certainly not the preferred format and when leveraging Syncify you are encouraged to establish a structure which suits your project and adheres to your workflow or tastes.
 
 <!-- prettier-ignore -->
 ```ts
@@ -712,6 +713,10 @@ An array list of glob path patterns to `.json` or `.liquid` **template** files. 
 
 </p>
 </details>
+
+# Shared Sections
+
+Syncify provides an elegant and simple solution for shared sections. This is an experimental feature and aims to provide developers an easy way to re-use section contents between section files containing schema.
 
 # HOT
 
@@ -2143,11 +2148,11 @@ util.spawned(): string[]
 
 # Contributing
 
-This project uses [pnpm](https://pnpm.js.org/en/cli/install). Fork the project, run `pnpm i` and you're good to go. If you're using Yarn like the rest of the plebs or npm then you will still need to install pnpm.
+This project uses [pnpm](https://pnpm.js.org/en/cli/install). Fork the project, run `pnpm i` and you're good to go.
 
 # Author
 
-Created by [Nίκος Σαβίδης](https://github.com/panoply) of [Sissel ΣaaΣ](https://sissel.io).
+Created by [Nίκος Σαβίδης](https://github.com/panoply).
 
 ### Acknowledgements
 
