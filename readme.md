@@ -171,7 +171,7 @@ Below are the **default** configurations. Options commented out within [transfor
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
   input: 'source',
@@ -492,7 +492,7 @@ By default, Syncify assumes you are using a basic (defaults) structure. This str
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
   input: 'source',
@@ -974,7 +974,7 @@ If you are processing JavaScript asset files using the [Rollup](https://rollupjs
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
     spawn: {
@@ -997,7 +997,7 @@ If you are processing JavaScript asset files using the [Webpack](https://webpack
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
     spawn: {
@@ -1020,7 +1020,7 @@ Though it is unlikely you'd ever need to include 2 different JavaScript bundlers
 
 <!-- prettier-ignore -->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
     spawn: {
@@ -1077,7 +1077,7 @@ The `script` options accepts several different structures and it is up to you ho
 
 <!--prettier-ignore-->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
   transforms: {
@@ -1103,7 +1103,7 @@ You may prefer to use rename (entry point) structures instead. When we are using
 
 <!--prettier-ignore-->
 ```ts
-import { defineConfig } from '@syncify/syncify';
+import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
   transforms: {
@@ -1174,7 +1174,7 @@ In the below example we are generating multiple stylesheets and compiling both S
 
 <!-- prettier-ignore-->
 ```ts
-import { defineConfig } from '@syncify/syncify'
+import { defineConfig } from '@syncify/cli'
 
 export default defineConfig({
   transforms: {
