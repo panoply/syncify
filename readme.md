@@ -24,9 +24,9 @@ A lightening fast, extensible and superior alternative Shopify CLI (Theme Develo
 
 ### Why?
 
-I have been working on the Shopify platform for several years and nothing the Shopify team have produced has actually increased my productivity. Despite the advancements Shopify has made in recent years I still find that their developer tooling to be rather average. The Shopify CLI is cool and all but for theme development it fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
+I have been working on the Shopify platform for several years and nothing the Shopify team have produced has increased my productivity. Despite the advancements Shopify has made in recent years I still find their developer tooling to be missing the mark. The Shopify CLI is cool and all but for me the approach to theme development it fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
 
-Syncify provides you with essential stack tooling for producing lean, performant and refined themes. It's fast, flexible, extensible, scalable but most importantly, it will not lock you into a restrictive low grade elementary workflow.
+Syncify provides you with essential stack tooling for producing lean, performant and refined themes. It's fast, flexible, extensible, scalable but most importantly, it's an un-restrictive workflow.
 
 # Installation
 
