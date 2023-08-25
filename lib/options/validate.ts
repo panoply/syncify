@@ -2,7 +2,7 @@ import { type, has } from 'rambdax';
 import { argv } from 'node:process';
 import { isArray, isUndefined, nl, ws, error, nlr, isString } from '../utils/native';
 import * as c from '~cli/ansi';
-import { bundle } from '~config';
+import { $ } from '~state';
 import { REGEX_OR_CHARS } from '~const';
 
 /**
@@ -116,7 +116,7 @@ export function typeError ({
     c.red(`The ${c.cyan(name)} option has an incorrect type value`) + nlr(2),
     c.red(`provided${c.COL} ${c.yellowBright(type(provided).toLowerCase())}`) + nl,
     c.red(`expected${c.COL} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}`) + nlr(2),
-    c.red(`in${c.COL} ${c.gray.underline(bundle.file.base)}`) + nlr(2),
+    c.red(`in${c.COL} ${c.gray.underline($.file.base)}`) + nlr(2),
     c.white.bold('How to fix?') + nl,
     `
     ${c.gray('You need to change the option value to use the')} ${c.blue('expected')} ${c.gray('type.')}
@@ -145,19 +145,26 @@ export function invalidCommand ({
 }) {
 
   const provided = argv.slice(2).join(' ');
+
   expected = c.white('syncify ' + provided + ' ') + c.blue(expected.replace(/([|,])/g, c.gray('$1')));
 
   error(
     nlr(2),
+
+    // ERROR DESCRIPTION
+
     c.red(`${c.bold('Invalid or incomplete command passed')}`) + nlr(2),
     c.red(isArray(message) ? message.join('\n ') : message) + nlr(2),
 
+    // PROVIDED / EXPECTED
+
     c.red(`provided${c.COL} ${c.white('$')} ${c.white('syncify ' + provided)}`) + nl,
     c.red(`expected${c.COL} ${c.white('$')} ${expected}`) + nlr(2),
+
+    // HOW TO FIX
+
     c.white.bold('How to fix?') + nl,
-   `
-   ${c.gray(isArray(fix) ? fix.join('\n   ') : fix)}
-   `
+    c.gray(isArray(fix) ? fix.join(nl) : fix)
   );
 
   process.exit(0);
@@ -198,16 +205,22 @@ export function invalidTarget ({
 
   error(
     nlr(2),
+
+    // ERROR DESCRIPTION
+
     c.red(c.bold(`Invalid ${c.cyan(type)} target provided`)) + nlr(2),
     c.red(message) + nlr(2),
+
+    // PROVIDED / EXPECTED
 
     c.red(`provided${c.COL} ${c.yellowBright(expected)}`) + nl,
     c.red(`expected${c.COL} ${c.blue(provided)}`) + nlr(2),
 
+    // HOW TO FIX
+
     c.white.bold('How to fix?') + nl,
-   `
-   ${c.gray(isArray(fix) ? fix.join('\n   ') : fix)}
-   `
+    c.gray(isArray(fix) ? fix.join(nl) : fix)
+
   );
 
   process.exit(0);
@@ -225,15 +238,21 @@ export function missingDependency (deps: string | string[]) {
 
     error(
       nlr(2),
+
+      // ERROR MESSAGE
+
       c.red(`${c.bold(`Missing ${c.cyan(deps as string)} dependency`)}`) + nlr(2),
       c.red(`You need to install ${c.cyan(deps as string)} to use it as a processor`) + nlr(2),
-      c.white.bold('How to fix?') + nl,
-      `
-      $ ${c.blue.bold('pnpm add ' + deps as string + ' -D')}
 
-      ${c.gray('If you are using a different package manager (i.e: Yarn or NPM) then')}
-      ${c.gray('please consider adopting pnpm. Pnpm is dope and does dope shit.')}
-      `
+      // HOW TO FIX
+
+      c.white.bold('How to fix?') + nl + nl,
+
+      `$ ${c.blue.bold('pnpm add ' + deps as string + ' -D')}` + nlr(2),
+
+      c.gray('If you are using a different package manager (i.e: Yarn or NPM) then'),
+      c.gray('please consider adopting pnpm. Pnpm is dope and does dope shit.')
+
     );
 
   } else {
@@ -272,7 +291,7 @@ export function missingOption (option: string, name: any, expects: string, why: 
     c.red(`${c.bold(`Missing ${c.LCB} ${c.cyan(option)} ${c.RCB} configuration option`)}`) + nlr(2),
     c.red(`The ${c.cyan(name)} option needs to be defined`) + nlr(2),
     c.red(`expects${c.COL} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}`) + nlr(2),
-    c.red(`at${c.COL} ${c.gray.underline(bundle.file.base)}`) + nlr(2),
+    c.red(`at${c.COL} ${c.gray.underline($.file.base)}`) + nlr(2),
     c.white.bold('Why?') + nl + nl +
     c.gray(isArray(why) ? ` ${why.join('\n ')}` : ` ${why}`) + nl + nl
   );
@@ -414,9 +433,9 @@ export function unknownError (option: string, value: any) {
     );
   }
 
-  const cfile = bundle.file.base === 'package.json'
+  const cfile = $.file.base === 'package.json'
     ? `${c.blue('syncify')} config in the ${c.blue('package.json')} file.`
-    : `${c.blue(bundle.file.base)} file.`;
+    : `${c.blue($.file.base)} file.`;
 
   error(
     nlr(2),
