@@ -2,7 +2,7 @@ import type { Colors } from '~cli/ansi';
 import { has, hasPath } from 'rambdax';
 import readline from 'node:readline';
 import wrap from 'wrap-ansi';
-import { REGEX_LINE_NO, REGEX_ADDRESS, REGEX_OBJECT, REGEX_QUOTES, REGEX_STRING } from '~const';
+import { REGEX_LINE_NO, REGEX_ADDRESS, REGEX_OBJECT, REGEX_QUOTES, REGEX_STRING, REGEX_FILENAME } from '~const';
 import { glue, isArray, log, nil, nl, nlr, ws, wsr } from '~utils/native';
 import { getTime } from '~utils/utils';
 import * as c from '~cli/ansi';
@@ -203,12 +203,13 @@ export function shopify (message: string | string[]) {
   let output: string = message;
 
   output = output.replace(REGEX_LINE_NO, c.gray('$1') + c.white('$2') + c.gray('$3') + c.white('$4') + nlr(2));
-  output = output.replace(REGEX_QUOTES, c.yellowBright.bold('$1'));
+  output = output.replace(REGEX_QUOTES, c.yellow.bold('$1'));
   output = output.replace(REGEX_OBJECT, c.cyan('$1') + c.whiteBright('$2') + c.cyan('$3'));
   output = output.replace(REGEX_ADDRESS, c.underline('$1'));
   output = output.replace(REGEX_STRING, c.magenta('$1') + c.cyan('$2') + c.magenta('$3'));
+  output = output.replace(REGEX_FILENAME, c.neonCyan.bold('$1'));
 
-  return indent(c.red(wrap(output, $.terminal.wrap)), { line: c.line.red });
+  return indent(c.redBright(wrap(output, $.terminal.wrap)), { line: c.line.red });
 
 }
 
@@ -304,7 +305,7 @@ export function context (data: {
     if (data.entries[k]) {
       output += glue([
         c.line.red,
-        c.red(k),
+        c.white(k),
         c.COL + ws,
         wsr(space - k.length),
         c.gray(`${data.entries[k]}`) + nl
@@ -316,7 +317,7 @@ export function context (data: {
     stack = data.stack;
     output += glue([
       c.line.red,
-      c.red('stack'),
+      c.white('stack'),
       c.COL + ws,
       wsr(space - 5),
       c.gray(`Type ${c.bold('s')} and press ${c.bold('enter')} to view stack trace`),
