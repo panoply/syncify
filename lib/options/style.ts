@@ -1,5 +1,5 @@
-import { Merge } from 'type-fest';
-import { Config, StyleTransform, Processors, WatchBundle } from 'types';
+import type { Config, StyleTransform, Processors, WatchBundle, StyleBundle, SASSConfig } from 'types';
+import type { Merge } from 'type-fest';
 import glob from 'fast-glob';
 import merge from 'mergerino';
 import anymatch, { Tester } from 'anymatch';
@@ -9,12 +9,12 @@ import { existsSync } from 'fs-extra';
 import { getModules, renameFile, readConfigFile } from '~utils/options';
 import { normalPath } from '~utils/paths';
 import { typeError, invalidError, warnOption, missingDependency, throwError } from '~options/validate';
-import { bundle, processor } from '~config';
 import { load } from '~transform/styles';
 import { getTransform } from './utilities';
-import * as u from '~utils/native';
+import { isObject, isBoolean, isArray, isString, defineProperty } from '~utils/native';
 import { uuid } from '~utils/utils';
 import { Type } from '~process/files';
+import { $ } from '~state';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -38,21 +38,24 @@ export async function setStyleConfig (config: Config) {
 
   if (!has('style', config.transforms)) return;
 
-  const { postcss, sass } = processor;
+  const { postcss, sass } = $.processor;
   const warn = warnOption('style transform option');
 
-  sass.installed = getModules(bundle.pkg, 'sass');
+  sass.installed = getModules($.pkg, 'sass');
 
   // Load SASS Dart module
   if (sass.installed) {
-    const loaded = await load('sass');
 
+    const loaded = await load('sass');
     if (!loaded) {
-      throwError('Unable to dynamically import SASS', 'Ensure you have installed sass');
+      throwError(
+        'Unable to dynamically import SASS',
+        'Ensure you have installed sass'
+      );
     }
   }
 
-  postcss.installed = getModules(bundle.pkg, 'postcss');
+  postcss.installed = getModules($.pkg, 'postcss');
 
   if (postcss.installed) {
 
@@ -60,7 +63,10 @@ export async function setStyleConfig (config: Config) {
     const loaded = await load('postcss');
 
     if (!loaded) {
-      throwError('Unable to dynamically import PostCSS', 'Ensure you have installed postcss');
+      throwError(
+        'Unable to dynamically import PostCSS',
+        'Ensure you have installed postcss'
+      );
     }
 
     const pcss = await readConfigFile<PostCSSProcess>('postcss.config');
@@ -85,7 +91,7 @@ export async function setStyleConfig (config: Config) {
   for (const style of styles) {
 
     // Default Dart SASS options compile model for each style
-    const compile: typeof style = {
+    const compile: StyleBundle = {
       uuid: uuid(),
       input: style.input,
       watch: null,
@@ -95,22 +101,25 @@ export async function setStyleConfig (config: Config) {
 
     if (has('postcss', style)) {
 
-      if (!postcss.installed) missingDependency('postcss');
-      if (u.isArray(style.postcss)) {
+      if (!postcss.installed) {
+        missingDependency('postcss');
+      }
+
+      if (isArray(style.postcss)) {
 
         compile.postcss = style.postcss;
 
       } else {
 
-        const override = u.isObject(style.postcss);
+        const override = isObject(style.postcss);
 
-        if ((u.isBoolean(style.postcss) || override) && !isNil(style.postcss)) {
+        if ((isBoolean(style.postcss) || override) && !isNil(style.postcss)) {
           if (style.postcss !== false) {
 
             if (!postcss.installed) missingDependency('postcss');
 
             compile.postcss = override
-              ? merge(postcss.config, style.postcss as Processors['postcss'])
+              ? merge(postcss.config, style.postcss as any)
               : true as unknown as any;
 
           }
@@ -127,25 +136,33 @@ export async function setStyleConfig (config: Config) {
 
     if ((has('sass', style) && style.sass !== false) && sass.installed === true) {
 
-      const override = u.isObject(style.sass);
+      const override = isObject(style.sass);
 
-      if ((u.isBoolean(style.sass) || override) && !isNil(style.sass)) {
-        if (!sass.installed) missingDependency('sass');
+      if ((isBoolean(style.sass) || override) && !isNil(style.sass)) {
+
+        if (!sass.installed) {
+          missingDependency('sass');
+        }
+
         if (!override) {
 
-          u.defineProperty(compile, 'sass', { get () { return style.sass; } });
+          defineProperty(compile, 'sass', {
+            get () {
+              return style.sass;
+            }
+          });
 
         } else {
 
           // console.log(sass.config);
-          compile.sass = u.assign(sass.config, style.sass);
+          compile.sass = merge(sass.config, style.sass as SASSConfig);
 
           for (const option in style.sass as StyleTransform) {
 
             // Validate the boolean options
             if (option === 'sourcemap' || option === 'warnings') {
 
-              if (u.isBoolean(style.sass[option])) {
+              if (isBoolean(style.sass[option])) {
                 compile.sass[option] = style.sass[option];
               } else {
                 typeError({
@@ -158,7 +175,7 @@ export async function setStyleConfig (config: Config) {
 
             } else if (option === 'style') {
 
-              if (!u.isString(style.sass[option])) {
+              if (!isString(style.sass[option])) {
                 typeError({
                   option: 'sass',
                   name: option,
@@ -175,9 +192,11 @@ export async function setStyleConfig (config: Config) {
 
             } else if (option === 'includePaths') {
 
-              if (u.isArray(style.sass[option])) {
+              if (isArray(style.sass[option])) {
+
                 // Full path relative to CWD
-                compile.sass[option] = uniq<string>(style.sass[option]).map(p => join(bundle.cwd, p));
+                compile.sass[option] = uniq<string>(style.sass[option]).map(p => join($.cwd, p));
+
               } else {
                 typeError({
                   option: 'sass',
@@ -213,7 +232,7 @@ export async function setStyleConfig (config: Config) {
     if (has('rename', style) && !isNil(style)) {
 
       // Ensure the rename value is a string
-      if (!u.isString(style.rename)) {
+      if (!isString(style.rename)) {
         typeError({
           option: 'styles',
           name: 'rename',
@@ -236,8 +255,12 @@ export async function setStyleConfig (config: Config) {
 
       // We are dealing with a .css file
       if (rename.name.endsWith('.css')) {
-        compile.rename = rename.name; // Rename is using valid .css extension
+
+        // Rename is using valid .css extension
+        compile.rename = rename.name;
+
       } else {
+
         // rename is using a non .css extension
         if (rename.name.endsWith('.scss')) {
           rename.name = rename.name.replace('.scss', '.css');
@@ -246,14 +269,15 @@ export async function setStyleConfig (config: Config) {
         } else if (!rename.name.endsWith('.liquid')) {
           rename.name = rename.name + '.css';
         }
+
       }
     }
 
     const watch: string[] = [];
 
-    if (bundle.mode.watch && has('watch', style)) {
+    if ($.mode.watch && has('watch', style)) {
 
-      if (!u.isArray(style.watch)) {
+      if (!isArray(style.watch)) {
         typeError({
           option: 'styles',
           name: 'watch',
@@ -264,9 +288,11 @@ export async function setStyleConfig (config: Config) {
 
       for (const uri of style.watch as unknown as string[]) {
 
-        const globs = await glob(join(bundle.cwd, path(uri)));
+        const globs = await glob(join($.cwd, path(uri)));
 
-        if (globs.length === 0 && uri[0] !== '!') warn('Cannot resolve watch glob/path uri', uri);
+        if (globs.length === 0 && uri[0] !== '!') {
+          warn('Cannot resolve watch glob/path uri', uri);
+        }
 
         for (const p of globs) {
           if (existsSync(p)) {
@@ -279,64 +305,79 @@ export async function setStyleConfig (config: Config) {
       };
 
       watch.push(compile.input);
-      watch.forEach(p => bundle.watch.add(p));
+      watch.forEach(p => $.watch.add(p));
+
       compile.watch = anymatch(watch);
 
     } else {
 
       compile.watch = anymatch([ compile.input ]);
-      bundle.watch.add(compile.input);
+
+      $.watch.add(compile.input);
 
     }
 
     if (typeof compile.sass === 'object') {
 
       // Include the CWD and parent directory
-      compile.sass.include.unshift(bundle.cwd, join(bundle.cwd, rename.dir));
+      compile.sass.include.unshift($.cwd, join($.cwd, rename.dir));
 
       // Apply includes (for Dart SASS)
       if (hasPath('sass.include', style)) {
-        compile.sass.include = (style.sass as SassDartProcess).include.map(p => join(bundle.cwd, p));
+        compile.sass.include = (style.sass as SassDartProcess).include.map(p => join($.cwd, p));
       }
     }
 
     if (has('snippet', style)) {
 
-      if (!u.isBoolean(style.snippet)) {
-        typeError({
-          option: 'styles',
-          name: 'snippet',
-          provided: style.snippet,
-          expects: 'boolean'
-        });
+      if (!isBoolean(style.snippet)) {
+
+        typeError(
+          {
+            option: 'styles',
+            name: 'snippet',
+            provided: style.snippet,
+            expects: 'boolean'
+          }
+        );
+
       }
 
       compile.snippet = style.snippet;
+
     }
 
     // Based on the snippet condition, we rename the export or not
     if (compile.snippet) {
 
-      if (!has('rename', compile)) compile.rename = rename.name;
+      if (!has('rename', compile)) {
+        compile.rename = rename.name;
+      }
+
       if (!rename.name.endsWith('.liquid') || !compile.rename.endsWith('.liquid')) {
         compile.rename = rename.name + '.liquid';
       }
 
-      bundle.paths.transforms.set(compile.input, Type.Style);
+      $.paths.transforms.set(compile.input, Type.Style);
 
-      if (bundle.mode.watch) {
-        (bundle.watch as WatchBundle).unwatch(`${join(bundle.cwd, config.output, 'snippets', compile.rename)}`);
+      if ($.mode.watch) {
+        ($.watch as WatchBundle).unwatch(join($.cwd, config.output, 'snippets', compile.rename));
       }
+
     } else {
 
       compile.rename = rename.name;
 
-      if (bundle.mode.watch) {
-        (bundle.watch as WatchBundle).unwatch(`${join(bundle.cwd, config.output, 'assets', rename.name)}`);
+      if ($.mode.watch) {
+        ($.watch as WatchBundle).unwatch(join($.cwd, config.output, 'assets', rename.name));
       }
+
     }
 
-    bundle.style.push(compile as any);
+    // Final Step - Insert Build Configuration
+    // This is where we populate the build
+    //
+    $.style.push(compile);
 
   };
 
