@@ -1,10 +1,10 @@
-import { Config, ENV, Tsconfig } from 'types';
-import { join, relative, basename } from 'node:path';
+import type { Config, ENV, Tsconfig } from 'types';
+import { join, relative, basename } from 'pathe';
 import { pathExists, readFile, readJson } from 'fs-extra';
+import stripJsonComments from 'strip-json-comments';
 import { bundleRequire } from '~utils/require';
 import { jsonc } from '~utils/utils';
-import { bundle } from '~config';
-import stripJsonComments from 'strip-json-comments';
+import { $ } from '~state';
 
 /**
  * Config Files
@@ -42,9 +42,9 @@ export async function configFile (cwd: string): Promise<Config> {
 
     if (path.endsWith('.json')) {
 
-      bundle.file.path = path;
-      bundle.file.relative = relative(cwd, path);
-      bundle.file.base = basename(path);
+      $.file.path = path;
+      $.file.relative = relative(cwd, path);
+      $.file.base = basename(path);
 
       const json = await readFile(path);
 
@@ -52,9 +52,9 @@ export async function configFile (cwd: string): Promise<Config> {
 
     } else {
 
-      bundle.file.path = path;
-      bundle.file.relative = relative(cwd, path);
-      bundle.file.base = basename(path);
+      $.file.path = path;
+      $.file.relative = relative(cwd, path);
+      $.file.base = basename(path);
 
       const config = await bundleRequire({ filepath: path });
 
@@ -127,7 +127,7 @@ export async function getPackageJson (cwd: string) {
   if (!has) throw new Error('Missing "package.json" file');
 
   try {
-    bundle.pkg = await readJson(uri);
+    $.pkg = await readJson(uri);
   } catch (e) {
     throw new Error(e);
   }
