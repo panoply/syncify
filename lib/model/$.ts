@@ -1,13 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
-import { argv } from 'node:process';
-import { Merge, PackageJson } from 'type-fest';
-import merge from 'mergerino';
-import { terser } from './terser';
-import { defaults } from './defaults';
-import { processor } from './processor';
-import { plugins } from './plugins';
-import {
+import type {
   Commands,
   Config,
   Cache,
@@ -28,14 +21,24 @@ import {
   HOTBundle,
   TerserBundle,
   TerserConfig,
-  PathsBundle,
   PageBundle,
   SnippetBundle,
   SectionBundle,
   WatchBundle,
-  ProcessorsBundle
+  ProcessorsBundle,
+  PathBundle
 } from 'types';
+import type { ChildProcess } from 'node:child_process';
+import { argv } from 'node:process';
+import { PackageJson } from 'type-fest';
+import merge from 'mergerino';
+import { terser } from './terser';
+import { defaults } from './defaults';
+import { processor } from './processor';
+import { plugins } from './plugins';
 import { size } from '~cli/size';
+import { PATH_KEYS } from '~const';
+import { create } from '~utils/native';
 
 /**
  * Warning stacks, maintains a store of log messages
@@ -50,6 +53,22 @@ export const warning: {
   current: null,
   count: 0,
   process: {}
+};
+
+function paths (): PathBundle {
+
+  const state = create(null);
+
+  for (const path of PATH_KEYS) {
+    state[path] = create(null);
+    state[path].input = null;
+    state[path].match = null;
+  }
+
+  state.transforms = new Map();
+
+  return state;
+
 };
 
 /**
@@ -84,6 +103,21 @@ export const $ = new class Bundle {
    * The parsed contents of `package.json` file
    */
   private static package: PackageJson = {};
+
+  /**
+   * Process Child
+   */
+  public process: ChildProcess;
+
+  /**
+   * Whether or not to restart process
+   */
+  public restart: boolean = false;
+
+  /**
+   * Cached reference of the CLI commands passed
+   */
+  public cli: Commands = {};
 
   /**
    * Cache references indexed from `node_modules/.syncify`
@@ -276,7 +310,7 @@ export const $ = new class Bundle {
   /**
    * Base directory path references
    */
-  public dirs: Merge<Directories, { cache: string }> = {};
+  public dirs: Directories = {};
 
   /**
    * Passed commands that may be of importance in the transform or build processes.
@@ -368,6 +402,7 @@ export const $ = new class Bundle {
    *  @default null // defaults to null unless watch mode is invoked
    */
   public watch: WatchBundle | Set<string | readonly string[]> = new Set();
+
   /**
    * Directory structure paths.
    *
@@ -381,9 +416,7 @@ export const $ = new class Bundle {
    * - `8` > `Type.Script`
    * - `9` > `Type.SVG`
    */
-  public paths: PathsBundle = {
-    transforms: new Map()
-  };
+  public paths: PathBundle = paths();
 
   /**
    * Page transforms
