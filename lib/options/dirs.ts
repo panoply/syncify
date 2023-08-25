@@ -1,24 +1,34 @@
-import { Commands } from 'types';
+import { Commands, Cache } from 'types';
 import { has, uniq } from 'rambdax';
-import { mkdir, emptyDir, writeJson, pathExists } from 'fs-extra';
-import { join } from 'node:path';
-import { assign, isArray, isString } from '~utils/native';
+import glob from 'fast-glob';
+import { mkdir, emptyDir, writeJson, pathExists, readJson } from 'fs-extra';
+import { join, basename, extname } from 'pathe';
+import { assign, create, defineProperty, isArray, isString } from '~utils/native';
 import { basePath } from '~utils/paths';
-import { bundle, cache } from '~config';
+import { $ } from '~state';
 import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '~const';
 import { typeError } from '~options/validate';
+import { updateCache } from '~process/caches';
 
 /**
  * Create Cache Directories
  *
- * Generates cache directories and references in
- * the `node_modules/.syncify` directory. This is a
- * fallback function and only runs is `postinstall`
- * was not triggered.
+ * Generates cache directories and references in the `node_modules/.syncify` directory.
+ * This is a fallback function and only runs if `postinstall` was not triggered.
  */
 export async function setCacheDirs (path: string, options = { purge: false }) {
 
-  bundle.dirs.cache = `${path}/`;
+  assign<Cache, Cache>($.cache, {
+    uri: join(path, 'build.map'),
+    version: $.version,
+    maps: {},
+    pages: {},
+    metafields: {},
+    sourcemaps: {
+      script: null,
+      style: null
+    }
+  });
 
   const hasBase = await pathExists(path);
 
@@ -32,13 +42,57 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
 
   for (const dir of CACHE_DIRS) {
 
-    if (dir === 'sections') {
-      cache[dir] = [];
-    } else {
-      cache[dir] = {};
+    const uri = join(path, dir, '/');
 
-      const uri = join(path, dir, '/');
+    if (dir === 'sourcemaps/script') {
+      $.cache.sourcemaps.script = uri;
+    } else if (dir === 'sourcemaps/style') {
+      $.cache.sourcemaps.style = uri;
+    }
+
+    const has = await pathExists(uri);
+
+    if (!has) {
+
+      try {
+        await mkdir(uri);
+      } catch (e) {
+        throw new Error(e);
+      }
+
+    } else {
+
+      if (options.purge) await emptyDir(uri);
+
+    }
+
+  }
+
+  await updateCache();
+
+};
+
+/**
+ * Read Cache
+ *
+ * Populates the cache references and assigns them
+ * to the `$.cache` model.
+ */
+export async function getCacheFiles () {
+
+  // Populate the store specifics records
+  //
+  if (dir === 'page' || dir === 'metafield' || dir === 'redirect') {
+
+    const stores = isArray($.config.stores) ? $.config.stores : [ $.config.stores ];
+
+    for (const { domain } of stores) {
+
+      const myshopify = `${domain}.myshopify.com`;
+      const uri = join(path, myshopify);
       const has = await pathExists(uri);
+
+      $.cache[dir as string] = { [myshopify]: create(null) };
 
       if (!has) {
 
@@ -48,25 +102,87 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
           throw new Error(e);
         }
 
-        assign(cache[dir], { uri, data: {} });
-
       } else {
-        if (options.purge) await emptyDir(uri);
+
+        const files = await glob(join(path, '*'));
+
+        if (files.length > 0) {
+
+          for (const file of files) {
+
+            const name = basename(file, extname(file));
+
+            try {
+
+              const data = await readJson(file);
+
+              defineProperty($.cache[dir as string][myshopify], name, {
+                get () {
+                  return data;
+                }
+              });
+
+            } catch (e) {
+              throw new Error(e);
+            }
+          }
+        }
       }
+    }
 
-      assign(cache[dir], { uri, data: {} });
+  } else if (dir === 'style' || dir === 'script') {
 
+    const files = await glob(join(path, '*'));
+
+    if (files.length > 0) {
+
+      for (const file of files) {
+
+        const name = basename(file, extname(file));
+
+        try {
+
+          $.cache[dir as string] = create(null);
+          $.cache[dir][name] = file;
+
+        } catch (e) {
+
+          throw new Error(e);
+        }
+      }
+    }
+
+  } else {
+
+    console.log(dir, path);
+    const files = await glob(join(path, '*.json'));
+
+    if (files.length > 0) {
+
+      for (const file of files) {
+
+        // const name = basename(file, '.json');
+
+        try {
+
+          const data = await readJson(file);
+
+          defineProperty($.cache, dir, {
+            get () {
+              return data;
+            }
+          });
+
+        } catch (e) {
+
+          throw new Error(e);
+        }
+      }
     }
 
   }
 
-  writeJson(join(path, 'store.map'), cache, { spaces: 0 }, (e) => {
-
-    if (e) throw e;
-
-  });
-
-};
+}
 
 /**
  * Create Theme Directories
@@ -79,19 +195,23 @@ export async function setThemeDirs (basePath: string) {
   const hasBase = await pathExists(basePath);
 
   if (hasBase) {
-    if (bundle.mode.clean) {
+
+    if ($.mode.clean) {
       try {
         await emptyDir(basePath);
       } catch (e) {
         console.error(e);
       }
     }
+
   } else {
+
     try {
       await mkdir(basePath);
     } catch (e) {
       throw new Error(e);
     }
+
   }
 
   for (const dir of THEME_DIRS) {
@@ -120,7 +240,7 @@ export async function setThemeDirs (basePath: string) {
  */
 export function setBaseDirs (cli: Commands) {
 
-  const { config, cwd, mode, dirs } = bundle;
+  const { config, cwd, mode, dirs } = $;
   const base = basePath(cwd);
 
   for (const [ dir, def ] of BASE_DIRS) {
@@ -131,12 +251,12 @@ export function setBaseDirs (cli: Commands) {
 
       if (mode.download) {
         if (has('output', cli)) {
-          bundle.dirs[dir] = base(cli.output);
+          $.dirs[dir] = base(cli.output);
         } else {
-          bundle.dirs[dir] = base(config.import);
+          $.dirs[dir] = base(config.import);
         }
       } else {
-        bundle.dirs[dir] = base(config.import);
+        $.dirs[dir] = base(config.import);
       }
 
       continue;
@@ -145,12 +265,12 @@ export function setBaseDirs (cli: Commands) {
 
       if (mode.download) {
         if (has('output', cli)) {
-          bundle.dirs[dir] = base(cli.output);
+          $.dirs[dir] = base(cli.output);
         } else {
-          bundle.dirs[dir] = base(config.export);
+          $.dirs[dir] = base(config.export);
         }
       } else {
-        bundle.dirs[dir] = base(config.export);
+        $.dirs[dir] = base(config.export);
       }
 
       continue;
@@ -158,7 +278,7 @@ export function setBaseDirs (cli: Commands) {
     } else if (has(dir, cli) && cli[dir] === def) {
 
       if (config[dir] === def) {
-        bundle.dirs[dir] = base(cli[dir]);
+        $.dirs[dir] = base(cli[dir]);
         continue;
       } else {
         path = config[dir];
@@ -171,21 +291,27 @@ export function setBaseDirs (cli: Commands) {
     }
 
     if (isArray(path)) {
+
       const roots = uniq(path.map(base));
       dirs[dir] = roots.length === 1 ? roots[0] : roots;
+
     } else if (isString(path)) {
+
       dirs[dir] = base(path);
+
     } else {
+
       typeError({
         option: 'config',
         name: dir,
         provided: path,
         expects: 'string'
       });
+
     }
   }
 
-  bundle.watch.add(bundle.file.path); // add config file to watch
+  $.watch.add($.file.path); // add config file to watch
 
 };
 
@@ -198,7 +324,7 @@ export function setBaseDirs (cli: Commands) {
  */
 export async function setImportDirs () {
 
-  const { dirs, sync, mode } = bundle;
+  const { dirs, sync, mode } = $;
 
   if (!mode.download) return;
 
