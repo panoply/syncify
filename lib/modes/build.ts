@@ -10,11 +10,12 @@ import { compile as styles } from '~transform/styles';
 import { compile as svg } from '~transform/svgs';
 import { isUndefined, nil, toArray } from '~utils/native';
 import { parseFile, Type } from '~process/files';
-import { bundle } from '~config';
+import { $ } from '~state';
 import { log, line, gray, tui, c } from '~log';
 import { has, isEmpty, mapAsync } from 'rambdax';
 import { fileSize } from '~utils/utils';
 import * as timer from '~utils/timer';
+import { updateCache } from '~process/caches';
 
 /**
  * Build Function
@@ -25,9 +26,11 @@ import * as timer from '~utils/timer';
  */
 export async function build (callback?: Syncify) {
 
+  $.cache.lastResource = 'build';
+
   timer.start();
 
-  const { paths, dirs, watch, filters, mode } = bundle;
+  const { paths, dirs, watch, filters, mode } = $;
   const hasFilter = isEmpty(filters) === false;
   const parse = parseFile(paths, dirs.output);
   const match = anymatch(toArray((watch as Set<string>).values()));
@@ -116,6 +119,11 @@ export async function build (callback?: Syncify) {
       files: [],
       report: null
     },
+    metaobject: {
+      time: nil,
+      files: [],
+      report: null
+    },
     templates: {
       time: nil,
       files: [],
@@ -166,6 +174,8 @@ export async function build (callback?: Syncify) {
       log.build(group, count, file);
 
       const value = await (file.ext === '.json' ? json(file, callback) : call(file, callback));
+
+      $.cache.maps[file.output] = file.input;
 
       log.out(tui.tree('bottom', c.neonGreen(file.key)));
 
@@ -272,6 +282,10 @@ export async function build (callback?: Syncify) {
 
     }
   }
+
+  $.cache.lastBuild = Date.now();
+
+  await updateCache();
 
   log.nwl();
   log.update(`${line.gray}Build Completed ${gray(`~ ${timer.stop()}`)}`);
