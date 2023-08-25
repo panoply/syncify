@@ -1,5 +1,5 @@
 import type { Commands, Modes } from 'types';
-import { anyTrue, allFalse } from 'rambdax';
+import { anyTrue, allFalse, allTrue } from 'rambdax';
 import { white, blue } from '~log';
 import { invalidCommand } from '~options/validate';
 import { assign, values } from '~utils/native';
@@ -15,11 +15,11 @@ import { $ } from '~state';
 export function setModes (cli: Commands) {
 
   const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
-  const transfrom = anyTrue(cli.style, cli.script, cli.image, cli.svg);
+  const transform = anyTrue(cli.style, cli.script, cli.image, cli.svg);
   const watch = anyTrue(resource, cli.upload, cli.download) ? false : cli.watch;
   const modes = <Modes> assign($.mode, {
     watch,
-    hot: watch && cli.hot,
+    hot: allTrue(cli.watch, cli.hot),
     vsc: cli.vsc,
     interactive: cli.interactive,
     export: cli.export,
@@ -30,15 +30,15 @@ export function setModes (cli: Commands) {
     pull: cli.pull,
     force: cli.force,
     views: cli.views,
-    script: transfrom ? cli.script : false,
-    style: transfrom ? cli.style : false,
-    image: transfrom ? cli.image : false,
-    svg: transfrom ? cli.svg : false,
+    script: transform ? cli.script : false,
+    style: transform ? cli.style : false,
+    image: transform ? cli.image : false,
+    svg: transform ? cli.svg : false,
     terse: anyTrue(cli.terse, cli.prod),
-    clean: anyTrue(resource, transfrom, cli.upload) ? false : cli.clean,
+    clean: anyTrue(resource, transform, cli.upload) ? false : cli.clean,
     build: anyTrue(cli.export, cli.watch, cli.download) ? false : cli.build,
-    upload: anyTrue(transfrom, watch) ? false : cli.upload,
-    download: anyTrue(resource, transfrom, cli.upload, cli.watch, cli.build) ? false : cli.download
+    upload: anyTrue(transform, watch) ? false : cli.upload,
+    download: anyTrue(resource, transform, cli.upload, cli.watch, cli.build) ? false : cli.download
   });
 
   if (allFalse(...values(modes))) {
