@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import type { AxiosRequestConfig } from 'axios';
-import { basename, extname } from 'node:path';
+import { basename, extname } from 'pathe';
 import glob from 'fast-glob';
 import anymatch, { Tester } from 'anymatch';
 import { pathExists } from 'fs-extra';
@@ -9,10 +9,10 @@ import { anyTrue, has } from 'rambdax';
 import { bundleRequire } from '~utils/require';
 import { lastPath, normalPath, globPath } from '~utils/paths';
 import { isArray, isObject, isString, isUndefined, assign, isFunction } from '~utils/native';
-import { typeError, invalidError, unknownError, warnOption, throwError } from '~options/validate';
+import { typeError, invalidError, warnOption, throwError } from '~options/validate';
 import { cyan } from '~cli/ansi';
 import { CONFIG_FILE_EXT } from '~const';
-import { bundle } from '~config';
+import { $ } from '~state';
 import { hasRenamespace } from '~utils/utils';
 
 /* -------------------------------------------- */
@@ -53,7 +53,7 @@ interface NormalizeTransform {
   flatten?: boolean;
   /**
    * Whether or not the input should be added to the bundle _watch_ `Set<string>` reference.
-   * When `true` the resolved globs are added to `bundle.watch` model.
+   * When `true` the resolved globs are added to `$.watch` model.
    */
   addWatch?: boolean;
   /**
@@ -156,10 +156,10 @@ export function getResolvedPaths<R extends string[] | Resolver> (
   hook?: ((uri: string) => string | string[])
 ): R {
 
-  const { cwd } = bundle;
+  const { cwd } = $;
   const match: string[] | false = isFunction(hook) ? [] : false;
   const warn = warnOption('Path Resolver');
-  const path = normalPath(bundle.dirs.input); // Path normalizer
+  const path = normalPath($.dirs.input); // Path normalizer
 
   if (isArray(filePath)) {
 
@@ -300,7 +300,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
   if (isString(transforms)) {
 
     const { paths, match } = getResolvedPaths<Resolver>(transforms, (watch) => {
-      if (opts.addWatch) bundle.watch.add(watch);
+      if (opts.addWatch) $.watch.add(watch);
       return globPath(watch);
     });
 
@@ -341,7 +341,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
     if (transforms.every(isString)) {
 
       const { paths, match } = getResolvedPaths<Resolver>(transforms, watch => {
-        if (opts.addWatch) bundle.watch.add(watch);
+        if (opts.addWatch) $.watch.add(watch);
         return globPath(watch);
       });
 
@@ -384,7 +384,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
         }
 
         const { paths, match } = getResolvedPaths<Resolver>(transforms, watch => {
-          if (opts.addWatch) bundle.watch.add(watch);
+          if (opts.addWatch) $.watch.add(watch);
           return globPath(watch);
         });
 
@@ -413,7 +413,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
     if (has('input', transforms)) {
 
       const { paths, match } = getResolvedPaths<Resolver>(transforms.input, watch => {
-        if (opts.addWatch) bundle.watch.add(watch);
+        if (opts.addWatch) $.watch.add(watch);
         return globPath(watch);
       });
 
@@ -456,7 +456,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
           if (rename) o.rename = asset ? prop.slice(7) : prop.slice(9);
 
           const { paths, match } = getResolvedPaths<Resolver>(option, watch => {
-            if (opts.addWatch) bundle.watch.add(watch);
+            if (opts.addWatch) $.watch.add(watch);
             return globPath(watch);
           });
 
@@ -475,7 +475,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
           }
 
           const { paths, match } = getResolvedPaths<Resolver>(option.input, watch => {
-            if (opts.addWatch) bundle.watch.add(watch);
+            if (opts.addWatch) $.watch.add(watch);
             return globPath(watch);
           });
 
@@ -497,7 +497,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
           if (option.every(isString)) {
 
             const { paths, match } = getResolvedPaths<Resolver>(option, watch => {
-              if (opts.addWatch) bundle.watch.add(watch);
+              if (opts.addWatch) $.watch.add(watch);
               return globPath(watch);
             });
 
@@ -543,7 +543,7 @@ export function getTransform<T> (transforms: any, opts: NormalizeTransform): T {
  */
 export function getModules (name: string) {
 
-  const { pkg } = bundle;
+  const { pkg } = $;
 
   return anyTrue(
     (has('devDependencies', pkg) && has(name, pkg.devDependencies)),
