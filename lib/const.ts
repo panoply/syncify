@@ -1,3 +1,5 @@
+import { PathBundle } from 'types';
+
 /**
  * Log Snipper frames
  */
@@ -29,14 +31,10 @@ export const CONFIG_FILES = [
  * Syncify cache directories
  */
 export const CACHE_DIRS = [
-  'style',
-  'script',
-  'svg',
-  'metafields',
-  'pages',
-  'sections',
-  'redirects',
-  'vscode'
+  'caches',
+  'sourcemaps',
+  'sourcemaps/style',
+  'sourcemaps/script'
 ];
 
 /**
@@ -53,7 +51,7 @@ export const BASE_DIRS = [
 /**
  * Syncify path Keys
  */
-export const PATH_KEYS = [
+export const PATH_KEYS: Array<Exclude<keyof PathBundle, 'transforms'>> = [
   'assets',
   'config',
   'layout',
@@ -62,6 +60,7 @@ export const PATH_KEYS = [
   'sections',
   'snippets',
   'templates',
+  'metaobject',
   'metafields',
   'pages',
   'redirects'
@@ -73,6 +72,7 @@ export const PATH_KEYS = [
 export const THEME_DIRS = [
   'templates',
   'templates/customers',
+  'templates/metaobject',
   'assets',
   'config',
   'layout',
@@ -155,6 +155,11 @@ export const REGEX_OBJECT = /({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g;
  * Shopify response URI/URL address
  */
 export const REGEX_ADDRESS = /((?:www|http:|https:)+[^\s]+[\w])/g;
+
+/**
+ * Shopify Filename exists error
+ */
+export const REGEX_FILENAME = /(?<=Filename\s)([\w._-]+)(?=\salready)/;
 
 /**
  * Shopify response regex capture
