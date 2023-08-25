@@ -2,6 +2,7 @@ import type { Filters, Theme } from 'types';
 import type { Bundle } from '~state';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import { allFalse, anyTrue, isEmpty } from 'rambdax';
+import { relative } from 'pathe';
 import { getTime, plural, toUpcase } from '~utils/utils';
 import { keys, nil, nl, wsr, log, toArray, values, ws } from '~utils/native';
 import { warnings } from '../options/validate';
@@ -136,8 +137,9 @@ export function start ($: Bundle) {
 
   if (!isEmpty($.filters)) {
     text.push(
-      `${c.line.gray}${c.whiteBright.bold('Filters')}`,
-      `${c.line.gray}` + getFilters($.filters)
+      c.line.gray,
+      `${c.line.gray}${c.whiteBright.bold('--filters')}`,
+      `${c.line.gray}` + getFilters($.cwd, $.filters)
     );
   }
 
@@ -220,15 +222,14 @@ export function start ($: Bundle) {
  *
  * Generates the spawn process id runtime list
  */
-function getFilters (filters: Filters) {
+function getFilters (cwd: string, filters: Filters) {
 
-  return values(filters).flat().reduce<string>((string, path) => {
+  return values(filters).flat().reduce<string>((string, path, index, size) => {
 
     string += (
-      nl +
-      c.line.gray +
-      c.DSH + ws +
-      c.whiteBright(path)
+      (index > 0 ? (nl + c.line.gray) : '') +
+      ws + ws +
+      c.white(relative(cwd, path))
     );
 
     return string;
