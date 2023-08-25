@@ -558,6 +558,31 @@ export function failed (path: string) {
 
 };
 
+export function configChanges () {
+
+  nwl('yellow');
+  log(c.line.yellow + c.bold.yellow(`WARNING ${c.TLD} RESTART IS REQUIRED`));
+  nwl('yellow');
+  log(
+    c.line.yellow +
+    c.bold.yellow(`Changes to ${c.neonCyan($.file.base)} require you restart watch mode.`) + nl +
+    c.line.yellow +
+    c.bold.yellow('Failure to restart watch mode will prevent changes from being reflected.')
+  );
+
+  nwl('yellow');
+
+  const notification = notifier.notify({
+    title: 'WARNING',
+    sound: 'Pop',
+    wait: true,
+    message: `Changes in ${$.file.base} will not reflect until you to restart watch mode.`
+  });
+
+  notification.notify();
+
+}
+
 /**
  * Log Failed - `red`
  *
