@@ -1,12 +1,12 @@
 import type { Commands, Config } from 'types';
 import dotenv from 'dotenv';
-import { join } from 'node:path';
+import { join } from 'pathe';
 import { anyTrue, has, includes } from 'rambdax';
 import { DSH, blue, white } from '~cli/ansi';
 import { throwError, invalidCommand, invalidTarget } from '~options/validate';
 import { authURL } from '~options/utilities';
 import { $ } from '~state';
-import * as u from '~utils/native';
+import { keys, isArray } from '~utils/native';
 
 /**
  * Resolve Stores
@@ -57,7 +57,7 @@ export function setStores (cli: Commands, config: Config) {
 
   const stores = cli._[0].split(',');
   const file = dotenv.config({ path: join($.cwd, '.env') });
-  const array = u.isArray(config.stores) ? config.stores : [ config.stores ];
+  const array = isArray(config.stores) ? config.stores : [ config.stores ];
   const items = array.filter(({ domain }) => includes(domain, stores));
   const queue = items.length > 1;
 
@@ -88,29 +88,32 @@ export function setStores (cli: Commands, config: Config) {
       ? (cli.theme as any).split(',')
       : has(store.domain, cli)
         ? cli[store.domain].split(',')
-        : u.keys(store.themes);
+        : keys(store.themes);
 
     for (const target of themes) {
 
       if (!has(target, store.themes)) {
 
-        invalidTarget({
-          type: 'theme',
-          expected: u.keys(store.themes).join(','),
-          provided: target,
-          message: [
+        invalidTarget(
+          {
+            type: 'theme',
+            expected: keys(store.themes).join(','),
+            provided: target,
+            message: [
             `Unknown theme target (${blue(target)}) provided to ${blue(store.domain)} store`,
             `Your ${blue($.file.base)} file contains no such theme using this name.`
-          ],
-          fix: [
+            ],
+            fix: [
             `Provide an ${blue('expected')} theme target or update/add an existing target.`,
             `You have ${blue(`${themes.length}`)} theme targets defined for ${blue(store.domain)}:`,
             '',
             `${DSH} ${themes.join(`\n${DSH} `)}`,
             ''
-          ]
+            ]
 
-        });
+          }
+        );
+
       }
 
       // Let populate the model with theme
@@ -128,36 +131,43 @@ export function setStores (cli: Commands, config: Config) {
 
   if (storeRequired) {
     if ($.sync.stores.length === 0) {
-      return invalidCommand({
-        expected: 'syncify <store>',
-        message: [
-          'You have not provided store to target, which is required',
-          'when running in a resource mode that syncs to a remote source'
-        ],
-        fix: [
-          'Provide the store target name as the first command argument followed by themes',
-          'target/s and other flags. Based on your current configuration:',
-          '',
+
+      return invalidCommand(
+        {
+          expected: 'syncify <store>',
+          message: [
+            'You have not provided store to target, which is required',
+            'when running in a resource mode that syncs to a remote source'
+          ],
+          fix: [
+            'Provide the store target name as the first command argument followed by themes',
+            'target/s and other flags. Based on your current configuration:',
+            '',
           `${DSH} ${white('$')} syncify ${array.join(`\n${DSH} ${white('$')} syncify `)}`,
           ''
-        ]
-      });
+          ]
+        }
+      );
+
     }
   }
 
   if ($.sync.themes.length === 0) {
     if (themeRequired) {
-      return invalidCommand({
-        expected: '-t <theme>',
-        message: [
-          'You have not provided a theme to target, which is required',
-          'when running this resource mode.'
-        ],
-        fix: [
+
+      return invalidCommand(
+        {
+          expected: '-t <theme>',
+          message: [
+            'You have not provided a theme to target, which is required',
+            'when running this resource mode.'
+          ],
+          fix: [
           `Provide a theme name to target following a ${blue('-t')} or ${blue('--theme')} flag.`,
           'Theme targets should be passed as the 2nd argument, the 1st argument should be store name/s.'
-        ]
-      });
+          ]
+        }
+      );
     }
   }
 
