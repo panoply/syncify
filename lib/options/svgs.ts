@@ -1,14 +1,14 @@
 import { Merge } from 'type-fest';
 import { Tester } from 'anymatch';
 import { Config, SVGBundle, SVGOConfig, SVGSprite, SVGFile, SVGSpriteConfig } from 'types';
-import { extname, relative } from 'node:path';
+import { extname, relative } from 'pathe';
 import { has } from 'rambdax';
 import merge from 'mergerino';
 import { cyan } from '~log';
 import { unknownError, throwError, missingOption, invalidError, warnOption, missingDependency } from '~options/validate';
 import { isObject } from '~utils/native';
 import { load } from '~transform/svgs';
-import { bundle, processor } from '~config';
+import { $ } from '~state';
 import { getTransform, getModules } from '~options/utilities';
 import { uuid } from '~utils/utils';
 
@@ -22,7 +22,7 @@ export async function setSvgOptions (config: Config) {
 
   if (!has('svg', config.transforms)) return;
 
-  const { sprite, svgo } = processor;
+  const { sprite, svgo } = $.processor;
   const warn = warnOption('svg transform');
 
   svgo.installed = getModules('svgo');
@@ -56,7 +56,7 @@ export async function setSvgOptions (config: Config) {
 
     const files = (svg.input as string[]).filter(path => {
       if (extname(path) !== '.svg') {
-        warn('Excluded file which is not an SVG type', relative(bundle.cwd, path));
+        warn('Excluded file which is not an SVG type', relative($.cwd, path));
         return false;
       } else {
         return true;
@@ -104,11 +104,15 @@ export async function setSvgOptions (config: Config) {
       } else {
 
         if (svgo.installed && sprite.installed) {
-          missingOption('transform.svg', 'format', 'sprite | file', [
+          missingOption(
+            'transform.svg', 'format',
+            'sprite | file',
+            [
             `SVG transforms require you to define ${cyan('format')} when both SVGO and SVG Sprite`,
             'processors are installed. Syncify needs to knows how is should handle the input and',
             'which processor to use for the transform.'
-          ]);
+            ]
+          );
         } else if (svgo.installed && !sprite.installed) {
 
           o.format = 'file';
@@ -120,7 +124,10 @@ export async function setSvgOptions (config: Config) {
           o.sprite = true;
 
         } else {
-          unknownError('transform > svg', 'Cannot resolve processor, try defining a format.');
+          unknownError(
+            'transform > svg',
+            'Cannot resolve processor, try defining a format.'
+          );
         }
       }
     } else {
@@ -142,12 +149,17 @@ export async function setSvgOptions (config: Config) {
         }
 
       } else {
-        invalidError('transform > svg', 'format', svg.format, '"sprite" | "file"');
+        invalidError(
+          'transform > svg',
+          'format',
+          svg.format,
+          '"sprite" | "file"'
+        );
       }
 
     }
 
-    bundle.svg.push(o);
+    $.svg.push(o);
 
   };
 
