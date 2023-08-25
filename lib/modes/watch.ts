@@ -9,7 +9,7 @@ import { compile as pages } from '~transform/pages';
 import { compile as svgs } from '~transform/svgs';
 import { isUndefined } from '~utils/native';
 import { Kind, parseFile, Type } from '~process/files';
-import { bundle } from '~config';
+import { $ } from '~state';
 import { log } from '~log';
 import { isNil } from 'rambdax';
 
@@ -20,19 +20,22 @@ import { isNil } from 'rambdax';
  */
 export function watch (callback: Syncify) {
 
-  const { sync, watch, mode, paths, wss, dirs } = bundle;
+  $.cache.lastResource = 'watch';
+
+  const { sync, watch, mode, paths, wss, dirs } = $;
 
   const request = client(sync);
   const parse = parseFile(paths, dirs.output);
 
-  if (mode.hot) bundle.wss.connected();
+  if (mode.hot) $.wss.connected();
 
-  (watch as WatchBundle).on('all', async function (event, path) {
+  (watch as WatchBundle).on('all', function (event, path) {
 
     const file: File = parse(path);
 
     if (isUndefined(file)) return;
 
+    if (file.base === $.file.base) return log.configChanges();
     if (file.type !== Type.Spawn) log.changed(file);
 
     if (event === 'change' || event === 'add') {
@@ -67,11 +70,15 @@ export function watch (callback: Syncify) {
 
       } else if (file.type === Type.Page) {
 
-        return pages(file, callback);
+        return pages(file, request.pages, callback);
 
       } else if (file.type === Type.Svg) {
 
         return svgs(file, request.assets, callback);
+
+      } else if (file.type === Type.Asset || file.type === Type.Spawn) {
+
+        return asset(file, request.assets, callback);
 
       }
 
@@ -112,10 +119,6 @@ export function watch (callback: Syncify) {
       } else if (file.type === Type.Template && file.kind === Kind.Liquid) {
 
         value = await liquid(file, callback);
-
-      } else if (file.type === Type.Asset || file.type === Type.Spawn) {
-
-        value = await asset(file, callback);
 
       }
 
