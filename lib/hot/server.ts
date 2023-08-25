@@ -1,4 +1,4 @@
-import { join, basename } from 'node:path';
+import { join, basename } from 'pathe';
 import { Server } from 'ws';
 import statics from 'serve-static';
 import handler from 'finalhandler';
