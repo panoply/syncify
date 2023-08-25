@@ -1,103 +1,89 @@
-#!/usr/bin/env node
-
-/* eslint key-spacing: ["error", {
-  "multiLine": {
-    "beforeColon": true,
-    "afterColon":true
-  },
-  "align": {
-      "beforeColon": true,
-      "afterColon": true,
-      "on": "colon"
-  }
-}] */
-
 import { argv } from 'node:process';
 import { log } from '~log';
 import { run } from '.';
 import mm from 'minimist';
 
 run(mm(argv.slice(1), {
-  alias : {
+  alias: {
 
     /* DIRECTORIES -------------------------------- */
 
-    config : 'c',
-    input  : 'i',
-    output : 'o',
+    config: 'c',
+    input: 'i',
+    output: 'o',
 
     /* MODES -------------------------------------- */
 
-    build    : 'b',
-    watch    : 'w',
-    upload   : 'u',
-    download : 'd',
+    build: 'b',
+    watch: 'w',
+    upload: 'u',
+    download: 'd',
 
     /* RESOURCE ----------------------------------- */
 
-    theme : 't',
-    help  : 'h',
-    spawn : 's',
+    theme: 't',
+    help: 'h',
+    spawn: 's',
 
     /* OPERATIONS --------------------------------- */
 
-    filter : 'f',
-    delete : 'del'
+    filter: 'f',
+    delete: 'del'
 
   },
-  default : {
+  default: {
 
-    cwd : process.cwd(),
+    cwd: process.cwd(),
 
     /* DIRECTORIES -------------------------------- */
 
-    config : '.',
-    input  : 'source',
+    config: '.',
+    input: 'source',
 
     /* ENV ---------------------------------------- */
 
-    cli  : true,
-    dev  : true,
-    prod : false,
+    cli: true,
+    dev: true,
+    prod: false,
 
     /* MODES -------------------------------------- */
 
-    import      : false,
-    export      : false,
-    build       : false,
-    watch       : false,
-    upload      : false,
-    download    : false,
-    terse       : false,
-    hot         : false,
-    help        : false,
-    interactive : false,
+    import: false,
+    export: false,
+    build: false,
+    watch: false,
+    upload: false,
+    download: false,
+    terse: false,
+    hot: false,
+    help: false,
+    interactive: false,
 
     /* TRANSFORMS --------------------------------- */
 
-    views  : false,
-    script : false,
-    style  : false,
-    svg    : false,
-    image  : false,
+    views: false,
+    script: false,
+    style: false,
+    svg: false,
+    image: false,
 
     /* RESOURCES ---------------------------------- */
 
-    metafields : false,
-    pages      : false,
-    redirects  : false,
+    metafields: false,
+    pages: false,
+    redirects: false,
 
     /* OPERATIONS --------------------------------- */
-    clean  : false,
-    silent : false,
-    force  : false,
+    clean: false,
+    silent: false,
+    force: false,
 
     /* TODO --------------------------------------- */
 
-    setup : false,
-    strap : false
+    setup: false,
+    strap: false
   },
-  boolean : [
+  boolean: [
 
     /* MODES -------------------------------------- */
 
@@ -144,7 +130,7 @@ run(mm(argv.slice(1), {
     'svg',
     'image'
   ],
-  string : [
+  string: [
 
     /* DIRECTORIES -------------------------------- */
 
