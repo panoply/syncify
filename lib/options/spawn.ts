@@ -7,7 +7,8 @@ import { gray } from '~cli/ansi';
 import { typeError } from '~options/validate';
 import { log } from '~log';
 import { $ } from '~state';
-import * as u from '~utils/native';
+import treeKill from 'tree-kill';
+import { isObject, isString, nil, keys, ws, isArray, create } from '~utils/native';
 
 /**
  * Set Spawns
@@ -25,7 +26,7 @@ export function setSpawns (config: Config) {
 
   if (!has('spawn', config) || isNil(config.spawn)) return;
 
-  if (!u.isObject(config.spawn)) {
+  if (!isObject(config.spawn)) {
     typeError({
       option: 'config',
       name: 'spawn',
@@ -40,7 +41,7 @@ export function setSpawns (config: Config) {
   if (mode.watch && has('watch', config.spawn)) run = 'watch';
   if (isNil(mode) || isNil(config.spawn[run])) return;
 
-  if (!u.isObject(config.spawn[run])) {
+  if (!isObject(config.spawn[run])) {
     typeError({
       option: 'spawn',
       name: run,
@@ -49,7 +50,7 @@ export function setSpawns (config: Config) {
     });
   }
 
-  const props = u.keys(config.spawn[run]);
+  const props = keys(config.spawn[run]);
 
   if (props.length === 0) return;
 
@@ -57,18 +58,18 @@ export function setSpawns (config: Config) {
 
     const command = config.spawn[run][name];
 
-    if (u.isString(command)) {
+    if (isString(command)) {
 
       // create the command model
       $.spawn.commands[name] = {
-        cmd: u.nil,
+        cmd: nil,
         args: [],
         pid: NaN
       };
 
       // convert to an array
-      const cmd = (command as string).trimStart().indexOf(u.ws) > -1
-        ? (command as string).trimStart().split(u.ws) as string[]
+      const cmd = (command as string).trimStart().indexOf(ws) > -1
+        ? (command as string).trimStart().split(ws) as string[]
         : [ command ] as string[];
 
       $.spawn.commands[name].cmd = cmd.shift();
@@ -76,11 +77,14 @@ export function setSpawns (config: Config) {
 
       spawned(name, $.spawn.commands[name], log.spawn(name));
 
-    } else if (u.isArray(command)) {
+    } else if (isArray(command)) {
 
       // create the command model
       const cmd = command.shift();
-      $.spawn.commands[name] = { cmd, args: command, pid: NaN };
+      $.spawn.commands[name] = create(null);
+      $.spawn.commands[name].cmd = cmd;
+      $.spawn.commands[name].args = command;
+      $.spawn.commands[name].pid = NaN;
 
       spawned(name, $.spawn.commands[name], log.spawn(name));
 
@@ -100,16 +104,16 @@ export function setSpawns (config: Config) {
     queue.pause();
     queue.clear();
 
-    log.nwl(u.nil);
+    log.nwl(nil);
 
     spawn.streams.forEach((child, name) => {
 
-      u.error(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
-      child.kill();
+      log.out(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
+      treeKill(child.pid);
 
     });
 
-    log.nwl(u.nil);
+    log.nwl(nil);
 
     spawn.streams.clear();
     process.exit(0);
