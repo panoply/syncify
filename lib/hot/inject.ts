@@ -1,5 +1,5 @@
 import { pathExists, readFile, writeFile } from 'fs-extra';
-import { basename } from 'node:path';
+import { basename } from 'pathe';
 import { nl } from '~utils/native';
 import { log, tui } from '~log';
 import { $ } from '~state';
