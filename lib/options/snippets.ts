@@ -1,8 +1,8 @@
 import { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
 import { typeError, invalidError } from '~options/validate';
+import { isObject, isString, isArray, isBoolean } from '~utils/native';
 import { $ } from '~state';
-import * as u from '~utils/native';
 
 /**
  * Snippet Options
@@ -16,10 +16,10 @@ export function setSnippetOptions (config: Config) {
   const { snippets } = config.views;
 
   if (isNil(snippets)) return;
-  if (u.isObject(snippets) && isEmpty(snippets)) return;
+  if (isObject(snippets) && isEmpty(snippets)) return;
 
   // Ensure the section option is an object
-  if (!u.isObject(snippets)) {
+  if (!isObject(snippets)) {
     typeError({
       option: 'views',
       name: 'snippets',
@@ -32,7 +32,7 @@ export function setSnippetOptions (config: Config) {
 
     // Validate the boolean type values of the option
     if (option === 'prefixDir') {
-      if (u.isBoolean(snippets[option])) {
+      if (isBoolean(snippets[option])) {
         $.snippet[option] = snippets[option];
         continue;
       } else {
@@ -48,7 +48,7 @@ export function setSnippetOptions (config: Config) {
     // Validate the prefix separator option, in Shopifysnippets
     // We cannot use dot prefixes, we ensure only accepts values are defined.
     if (option === 'separator') {
-      if (u.isString(snippets[option])) {
+      if (isString(snippets[option])) {
 
         // Only these character can be prefixers
         if (/[.@:_-]/.test(snippets[option])) {
@@ -70,9 +70,9 @@ export function setSnippetOptions (config: Config) {
     // Validate the global globs which should have no prefixes applied.
     if (option === 'global') {
 
-      const globals = u.isString(snippets[option]) ? [ snippets[option] ] : snippets[option];
+      const globals = isString(snippets[option]) ? [ snippets[option] ] : snippets[option];
 
-      if (u.isArray(globals)) {
+      if (isArray(globals)) {
 
         if (globals.length > 0) {
           $.snippet[option] = new RegExp(`${globals.join('|')}`);
@@ -86,6 +86,7 @@ export function setSnippetOptions (config: Config) {
           provided: snippets[option],
           expects: 'string | string[]'
         });
+
       }
     }
   }
