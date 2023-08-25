@@ -1,13 +1,13 @@
 import type { Config } from 'types';
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
-import { join, relative } from 'node:path';
+import { join, relative } from 'pathe';
 import { has } from 'rambdax';
 import { normalPath } from '~utils/paths';
 import { warnOption } from '~options/validate';
 import { PATH_KEYS } from '~const';
 import { $ } from '~state';
-import * as u from '~utils/native';
+import { isArray } from '~utils/native';
 
 /**
  * Get Paths
@@ -31,18 +31,28 @@ export async function setPaths (config: Config) {
     if (key === 'customers') {
 
       uri = has(key, config.paths)
-        ? u.isArray(config.paths[key])
+        ? isArray(config.paths[key])
           ? (config.paths[key] as string[]).map(path)
           : [ path(config.paths[key]) ]
         : [ path('templates/customers') ];
 
+    } else if (key === 'metaobject') {
+
+      uri = has(key, config.paths)
+        ? isArray(config.paths[key])
+          ? (config.paths[key] as string[]).map(path)
+          : [ path(config.paths[key]) ]
+        : [ path('templates/metaobject') ];
+
     } else if (has(key, config.paths)) {
 
-      uri = u.isArray(config.paths[key])
-        ? config.paths[key].map(path)
+      uri = isArray(config.paths[key])
+        ? (config.paths[key] as string[]).map(path)
         : [ path(config.paths[key]) ];
 
-      if (key === 'assets') uri.push(join($.dirs.output, 'assets/*'));
+      if (key === 'assets') {
+        uri.push(join($.dirs.output, 'assets/*'));
+      }
 
     } else if (key === 'redirects' && has(key, config.paths)) {
 
@@ -61,15 +71,35 @@ export async function setPaths (config: Config) {
       // SKIPPING THESE PREVENTS WARNINGS FROM SHOWING
       if (p.endsWith('metafields') || p.endsWith('pages') || p.endsWith('redirects')) continue;
 
-      const exists = await glob(p);
+      const paths = await glob(p, { cwd: $.cwd });
 
-      if (exists.length === 0) warn('No files could be resolved in', relative($.cwd, p));
+      if (paths.length === 0) {
 
-      if (!$.watch.has(p)) $.watch.add(p);
+        warn('No files could be resolved in', relative($.cwd, p));
+
+      } else {
+
+        // We will create the set if null
+        // otherwise we iterate and populate the set.
+        //
+        if ($.paths[key].input === null) {
+          $.paths[key].input = new Set(paths);
+        } else {
+          for (const entry of paths) {
+            $.paths[key].input.add(entry);
+          }
+        }
+
+        // TODO
+        // IMPROVE THIS LOGIC
+        //
+        $.watch.add(p);
+
+      }
 
     }
 
-    $.paths[key] = anymatch(uri);
+    $.paths[key].match = anymatch(uri);
 
   }
 
