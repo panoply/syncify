@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
 
-import type { Pages, Sections, Snippets } from './views';
-import type { HOTConfig } from '../internal/hot';
+import type { Sections, Snippets } from './views';
+import type { HOTConfig } from '../bundle/hot';
 import type { ScriptTerse, JSONTerse, ViewTerse } from './terser';
-import type { PluginHooks } from '../internal/plugin';
+import type { PluginHooks } from '../bundle/plugin';
 import type { JSONConfig } from '../transforms/json';
 import type { SharpConfig } from '../transforms/image';
+import type { PagesConfig } from 'types/transforms/pages';
 import type { ScriptTransformer, ESBuildConfig } from '../transforms/script';
 import type { StyleTransformer, SASSConfig, PostCSSConfig } from '../transforms/style';
 import type { SVGTransformer, SVGOConfig, SVGSpriteConfig } from '../transforms/svg';
@@ -69,7 +70,7 @@ export interface Views {
   /**
    * Static page handling
    */
-  pages?: Pages;
+  pages?: PagesConfig;
   /**
    * Snippet file handling (ie: sub-directory grouping)
    */
@@ -301,7 +302,7 @@ export interface Stores {
    * structure. The `key` values represent target names that
    * will be used in the CLI.
    */
-  themes: { [target: string]: number; }
+  themes: { [target: string]: number }
 }
 
 /* -------------------------------------------- */
@@ -339,20 +340,6 @@ export interface Directories {
    * @default '/'
    */
   config?: string;
-  /**
-   * The resolved `pages` directory path, if multiple paths
-   * are defined the value will be an array list.
-   *
-   * @default '/source/pages/'
-   */
-  pages?: string;
-  /**
-   * The resolved `metafields` directory path, if multiple paths
-   * are defined the value will be an array list.
-   *
-   * @default '/source/metafields/'
-   */
-  metafields?: string | string[]
 }
 
 /* -------------------------------------------- */
@@ -390,6 +377,12 @@ export interface Paths<T = string | string[]> {
    * @default 'source/templates'
    */
   templates?: T
+  /**
+   * An array list of files to be uploaded as metaobject templates
+   *
+   * @default 'source/templates/metaobject'
+   */
+  metaobject?: T
   /**
    * An array list of files to be uploaded as template/customers
    *
@@ -435,11 +428,11 @@ export interface Paths<T = string | string[]> {
 /**
  * The Configuration model
  */
-export interface Config extends Directories {
+export interface Config<T = Stores> extends Directories {
   /**
    * Define your Shopify store/s and thier theme/s
    */
-  stores: Stores | Stores[];
+  stores: T | Stores | Stores[];
   /**
    * Define customize input structures - Paths resolve to `input`
    */

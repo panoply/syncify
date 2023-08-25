@@ -173,12 +173,12 @@ export interface StyleTerse extends CleanCSSOptions {
    *
    * @default false
    */
-  ofuscateClassNames?: boolean;
+  obfuscateClassNames?: boolean;
   /**
    * List of class names that should be excluded from
    * obfuscation and shortnaming.
    */
-  ofuscateWhitelist?: string[];
+  obfuscateWhitelist?: string[];
   /**
    * The alphabet used to generate the new class names.
    *
@@ -188,7 +188,7 @@ export interface StyleTerse extends CleanCSSOptions {
    *
    * @default 'abcefghijklmnopqrstuvwxyz0123456789'
    */
-  ofuscateAlphabet?: string;
+  obfuscateAlphabet?: string;
   /**
    * Excluded files from terser minification
    *
