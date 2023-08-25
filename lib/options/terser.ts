@@ -1,7 +1,7 @@
 import { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
 import { isBoolean, isObject, isRegex } from '~utils/native';
-import { bundle, terser, processor } from '~config';
+import { $ } from '~state';
 import { throwError, typeError, unknownError, warnOption } from '~options/validate';
 import { ESBUILD_NOT_INSTALLED } from '~const';
 import { getResolvedPaths } from './utilities';
@@ -14,11 +14,13 @@ import { getResolvedPaths } from './utilities';
  */
 export function setMinifyOptions (config: Config) {
 
+  const { terser, mode } = $;
+
   // Do not terser
   if (isBoolean(config.terser)) {
-    if (bundle.mode.terse === false && config.terser === false) return;
-    if (bundle.mode.terse === false && config.terser === true) {
-      bundle.mode.terse = true;
+    if (mode.terse === false && config.terser === false) return;
+    if (mode.terse === false && config.terser === true) {
+      mode.terse = true;
     }
   }
 
@@ -30,13 +32,13 @@ export function setMinifyOptions (config: Config) {
 
       // We don't care if false, or is nil, we can carry on as normal
       if (config.terser[key] === false || isNil(config.terser[key])) {
-        if (bundle.mode.terse === true) bundle.terse[key] = true;
+        if ($.mode.terse === true) $.terse[key] = true;
         continue;
       }
 
       if (key === 'script') {
 
-        if (processor.esbuild.installed === false && (
+        if ($.processor.esbuild.installed === false && (
           (
             isObject(config.terser[key]) &&
             isEmpty(config.terser[key]) === false
@@ -54,7 +56,7 @@ export function setMinifyOptions (config: Config) {
       if (isBoolean(config.terser[key])) {
 
         // use defaults when true
-        bundle.terser[key] = config.terser[key];
+        $.terser[key] = config.terser[key];
 
       } else if (isObject(terser[key])) {
 
