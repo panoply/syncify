@@ -3,21 +3,23 @@ import { join } from 'path';
 import { has } from 'rambdax';
 import { writeFile } from 'fs-extra';
 import { isFunction, isUndefined, isString, isBuffer } from '../utils/native';
-import { bundle } from '../config';
+import { $ } from '~state';
 import { log, c } from '~log';
-import * as timer from '../utils/timer';
-import * as request from '../requests/assets';
+import * as timer from '~utils/timer';
+import * as request from '~requests/assets';
 import merge from 'mergerino';
 
 export async function download (cb?: Syncify): Promise<void> {
+
+  $.cache.lastResource = 'download';
 
   timer.start();
 
   const hashook = isFunction(cb);
 
-  for (const theme of bundle.sync.themes) {
+  for (const theme of $.sync.themes) {
 
-    const store = bundle.sync.stores[theme.sidx];
+    const store = $.sync.stores[theme.sidx];
     const { assets } = await request.get<Requests.Assets>(theme.url, store.client);
 
     for (const { key } of assets) {
@@ -26,7 +28,7 @@ export async function download (cb?: Syncify): Promise<void> {
 
         const data = merge(store.client, { params: { 'asset[key]': key } });
         const { asset } = await request.get<Requests.Asset>(theme.url, data);
-        const output = join(bundle.dirs.import, store.domain, theme.target, key);
+        const output = join($.dirs.import, store.domain, theme.target, key);
         const buffer = has('attachment', asset)
           ? Buffer.from(asset.attachment, 'base64')
           : Buffer.from(asset.value || null, 'utf8');
