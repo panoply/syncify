@@ -36,6 +36,7 @@ export const defaults = (): Config => ({
     locales: 'locales/*.json',
     snippets: 'snippets/*.liquid',
     metafields: 'metafields/**/*.json',
+    metaobject: 'templates/customers/*.json',
     redirects: 'redirects.yaml',
     sections: [
       'sections/**/*.json',
