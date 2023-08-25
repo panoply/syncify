@@ -4,7 +4,7 @@ import type { LiteralUnion, Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Config as TailwindConfig } from 'tailwindcss';
 import type { Plugin as PostCSSPlugin, Transformer, TransformCallback } from 'postcss';
-import type { GetProcessorConfigs, RenamePaths } from '../internal/shared';
+import type { GetProcessorConfigs, RenamePaths } from '../bundle/shared';
 
 /* -------------------------------------------- */
 /* PROCESSOR CONFIGS                            */
@@ -205,7 +205,7 @@ export type SASSProcesser = GetProcessorConfigs<SASSConfig>
  */
 export type StyleBundle = Merge<StyleTransform, {
   /**
-   * A UUID reference for this bundle.
+   * A UUID reference for this $.
    */
   uuid: string;
   /**

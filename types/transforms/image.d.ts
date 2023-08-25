@@ -1,5 +1,5 @@
 import type { SharpOptions as SharpConfig } from 'sharp';
-import type { GetProcessorConfigs } from '../internal/shared';
+import type { GetProcessorConfigs } from '../bundle/shared';
 
 export type { SharpConfig };
 

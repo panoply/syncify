@@ -39,4 +39,13 @@ export interface JSONConfig {
  *
  * Bundling Configuration
  */
-export type JSONBundle = Merge<JSONConfig, { exclude: Tester }>;
+export type JSONBundle = Merge<JSONConfig, {
+  /**
+   * Paths to exclude from JSON processing
+   */
+  exclude: Tester;
+  /**
+   * The resolved cache path.
+   */
+  cache: string;
+}>;

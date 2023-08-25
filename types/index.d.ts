@@ -2,24 +2,24 @@ import { Config } from './config';
 import { Syncify as syncify } from './api';
 
 export type { Tsconfig } from 'tsconfig-type';
-export type { FileKeys } from './internal/file';
+export type { FileKeys } from './bundle/file';
 
 export * from './api';
 export * from './cli';
 export * from './config';
 export * from './config/views';
 export * from './config/terser';
-export * from './internal/cache';
-export * from './internal/filters';
-export * from './internal/markdown';
-export * from './internal/requests';
-export * from './internal/shared';
-export * from './internal/errors';
-export * from './internal/reports';
-export * from './internal/file';
-export * from './internal';
-export * from './internal/plugin';
-export * from './internal/hot';
+export * from './bundle/cache';
+export * from './bundle/filters';
+export * from './bundle/requests';
+export * from './bundle/shared';
+export * from './bundle/errors';
+export * from './bundle/reports';
+export * from './bundle/file';
+export * from './bundle';
+export * from './bundle/plugin';
+export * from './bundle/hot';
+export * from './transforms/pages';
 export * from './transforms/image';
 export * from './transforms/json';
 export * from './transforms/script';
@@ -27,13 +27,13 @@ export * from './transforms/style';
 export * from './transforms/svg';
 
 /**
- * ***Define Config:***
+ * **Define Config:**
  *
  * Provide to the default export in your `syncify.config.js` file.
  *
  * ---
  *
- * ***Supported Files:***
+ * **Supported Files:**
  *
  * - syncify.config.ts
  * - syncify.config.js
@@ -51,5 +51,5 @@ export * from './transforms/svg';
  * });
  *
  */
-export declare function defineConfig(config: Config): void
+export declare function defineConfig<T>(config: Config<T>): void;
 export default syncify;

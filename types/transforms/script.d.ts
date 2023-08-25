@@ -3,7 +3,7 @@ import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Tsconfig } from 'tsconfig-type';
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
-import type { GetProcessorConfigs, RenamePaths } from '../internal/shared';
+import type { GetProcessorConfigs, RenamePaths } from '../bundle/shared';
 
 type TargetBrowser = (
   | 'chrome'
@@ -259,7 +259,7 @@ export type ESBuildProcesser = Merge<GetProcessorConfigs<ESBuildOptions>, {
  */
 export interface ScriptBundle {
   /**
-   * A UUID reference for this bundle.
+   * A UUID reference for this $.
    */
   uuid: string;
   /**
@@ -302,7 +302,7 @@ export interface ScriptBundle {
   watchCustom: Tester;
   /**
    * ESBuild options which will either use the processor defaults or
-   * if defined on script bundle, will be merged with processor defaults.
+   * if defined on script $, will be merged with processor defaults.
    */
   esbuild: ESBuildOptions
 }
