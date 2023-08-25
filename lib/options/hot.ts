@@ -1,5 +1,5 @@
 import type { Config, HOTConfig } from 'types';
-import { join } from 'node:path';
+import { join } from 'pathe';
 import { socket } from '~hot/server';
 import { isObject, isBoolean } from '~utils/native';
 import { allFalse, isNil, isEmpty, has } from 'rambdax';
