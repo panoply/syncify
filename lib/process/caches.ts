@@ -1,30 +1,92 @@
+/* eslint-disable no-unused-vars */
+
+import { writeJson, writeJsonSync } from 'fs-extra';
 import { has } from 'rambdax';
-import { writeJson, readJson } from 'fs-extra';
-import { bundle, cache } from '../config';
-import { Cache } from '../../types';
+import { Requests } from 'types';
+import { $ } from '~state';
+import { isObject } from '~utils/native';
 
-type Files = keyof Omit<Cache, 'updated' | 'created' | 'sections' | 'pages'>
+export enum Cached {
+  /**
+   * A new cache record was created
+   */
+  Created = 1,
+  /**
+   * An exisiting cache record was updated.
+   */
+  Updated
 
-export async function getCache (key?: Files) {
+}
+
+/**
+ * Update Cache Sync
+ *
+ * Updates the `store.map` cache synchronously.
+ */
+export async function updateCacheSync () {
+
+  $.cache.updated = Date.now();
 
   try {
-    return readJson(cache[key].uri);
+
+    writeJsonSync($.cache.uri, $.cache, { spaces: 0 });
+
   } catch (e) {
-    throw new Error(e);
+
+    throw console.error(e);
+
   }
 
 }
 
-export function updateCache (key?: Files) {
+/**
+ * Update Pages
+ *
+ * Update or create page cache reference. Requires the `$.sync` (`store.domain`)
+ * the page `handle` and the remote Shopify page response. Returns a enum describing
+ * what operation took place.
+ */
+export async function pages (domain: string, record: Requests.Page) {
 
-  if (has('uri', cache[key])) {
-    writeJson(cache[key].uri, cache[key].data, { spaces: 0 }, (e) => {
-      if (e) throw console.error(e);
-    });
+  if (!has(domain, $.cache.pages)) {
+    $.cache.pages[domain] = { [record.id]: record };
+    await update();
+    return Cached.Created;
   }
 
-  writeJson(bundle.dirs.cache + 'store.map', cache, { spaces: 0 }, (e) => {
-    if (e) throw console.error(e);
-  });
+  if (!(record.id in $.cache.pages[domain])) {
+    $.cache.pages[domain][record.id] = record;
+    await update();
+    return Cached.Created;
+  }
+
+  $.cache.pages[domain][record.id] = record;
+
+  await update();
+
+  return Cached.Updated;
+
+}
+
+/**
+ * Update Cache
+ *
+ * Updates the `store.map` cache. Optionally accepts a cache dir reference to
+ * be updated, when provided the cache `data` of the this store will be updated
+ * and then from here the `store.map`
+ */
+export async function update () {
+
+  $.cache.updated = Date.now();
+
+  try {
+
+    await writeJson($.cache.uri, $.cache, { spaces: 0 });
+
+  } catch (e) {
+
+    throw console.error(e);
+
+  }
 
 }
