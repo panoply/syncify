@@ -542,6 +542,7 @@ export type WatchBundle = Merge<FSWatcher, {
    * Returns all watched paths
    */
   get paths (): string[]
+
 }>;
 
 /* -------------------------------------------- */
