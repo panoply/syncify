@@ -1,7 +1,7 @@
 import type { Syncify, File, ClientParam, ScriptBundle, WatchBundle } from 'types';
 import pNext, { getImport, getSizeStr, byteSize, fileSize } from '~utils/utils';
 import ESBuild, { Metafile } from 'esbuild';
-import { join, relative } from 'node:path';
+import { join, relative } from 'pathe';
 import { has, isNil, isType } from 'rambdax';
 import { isBuffer } from '~utils/native';
 import { writeFile } from 'fs-extra';
@@ -187,7 +187,7 @@ export async function compile <T extends ScriptBundle> (
 
         if (path.endsWith('.map')) {
 
-          const map = join($.cache.script.uri, file.base + '.map');
+          const map = join($.cache.sourcemaps.script, file.base + '.map');
 
           writeFile(map, text).catch(
             error.write('Error writing JavaScript Source Map to cache', {
