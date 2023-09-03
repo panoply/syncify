@@ -28,6 +28,7 @@ import type {
   ProcessorsBundle,
   PathBundle
 } from 'types';
+
 import type { ChildProcess } from 'node:child_process';
 import { argv } from 'node:process';
 import { PackageJson } from 'type-fest';
@@ -102,7 +103,17 @@ export const $ = new class Bundle {
   /**
    * The parsed contents of `package.json` file
    */
-  private static package: PackageJson = {};
+  private static package: PackageJson = create(null);
+
+  /**
+   * Cache file reference
+   */
+  private static cache: Cache = create(null);
+
+  /**
+   * Chokidar watch instance
+   */
+  private static watch: WatchBundle | Set<string | readonly string[]> = new Set();
 
   /**
    * Process Child
@@ -117,12 +128,7 @@ export const $ = new class Bundle {
   /**
    * Cached reference of the CLI commands passed
    */
-  public cli: Commands = {};
-
-  /**
-   * Cache references indexed from `node_modules/.syncify`
-   */
-  public cache: Cache = {};
+  public cli: Commands = create(null);
 
   /**
    * Websockets HOT reloading
@@ -134,14 +140,14 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public filters: Filters = {};
+  public filters: Filters = create(null);
 
   /**
    * Cache copy of the invoked commands in which syncify was started
    *
    * @default null
    */
-  public commands: Commands = null;
+  public commands: Commands = create(null);
 
   /**
    * The version defined in the package.json
@@ -156,18 +162,6 @@ export const $ = new class Bundle {
    * @default null
    */
   public cwd: string = null;
-
-  /**
-   * The terminal rows and columns size
-   *
-   * @default
-   * {
-   *   cols: number;
-   *   rows: number;
-   *   wrap: number;
-   * }
-   */
-  public terminal: { cols: number; rows: number; wrap?: number } = size();
 
   /**
    * The provided command passed on the CLI.
@@ -244,6 +238,7 @@ export const $ = new class Bundle {
       , 'history: false'
       , 'method: "hot"'
     ].join(', ') + ' %}'
+
   };
 
   /**
@@ -395,15 +390,6 @@ export const $ = new class Bundle {
   };
 
   /**
-   * Holds an instance of FSWatcher. Chokidar is leveraged in for watching,
-   * and this value exposes the instance and it can be used anywhere in the
-   * module. In addition, the main Chokidar is extended to support `.has()`
-   *
-   *  @default null // defaults to null unless watch mode is invoked
-   */
-  public watch: WatchBundle | Set<string | readonly string[]> = new Set();
-
-  /**
    * Directory structure paths.
    *
    * Includes a special `transforms` Map reference for transform related files
@@ -446,6 +432,11 @@ export const $ = new class Bundle {
    *}
    */
   public page: PageBundle = {
+    safeSync: true,
+    author: '',
+    global: null,
+    suffixDir: false,
+    importLanguage: 'html',
     export: {
       quotes: '“”‘’',
       html: true,
@@ -501,9 +492,13 @@ export const $ = new class Bundle {
      */
     json: false,
     /**
-      * View minification
-      */
-    views: false,
+     * Terse Liquid minification
+     */
+    liquid: false,
+    /**
+     * Terse Markup (HTML) minification
+     */
+    markup: false,
     /**
       * **NOTE YET AVAILABLE**
       *
@@ -516,6 +511,26 @@ export const $ = new class Bundle {
     script: false
   };
 
+  /**
+   * Holds an instance of FSWatcher. Chokidar is leveraged in for watching,
+   * and this value exposes the instance and it can be used anywhere in the
+   * module. In addition, the main Chokidar is extended to support `.has()`
+   *
+   * @default null // defaults to null unless watch mode is invoked
+   */
+  get watch () { return Bundle.watch; }
+  /**
+   * Set the FSWatch instance reference
+   */
+  set watch (instance: WatchBundle | Set<string | readonly string[]>) { Bundle.watch = instance; }
+  /**
+   * Cache reference
+   */
+  get cache () { return Bundle.cache; }
+  /**
+   * Re-assign the cache reference
+   */
+  set cache (cache: Cache) { Bundle.cache = cache; }
   /**
   * Merged terse minification configuration
   */
@@ -548,6 +563,10 @@ export const $ = new class Bundle {
    * Plugins
    */
   get plugins (): Plugins { return Bundle.plugins; }
+  /**
+   * The terminal rows and columns size
+   */
+  get terminal (): { cols: number; rows: number; wrap?: number } { return size(); }
 
 }();
 
