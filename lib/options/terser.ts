@@ -63,6 +63,7 @@ export function setMinifyOptions (config: Config) {
         for (const opt in config.terser[key]) {
 
           if (opt === 'exclude') {
+
             if (!isEmpty(config.terser[key][opt])) {
               terser[key][opt] = getResolvedPaths(config.terser[key][opt]);
             }
@@ -86,7 +87,11 @@ export function setMinifyOptions (config: Config) {
 
           } else {
 
-            if (!isNil(config.terser[key][opt]) && typeof terser[key][opt] !== typeof config.terser[key][opt]) {
+            if (
+              !isNil(config.terser[key][opt]) &&
+              typeof terser[key][opt] !==
+              typeof config.terser[key][opt]) {
+
               typeError({
                 option: `terser.${key}`,
                 name: opt,

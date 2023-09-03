@@ -8,7 +8,6 @@ import { log, error } from '~log';
 import { $ } from '~state';
 import merge from 'mergerino';
 import { event, getSizeStr } from '~utils/utils';
-import { hasPath } from 'rambdax';
 
 /**
  * Has Asset
@@ -86,7 +85,9 @@ export async function upload (asset: string, config: { theme: Theme, key: FileKe
  * Executes a request to a Shopify resource REST endpoint.
  * When request rates are exceeded the handler will re-queue them.
  */
-export async function get <T> (url: string, config: AxiosRequestConfig<Request>): Promise<T> {
+export async function get <T> (theme: string | Theme, config: AxiosRequestConfig<Request>): Promise<T> {
+
+  const url = typeof theme === 'string' ? theme : theme.url;
 
   return axios.get(url, config).then(({ data }) => {
 
@@ -95,8 +96,14 @@ export async function get <T> (url: string, config: AxiosRequestConfig<Request>)
   }).catch((e: AxiosError) => {
 
     if (e.response && (e.response.status === 429 || e.response.status === 500)) {
-      log.retrying(file.key, theme);
-      queue.add(() => sync(theme, file, config));
+
+      if (config.params['asset[key]']) {
+
+        log.retrying(config.params['asset[key]'], theme as Theme);
+
+        queue.add(() => get(theme, config));
+      }
+
     } else {
 
       if ($.mode.upload) {
@@ -105,14 +112,16 @@ export async function get <T> (url: string, config: AxiosRequestConfig<Request>)
 
       } else {
 
-        log.failed(file.key);
-        error.request(file.relative, e.response);
+        if (config.params['asset[key]']) {
+
+          log.failed(config.params['asset[key]']);
+          error.request(config.params['asset[key]'], e.response);
+
+        }
+
       }
 
     }
-
-    log.failed(url);
-    error.request(url, e.response);
 
   });
 
@@ -140,11 +149,12 @@ export async function sync (theme: Theme, file: File, config: Request) {
     queue.concurrency++;
   }
 
-  if (!mode.upload) timer.start();
+  if (!mode.upload && !mode.download) timer.start();
 
   const promise = await axios(config).then(({ headers, data }) => {
 
-    if (config.method === 'get') return data;
+    if (mode.download === false && config.method === 'get') return data;
+
     if (config.method === 'delete') {
 
       log.deleted(file.relative, theme);
@@ -169,6 +179,14 @@ export async function sync (theme: Theme, file: File, config: Request) {
           fileSize
         });
 
+      } else if (mode.download) {
+
+        event.emit('download', 'downloads', theme, {
+          key: file.key,
+          namespace: file.namespace,
+          data
+        });
+
       }
 
     }
@@ -181,10 +199,23 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
     if (e.response && (e.response.status === 429 || e.response.status === 500)) {
 
-      if (!mode.upload) log.retrying(file.key, theme);
+      if (!mode.upload && !mode.download) log.retrying(file.key, theme);
 
       queue.add(() => sync(theme, file, config));
 
+      if (mode.download) {
+
+        event.emit('download', 'retry', theme, {
+          key: file.key,
+          namespace: file.namespace,
+          get file () {
+            return file;
+          }
+        });
+
+        //  throw e.response;
+
+      }
     } else {
 
       if (mode.upload) {
@@ -197,6 +228,21 @@ export async function sync (theme: Theme, file: File, config: Request) {
           key: file.key,
           namespace: file.namespace,
           fileSize,
+          get file () {
+            return file;
+          },
+          get error () {
+            return e.response;
+          }
+        });
+
+        //  throw e.response;
+
+      } else if (mode.download) {
+
+        event.emit('download', 'failed', theme, {
+          key: file.key,
+          namespace: file.namespace,
           get file () {
             return file;
           },

@@ -120,7 +120,11 @@ export function suffix (color: Colors, prefix: Prefixes, message: string) {
       ? c.line.yellow
       : c.line.gray;
 
-  return line + c[color](prefix) + wsr(10 - prefix.length) + c.ARR + ws + c[color](message);
+  let space = 10 - prefix.length;
+
+  if (space < 0) space = 0;
+
+  return line + c[color](prefix) + wsr(space) + c.ARR + ws + c[color](message);
 
 };
 

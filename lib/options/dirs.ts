@@ -1,6 +1,6 @@
 import { Commands } from 'types';
 import { has, uniq } from 'rambdax';
-import { mkdir, emptyDir, pathExists } from 'fs-extra';
+import { mkdir, emptyDir, pathExists, remove } from 'fs-extra';
 import { join } from 'pathe';
 import { isArray, isString } from '~utils/native';
 import { basePath } from '~utils/paths';
@@ -16,6 +16,8 @@ import * as cache from '~process/caches';
  * This is a fallback function and only runs if `postinstall` was not triggered.
  */
 export async function setCacheDirs (path: string, options = { purge: false }) {
+
+  await remove(path);
 
   $.cache = {
     uri: join(path, 'build.map'),

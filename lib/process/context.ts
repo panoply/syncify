@@ -128,8 +128,6 @@ export function snippet (file: File) {
 
     if ($.snippet.baseDir.has(last)) return file;
 
-    console.log($.snippet);
-
     const rename = last + $.snippet.separator + file.base;
 
     file.name = rename;

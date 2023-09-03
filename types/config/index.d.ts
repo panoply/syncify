@@ -353,7 +353,7 @@ export interface Directories {
   /**
    * The resolved `cache` directory path for build tool files
    *
-   * @default '.syncify/cache'
+   * @default 'node_modules/.syncify/'
    */
   cache?: string;
 }

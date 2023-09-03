@@ -271,34 +271,29 @@ export function parseFile (paths: PathBundle, output: string) {
  *
  * @param output The import directory base path
  */
-export function importFile (output: string) {
+export function importFile (key: string): File {
 
-  return (path: string) => {
+  if (key.startsWith('sections/')) {
+    return assign({ key, namspace: Namespace.Sections });
+  } else if (key.startsWith('snippets/')) {
+    return assign({ key, namspace: Namespace.Snippets });
+  } else if (key.startsWith('layout/')) {
+    return assign({ key, namspace: Namespace.Layout });
+  } else if (key.startsWith('customers/', 10)) {
+    return assign({ key, namspace: Namespace.Customers });
+  } else if (key.startsWith('metaobject/', 10)) {
+    return assign({ key, namspace: Namespace.Metaobject });
+  } else if (key.startsWith('templates/')) {
+    return assign({ key, namspace: Namespace.Templates });
+  } else if (key.startsWith('config/')) {
+    return assign({ key, namspace: Namespace.Config });
+  } else if (key.startsWith('locales/')) {
+    return assign({ key, namspace: Namespace.Locales });
+  } else if (key.startsWith('assets/')) {
+    return assign({ key, namspace: Namespace.Assets });
+  }
 
-    const file: Partial<File> = parse(path);
-    const merge = setFile(file, path, output);
-
-    if (path.startsWith('sections/')) {
-      return merge('sections', Type.Section);
-    } else if (path.startsWith('snippets/')) {
-      return merge('snippets', Type.Snippet);
-    } else if (path.startsWith('layout/')) {
-      return merge('layout', Type.Layout);
-    } else if (path.startsWith('customers/', 10)) {
-      return merge('templates/customers', Type.Template);
-    } else if (path.startsWith('metaobject/', 10)) {
-      return merge('templates/metaobject', Type.Template);
-    } else if (path.startsWith('templates/')) {
-      return merge('templates', Type.Template);
-    } else if (path.startsWith('config/')) {
-      return merge('config', Type.Config);
-    } else if (path.startsWith('locales/')) {
-      return merge('locales', Type.Locale);
-    } else if (path.startsWith('assets/')) {
-      return merge('assets', Type.Asset);
-    }
-
-  };
+  return assign({ key, namspace: Namespace.Assets });
 
 };
 

@@ -154,7 +154,7 @@ export interface HOTBundle {
    * The hot reload inline snippet script URI location
    *
    * @default
-   * 'node_modules/@syncify/syncify/hot.js.liquid'
+   * 'node_modules/@syncify/cli/hot.js.liquid'
    */
   snippet?: string;
   /**

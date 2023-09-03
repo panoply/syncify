@@ -142,6 +142,8 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
 
     const { mode, terser } = $;
 
+    console.log(terser);
+
     if (mode.terse) {
       if (file.type === Type.Asset) {
         if (terser.json.assets) space = 0;
@@ -151,6 +153,10 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
         if (terser.json.templates) space = 0;
       } else if (file.type === Type.Metafield) {
         if (terser.json.metafields) space = 0;
+      } else if (file.type === Type.Metaobject) {
+        if (terser.json.metaobject) space = 0;
+      } else if (file.type === Type.Section) {
+        if (terser.json.groups) space = 0;
       } else if (file.type === Type.Config) {
         if (terser.json.config) space = 0;
       }

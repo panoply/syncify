@@ -3,7 +3,7 @@ import glob from 'fast-glob';
 import anymatch from 'anymatch';
 import { dirname, join, relative } from 'pathe';
 import { has } from 'rambdax';
-import { lastPath, normalPath, parentPath } from '~utils/paths';
+import { lastPath, normalPath } from '~utils/paths';
 import { warnOption } from '~options/validate';
 import { PATH_KEYS } from '~const';
 import { $ } from '~state';
@@ -74,13 +74,9 @@ export async function setPaths (config: Config) {
 
     }
 
-    for (const p of uri) {
+    if (key === 'metafields' || key === 'redirects') continue;
 
-      // TODO
-      // ENABLE WHEN SUPPORTED
-      // SKIPPING THESE PREVENTS WARNINGS FROM SHOWING
-      //
-      if (p.endsWith('/metafields/**/*.json') || p.endsWith('redirects.yaml')) continue;
+    for (const p of uri) {
 
       const paths = await glob(p, { cwd: $.cwd });
 

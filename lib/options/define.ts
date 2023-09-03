@@ -2,7 +2,7 @@ import type { Commands, Config, WatchBundle } from 'types';
 import { join } from 'pathe';
 import { has } from 'rambdax';
 import { FSWatcher } from 'chokidar';
-import { pathExists, readJSON } from 'fs-extra';
+import { pathExists, readJSON, remove } from 'fs-extra';
 import { missingConfig } from '~options/validate';
 import { configFile, getPackageJson } from '~options/files';
 import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from '~options/dirs';
@@ -218,6 +218,13 @@ async function setCaches (cwd: string) {
   if (!has) return setCacheDirs($.dirs.cache);
 
   $.cache = await readJSON(uri);
+
+  if ($.cache.version !== $.version && $.version === '0.3.0-beta') {
+    if (await (pathExists($.dirs.cache))) {
+      await remove($.dirs.cache);
+      return setCacheDirs($.dirs.cache);
+    }
+  }
 
 };
 

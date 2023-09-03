@@ -56,26 +56,7 @@ export function client ({ stores, themes }: Sync) {
 
       await queue.add(() => pMap(themes, async (theme) => {
 
-        if ($.mode.upload) timer.start();
-
-        if (file.name === 'settings_data') {
-
-          // const onStore = await asset.get<{
-          //   asset: {
-          //     value: string
-          //   }
-          // }>(theme.url, merge(stores[theme.sidx].client, {
-          //   params: {
-          //     'asset[key]': file.key
-          //   }
-          // }));
-
-          // const remote = JSON.stringify(JSON.parse(onStore.asset.value), null, 0);
-          // const local = JSON.stringify(JSON.parse(content), null, 0);
-
-          // console.log(remote === local);
-
-        }
+        if ($.mode.upload || $.mode.download) timer.start();
 
         await asset.sync(theme, file, assign(
           { url: theme.url },
