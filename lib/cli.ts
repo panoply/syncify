@@ -27,6 +27,7 @@ run(mm(argv.slice(1), {
 
     /* OPERATIONS --------------------------------- */
 
+    resource: 'r',
     filter: 'f',
     delete: 'del'
 
@@ -74,6 +75,7 @@ run(mm(argv.slice(1), {
     redirects: false,
 
     /* OPERATIONS --------------------------------- */
+
     clean: false,
     silent: false,
     force: false,
@@ -154,6 +156,12 @@ run(mm(argv.slice(1), {
 
     'bump'
     , // --bump major | --bump minor | --bump patch
+
+    'resource'
+    // --resource
+    // --resource theme | -r theme
+    // --resource metafields | -r metafields
+    ,
 
     /* FILTERING ---------------------------------- */
 
