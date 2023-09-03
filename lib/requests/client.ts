@@ -4,10 +4,13 @@ import { mapParallelAsync } from 'rambdax';
 import { queue } from '../requests/queue';
 import { isUndefined } from '../utils/native';
 import * as asset from '../requests/assets';
+import * as pages from '../requests/pages';
 import * as metafields from '../requests/metafields';
 import merge from 'mergerino';
-import { bundle } from '~config';
+import { $ } from '~state';
 import * as timer from '~utils/timer';
+import { Type } from '~process/files';
+import { assign } from 'markdown-it/lib/common/utils';
 // import merge from 'mergerino';
 // import * as pages from '../requests/pages';
 
@@ -29,6 +32,13 @@ export function client ({ stores, themes }: Sync) {
 
     assets: async <T>(method: Methods, file: File<T>, content?: any) => {
 
+      /**
+       * Create Request Payload
+       *
+       * When `content` parameter is undefined request is
+       * either `GET` or `DELETE` but when `content` is passed
+       * the request will be either `POST` or `PUT`
+       */
       const payload: Partial<Request> = isUndefined(content) ? {
         method,
         params: {
@@ -46,30 +56,48 @@ export function client ({ stores, themes }: Sync) {
 
       await queue.add(() => pMap(themes, async (theme) => {
 
-        if (bundle.mode.upload) {
-          timer.start();
+        if ($.mode.upload) timer.start();
+
+        if (file.name === 'settings_data') {
+
+          // const onStore = await asset.get<{
+          //   asset: {
+          //     value: string
+          //   }
+          // }>(theme.url, merge(stores[theme.sidx].client, {
+          //   params: {
+          //     'asset[key]': file.key
+          //   }
+          // }));
+
+          // const remote = JSON.stringify(JSON.parse(onStore.asset.value), null, 0);
+          // const local = JSON.stringify(JSON.parse(content), null, 0);
+
+          // console.log(remote === local);
+
         }
 
-        await asset.sync(
-          theme,
-          file,
-          merge({ url: theme.url }, stores[theme.sidx].client, payload)
-        );
+        await asset.sync(theme, file, assign(
+          { url: theme.url },
+          stores[theme.sidx].client,
+          payload
+        ));
 
       }));
 
     },
-    pages: (content?: Requests.Page) => {
 
-      return queue.add(function () {
+    pages: async <T>(method: Methods, file: File<T>, content?: any) => {
 
-        return mapParallelAsync<Store, any>(async function (store) {
+      await queue.add(() => pMap(stores, async (store) => {
 
-          //  await pages.sync(store, content);
+        if ($.mode.upload) timer.start();
 
-        }, stores);
+        console.log(content);
 
-      });
+        //   await pages.sync(store, content);
+
+      }));
 
     },
 
