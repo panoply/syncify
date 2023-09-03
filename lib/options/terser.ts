@@ -16,12 +16,10 @@ export function setMinifyOptions (config: Config) {
 
   const { terser, mode } = $;
 
-  // Do not terser
+  // Do not terse
   if (isBoolean(config.terser)) {
     if (mode.terse === false && config.terser === false) return;
-    if (mode.terse === false && config.terser === true) {
-      mode.terse = true;
-    }
+    if (mode.terse === false && config.terser === true) mode.terse = true;
   }
 
   const warn = warnOption('terser configuration');
@@ -64,13 +62,20 @@ export function setMinifyOptions (config: Config) {
 
         for (const opt in config.terser[key]) {
 
-          const p = key === 'views' ? 'liquid' : key;
+          if (opt === 'exclude') {
+            if (!isEmpty(config.terser[key][opt])) {
+              terser[key][opt] = getResolvedPaths(config.terser[key][opt]);
+            }
 
-          if (!has(opt, terser[p])) unknownError(`terser.${key}`, opt);
+            continue;
+          }
+
+          if (!has(opt, terser[key])) unknownError(`terser.${key}`, opt);
 
           if (opt === 'mangleProps') {
 
-            if (!isNil(config.terser[key][opt]) && !isRegex(terser[p][opt])) {
+            if (!isNil(config.terser[key][opt]) && !isRegex(terser[key][opt])) {
+
               typeError({
                 option: `terser.${key}`,
                 name: opt,
@@ -81,25 +86,24 @@ export function setMinifyOptions (config: Config) {
 
           } else {
 
-            if (!isNil(config.terser[key][opt]) && typeof terser[p][opt] !== typeof config.terser[key][opt]) {
+            if (!isNil(config.terser[key][opt]) && typeof terser[key][opt] !== typeof config.terser[key][opt]) {
               typeError({
                 option: `terser.${key}`,
                 name: opt,
                 provided: typeof config.terser[key][opt],
-                expects: typeof terser[p][opt]
+                expects: typeof terser[key][opt]
               });
             }
           }
 
-          if (opt === 'exclude' && !isEmpty(config.terser[key][opt])) {
-            terser[key][opt] = getResolvedPaths(config.terser[key][opt]);
-          } else if (opt === 'collapseWhitespace') {
-            terser.html.collapseWhitespace = config.terser[key][opt];
+          if (opt === 'collapseWhitespace') {
+            terser.markup.collapseWhitespace = config.terser[key][opt];
           } else {
             terser[key][opt] = config.terser[key][opt];
           }
 
         }
+
       } else {
 
         warn('unkown option provided', key);
