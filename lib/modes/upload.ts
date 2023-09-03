@@ -47,12 +47,18 @@ interface ErrorModel {
   }
 }
 
+/**
+ * Get Model
+ *
+ * Generates the upload model which will create a workable store reference
+ * for the uploading process.
+ */
 function getModel (size: number) {
 
   if (size === 0) {
     throwError('Empty output directory', [
-      `There are no files within ${c.blue(relative($.cwd, $.dirs.output))}`,
-      `You may need to run the ${c.blue('syncify build')} command and try again`
+      `There are no files within ${c.blue(relative($.cwd, $.dirs.output) + '/**')}`,
+      `You may need to run the ${c.blue('syncify build')} command and try again.`
     ]);
   }
 
@@ -116,9 +122,12 @@ export async function upload (cb?: Syncify): Promise<void> {
   const request = client($.sync);
   const hashook = n.isFunction(cb);
   const parse = outputFile($.dirs.output);
-  const files = glob.sync(`${$.dirs.output}/**`).sort();
+  const files = glob.sync(`${$.dirs.output}/templates/*`).sort();
   const { sync, errors, size } = getModel(files.length);
 
+  // DELAY
+  // We apply a small delay to ensure all operations have completed before moving ahead.
+  //
   await delay(250);
 
   /* -------------------------------------------- */
@@ -204,6 +213,9 @@ export async function upload (cb?: Syncify): Promise<void> {
 
   });
 
+  // DELAY
+  // We apply a small delay to ensure all operations have completed before moving ahead.
+  //
   await delay(500);
 
   for (const path of files) {
@@ -275,11 +287,12 @@ export async function upload (cb?: Syncify): Promise<void> {
       log.out(tui.suffix('whiteBright', 'failed ', failed));
       log.nwl();
       log.write([
-        c.gray('Syncify is now watching all rejected files.'),
-        c.gray('Changes will be resynced if successful.')
+        c.gray('Syncify is now watching all rejected files. Changes will be resynced if successful.'),
+        c.gray('In some cases, you may need to perform more detailed adjustments and then resync.')
       ]);
 
       let number: number = 1;
+
       for (const [ file, item ] of errors.remote[storeName].entries()) {
 
         const theme = item.find(({ theme }) => theme === themeName);
