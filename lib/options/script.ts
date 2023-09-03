@@ -1,18 +1,15 @@
 import { Config, ESBuildConfig, ScriptBundle, ScriptTransform, WatchBundle } from 'types';
-import { join } from 'node:path';
+import { join } from 'pathe';
 import { has, isEmpty, isNil, omit } from 'rambdax';
 import merge from 'mergerino';
 import { getModules, readConfigFile } from '~utils/options';
 import { warnOption, missingDependency, invalidError, typeError, throwError } from '~options/validate';
 import { getResolvedPaths, getTransform, renameFile } from './utilities';
-import { isArray } from '~utils/native';
-import { bundle, processor } from '~config';
+import { isArray, isBoolean } from '~utils/native';
+import { $ } from '~state';
 import { esbuildModule, esbuildBundle } from '~transform/script';
 import { uuid } from '~utils/utils';
-import * as u from '~utils/native';
 import anymatch from 'anymatch';
-
-// import { log } from '~log';
 
 /**
  * Script Transform
@@ -27,10 +24,10 @@ export async function setScriptOptions (config: Config) {
 
   const warn = warnOption('script transform option');
 
-  const { esbuild } = processor;
+  const { esbuild } = $.processor;
   const { script } = config.transforms;
 
-  esbuild.installed = getModules(bundle.pkg, 'esbuild');
+  esbuild.installed = getModules($.pkg, 'esbuild');
 
   if (esbuild.installed) {
 
@@ -66,7 +63,7 @@ export async function setScriptOptions (config: Config) {
 
   // Provide tsconfig raw options
   //
-  // const tsconfig = await getTSConfig(bundle.cwd);
+  // const tsconfig = await getTSConfig($.cwd);
   //
   // defineProperty(esbuild, 'tsconfig', {
   //   get () {
@@ -94,7 +91,7 @@ export async function setScriptOptions (config: Config) {
   ]);
 
   if (!has('absWorkingDir', esbuild.config)) {
-    esbuild.config.absWorkingDir = bundle.cwd;
+    esbuild.config.absWorkingDir = $.cwd;
   }
 
   for (const transform of transforms) {
@@ -130,7 +127,7 @@ export async function setScriptOptions (config: Config) {
       uuid: uuid(),
       snippet,
       input: transform.input as string,
-      output: join(bundle.dirs.output, keyDir, rename),
+      output: join($.dirs.output, keyDir, rename),
       key: join(keyDir, rename),
       namespace: transform.snippet ? 'snippets' : 'assets',
       size: NaN,
@@ -141,12 +138,12 @@ export async function setScriptOptions (config: Config) {
 
     esbuild.config.outfile = scriptBundle.output;
 
-    if (bundle.mode.watch) {
-      (bundle.watch as WatchBundle).unwatch(scriptBundle.output);
+    if ($.mode.watch) {
+      ($.watch as WatchBundle).unwatch(scriptBundle.output);
     }
 
     if (has('esbuild', transform)) {
-      if (u.isBoolean(transform.esbuild) || isNil(transform.esbuild)) {
+      if (isBoolean(transform.esbuild) || isNil(transform.esbuild)) {
 
         if (isEmpty(esbuildOptions)) {
           scriptBundle.esbuild = merge<any>(esbuild.config);
@@ -206,7 +203,7 @@ export async function setScriptOptions (config: Config) {
 
     scriptBundle.esbuild.entryPoints = [ scriptBundle.input as string ];
 
-    if (bundle.mode.watch) {
+    if ($.mode.watch) {
 
       if (!has('watch', transform)) {
 
@@ -245,14 +242,16 @@ export async function setScriptOptions (config: Config) {
 
     }
 
-    if (bundle.mode.terse) {
+    if ($.mode.terse) {
+
       // @ts-expect-error
-      scriptBundle.esbuild = merge(scriptBundle.esbuild, bundle.terser.script, {
+      scriptBundle.esbuild = merge(scriptBundle.esbuild, $.terser.script, {
         exclude: undefined
       });
+
     }
 
-    bundle.script.push(scriptBundle);
+    $.script.push(scriptBundle);
 
   }
 
