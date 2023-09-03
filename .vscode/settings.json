@@ -3,7 +3,6 @@
   "npm.packageManager": "pnpm",
   "eslint.packageManager": "pnpm",
   "files.associations": {
-    "*.liquid": "html",
     "*.scss.liquid": "scss",
     "*.css.liquid": "css",
     "*i18n.js.liquid": "javascript",
@@ -101,6 +100,7 @@
     }
   ],
   "cSpell.words": [
+    "adastra",
     "gzipsize",
     "imgmin",
     "linkify",
@@ -109,5 +109,15 @@
     "purgecss",
     "Spriter",
     "tailwindcss"
-  ]
+  ],
+  "[liquid]": {
+    "editor.formatOnSave": true
+  },
+  "liquid.config.method": "workspace",
+  "liquid.format.rules": {
+    "liquid": {
+      "indentAttribute": true,
+      "forceArgument": 3
+    }
+  }
 }
