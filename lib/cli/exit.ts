@@ -24,13 +24,9 @@ function exit (manual: boolean, signal: number) {
 
   trigger = true;
 
-  for (const hook of hooks) {
-    hook();
-  }
+  for (const hook of hooks) hook();
 
-  if (manual) {
-    process.exit(128 + signal);
-  }
+  if (manual) process.exit(128 + signal);
 
 };
 

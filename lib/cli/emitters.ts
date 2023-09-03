@@ -1,4 +1,7 @@
 import { log, gray } from '~log';
+// import kill from 'tree-kill';
+import { $ } from '~state';
+// import { readJsonSync } from 'fs-extra';
 
 /**
  * Signal Interuption
@@ -8,8 +11,16 @@ import { log, gray } from '~log';
 export function signal () {
 
   log.nwl('');
+
+  // const p = readJsonSync($.dirs.cache + 'store.map');
+
+  // log.out(gray('SIGINT: ' + process.pid));
+
+  // kill(p.process.pid, 'SIGKILL');
+
   log.out(gray('SIGINT'));
   process.exit();
+  // process.exit(0);
 
 }
 

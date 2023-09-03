@@ -13,7 +13,8 @@
   "typeAcquisition": {
     "enable": true,
     "include": [
-      "node"
+      "node",
+      "./types/modules/"
     ]
   },
   "compilerOptions": {
@@ -48,8 +49,8 @@
       "types": [
         "./types/index.d.ts"
       ],
-      "~config": [
-        "./lib/config.ts"
+      "~state": [
+        "./lib/model/$.ts"
       ],
       "~const": [
         "./lib/const.ts"
@@ -69,8 +70,14 @@
       "~modes/*": [
         "./lib/modes/*"
       ],
+      "~resource/*": [
+        "./lib/resource/*"
+      ],
       "~requests/*": [
         "./lib/requests/*"
+      ],
+      "~forks/*": [
+        "./lib/forks/*"
       ],
       "~hot/*": [
         "./lib/hot/*"

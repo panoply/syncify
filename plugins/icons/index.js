@@ -1,10 +1,9 @@
-
 export default function () {
 
   const { icons } = config.views;
 
   if (u.isBoolean(icons.useCustomTag)) {
-    bundle.svg.icons.useCustomTag = icons.useCustomTag;
+    $.svg.icons.useCustomTag = icons.useCustomTag;
   } else {
     typeError('icons', 'replacer', icons.useCustomTag, 'boolean');
   }
@@ -15,7 +14,7 @@ export default function () {
       typeError('icons', 'vscodeCustomData', icons.vscodeCustomData, 'boolean');
     }
 
-    if (bundle.svg.icons.useCustomTag && icons.vscodeCustomData) {
+    if ($.svg.icons.useCustomTag && icons.vscodeCustomData) {
 
       if (!existsSync(cache.vscode.uri)) {
         try {
@@ -87,7 +86,7 @@ export default function () {
         settings['html.customData'].push(cache.vscode.data.icons);
 
         await writeJson(file, settings, {
-          spaces: bundle.json.indent
+          spaces: $.json.indent
         });
       }
 

@@ -182,10 +182,7 @@ export const dash = lightGray('│  ├─ ');
  * TUI Arrow - line
  *
  * ```
- * │ ╭───────────────────────────
- * ├─┤ line
- * │ └─╮
- *     ├─
+ *├─
  * ```
  */
 export const top = lightGray('├─ ');
@@ -207,6 +204,19 @@ export const bottom = lightGray('│  └─ ');
  * ```
  */
 export const close = lightGray('└─ ');
+
+/**
+ * TUI Horizontal Rule Size
+ *
+ * Same as `hr()` but only applies horizonal lines `x` amount of times
+ *
+ * ```
+ * │
+ * ├────────────────────────────────────────────────
+ * │
+ * ```
+ */
+export const hrs = (x: number) => lightGray(`${'─'.repeat(x)}`);
 
 /**
  * TUI Horizontal Row

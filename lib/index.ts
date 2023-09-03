@@ -7,12 +7,12 @@ import { build } from './modes/build';
 import { watch } from './modes/watch';
 import { server } from './hot/server';
 import { stdin } from '~log/stdin';
+import { $ } from '~state';
 // import { resource } from 'modes/resource';
 // import { readConfig } from 'config/config';
 import { help } from '~log/help';
 import { log } from '~log';
 import { define } from './options/define';
-import { $ } from '~state';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -70,14 +70,11 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   /* -------------------------------------------- */
 
   process.on('SIGINT', signal);
-  process.stdin.on('data', stdin);
-
-  process.on('uncaughtException', exception);
-  process.on('unhandledRejection', rejection);
+  // process.on('unhandledRejection', rejection);
+  // process.on('uncaughtException', exception);
+  process.on('rejectionHandled', rejection);
 
   if ($.mode.hot) await server();
-
-  // console.log(bundle);
 
   /* -------------------------------------------- */
   /* EXECUTE MODE                                 */
@@ -86,15 +83,25 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   try {
 
     if ($.mode.build) {
+
       return build(callback);
+
     } else if ($.mode.watch) {
+
       return watch(callback);
+
     } else if ($.mode.upload) {
+
       return upload(callback);
+
     } else if ($.mode.download) {
+
       return download(callback);
+
     } else if ($.mode.export) {
+
       return console.log('TODO');
+
     }
 
   } catch (e) {
