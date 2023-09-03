@@ -68,9 +68,10 @@ export const defaults = (): Config => ({
     },
     pages: {
       author: '',
-      language: 'html',
-      global: [],
-      suffixDir: false
+      safeSync: true,
+      importLanguage: 'html',
+      suffixDir: false,
+      global: []
     }
   },
   transforms: {
@@ -80,7 +81,8 @@ export const defaults = (): Config => ({
   },
   terser: {
     json: false,
-    views: false,
+    markup: false,
+    liquid: false,
     script: false
   }
 });
