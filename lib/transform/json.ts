@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'fs-extra';
 import { isBuffer, isArray, isObject, isUndefined, isString, isFunction } from '~utils/native';
 import { Type } from '~process/files';
 import { byteSize, byteConvert, fileSize } from '~utils/utils';
-import { bundle } from '~config';
+import { $ } from '~state';
 import * as timer from '~utils/timer';
 import { log, error } from '~log';
 
@@ -54,6 +54,21 @@ export function minifyJSON (data: string, space = 0): any {
 };
 
 /**
+ * Diff JSON
+ *
+ * Compares remote and local sources with one another to detemine
+ * whether or not changes should be merged and kept aligned. This
+ * operation will execute at runtime when the `--merge` flag is
+ * passed.
+ */
+export function diffJSON (remote: string, local: string) {
+
+  const o1 = JSON.stringify(JSON.parse(remote), null, 0);
+  const o2 = JSON.stringify(JSON.parse(local), null, 0);
+
+}
+
+/**
  * Minify and Write JSON file
  *
  * Applies minification and publishment of
@@ -65,7 +80,7 @@ export async function jsonCompile (file: File, data: string, space = 0) {
   const minified = minifyJSON(data, space);
 
   if (isNil(minified)) {
-    if (bundle.mode.watch) timer.stop();
+    if ($.mode.watch) timer.stop();
     return data;
   }
 
@@ -97,7 +112,7 @@ export async function jsonCompile (file: File, data: string, space = 0) {
  */
 export async function compile (file: File, cb: Syncify): Promise<string> {
 
-  if (bundle.mode.watch) timer.start();
+  if ($.mode.watch) timer.start();
 
   const json = await readFile(file.input).catch(
     error.write('Error reading JSON file', {
@@ -123,9 +138,9 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
       return null;
     }
 
-    let space: number = bundle.processor.json.indent;
+    let space: number = $.processor.json.indent;
 
-    const { mode, terser } = bundle;
+    const { mode, terser } = $;
 
     if (mode.terse) {
       if (file.type === Type.Asset) {
