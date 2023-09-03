@@ -1,4 +1,4 @@
-import { Bundle } from '~config';
+import { Bundle } from '~state';
 import { mkdir, pathExistsSync, readJson, writeJson } from 'fs-extra';
 import { join } from 'path';
 import { allTrue, has } from 'rambdax';
