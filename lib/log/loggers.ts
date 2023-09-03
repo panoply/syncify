@@ -1,9 +1,10 @@
-import type { File, Theme } from 'types';
+import type { File, Store, Theme } from 'types';
+import { inspect } from 'node:util';
 import { has, isEmpty } from 'rambdax';
 import { $, warning } from '~state';
 import { queue } from '~requests/queue';
 import { addSuffix, sanitize, plural, toUpcase } from '~utils/utils';
-import { error, isArray, log, nil, nl } from '~utils/native';
+import { error, isArray, isObject, log, nil, nl } from '~utils/native';
 import { intercept } from '~cli/intercept';
 import * as timer from '~utils/timer';
 import * as errors from '~log/errors';
@@ -23,6 +24,20 @@ export { clear, hline } from '~log/tui';
 export { spinner } from '~log/spinner';
 export { progress } from '~cli/progress';
 export { log as out } from '~utils/native';
+
+/* -------------------------------------------- */
+/* INTERNAL                                     */
+/* -------------------------------------------- */
+
+/**
+ * **INTERNAL - DEVELOPMENT ONLY**
+ *
+ * Console Log with inspect
+ */
+export function console (...message: any) {
+
+  log(inspect(message, { colors: true, showHidden: true }));
+}
 
 /* -------------------------------------------- */
 /* LOCAL SCOPES                                 */
@@ -233,6 +248,17 @@ export function newGroup (name: string, clear = false) {
 }
 
 /**
+ * Log Updated - `neonCyan`
+ *
+ * @example '│ updated → source/dir/file.ext'
+ */
+export function updated (file: File, suffix?: string) {
+
+  log(tui.suffix('greenBright', 'updated', `${file.relative} ${suffix ? c.gray(`~ ${suffix}`) : nil}`));
+
+}
+
+/**
  * Log Changed - `neonCyan`
  *
  * @example '│ changed → source/dir/file.ext'
@@ -287,6 +313,47 @@ export function hot () {
 }
 
 /**
+ * Log Resource - `neonGreen`
+ *
+ * Identical to `upload` but accepts a `store` parameter and requires
+ * the resource `type` be providedl.
+ *
+ * @example '│ uploaded → page → store.myshopify.com ~ 500ms'
+ */
+export function resource (type: string, store: Store) {
+
+  if ($.mode.watch) {
+
+    uploads.add([
+      type,
+      store.domain,
+      timer.stop()
+    ]);
+
+    if (idle) return;
+
+    idle = true;
+
+    queue.onIdle().then(() => {
+
+      for (const [ type, store, time ] of uploads) {
+        log(tui.suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store}` + c.time(time)));
+      }
+
+      uploads.clear();
+      idle = false;
+
+    });
+
+  } else {
+
+    log(tui.suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store.domain}` + c.time(timer.stop())));
+
+  }
+
+};
+
+/**
  * Log Uploaded - `neonGreen`
  *
  * @example '│ uploaded → theme → store.myshopify.com ~ 500ms'
@@ -327,14 +394,34 @@ export function upload (theme: Theme) {
 /**
  * Log Prompt - `blueBright`
  *
+ * This is curried and will close the log group. Calling
+ * the return function will opens the log group. In addition
+ * an optional `notify` message can be provided which will
+ * trigger a notification when defined
+ *
+ *
+ * ```
+ * │ prompt → Command is required
+ * │
+ * └─ Name ~ 01:59:20
+ *
+ * Select an option
+ *
+ * >
+ *
+ * ┌─ Name ~ 01:59:20
+ * ```
+ *
  * @example '│ prompt → dir/file.ext'
  */
-export function prompt (message: string) {
+export function prompt (message: string, notify?: notifier.Notification) {
 
   // close previous group
 
   log(tui.suffix('orange', 'prompt', message));
   log(tui.closer(group) + nl);
+
+  if (isObject(notify)) notifier.notify(notify).notify();
 
   return () => {
     log(tui.opener(group));
@@ -447,6 +534,17 @@ export function transform (message: string) {
 };
 
 /**
+ * Log Warning `yellowBright`
+ *
+ * @example '│ warning → message ~ autofix was applied
+ */
+export function warn (message: string, fix?: string) {
+
+  log(tui.suffix('yellowBright', 'warning', `${message}${fix ? c.gray(` ~ ${fix}`) : ''}`));
+
+};
+
+/**
  * TUI Warning - `orange`
  *
  * @example '│ retrying → dir/file.ext → theme ~ store.myshopify.com'
@@ -519,9 +617,13 @@ export function ignored (path: string) {
 /**
  * Log Invalid - `red`
  *
+ * Accepts an optional `message` and when provided will replicate
+ * an error. Cancellation is not imposed, it is left upto the calling function
+ * to cancel out of any operations.
+ *
  * @example '│ invalid → dir/file.ext'
  */
-export function invalid (path: string) {
+export function invalid (path: string, message?: string | string[]) {
 
   log(tui.suffix('red', 'invalid', path));
 
@@ -534,6 +636,17 @@ export function invalid (path: string) {
   });
 
   notification.notify();
+
+  if (message) {
+
+    nwl();
+
+    if (isArray(message)) {
+      error(c.red(message.map(text => c.line.red + sanitize(text)).join(nl)));
+    } else {
+      error(c.line.red + sanitize(message));
+    }
+  }
 
 };
 
