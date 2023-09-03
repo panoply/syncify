@@ -19,17 +19,21 @@ import { AssetRequest } from '~requests/client';
  */
 function passthrough (file: File, sync: ClientParam<AssetRequest>) {
 
-  const { wss, mode, watch } = $;
+  const { wss, mode, watch, env } = $;
   const { type, relative, kind, key, output } = file;
 
   return async (data: string) => {
 
     if (type !== Type.Spawn) {
 
-      // Remove non-spawn references from watch mode
-      // this will prevent infinite loops from occuring.
-      //
-      (watch as WatchBundle).unwatch(output);
+      if (mode.watch) {
+
+        // Remove non-spawn references from watch mode
+        // this will prevent infinite loops from occuring.
+        //
+        (watch as WatchBundle).unwatch(output);
+
+      }
 
       await writeFile(output, data).catch(
         error.write('Error writing asset to output', {
@@ -40,9 +44,9 @@ function passthrough (file: File, sync: ClientParam<AssetRequest>) {
 
     };
 
-    log.syncing(key, true);
-
     if (mode.hot) {
+
+      log.syncing(key, true);
 
       if (kind === Kind.JavaScript) {
         wss.script(key);
@@ -52,8 +56,9 @@ function passthrough (file: File, sync: ClientParam<AssetRequest>) {
 
     }
 
-    return sync('put', file, data);
-
+    if (env.sync !== 0) {
+      return sync('put', file, data);
+    }
   };
 };
 
