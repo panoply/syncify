@@ -143,7 +143,7 @@ export async function getPackageJson (cwd: string) {
  */
 export async function rcFile (cwd: string): Promise<ENV.RCFile> {
 
-  let rcconfig = join(cwd, '.syncifyenv');
+  let rcconfig = join(cwd, '.env.syncify');
   let rcexists = await pathExists(rcconfig);
 
   if (!rcexists) {
