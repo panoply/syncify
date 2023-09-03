@@ -108,6 +108,7 @@ export interface HTMLMinifierTerserOptions {
   minifyURLs?: boolean | string | object | ((text: string) => string) | undefined;
   /**
    * Never add a newline before a tag that closes an element
+   *
    * @default false
    */
   noNewlinesBeforeTagClose?: boolean | undefined;
@@ -154,26 +155,31 @@ export interface HTMLMinifierTerserOptions {
   removeEmptyAttributes?: boolean | ((attrName: string, tag: string) => boolean) | undefined;
   /**
    * Remove all elements with empty contents
+   *
    * @default false
    */
   removeEmptyElements?: boolean | undefined;
   /**
    * Remove optional tags
+   *
    * @default false
    */
   removeOptionalTags?: boolean | undefined;
   /**
    * Remove attributes when value matches default
+   *
    * @default false
    */
   removeRedundantAttributes?: boolean | undefined;
   /**
    * Remove `type="text/javascript"` from `script` tags. Other `type` attribute values are left intact
+   *
    * @default false
    */
   removeScriptTypeAttributes?: boolean | undefined;
   /**
    * Remove `type="text/css"` from `style` and `link` tags. Other `type` attribute values are left intact
+   *
    * @default false
    */
   removeStyleLinkTypeAttributes?: boolean | undefined;
@@ -206,6 +212,7 @@ export interface HTMLMinifierTerserOptions {
 
 /**
  * HTMLMinifier is a highly configurable, well-tested, JavaScript-based HTML minifier.
+ *
  * @async
  */
 export function minify(value: string, options?: HTMLMinifierTerserOptions): Promise<string>;
