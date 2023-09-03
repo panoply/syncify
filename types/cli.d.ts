@@ -190,6 +190,12 @@ export interface Commands {
    * ```
    */
   export?: boolean;
+  /**
+   * Triggers a resource mode
+   *
+   * @default ''
+   */
+  resource?: string;
    /**
    * Download a theme from a store. Will be place in `import` driectory. Requires a store
    * target and theme target to be passed.
