@@ -35,6 +35,7 @@ type Loggers = (
  */
 type Prefixes = LiteralUnion<string, (
   | 'changed'
+  | 'updated'
   | 'process'
   | 'exports'
   | 'skipped'
