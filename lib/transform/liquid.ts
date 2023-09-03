@@ -1,14 +1,16 @@
 import { minify as terser } from 'html-minifier-terser';
+import { join, basename } from 'pathe';
 import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { isNil, isType } from 'rambdax';
+import { has, isNil, isType } from 'rambdax';
 import { Type } from '~process/files';
-import { nil } from '~utils/native';
+import { isArray, nil } from '~utils/native';
 import { byteConvert, byteSize, fileSize } from '~utils/utils';
 import { $ } from '~state';
 import * as timer from '~utils/timer';
 import { log } from '~log';
 import { hasSnippet, inject, removeRender } from '~hot/inject';
+import glob from 'fast-glob';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -25,10 +27,13 @@ const LiquidLineComments = /{%-?\s*#[\s\S]+?%}/g;
 const LiquidBlockComments = /{%-?\s*comment\s*-?%}[\s\S]+?{%-?\s*endcomment\s*-?%}/g;
 
 /**
- * Liquid Strip Dash Spaces
+ * Liquid Tag Preservation
  */
 const LiquidTag = /{%-?\s*liquid[\s\S]+?%}/g;
 
+/**
+ * JSON Whitespace
+ */
 const ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
 
 /* -------------------------------------------- */
@@ -119,7 +124,7 @@ async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await terser(content, $.terser.html);
+    const htmlmin = await terser(content, $.terser.markup);
 
     return htmlmin;
 
@@ -143,7 +148,9 @@ async function htmlMinify (file: File, content: string) {
 const transform = (file: File) => async (data: string) => {
 
   if (file.type === Type.Layout && $.mode.hot) {
-    if (!hasSnippet(data)) data = inject(data);
+    if (hasSnippet(data) === false) {
+      data = inject(data);
+    }
   }
 
   if (!$.mode.terse) {
@@ -151,6 +158,7 @@ const transform = (file: File) => async (data: string) => {
     log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
     return data;
   }
+
   let htmlmin: string;
 
   if (file.base.endsWith('.js.liquid')) {
@@ -203,6 +211,109 @@ const transform = (file: File) => async (data: string) => {
 
 };
 
+async function extractSchema (uri: string) {
+
+  const read = await readFile(uri);
+  const content = read.toString();
+  const open = content.search(/{%-?\s*schema/);
+
+  if (open < 0) return;
+
+  const begin = content.indexOf('%}', open + 2) + 2;
+  const start = content.slice(begin);
+  const ender = begin + start.search(/{%-?\s*endschema/);
+
+  if (ender < 0) log.throws(uri);
+
+  const parse = JSON.parse(content.slice(begin, ender));
+
+  return parse;
+
+}
+
+async function sharedSections (file: File, content: string) {
+
+  const open = content.search(/{%-?\s*schema/);
+
+  if (open < 0) return content;
+
+  const begin = content.indexOf('%}', open + 2) + 2;
+  const start = content.slice(begin);
+  const ender = begin + start.search(/{%-?\s*endschema/);
+
+  if (ender < 0) log.throws(file.relative);
+
+  const parse = JSON.parse(content.slice(begin, ender));
+
+  if (!has('use', parse)) return content;
+
+  if (!isArray(parse.use)) {
+    throw new Error('Invalid type passed on schema');
+  }
+
+  const linked: { [name: string]: any } = {};
+  const dirs = await glob(join($.dirs.output, 'sections') + '/**');
+
+  for (const use of parse.use) {
+    for (const dir of dirs) {
+      const base = basename(dir, '.liquid');
+      if (base.endsWith(use)) {
+        const read = await extractSchema(dir);
+        linked[use] = read;
+      }
+    }
+  }
+
+  const settings: any[] = [];
+
+  for (let i = 0; i < parse.settings.length; i++) {
+    if (has('ref', parse.settings[i])) {
+
+      const [ target, id ] = parse.settings[i].ref.split('.').filter(Boolean);
+      const entry = linked[target].settings.find(setting => setting.id === id);
+
+      if (entry) {
+        parse.settings[i] = entry;
+        settings.push(entry);
+      }
+
+    }
+  }
+
+  for (let i = 0; i < parse.blocks.length; i++) {
+
+    for (let b = 0; b < parse.blocks[i].settings.length; b++) {
+
+      const block = parse.blocks[i].settings[b];
+
+      if (has('ref', block)) {
+
+        const [ target, name, id ] = block.ref.split('.').filter(Boolean);
+
+        const blocks = linked[target].blocks.find(setting => setting.type === name);
+
+        if (blocks) {
+
+          const entry = blocks.settings.find(setting => setting.id === id);
+
+          if (entry) {
+            parse.blocks[i].settings[b] = entry;
+            settings.push(entry);
+          }
+
+        }
+      }
+    }
+  }
+
+  delete parse.use;
+
+  const write = content.slice(0, begin) + '\n' + JSON.stringify(parse, null, 2) + '\n' + content.slice(ender);
+
+  return write;
+
+}
+
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */
 /* -------------------------------------------- */
@@ -227,6 +338,10 @@ export async function compile (file: File, cb: Syncify) {
         input = removeRender(input);
       }
     }
+  }
+
+  if (file.type === Type.Section) {
+    input = await sharedSections(file, input);
   }
 
   file.size = byteSize(input);
