@@ -15,7 +15,8 @@ export const terser = (): TerserConfig => ({
     config: true,
     locales: true,
     metafields: true,
-    sectionGroups: true,
+    metaobject: true,
+    groups: true,
     templates: true,
     exclude: []
   },
@@ -30,10 +31,13 @@ export const terser = (): TerserConfig => ({
     exclude: []
   },
   liquid: {
-    minifyScript: true,
+    minifyJavascript: false,
+    minifyStylesheet: false,
     minifyStyle: true,
     minifySchema: true,
     removeComments: true,
+    collapseInner: false,
+    collapseWhitespace: true,
     stripDashes: true,
     exclude: []
   },
@@ -46,7 +50,7 @@ export const terser = (): TerserConfig => ({
     obfuscateClassNames: false,
     obfuscateWhitelist: []
   },
-  html: {
+  markup: {
     caseSensitive: false,
     collapseBooleanAttributes: false,
     collapseInlineTagWhitespace: false,
@@ -57,19 +61,20 @@ export const terser = (): TerserConfig => ({
     removeEmptyAttributes: false,
     removeEmptyElements: false,
     removeOptionalTags: false,
-    removeRedundantAttributes: true,
+    removeRedundantAttributes: false,
     removeScriptTypeAttributes: true,
     removeStyleLinkTypeAttributes: true,
     useShortDoctype: false,
     collapseWhitespace: true,
     continueOnParseError: true,
     removeComments: true,
-    trimCustomFragments: true,
+    minifyCSS: true,
+    minifyJS: true,
+    trimCustomFragments: false,
     ignoreCustomFragments: [
       /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
       /<style[\s\S]*?<\/style>/,
       /<script[\s\S]*?<\/script>/,
-      /{%-?\s*liquid[\s\S]*?%}/,
       /{%[\s\S]*?%}/
     ]
   }
