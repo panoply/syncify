@@ -92,10 +92,10 @@ export function request <T> (file: string, e: AxiosResponse, logError = true): T
       tui.context({
         stack: false,
         entries: {
-          details: 'File did not sync because Shopify rejected the request',
+          // details: 'File did not sync because Shopify rejected the request',
           status: e.status,
           message: e.statusText,
-          source: `${file}`
+          source: c.underline(`${file}`)
         }
       })
     ]);
