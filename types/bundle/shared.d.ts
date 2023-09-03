@@ -96,7 +96,7 @@ export namespace ENV {
   export type RCSecrets = RCSecret[]
 
   /**
-   * Auth using `token` in `.syncifyrc` file
+   * Auth using `token` in `.env.syncify.json` file
    *
    * > _Single store_
    */
