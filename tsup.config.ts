@@ -5,6 +5,7 @@ import * as pkg from './package.json';
 const noExternal = [
   'ansis',
   'clean-stack',
+  'open-editor',
   'mergerino',
   'log-update',
   'p-queue',
@@ -18,6 +19,7 @@ const noExternal = [
 const external = [
   'anymatch',
   'axios',
+  'pathe',
   'chokidar',
   'cross-spawn',
   'dotenv',
