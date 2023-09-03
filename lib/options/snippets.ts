@@ -27,6 +27,7 @@ export function setSnippetOptions (config: Config) {
       provided: typeof snippets
     });
   }
+
   // Iterate over all the properties in sections option
   for (const option in $.snippet) {
 
