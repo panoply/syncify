@@ -4,7 +4,7 @@ import { queue, axios } from '~requests/queue';
 import { assign } from '~utils/native';
 import * as timer from '~utils/timer';
 import { log, error } from '~log';
-import { bundle } from '~config';
+import { $ } from '~state';
 
 /**
  * Has Redirect
@@ -14,7 +14,7 @@ import { bundle } from '~config';
 export async function has (asset: FileKeys, theme: Theme): Promise<boolean> {
 
   return axios({
-    ...bundle.sync.stores[theme.sidx].client,
+    ...$.sync.stores[theme.sidx].client,
     method: 'get',
     url: theme.url,
     params: {
@@ -32,7 +32,7 @@ export async function has (asset: FileKeys, theme: Theme): Promise<boolean> {
 export async function find (asset: FileKeys, theme: Theme): Promise<string> {
 
   return axios({
-    ...bundle.sync.stores[theme.sidx].client,
+    ...$.sync.stores[theme.sidx].client,
     method: 'get',
     url: theme.url,
     params: {
@@ -49,7 +49,7 @@ export async function find (asset: FileKeys, theme: Theme): Promise<string> {
  */
 export async function upload (asset: string, config: { theme: Theme, key: FileKeys }): Promise<boolean> {
 
-  const request = assign({}, bundle.sync.stores[config.theme.sidx].client, {
+  const request = assign({}, $.sync.stores[config.theme.sidx].client, {
     method: 'put',
     url: config.theme.url,
     data: {
@@ -75,6 +75,20 @@ export async function upload (asset: string, config: { theme: Theme, key: FileKe
   });
 
 };
+
+export async function list (config: AxiosRequestConfig<Request>) {
+
+  return axios.get('/redirects.json', config).then(({ data }) => {
+
+    return data;
+
+  }).catch((e: AxiosError) => {
+
+    console.log(e);
+
+  });
+
+}
 
 /**
  * Request Handler
