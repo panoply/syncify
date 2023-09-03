@@ -1,6 +1,6 @@
 import type PostCSS from 'postcss';
 import type SASS from 'sass';
-import { join, relative } from 'node:path';
+import { join, relative } from 'pathe';
 import { File, StyleTransform, Syncify, Processors } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
@@ -120,7 +120,7 @@ async function sassProcess (file: File<StyleTransform>) {
 
       if (opts.sourcemap) {
 
-        const map = join($.cache.style.uri, file.base + '.map');
+        const map = join($.cache.sourcemaps.style, file.base + '.map');
 
         writeFile(map, JSON.stringify(sourceMap)).catch(
           error.write('Error writing SASS Source Map file to the cache directory', {
