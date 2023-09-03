@@ -1,16 +1,20 @@
 import { AxiosError } from 'axios';
-import { allFalse, has, isNil } from 'rambdax';
-import { IConfig, IMetafield, IStore, IPage } from 'types';
+import { allFalse, has, hasPath, isNil } from 'rambdax';
+import { Pages, Store, Requests, File } from 'types';
 import { join } from 'path';
 import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
 import Turndown from 'turndown';
 import markdown from 'markdown-it';
-
+import * as timer from '~utils/timer';
+import * as cache from '~process/caches';
+import mergerino from 'mergerino';
 import { pathExistsSync, stat, writeFile } from 'fs-extra';
-import { assign, is } from '../utils/native';
+import { assign } from '../utils/native';
 import { queue, axios, requeue } from '../requests/queue';
-import { log, c, error } from '~log';
+import { log, c, error, tui } from '~log';
+import { $ } from '~state';
+import { event, getSizeStr } from '~utils/utils';
 
 /**
  * Merge Pages
@@ -19,7 +23,7 @@ import { log, c, error } from '~log';
  * Performs a last-updated check to determine which
  * metafield to be updated.
  */
-export async function merge (store: IStore, config: IConfig): Promise<{
+export async function merge (store: Store): Promise<{
   title: string;
   data: object;
   path: string;
@@ -37,7 +41,7 @@ export async function merge (store: IStore, config: IConfig): Promise<{
   for (const prop of fields) {
 
     const name = prop.handle;
-    const file = join(config.metafields, prop.handle);
+    const file = join($.dirs.metafields.metafields, prop.handle);
 
     let isMD = true;
     let ext = '.md';
@@ -79,7 +83,7 @@ export async function merge (store: IStore, config: IConfig): Promise<{
     }
   }
 
-  if (is(choices.length, 0)) {
+  if (choices.length === 0) {
     spins.stop(c.gray(`${c.green.bold('✔')} Pages are aligned, no merges required`));
     process.exit();
   }
@@ -168,38 +172,12 @@ export async function pull (store: IStore, config: IConfig) {
 };
 
 /**
- * List Pages
- *
- * Pages listing request, typically called
- * from the prompt to query and explore pages.
- */
-export async function list <T extends { pages: IPage[] }> (store: IStore) {
-
-  return axios.get<T>('pages.json', store.client).then(({ data }) => {
-
-    return data.pages;
-
-  }).catch((e: AxiosError) => {
-
-    if (requeue(e.response.status)) {
-      queue.add(() => list(store));
-    } else {
-      return error(store.store, e.response);
-    }
-
-  });
-
-};
-
-/**
  * Get Page
  *
  * Returns a page by id reference. We keep a cache
  * map reference of page IDs in the `node_modules/.syncify/pages.map` file.
  */
-export async function get <T extends { page: IPage[] }> (store: IStore, id?: number) {
-
-  if (is(arguments.length, 1)) return (_id: number) => get(store, _id);
+export async function get <T extends { page: Requests.Page[] }> (store: Store, id?: number) {
 
   return axios.get<T>(`pages/${id}.json`, store.client).then(({ data }) => {
 
@@ -224,11 +202,9 @@ export async function get <T extends { page: IPage[] }> (store: IStore, id?: num
  * Returns a metafield by id reference. We keep a cache
  * map reference of metafield IDs in the `node_modules/.syncify/metafields.map` file.
  */
-export async function remove <T extends { pages: IMetafield[] }> (store: IStore, id?: number) {
+export async function remove (store: Store, id?: number) {
 
-  if (is(arguments.length, 1)) return (_id: number) => remove(store, _id);
-
-  return axios.delete<T>(`pages/${id}.json`, store.client).then(() => {
+  return axios.delete(`pages/${id}.json`, store.client).then(() => {
 
     return true;
 
@@ -246,15 +222,36 @@ export async function remove <T extends { pages: IMetafield[] }> (store: IStore,
 };
 
 /**
+ * List Pages
+ *
+ * Pages listing request, typically called
+ * from the prompt to query and explore pages.
+ */
+export async function list <T extends { pages: Requests.Page<'get'>[] }> (store: Store) {
+
+  return axios.get<T>('pages.json', store.client).then(({ data }) => {
+
+    return data.pages;
+
+  }).catch((e: AxiosError) => {
+
+    if (requeue(e.response.status)) {
+      queue.add(() => list(store));
+    } else {
+      console.error(e);
+    }
+
+  });
+
+};
+
+/**
  * Find Page
  *
- * Finds a Page via handle, title or both.
- * Walks through fields returning either an object or array.
- * If no match is found then `undefined` is returned
+ * Finds a Page via handle, title or both. Walks through fields returning either an
+ * object or array. If no match is found then `undefined` is returned
  */
-export async function find <T extends IPage> (store: IStore, page?: IPage) {
-
-  if (is(arguments.length, 1)) return (_page: IPage) => find(store, _page);
+export async function find <T extends Requests.Page> (store: Store, page?: T): Promise<Requests.Page> {
 
   if (allFalse(has('handle', page), has('title', page))) {
     console.log('invalid fields');
@@ -263,7 +260,23 @@ export async function find <T extends IPage> (store: IStore, page?: IPage) {
 
   return axios.get<{ pages: T[] }>('pages.json', store.client).then(({ data }) => {
 
-    return data.pages.find(p => (page.title === p.title && page.handle === p.handle));
+    if (has('handle', page) && has('title', page)) {
+
+      return data.pages.find(p => (page.title === p.title && page.handle === p.handle));
+
+    } else if (has('handle', page)) {
+
+      return data.pages.find(p => (page.handle === p.handle));
+
+    } else if (has('title', page)) {
+
+      return data.pages.find(p => (page.title === p.title));
+
+    } else {
+
+      return undefined;
+
+    }
 
   }).catch(e => {
 
@@ -280,28 +293,38 @@ export async function find <T extends IPage> (store: IStore, page?: IPage) {
  *
  * Creates a new page in the online store
  */
-export async function create <T extends IPage> (store: IStore, page?: T) {
+export async function create <T extends Requests.Page> (store: Store, page: T): Promise<T> {
 
-  if (is(arguments.length, 1)) return (_page: IPage) => create(store, _page);
+  if (!$.mode.upload) timer.start();
 
-  return axios.post<{ page: T }>('pages.json', { page }).then(({ data }) => {
+  const promise = await axios.post<{ page: T }>('/pages.json', { page }, store.client).then(({ data }) => {
 
-    console.log('created');
+    log.resource('page', store);
 
     return data.page;
 
   }).catch(e => {
 
-    if (!store.queue) return error(page.title, e.response);
+    // if (!store.queue) return log.err(page.title);
 
     if (requeue(e.response.status)) {
+
       queue.add(() => create(store, page));
-      return undefined;
+
     } else {
-      return error(store.store, e.response);
+
+      if (hasPath('response.data', e.response)) {
+        error.request(page.title, e.response);
+      }
     }
 
   });
+
+  if (!promise) return undefined;
+
+  await cache.pages(store.domain, promise);
+
+  return promise;
 
 };
 
@@ -311,45 +334,48 @@ export async function create <T extends IPage> (store: IStore, page?: T) {
  * Updates an existing page using its unique `id`.
  * This is applied only when a metafield reference exists.
  */
-export async function sync <T extends IPage> (store: IStore, id?: number, page?: T) {
+export async function sync <T extends Requests.Page> (store: Store, file: File, page?: T): Promise<T> {
 
-  return axios.put<{ page: T }>(`pages/${id}.json`, { page }, store.client).then(({ data }) => {
+  const { mode } = $;
 
-    console.log('created');
+  if (!mode.upload) timer.start();
+
+  const url = `pages/${page.id}.json`;
+  const promise = await axios.put<{ page: T}>(url, { page }, store.client).then(({ data }) => {
+
+    if (mode.watch) {
+
+      log.resource('page', store);
+
+    } else if (mode.upload) {
+
+      event.emit('upload', 'uploaded', page, {
+        key: file.key,
+        namespace: file.namespace,
+        fileSize: getSizeStr(page.body_html)
+      });
+
+    }
+
     return data.page;
 
   }).catch(e => {
 
-    if (!store.queue) return error(store.store, e.response);
+    // if (!store.queue) return error(store.store, e.response);
 
     if (requeue(e.response.status)) {
-      queue.add(() => update(store, id, page));
+
+      queue.add(() => sync(store, file, page));
+
     } else {
-      return error(store.store, e.response);
+
+      console.log(e);
     }
 
   });
-};
 
-/**
- * Metafields
- *
- * Metafield handler function. This is used in the
- * resource modes and will query, create or update
- * metafields.
- */
-export function client (store: IStore) {
+  if (!promise) return undefined;
 
-  return {
-    sync: update.apply(null, store),
-    list: list.apply(null, store),
-    get: get.apply(null, store),
-    find: find.apply(null, store),
-    create: create.apply(null, store),
-    update: update.apply(null, store),
-    delete: remove.apply(null, store),
-    merge,
-    pull
-  };
+  return promise;
 
 };
