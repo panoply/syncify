@@ -76,6 +76,21 @@ export function hasRenamespace (rename: string) {
 }
 
 /**
+ * Converts string input to a handle
+ *
+ * @param string The string to convert
+ */
+export function handleize (string: string) {
+
+  return string
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-$/, '')
+    .replace(/^-/, '');
+
+}
+
+/**
  * Adds an `s` to the end of a word if length is more than 1
  *
  * @param word The word to pluralize
@@ -331,6 +346,20 @@ export function getImport <T> (id: string): T {
   // @ts-expect-error
   return createRequire(import.meta.url)(id);
 
+}
+
+export function kebabCase (string: string) {
+
+  if (typeof string === 'string' && string.length > 0) {
+
+    return string
+      .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+      .join('-')
+      .toLowerCase();
+
+  }
+
+  return string;
 }
 
 /**
