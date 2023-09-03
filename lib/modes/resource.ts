@@ -1,18 +1,16 @@
-import { IConfig } from 'types';
 import prompts from 'prompts';
 import * as pages from '../requests/pages';
 import * as metafields from '../requests/metafields';
+import { $ } from '~state';
 
-export async function resource (config: IConfig) {
+export async function resource () {
 
-  const [ store ] = config.sync.stores;
+  if ($.mode.pages) {
 
-  if (config.mode.pages) {
-
-    if (config.mode.pull) {
-      return pages.pull(store, config);
-    } else if (config.mode.merge) {
-      return pages.merge(store, config);
+    if ($.mode.pull) {
+      return pages.pull(store, bundle);
+    } else if ($.mode.merge) {
+      return pages.merge(store, bundle);
     }
 
     /* await prompts([
@@ -62,11 +60,11 @@ export async function resource (config: IConfig) {
       }
     ]); */
 
-  } else if (config.mode.metafields) {
+  } else if ($.mode.metafields) {
 
-    if (config.mode.pull) {
+    if ($.mode.pull) {
       return metafields.pull(store, config);
-    } else if (config.mode.merge) {
+    } else if ($.mode.merge) {
       return metafields.merge(store, config);
     }
 
@@ -118,6 +116,16 @@ export async function resource (config: IConfig) {
       initial: 0,
       choices: [
         {
+          title: 'Stores',
+          description: 'Available Stores',
+          value: 's'
+        },
+        {
+          title: 'Themes',
+          description: `Themes on ${store.domain}`,
+          value: 't'
+        },
+        {
           title: 'Metafields',
           description: `Metafields on ${store.domain}`,
           value: 'm'
@@ -131,8 +139,8 @@ export async function resource (config: IConfig) {
     }
   ]);
 
-  if (action.resource === 'p') config.mode.pages = true;
-  if (action.resource === 'm') config.mode.metafields = true;
+  if (action.resource === 'p') $.mode.pages = true;
+  if (action.resource === 'm') $.mode.metafields = true;
 
   return resource(config);
 
