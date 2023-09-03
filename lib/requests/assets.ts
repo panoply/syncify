@@ -5,7 +5,7 @@ import { pMapSkip } from 'p-map';
 import { queue, axios } from '~requests/queue';
 import * as timer from '~utils/timer';
 import { log, error } from '~log';
-import { bundle } from '~config';
+import { $ } from '~state';
 import merge from 'mergerino';
 import { event, getSizeStr } from '~utils/utils';
 import { hasPath } from 'rambdax';
@@ -18,7 +18,7 @@ import { hasPath } from 'rambdax';
 export async function has (asset: FileKeys, theme: Theme): Promise<boolean> {
 
   return axios({
-    ...bundle.sync.stores[theme.sidx].client,
+    ...$.sync.stores[theme.sidx].client,
     method: 'get',
     url: theme.url,
     params: {
@@ -36,7 +36,7 @@ export async function has (asset: FileKeys, theme: Theme): Promise<boolean> {
 export async function find (asset: FileKeys, theme: Theme): Promise<string> {
 
   return axios({
-    ...bundle.sync.stores[theme.sidx].client,
+    ...$.sync.stores[theme.sidx].client,
     method: 'get',
     url: theme.url,
     params: {
@@ -53,7 +53,7 @@ export async function find (asset: FileKeys, theme: Theme): Promise<string> {
  */
 export async function upload (asset: string, config: { theme: Theme, key: FileKeys }): Promise<boolean> {
 
-  const request = merge(bundle.sync.stores[config.theme.sidx].client, {
+  const request = merge($.sync.stores[config.theme.sidx].client, {
     method: 'put',
     url: config.theme.url,
     data: {
@@ -99,7 +99,7 @@ export async function get <T> (url: string, config: AxiosRequestConfig<Request>)
       queue.add(() => sync(theme, file, config));
     } else {
 
-      if (bundle.mode.upload) {
+      if ($.mode.upload) {
 
         throw e.response;
 
@@ -131,7 +131,7 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
   if (queue.isPaused) return;
 
-  const { mode } = bundle;
+  const { mode } = $;
 
   if (queue.concurrency > 2) {
     if (limit >= 20) queue.concurrency--;
@@ -146,7 +146,9 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
     if (config.method === 'get') return data;
     if (config.method === 'delete') {
+
       log.deleted(file.relative, theme);
+
     } else {
 
       if (mode.watch) {
@@ -157,10 +159,14 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
       } else if (mode.upload) {
 
+        let fileSize = '';
+
+        if ('asset' in config.data) fileSize = getSizeStr(config.data.asset.value);
+
         event.emit('upload', 'uploaded', theme, {
           key: file.key,
           namespace: file.namespace,
-          fileSize: getSizeStr(config.data.asset.value)
+          fileSize
         });
 
       }
@@ -183,10 +189,14 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
       if (mode.upload) {
 
+        let fileSize = '';
+
+        if ('asset' in config.data) fileSize = getSizeStr(config.data.asset.value);
+
         event.emit('upload', 'failed', theme, {
           key: file.key,
           namespace: file.namespace,
-          fileSize: getSizeStr(config.data.asset.value),
+          fileSize,
           get file () {
             return file;
           },
@@ -201,9 +211,10 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
         log.failed(file.key);
 
-        if (hasPath('response.data', e.response)) {
+        if (e.isAxiosError) {
           error.request(file.relative, e.response);
         }
+
       }
 
     }
