@@ -1,7 +1,7 @@
 import type { SVGBundle, File, Syncify, SVGSpriteConfig, SVGOConfig, ClientParam } from 'types';
 import type { SVGSpriter, SVGSpriterConstructor } from 'svg-sprite';
 import type SVGO from 'svgo';
-import { join, relative } from 'node:path';
+import { join, relative } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, mapAsync } from 'rambdax';
 import { toArray, assign } from '~utils/native';
@@ -201,8 +201,8 @@ function patchPathVoids (svg: string) {
   const patch = /<path[^>]*[a-zA-Z"'\s](>)(?!\s*<\/path>)/g;
 
   if (patch.test(svg)) {
-    const before = `${c.redBright(`<${c.white('path')}>`)}`;
-    const after = `${c.greenBright(`<${c.white('path')} />`)}`;
+    const before = `${c.gray(`<${c.white('path')}>`)}`;
+    const after = `${c.neonGreen(`<${c.white('path')} />`)}`;
     log.transform(`${before} ${c.ARR} ${after} ${c.TLD} ${c.gray('patched solidus')}`);
     return svg.replace(/(<path[^>]*[a-zA-Z"'\s])(>)(?!\s*<\/path>)/g, '$1 /$2');
   }
