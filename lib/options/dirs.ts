@@ -1,14 +1,13 @@
-import { Commands, Cache } from 'types';
+import { Commands } from 'types';
 import { has, uniq } from 'rambdax';
-import glob from 'fast-glob';
-import { mkdir, emptyDir, writeJson, pathExists, readJson } from 'fs-extra';
-import { join, basename, extname } from 'pathe';
-import { assign, create, defineProperty, isArray, isString } from '~utils/native';
+import { mkdir, emptyDir, pathExists } from 'fs-extra';
+import { join } from 'pathe';
+import { isArray, isString } from '~utils/native';
 import { basePath } from '~utils/paths';
 import { $ } from '~state';
 import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '~const';
 import { typeError } from '~options/validate';
-import { updateCache } from '~process/caches';
+import * as cache from '~process/caches';
 
 /**
  * Create Cache Directories
@@ -18,7 +17,7 @@ import { updateCache } from '~process/caches';
  */
 export async function setCacheDirs (path: string, options = { purge: false }) {
 
-  assign<Cache, Cache>($.cache, {
+  $.cache = {
     uri: join(path, 'build.map'),
     version: $.version,
     maps: {},
@@ -28,7 +27,7 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
       script: null,
       style: null
     }
-  });
+  };
 
   const hasBase = await pathExists(path);
 
@@ -68,7 +67,7 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
 
   }
 
-  await updateCache();
+  await cache.update();
 
 };
 
@@ -78,111 +77,111 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
  * Populates the cache references and assigns them
  * to the `$.cache` model.
  */
-export async function getCacheFiles () {
+// export async function getCacheFiles () {
 
-  // Populate the store specifics records
-  //
-  if (dir === 'page' || dir === 'metafield' || dir === 'redirect') {
+//   // Populate the store specifics records
+//   //
+//   if (dir === 'page' || dir === 'metafield' || dir === 'redirect') {
 
-    const stores = isArray($.config.stores) ? $.config.stores : [ $.config.stores ];
+//     const stores = isArray($.config.stores) ? $.config.stores : [ $.config.stores ];
 
-    for (const { domain } of stores) {
+//     for (const { domain } of stores) {
 
-      const myshopify = `${domain}.myshopify.com`;
-      const uri = join(path, myshopify);
-      const has = await pathExists(uri);
+//       const myshopify = `${domain}.myshopify.com`;
+//       const uri = join(path, myshopify);
+//       const has = await pathExists(uri);
 
-      $.cache[dir as string] = { [myshopify]: create(null) };
+//       $.cache[dir as string] = { [myshopify]: create(null) };
 
-      if (!has) {
+//       if (!has) {
 
-        try {
-          await mkdir(uri);
-        } catch (e) {
-          throw new Error(e);
-        }
+//         try {
+//           await mkdir(uri);
+//         } catch (e) {
+//           throw new Error(e);
+//         }
 
-      } else {
+//       } else {
 
-        const files = await glob(join(path, '*'));
+//         const files = await glob(join(path, '*'));
 
-        if (files.length > 0) {
+//         if (files.length > 0) {
 
-          for (const file of files) {
+//           for (const file of files) {
 
-            const name = basename(file, extname(file));
+//             const name = basename(file, extname(file));
 
-            try {
+//             try {
 
-              const data = await readJson(file);
+//               const data = await readJson(file);
 
-              defineProperty($.cache[dir as string][myshopify], name, {
-                get () {
-                  return data;
-                }
-              });
+//               defineProperty($.cache[dir as string][myshopify], name, {
+//                 get () {
+//                   return data;
+//                 }
+//               });
 
-            } catch (e) {
-              throw new Error(e);
-            }
-          }
-        }
-      }
-    }
+//             } catch (e) {
+//               throw new Error(e);
+//             }
+//           }
+//         }
+//       }
+//     }
 
-  } else if (dir === 'style' || dir === 'script') {
+//   } else if (dir === 'style' || dir === 'script') {
 
-    const files = await glob(join(path, '*'));
+//     const files = await glob(join(path, '*'));
 
-    if (files.length > 0) {
+//     if (files.length > 0) {
 
-      for (const file of files) {
+//       for (const file of files) {
 
-        const name = basename(file, extname(file));
+//         const name = basename(file, extname(file));
 
-        try {
+//         try {
 
-          $.cache[dir as string] = create(null);
-          $.cache[dir][name] = file;
+//           $.cache[dir as string] = create(null);
+//           $.cache[dir][name] = file;
 
-        } catch (e) {
+//         } catch (e) {
 
-          throw new Error(e);
-        }
-      }
-    }
+//           throw new Error(e);
+//         }
+//       }
+//     }
 
-  } else {
+//   } else {
 
-    console.log(dir, path);
-    const files = await glob(join(path, '*.json'));
+//     console.log(dir, path);
+//     const files = await glob(join(path, '*.json'));
 
-    if (files.length > 0) {
+//     if (files.length > 0) {
 
-      for (const file of files) {
+//       for (const file of files) {
 
-        // const name = basename(file, '.json');
+//         // const name = basename(file, '.json');
 
-        try {
+//         try {
 
-          const data = await readJson(file);
+//           const data = await readJson(file);
 
-          defineProperty($.cache, dir, {
-            get () {
-              return data;
-            }
-          });
+//           defineProperty($.cache, dir, {
+//             get () {
+//               return data;
+//             }
+//           });
 
-        } catch (e) {
+//         } catch (e) {
 
-          throw new Error(e);
-        }
-      }
-    }
+//           throw new Error(e);
+//         }
+//       }
+//     }
 
-  }
+//   }
 
-}
+// }
 
 /**
  * Create Theme Directories
