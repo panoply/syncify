@@ -1,7 +1,7 @@
 import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
-import { join, dirname, basename } from 'node:path';
+import { join, dirname, basename } from 'pathe';
 import { defineProperty, isRegex, isUndefined } from '../utils/native';
-import { bundle } from '../config';
+import { $ } from '~state';
 import { lastPath, parentPath } from '../utils/paths';
 
 /**
@@ -11,7 +11,7 @@ import { lastPath, parentPath } from '../utils/paths';
  */
 export function svg (file: File<SVGBundle>) {
 
-  const config = bundle.svg.filter(context => {
+  const config = $.svg.filter(context => {
 
     if (context.input.has(file.input)) return true;
     if (!context.match(file.input)) return false;
@@ -37,7 +37,7 @@ export function svg (file: File<SVGBundle>) {
  */
 export function style (file: File<StyleBundle>) {
 
-  const config = bundle.style.find(x => x.watch(file.input));
+  const config = $.style.find(x => x.watch(file.input));
 
   if (isUndefined(config)) return file;
 
@@ -54,14 +54,14 @@ export function style (file: File<StyleBundle>) {
   if (file.output) {
     if (file.data.rename !== basename(file.output)) {
       if (config.snippet) {
-        file.output = join(bundle.dirs.output, file.key);
+        file.output = join($.dirs.output, file.key);
       } else {
         file.output = join(parentPath(file.output), file.data.rename);
       }
     }
   } else {
 
-    file.output = join(bundle.dirs.output, file.key);
+    file.output = join($.dirs.output, file.key);
 
   }
 
@@ -76,7 +76,7 @@ export function style (file: File<StyleBundle>) {
  */
 export function script (file: File<ScriptBundle[]>) {
 
-  const config = bundle.script.filter(config => config.watch.has(file.input));
+  const config = $.script.filter(config => config.watch.has(file.input));
 
   if (config.length === 0) return file;
 
@@ -93,12 +93,12 @@ export function script (file: File<ScriptBundle[]>) {
  */
 export function section (file: File) {
 
-  if (bundle.section.prefixDir) {
+  if ($.section.prefixDir) {
 
     if (file.base.endsWith('-group.json')) return file;
-    if (isRegex(bundle.section.global) && bundle.section.global.test(file.input)) return file;
+    if (isRegex($.section.global) && $.section.global.test(file.input)) return file;
 
-    const rename = lastPath(file.input) + bundle.section.separator + file.base;
+    const rename = lastPath(file.input) + $.section.separator + file.base;
 
     file.name = rename;
     file.key = join(file.namespace, rename);
@@ -116,11 +116,11 @@ export function section (file: File) {
  */
 export function snippet (file: File) {
 
-  if (bundle.snippet.prefixDir) {
+  if ($.snippet.prefixDir) {
 
-    if (isRegex(bundle.snippet.global) && bundle.snippet.global.test(file.input)) return file;
+    if (isRegex($.snippet.global) && $.snippet.global.test(file.input)) return file;
 
-    const rename = lastPath(file.input) + bundle.snippet.separator + file.base;
+    const rename = lastPath(file.input) + $.snippet.separator + file.base;
 
     file.name = rename;
     file.key = join(file.namespace, rename);
