@@ -1,14 +1,14 @@
 import { allFalse, has } from 'rambdax';
 import { AxiosError } from 'axios';
 import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
-import { Bundle, Config, Store, Requests } from '../../types';
+import { Config, Store, Requests } from 'types';
 import { join } from 'path';
 import prompts from 'prompts';
 import Spinner from 'tiny-spinner';
-import { assign } from '../utils/native';
-import { queue, axios, requeue } from '../requests/queue';
+import { assign } from '~utils/native';
+import { queue, axios, requeue } from '~requests/queue';
 import { log, c, error } from '~log';
-import { bundle } from '../config';
+import { $, Bundle } from '~state';
 
 /**
  * Write Metafields
@@ -18,8 +18,8 @@ import { bundle } from '../config';
  */
 function write (config: Config) {
 
-  const base = join(bundle.cwd, config.metafields);
-  const { indent } = bundle.json;
+  const base = join($.cwd, config.metafields);
+  const { indent } = $.json;
 
   return async (field: { dir: string; key: string; data: object; name: string; }) => {
 
