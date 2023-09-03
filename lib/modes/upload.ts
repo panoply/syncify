@@ -324,4 +324,10 @@ export async function upload (cb?: Syncify): Promise<void> {
 
   }
 
+  log.nwl();
+  log.update(`${c.line.gray}Upload Completed`);
+  log.nwl();
+
+  process.exit(0);
+
 };

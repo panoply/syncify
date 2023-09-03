@@ -34,7 +34,6 @@ export async function build (callback?: Syncify) {
   const parse = parseFile(paths, dirs.output);
   const match = anymatch(toArray((watch as Set<string>).values()));
   const files = await glob('**', {
-    onlyFiles: true,
     absolute: true,
     cwd: dirs.input
   });
@@ -64,8 +63,12 @@ export async function build (callback?: Syncify) {
         acc.configs.files.push(file); break;
       case Type.Template:
         acc.templates.files.push(file); break;
+      case Type.Page:
+        acc.pages.files.push(file); break;
       case Type.Asset:
         acc.assets.files.push(file); break;
+      case Type.Metafield:
+        acc.metafields.files.push(file); break;
       case Type.Svg: {
 
         // Special handling for SVG build
@@ -135,6 +138,16 @@ export async function build (callback?: Syncify) {
       report: null
     },
     configs: {
+      time: nil,
+      files: [],
+      report: null
+    },
+    pages: {
+      time: nil,
+      files: [],
+      report: null
+    },
+    metafields: {
       time: nil,
       files: [],
       report: null
@@ -234,7 +247,7 @@ export async function build (callback?: Syncify) {
 
       }
 
-    } else if (id === 'locales' || id === 'configs') {
+    } else if (id === 'locales' || id === 'configs' || id === 'metafields') {
 
       if (mode.views) {
 
@@ -244,6 +257,13 @@ export async function build (callback?: Syncify) {
         source[id].time = timer.stop();
 
       }
+    } else if (id === 'pages' && mode.views) {
+
+      // if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;
+
+      // source[id].report = await mapAsync<File, BuildModeReport>(handle(id, size, pages), item);
+      // source[id].time = timer.stop();
+
     } else if (id === 'assets' && mode.views) {
 
       if (hasFilter && (!(has(id, filters) && filters[id].includes(id)))) continue;

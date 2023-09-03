@@ -142,8 +142,6 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
 
     const { mode, terser } = $;
 
-    console.log(terser);
-
     if (mode.terse) {
       if (file.type === Type.Asset) {
         if (terser.json.assets) space = 0;

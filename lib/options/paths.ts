@@ -74,39 +74,40 @@ export async function setPaths (config: Config) {
 
     }
 
-    if (key === 'metafields' || key === 'redirects') continue;
-
     for (const p of uri) {
 
-      const paths = await glob(p, { cwd: $.cwd });
+      if (key !== 'metafields' && key !== 'redirects') {
 
-      if (paths.length === 0) {
+        const paths = await glob(p, { cwd: $.cwd });
 
-        warn('No files could be resolved in', relative($.cwd, p));
+        if (paths.length === 0) {
 
-      } else {
+          warn('No files could be resolved in', relative($.cwd, p));
 
-        // We will create the set if null
-        // otherwise we iterate and populate the set.
-        //
-        if ($.paths[key].input === null) {
-          $.paths[key].input = new Set(paths);
         } else {
-          for (const entry of paths) {
-            $.paths[key].input.add(entry);
-          }
-        }
 
-        // TODO
-        // IMPROVE THIS LOGIC
-        //
-        $.watch.add(p);
+          // We will create the set if null
+          // otherwise we iterate and populate the set.
+          //
+          if ($.paths[key].input === null) {
+            $.paths[key].input = new Set(paths);
+          } else {
+            for (const entry of paths) {
+              $.paths[key].input.add(entry);
+            }
+          }
+
+          // TODO
+          // IMPROVE THIS LOGIC
+          //
+          $.watch.add(p);
+
+        }
 
       }
 
+      $.paths[key].match = anymatch(uri);
     }
-
-    $.paths[key].match = anymatch(uri);
 
   }
 
