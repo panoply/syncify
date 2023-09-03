@@ -1,12 +1,12 @@
 // @ts-expect-error
 import { loadTsConfig } from 'load-tsconfig';
 import { readFile, unlink, writeFile } from 'fs-extra';
-import { isAbsolute, dirname, extname } from 'node:path';
+import { isAbsolute, dirname, extname } from 'pathe';
 import { pathToFileURL } from 'node:url';
 import { build, BuildOptions, BuildFailure, BuildResult, Plugin as EsbuildPlugin } from 'esbuild';
 import { inferLoader, dynamicImport, uuid } from './utils';
 import { keys } from './native';
-import { bundle } from '~config';
+import { $ } from '~state';
 import { DIRNAME_VAR_NAME, FILENAME_VAR_NAME, IMPORT_META_URL_VAR_NAME, REGEX_EXTJS } from '~const';
 
 /**
@@ -29,7 +29,7 @@ function isCommonJSorESM (inputFile: string): 'esm' | 'cjs' {
   const ext = extname(inputFile);
 
   if (ext === '.js') {
-    return bundle.pkg.type === 'module' ? 'esm' : 'cjs';
+    return $.pkg.type === 'module' ? 'esm' : 'cjs';
   } else if (ext === '.ts') {
     return 'esm';
   } else if (ext === '.mjs') {
