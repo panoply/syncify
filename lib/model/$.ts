@@ -367,7 +367,8 @@ export const $ = new class Bundle {
   public section: SectionBundle = {
     prefixDir: false,
     separator: '-',
-    global: null
+    global: null,
+    baseDir: new Set()
   };
 
   /**
@@ -386,7 +387,8 @@ export const $ = new class Bundle {
   public snippet: SnippetBundle = {
     prefixDir: false,
     separator: '-',
-    global: null
+    global: null,
+    baseDir: new Set()
   };
 
   /**

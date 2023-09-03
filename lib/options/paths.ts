@@ -1,9 +1,9 @@
 import type { Config } from 'types';
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
-import { join, relative } from 'pathe';
+import { dirname, join, relative } from 'pathe';
 import { has } from 'rambdax';
-import { normalPath } from '~utils/paths';
+import { lastPath, normalPath, parentPath } from '~utils/paths';
 import { warnOption } from '~options/validate';
 import { PATH_KEYS } from '~const';
 import { $ } from '~state';
@@ -50,8 +50,18 @@ export async function setPaths (config: Config) {
         ? (config.paths[key] as string[]).map(path)
         : [ path(config.paths[key]) ];
 
-      if (key === 'assets') {
+      if (key === 'snippets') {
+
+        for (const p of uri) $.snippet.baseDir.add(lastPath(dirname(p)));
+
+      } else if (key === 'sections') {
+
+        for (const p of uri) $.section.baseDir.add(lastPath(dirname(p)));
+
+      } else if (key === 'assets') {
+
         uri.push(join($.dirs.output, 'assets/*'));
+
       }
 
     } else if (key === 'redirects' && has(key, config.paths)) {

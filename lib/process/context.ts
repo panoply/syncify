@@ -98,6 +98,10 @@ export function section (file: File) {
     if (file.base.endsWith('-group.json')) return file;
     if (isRegex($.section.global) && $.section.global.test(file.input)) return file;
 
+    const last = lastPath(file.input);
+
+    if ($.section.baseDir.has(last)) return file;
+
     const rename = lastPath(file.input) + $.section.separator + file.base;
 
     file.name = rename;
@@ -120,7 +124,13 @@ export function snippet (file: File) {
 
     if (isRegex($.snippet.global) && $.snippet.global.test(file.input)) return file;
 
-    const rename = lastPath(file.input) + $.snippet.separator + file.base;
+    const last = lastPath(file.input);
+
+    if ($.snippet.baseDir.has(last)) return file;
+
+    console.log($.snippet);
+
+    const rename = last + $.snippet.separator + file.base;
 
     file.name = rename;
     file.key = join(file.namespace, rename);

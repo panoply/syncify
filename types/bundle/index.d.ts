@@ -393,6 +393,12 @@ export interface ConfigFile {
 export type SectionBundle = Merge<Config.Views['sections'], {
   global: RegExp;
   paths?: Tester;
+  /**
+   * Base directory name used for matching on directory prefixes
+   * The base directory name will equate to the last known directory
+   * before a glob pattern or file reference.
+   */
+  baseDir: Set<string>;
 }>
 
 /* -------------------------------------------- */
@@ -407,6 +413,12 @@ export type SectionBundle = Merge<Config.Views['sections'], {
 export type SnippetBundle = Merge<Config.Views['snippets'], {
   global: RegExp;
   paths?: Tester;
+ /**
+  * Base directory name used for matching on directory prefixes
+  * The base directory name will equate to the last known directory
+  * before a glob pattern or file reference.
+  */
+  baseDir: Set<string>;
 }>
 
 /* -------------------------------------------- */

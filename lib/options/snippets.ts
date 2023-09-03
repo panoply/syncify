@@ -46,8 +46,8 @@ export function setSnippetOptions (config: Config) {
       }
     }
 
-    // Validate the prefix separator option, in Shopifysnippets
-    // We cannot use dot prefixes, we ensure only accepts values are defined.
+    // Validate the prefix separator option, in Shopify snippets
+    // We support dot prefixes in snippets unlike sections where such is invalid.
     if (option === 'separator') {
       if (isString(snippets[option])) {
 
@@ -56,7 +56,7 @@ export function setSnippetOptions (config: Config) {
           $.section[option] = snippets[option];
           continue;
         } else {
-          invalidError('sections', option, snippets[option], '@ | _ | : | - | .');
+          invalidError('snippets', option, snippets[option], '@ | _ | : | - | .');
         }
       } else {
         typeError({
@@ -79,6 +79,7 @@ export function setSnippetOptions (config: Config) {
           $.snippet[option] = new RegExp(`${globals.join('|')}`);
           continue;
         }
+
       } else {
 
         typeError({
