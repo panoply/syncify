@@ -19,16 +19,16 @@ import { setSvgOptions } from '~options/svgs';
 import { setHotReloads } from '~options/hot';
 import { setFilters } from '~options/filters';
 import { setMinifyOptions } from '~options/terser';
+import { setPageOptions } from './pages';
 import { log } from '~log';
 import { $ } from '~state';
 import * as u from '~utils/native';
 
 /**
- * Resolve Paths
+ * Define Options
  *
- * Resolves `package.json` file and the `.env`
- * file locations relative to the current working
- * directory.
+ * Runtime function - Syncify execution executes and generates the workable
+ * state (`$`) object and constructs all required references,
  */
 export async function define (cli: Commands, _options?: Config) {
 
@@ -65,6 +65,7 @@ export async function define (cli: Commands, _options?: Config) {
     setProcessors(config),
     setSectionOptions(config),
     setSnippetOptions(config),
+    setPageOptions(config),
     setJsonOptions(config),
     setScriptOptions(config),
     setStyleConfig(config),
@@ -93,40 +94,36 @@ export async function define (cli: Commands, _options?: Config) {
  */
 export function setChokidar (watch: boolean, cwd: string) {
 
-  if (!watch) {
+  if (!watch) return;
 
-    $.watch = new Set() as any;
+  $.watch = new FSWatcher({
+    persistent: true,
+    ignoreInitial: true,
+    usePolling: true,
+    interval: 75,
+    binaryInterval: 100,
+    ignored: [ '**/*.map' ],
+    ignorePermissionErrors: true
+  });
 
-  } else {
-
-    $.watch = new FSWatcher({
-      persistent: true,
-      ignoreInitial: true,
-      usePolling: true,
-      interval: 75,
-      binaryInterval: 100,
-      ignored: [ '**/*.map' ],
-      ignorePermissionErrors: true
-    });
-
-    Object.defineProperties($.watch, {
-      has: {
-        value (path: string, dir = cwd) {
-          return ($.watch as WatchBundle)._watched.get(dir).items.has(path);
-        }
-      },
-      paths: {
-        get () {
-          return u.toArray($.watch.values());
-        }
-      },
-      watching: {
-        get () {
-          return ($.watch as WatchBundle)._watched;
-        }
+  $.watch = Object.defineProperties($.watch, {
+    has: {
+      value (path: string, dir = cwd) {
+        return ($.watch as WatchBundle)._watched.get(dir).items.has(path);
       }
-    });
-  }
+    },
+    paths: {
+      get () {
+        return u.toArray($.watch.values());
+      }
+    },
+    watching: {
+      get () {
+        return ($.watch as WatchBundle)._watched;
+      }
+    }
+  });
+
 }
 
 /**
@@ -213,11 +210,12 @@ function setPlugins (config: Config) {
  */
 async function setCaches (cwd: string) {
 
-  const dir = join(cwd, 'node_modules/.syncify');
-  const uri = join(dir, 'build.json');
+  $.dirs.cache = join(cwd, 'node_modules/.syncify');
+
+  const uri = join($.dirs.cache, 'build.map');
   const has = await pathExists(uri);
 
-  if (!has) return setCacheDirs(dir);
+  if (!has) return setCacheDirs($.dirs.cache);
 
   $.cache = await readJSON(uri);
 
