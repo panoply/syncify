@@ -48,8 +48,11 @@ export function watch (callback: Syncify) {
       /* DELETED FILE                                 */
       /* -------------------------------------------- */
 
-      return request.assets('delete', file);
-
+      if (file.type === Type.Page) {
+        return request.pages('delete', file);
+      } else {
+        return request.assets('delete', file);
+      }
     }
 
   });
@@ -70,7 +73,7 @@ export function watch (callback: Syncify) {
 
       } else if (file.type === Type.Page) {
 
-        return pages(file, request.pages, callback);
+        return pages(file, callback);
 
       } else if (file.type === Type.Svg) {
 
