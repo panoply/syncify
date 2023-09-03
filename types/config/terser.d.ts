@@ -39,37 +39,43 @@ export interface JSONTerse {
    *
    * @default true
    */
-  assets: boolean;
+  assets?: boolean;
   /**
    * Minify `settings_schema.json` and `settings_data.json` config files.
    *
    * @default true
    */
-  config: boolean;
+  config?: boolean;
   /**
    * Minify `locale` and `.json` files.
    *
    * @default true
    */
-  locales: boolean;
+  locales?: boolean;
   /**
    * Minify `metafield` and `.json` files.
    *
    * @default true
    */
-  metafields: boolean;
+  metafields?: boolean;
+  /**
+   * Minify `metaobject` and `.json` files.
+   *
+   * @default true
+   */
+  metaobject?: boolean;
   /**
    * Minify section group `.json` files
    *
    * @default true
    */
-  sectionGroups: boolean;
+  groups?: boolean;
   /**
    * Minify `template` and `.json` files.
    *
    * @default true
    */
-  templates: boolean;
+  templates?: boolean;
   /**
    * An optional list of paths/files to exclude from minification.
    *
@@ -81,17 +87,23 @@ export interface JSONTerse {
 /**
  * Liquid Minification
  */
-export interface ViewTerse {
+export interface LiquidTerse {
   /**
-   * Minifies inner contents of `<script>` tags
+   * Minifies inner contents of `{% javascript %}` tags
    *
-   * @default true
+   * @default false
    */
-  minifyScript?: boolean;
+  minifyJavascript?: boolean;
   /**
-   * Minifies inner contents of `<style>` tags
+   * Minifies inner contents of `{% stylesheet %}`` tags
    *
-   * @default true
+   * @default false
+   */
+  minifyStylesheet?: boolean;
+  /**
+   * Minifies inner contents of `{% style %}` tags
+   *
+   * @default false
    */
   minifyStyle?: boolean;
   /**
@@ -101,11 +113,11 @@ export interface ViewTerse {
    * >
    * > Minifying schema tag contents has no effect on store performance.
    *
-   * @default true
+   * @default false
    */
   minifySchema?: boolean;
   /**
-   * Remove all occurances of Liquid/HTML comments
+   * Remove all occurances of Liquid comments
    *
    * @default true
    */
@@ -150,6 +162,42 @@ export interface ViewTerse {
    * {%unless foo==bar%}{{some.object|filter:'foo'}}{%endunless%}
    */
   collapseInner?: boolean;
+  /**
+   * Excluded files from minification
+   *
+   * @default []
+   */
+  exclude?: string[]
+}
+
+/**
+ * Liquid Minification
+ */
+export interface MarkupTerse {
+  /**
+   * Minifies inner contents of `<script>` tags
+   *
+   * @default true
+   */
+  minifyJS?: boolean;
+  /**
+   * Minifies inner contents of `<style>` tags
+   *
+   * @default true
+   */
+  minifyCSS?: boolean;
+  /**
+   * Remove all occurances of HTML comments
+   *
+   * @default true
+   */
+  removeComments?: boolean;
+  /**
+   * Collapse all whitespace and newlines
+   *
+   * @default true
+   */
+  collapseWhitespace?: boolean;
   /**
    * Excluded files from minification
    *
@@ -214,13 +262,13 @@ export interface TerserConfig {
   /**
    * Terse View (Liquid) Minification
    */
-  liquid?: Omit<ViewTerse, 'collapseWhitespace'>;
+  liquid?: LiquidTerse;
   /**
-   * Terse View (HTML) Minification
+   * Terse Markup (HTML) Minification
    *
    * > Uses [html-minifier-terser](https://github.com/terser/html-minifier-terser)
    */
-  html?: HTMLMinifierTerserOptions;
+  markup?: HTMLMinifierTerserOptions;
   /**
    * **NOTE YET AVAILABLE**
    *
@@ -251,9 +299,13 @@ export interface TerserBundle {
    */
   json: boolean;
   /**
-   * View minification
+   * HTML (Markup) Minification
    */
-  views: boolean;
+  markup: boolean;
+  /**
+   * Liquid Minification
+   */
+  liquid: boolean;
   /**
    * **NOTE YET AVAILABLE**
    *

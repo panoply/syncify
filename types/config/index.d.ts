@@ -2,11 +2,11 @@
 
 import type { Sections, Snippets } from './views';
 import type { HOTConfig } from '../bundle/hot';
-import type { ScriptTerse, JSONTerse, ViewTerse } from './terser';
+import type { ScriptTerse, JSONTerse, MarkupTerse, LiquidTerse } from './terser';
 import type { PluginHooks } from '../bundle/plugin';
 import type { JSONConfig } from '../transforms/json';
 import type { SharpConfig } from '../transforms/image';
-import type { PagesConfig } from 'types/transforms/pages';
+import type { PagesConfig } from '../transforms/pages';
 import type { ScriptTransformer, ESBuildConfig } from '../transforms/script';
 import type { StyleTransformer, SASSConfig, PostCSSConfig } from '../transforms/style';
 import type { SVGTransformer, SVGOConfig, SVGSpriteConfig } from '../transforms/svg';
@@ -246,7 +246,17 @@ export interface Terser {
    * of options are exposed in order to prevent invalid or broken
    * output from being generated.
    */
-  views?: boolean | ViewTerse;
+  liquid?: boolean | LiquidTerse;
+  /**
+   * View minification options. You can disable all views from
+   * being minified by passing a boolean `false`.
+   *
+   * Syncify uses HTML Minifier Terser under the hood, it has been
+   * configured to work with Liquid files so only a limited number
+   * of options are exposed in order to prevent invalid or broken
+   * output from being generated.
+   */
+  markup?: boolean | MarkupTerse;
   /**
    * JavaScript minification options. Script minification is only
    * available for projects with `esbuild` installed and configured
@@ -340,6 +350,12 @@ export interface Directories {
    * @default '/'
    */
   config?: string;
+  /**
+   * The resolved `cache` directory path for build tool files
+   *
+   * @default '.syncify/cache'
+   */
+  cache?: string;
 }
 
 /* -------------------------------------------- */
@@ -402,6 +418,12 @@ export interface Paths<T = string | string[]> {
    */
   locales?: T
   /**
+   * **NOT YET AVAILABLE**
+   *
+   * > **This option will be available in later versions**
+   *
+   * ---
+   *
    * The resolved `metafields` directory path
    *
    * @default 'source/metafields'
@@ -414,7 +436,11 @@ export interface Paths<T = string | string[]> {
    */
   pages?: T
   /**
-   * The resolved `redirects` yaml file
+   * **NOT YET AVAILABLE**
+   *
+   * > **This option will be available in later versions**
+   *
+   * ---
    *
    * @default 'redirects.yaml'
    */
@@ -517,7 +543,8 @@ export interface Config<T = Stores> extends Directories {
   terser?: boolean | Terser;
   /**
    * @deprecated
-   *  Use `terser` option instead
+   *
+   * Use `terser` option instead
    */
   minify?: undefined;
 }
