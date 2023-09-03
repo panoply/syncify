@@ -74,10 +74,9 @@ export interface Cache {
      */
     [myshopifyDomain: string]: {
       /**
-       * The page handle name, this will either be the page file name,
-       * the frontmatter `title` or if defined the frontmatter `handle`.
+       * The page id, as property and the page payload reference as value.
        */
-      [pageHandle: string]: Requests.Page
+      [pageId: number]: Requests.Page
     }
   },
   /**
