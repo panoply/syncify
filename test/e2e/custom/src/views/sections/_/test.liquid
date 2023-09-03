@@ -1,25 +1,34 @@
-
-<h1 style="background-color:green">
-  Hello World {{ section.settings.id }} {{ section.settings.xxx }}
-</h1>
+BEFORE
 
 {% schema %}
   {
     "name": "tester",
     "class": "example",
     "tag": "section",
+    "use": [
+      "header",
+      "footer"
+    ],
     "settings": [
       {
-        "type": "text",
-        "id": "xxx",
-        "label": "Xxx",
-        "default": "Foo Bar"
+        "ref": "header.logo_position"
       },
       {
-        "type": "text",
-        "id": "id",
-        "label": "Id",
-        "default": "fooooo"
+        "ref": "footer.color_scheme"
+      }
+    ],
+    "blocks": [
+      {
+        "name": "Sample",
+        "type": "sample",
+        "settings": [
+          {
+            "ref": "footer.link_list.heading"
+          },
+          {
+            "ref": "footer.brand_information.show_social"
+          },
+        ]
       }
     ]
   }

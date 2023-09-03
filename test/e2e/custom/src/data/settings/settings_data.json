@@ -12,7 +12,7 @@
             "button": "#121212",
             "button_label": "#FFFFFF",
             "secondary_button_label": "#121212",
-            "shadow": "#121212"
+            "shadow": "#FFF"
           }
         },
         "background-2": {

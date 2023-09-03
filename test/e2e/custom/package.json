@@ -6,11 +6,13 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "dev": "syncify syncify -t custom --watch --hot",
+    "dev": "syncify syncify -t custom --watch",
+    "hot": "syncify syncify -t custom --watch --hot",
     "dev:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --watch",
     "build": "syncify --build --prod --clean",
     "upload": "syncify syncify -t custom --upload",
     "upload:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --upload",
+    "upload:multi:filter": "syncify syncify,boefje --syncify custom --boefje dev,prod --upload --filter templates/*",
     "download": "syncify syncify -t custom --download",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -49,7 +51,9 @@
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.1",
+    "@liquify/highlight": "^0.1.0",
     "lazysizes": "^5.3.2",
+    "lightgallery": "1.10.0",
     "mithril": "^2.2.2"
   }
 }

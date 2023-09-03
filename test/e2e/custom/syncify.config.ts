@@ -9,14 +9,19 @@ export default defineConfig({
   clean: true,
   input: 'src',
   output: 'theme',
-  hot: {},
+  hot: {
+    strategy: 'replace',
+  },
   paths: {
 
     // metafields: 'metafields/**/*',
-    // pages: 'pages/*',
     // redirects: 'redirects.yaml'
 
-    assets: 'assets/images/**/*',
+    pages: 'pages/*',
+    assets: [
+      'assets/images/*',
+      'scripts/vendor/**/*.js'
+    ],
     config: 'data/settings/*',
     locales: 'data/translations/*',
     snippets: [
@@ -27,6 +32,9 @@ export default defineConfig({
     ],
     customers: [
       'views/customers/*'
+    ],
+    metaobject: [
+      'views/templates/meta/*'
     ],
     templates: [
       'views/templates/json/*',
@@ -55,13 +63,11 @@ export default defineConfig({
 
   views: {
 
-    // pages: {}
-
     // EXAMPLE: SUB-DIRECTORY SECTION SUPPORT
 
     sections: {
       prefixDir: true,
-      separator: '-',
+      separator: '_',
       global: [
         '_',
         'layout',
@@ -73,13 +79,19 @@ export default defineConfig({
 
     snippets: {
       prefixDir: true,
-      separator: '-',
+      separator: '_',
       global: [
         '_',
         'example',
         'misc'
       ]
     },
+
+
+    pages: {
+      safeSync: true,
+      importLanguage: 'markdown'
+    }
   },
   spawn: {
 
@@ -89,22 +101,13 @@ export default defineConfig({
     script: {
 
       // DAWN JS
-
       'assets/[file]': 'scripts/dawn/*.js',
 
       // EXAMPLE: BELOW IS AN EXAMPLE OF TS/JS
-
       'assets/bundle.min.js': 'scripts/bundle.ts',
 
       // EXAMPLE: MULTIPLE FILES WITH RENAME
-
-      'assets/output-[file]': [
-        'scripts/components/test.ts',
-        'scripts/modules/lazysizes.ts'
-      ],
-
       // EXAMPLE: GENERATING A SNIPPET
-
       'snippets/foo-snippet': {
         input: 'scripts/snippet.ts',
         format: 'esm',
@@ -117,26 +120,20 @@ export default defineConfig({
     },
 
     style: {
-
       // DAWN CSS
-
       'assets/[file]': {
         input: 'styles/dawn/*.css',
         postcss: true,
         sass: false,
       },
-
       // EXAMPLE: BUNDLING BOOTSTRAP
-
       'assets/example.min.css': {
         input: 'styles/example.scss',
         watch: ['styles/example/*'],
         postcss: true,
         sass: true
       },
-
       // EXAMPLE: GENERATING A SNIPPET
-
       'snippets/example.css.liquid': {
         input: 'styles/snippet.scss',
         postcss: true,
@@ -145,17 +142,13 @@ export default defineConfig({
     },
 
     svg: {
-
       // DAWN ICONS
-
       'snippets/icon.[file]': {
         input: 'assets/icons/dawn/*',
         snippet: true,
-        format: 'file'
+        format: 'file',
       },
-
       // EXAMPLE: BUILDING A SPRITE FROM FEATHER ICONS
-
       'snippets/sprite.liquid': {
         input: 'assets/icons/feather/*',
         format: 'sprite',
@@ -172,16 +165,14 @@ export default defineConfig({
   processors: {
     esbuild: {
       bundle: true,
-      sourcemap: false,
+      sourcemap: true,
     },
     sass: {
       sourcemap: true,
       style: 'compressed',
       include: ['node_modules/'],
     },
-    postcss: [
-
-    ]
+    postcss: []
   },
   terser: {
     json: {
@@ -190,7 +181,7 @@ export default defineConfig({
       locales: true,
       metafields: true,
       templates: true,
-      sectionGroups: true,
+      groups: true,
       exclude: []
     },
     script: {
@@ -202,13 +193,22 @@ export default defineConfig({
       mangleQuoted: true,
       exclude: []
     },
-    views: {
-      collapseWhitespace: true,
-      minifySchema: true,
-      minifyScript: true,
-      minifyStyle: true,
+    liquid: {
       removeComments: true,
+      collapseInner: false,
+      collapseWhitespace: true,
+      minifyJavascript: false,
+      minifySchema: false,
+      minifyStyle: false,
+      minifyStylesheet: false,
       stripDashes: true,
+      exclude: []
+    },
+    markup: {
+      collapseWhitespace: true,
+      minifyJS: true,
+      minifyCSS: true,
+      removeComments: true,
       exclude: []
     }
   }

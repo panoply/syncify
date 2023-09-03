@@ -4,7 +4,7 @@
 
 # SYNCIFY
 
-A lightening fast, extensible and superior alternative Shopify CLI (Theme Development) tool. Syncify provides developers with a powerful CLI and employs an intuitive approach for creating Shopify themes.
+A lightening fast, extensible and superior alternative Shopify CLI (Theme Development) tool. Syncify provides developers with a powerful CLI and employs an intuitive approach for creating Shopify themes. It's batteries included solution designed for advanced theme development.
 
 ### Demos
 
@@ -24,7 +24,7 @@ A lightening fast, extensible and superior alternative Shopify CLI (Theme Develo
 
 ### Why?
 
-I have been working on the Shopify platform for several years and nothing the Shopify team have produced has increased my productivity. Despite the advancements Shopify has made in recent years I still find their developer tooling to be missing the mark. The Shopify CLI is cool and all but for me the approach to theme development it fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
+I have been working on the Shopify platform for several years and nothing the Shopify team have produced has increased my productivity. Despite the advancements Shopify has made in recent years I still find their developer tooling to be missing the mark and a clear disconnect is apparent. The Shopify CLI is cool and all but for me the approach to theme development it fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
 
 Syncify provides you with essential stack tooling for producing lean, performant and refined themes. It's fast, flexible, extensible, scalable but most importantly, it's an un-restrictive workflow.
 
@@ -215,6 +215,9 @@ export default defineConfig({
     sections: 'sections/*.liquid',
     snippets: 'snippets/*.liquid',
     metafields: 'metafields/**/*.json',
+    metaobject: [
+      'templates/metaobject/*.json'
+    ],
     customers: [
       'templates/customers/*.json',
       'templates/customers/*.liquid'
@@ -246,13 +249,11 @@ export default defineConfig({
       renamePatterns: {}
     },
     pages: {
-      suffixDir: true,
+      safeSync: true,
       author: '',
-      global: [],
-      language: [
-        'html',
-        'markdown'
-      ],
+      importLanguage: 'html',
+      suffixDir: false,
+      global: []
     }
   },
   transforms: {
@@ -341,9 +342,9 @@ Syncify requires you to define custom **base** directory paths that point to the
 
 ### Input → Output
 
-Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can always be rebuilt from input. If you are used to working from a single directory (e.g: Dawn) then it is important that you understand the difference between the **input** and **output** directories.
+Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file (because it can always be rebuilt from input). If you have become accustomed to working from a single directory structure (i.e: Shopify Dawn) it is important that you understand the difference between the **input** and **output** directory approach.
 
-Single directory structures are not a viable approach when building modern and performant Shopify themes. Client-side (front-end) development is not SaaS specific and thus, with the proper tooling, Shopify theme development does not require one to adhere to the imposed approach of Dawn (via Shopify CLI). The argument for multi-directory architecture rests upon the millions of projects which isolate source ~ distribution variations and appropriate such logic.
+Single directory structures are not a viable approach when building modern and performant Shopify themes. Client-side (front-end) development is not SaaS specific and thus, with the proper tooling, Shopify theme development does not require one to adhere to the imposed approach of Shopify Dawn (via Shopify CLI). The argument for multi-directory architecture rests upon the millions of projects which isolate source ~ distribution variations and appropriate such logic.
 
 ### Default Structure
 
@@ -410,7 +411,7 @@ export default defineConfig({
 
 The `stores` option is required and will be used to perform sync operations. The option accepts an **object** or **array** type. Each item will hold reference to your shopify store/s and their theme/s. For each store you define, you will provide the **shop** name, theme **target** name and **id**. The `themes` object uses a **key** > **value** structure, where the **key** represent a theme name (target) and the value a theme id.
 
-The information you provide on this option can be used via the CLI when targeting and executing operations. Please see [commands](#commands) portion of this readme for more information on how CLI usage.
+The information you provide to this option can be used via the CLI when targeting and executing operations. Please refer to the [commands](#commands) portion of this readme for more information on CLI usage.
 
 > **Note**
 >
@@ -545,6 +546,7 @@ Below are **2** different **input** structures and an **output** structure. The 
      ├─ sections
      ├─ snippets
      └─ templates
+        ├─ metaobject
         └─ customers
        ㅤ
              ㅤ
@@ -571,6 +573,7 @@ Below are **2** different **input** structures and an **output** structure. The 
    ├─ scripts
    └─ views
       ├─ customers
+      ├─ meta
       ├─ sections
       ├─ snippets
       ├─ templates
@@ -596,6 +599,7 @@ Below are **2** different **input** structures and an **output** structure. The 
     ├─ sections
     ├─ snippets
     └─ template
+       ├─ metaobject
        └─ customers ㅤ
        ㅤ
        ㅤ
@@ -714,6 +718,17 @@ An array list of glob path patterns to `.json` or `.liquid` **template** files. 
 </p>
 </details>
 
+<details>
+<summary>
+<strong><code>Metaobject</code></strong>
+</summary>
+<p>
+
+An array list of glob path patterns to `.json` **metaobject** template files. These will be written to the `{output}/templates/metaobject` directory of your defined `output` path.
+
+</p>
+</details>
+
 # Shared Sections
 
 Syncify provides an elegant and simple solution for shared sections. This is an experimental feature and aims to provide developers an easy way to re-use section contents between section files containing schema.
@@ -762,6 +777,74 @@ window.syncify.sections.load()
 //
 window.syncify.style.parent({ /* CSS */ });
 window.syncify.style.label({ /* CSS */ });
+```
+
+# Pages
+
+Syncify supports page sync and employs an intuitive approach to working with static pages for stores. The [paths](#paths) **pages** option is where you can provide path file references to be synced. Pages in Syncify can be either `.html` (markup) or `.md` (markdown) files and cannot contain Liquid syntax (Shopify does not support Liquid in pages only static markup). Syncify also support frontmatter in page files, this allows you to pass in additional data when syncing to store/s.
+
+### Options
+
+The `pages` setting available in the `views` option of your `syncify.config.ts` file allows you to configure page processing and transforms. In Syncify, frontmatter can be used to configure per-page control.
+
+<!--prettier-ignore-->
+```js
+import { defaultConfig } from '@syncify/cli'
+
+export default defineConfig({
+  ...,
+  paths: {
+    // Set the location of page files
+    pages: [
+      'pages/*.md',
+      'pages/*.html'
+    ]
+  },
+  views: {
+
+    pages: {
+      suffixDir: false,        // When true, directory name will be used for template_suffix
+      safeSync: true,          // Ensure local and remote versions are aligned
+      author: '',              // Fallback author name
+      global: [],              // List of directories to exclude from applying template_suffix
+      importLanguage: 'html'   // Set the import language when remote sources sync to local ones
+    }
+
+  }
+})
+```
+
+### Remote and Local sources
+
+By default, syncify will perform **safe** synchronization. The `safeSync` option instructs syncify to pull down remote versions before uploading local ones in watch and upload modes. This operation ensures that you do not overwrite page content in situations where changes have been applied in your store since the last sync was performed on your local machine. Syncify will prompt you when misalignment is detected and allow you to pull in the remote versions.
+
+### Markdown Support
+
+Pages can be written in markdown, Syncify will transform `.md` page files into valid HTML markup when syncing. Markdown pages are parsed and transformed using the the powerful [markdown-it](https://github.com/markdown-it/markdown-it) and support Github flavored markdown syntax. In addition to Markdown → HTML generation, Syncify can also perform reversed conversion (HTML → Markdown). Using the `importLanguage` option, any time a remote to local alignment is carried out, files will be written in markdown.
+
+### Frontmatter Support
+
+You can pass frontmatter data in page files. Page frontmatter can be used to control per-page publishing settings and allows for additional request payloads to be passed. Syncify supports a modest schema structure for page frontmatter.
+
+<!-- prettier-ignore -->
+```yaml
+---
+title: 'Lorem Ipsum'    # The page title
+handle: '/some-handle'  # Custom page handle
+template: 'example'     # Specify a template_suffix
+published: true         # Whether the page is published
+links: false            # Auto-convert URL-like
+breaks: true            # Convert '\n' into `<br>`
+metafields:             # Pass in additional metafields
+  - namespace: 'foo'
+    key: 'greeting'
+    type: 'single_line_text_field'
+    value: 'Hello World!'
+  - namespace: 'bar'
+    key: 'some_condition'
+    type: 'boolean'
+    value: true
+---
 ```
 
 # Metafields
@@ -1780,7 +1863,7 @@ export default defineConfig({
 
 # Terser
 
-The **Terser** option is for minification configuration options. Syncify supports minification and compression of Liquid, HTML JSON and also provides handling around Script and Style Transform file types. Terse output is core to theme development using Syncify and developers should indeed get into a habit a distributing themes in terse a format.
+The **Terser** option is for minification configuration options. Syncify supports minification and compression of Liquid, HTML JSON and also provides handling around Script and Style transform file types. Terse output is core to theme development using Syncify and developers should indeed get into a habit a distributing themes in terse a format.
 
 ### Does Liquid Minification Matter?
 
@@ -1788,11 +1871,11 @@ When we are talking about Liquid syntax specifically, there is no real measurabl
 
 ### Usage
 
-Produce terse output by passing `--terse` command flag. The `--prod` flag will also produce terse output. You can pass a boolean `false` to options to skip minification.
+Produce terse output by passing the `--terse` command flag. The `--prod` flag will also produce terse output. You can pass a boolean `false` to options to skip minification. The `terser` options defined within your Syncify configuration file will be used when performing minification. If all terser options are set to `false` then (logically) terse minification will not be applied.
 
 ### Terse Options
 
-Below is is the default configuration Syncify uses for minification.
+Below is is the default configuration Syncify uses for minification. The `json`, `liquid`, `markup` and `script` options accept either an object or a boolean value. Passing boolean `true` will use defaults, whereas boolean `false` will skip minification.
 
 <!-- prettier-ignore -->
 ```ts
@@ -1805,18 +1888,28 @@ export default defineConfig({
       config: true,
       locales: true,
       metafields: true,
+      metaobject: true,
+      groups: true,
       templates: true,
       exclude: []
     },
-    view: {
+    liquid: {
       collapseWhitespace: true,
-      minifySchema: true,
+      collapseInner: false,
+      removeComments: true,
+      minifyJavascript: false,
+      minifySchema: false,
+      minifyStyle: false,
+      minifyStylesheet: false,
+      stripDashes: true,
+      exclude: []
+    },
+    markup: {
+      collapseWhitespace: true,
+      minifyScriptJSON: true,
       minifyScript: true,
       minifyStyle: true,
-      replaceSugar: true,
       removeComments: true,
-      stripDashes: true,
-      swapAssign: true,
       exclude: []
     },
     // Requires ESBuild to be installed

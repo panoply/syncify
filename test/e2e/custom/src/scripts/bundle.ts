@@ -7,7 +7,7 @@ import b from './globs/b'
 import { d } from './globs/d'
 import { e } from './globs/e'
 
-console.log('HOT RELOAD');
+console.log('HOT RELOAD 1');
 
 b()
 d()
