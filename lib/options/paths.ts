@@ -69,7 +69,8 @@ export async function setPaths (config: Config) {
       // TODO
       // ENABLE WHEN SUPPORTED
       // SKIPPING THESE PREVENTS WARNINGS FROM SHOWING
-      if (p.endsWith('metafields') || p.endsWith('pages') || p.endsWith('redirects')) continue;
+      //
+      if (p.endsWith('/metafields/**/*.json') || p.endsWith('redirects.yaml')) continue;
 
       const paths = await glob(p, { cwd: $.cwd });
 
