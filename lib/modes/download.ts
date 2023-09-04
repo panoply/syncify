@@ -1,6 +1,6 @@
-import { Syncify, Requests, Theme, AssetResource } from 'types';
+import { Syncify, Requests, Theme, AssetResource, File } from 'types';
 import { join } from 'path';
-import { has, mapAsync } from 'rambdax';
+import { delay, has, mapAsync } from 'rambdax';
 import { writeFile, writeFileSync } from 'fs-extra';
 import { isFunction, isUndefined, isString, isBuffer, nl, glue } from '../utils/native';
 import { $ } from '~state';
@@ -8,77 +8,152 @@ import { log, c, tui } from '~log';
 import { client } from '~requests/client';
 import merge from 'mergerino';
 import { Namespace, importFile } from '~process/files';
-import { event, getSizeStr } from '~utils/utils';
+import { event, getSizeStr, toUpcase } from '~utils/utils';
 import { AxiosResponse } from 'axios';
-import { get } from '~requests/assets';
+import { Events, get } from '~requests/assets';
 import * as timer from '~utils/timer';
 import * as n from '~utils/native';
+import { Progress } from '~cli/progress';
+import { NIL } from '~utils/chars';
 
-interface SyncModel {
-  [store: string]: {
-    [theme: string]: {
-      files: AssetResource[]
-      data: string[];
-      theme: string;
-      downloads: number;
-      failed: number;
-      previous: {
-        key: string;
-        size: string;
-      };
-      retry: number;
-      progress: ReturnType<typeof log['progress']>
-      errors: string[]
-    }
+type SyncKey = [
+  /**
+   * The store name, eg: `shop.myshopify.com`
+   */
+  store: string,
+  /**
+   * The theme (target) name
+   */
+  theme: string
+]
+
+type SyncModel = Map<string, {
+  /**
+   * The number of files to transfer
+   */
+  size: number;
+  /**
+   * The File keys for each store theme
+   */
+  files: AssetResource[];
+  /**
+   * The number of successful transfers
+   */
+  success: number;
+  /**
+   * The number of transfers that will retry
+   */
+  retry: number;
+  /**
+   * The number of failed transfers
+   */
+  failed: number;
+  /**
+   * Progress bar instance
+   */
+  progress: Progress;
+  /**
+   * The previous transfer
+   */
+  history: {
+    key: string;
+    namespace: string;
   }
-}
-
-type StoreError = Map<string, Array<{
-  file: File;
-  attempts: number;
-  store: string;
-  theme: string;
-  response: AxiosResponse;
-}>>
-
-interface RetryModel {
-  [store: string]: {
-    [theme: string]: Map<string, {
+  /**
+   * Error Model
+   *
+   * This maintains a reference of all failures and retry transfer
+   * attempts.
+   */
+  errors: {
+    /**
+     * Local Errors
+     *
+     * Entries in this map are local failures, i.e: writing a file etc
+     */
+    local: Map<string, {
+      /**
+       * The File reference of failed transfer
+       */
       file: File;
+      /**
+       * The number of re-sync attempts
+       */
+      attempts: number;
+      /**
+       * The error message
+       */
+      message: any;
+    }>;
+    /**
+     * Remote Errors
+     *
+     * Entries in this map are request failures incurred during transfer
+     */
+    remote: Map<string, {
+      /**
+       * The File reference of failed transfer
+       */
+      file: File;
+      /**
+       * The number of re-sync attempts
+       */
+      attempts: number;
+      /**
+       * Axios error Response
+       */
+      response: AxiosResponse;
+    }>;
+    /**
+     * Retrying
+     *
+     * Entries in this map will retry and be re-queued
+     */
+    retry: Map<string, {
+      /**
+       * The File reference of failed transfer
+       */
+      file: File;
+      /**
+       * The number of re-sync attempts
+       */
       attempts: number;
     }>
   }
-}
+}>
 
-interface ErrorModel {
-  local: Array<{
-    file: File;
-    attempts: number;
-    response: string;
-  }>;
-  retry: RetryModel;
-  remote: {
-    [store: string]: {
-      [theme: string]: StoreError
-    }
-  }
+interface EventParams {
+  /**
+   * The response status
+   */
+  status: Events;
+  /**
+   * The Theme request model
+   */
+  get theme (): Theme;
+  /**
+   * The File model
+   */
+  get file (): File;
+  /**
+   * The response data (only if successful)
+   */
+  get data (): Requests.Asset
+  /**
+   * The Axios Response Error (only if error)
+   */
+  get error (): AxiosResponse
 }
 
 /**
  * Get Model
  *
  * Generates the upload model which will create a workable store reference
- * for the uploading process.
+ * for the download transfer operation
  */
 async function getModel () {
 
-  const errors: ErrorModel = {
-    local: [],
-    remote: {},
-    retry: {}
-  };
-
-  const sync: SyncModel = {};
+  const sync: SyncModel = new Map();
 
   /**
    * Indentation Width used for CLI logging
@@ -87,35 +162,37 @@ async function getModel () {
 
   for (const theme of $.sync.themes) {
 
-    const store = $.sync.stores[theme.sidx];
-    const { assets } = await get<Requests.Assets>(theme, store.client);
-
     if (theme.target.length > width) width = theme.target.length;
 
-    if (!has(theme.store, sync)) sync[theme.store] = {};
-    if (!has(theme.store, errors.remote)) errors.remote[theme.store] = {};
-    if (!has(theme.target, errors.remote[theme.store])) errors.remote[theme.store][theme.target] = new Map();
-    if (!has(theme.store, errors.retry)) errors.retry[theme.store] = {};
-    if (!has(theme.target, errors.retry[theme.store])) errors.retry[theme.store][theme.target] = new Map();
+    const store = $.sync.stores[theme.sidx];
+    const key: string = `${theme.store}:${theme.target}`;
+    const { assets } = await get<Requests.Assets>(theme, store.client);
 
-    sync[theme.store][theme.target] = {
-      get files () { return assets; },
-      theme: theme.target,
-      data: [],
-      downloads: 0,
-      failed: 0,
-      retry: 0,
-      previous: {
-        key: '',
-        size: ''
-      },
-      progress: log.progress(assets.length),
-      errors: []
-    };
+    if (!sync.has(key)) {
+
+      sync.set(key, {
+        size: assets.length,
+        failed: 0,
+        success: 0,
+        retry: 0,
+        progress: log.progress(assets.length),
+        history: {
+          key: NIL,
+          namespace: NIL
+        },
+        get files () { return assets; },
+        errors: {
+          local: new Map(),
+          remote: new Map(),
+          retry: new Map()
+        }
+      });
+
+    }
 
   }
 
-  return { sync, errors };
+  return sync;
 
 }
 
@@ -123,276 +200,161 @@ export async function download (cb?: Syncify): Promise<void> {
 
   $.cache.lastResource = 'download';
 
+  let transfers: number = 0;
+
   timer.start('download');
-  log.newGroup('Download', true);
+  log.group('Download', true);
+  log.spinner('Preparing');
 
   const hashook = isFunction(cb);
   const request = client($.sync);
-  const { sync, errors } = await getModel();
+  const sync = await getModel();
+
+  await delay(500);
 
   /* -------------------------------------------- */
   /* FUNCTIONS                                    */
   /* -------------------------------------------- */
 
-  event.on('download', function (type: 'downloads' | 'failed' | 'retry', { target, store }: Theme, item: {
-    key: string;
-    namespace: Namespace;
-    data: {
-      asset: {
-        attachment: BufferEncoding;
-        value: string;
-      }
-    };
-    get file (): File,
-    get error (): AxiosResponse
-  }) {
+  event.on('download', function (item: EventParams) {
 
     log.spinner.stop();
 
-    const success = type !== 'failed' && type !== 'retry';
-    const items = [
-      tui.message('whiteBright', c.bold(item.namespace)),
+    const { theme, file } = item;
+
+    const key = `${theme.store}:${theme.target}`;
+    const record = sync.get(key);
+    const message: string[] = [
+      tui.suffix('gray', 'Transfers  ', `  ${transfers++}`),
+      nl,
+      tui.suffix('gray', 'Duration   ', `  ${timer.now('download')}`),
       c.newline
     ];
 
-    sync[store][target][type] += 1;
-    sync[store][target].progress.increment(1);
+    let status: string = NIL;
 
-    if (success) {
+    record.history.namespace = `  ${c.whiteBright(file.namespace)}`;
+
+    if (item.status === Events.Success) {
+
+      if (record.errors.retry.has(file.output)) {
+        record.retry -= 1;
+        record.errors.retry.delete(file.output);
+      }
+
+      record.success += 1;
+      record.progress.increment(1);
 
       const buffer = has('attachment', item.data.asset)
         ? Buffer.from(item.data.asset.attachment, 'base64')
         : Buffer.from(item.data.asset.value || null, 'utf8');
 
-      if (errors.retry[store][target].has(item.key)) {
-        errors.retry[store][target].delete(item.key);
-        sync[store][target].retry = errors.retry[store][target].size;
+      writeFileSync(file.output, buffer);
+
+      record.history.key = status = tui.message('neonGreen', file.key);
+
+    } else if (item.status === Events.Retry) {
+
+      if (!record.errors.retry.has(file.output)) {
+        record.retry += 1;
+        record.errors.retry.set(file.output, { file, attempts: 0 });
       }
 
-      items.push(
-        tui.suffix('white', 'duration ', `  ${timer.stop()}`),
-        n.nl,
-        tui.suffix('white', 'elapsed ', `  ${timer.now('download')}`),
-        c.newline
-      );
+      record.history.key = status = tui.message('orange', file.key);
 
-      for (const storeName in sync) {
-        for (const themeName in sync[storeName]) {
+    } else if (item.status === Events.Failed) {
 
-          const shop = sync[storeName][themeName];
-          const download = `  ${c.bold(`${shop.downloads}`)} ${c.white('of')} ${c.bold(`${shop.files.length}`)}`;
-          const failed = `  ${c.bold(`${shop.failed}`)}`;
-          const retry = `  ${c.bold(`${shop.retry}`)} ${c.white('of')} ${c.bold(`${shop.files.length}`)}`;
-
-          if (target === themeName && storeName === store) {
-
-            shop.previous.key = item.key;
-            shop.previous.size = getSizeStr(buffer.toString());
-
-            items.push(
-              tui.message('neonCyan', `${c.bold(themeName.toUpperCase())}  ${c.ARR}  ${storeName}`),
-              c.newline,
-              tui.message(success ? 'neonGreen' : 'redBright', item.key),
-              n.nl,
-              tui.message('whiteBright', shop.previous.size),
-              c.newline,
-              tui.suffix('whiteBright', 'download ', download),
-              n.nl,
-              tui.suffix(shop.retry > 0 ? 'orange' : 'white', 'retrying ', retry),
-              n.nl,
-              tui.suffix(shop.failed > 0 ? 'redBright' : 'white', 'failed ', failed),
-              c.newline,
-              shop.progress.render(),
-              c.newline
-            );
-          } else {
-            items.push(
-              tui.message('neonCyan', `${c.bold(themeName.toUpperCase())}  ${c.ARR}  ${storeName}`),
-              c.newline,
-              tui.message(success ? 'neonGreen' : 'redBright', shop.previous.key),
-              n.nl,
-              tui.message('whiteBright', shop.previous.size),
-              c.newline,
-              tui.suffix('whiteBright', 'download ', download),
-              n.nl,
-              tui.suffix(shop.retry > 0 ? 'orange' : 'white', 'retrying ', retry),
-              n.nl,
-              tui.suffix(shop.failed > 0 ? 'redBright' : 'white', 'failed ', failed),
-              c.newline,
-              shop.progress.render(),
-              c.newline
-            );
-          }
-
-        }
+      if (record.errors.retry.has(file.output)) {
+        record.retry -= 1;
+        record.errors.retry.delete(file.output);
       }
 
-      writeFileSync(join($.dirs.import, store, target, item.key), buffer);
+      if (!record.errors.remote.has(file.output)) {
 
-      log.update(n.glue(items));
-
-    } else if (type === 'retry') {
-
-      sync[store][target].previous.key = c.orange(item.key);
-      sync[store][target].previous.size = '';
-      sync[store][target].retry = sync[store][target].retry + 1;
-
-      if (errors.retry[store][target].has(item.key)) {
-
-        const retrying = errors.retry[store][target].get(item.key);
-
-        errors.retry[store][target].set(item.key, {
-          file: item.file,
-          attempts: retrying.attempts + 1
-        });
-
-      } else {
-
-        errors.retry[store][target].set(item.key, {
-          file: item.file,
-          attempts: 0
-        });
-      }
-
-    } else {
-
-      sync[store][target].errors.push(item.key);
-      sync[store][target].previous.key = item.key;
-      sync[store][target].previous.size = '';
-
-      if (errors.remote[store][target].has(item.key)) {
-
-        errors.remote[store][target].get(item.key).push({
-          store,
-          theme: target,
-          file: item.file,
+        record.failed += 1;
+        record.progress.increment(1);
+        record.errors.remote.set(file.output, {
+          file,
           attempts: 0,
           response: item.error
         });
+      }
+
+      record.history.key = status = tui.message('redBright', file.key);
+
+    }
+
+    for (const [ prop, ref ] of sync) {
+
+      const [ store, target ] = prop.split(':');
+
+      message.push(
+        tui.message('neonCyan', `${c.bold(target.toUpperCase())}  ${c.ARR}  ${store}`),
+        c.newline
+      );
+
+      if (store === theme.store && target === theme.target) {
+
+        const success = `  ${c.bold(`${ref.success}`)} ${c.white('of')} ${c.bold(`${ref.size}`)}`;
+        const retried = `  ${c.bold(`${ref.retry}`)}`;
+        const failed = `  ${c.bold(`${ref.failed}`)}`;
+
+        message.push(
+          status,
+          c.newline,
+          tui.suffix('white', 'resource  ', record.history.namespace),
+          n.nl,
+          tui.suffix('whiteBright', 'success  ', success),
+          n.nl,
+          tui.suffix(ref.retry > 0 ? 'orange' : 'white', 'retrying ', retried),
+          n.nl,
+          tui.suffix(ref.failed > 0 ? 'redBright' : 'white', 'errors', failed),
+          c.newline,
+          ref.progress.render(),
+          c.newline
+        );
 
       } else {
 
-        errors.remote[store][target].set(item.key, [
-          {
-            store,
-            theme: target,
-            file: item.file,
-            attempts: 0,
-            response: item.error
-          }
-        ]);
+        const success = `  ${c.bold(`${ref.success}`)} ${c.white('of')} ${c.bold(`${ref.size}`)}`;
+        const retried = `  ${c.bold(`${ref.retry}`)}`;
+        const failed = `  ${c.bold(`${ref.failed}`)}`;
+
+        message.push(
+          ref.history.key,
+          c.newline,
+          tui.suffix('white', 'resource  ', ref.history.namespace),
+          n.nl,
+          tui.suffix('whiteBright', 'success  ', success),
+          n.nl,
+          tui.suffix(ref.retry > 0 ? 'orange' : 'white', 'retrying ', retried),
+          n.nl,
+          tui.suffix(ref.failed > 0 ? 'redBright' : 'white', 'errors', failed),
+          c.newline,
+          ref.progress.render(),
+          c.newline
+        );
+
       }
 
     }
+
+    log.update(n.glue(message));
 
   });
 
-  for (const store in sync) {
-    for (const theme in sync[store]) {
-      for (const asset of sync[store][theme].files) {
-        await request.assets('get', importFile(asset.key));
-      }
+  for (const [ key, { files } ] of sync) {
+
+    const [ store, theme ] = key.split(':');
+    const output = join($.dirs.import, store, theme);
+
+    for (const asset of files) {
+
+      timer.start();
+
+      await request.assets('get', importFile(asset.key, output));
+
     }
   }
-
-  // for (const theme of sync) {
-
-  //   const store = $.sync.stores[theme.sidx];
-  //   const { assets } = await get<Requests.Assets>(theme, store.client);
-  //   const { sync, errors, size } = getModel(assets.length);
-
-  //   let n : number = 0;
-
-  //   for (const { key } of assets) {
-
-  //     if (!hashook) {
-
-  //       await request.assets('put', file, input);
-
-  //     } else {
-
-  //       const update = cb.apply({ ...file }, input);
-
-  //       if (n.isUndefined(update) || update === false) {
-  //         await request.assets('put', file, input);
-  //       } else if (n.isString(update)) {
-  //         await request.assets('put', file, update);
-  //       } else if (n.isBuffer(update)) {
-  //         await request.assets('put', file, update.toString());
-  //       } else {
-  //         await request.assets('put', file, input);
-  //       }
-  //     }
-
-  //     try {
-
-  //       timer.start();
-
-  //       const data = merge(store.client, { params: { 'asset[key]': key } });
-  //       const { asset } = await request.get<Requests.Asset>(theme, data);
-  //       const baseDir = join($.dirs.import, store.domain, theme.target);
-  //       const output = join(baseDir, key);
-  //       const buffer = has('attachment', asset)
-  //         ? Buffer.from(asset.attachment, 'base64')
-  //         : Buffer.from(asset.value || null, 'utf8');
-
-  //       n = n + 1;
-
-  //       const downloaded = `${n} of ${size}`;
-  //       const namespace = importFile(key);
-  //       const fileSize = getSizeStr(buffer.toString());
-
-  //       progress.increment();
-
-  //       if (hashook) {
-
-  //         const update = cb.apply({ asset, output }, buffer);
-
-  //         if (isUndefined(update) || update === false) {
-  //           await writeFile(output, buffer);
-  //         } else if (isString(update) || isBuffer(update)) {
-  //           await writeFile(output, update);
-  //         } else {
-  //           await writeFile(output, buffer);
-  //         }
-
-  //       } else {
-
-  //         await writeFile(output, buffer);
-
-  //         const items = [
-  //           tui.message('whiteBright', c.bold(namespace)),
-  //           c.newline,
-  //           tui.message('neonGreen', key),
-  //           c.newline,
-  //           tui.suffix('white', 'size ', `  ${fileSize}`),
-  //           nl,
-  //           tui.suffix('white', 'duration ', `  ${timer.stop()}`),
-  //           nl,
-  //           tui.suffix('white', 'elapsed ', `  ${timer.now('download')}`),
-  //           c.newline,
-  //           tui.message('neonCyan', `${c.bold(theme.target.toUpperCase())}  ${c.ARR}  ${store.domain}`),
-  //           c.newline,
-  //           tui.suffix('whiteBright', 'downloaded ', downloaded),
-  //           c.newline,
-  //           progress.render(),
-  //           c.newline
-  //         ];
-
-  //         log.update(glue(items));
-
-  //       }
-
-  //     } catch (e) {
-
-  //       console.log(e);
-
-  //       log.failed(key);
-
-  //     }
-
-  //   }
-
-  // }
 
 };
