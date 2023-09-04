@@ -1,6 +1,35 @@
 import { c, Colors } from '~log';
 import { assign } from '~utils/native';
 
+export interface Progress {
+  /**
+   * Increment progress
+   *
+   * @param incrementBy Defaults to `1`
+   */
+  increment: (incrementBy?: number) => void;
+  /**
+   * Decrement progress
+   *
+   * @param decrementBy Defaults to `1`
+   */
+  decrement: (decrementBy?: number) => void;
+  /**
+   * Render the progress bar - Returns the string for console.
+   *
+   * @returns string
+   */
+  render: () => string;
+  /**
+   * Stops progress and clears console
+   */
+  stop: () => void;
+  /**
+   * Returns the current percentage completion
+   */
+  get percent(): number;
+}
+
 /**
  * Progress Rendering Options
  */
@@ -58,6 +87,10 @@ interface ProgressOptions {
  * Renders a progress bar to the terminal and returns incremental/decrement
  * methods for controlling the progress amount.
  *
+ * @param total The progress to amount
+ * @param opts The progress options
+ *
+ *
  * ```bash
  *
  * # EXAMPLE
@@ -66,7 +99,7 @@ interface ProgressOptions {
  *
  * ```
  */
-export function progress (total: number, opts: ProgressOptions = {}) {
+export function progress (total: number, opts: ProgressOptions = {}): Progress {
 
   const options: ProgressOptions = assign({
     showPercentage: true,
@@ -79,7 +112,7 @@ export function progress (total: number, opts: ProgressOptions = {}) {
   /**
    * The current progress
    */
-  let current: number = 0;
+  let percent: number = 0;
 
   /* -------------------------------------------- */
   /* PRIVATES                                     */
@@ -114,11 +147,11 @@ export function progress (total: number, opts: ProgressOptions = {}) {
    */
   function increment (incrementBy: number = 1) {
 
-    const filled = current + incrementBy;
+    const filled = percent + incrementBy;
 
-    current = Math.min(filled, total);
+    percent = Math.min(filled, total);
 
-    if (current === total) stop();
+    if (percent === total) stop();
 
   }
 
@@ -127,9 +160,9 @@ export function progress (total: number, opts: ProgressOptions = {}) {
    */
   function decrement (decrementBy: number = 1) {
 
-    const filled = current - decrementBy;
+    const filled = percent - decrementBy;
 
-    current = Math.max(filled, 0);
+    percent = Math.max(filled, 0);
 
   }
 
@@ -138,14 +171,14 @@ export function progress (total: number, opts: ProgressOptions = {}) {
    */
   function render (): string {
 
-    const progress = Math.round((current / total) * options.barSize);
+    const progress = Math.round((percent / total) * options.barSize);
     const filled = bar(progress);
     const empty = bar(options.barSize - progress, true);
 
     let output = c[options.barColor](filled) + c.lightGray(empty);
 
     if (options.showPercentage) {
-      output += ` ${String(Math.round((current / total) * 100))}%`;
+      output += ` ${String(Math.round((percent / total) * 100))}%`;
     }
 
     return align(output);
@@ -158,9 +191,9 @@ export function progress (total: number, opts: ProgressOptions = {}) {
     decrement,
     render,
     /**
-     * Returns the current filled amount
+     * Returns the percent filled amount
      */
-    get percent () { return current; }
+    get percent () { return percent; }
   };
 
 }
