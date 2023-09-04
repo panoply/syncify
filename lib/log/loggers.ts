@@ -1,8 +1,11 @@
+import type { LiteralUnion } from 'type-fest';
 import type { File, Store, Theme } from 'types';
+import notifier from 'node-notifier';
 import { inspect } from 'node:util';
 import { has, isEmpty } from 'rambdax';
 import { $, warning } from '~state';
 import { queue } from '~requests/queue';
+import { NIL, NWL } from '~utils/chars';
 import { addSuffix, sanitize, plural, toUpcase } from '~utils/utils';
 import { error, isArray, isObject, log, nil, nl } from '~utils/native';
 import { intercept } from '~cli/intercept';
@@ -10,9 +13,7 @@ import * as timer from '~utils/timer';
 import * as errors from '~log/errors';
 import * as c from '~cli/ansi';
 import * as tui from '~log/tui';
-import notifier from 'node-notifier';
 import { Kind } from '~process/files';
-import { LiteralUnion } from 'type-fest';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -37,6 +38,7 @@ export { log as out } from '~utils/native';
 export function console (...message: any) {
 
   log(inspect(message, { colors: true, showHidden: true }));
+
 }
 
 /* -------------------------------------------- */
@@ -44,34 +46,43 @@ export function console (...message: any) {
 /* -------------------------------------------- */
 
 /**
- * Upload stacks, maintains files being uploaded
+ * Logger State
+ *
+ * Maintains a various log specific refs
  */
-const uploads: Set<[string, string, string]> = new Set();
-
-/**
- * Stdout/Stderr interception hook
- */
-let listen: () => void = null;
-
-/**
- * Whether or not we are in idle
- */
-let idle: boolean = false;
-
-/**
- * Current Filename
- */
-let group: LiteralUnion<Kind, string> = 'Syncify';
-
-/**
- * Current Filename
- */
-let title: string = nil;
-
-/**
- * Current URI
- */
-let uri: string = nil;
+const state: {
+  /**
+   * Whether or not we are in idle
+   */
+  idle: boolean;
+  /**
+   * Current Group Name
+   */
+  group: LiteralUnion<Kind, string>;
+  /**
+   * Current Filename
+   */
+  title: string;
+  /**
+   * Current URI
+   */
+  uri: string;
+  /**
+   * Stdout/Stderr interception hook
+   */
+  listen: () => void;
+  /**
+   * Upload stacks, maintains files being uploaded
+   */
+  queue: Set<[string, string, string]>
+} = {
+  idle: false,
+  group: 'Syncify',
+  title: NIL,
+  uri: NIL,
+  listen: null,
+  queue: new Set()
+};
 
 /* -------------------------------------------- */
 /* FUNCTIONS                                    */
@@ -84,29 +95,30 @@ let uri: string = nil;
  */
 export function build (id: string, count: number, file: File | string) {
 
-  const close = (title !== id);
+  const close = (state.title !== id);
 
   timer.start();
 
   // close previous group
   if (close) {
-    log(tui.closer(group));
+    log(tui.closer(state.group));
 
   }
 
   // clear if first run
-  if (group === 'Syncify') tui.clear();
+  if (state.group === 'Syncify') tui.clear();
 
   // open new group
   if (close) {
-    log(tui.opener(group));
+
+    log(tui.opener(state.group));
     nwl();
     log(c.line.gray + c.bold(`${count} ${toUpcase(id)}`));
     nwl();
 
     // update group
-    group = id;
-    title = id;
+    state.group = id;
+    state.title = id;
   }
 
   nwl();
@@ -126,7 +138,7 @@ export function build (id: string, count: number, file: File | string) {
 export function nwl (entry: '' | 'red' | 'yellow' | 'gray' | undefined = 'gray') {
 
   if (isEmpty(entry)) {
-    log(nl);
+    log(NWL);
   } else {
     log(c.line[entry]);
   }
@@ -143,7 +155,7 @@ export function nwl (entry: '' | 'red' | 'yellow' | 'gray' | undefined = 'gray')
 export function err (input: string | string[]) {
 
   if (isArray(input)) {
-    error(c.red(input.map(text => c.line.red + sanitize(text)).join(nl)));
+    error(c.red(input.map(text => c.line.red + sanitize(text)).join(NWL)));
   } else {
     error(c.line.red + sanitize(input));
   }
@@ -191,14 +203,14 @@ export function hook (name: string) {
     warning.process[name] = new Set();
   }
 
-  listen = intercept((stream, data) => {
+  state.listen = intercept((stream, data) => {
 
     if (data.charCodeAt(0) === 9474) {
       process[stream].write(data);
     } else {
 
       warning.count += 1;
-      const text = data.split('\n');
+      const text = data.split(NWL);
 
       while (text.length !== 0) {
         warning.process[name].add(`${c.yellowBright(text.shift().trimStart())}`);
@@ -217,8 +229,8 @@ export function hook (name: string) {
  */
 export function unhook () {
 
-  listen();
-  listen = null;
+  state.listen();
+  state.listen = null;
 
 };
 
@@ -231,17 +243,17 @@ export function unhook () {
  * │
  * └─ Name ~ 01:59:20
  */
-export function newGroup (name: string, clear = false) {
+export function group (name: string, clear = false) {
 
   // close previous group
-  log(tui.closer(group));
+  log(tui.closer(state.group));
 
   // do not clear if first run
   if (clear) tui.clear();
 
   log(tui.opener(name));
 
-  group = name;
+  state.group = name;
 
   nwl();
 
@@ -265,35 +277,35 @@ export function updated (file: File, suffix?: string) {
  */
 export function changed (file: File) {
 
-  const close = (title !== file.namespace);
+  const close = (state.title !== file.namespace);
 
   timer.start();
 
   // close previous group
-  if (close) log(tui.closer(group));
+  if (close) log(tui.closer(state.group));
 
   // do not clear if first run
-  if (group !== 'Syncify' && close) tui.clear();
+  if (state.group !== 'Syncify' && close) tui.clear();
 
   // Provides us better group context, for example:
   //
   // Liquid Snippet
   // Liquid Template
   //
-  group = `${file.kind} ${toUpcase(file.namespace)}`;
+  state.group = `${file.kind} ${toUpcase(file.namespace)}`;
 
   // open new group
   if (close) {
     tui.clear();
-    log(tui.opener(group));
-    title = file.namespace;
+    log(tui.opener(state.group));
+    state.title = file.namespace;
   }
 
   // Create stack reference model
   if (!has(file.relative, warning)) warning[file.relative] = new Set();
 
   // Update the current records
-  if (uri !== file.relative) uri = file.relative;
+  if (state.uri !== file.relative) state.uri = file.relative;
 
   if ($.mode.watch) {
     nwl();
@@ -324,24 +336,30 @@ export function resource (type: string, store: Store) {
 
   if ($.mode.watch) {
 
-    uploads.add([
+    state.queue.add([
       type,
       store.domain,
       timer.stop()
     ]);
 
-    if (idle) return;
+    if (state.idle) return;
 
-    idle = true;
+    state.idle = true;
 
     queue.onIdle().then(() => {
 
-      for (const [ type, store, time ] of uploads) {
+      for (const [
+        type,
+        store,
+        time
+      ] of state.queue) {
+
         log(tui.suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store}` + c.time(time)));
+
       }
 
-      uploads.clear();
-      idle = false;
+      state.queue.clear();
+      state.idle = false;
 
     });
 
@@ -362,24 +380,31 @@ export function upload (theme: Theme) {
 
   if ($.mode.watch) {
 
-    uploads.add([
-      theme.target,
-      theme.store,
-      timer.stop()
-    ]);
+    state.queue.add(
+      [
+        theme.target,
+        theme.store,
+        timer.stop()
+      ]
+    );
 
-    if (idle) return;
+    if (state.idle) return;
 
-    idle = true;
-
+    state.idle = true;
     queue.onIdle().then(() => {
 
-      for (const [ target, store, time ] of uploads) {
+      for (const [
+        target,
+        store,
+        time
+      ] of state.queue) {
+
         log(tui.suffix('neonGreen', 'uploaded', `${c.bold(target)} → ${store}` + c.time(time)));
+
       }
 
-      uploads.clear();
-      idle = false;
+      state.queue.clear();
+      state.idle = false;
 
     });
 
@@ -419,12 +444,12 @@ export function prompt (message: string, notify?: notifier.Notification) {
   // close previous group
 
   log(tui.suffix('orange', 'prompt', message));
-  log(tui.closer(group) + nl);
+  log(tui.closer(state.group) + NWL);
 
   if (isObject(notify)) notifier.notify(notify).notify();
 
   return () => {
-    log(tui.opener(group));
+    log(tui.opener(state.group));
     nwl();
   };
 
@@ -438,25 +463,45 @@ export function prompt (message: string, notify?: notifier.Notification) {
 export function syncing (path: string, hot = false) {
 
   if (warning.count > 0) {
-    tui.suffix('yellowBright', 'warning', `${warning.count} ${plural('warning', warning.count)}`);
+    log(tui.suffix(
+      'yellowBright',
+      'warning',
+      `${warning.count} ${plural('warning', warning.count)}`
+    ));
   }
 
   if (hot) {
 
-    log(tui.suffix('magentaBright', 'syncing', path));
+    log(tui.suffix(
+      'magentaBright',
+      'syncing',
+      path
+    ));
 
     // when hot reloads hold off on logging queues
     if (queue.pending > 2) {
-      log(tui.suffix('orange', 'queued', `${path} ~ ${c.bold(addSuffix(queue.pending))} in queue`));
+      log(tui.suffix(
+        'orange',
+        'queued',
+        `${path} ${c.TLD} ${c.bold(addSuffix(queue.pending))} in queue`
+      ));
     }
 
   } else {
 
-    log(tui.suffix('magentaBright', 'syncing', path));
+    log(tui.suffix(
+      'magentaBright',
+      'syncing',
+      path
+    ));
 
     if (queue.pending > 0) {
 
-      log(tui.suffix('orange', 'queued', `${path} ~ ${c.bold(addSuffix(queue.pending))} in queue`));
+      log(tui.suffix(
+        'orange',
+        'queued',
+        `${path} ${c.TLD} ${c.bold(addSuffix(queue.pending))} in queue`
+      ));
     }
   }
 
@@ -486,7 +531,11 @@ export function process (name: string, ...message: [message?: string, time?: str
     time = message[1];
   }
 
-  log(tui.suffix('whiteBright', 'process', c.bold(name) + text + c.time(time)));
+  log(tui.suffix(
+    'whiteBright',
+    'process',
+    `${c.bold(name)}${text}${c.time(time)}`
+  ));
 
 };
 
@@ -497,7 +546,11 @@ export function process (name: string, ...message: [message?: string, time?: str
  */
 export function exported (file: string) {
 
-  log(tui.suffix('whiteBright', 'exports', file));
+  log(tui.suffix(
+    'whiteBright',
+    'exports',
+    file
+  ));
 
 };
 
@@ -518,7 +571,11 @@ export function exported (file: string) {
 export function importer (message: string) {
 
   if (!$.mode.build) {
-    log(tui.suffix('lavender', 'importer', message));
+    log(tui.suffix(
+      'lavender',
+      'importer',
+      message
+    ));
   }
 };
 
@@ -529,7 +586,11 @@ export function importer (message: string) {
  */
 export function transform (message: string) {
 
-  log(tui.suffix('whiteBright', 'transform', message));
+  log(tui.suffix(
+    'whiteBright',
+    'transform',
+    message
+  ));
 
 };
 
@@ -540,7 +601,11 @@ export function transform (message: string) {
  */
 export function warn (message: string, fix?: string) {
 
-  log(tui.suffix('yellowBright', 'warning', `${message}${fix ? c.gray(` ~ ${fix}`) : ''}`));
+  log(tui.suffix(
+    'yellowBright',
+    'warning',
+    `${message}${fix ? c.gray(` ~ ${fix}`) : NIL}`
+  ));
 
 };
 
@@ -551,7 +616,11 @@ export function warn (message: string, fix?: string) {
  */
 export function retrying (file: string, theme: Theme) {
 
-  log(tui.suffix('orange', 'retrying', `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`));
+  log(tui.suffix(
+    'orange',
+    'retrying',
+    `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`
+  ));
 
 }
 
@@ -562,7 +631,11 @@ export function retrying (file: string, theme: Theme) {
  */
 export function deleted (file: string, theme: Theme) {
 
-  log(tui.suffix('blueBright', 'deleted', `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`));
+  log(tui.suffix(
+    'blueBright',
+    'deleted',
+    `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`
+  ));
 
 };
 
@@ -588,7 +661,11 @@ export function minified (kind: string, before: string, after: string, saved: st
  */
 export function reloaded (path: string, time: string) {
 
-  log(tui.suffix('whiteBright', 'reloaded', path + time));
+  log(tui.suffix(
+    'whiteBright',
+    'reloaded',
+    `${path}${time}`
+  ));
 
 };
 
@@ -599,7 +676,11 @@ export function reloaded (path: string, time: string) {
  */
 export function skipped (file: File | string, reason: string) {
 
-  log(tui.suffix('gray', 'skipped', `${typeof file === 'string' ? file : file.key} ~ ${reason}`));
+  log(tui.suffix(
+    'gray',
+    'skipped',
+    `${typeof file === 'string' ? file : file.key} ~ ${reason}`
+  ));
 
 };
 
@@ -642,9 +723,9 @@ export function invalid (path: string, message?: string | string[]) {
     nwl();
 
     if (isArray(message)) {
-      error(c.red(message.map(text => c.line.red + sanitize(text)).join(nl)));
+      error(c.red(message.map(text => `${c.line.red}${sanitize(text)}`).join(NWL)));
     } else {
-      error(c.line.red + sanitize(message));
+      error(`${c.line.red}${sanitize(message)}`);
     }
   }
 
@@ -674,11 +755,11 @@ export function failed (path: string) {
 export function configChanges () {
 
   nwl('yellow');
-  log(c.line.yellow + c.bold.yellow(`WARNING ${c.TLD} RESTART IS REQUIRED`));
+  log(`${c.line.yellow}${c.bold.yellow(`WARNING ${c.TLD} RESTART IS REQUIRED`)}`);
   nwl('yellow');
   log(
     c.line.yellow +
-    c.bold.yellow(`Changes to ${c.neonCyan($.file.base)} require you restart watch mode.`) + nl +
+    c.bold.yellow(`Changes to ${c.neonCyan($.file.base)} require you restart watch mode.`) + NWL +
     c.line.yellow +
     c.bold.yellow('Failure to restart watch mode will prevent changes from being reflected.')
   );
@@ -720,26 +801,26 @@ export function spawn (name: string) {
 
     if (!$.spawn.invoked) $.spawn.invoked = true;
 
-    if (group !== 'Spawn') {
+    if (state.group !== 'Spawn') {
 
-      log(tui.closer(group));
+      log(tui.closer(state.group));
 
       // do not clear if first run
-      if (group !== 'Syncify') tui.clear();
+      if (state.group !== 'Syncify') tui.clear();
 
       log(tui.opener('Spawn'));
 
       // update name reference
-      group = 'Spawn';
+      state.group = 'Spawn';
 
     }
 
-    if (title !== name) {
+    if (state.title !== name) {
 
       log(tui.message('pink', name));
 
       // update spawn process title
-      title = name;
+      state.title = name;
 
     }
 
