@@ -52,7 +52,7 @@ type Spinner = {
 /**
  * The interval instance
  */
-let interval: NodeJS.Timer;
+let interval: NodeJS.Timeout;
 
 /**
  * Whether or not the spinner is running
@@ -73,7 +73,7 @@ const spinner: Spinner = function spinner (text?, color = 'pink') {
 
   interval = setInterval(() => {
     if (!active) return;
-    update(`${c.line.gray} ${c[color](`${SPINNER_FRAMES[f = ++f % size]}`)}${text ? ` ${text}` : nil}`);
+    update(`${c.line.gray}${c[color](`${SPINNER_FRAMES[f = ++f % size]}`)}${text ? ` ${text}` : nil}`);
   }, 50);
 
 };
