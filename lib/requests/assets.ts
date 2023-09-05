@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import type { Request, Theme, File, FileKeys } from 'types';
 import { Type } from '~process/files';
@@ -8,6 +10,26 @@ import { log, error } from '~log';
 import { $ } from '~state';
 import merge from 'mergerino';
 import { event, getSizeStr } from '~utils/utils';
+import { delay } from 'rambdax';
+
+export const enum Events {
+  /**
+   * Transfer Successful
+   */
+  Success,
+  /**
+   * Transfer Retry Queue
+   */
+  Retry,
+  /**
+   * Transfer Failed
+   */
+  Failed,
+  /**
+   * Transfer file is empty
+   */
+  Empty,
+}
 
 /**
  * Has Asset
@@ -16,14 +38,15 @@ import { event, getSizeStr } from '~utils/utils';
  */
 export async function has (asset: FileKeys, theme: Theme): Promise<boolean> {
 
-  return axios({
-    ...$.sync.stores[theme.sidx].client,
+  const request = merge($.sync.stores[theme.sidx].client, {
     method: 'get',
     url: theme.url,
     params: {
       'asset[key]': asset
     }
-  }).then(() => true).catch(() => false);
+  });
+
+  return axios(request).then(() => true).catch(() => false);
 
 };
 
@@ -34,14 +57,15 @@ export async function has (asset: FileKeys, theme: Theme): Promise<boolean> {
  */
 export async function find (asset: FileKeys, theme: Theme): Promise<string> {
 
-  return axios({
-    ...$.sync.stores[theme.sidx].client,
+  const request = merge($.sync.stores[theme.sidx].client, {
     method: 'get',
     url: theme.url,
     params: {
       'asset[key]': asset
     }
-  }).then(({ data }) => data.asset).catch(() => false);
+  });
+
+  return axios(request).then(({ data }) => data.asset).catch(() => false);
 
 };
 
@@ -132,9 +156,9 @@ let limit: number;
 /**
  * Request Handler
  *
- * Executes a request to a Shopify resource
- * REST endpoint. When request rates are exceeded
- * the handler will re-queue them.
+ * Executes a request to a Shopify resource REST endpoint. When request rates are exceeded
+ * the handler will re-queue them. This function supports various methods and is used for mode
+ * execution in `download`, `upload` and `watch`.
  */
 export async function sync (theme: Theme, file: File, config: Request) {
 
@@ -144,7 +168,8 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
   if (queue.concurrency > 2) {
     if (limit >= 20) queue.concurrency--;
-    if (limit >= 35) queue.concurrency--;
+    if (limit >= 32) queue.concurrency--;
+    if (limit >= 39) await delay(500);
   } else if (queue.concurrency < 3 && limit < 30) {
     queue.concurrency++;
   }
@@ -169,22 +194,19 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
       } else if (mode.upload) {
 
-        let fileSize = '';
-
-        if ('asset' in config.data) fileSize = getSizeStr(config.data.asset.value);
-
-        event.emit('upload', 'uploaded', theme, {
-          key: file.key,
-          namespace: file.namespace,
-          fileSize
+        event.emit('upload', {
+          status: Events.Success,
+          get theme () { return theme; },
+          get file () { return file; }
         });
 
       } else if (mode.download) {
 
-        event.emit('download', 'downloads', theme, {
-          key: file.key,
-          namespace: file.namespace,
-          data
+        event.emit('download', {
+          status: Events.Success,
+          get theme () { return theme; },
+          get file () { return file; },
+          get data () { return data; }
         });
 
       }
@@ -203,55 +225,55 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
       queue.add(() => sync(theme, file, config));
 
-      if (mode.download) {
+      if (mode.upload) {
 
-        event.emit('download', 'retry', theme, {
-          key: file.key,
-          namespace: file.namespace,
-          get file () {
-            return file;
-          }
+        event.emit('upload', {
+          status: Events.Retry,
+          get theme () { return theme; },
+          get file () { return file; }
         });
 
-        //  throw e.response;
+      } else if (mode.download) {
+
+        event.emit('download', {
+          status: Events.Retry,
+          get theme () { return theme; },
+          get file () { return file; }
+        });
 
       }
+
     } else {
 
       if (mode.upload) {
 
-        let fileSize = '';
-
-        if ('asset' in config.data) fileSize = getSizeStr(config.data.asset.value);
-
-        event.emit('upload', 'failed', theme, {
-          key: file.key,
-          namespace: file.namespace,
-          fileSize,
-          get file () {
-            return file;
-          },
-          get error () {
-            return e.response;
-          }
+        return event.emit('upload', {
+          status: Events.Failed,
+          error: e.response,
+          get theme () { return theme; },
+          get file () { return file; }
         });
-
-        //  throw e.response;
 
       } else if (mode.download) {
 
-        event.emit('download', 'failed', theme, {
-          key: file.key,
-          namespace: file.namespace,
-          get file () {
-            return file;
-          },
-          get error () {
-            return e.response;
-          }
-        });
+        if (e.response === undefined) {
 
-        //  throw e.response;
+          event.emit('download', {
+            status: Events.Empty,
+            get theme () { return theme; },
+            get file () { return file; }
+          });
+
+        } else {
+
+          return event.emit('download', {
+            status: Events.Failed,
+            error: e.response,
+            get theme () { return theme; },
+            get file () { return file; }
+          });
+
+        }
 
       } else {
 
