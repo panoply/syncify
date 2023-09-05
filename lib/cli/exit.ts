@@ -40,7 +40,9 @@ export function kill (callback: Function) {
   hooks.add(callback);
 
   if (!register) {
+
     register = true;
+
     process.once('exit', exit);
     process.once('SIGINT', exit.bind(undefined, true, 2));
     process.once('SIGTERM', exit.bind(undefined, true, 15));
