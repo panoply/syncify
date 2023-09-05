@@ -167,13 +167,13 @@ export function toUpcase <T extends string> (value: T) {
 /**
  * Sugar helper which runs `byteConvert` and `byteSize` and
  * returns a string, e.g: `20kb`
- *
- * @param string
- * The string to determine
- */
-export function getSizeStr (value: string) {
 
-  return byteConvert(byteSize(value));
+ */
+export function getSizeStr (value: string | number) {
+
+  return typeof value === 'number'
+    ? byteConvert(value)
+    : byteConvert(byteSize(value));
 }
 
 /**
