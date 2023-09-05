@@ -37,10 +37,9 @@ const methods: string[] = [
 /**
  * Console Intercept
  *
- * Intercepts `stdout` and `stderr` console methods.
- * This ensures log output is correctly printed and follows the TUI aesthetic.
- * Interception is dynamic and is only enabled during processing to catch any
- * logs from external tooling.
+ * Intercepts `stdout` and `stderr` console methods. This ensures log output is correctly
+ * printed and follows the TUI aesthetic. Interception is dynamic and is only enabled during
+ * processing to catch any logs from external tooling.
  */
 export function intercept (callback:(stream: 'stdout' | 'stderr', data: string) => void): () => void {
 
