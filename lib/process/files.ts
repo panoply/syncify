@@ -78,11 +78,74 @@ export const enum Kind {
   HTML = 'HTML',
   Markdown = 'Markdown',
   Yaml = 'YAML',
+  Unknown = 'Unknown'
 }
 
 /* -------------------------------------------- */
 /* FUNCTIONS                                    */
 /* -------------------------------------------- */
+
+/**
+ * File Kind
+ *
+ * Expects a file extension as parameter and will return the
+ * file **Kind** enum reference. Mainly used for Imports (downloads).
+ */
+function getFileKind (ext: string) {
+
+  switch (ext) {
+    case '.liquid':
+      return Kind.Liquid;
+    case '.json':
+      return Kind.JSON;
+    case '.html':
+      return Kind.HTML;
+    case '.md':
+      return Kind.Markdown;
+    case '.js':
+    case '.mjs':
+      return Kind.JavaScript;
+    case '.jsx':
+      return Kind.JSX;
+    case '.ts':
+      return Kind.TypeScript;
+    case '.tsx':
+      return Kind.TSX;
+    case '.svg':
+      return Kind.SVG;
+    case '.css':
+      return Kind.CSS;
+    case '.scss':
+      return Kind.SCSS;
+    case '.sass':
+      return Kind.SASS;
+    case '.mov':
+    case '.mp4':
+    case '.webm':
+    case '.ogg':
+      return Kind.Video;
+    case '.ico':
+    case '.jpg':
+    case '.png':
+    case '.gif':
+    case '.pjpg':
+    case '.webp':
+      return Kind.Image;
+    case '.eot':
+    case '.ttf':
+    case '.woff':
+    case '.woff2':
+      return Kind.Font;
+    case '.pdf':
+      return Kind.PDF;
+    case '.yaml':
+    case '.yml':
+      return Kind.Yaml;
+  }
+
+  return Kind.Unknown;
+
+}
 
 /**
  * Renames the file by replacing namespaces with their inferred values.
@@ -157,6 +220,32 @@ export function setFile (parsedFile: Partial<File>, input: string, output: strin
 };
 
 /**
+ * Path setter for imports (downloads). Import file references use the
+ * remote asset key for determination and will write a partial File reference.
+ * the `input` property is excluded in import file references.
+ *
+ * @param file The parsed file context information
+ * @param input The file path which is being processed
+ * @param output The output base directory path
+ */
+export function setImportFile (parsedFile: Partial<File>, output: string) {
+
+  const file = <File>parsedFile;
+
+  return <T extends unknown>(key: string, namespace: Namespace): File<T> => {
+
+    return assign({}, file, {
+      uuid: uuid(),
+      key,
+      namespace,
+      output,
+      kind: getFileKind(file.ext),
+      relative: relative($.cwd, output)
+    });
+
+  };
+}
+/**
  * Parses the filename and returns a workable object that we will pass
  * into requests and transforms. The function returns file context.
  * Some files use an anymatch test to determine their handling whereas
@@ -196,7 +285,13 @@ export function parseFile (paths: PathBundle, output: string) {
 
       if ($.spawn.invoked) {
         return define('assets', Type.Spawn);
-      } else if (file.ext === '.jpg' || file.ext === '.png' || file.ext === '.gif' || file.ext === '.pjpg') {
+      } else if (
+        file.ext === '.ico' ||
+        file.ext === '.jpg' ||
+        file.ext === '.png' ||
+        file.ext === '.gif' ||
+        file.ext === '.webp' ||
+        file.ext === '.pjpg') {
         return define('assets', Type.Asset, Kind.Image);
       } else if (file.ext === '.mov' || file.ext === '.mp4' || file.ext === '.webm' || file.ext === '.ogg') {
         return define('assets', Type.Asset, Kind.Video);
@@ -271,29 +366,31 @@ export function parseFile (paths: PathBundle, output: string) {
  *
  * @param output The import directory base path
  */
-export function importFile (key: string): File {
+export function importFile (key: string, outputPath: string): File {
+
+  const path = join(outputPath, key);
+  const file: Partial<File> = parse(path);
+  const define = setImportFile(file, path);
 
   if (key.startsWith('sections/')) {
-    return assign({ key, namspace: Namespace.Sections });
+    return define(key, Namespace.Sections);
   } else if (key.startsWith('snippets/')) {
-    return assign({ key, namspace: Namespace.Snippets });
+    return define(key, Namespace.Snippets);
   } else if (key.startsWith('layout/')) {
-    return assign({ key, namspace: Namespace.Layout });
+    return define(key, Namespace.Layout);
   } else if (key.startsWith('customers/', 10)) {
-    return assign({ key, namspace: Namespace.Customers });
+    return define(key, Namespace.Customers);
   } else if (key.startsWith('metaobject/', 10)) {
-    return assign({ key, namspace: Namespace.Metaobject });
+    return define(key, Namespace.Metaobject);
   } else if (key.startsWith('templates/')) {
-    return assign({ key, namspace: Namespace.Templates });
+    return define(key, Namespace.Templates);
   } else if (key.startsWith('config/')) {
-    return assign({ key, namspace: Namespace.Config });
+    return define(key, Namespace.Config);
   } else if (key.startsWith('locales/')) {
-    return assign({ key, namspace: Namespace.Locales });
+    return define(key, Namespace.Locales);
   } else if (key.startsWith('assets/')) {
-    return assign({ key, namspace: Namespace.Assets });
+    return define(key, Namespace.Assets);
   }
-
-  return assign({ key, namspace: Namespace.Assets });
 
 };
 
