@@ -1,33 +1,36 @@
-import { Syncify, Requests, Theme, AssetResource, File } from 'types';
-import { join } from 'path';
-import { delay, has, mapAsync } from 'rambdax';
-import { writeFile, writeFileSync } from 'fs-extra';
-import { isFunction, isUndefined, isString, isBuffer, nl, glue } from '../utils/native';
+import type { Syncify, Requests, Theme, AssetResource, File, Request } from 'types';
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { join, relative } from 'pathe';
+import { delay, has } from 'rambdax';
+import { writeFileSync } from 'fs-extra';
 import { $ } from '~state';
-import { log, c, tui } from '~log';
-import { client } from '~requests/client';
-import merge from 'mergerino';
-import { Namespace, importFile } from '~process/files';
-import { event, getSizeStr, toUpcase } from '~utils/utils';
-import { AxiosResponse } from 'axios';
-import { Events, get } from '~requests/assets';
+import { log, c, tui, error } from '~log';
+import { importFile } from '~process/files';
+import { addSuffix, event } from '~utils/utils';
+import { Progress } from '~cli/progress';
+import { NIL, NWL } from '~utils/chars';
+import { queue } from '~requests/queue';
 import * as timer from '~utils/timer';
 import * as n from '~utils/native';
-import { Progress } from '~cli/progress';
-import { NIL } from '~utils/chars';
+import * as request from '~requests/assets';
 
-type SyncKey = [
+interface SyncRecord {
   /**
-   * The store name, eg: `shop.myshopify.com`
+   * Whether or not this record is syncing
    */
-  store: string,
+  active: boolean;
   /**
-   * The theme (target) name
+   * The record number index (used for queues)
    */
-  theme: string
-]
-
-type SyncModel = Map<string, {
+  number: number;
+  /**
+   * The theme request modal
+   */
+  theme: Theme;
+  /**
+   * The Completed or awaited log reference
+   */
+  log: string;
   /**
    * The number of files to transfer
    */
@@ -36,6 +39,10 @@ type SyncModel = Map<string, {
    * The File keys for each store theme
    */
   files: AssetResource[];
+  /**
+   * The number of transfers executed
+   */
+  transfers: number;
   /**
    * The number of successful transfers
    */
@@ -52,14 +59,7 @@ type SyncModel = Map<string, {
    * Progress bar instance
    */
   progress: Progress;
-  /**
-   * The previous transfer
-   */
-  history: {
-    key: string;
-    namespace: string;
-  }
-  /**
+/**
    * Error Model
    *
    * This maintains a reference of all failures and retry transfer
@@ -109,24 +109,17 @@ type SyncModel = Map<string, {
      *
      * Entries in this map will retry and be re-queued
      */
-    retry: Map<string, {
-      /**
-       * The File reference of failed transfer
-       */
-      file: File;
-      /**
-       * The number of re-sync attempts
-       */
-      attempts: number;
-    }>
+    retry: Set<string>
   }
-}>
+}
+
+type SyncModel = Map<string, SyncRecord>
 
 interface EventParams {
   /**
    * The response status
    */
-  status: Events;
+  status: request.Events;
   /**
    * The Theme request model
    */
@@ -166,25 +159,26 @@ async function getModel () {
 
     const store = $.sync.stores[theme.sidx];
     const key: string = `${theme.store}:${theme.target}`;
-    const { assets } = await get<Requests.Assets>(theme, store.client);
+    const { assets } = await request.get<Requests.Assets>(theme, store.client);
 
     if (!sync.has(key)) {
 
       sync.set(key, {
+        active: sync.size === 0,
+        log: null,
+        number: sync.size + 1,
         size: assets.length,
+        transfers: 0,
         failed: 0,
         success: 0,
         retry: 0,
         progress: log.progress(assets.length),
-        history: {
-          key: NIL,
-          namespace: NIL
-        },
         get files () { return assets; },
+        get theme () { return theme; },
         errors: {
           local: new Map(),
           remote: new Map(),
-          retry: new Map()
+          retry: new Set()
         }
       });
 
@@ -196,46 +190,94 @@ async function getModel () {
 
 }
 
+function getDoneLog (record: SyncRecord, output: string, time: string) {
+
+  const success = `  ${c.bold(`${record.success}`)} ${c.white('of')} ${c.bold(`${record.size}`)}`;
+  const failed = `  ${c.bold(`${record.failed}`)}`;
+  const target = c.bold(`${c.CHK} ${record.theme.target.toUpperCase()}`);
+
+  return [
+    tui.message('whiteBright', `${target}  ${c.ARR}  ${record.theme.store}`),
+    c.newline,
+    tui.message('whiteBright', c.bold(time)),
+    c.newline,
+    tui.suffix('whiteBright', 'location ', `  ${c.gray.underline(output)}`),
+    NWL,
+    tui.suffix('whiteBright', 'synced  ', success),
+    NWL,
+    tui.suffix(record.failed > 0 ? 'redBright' : 'white', 'errors', failed),
+    c.newline,
+    record.progress.render(),
+    c.newline
+  ].join(NIL);
+
+}
+
+function getWaitLog (record: SyncRecord) {
+
+  return [
+    tui.message('neonCyan', `${c.bold(record.theme.target.toUpperCase())}  ${c.ARR}  ${record.theme.store}`),
+    c.newline,
+    tui.message('white', `${c.bold(addSuffix(record.number))} in queue`),
+    c.newline,
+    tui.suffix('gray', 'synced  ', `  ${c.bold('0')} ${c.white('of')} ${c.bold(`${record.size}`)}`),
+    NWL,
+    tui.suffix('gray', 'retry ', `  ${c.bold('0')}`),
+    NWL,
+    tui.suffix('gray', 'errors', `  ${c.bold('0')}`),
+    c.newline,
+    record.progress.render(),
+    c.newline
+  ].join(NIL);
+
+}
+
 export async function download (cb?: Syncify): Promise<void> {
 
   $.cache.lastResource = 'download';
 
+  let remaining: number = 0;
   let transfers: number = 0;
 
   timer.start('download');
   log.group('Download', true);
   log.spinner('Preparing');
 
-  const hashook = isFunction(cb);
-  const request = client($.sync);
+  const hashook = n.isFunction(cb);
   const sync = await getModel();
 
   await delay(500);
 
   /* -------------------------------------------- */
-  /* FUNCTIONS                                    */
+  /* EVENT CALLBACK                               */
   /* -------------------------------------------- */
 
-  event.on('download', function (item: EventParams) {
+  function callback (item: EventParams) {
 
     log.spinner.stop();
 
     const { theme, file } = item;
-
     const key = `${theme.store}:${theme.target}`;
     const record = sync.get(key);
-    const message: string[] = [
-      tui.suffix('gray', 'Transfers  ', `  ${transfers++}`),
-      nl,
-      tui.suffix('gray', 'Duration   ', `  ${timer.now('download')}`),
+    const preview = `https://${theme.store}?preview_theme_id=${theme.id}`;
+    const prefix: string = [
+
+      tui.suffix('gray', 'Duration   ', c.whiteBright(`  ${timer.now('download')}`)),
+      NWL,
+      tui.suffix('gray', 'Transfers  ', c.whiteBright.bold(`  ${transfers++}`)),
+      NWL,
+      tui.suffix('gray', 'Syncing    ', `  ${c.pink(`${c.bold(theme.target)}  ${c.ARR}  ${theme.store}`)}`),
+      NWL,
+      tui.suffix('gray', 'Preview    ', `  ${c.underline(preview)}`),
+      c.newline,
+      c.hrs(preview.length + 17),
       c.newline
-    ];
 
-    let status: string = NIL;
+    ].join(NIL);
 
-    record.history.namespace = `  ${c.whiteBright(file.namespace)}`;
+    let processing: string = NIL;
 
-    if (item.status === Events.Success) {
+    if (item.status === request.Events.Success) {
 
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -243,6 +285,7 @@ export async function download (cb?: Syncify): Promise<void> {
       }
 
       record.success += 1;
+      record.transfers += 1;
       record.progress.increment(1);
 
       const buffer = has('attachment', item.data.asset)
@@ -251,18 +294,18 @@ export async function download (cb?: Syncify): Promise<void> {
 
       writeFileSync(file.output, buffer);
 
-      record.history.key = status = tui.message('neonGreen', file.key);
+      processing = tui.message('neonGreen', file.key);
 
-    } else if (item.status === Events.Retry) {
+    } else if (item.status === request.Events.Retry) {
 
       if (!record.errors.retry.has(file.output)) {
         record.retry += 1;
-        record.errors.retry.set(file.output, { file, attempts: 0 });
+        record.errors.retry.add(file.output);
       }
 
-      record.history.key = status = tui.message('orange', file.key);
+      processing = tui.message('orange', file.key);
 
-    } else if (item.status === Events.Failed) {
+    } else if (item.status === request.Events.Failed) {
 
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -272,89 +315,121 @@ export async function download (cb?: Syncify): Promise<void> {
       if (!record.errors.remote.has(file.output)) {
 
         record.failed += 1;
+        record.transfers += 1;
         record.progress.increment(1);
         record.errors.remote.set(file.output, {
           file,
           attempts: 0,
           response: item.error
         });
+
       }
 
-      record.history.key = status = tui.message('redBright', file.key);
+      processing = tui.message('redBright', file.key);
 
     }
 
-    for (const [ prop, ref ] of sync) {
+    const success = `  ${c.bold(`${record.success}`)} ${c.white('of')} ${c.bold(`${record.size}`)}`;
+    const retried = `  ${c.bold(`${record.retry}`)}`;
+    const failed = `  ${c.bold(`${record.failed}`)}`;
+    const status = [
+      tui.message('neonCyan', `${c.bold(record.theme.target.toUpperCase())}  ${c.ARR}  ${record.theme.store}`),
+      c.newline,
+      processing,
+      c.newline,
+      tui.suffix('whiteBright', 'synced   ', success),
+      NWL,
+      tui.suffix(record.retry > 0 ? 'orange' : 'whiteBright', 'retry ', retried),
+      NWL,
+      tui.suffix(record.failed > 0 ? 'redBright' : 'whiteBright', 'errors', failed),
+      c.newline,
+      record.progress.render(),
+      c.newline
 
-      const [ store, target ] = prop.split(':');
+    ].join(NIL);
 
-      message.push(
-        tui.message('neonCyan', `${c.bold(target.toUpperCase())}  ${c.ARR}  ${store}`),
-        c.newline
-      );
+    const message: string[] = [ prefix ];
 
-      if (store === theme.store && target === theme.target) {
+    let counter: number = 0;
 
-        const success = `  ${c.bold(`${ref.success}`)} ${c.white('of')} ${c.bold(`${ref.size}`)}`;
-        const retried = `  ${c.bold(`${ref.retry}`)}`;
-        const failed = `  ${c.bold(`${ref.failed}`)}`;
-
-        message.push(
-          status,
-          c.newline,
-          tui.suffix('white', 'resource  ', record.history.namespace),
-          n.nl,
-          tui.suffix('whiteBright', 'success  ', success),
-          n.nl,
-          tui.suffix(ref.retry > 0 ? 'orange' : 'white', 'retrying ', retried),
-          n.nl,
-          tui.suffix(ref.failed > 0 ? 'redBright' : 'white', 'errors', failed),
-          c.newline,
-          ref.progress.render(),
-          c.newline
-        );
-
+    for (const stream of sync.values()) {
+      if (stream.active) {
+        message.push(status);
       } else {
-
-        const success = `  ${c.bold(`${ref.success}`)} ${c.white('of')} ${c.bold(`${ref.size}`)}`;
-        const retried = `  ${c.bold(`${ref.retry}`)}`;
-        const failed = `  ${c.bold(`${ref.failed}`)}`;
-
-        message.push(
-          ref.history.key,
-          c.newline,
-          tui.suffix('white', 'resource  ', ref.history.namespace),
-          n.nl,
-          tui.suffix('whiteBright', 'success  ', success),
-          n.nl,
-          tui.suffix(ref.retry > 0 ? 'orange' : 'white', 'retrying ', retried),
-          n.nl,
-          tui.suffix(ref.failed > 0 ? 'redBright' : 'white', 'errors', failed),
-          c.newline,
-          ref.progress.render(),
-          c.newline
-        );
-
+        if (stream.log === null) {
+          counter = counter + 1;
+          stream.number = counter;
+          message.push(getWaitLog(stream));
+        } else {
+          message.push(stream.log);
+        }
       }
-
     }
 
-    log.update(n.glue(message));
+    log.update(message.join(NIL));
 
-  });
-
-  for (const [ key, { files } ] of sync) {
-
-    const [ store, theme ] = key.split(':');
-    const output = join($.dirs.import, store, theme);
-
-    for (const asset of files) {
-
-      timer.start();
-
-      await request.assets('get', importFile(asset.key, output));
-
-    }
   }
 
+  /* -------------------------------------------- */
+  /* FUNCTIONS                                    */
+  /* -------------------------------------------- */
+
+  event.on('download', callback);
+
+  remaining = sync.size - 1;
+
+  for (const [ id, record ] of sync) {
+
+    const [ store, target ] = id.split(':');
+    const output = join($.dirs.import, store, target);
+
+    timer.start(id);
+    record.active = true;
+
+    for (const { key } of record.files) {
+
+      const file = importFile(key, output);
+      const payload = n.assign<Request, AxiosRequestConfig>({
+        url: record.theme.url,
+        method: 'get',
+        params: {
+          'asset[key]': file.key
+        }
+      }, $.sync.stores[record.theme.sidx].client);
+
+      await queue.add(() => request.sync(record.theme, file, payload));
+
+    }
+
+    await queue.onIdle();
+
+    remaining = remaining - 1;
+
+    record.active = false;
+    record.log = getDoneLog(sync.get(id), relative($.cwd, output), timer.stop(id));
+
+  }
+
+  /* -------------------------------------------- */
+  /* POST PROCESSING                              */
+  /* -------------------------------------------- */
+
+  for (const { errors } of sync.values()) {
+
+    if (errors.remote.size > 0) {
+
+      let errno: number = 0;
+
+      for (const [ path, { response } ] of errors.remote) {
+
+        log.nwl();
+        log.write(c.redBright.bold(`ERROR ${errno++}`));
+
+        console.log(response);
+
+      }
+
+    }
+
+  }
 };
