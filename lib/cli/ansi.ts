@@ -76,7 +76,8 @@ export const {
   reset,
   italic,
   strike,
-  dim
+  dim,
+  strip
 } = ansis;
 
 /* -------------------------------------------- */
@@ -130,7 +131,7 @@ export const neonMagenta = ansis.hex('#B319FF');
 /**
  * TUI Tree - Crown
  *
- * ```
+ * ```bash
  * ┌─
  * ```
  */
@@ -139,7 +140,7 @@ export const open = lightGray('┌─ ');
 /**
  * TUI Tree - line
  *
- * ```
+ * ```bash
  * │
  * ```
  */
@@ -161,7 +162,7 @@ export const line = {
 /**
  * TUI Tree - newline lines, ie: `\n` are prepended and appended
  *
- * ```
+ * ```bash
  *
  * │
  *
@@ -172,7 +173,7 @@ export const newline = lightGray(`${nl}│${nl}`);
 /**
  * TUI Branch - line
  *
- * ```
+ * ```bash
  * ├─
  * ```
  */
@@ -181,7 +182,7 @@ export const dash = lightGray('│  ├─ ');
 /**
  * TUI Arrow - line
  *
- * ```
+ * ```bash
  *├─
  * ```
  */
@@ -190,7 +191,7 @@ export const top = lightGray('├─ ');
 /**
  * TUI Arrow - line
  *
- * ```
+ * ```bash
  * │  ┌┘
  * ```
  */
@@ -199,7 +200,7 @@ export const bottom = lightGray('│  └─ ');
 /**
  * TUI Tree - close
  *
- * ```
+ * ```bash
  * └─
  * ```
  */
@@ -210,13 +211,13 @@ export const close = lightGray('└─ ');
  *
  * Same as `hr()` but only applies horizonal lines `x` amount of times
  *
- * ```
+ * ```bash
  * │
  * ├────────────────────────────────────────────────
  * │
  * ```
  */
-export const hrs = (x: number) => lightGray(`${'─'.repeat(x)}`);
+export const hrs = (x: number = size().cols - 10) => lightGray(`│ ${'─'.repeat(x)}`);
 
 /**
  * TUI Horizontal Row
@@ -224,7 +225,7 @@ export const hrs = (x: number) => lightGray(`${'─'.repeat(x)}`);
  * Prints a horizontal line separator. Will span the length
  * of the terminal pane.
  *
- * ```
+ * ```bash
  * │
  * ├────────────────────────────────────────────────
  * │
@@ -239,7 +240,7 @@ export const hr = (minus: number) => lightGray(`│${nl}├${'─'.repeat(size()
 /**
  * Checkmark character in neonGreen suffixed with single space
  *
- * ```
+ * ```bash
  * ✓
  * ```
  */
@@ -248,7 +249,7 @@ export const CHK = neonGreen('✓ ');
 /**
  * Cross character in redBright
  *
- * ```
+ * ```bash
  * 𐄂
  * ```
  */
@@ -266,7 +267,7 @@ export const COL = gray(':');
 /**
  * Right Arrow character in gray
  *
- * ```
+ * ```bash
  * →
  * ```
  */
@@ -275,7 +276,7 @@ export const ARR = gray('→');
 /**
  * Right Chevron solid character in gray
  *
- * ```
+ * ```bash
  * ‣
  * ```
  */
@@ -284,7 +285,7 @@ export const CHV = gray('‣');
 /**
  * Right + Small Left Arrow character in gray
  *
- * ```
+ * ```bash
  * ⥂
  * ```
  */
@@ -293,7 +294,7 @@ export const ARL = gray('⥂');
 /**
  * Tilde character in gray
  *
- * ```
+ * ```bash
  * ~
  * ```
  */
@@ -302,7 +303,7 @@ export const TLD = gray('~');
 /**
  * Long EnDash character in gray
  *
- * ```
+ * ```bash
  * —
  * ```
  */
@@ -311,7 +312,7 @@ export const DSH = gray('—');
 /**
  * Left Parenthesis in gray
  *
- * ```
+ * ```bash
  * (
  * ```
  */
@@ -320,7 +321,7 @@ export const LPR = gray('(');
 /**
  * Right Parenthesis in gray
  *
- * ```
+ * ```bash
  * )
  * ```
  */
@@ -329,7 +330,7 @@ export const RPR = gray(')');
 /**
  * Left Curly Brace in gray
  *
- * ```
+ * ```bash
  * {
  * ```
  */
@@ -338,7 +339,7 @@ export const LCB = gray('{');
 /**
  * Right Curly Brace in gray
  *
- * ```
+ * ```bash
  * }
  * ```
  */
@@ -360,8 +361,10 @@ export const warning = yellowBright(` ~ Type ${bold('w')} and press ${bold('ente
 /**
  * Error stdin suffix
  *
- * ```
+ * ```bash
+ *
  *  ~ Type v and press enter to view
+ *
  * ```
  */
 export const error = redBright(` ~ Type ${bold('v')} and press ${bold('enter')} to view`);
@@ -369,8 +372,10 @@ export const error = redBright(` ~ Type ${bold('v')} and press ${bold('enter')} 
 /**
  * Time Suffix
  *
- * ```
+ * ```bash
+ *
  *  ~ 01:59:20
+ *
  * ```
  */
 export const time = (now: string) => now ? reset.gray(` ~ ${now}`) : nil;
