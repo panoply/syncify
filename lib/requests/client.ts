@@ -56,7 +56,7 @@ export function client ({ stores, themes }: Sync) {
 
       await queue.add(() => pMap(themes, async (theme) => {
 
-        if ($.mode.upload || $.mode.download) timer.start();
+        if ($.mode.upload) timer.start(file.uuid);
 
         await asset.sync(theme, file, assign(
           { url: theme.url },
