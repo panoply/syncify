@@ -4,7 +4,7 @@ import type { Exception } from 'sass';
 import type { NodeErrorOptions } from 'postcss';
 import type { Message } from 'esbuild';
 import { hasPath } from 'rambdax';
-import { nil, nl, error, glue } from '~utils/native';
+import { nil, nl, error, glue, assign } from '~utils/native';
 import cleanStack from 'clean-stack';
 import wrap from 'wrap-ansi';
 import { SHOPIFY_REQUEST_ERRORS } from '~const';
@@ -15,7 +15,7 @@ import { $ } from '~state';
 /**
  * Error Reporting
  *
- * The is a store model used for delayed logging of
+ * This is a store model used for delayed logging of
  * errors encountered. Typically used when performing uploads.
  */
 export const errors: { [file: string]: Set<string> } = {};
@@ -77,7 +77,26 @@ export function spawn (data: string) {
  * or is rejected. The response data returned by Shopify is parsed
  * and additional information is appended.
  */
-export function request <T> (file: string, e: AxiosResponse, logError = true): T {
+export function request <T> (file: string, e: AxiosResponse, options: {
+  log?: boolean;
+  store?: boolean;
+} = {}): T {
+
+  const o: {
+    log: boolean;
+    store: boolean;
+    data?: {
+      message?: string;
+      context?: {
+        stack: string | boolean;
+        entries: {
+            [name: string]: string | number;
+        };
+      }
+    }
+  } = assign({ log: true, store: false }, options);
+
+  if (o.store) o.data = {};
 
   const message = hasPath('error.asset', e.data)
     ? e.data.error.asset
@@ -85,47 +104,82 @@ export function request <T> (file: string, e: AxiosResponse, logError = true): T
 
   if (e.status === 422) {
 
+    const info = tui.shopify(message);
+    const context = {
+      stack: false,
+      entries: {
+        details: 'File did not sync because Shopify rejected the request',
+        status: e.status,
+        message: e.statusText,
+        source: file
+      }
+    };
+
+    if (o.store) {
+      o.data.message = c.strip(info);
+      o.data.context = context;
+    }
+
     const output = glue([
       c.line.red,
       nl,
-      tui.shopify(message),
-      tui.context({
-        stack: false,
-        entries: {
-          // details: 'File did not sync because Shopify rejected the request',
-          status: e.status,
-          message: e.statusText,
-          source: c.underline(`${file}`)
-        }
-      })
+      info,
+      tui.context(context as any)
     ]);
 
-    return <T>(logError ? error(output) : output);
+    if (o.log) error(output);
+
+    return <T>(o.store ? o.data : output);
 
   } else if (e.status in SHOPIFY_REQUEST_ERRORS) {
 
+    const info = tui.multiline('error', SHOPIFY_REQUEST_ERRORS[e.status]);
+    const context = {
+      stack: false,
+      entries: {
+        status: e.status,
+        message: e.statusText,
+        source: `${file}`
+      }
+    };
+
+    if (o.store) {
+      o.data.message = c.strip(info);
+      o.data.context = context;
+    }
+
     const output = glue([
       c.line.red,
       nl,
-      tui.multiline('error', SHOPIFY_REQUEST_ERRORS[e.status]) +
-      tui.context({
-        stack: false,
-        entries: {
-          status: e.status,
-          message: e.statusText,
-          source: `${file}`
-        }
-      })
+      info +
+      tui.context(context as any)
     ]);
 
-    return <T>(logError ? error(output) : output);
+    if (o.log) error(output);
+
+    return <T>(o.store ? o.data : output);
 
   } else {
 
+    const info = 'Unknown error has occured';
+    const context = {
+      stack: false,
+      entries: {
+        status: e.status,
+        message: e.statusText,
+        source: `${file}`
+      }
+    };
+
+    if (o.store) {
+      o.data.message = info;
+      o.data.context = context;
+    }
+
     const output = glue([
       c.line.red,
       nl,
-      c.red('Unknown error has occured') +
+      c.redBright(info) +
       tui.context({
         stack: false,
         entries: {
@@ -136,7 +190,9 @@ export function request <T> (file: string, e: AxiosResponse, logError = true): T
       })
     ]);
 
-    return <T>(logError ? error(output) : output);
+    if (o.log) error(output);
+
+    return <T>(o.store ? o.data : output);
 
   }
 }
