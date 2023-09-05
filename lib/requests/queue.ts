@@ -19,8 +19,8 @@ export const axios = connect.create({
  * the rates we requeue the requests.
  */
 export const queue = new Queue({
-  concurrency: 5,
-  interval: 250,
+  // concurrency: 5,
+  interval: 500,
   intervalCap: 2
 });
 
