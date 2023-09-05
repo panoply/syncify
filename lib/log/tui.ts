@@ -306,14 +306,13 @@ export function context (data: {
 
   // generate output
   for (const k in data.entries) {
-
     if (data.entries[k]) {
       output += glue([
         c.line.red,
         c.white(k),
         c.COL + ws,
         wsr(space - k.length),
-        c.gray(`${data.entries[k]}`) + nl
+        c.gray(`${k === 'source' ? c.underline(`${data.entries[k]}`) : data.entries[k]}`) + nl
       ]);
     }
   }
