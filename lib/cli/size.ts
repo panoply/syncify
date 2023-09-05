@@ -1,7 +1,7 @@
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
-import { dirname, join } from 'pathe';
 import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'pathe';
 
 /**
  * Returns `child_process.execFileSync()` method
@@ -20,10 +20,15 @@ function exec (command: string, args: string[], shell?: boolean) {
 
 }
 
+/**
+ * Executes Native CJS
+ */
 function execNative (command: string, shell: boolean) {
+
   // @ts-expect-error
   const __dirname = dirname(fileURLToPath(import.meta.url));
   return exec(join(__dirname, command), [], shell).split(/\r?\n/);
+
 }
 
 /**
@@ -42,7 +47,8 @@ function create (columns: number | string, rows: number | string) {
  * Terminal Size
  *
  * Returns the terminal width (columns) and height (rows).
- * Lifted from https://github.com/sindresorhus/term-size
+ *
+ * @see https://github.com/sindresorhus/term-size
  */
 export function size () {
 
@@ -89,14 +95,16 @@ export function size () {
     } catch {}
 
     if (process.env.TERM) {
+
       try {
 
-        const columns = exec('tput', [ 'cols' ]);
+        const cols = exec('tput', [ 'cols' ]);
         const rows = exec('tput', [ 'lines' ]);
 
-        if (columns && rows) return create(columns, rows);
+        if (cols && rows) return create(cols, rows);
 
       } catch {}
+
     }
   }
 
