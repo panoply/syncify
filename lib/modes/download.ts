@@ -14,6 +14,29 @@ import * as timer from '~utils/timer';
 import * as n from '~utils/native';
 import * as request from '~requests/assets';
 
+interface EventParams {
+  /**
+   * The response status
+   */
+  status: request.Events;
+  /**
+   * The Theme request model
+   */
+  get theme (): Theme;
+  /**
+   * The File model
+   */
+  get file (): File;
+  /**
+   * The response data (only if successful)
+   */
+  get data (): Requests.Asset
+  /**
+   * The Axios Response Error (only if error)
+   */
+  get error (): AxiosResponse
+}
+
 interface SyncRecord {
   /**
    * Whether or not this record is syncing
@@ -48,6 +71,10 @@ interface SyncRecord {
    */
   success: number;
   /**
+   * The number of warning transfers
+   */
+  warning: number;
+  /**
    * The number of transfers that will retry
    */
   retry: number;
@@ -59,7 +86,7 @@ interface SyncRecord {
    * Progress bar instance
    */
   progress: Progress;
-/**
+  /**
    * Error Model
    *
    * This maintains a reference of all failures and retry transfer
@@ -90,20 +117,7 @@ interface SyncRecord {
      *
      * Entries in this map are request failures incurred during transfer
      */
-    remote: Map<string, {
-      /**
-       * The File reference of failed transfer
-       */
-      file: File;
-      /**
-       * The number of re-sync attempts
-       */
-      attempts: number;
-      /**
-       * Axios error Response
-       */
-      response: AxiosResponse;
-    }>;
+    remote: Map<string, EventParams>;
     /**
      * Retrying
      *
@@ -114,29 +128,6 @@ interface SyncRecord {
 }
 
 type SyncModel = Map<string, SyncRecord>
-
-interface EventParams {
-  /**
-   * The response status
-   */
-  status: request.Events;
-  /**
-   * The Theme request model
-   */
-  get theme (): Theme;
-  /**
-   * The File model
-   */
-  get file (): File;
-  /**
-   * The response data (only if successful)
-   */
-  get data (): Requests.Asset
-  /**
-   * The Axios Response Error (only if error)
-   */
-  get error (): AxiosResponse
-}
 
 /**
  * Get Model
@@ -169,6 +160,7 @@ async function getModel () {
         number: sync.size + 1,
         size: assets.length,
         transfers: 0,
+        warning: 0,
         failed: 0,
         success: 0,
         retry: 0,
@@ -194,18 +186,18 @@ function getDoneLog (record: SyncRecord, output: string, time: string) {
 
   const success = `  ${c.bold(`${record.success}`)} ${c.white('of')} ${c.bold(`${record.size}`)}`;
   const failed = `  ${c.bold(`${record.failed}`)}`;
-  const target = c.bold(`${c.CHK} ${record.theme.target.toUpperCase()}`);
+  const target = c.bold(`${record.theme.target.toUpperCase()}`);
 
   return [
-    tui.message('whiteBright', `${target}  ${c.ARR}  ${record.theme.store}`),
+    tui.message('neonCyan', `${target}  ${c.ARR}  ${record.theme.store}`),
     c.newline,
-    tui.message('whiteBright', c.bold(time)),
+    tui.message('gray', `completed in ${c.gray(time)}`),
     c.newline,
-    tui.suffix('whiteBright', 'location ', `  ${c.gray.underline(output)}`),
-    NWL,
     tui.suffix('whiteBright', 'synced  ', success),
     NWL,
     tui.suffix(record.failed > 0 ? 'redBright' : 'white', 'errors', failed),
+    NWL,
+    tui.suffix('whiteBright', 'location ', `  ${c.gray.underline(output)}`),
     c.newline,
     record.progress.render(),
     c.newline
@@ -277,7 +269,17 @@ export async function download (cb?: Syncify): Promise<void> {
 
     let processing: string = NIL;
 
-    if (item.status === request.Events.Success) {
+    if (item.status === request.Events.Empty) {
+
+      writeFileSync(file.output, '');
+
+      record.warning += 1;
+      record.transfers += 1;
+      record.progress.increment(1);
+
+      processing = tui.message('yellowBright', file.key);
+
+    } else if (item.status === request.Events.Success) {
 
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -317,11 +319,7 @@ export async function download (cb?: Syncify): Promise<void> {
         record.failed += 1;
         record.transfers += 1;
         record.progress.increment(1);
-        record.errors.remote.set(file.output, {
-          file,
-          attempts: 0,
-          response: item.error
-        });
+        record.errors.remote.set(file.output, item);
 
       }
 
@@ -332,6 +330,8 @@ export async function download (cb?: Syncify): Promise<void> {
     const success = `  ${c.bold(`${record.success}`)} ${c.white('of')} ${c.bold(`${record.size}`)}`;
     const retried = `  ${c.bold(`${record.retry}`)}`;
     const failed = `  ${c.bold(`${record.failed}`)}`;
+    const warnings = `  ${c.bold(`${record.warning}`)}`;
+
     const status = [
       tui.message('neonCyan', `${c.bold(record.theme.target.toUpperCase())}  ${c.ARR}  ${record.theme.store}`),
       c.newline,
@@ -340,6 +340,8 @@ export async function download (cb?: Syncify): Promise<void> {
       tui.suffix('whiteBright', 'synced   ', success),
       NWL,
       tui.suffix(record.retry > 0 ? 'orange' : 'whiteBright', 'retry ', retried),
+      NWL,
+      tui.suffix(record.warning > 0 ? 'yellowBright' : 'whiteBright', 'warning ', warnings),
       NWL,
       tui.suffix(record.failed > 0 ? 'redBright' : 'whiteBright', 'errors', failed),
       c.newline,
@@ -420,12 +422,10 @@ export async function download (cb?: Syncify): Promise<void> {
 
       let errno: number = 0;
 
-      for (const [ path, { response } ] of errors.remote) {
+      for (const [ path, ref ] of errors.remote) {
 
         log.nwl();
         log.write(c.redBright.bold(`ERROR ${errno++}`));
-
-        console.log(response);
 
       }
 
