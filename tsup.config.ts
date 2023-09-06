@@ -2,6 +2,8 @@ import { defineConfig } from 'tsup';
 import { build } from 'esbuild';
 import * as pkg from './package.json';
 
+const json = JSON.stringify;
+
 const noExternal = [
   'ansis',
   'clean-stack',
@@ -73,6 +75,10 @@ export default defineConfig(options => ([
     noExternal,
     external,
     define: {
+      NIL: json(''),
+      NWL: json('\n'),
+      NLR: json('\n\n'),
+      WSP: json(' '),
       VERSION: `"${pkg.version}"`
     },
     esbuildOptions (options) {
