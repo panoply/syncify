@@ -1,5 +1,4 @@
 import type { Colors } from '~cli/ansi';
-import { SPINNER_FRAMES } from '~const';
 import update from 'log-update';
 import { c } from '~log';
 import { defineProperty } from '~native';
@@ -58,9 +57,25 @@ export function getSpinner () {
   let active: boolean = false;
 
   /**
+   * Log Snipper frames
+   */
+  const frames = [
+    '⠋',
+    '⠙',
+    '⠹',
+    '⠸',
+    '⠼',
+    '⠴',
+    '⠦',
+    '⠧',
+    '⠇',
+    '⠏'
+  ];
+
+  /**
    * Spinner Frames
    */
-  const size = SPINNER_FRAMES.length;
+  const size = frames.length;
 
   /**
    * TUI Spinner
@@ -75,7 +90,7 @@ export function getSpinner () {
 
     interval = setInterval(() => {
       if (!active) return;
-      update(`${c.line.gray}${c[color](`${SPINNER_FRAMES[f = ++f % size]}`)}${text ? ` ${text}` : NIL}`);
+      update(`${c.line.gray}${c[color](`${frames[f = ++f % size]}`)}${text ? ` ${text}` : NIL}`);
     }, 50);
 
   };

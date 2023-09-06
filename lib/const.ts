@@ -1,43 +1,6 @@
 import type { PathBundle } from 'types';
 
 /**
- * Log Snipper frames
- */
-export const SPINNER_FRAMES = [
-  '⠋',
-  '⠙',
-  '⠹',
-  '⠸',
-  '⠼',
-  '⠴',
-  '⠦',
-  '⠧',
-  '⠇',
-  '⠏'
-];
-
-/**
- * Syncify configuration files
- */
-export const CONFIG_FILES = [
-  'syncify.config.js',
-  'syncify.config.mjs',
-  'syncify.config.cjs',
-  'syncify.config.ts',
-  'syncify.config.json'
-];
-
-/**
- * Syncify cache directories
- */
-export const CACHE_DIRS = [
-  'caches',
-  'sourcemaps',
-  'sourcemaps/style',
-  'sourcemaps/script'
-];
-
-/**
  * Syncify base directory defaults
  */
 export const BASE_DIRS = [
@@ -110,21 +73,6 @@ export const ESBUILD_NOT_INSTALLED = [
   'and configured as a processor. Install esbuild and configure Syncify',
   'to apply transforms to leverage script minification.'
 ];
-
-/**
- * Bundle Require related constant
- */
-export const DIRNAME_VAR_NAME = '__injected_dirname__';
-
-/**
- * Bundle Require related constant
- */
-export const FILENAME_VAR_NAME = '__injected_filename__';
-
-/**
- * Bundle Require related constant
- */
-export const IMPORT_META_URL_VAR_NAME = '__injected_import_meta_url__';
 
 /**
  * Log error validations for or type characters

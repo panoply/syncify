@@ -2,10 +2,10 @@ import type { BundleRequire, BundleResolve } from 'types/internal';
 import { readFile, unlink, writeFile, existsSync, readFileSync } from 'fs-extra';
 import { isAbsolute, dirname, extname, join, parse, resolve } from 'pathe';
 import { pathToFileURL } from 'node:url';
-import { inferLoader, dynamicImport, uuid, isRegex, jsonc, isArray } from './utils';
+import { inferLoader, dynamicImport, uuid, isRegex, jsonc, isArray, glue } from './utils';
 import { assign, keys } from './native';
 import { build, BuildResult, Plugin } from 'esbuild';
-import { DIRNAME_VAR_NAME, FILENAME_VAR_NAME, IMPORT_META_URL_VAR_NAME, REGEX_EXTJS } from '~const';
+import { REGEX_EXTJS } from '~const';
 import { $ } from '~state';
 import { has } from 'rambdax';
 
@@ -222,9 +222,9 @@ export function injectFileScopePlugin (): Plugin {
 
       ctx.initialOptions.define = {
         ...ctx.initialOptions.define,
-        __dirname: DIRNAME_VAR_NAME,
-        __filename: FILENAME_VAR_NAME,
-        'import.meta.url': IMPORT_META_URL_VAR_NAME
+        __dirname: '__injected_dirname__',
+        __filename: '__injected_filename__',
+        'import.meta.url': '__injected_import_meta_url__'
       };
 
       ctx.onLoad({ filter: REGEX_EXTJS }, async (args) => {
@@ -232,13 +232,13 @@ export function injectFileScopePlugin (): Plugin {
         const contents = await readFile(args.path, 'utf-8');
 
         const injectLines = [
-          `const ${FILENAME_VAR_NAME} = ${JSON.stringify(args.path)};`,
-          `const ${DIRNAME_VAR_NAME} = ${JSON.stringify(dirname(args.path))};`,
-          `const ${IMPORT_META_URL_VAR_NAME} = ${JSON.stringify(pathToFileURL(args.path).href)};`
+          `const __injected_filename__ = ${JSON.stringify(args.path)};`,
+          `const __injected_dirname__ = ${JSON.stringify(dirname(args.path))};`,
+          `const __injected_import_meta_url__ = ${JSON.stringify(pathToFileURL(args.path).href)};`
         ];
 
         return {
-          contents: injectLines.join('') + contents,
+          contents: glue(injectLines) + contents,
           loader: inferLoader(extname(args.path))
         };
       });

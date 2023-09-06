@@ -12,7 +12,7 @@ import { intercept } from '~cli/intercept';
 import { Kind } from '~process/files';
 import * as errors from '~log/errors';
 import * as c from '~cli/ansi';
-import * as tui from '~log/tui';
+import { opener, clear, closer, message, suffix, tree } from './tui';
 import { getSpinner } from './spinner';
 
 /* -------------------------------------------- */
@@ -20,9 +20,9 @@ import { getSpinner } from './spinner';
 /* -------------------------------------------- */
 
 export { default as update } from 'log-update';
-export { start } from '~log/start';
-export { clear, hline } from '~log/tui';
 export { progress } from '~cli/progress';
+export { start } from './start';
+export { clear, hline } from './tui';
 export { log as out } from '~native';
 
 /* -------------------------------------------- */
@@ -116,17 +116,17 @@ export function build (id: string, count: number, file: File | string) {
 
   // close previous group
   if (close) {
-    log(tui.closer(state.group));
+    log(closer(state.group));
 
   }
 
   // clear if first run
-  if (state.group === 'Syncify') tui.clear();
+  if (state.group === 'Syncify') clear();
 
   // open new group
   if (close) {
 
-    log(tui.opener(state.group));
+    log(opener(state.group));
     nwl();
     log(c.line.gray + c.bold(`${count} ${toUpcase(id)}`));
     nwl();
@@ -137,7 +137,7 @@ export function build (id: string, count: number, file: File | string) {
   }
 
   nwl();
-  log(tui.tree('top', c.neonCyan(typeof file === 'string' ? file : file.relative)));
+  log(tree('top', c.neonCyan(typeof file === 'string' ? file : file.relative)));
 
 };
 
@@ -199,7 +199,7 @@ export function write (input: string | string[]) {
  */
 export function external (operation: string) {
 
-  log(tui.suffix('cyan', 'external', operation));
+  log(suffix('cyan', 'external', operation));
 
 };
 
@@ -258,15 +258,15 @@ export function unhook () {
  * │
  * └─ Name ~ 01:59:20
  */
-export function group (name: string, clear = false) {
+export function group (name: string, clearLog = false) {
 
   // close previous group
-  log(tui.closer(state.group));
+  log(closer(state.group));
 
   // do not clear if first run
-  if (clear) tui.clear();
+  if (clearLog) clear();
 
-  log(tui.opener(name));
+  log(opener(name));
 
   state.group = name;
 
@@ -279,9 +279,9 @@ export function group (name: string, clear = false) {
  *
  * @example '│ updated → source/dir/file.ext'
  */
-export function updated (file: File, suffix?: string) {
+export function updated (file: File, msg?: string) {
 
-  log(tui.suffix('greenBright', 'updated', `${file.relative} ${suffix ? c.gray(`~ ${suffix}`) : NIL}`));
+  log(suffix('greenBright', 'updated', `${file.relative} ${suffix ? c.gray(`~ ${msg}`) : NIL}`));
 
 }
 
@@ -297,10 +297,10 @@ export function changed (file: File) {
   timer.start();
 
   // close previous group
-  if (close) log(tui.closer(state.group));
+  if (close) log(closer(state.group));
 
   // do not clear if first run
-  if (state.group !== 'Syncify' && close) tui.clear();
+  if (state.group !== 'Syncify' && close) clear();
 
   // Provides us better group context, for example:
   //
@@ -311,8 +311,8 @@ export function changed (file: File) {
 
   // open new group
   if (close) {
-    tui.clear();
-    log(tui.opener(state.group));
+    clear();
+    log(opener(state.group));
     state.title = file.namespace;
   }
 
@@ -324,7 +324,7 @@ export function changed (file: File) {
 
   if ($.mode.watch) {
     nwl();
-    log(tui.suffix('neonCyan', 'changed', file.relative));
+    log(suffix('neonCyan', 'changed', file.relative));
   }
 };
 
@@ -335,7 +335,7 @@ export function changed (file: File) {
  */
 export function hot () {
 
-  log(tui.suffix('neonRouge', 'reloaded', `${c.bold('HOT RELOAD')}${c.time(timer.now())}`));
+  log(suffix('neonRouge', 'reloaded', `${c.bold('HOT RELOAD')}${c.time(timer.now())}`));
 
 }
 
@@ -369,7 +369,7 @@ export function resource (type: string, store: Store) {
         time
       ] of state.queue) {
 
-        log(tui.suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store}` + c.time(time)));
+        log(suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store}` + c.time(time)));
 
       }
 
@@ -380,7 +380,7 @@ export function resource (type: string, store: Store) {
 
   } else {
 
-    log(tui.suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store.domain}` + c.time(timer.stop())));
+    log(suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store.domain}` + c.time(timer.stop())));
 
   }
 
@@ -414,7 +414,7 @@ export function upload (theme: Theme) {
         time
       ] of state.queue) {
 
-        log(tui.suffix('neonGreen', 'uploaded', `${c.bold(target)} → ${store}` + c.time(time)));
+        log(suffix('neonGreen', 'uploaded', `${c.bold(target)} → ${store}` + c.time(time)));
 
       }
 
@@ -425,7 +425,7 @@ export function upload (theme: Theme) {
 
   } else {
 
-    log(tui.suffix('neonGreen', 'uploaded', `${c.bold(theme.target)} → ${theme.store}` + c.time(timer.stop())));
+    log(suffix('neonGreen', 'uploaded', `${c.bold(theme.target)} → ${theme.store}` + c.time(timer.stop())));
 
   }
 
@@ -458,13 +458,13 @@ export function prompt (message: string, notify?: notifier.Notification) {
 
   // close previous group
 
-  log(tui.suffix('orange', 'prompt', message));
-  log(tui.closer(state.group) + NWL);
+  log(suffix('orange', 'prompt', message));
+  log(closer(state.group) + NWL);
 
   if (isObject(notify)) notifier.notify(notify).notify();
 
   return () => {
-    log(tui.opener(state.group));
+    log(opener(state.group));
     nwl();
   };
 
@@ -478,7 +478,7 @@ export function prompt (message: string, notify?: notifier.Notification) {
 export function syncing (path: string, hot = false) {
 
   if (warning.count > 0) {
-    log(tui.suffix(
+    log(suffix(
       'yellowBright',
       'warning',
       `${warning.count} ${plural('warning', warning.count)}`
@@ -487,7 +487,7 @@ export function syncing (path: string, hot = false) {
 
   if (hot) {
 
-    log(tui.suffix(
+    log(suffix(
       'magentaBright',
       'syncing',
       path
@@ -495,7 +495,7 @@ export function syncing (path: string, hot = false) {
 
     // when hot reloads hold off on logging queues
     if (queue.pending > 2) {
-      log(tui.suffix(
+      log(suffix(
         'orange',
         'queued',
         `${path} ${c.TLD} ${c.bold(addSuffix(queue.pending))} in queue`
@@ -504,7 +504,7 @@ export function syncing (path: string, hot = false) {
 
   } else {
 
-    log(tui.suffix(
+    log(suffix(
       'magentaBright',
       'syncing',
       path
@@ -512,7 +512,7 @@ export function syncing (path: string, hot = false) {
 
     if (queue.pending > 0) {
 
-      log(tui.suffix(
+      log(suffix(
         'orange',
         'queued',
         `${path} ${c.TLD} ${c.bold(addSuffix(queue.pending))} in queue`
@@ -546,7 +546,7 @@ export function process (name: string, ...message: [message?: string, time?: str
     time = message[1];
   }
 
-  log(tui.suffix(
+  log(suffix(
     'whiteBright',
     'process',
     `${c.bold(name)}${text}${c.time(time)}`
@@ -561,7 +561,7 @@ export function process (name: string, ...message: [message?: string, time?: str
  */
 export function exported (file: string) {
 
-  log(tui.suffix(
+  log(suffix(
     'whiteBright',
     'exports',
     file
@@ -586,7 +586,7 @@ export function exported (file: string) {
 export function importer (message: string) {
 
   if (!$.mode.build) {
-    log(tui.suffix(
+    log(suffix(
       'lavender',
       'importer',
       message
@@ -601,7 +601,7 @@ export function importer (message: string) {
  */
 export function transform (message: string) {
 
-  log(tui.suffix(
+  log(suffix(
     'whiteBright',
     'transform',
     message
@@ -616,7 +616,7 @@ export function transform (message: string) {
  */
 export function warn (message: string, fix?: string) {
 
-  log(tui.suffix(
+  log(suffix(
     'yellowBright',
     'warning',
     `${message}${fix ? c.gray(` ~ ${fix}`) : NIL}`
@@ -631,7 +631,7 @@ export function warn (message: string, fix?: string) {
  */
 export function retrying (file: string, theme: Theme) {
 
-  log(tui.suffix(
+  log(suffix(
     'orange',
     'retrying',
     `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`
@@ -646,7 +646,7 @@ export function retrying (file: string, theme: Theme) {
  */
 export function deleted (file: string, theme: Theme) {
 
-  log(tui.suffix(
+  log(suffix(
     'blueBright',
     'deleted',
     `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`
@@ -661,11 +661,11 @@ export function deleted (file: string, theme: Theme) {
  */
 export function minified (kind: string, before: string, after: string, saved: string) {
 
-  const suffix = kind
+  const msg = kind
     ? `${c.bold(kind)} ${c.ARR} ${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`
     : `${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`;
 
-  log(tui.suffix('whiteBright', 'minified', suffix));
+  log(suffix('whiteBright', 'minified', msg));
 
 };
 
@@ -676,7 +676,7 @@ export function minified (kind: string, before: string, after: string, saved: st
  */
 export function reloaded (path: string, time: string) {
 
-  log(tui.suffix(
+  log(suffix(
     'whiteBright',
     'reloaded',
     `${path}${time}`
@@ -691,7 +691,7 @@ export function reloaded (path: string, time: string) {
  */
 export function skipped (file: File | string, reason: string) {
 
-  log(tui.suffix(
+  log(suffix(
     'gray',
     'skipped',
     `${typeof file === 'string' ? file : file.key} ~ ${reason}`
@@ -706,7 +706,7 @@ export function skipped (file: File | string, reason: string) {
  */
 export function ignored (path: string) {
 
-  log(tui.suffix('gray', 'ignored', path));
+  log(suffix('gray', 'ignored', path));
 
 };
 
@@ -721,7 +721,7 @@ export function ignored (path: string) {
  */
 export function invalid (path: string, message?: string | string[]) {
 
-  log(tui.suffix('red', 'invalid', path));
+  log(suffix('red', 'invalid', path));
 
   const notification = notifier.notify({
     title: 'Syncify Error',
@@ -753,7 +753,7 @@ export function invalid (path: string, message?: string | string[]) {
  */
 export function failed (path: string) {
 
-  log(tui.suffix('red', 'failed', path));
+  log(suffix('red', 'failed', path));
 
   const notification = notifier.notify({
     title: 'Syncify Error',
@@ -812,18 +812,18 @@ export function throws (data: string) {
  */
 export function spawn (name: string) {
 
-  return (...message: string[]) => {
+  return (...input: string[]) => {
 
     if (!$.spawn.invoked) $.spawn.invoked = true;
 
     if (state.group !== 'Spawn') {
 
-      log(tui.closer(state.group));
+      log(closer(state.group));
 
       // do not clear if first run
-      if (state.group !== 'Syncify') tui.clear();
+      if (state.group !== 'Syncify') clear();
 
-      log(tui.opener('Spawn'));
+      log(opener('Spawn'));
 
       // update name reference
       state.group = 'Spawn';
@@ -832,14 +832,14 @@ export function spawn (name: string) {
 
     if (state.title !== name) {
 
-      log(tui.message('pink', name));
+      log(message('pink', name));
 
       // update spawn process title
       state.title = name;
 
     }
 
-    errors.spawn(sanitize(message.shift()));
+    errors.spawn(sanitize(input.shift()));
   };
 
 };

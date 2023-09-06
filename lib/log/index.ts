@@ -1,6 +1,8 @@
-export * as log from './loggers';
-export * as tui from './tui';
-export * as error from './errors';
-export * as warning from './warnings';
-export * as c from '~cli/ansi';
+import * as tui from './tui';
+import * as log from './loggers';
+import * as error from './errors';
+import * as warning from './warnings';
+import * as c from '~cli/ansi';
 export * from '~cli/ansi';
+
+export { tui, log, error, warning, c };

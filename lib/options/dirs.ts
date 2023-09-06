@@ -5,7 +5,7 @@ import { join } from 'pathe';
 import { isArray, isString } from '~utils';
 import { basePath } from '~utils/paths';
 import { $ } from '~state';
-import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '~const';
+import { THEME_DIRS, BASE_DIRS } from '~const';
 import { typeError } from '~log/validate';
 import * as cache from '~process/caches';
 
@@ -45,7 +45,12 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
     }
   }
 
-  for (const dir of CACHE_DIRS) {
+  for (const dir of [
+    'caches',
+    'sourcemaps',
+    'sourcemaps/style',
+    'sourcemaps/script'
+  ]) {
 
     const uri = join(path, dir, '/');
 

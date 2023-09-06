@@ -1,6 +1,14 @@
 /* eslint-disable no-unused-vars */
 
-import type { Package, SVGTransformer, ScriptTransform, ScriptTransformer, StyleTransform, StyleTransformer } from 'types';
+import type {
+  Package,
+  SVGTransformer,
+  ScriptTransform,
+  ScriptTransformer,
+  StyleTransform,
+  StyleTransformer
+} from 'types';
+
 import type { Input, Transform } from 'types/internal';
 import type { AxiosRequestConfig } from 'axios';
 import { basename, extname } from 'pathe';
@@ -10,11 +18,11 @@ import merge from 'mergerino';
 import { pathExists } from 'fs-extra';
 import { has } from 'rambdax';
 import { CONFIG_FILE_EXT } from '~const';
+import { typeError, invalidError, warnOption, throwError } from '~log/validate';
 import { bundleRequire } from '~utils/require';
 import { lastPath, normalPath, globPath } from '~utils/paths';
 import { assign } from '~native';
 import { isArray, isObject, isString, isUndefined, isFunction } from '~utils';
-import { typeError, invalidError, warnOption, throwError } from '~log/validate';
 import { cyan } from '~log';
 import { $ } from '~state';
 
