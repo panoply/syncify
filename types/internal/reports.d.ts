@@ -1,4 +1,4 @@
-import { File } from './file';
+import { File } from '../bundle/file';
 
 export interface UploadModeReport {
   /**

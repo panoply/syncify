@@ -5,7 +5,7 @@ import type { SASSConfig, PostCSSConfig } from '../transforms/style';
 import type { SVGOConfig, SVGSpriteConfig } from '../transforms/svg';
 
 /**
- * **Internal Use**
+ * **INTERNAL USE**
  *
  * Processor Default Configurations
  *

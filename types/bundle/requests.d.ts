@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { File, FileKeys } from './file';
+import { File, FileKeys } from '../bundle/file';
 import { LiteralUnion } from 'type-fest';
 
 /**

@@ -1,26 +1,4 @@
 /* -------------------------------------------- */
-/* LOGGER                                       */
-/* -------------------------------------------- */
-
-import { LiteralUnion } from 'type-fest';
-
-export type Group = LiteralUnion<
-  | 'Syncify'
-  | 'Asset'
-  | 'Spawn'
-  | 'SVG'
-  | 'Snippet'
-  | 'Layout'
-  | 'Section'
-  | 'Page'
-  | 'Locale'
-  | 'Config'
-  | 'Template'
-  | 'Metafield'
-  , string
->
-
-/* -------------------------------------------- */
 /* CLI OPTIONS                                  */
 /* -------------------------------------------- */
 
@@ -481,10 +459,10 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --views         # executes build
+   * $ syncify --views          # executes build
    * $ syncify -w --views       # executes in watch mode
    * $ syncify --views --prod   # executes build with minify
-   * $ syncify --views --terse # executes build with minify
+   * $ syncify --views --terse  # executes build with minify
    * ```
    */
   views?: boolean;
@@ -498,7 +476,7 @@ export interface Commands {
    * $ syncify --script          # executes build
    * $ syncify -w --script       # executes in watch mode
    * $ syncify --script --prod   # executes build with minify
-   * $ syncify --script --terse # executes build with minify
+   * $ syncify --script --terse  # executes build with minify
    * ```
    */
   script?: boolean;
@@ -512,7 +490,7 @@ export interface Commands {
    * $ syncify --style           # executes build
    * $ syncify -w --style        # executes in watch mode
    * $ syncify --style --prod    # executes build with minify
-   * $ syncify --style --terse  # executes build with minify
+   * $ syncify --style --terse   # executes build with minify
    * ```
    */
   style?: boolean;
@@ -526,7 +504,7 @@ export interface Commands {
    * $ syncify --svg           # executes build
    * $ syncify -w --svg        # executes in watch mode
    * $ syncify --svg --prod    # executes build with minify
-   * $ syncify --svg --terse  # executes build with minify
+   * $ syncify --svg --terse   # executes build with minify
    * ```
    */
   svg?: boolean;
@@ -540,7 +518,7 @@ export interface Commands {
    * $ syncify --image           # executes build
    * $ syncify -w --image        # executes in watch mode
    * $ syncify --image --prod    # executes build with minify
-   * $ syncify --image --terse  # executes build with minify
+   * $ syncify --image --terse   # executes build with minify
    * ```
    */
   image?: boolean;

@@ -1,4 +1,21 @@
-import { Config } from '../config';
+import type { LiteralUnion } from 'type-fest';
+import { Config } from './config';
+
+export type Group = LiteralUnion<
+  | 'Syncify'
+  | 'Asset'
+  | 'Spawn'
+  | 'SVG'
+  | 'Snippet'
+  | 'Layout'
+  | 'Section'
+  | 'Page'
+  | 'Locale'
+  | 'Config'
+  | 'Template'
+  | 'Metafield'
+  , string
+>
 
 export type Namespacing = (
   | '[dir]'

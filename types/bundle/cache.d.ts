@@ -1,4 +1,4 @@
-import { Requests, Resource } from './requests';
+import { Requests, Resource } from '../internal/requests';
 
 export interface Cache {
   /**
@@ -23,6 +23,13 @@ export interface Cache {
   * @default 'node_modules/.syncify/build.map'
   */
   uri?: string;
+  /**
+   * Error Cache
+   */
+  errors?: {
+    uri?: string;
+    files?: string[];
+  }
   /**
    * Sourcemap directories for transforms
    */

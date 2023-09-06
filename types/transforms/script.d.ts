@@ -3,7 +3,7 @@ import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Tsconfig } from 'tsconfig-type';
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
-import type { GetProcessorConfigs, RenamePaths } from '../bundle/shared';
+import type { GetProcessorConfigs, RenamePaths } from '../shared';
 
 type TargetBrowser = (
   | 'chrome'

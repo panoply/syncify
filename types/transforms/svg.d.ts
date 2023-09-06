@@ -4,7 +4,7 @@ import type { LiteralUnion, Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Config as SVGOConfig } from 'svgo';
 import type { Config as SVGSpriteConfig } from 'svg-sprite';
-import type { GetProcessorConfigs, RenamePaths } from '../bundle/shared';
+import type { GetProcessorConfigs, RenamePaths } from '../shared';
 
 /* -------------------------------------------- */
 /* PROCESSOR CONFIGS                            */

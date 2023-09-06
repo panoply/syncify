@@ -1,20 +1,19 @@
-import { Config } from './config';
-import { Syncify as syncify } from './api';
+import type { Config } from './config';
+import type { Syncify as syncify } from './api';
 
 export type { Tsconfig } from 'tsconfig-type';
 export type { FileKeys } from './bundle/file';
 
 export * from './api';
 export * from './cli';
+export * from './shared';
 export * from './config';
 export * from './config/views';
 export * from './config/terser';
 export * from './bundle/cache';
 export * from './bundle/filters';
-export * from './bundle/requests';
-export * from './bundle/shared';
 export * from './bundle/errors';
-export * from './bundle/reports';
+export * from './bundle/requests';
 export * from './bundle/file';
 export * from './bundle';
 export * from './bundle/plugin';

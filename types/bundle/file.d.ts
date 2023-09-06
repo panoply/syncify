@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import { LiteralUnion, Merge } from 'type-fest';
+import { LiteralUnion } from 'type-fest';
 
 /**
  * File types are represented as numeric values.

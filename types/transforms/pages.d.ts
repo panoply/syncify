@@ -1,6 +1,6 @@
 import { Tester } from 'anymatch';
 import { Merge } from 'type-fest';
-import { PageMetafield } from '../bundle/requests';
+import { PageMetafield } from '../internal/requests';
 
 /**
  * **Markdown > HTML**

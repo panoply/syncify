@@ -4,7 +4,7 @@ import type { LiteralUnion, Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Config as TailwindConfig } from 'tailwindcss';
 import type { Plugin as PostCSSPlugin, Transformer, TransformCallback } from 'postcss';
-import type { GetProcessorConfigs, RenamePaths } from '../bundle/shared';
+import type { GetProcessorConfigs, RenamePaths } from '../shared';
 
 /* -------------------------------------------- */
 /* PROCESSOR CONFIGS                            */
@@ -64,14 +64,14 @@ export interface SASSConfig {
 /* TRANSFORM                                    */
 /* -------------------------------------------- */
 
-export interface StyleTransform {
+export interface StyleTransform<T = string | string[]> {
   /**
    * SVG input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.
    *
    * @default undefined
    */
-  input: string | string[];
+  input: T;
   /**
    * Glob stylesheet paths/files to watch. When changes
    * are applied to matched files, then the defined `input`

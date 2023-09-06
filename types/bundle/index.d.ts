@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-vars */
 
-import type { Tester } from 'anymatch';
-import type { Config as TailwindProcessor } from 'tailwindcss';
 import type { Merge } from 'type-fest';
+import type { ChildProcessWithoutNullStreams } from 'node:child_process';
+import type { Tester } from 'anymatch';
+import type { FSWatcher } from 'chokidar';
 import type { AxiosRequestConfig } from 'axios';
+import type { Config as TailwindProcessor } from 'tailwindcss';
 import type { ESBuildProcesser } from '../transforms/script';
 import type { SASSProcesser, PostCSSProcesser } from '../transforms/style';
 import type { SVGOProcesser, SVGSpriteProcesser } from '../transforms/svg';
 import type { JSONBundle } from '../transforms/json';
-import type { FSWatcher } from 'chokidar';
-import type { ChildProcessWithoutNullStreams } from 'child_process';
 import type * as Config from '../config/index';
 
 /* -------------------------------------------- */
