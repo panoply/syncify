@@ -61,6 +61,30 @@
           "color": "#ffbafc"
         }
       ]
+    },
+    "(?<=\\b(?:from) ')(\\.)(\/)(?=[a-z])": {
+      "regexFlags": "g",
+      "filterLanguageRegex": "typescript",
+      "decorations": [
+        {
+          "color": "#F48FB1",
+          "fontStyle": "bold"
+        },
+        {
+          "color": "#E91E63",
+          "fontStyle": "bold"
+        },
+      ]
+    },
+    "(?<=\\b(?:from) ')(\\~)(?=[a-z])": {
+      "regexFlags": "g",
+      "filterLanguageRegex": "typescript",
+      "decorations": [
+        {
+          "color": "#E91E63",
+          "fontStyle": "bold"
+        },
+      ]
     }
   },
   "vsicons.associations.files": [
