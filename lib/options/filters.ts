@@ -1,11 +1,11 @@
 import type { Commands } from 'types';
 import { has } from 'rambdax';
 import { join } from 'pathe';
-import { blue, bold, log, white, yellow } from '~log';
-import { invalidCommand } from '~options/validate';
-import { isArray } from '~utils/native';
-import { $ } from '~state';
 import { PATH_KEYS, THEME_DIRS } from '~const';
+import { blue, bold, log, white, yellow } from '~log';
+import { invalidCommand } from '~log/validate';
+import { isArray } from '~utils';
+import { $ } from '~state';
 
 /**
  * Throws filter error

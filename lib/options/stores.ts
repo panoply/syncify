@@ -2,11 +2,12 @@ import type { Commands, Config } from 'types';
 import dotenv from 'dotenv';
 import { join } from 'pathe';
 import { anyTrue, has, includes } from 'rambdax';
-import { DSH, blue, white } from '~cli/ansi';
-import { throwError, invalidCommand, invalidTarget } from '~options/validate';
-import { authURL } from '~options/utilities';
+import { DSH, blue, white } from '~log';
+import { throwError, invalidCommand, invalidTarget } from '~log/validate';
+import { authURL } from '~utils/options';
 import { $ } from '~state';
-import { keys, isArray } from '~utils/native';
+import { keys } from '~native';
+import { isArray } from '~utils';
 
 /**
  * Resolve Stores

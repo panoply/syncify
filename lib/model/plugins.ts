@@ -1,4 +1,4 @@
-import { Plugins } from 'types';
+import type { Plugins } from 'types';
 
 /**
  * Plugin Store

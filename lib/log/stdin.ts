@@ -1,8 +1,8 @@
 import { $, warning } from '~state';
-import { errors } from '~log/errors';
 import { log, c, tui } from '~log';
-import { error, keys, nl } from '~utils/native';
-import { out } from './loggers';
+import { error, keys } from '~native';
+import { errors } from './errors';
+import { isString } from '~utils';
 
 export const stacks: Set<string> = new Set();
 
@@ -25,7 +25,7 @@ export function stdin (data: Buffer) {
       log.write(c.bold.whiteBright(prop));
 
       for (const message of errors[prop].values()) {
-        if (typeof message === 'string' && message.length > 0) {
+        if (isString(message) && message.length > 0) {
           error(message);
         }
       }
@@ -36,7 +36,7 @@ export function stdin (data: Buffer) {
 
     if ($.mode.upload) {
 
-      out(tui.closer('Upload'), nl);
+      log.out(tui.closer('Upload'), NWL);
       process.exit(0);
 
     }

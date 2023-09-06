@@ -1,8 +1,8 @@
-import { Config } from 'types';
+import type { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { typeError, unknownError, invalidError } from '~options/validate';
+import { typeError, unknownError, invalidError } from '~log/validate';
+import { isBoolean, isArray, isString, isObject } from '~utils';
 import { $ } from '~state';
-import * as u from '~utils/native';
 
 export function setPageOptions (config: Config) {
 
@@ -11,7 +11,7 @@ export function setPageOptions (config: Config) {
   const { pages } = config.views;
 
   // Ensure the section option is an object
-  if (!u.isObject(pages) && !isNil(pages)) {
+  if (!isObject(pages) && !isNil(pages)) {
     typeError({
       option: 'views',
       name: 'pages',
@@ -34,7 +34,7 @@ export function setPageOptions (config: Config) {
 
     if (option === 'importLanguage') {
 
-      if (u.isString(pages[option])) {
+      if (isString(pages[option])) {
         if (pages[option] === 'markdown' || pages[option] === 'html') {
           $.page[option] = pages[option];
         } else {
@@ -53,7 +53,7 @@ export function setPageOptions (config: Config) {
 
       if (isNil(pages[option])) continue;
 
-      if (u.isString(pages[option])) {
+      if (isString(pages[option])) {
 
         $.page[option] = pages[option];
 
@@ -70,7 +70,7 @@ export function setPageOptions (config: Config) {
 
       if (isNil(pages[option])) continue;
 
-      if (u.isBoolean(pages[option])) {
+      if (isBoolean(pages[option])) {
 
         $.page[option] = pages[option];
 
@@ -88,7 +88,7 @@ export function setPageOptions (config: Config) {
 
       if (isNil(pages[option])) continue;
 
-      if (u.isArray(pages[option])) {
+      if (isArray(pages[option])) {
 
         if (pages[option].length > 0) {
           $.page[option] = new RegExp(`${pages[option].join('|')}`);

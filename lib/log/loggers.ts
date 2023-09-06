@@ -1,19 +1,19 @@
 import type { LiteralUnion } from 'type-fest';
 import type { File, Store, Theme } from 'types';
-import notifier from 'node-notifier';
 import { inspect } from 'node:util';
+import notifier from 'node-notifier';
 import { has, isEmpty } from 'rambdax';
 import { $, warning } from '~state';
 import { queue } from '~requests/queue';
-import { NIL, NWL } from '~utils/chars';
-import { addSuffix, sanitize, plural, toUpcase } from '~utils/utils';
-import { error, isArray, isObject, log, nil, nl } from '~utils/native';
+import { addSuffix, sanitize, plural, toUpcase, isArray, isObject } from '~utils';
+import { error, log } from '~native';
+import { timer } from '~timer';
 import { intercept } from '~cli/intercept';
-import * as timer from '~utils/timer';
+import { Kind } from '~process/files';
 import * as errors from '~log/errors';
 import * as c from '~cli/ansi';
 import * as tui from '~log/tui';
-import { Kind } from '~process/files';
+import { getSpinner } from './spinner';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -22,9 +22,8 @@ import { Kind } from '~process/files';
 export { default as update } from 'log-update';
 export { start } from '~log/start';
 export { clear, hline } from '~log/tui';
-export { spinner } from '~log/spinner';
 export { progress } from '~cli/progress';
-export { log as out } from '~utils/native';
+export { log as out } from '~native';
 
 /* -------------------------------------------- */
 /* INTERNAL                                     */
@@ -40,6 +39,22 @@ export function console (...message: any) {
   log(inspect(message, { colors: true, showHidden: true }));
 
 }
+
+/* -------------------------------------------- */
+/* EXPORT INSTANCES                             */
+/* -------------------------------------------- */
+
+/**
+ * Loading Spinner
+ *
+ * Spinner instance that can be invoked on the default.
+ * Use `log.spinner.stop()` to kill
+ *
+ *  ```bash
+   * │ ⠋
+   * ```
+ */
+export const spinner = getSpinner();
 
 /* -------------------------------------------- */
 /* LOCAL SCOPES                                 */
@@ -135,7 +150,7 @@ export function build (id: string, count: number, file: File | string) {
  *
  * `│`
  */
-export function nwl (entry: '' | 'red' | 'yellow' | 'gray' | undefined = 'gray') {
+export function nwl (entry: string | 'red' | 'yellow' | 'gray' | undefined = 'gray') {
 
   if (isEmpty(entry)) {
     log(NWL);
@@ -171,7 +186,7 @@ export function err (input: string | string[]) {
 export function write (input: string | string[]) {
 
   if (isArray(input)) {
-    log(input.map(text => c.line.gray + sanitize(text)).join(nl));
+    log(input.map(text => c.line.gray + sanitize(text)).join(NWL));
   } else {
     log(c.line.gray + sanitize(input));
   }
@@ -266,7 +281,7 @@ export function group (name: string, clear = false) {
  */
 export function updated (file: File, suffix?: string) {
 
-  log(tui.suffix('greenBright', 'updated', `${file.relative} ${suffix ? c.gray(`~ ${suffix}`) : nil}`));
+  log(tui.suffix('greenBright', 'updated', `${file.relative} ${suffix ? c.gray(`~ ${suffix}`) : NIL}`));
 
 }
 
@@ -524,7 +539,7 @@ export function syncing (path: string, hot = false) {
 export function process (name: string, ...message: [message?: string, time?: string]) {
 
   let time: string = message[0];
-  let text: string = nil;
+  let text: string = NIL;
 
   if (message.length === 2) {
     text = ` ${c.CHV} ${message[0]}`;

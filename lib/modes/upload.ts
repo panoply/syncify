@@ -5,21 +5,18 @@ import { readFile } from 'fs-extra';
 import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
 import { outputFile } from '~process/files';
-import { error, log, tui } from '~log';
-import { $ } from '~state';
-import * as n from '~utils/native';
-import * as timer from '~utils/timer';
-import * as c from '~cli/ansi';
 import { delay } from 'rambdax';
-import { event, getSizeInteger, getSizeStr, toUpcase } from '~utils/utils';
+import { event, byteSize, getSizeStr, glue, isBuffer, isFunction, isString, isUndefined, toUpcase } from '~utils';
 import { AxiosResponse } from 'axios';
 import { hasSnippet, removeRender } from '~hot/inject';
-import { throwError } from '~options/validate';
+import { throwError } from '~log/validate';
 import { Progress } from '~cli/progress';
 import { Events } from '~requests/assets';
-import { NIL, NWL } from '~utils/chars';
+import { c, error, log, tui } from '~log';
+import { timer } from '~timer';
+import { $ } from '~state';
 
-interface EventParams {
+interface RequestParams {
   /**
    * The response status
    */
@@ -91,7 +88,7 @@ interface SyncRecord {
      *
      * Entries in this map are request failures incurred during transfer
      */
-    remote: Map<string, EventParams>;
+    remote: Map<string, RequestParams>;
     /**
      * Retrying
      *
@@ -166,7 +163,7 @@ export async function upload (cb?: Syncify): Promise<void> {
   timer.start('upload');
 
   const request = client($.sync);
-  const hashook = n.isFunction(cb);
+  const hashook = isFunction(cb);
   const parse = outputFile($.dirs.output);
   const files = glob.sync(`${$.dirs.output}/**`).sort();
   const sync = getModel(files.length);
@@ -180,7 +177,7 @@ export async function upload (cb?: Syncify): Promise<void> {
   /* EVENT CALLBACK                               */
   /* -------------------------------------------- */
 
-  function callback (item: EventParams) {
+  function callback (item: RequestParams) {
 
     log.spinner.stop();
 
@@ -250,9 +247,9 @@ export async function upload (cb?: Syncify): Promise<void> {
         processed,
         c.newline,
         tui.suffix('whiteBright', 'synced ', uploaded),
-        n.nl,
+        NWL,
         tui.suffix(retry > 0 ? 'orange' : 'whiteBright', 'retry ', retrying),
-        n.nl,
+        NWL,
         tui.suffix(failed > 0 ? 'redBright' : 'whiteBright', 'errors ', failures),
         c.newline,
         progress.render(),
@@ -261,7 +258,7 @@ export async function upload (cb?: Syncify): Promise<void> {
 
     }
 
-    log.update(message.join(NIL));
+    log.update(glue(message));
 
   }
 
@@ -295,7 +292,7 @@ export async function upload (cb?: Syncify): Promise<void> {
         }
       }
 
-      file.size = getSizeInteger(input);
+      file.size = byteSize(input);
 
       if (!hashook) {
 
@@ -305,11 +302,11 @@ export async function upload (cb?: Syncify): Promise<void> {
 
         const update = cb.apply({ ...file }, input);
 
-        if (n.isUndefined(update) || update === false) {
+        if (isUndefined(update) || update === false) {
           await request.assets('put', file, input);
-        } else if (n.isString(update)) {
+        } else if (isString(update)) {
           await request.assets('put', file, update);
-        } else if (n.isBuffer(update)) {
+        } else if (isBuffer(update)) {
           await request.assets('put', file, update.toString());
         } else {
           await request.assets('put', file, input);

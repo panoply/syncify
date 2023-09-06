@@ -1,7 +1,7 @@
 import { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { typeError, invalidError } from '~options/validate';
-import { isObject, isString, isArray, isBoolean } from '~utils/native';
+import { typeError, invalidError } from '~log/validate';
+import { isObject, isString, isArray, isBoolean } from '~utils';
 import { $ } from '~state';
 
 /**

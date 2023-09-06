@@ -30,16 +30,16 @@ import type {
 } from 'types';
 
 import type { ChildProcess } from 'node:child_process';
+import type { PackageJson } from 'type-fest';
 import { argv } from 'node:process';
-import { PackageJson } from 'type-fest';
 import merge from 'mergerino';
+import { size } from '~cli/size';
+import { create } from '~native';
+import { PATH_KEYS } from '~const';
 import { terser } from './terser';
 import { defaults } from './defaults';
 import { processor } from './processor';
 import { plugins } from './plugins';
-import { size } from '~cli/size';
-import { PATH_KEYS } from '~const';
-import { create } from '~utils/native';
 
 /**
  * Warning stacks, maintains a store of log messages

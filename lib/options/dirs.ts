@@ -1,12 +1,12 @@
-import { Commands } from 'types';
+import type { Commands } from 'types';
 import { has, uniq } from 'rambdax';
 import { mkdir, emptyDir, pathExists, remove } from 'fs-extra';
 import { join } from 'pathe';
-import { isArray, isString } from '~utils/native';
+import { isArray, isString } from '~utils';
 import { basePath } from '~utils/paths';
 import { $ } from '~state';
 import { CACHE_DIRS, THEME_DIRS, BASE_DIRS } from '~const';
-import { typeError } from '~options/validate';
+import { typeError } from '~log/validate';
 import * as cache from '~process/caches';
 
 /**
@@ -22,6 +22,10 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
   $.cache = {
     uri: join(path, 'build.map'),
     version: $.version,
+    errors: {
+      uri: join(path, 'errors'),
+      files: []
+    },
     maps: {},
     pages: {},
     metafields: {},

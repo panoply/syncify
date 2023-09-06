@@ -1,8 +1,8 @@
 import { last } from 'rambdax';
-import { join, dirname } from 'path';
-import { isArray } from '~utils/native';
-import { throwError } from '~options/validate';
+import { join, dirname } from 'pathe';
 import { COL, yellowBright } from '~log';
+import { throwError } from '~log/validate';
+import { isArray } from './utils';
 
 /**
  * Glob Path

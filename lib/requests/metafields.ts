@@ -4,7 +4,7 @@ import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
 import { Config, Store, Requests } from 'types';
 import { join } from 'path';
 import prompts from 'prompts';
-import Spinner from 'tiny-spinner';
+
 import { assign } from '~utils/native';
 import { queue, axios, requeue } from '~requests/queue';
 import { log, c, error } from '~log';

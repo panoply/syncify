@@ -1,5 +1,5 @@
 import { c, Colors } from '~log';
-import { assign } from '~utils/native';
+import { assign } from '~native';
 
 export interface Progress {
   /**

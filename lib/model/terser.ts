@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
-import { TerserConfig } from 'types';
+import type { TerserConfig } from 'types';
 
 /**
  * Terser Configuration

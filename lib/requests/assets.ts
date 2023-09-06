@@ -2,15 +2,15 @@
 
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import type { Request, Theme, File, FileKeys } from 'types';
-import { Type } from '~process/files';
+import merge from 'mergerino';
+import { delay } from 'rambdax';
 import { pMapSkip } from 'p-map';
+import { Type } from '~process/files';
 import { queue, axios } from '~requests/queue';
-import * as timer from '~utils/timer';
+import { timer } from '~timer';
+import { event } from '~utils';
 import { log, error } from '~log';
 import { $ } from '~state';
-import merge from 'mergerino';
-import { event, getSizeStr } from '~utils/utils';
-import { delay } from 'rambdax';
 
 export const enum Events {
   /**

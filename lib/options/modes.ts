@@ -1,8 +1,8 @@
 import type { Commands, Modes } from 'types';
 import { anyTrue, allFalse, allTrue } from 'rambdax';
 import { white, blue } from '~log';
-import { invalidCommand } from '~options/validate';
-import { assign, values } from '~utils/native';
+import { invalidCommand } from '~log/validate';
+import { assign, values } from '~native';
 import { $ } from '~state';
 
 /**

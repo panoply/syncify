@@ -1,14 +1,10 @@
-import { Colors } from '~cli/ansi';
+import type { Colors } from '~cli/ansi';
 import { SPINNER_FRAMES } from '~const';
 import update from 'log-update';
-import * as c from '~cli/ansi';
-import { nil } from '~utils/native';
+import { c } from '~log';
+import { defineProperty } from '~native';
 
-/* -------------------------------------------- */
-/* TYPES                                        */
-/* -------------------------------------------- */
-
-type Spinner = {
+export interface Spinner {
   /**
    * Render Spinner
    *
@@ -43,57 +39,66 @@ type Spinner = {
    * Optional text to append
    */
   stop: (text?: string) => void;
+  /**
+   * Whether or not the spinner is running
+   */
+  readonly active?: boolean;
 }
 
-/* -------------------------------------------- */
-/* FUNCTIONS                                    */
-/* -------------------------------------------- */
+export function getSpinner () {
 
-/**
- * The interval instance
- */
-let interval: NodeJS.Timeout;
+  /**
+   * The interval instance
+   */
+  let interval: NodeJS.Timeout;
 
-/**
- * Whether or not the spinner is running
- */
-let active: boolean = false;
+  /**
+   * Whether or not the spinner is running
+   */
+  let active: boolean = false;
 
-/**
- * TUI Spinner
- *
- * Generates a log spinner.
- */
-const spinner: Spinner = function spinner (text?, color = 'pink') {
-
-  active = true;
-
-  let f = 0;
+  /**
+   * Spinner Frames
+   */
   const size = SPINNER_FRAMES.length;
 
-  interval = setInterval(() => {
+  /**
+   * TUI Spinner
+   *
+   * Generates a log spinner.
+   */
+  const spinner: Spinner = function spinner (text?, color = 'pink') {
+
+    active = true;
+
+    let f: number = 0;
+
+    interval = setInterval(() => {
+      if (!active) return;
+      update(`${c.line.gray}${c[color](`${SPINNER_FRAMES[f = ++f % size]}`)}${text ? ` ${text}` : NIL}`);
+    }, 50);
+
+  };
+
+  defineProperty(spinner, 'active', { get () { return active; } });
+
+  spinner.stop = function (text?: string) {
+
     if (!active) return;
-    update(`${c.line.gray}${c[color](`${SPINNER_FRAMES[f = ++f % size]}`)}${text ? ` ${text}` : nil}`);
-  }, 50);
 
-};
+    active = false;
 
-spinner.stop = (text?) => {
+    if (text) {
+      update(c.line.gray + text);
+      update.done();
+    } else {
+      update.clear();
+    }
 
-  if (!active) return;
+    clearInterval(interval);
+    interval = undefined;
+  };
 
-  active = false;
+  return spinner;
 
-  if (text) {
-    update(c.line.gray + text);
-    update.done();
-  } else {
-    update.clear();
-  }
-
-  clearInterval(interval);
-  interval = undefined;
-
-};
-
-export { spinner };
+}

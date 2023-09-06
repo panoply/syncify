@@ -1,6 +1,7 @@
 import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
 import { join, dirname, basename } from 'pathe';
-import { defineProperty, isRegex, isUndefined } from '../utils/native';
+import { defineProperty } from '~native';
+import { isRegex, isUndefined } from '~utils';
 import { $ } from '~state';
 import { lastPath, parentPath } from '../utils/paths';
 

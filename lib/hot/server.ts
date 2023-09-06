@@ -1,16 +1,15 @@
-import { join, basename } from 'pathe';
-import { Server } from 'ws';
+import type { WSS } from 'types';
+import http from 'node:http';
 import statics from 'serve-static';
 import handler from 'finalhandler';
-import http from 'node:http';
 import glob from 'fast-glob';
+import { pathExists, readFile, writeFile } from 'fs-extra';
+import { join, basename } from 'pathe';
+import { Server } from 'ws';
 import { kill } from '~cli/exit';
 import { log, tui, bold, gray, line, redBright, ARR, neonCyan, COL } from '~log';
 import { $ } from '~state';
 import { injectSnippet, injectRender } from './inject';
-import { pathExists, readFile, writeFile } from 'fs-extra';
-import { nl } from '~utils/native';
-import { WSS } from 'types';
 
 export const HOTError: {
   /**
@@ -95,7 +94,7 @@ export async function server () {
     );
 
     log.err(redBright(`${bold('ERROR')} on ${bold(`${$.hot.method === 'hot' ? 'HOT' : 'LIVE'} Reload:`)}`));
-    log.out(HOTError.output.join(nl));
+    log.out(HOTError.output.join(NWL));
 
     return null;
 
@@ -132,7 +131,7 @@ export async function server () {
       );
 
       log.update.clear();
-      log.out(HOTError.output.join(nl));
+      log.out(HOTError.output.join(NWL));
       $.wss.http.close();
 
       return null;

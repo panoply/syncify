@@ -1,4 +1,4 @@
-import { gray, bold, COL } from '../cli/ansi';
+import { gray, bold, COL } from '~log';
 
 /**
  * Help Text

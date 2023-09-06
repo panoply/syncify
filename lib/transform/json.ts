@@ -1,12 +1,22 @@
+import type { File, Syncify } from 'types';
 import { isEmpty, isNil } from 'rambdax';
-import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { isBuffer, isArray, isObject, isUndefined, isString, isFunction } from '~utils/native';
 import { Type } from '~process/files';
-import { byteSize, byteConvert, fileSize } from '~utils/utils';
-import { $ } from '~state';
-import * as timer from '~utils/timer';
+import { timer } from '~timer';
 import { log, error } from '~log';
+import {
+  isBuffer,
+  isArray,
+  isObject,
+  isUndefined,
+  isString,
+  isFunction,
+  byteSize,
+  byteConvert,
+  fileSize,
+  sanitize
+} from '~utils';
+import { $ } from '~state';
 
 /**
  * Parse JSON
@@ -63,8 +73,8 @@ export function minifyJSON (data: string, space = 0): any {
  */
 export function diffJSON (remote: string, local: string) {
 
-  const o1 = JSON.stringify(JSON.parse(remote), null, 0);
-  const o2 = JSON.stringify(JSON.parse(local), null, 0);
+  // const o1 = JSON.stringify(JSON.parse(remote), null, 0);
+  // const o2 = JSON.stringify(JSON.parse(local), null, 0);
 
 }
 
@@ -167,7 +177,7 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
     if (isUndefined(update)) {
       return jsonCompile(file, data, space);
     } else if (isArray(update) || isObject(update)) {
-      return jsonCompile(file, update, space);
+      return jsonCompile(file, sanitize(update), space);
     } else if (isString(update)) {
       return jsonCompile(file, parse(update), space);
     } else if (isBuffer(update)) {

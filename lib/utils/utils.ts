@@ -1,13 +1,12 @@
 /* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable n/handle-callback-err */
-
-import strip from 'strip-json-comments';
-import { bold, gray } from '~log';
-import { isString, isBuffer, isArray, isObject, ws, isFunction } from './native';
 import { EventEmitter } from 'node:events';
 import { createRequire } from 'node:module';
 import zlib from 'node:zlib';
-import { UNITS } from '../const';
+import strip from 'strip-json-comments';
+import { UNITS } from '~const';
+import { COL, DSH, bold } from '~log';
+import { toBuffer, toString } from './native';
 
 /**
  * Event emitter instance
@@ -15,6 +14,20 @@ import { UNITS } from '../const';
 export const event = new EventEmitter();
 
 /**
+ * Join an array together with character
+ *
+ * @param input The string input to join (defaults to `''` NIL)
+ * @param char The character to join (optional)
+ */
+export function glue (input: string[], char: string = NIL) {
+
+  return input.join(char);
+
+}
+
+/**
+ * JSONC
+ *
  * Strip JSON Comments
  *
  * @param data JSON content in string form
@@ -29,11 +42,16 @@ export function jsonc <T> (data: string): T {
 }
 
 /**
- * Returns a grouping reference name according to file extension
+ * File Kind
  *
- * @param ext The file extension within the `.`
+ * Returns a grouping reference name according to file extensio
+ *
+ * @param ext The file extension
  */
 export function fileKind (ext: string) {
+
+  // Remove the . if passed
+  if (ext.charCodeAt(0) === 46) ext = ext.slice(1);
 
   switch (ext) {
     case 'webm':
@@ -65,26 +83,17 @@ export function fileKind (ext: string) {
 };
 
 /**
- * Check for the existence of a rename namespace
- *
- * @param rename The rename string value
- */
-export function hasRenamespace (rename: string) {
 
-  return /\[(?:file|dir|ext)\]/.test(rename);
-
-}
-
-/**
  * Converts string input to a handle
  *
  * @param string The string to convert
+ * @example 'foo:bar_baz 10' => 'foo-bar-baz-10'
  */
 export function handleize (string: string) {
 
   return string
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/[^a-z0-9_:]+/g, '-')
     .replace(/-$/, '')
     .replace(/^-/, '');
 
@@ -94,40 +103,47 @@ export function handleize (string: string) {
  * Adds an `s` to the end of a word if length is more than 1
  *
  * @param word The word to pluralize
- * @param length The length to determine
- * @param zeroS Whether or not count `0` should be plural
+ * @param size The length to determine, if `undefined` will measure `word`
+ * @param zero Whether a length of `0` should be plural (defaults to `false`)
  */
-export function plural (word: string, length: number, zeroS = false) {
+export function plural (word: string, size?: number, zero = false) {
 
-  return length > 1 ? `${word}s` : word;
+  if (isUndefined(size)) size = word.length;
+
+  return length > 1 ? `${word}s` : zero ? `${word}s` : word;
 
 }
 
 /**
- * Sanatizes the log message passed
+ * Sanatizes the log message passed. Converts a `Buffer`, `number`, `object`,
+ * `boolean` or an `array` type to a readable string.
  *
- * @param message The input to sanitize
+ * @param message Input string to sanitize
+ * @example
+ * sanitize(true) => 'true'
+ * sanitize({ x: 1 }) => '{"x":1}'
+ * sanitize(1000) => '1000'
  */
-export function sanitize (message: string | Buffer | object | any[]): string {
+export function sanitize (message: boolean | string | Buffer | object | any[]): string {
 
   if (isBuffer(message)) return message.toString();
   if (isObject(message) || isArray(message)) return JSON.stringify(message);
+  if (isBoolean(message) || isNumber(message)) return `${message}`;
 
   return String(message);
 
 };
 
 /**
- * Dynamically import files.
- *
  * As a temporary workaround for Jest's lack of stable ESM support, we fallback to require
  * if we're in a Jest environment.
  *
  * See https://github.com/vitejs/vite/pull/5197#issuecomment-938054077
  *
  * @param file File path to import.
+ * @param format The import format, e.g: `esm`
  */
-export async function dynamicImport (id: string, { format }) {
+export async function dynamicImport (id: string, { format }: { format: string }) {
 
   if (format === 'esm') {
 
@@ -143,6 +159,8 @@ export async function dynamicImport (id: string, { format }) {
 
 /**
  * Infer JavaScript loader (used for esbuild related logic)
+ *
+ * @param ext The JS file extension, e.g: `.mjs`, `.js` etc
  */
 export function inferLoader <T> (ext: string): T {
 
@@ -153,10 +171,10 @@ export function inferLoader <T> (ext: string): T {
 }
 
 /**
- * Will captilalize the first letter of a string. Used
- * by the console for names and various other informatives.
+ * Capitlalize the first letter of a string.
  *
  * @param value The word to upcase
+ * @example 'title' => 'Title'
  */
 export function toUpcase <T extends string> (value: T) {
 
@@ -165,9 +183,10 @@ export function toUpcase <T extends string> (value: T) {
 };
 
 /**
- * Sugar helper which runs `byteConvert` and `byteSize` and
- * returns a string, e.g: `20kb`
-
+ * Helper which runs `byteConvert` and `byteSize` to return readable
+ * size string.
+ *
+ * @param value Either number of bytes of string input
  */
 export function getSizeStr (value: string | number) {
 
@@ -177,23 +196,24 @@ export function getSizeStr (value: string | number) {
 }
 
 /**
- * Returns the byte size of a string value
+ * Returns the byte size of a string value. Use the `getSizeStr()` utility
+ * to return a readable string.
  *
  * @param string The string to determine
  */
 export function byteSize (string: string | Buffer): number {
 
   return isString(string)
-    ? Buffer.from(string).toString().length
+    ? toBuffer(string).toString().length
     : string.toString().length;
 
 };
 
 /**
- * Converts byte size to killobyte, megabyre,
- * gigabyte or terrabyte
+ * Converts byte size to killobyte, megabyte, gigabyte or terrabyte
  *
  * @param bytes The bytes number to convert
+ * @example 1000 => '1kb'
  */
 export function byteConvert (bytes: number): string {
 
@@ -208,14 +228,10 @@ export function byteConvert (bytes: number): string {
 
 /**
  * Returns an object containing size analysis of a string.
- * Requires a `beforeSize` value be provided to perform diff
- * analysis
+ * Requires a `beforeSize` value be provided to perform diff analysis
  *
- * @param content
- * The content to measure
- *
- * @param beforeSize
- * The size to compare
+ * @param content The content to measure
+ * @param beforeSize The size to compare
  */
 export function fileSize (content: string | Buffer, beforeSize: number) {
 
@@ -235,7 +251,7 @@ export function fileSize (content: string | Buffer, beforeSize: number) {
 };
 
 /**
- * Converts Time
+ * Converts milisecond time to a readable string
  *
  * @param ms The miliseconds to convert
  */
@@ -249,10 +265,10 @@ export function convertTimer (ms: number) {
 };
 
 /**
- * Return the current time/date
+ * Return the current time/date - This is console specific and
+ * will write ANSI colors
  *
  * @example
- *
  * '01:59:20'
  */
 export function getTime () {
@@ -261,20 +277,19 @@ export function getTime () {
   const hur = now.getHours();
   const min = now.getMinutes();
   const sec = now.getSeconds();
-  const col = gray(':');
 
   return (
     (hur < 10 ? `0${hur}` : hur) +
-    col + (min < 10 ? `0${min}` : min) +
-    col + (sec < 10 ? `0${sec}` : sec)
+    COL + (min < 10 ? `0${min}` : min) +
+    COL + (sec < 10 ? `0${sec}` : sec)
   );
 };
 
 /**
- * Return the current time/date
+ * Return the current time/date - This is console specific and
+ * will write ANSI colors
  *
  * @example
- *
  * '01-01-2022 01:59:20'
  */
 export function getDateTime () {
@@ -287,15 +302,13 @@ export function getDateTime () {
   const hur = now.getHours();
   const min = now.getMinutes();
   const sec = now.getSeconds();
-  const col = gray(':');
-  const dsh = gray('-');
 
   return (
     (d < 10 ? `0${d + 1}` : `${d + 1}`) +
-    dsh + (m < 10 ? `0${m}` : m) +
-    dsh + y + ws + (hur < 10 ? `0${hur}` : hur) +
-    col + (min < 10 ? `0${min}` : min) +
-    col + (sec < 10 ? `0${sec}` : sec)
+    DSH + (m < 10 ? `0${m}` : m) +
+    DSH + y + WSP + (hur < 10 ? `0${hur}` : hur) +
+    COL + (min < 10 ? `0${min}` : min) +
+    COL + (sec < 10 ? `0${sec}` : sec)
   );
 
 };
@@ -305,17 +318,17 @@ export function getDateTime () {
  *
  * @param i The number to suffix
  * @example
- * 1 // => 1st
- * 2 // => 2nd
- * 3 // => 3rd
- * 4 // => 4th
+ * 1 => '1st'
+ * 2 => '2nd'
+ * 3 => '3rd'
+ * 4 => '4th'
  */
-export function addSuffix (i: number): string {
+export function addSuffix (number: number): string {
 
-  const a = i % 10;
-  const b = i % 100;
+  const a = number % 10;
+  const b = number % 100;
 
-  return i + ((a === 1 && b !== 11)
+  return number + ((a === 1 && b !== 11)
     ? 'st'
     : (a === 2 && b !== 12) ? 'nd' : (a === 3 && b !== 13) ? 'rd' : 'th'
   );
@@ -323,28 +336,19 @@ export function addSuffix (i: number): string {
 }
 
 /**
- * Returns the byte size of a string value
- */
-export function getSizeInteger (string: string | Buffer): number {
-
-  return isString(string)
-    ? Buffer.from(string).toString().length
-    : string.toString().length;
-
-};
-
-/**
  * Small helper for determining how an external dependency should
  * be resolved, returning an import resolver.
+ *
+ * @param name The import pkg or path
  */
-export function getImport <T> (id: string): T {
+export function getImport <T> (name: string): T {
 
   if (isFunction(globalThis.require)) {
-    return globalThis.require(id);
+    return globalThis.require(name);
   }
 
   // @ts-expect-error
-  return createRequire(import.meta.url)(id);
+  return createRequire(import.meta.url)(name);
 
 }
 
@@ -364,6 +368,9 @@ export function kebabCase (string: string) {
 
 /**
  * Generate a random UUID
+ *
+ * @example
+ * uuid() => 'x1s2n5'
  */
 export function uuid (): string {
 
@@ -374,10 +381,10 @@ export function uuid (): string {
 /**
  * Returns a promise resolved in the next event loop
  */
-export default function pNext () {
+export function pNext () {
 
   return new Promise(resolve => {
-    if (typeof setImmediate === 'function') {
+    if (isFunction(setImmediate)) {
       setImmediate(resolve);
     } else {
       setTimeout(resolve);
@@ -414,4 +421,110 @@ export function debouncePromise<T extends unknown[]> (
       }, delay);
     }
   };
+}
+
+/**
+ * Check if param is an array type
+ */
+export function isArray <T extends any[]> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Array';
+
+}
+
+/**
+ * Check if param is an object type
+ */
+export function isObject <T extends object> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Object';
+
+}
+
+/**
+ * Check if param is a string type
+ */
+export function isString <T extends string> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'String';
+
+}
+
+/**
+ * Check if param is a date type
+ */
+export function isDate <T extends Date> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Date';
+
+}
+
+/**
+ * Check if param is an regular expression type
+ */
+export function isRegex <T extends RegExp> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'RegExp';
+
+}
+
+/**
+ * Check if param is a function type
+ */
+export function isFunction <T extends Function> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Function';
+
+}
+
+/**
+ * Check if param is a boolean type
+ */
+export function isBoolean <T extends Function> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Boolean';
+
+}
+
+/**
+ * Check if param is a number type
+ */
+export function isNumber <T extends number> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Number';
+
+}
+
+/**
+ * Check if param is null type
+ */
+export function isNull <T extends null> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Null';
+
+}
+
+/**
+ * Check if param is a undefined type
+ */
+export function isUndefined <T extends undefined> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'Undefined';
+}
+
+/**
+ * Check if param is Asynchronous type
+ */
+export function isAsync<T extends Promise<unknown>> (param: any): param is T {
+
+  return toString.call(param).slice(8, -1) === 'AsyncFunction';
+
+}
+
+/**
+ * Check if param is Buffer type
+ */
+export function isBuffer<T extends Buffer> (param: any): param is T {
+
+  return Buffer.isBuffer(param);
 }

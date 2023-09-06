@@ -1,14 +1,14 @@
 import type { Config } from 'types';
 import { isNil, has } from 'rambdax';
+import treeKill from 'tree-kill';
+import { create, keys } from '~native';
+import { isObject, isString, isArray } from '~utils';
+import { log, gray } from '~log';
+import { typeError } from '~log/validate';
 import { queue } from '~requests/queue';
 import { spawned } from '~cli/spawn';
 import { kill } from '~cli/exit';
-import { gray } from '~cli/ansi';
-import { typeError } from '~options/validate';
-import { log } from '~log';
 import { $ } from '~state';
-import treeKill from 'tree-kill';
-import { isObject, isString, nil, keys, ws, isArray, create } from '~utils/native';
 
 /**
  * Set Spawns
@@ -62,14 +62,14 @@ export function setSpawns (config: Config) {
 
       // create the command model
       $.spawn.commands[name] = {
-        cmd: nil,
+        cmd: NIL,
         args: [],
         pid: NaN
       };
 
       // convert to an array
-      const cmd = (command as string).trimStart().indexOf(ws) > -1
-        ? (command as string).trimStart().split(ws) as string[]
+      const cmd = (command as string).trimStart().indexOf(WSP) > -1
+        ? (command as string).trimStart().split(WSP) as string[]
         : [ command ] as string[];
 
       $.spawn.commands[name].cmd = cmd.shift();
@@ -104,7 +104,7 @@ export function setSpawns (config: Config) {
     queue.pause();
     queue.clear();
 
-    log.nwl(nil);
+    log.nwl(NIL);
 
     spawn.streams.forEach((child, name) => {
 
@@ -113,7 +113,7 @@ export function setSpawns (config: Config) {
 
     });
 
-    log.nwl(nil);
+    log.nwl(NIL);
 
     spawn.streams.clear();
     process.exit(0);

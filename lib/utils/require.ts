@@ -1,20 +1,146 @@
-// @ts-expect-error
-import { loadTsConfig } from 'load-tsconfig';
-import { readFile, unlink, writeFile } from 'fs-extra';
-import { isAbsolute, dirname, extname } from 'pathe';
+import type { BundleRequire, BundleResolve } from 'types/internal';
+import { readFile, unlink, writeFile, existsSync, readFileSync } from 'fs-extra';
+import { isAbsolute, dirname, extname, join, parse, resolve } from 'pathe';
 import { pathToFileURL } from 'node:url';
-import { build, BuildOptions, BuildFailure, BuildResult, Plugin as EsbuildPlugin } from 'esbuild';
-import { inferLoader, dynamicImport, uuid } from './utils';
-import { keys } from './native';
-import { $ } from '~state';
+import { inferLoader, dynamicImport, uuid, isRegex, jsonc, isArray } from './utils';
+import { assign, keys } from './native';
+import { build, BuildResult, Plugin } from 'esbuild';
 import { DIRNAME_VAR_NAME, FILENAME_VAR_NAME, IMPORT_META_URL_VAR_NAME, REGEX_EXTJS } from '~const';
+import { $ } from '~state';
+import { has } from 'rambdax';
+
+function findUp (name: string, startDir: string, stopDir = parse(startDir).root) {
+
+  let dir: string = startDir;
+
+  while (dir !== stopDir) {
+
+    const file = join(dir, name);
+
+    if (existsSync(file)) return file;
+    if (extname(file) !== '.json') {
+
+      const path = file + '.json';
+
+      if (existsSync(path)) return path;
+
+    }
+
+    dir = dirname(dir);
+
+  }
+
+  return null;
+
+};
+
+function getTSConfigFromFile (cwd: string, filename: string) {
+
+  return isAbsolute(filename)
+    ? existsSync(filename) ? filename : null
+    : findUp(filename, cwd);
+
+};
+
+function getTSConfigFromExtends (cwd: string, name: string) {
+
+  if (isAbsolute(name)) return existsSync(name) ? name : null;
+  if (name.startsWith('.')) return findUp(name, cwd);
+
+  return require.resolve(name, { paths: [ cwd ] });
+
+};
+
+export type Loaded = {
+  /** Path to the nearest config file */
+  path: string
+  /** Merged config data */
+  data: any
+  /** Discovered config files */
+  files: string[]
+}
+
+function getTSConfig (dir = process.cwd(), name = 'tsconfig.json', isExtends = false): Loaded | null {
+
+  dir = resolve(dir);
+
+  const id = isExtends
+    ? getTSConfigFromExtends(dir, name)
+    : getTSConfigFromFile(dir, name);
+
+  if (!id) return null;
+
+  const data: {
+    extends?: string | string[]
+    [k: string]: any
+  } = jsonc(readFileSync(id, 'utf-8'));
+
+  const configDir = dirname(id);
+
+  if (has('baseURL', data.compilerOptions)) {
+
+    data.compilerOptions.baseUrl = join(configDir, data.compilerOptions.baseUrl);
+
+  }
+
+  const extendsFiles: string[] = [];
+
+  if (data.extends) {
+
+    const extendsList = isArray(data.extends) ? data.extends : [ data.extends ];
+    const extendsData: Record<string, any> = {};
+
+    for (const name of extendsList) {
+
+      const parentConfig = getTSConfig(configDir, name, true);
+
+      if (parentConfig) {
+
+        assign(extendsData, {
+          ...parentConfig?.data,
+          compilerOptions: {
+            ...extendsData.compilerOptions,
+            ...parentConfig?.data?.compilerOptions
+          }
+        });
+
+        extendsFiles.push(...parentConfig.files);
+
+      }
+    }
+
+    assign(data, {
+      ...extendsData,
+      ...data,
+      compilerOptions: {
+        ...extendsData.compilerOptions,
+        ...data.compilerOptions
+      }
+    });
+
+  }
+
+  delete data.extends;
+
+  return {
+    path: id,
+    data,
+    files: [ ...extendsFiles, id ]
+  };
+};
+
+export function loadTSConfig (dir: string, name?: string) {
+
+  return getTSConfig(dir, name);
+
+}
 
 /**
  * Use a random path to avoid import cache
  */
-function defaultGetOutputFile (filepath: string, format: 'esm' | 'cjs'): string {
+function defaultGetOutputFile (path: string, format: 'esm' | 'cjs'): string {
 
-  return filepath.replace(REGEX_EXTJS, `.bundled_${uuid()}.${format === 'esm' ? 'mjs' : 'cjs'}`);
+  return path.replace(REGEX_EXTJS, `.bundled_${uuid()}.${format === 'esm' ? 'mjs' : 'cjs'}`);
 
 }
 
@@ -23,7 +149,6 @@ function defaultGetOutputFile (filepath: string, format: 'esm' | 'cjs'): string 
  */
 function isCommonJSorESM (inputFile: string): 'esm' | 'cjs' {
 
-  // @ts-expect-error
   if (typeof jest === 'undefined') return 'cjs';
 
   const ext = extname(inputFile);
@@ -51,7 +176,7 @@ function match (id: string, patterns?: (string | RegExp)[]) {
   if (!patterns) return false;
 
   return patterns.some((p) => {
-    if (p instanceof RegExp) return p.test(id);
+    if (isRegex(p)) return p.test(id);
     return id === p || id.startsWith(p + '/');
   });
 
@@ -66,7 +191,7 @@ export function externalPlugin ({
 }: {
   external?: (string | RegExp)[]
   notExternal?: (string | RegExp)[]
-} = {}): EsbuildPlugin {
+} = {}): Plugin {
 
   return {
     name: 'bundle-require:external',
@@ -90,7 +215,7 @@ export function externalPlugin ({
   };
 };
 
-export function injectFileScopePlugin (): EsbuildPlugin {
+export function injectFileScopePlugin (): Plugin {
   return {
     name: 'bundle-require:inject-file-scope',
     setup (ctx) {
@@ -121,71 +246,23 @@ export function injectFileScopePlugin (): EsbuildPlugin {
   };
 };
 
-export async function bundleRequire<T = any> (
-  options: {
-    cwd?: string
-    /**
-     * The filepath to bundle and require
-     */
-    filepath: string
-    /**
-     * The `require` function that is used to load the output file
-     * Default to the global `require` function
-     * This function can be asynchronous, i.e. returns a Promise
-     */
-    require?: (
-      outfile: string,
-      ctx: { format: 'cjs' | 'esm' },
-    ) => any
-    /**
-     * esbuild options
-     */
-    esbuildOptions?: BuildOptions
-    /**
-     * Get the path to the output file
-     * By default we simply replace the extension with `.bundled_{randomId}.js`
-     */
-    getOutputFile?: (filepath: string, format: 'esm' | 'cjs') => string
-    /**
-     * Enable watching and call the callback after each rebuild
-     */
-    onRebuild?: (ctx: {
-      err?: BuildFailure
-      mod?: any
-      dependencies?: string[]
-    }) => void
+export async function bundleRequire<T = any> (options: BundleRequire): BundleResolve<T> {
 
-    /** External packages */
-    external?: (string | RegExp)[]
-
-    /** A custom tsconfig path to read `paths` option */
-    tsconfig?: string
-
-    /**
-     * Preserve compiled temporary file for debugging
-     * Default to `process.env.BUNDLE_REQUIRE_PRESERVE`
-     */
-    preserveTemporaryFile?: boolean
-
-    /**
-     * Provide bundle format explicitly
-     * to skip the default format inference
-     */
-    format?: 'cjs' | 'esm'
+  if (!REGEX_EXTJS.test(options.filepath)) {
+    throw new Error(`${options.filepath} is not a valid JS file`);
   }
-): Promise<{ mod: T; dependencies: string[] }> {
-
-  if (!REGEX_EXTJS.test(options.filepath)) throw new Error(`${options.filepath} is not a valid JS file`);
 
   const preserveTemporaryFile = options.preserveTemporaryFile ?? !!process.env.BUNDLE_REQUIRE_PRESERVE;
-  const cwd = options.cwd || process.cwd();
+  const cwd = options.cwd;
   const format = options.format ?? isCommonJSorESM(options.filepath);
-  const tsc = loadTsConfig(cwd, options.tsconfig);
+  const tsc = loadTSConfig(cwd, options.tsconfig);
   const resolvePaths = tsconfigPathsToRegExp(tsc?.data.compilerOptions?.paths || {});
 
   async function extractResult (result: BuildResult) {
 
-    if (!result.outputFiles) throw new Error('[bundle-require] no output files');
+    if (!result.outputFiles) {
+      throw new Error('[bundle-require] no output files');
+    }
 
     const { text } = result.outputFiles[0];
     const getOutputFile = options.getOutputFile || defaultGetOutputFile;
@@ -195,14 +272,14 @@ export async function bundleRequire<T = any> (
 
     let mod: any;
 
-    const req: (
-      outfile: string,
-      ctx: { format: 'cjs' | 'esm' },
-    ) => any = options.require || dynamicImport;
-
     try {
 
-      mod = await req(format === 'esm' ? pathToFileURL(outfile).href : outfile, { format });
+      mod = await (
+        options.require ||
+        dynamicImport
+      )(format === 'esm'
+        ? pathToFileURL(outfile).href
+        : outfile, { format });
 
     } finally {
 

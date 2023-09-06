@@ -1,9 +1,9 @@
 import type { Config, HOTConfig } from 'types';
 import { join } from 'pathe';
-import { socket } from '~hot/server';
-import { isObject, isBoolean } from '~utils/native';
 import { allFalse, isNil, isEmpty, has } from 'rambdax';
-import { warnOption, typeError, unknownError, invalidError } from '~options/validate';
+import { socket } from '~hot/server';
+import { isObject, isBoolean } from '~utils';
+import { warnOption, typeError, unknownError, invalidError } from '~log/validate';
 import { $ } from '~state';
 
 /**

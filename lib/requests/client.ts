@@ -1,16 +1,16 @@
-import { Request, Store, File, Methods, Sync, Requests } from 'types';
+import type { Request, Store, File, Methods, Sync, Requests } from 'types';
 import pMap from 'p-map';
 import { mapParallelAsync } from 'rambdax';
-import { queue } from '../requests/queue';
-import { isUndefined } from '../utils/native';
-import * as asset from '../requests/assets';
-import * as pages from '../requests/pages';
-import * as metafields from '../requests/metafields';
-import merge from 'mergerino';
-import { $ } from '~state';
-import * as timer from '~utils/timer';
 import { Type } from '~process/files';
-import { assign } from 'markdown-it/lib/common/utils';
+import { queue } from '../requests/queue';
+import { timer } from '~timer';
+import { isUndefined } from '~utils';
+import { assign } from '~native';
+import { $ } from '~state';
+import * as asset from '~requests/assets';
+import * as pages from '~requests/pages';
+import * as metafields from '~requests/metafields';
+
 // import merge from 'mergerino';
 // import * as pages from '../requests/pages';
 

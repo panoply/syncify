@@ -1,24 +1,22 @@
 /* eslint-disable no-unused-vars */
-import { File, Syncify, ClientParam, Requests, Store, PageFrontmatter, PageMetafield, WatchBundle } from 'types';
-import { readFile, writeFile } from 'fs-extra';
-import prompts from 'prompts';
-import matter, { stringify } from 'gray-matter';
+import type { File, Syncify, Requests, Store, PageFrontmatter, PageMetafield, WatchBundle } from 'types';
 import { has, isEmpty } from 'rambdax';
-import Turndown from 'turndown';
-import { gfm } from '~forks/gfm';
+import { readFile, writeFile } from 'fs-extra';
+import matter, { stringify } from 'gray-matter';
+import prompts from 'prompts';
+import highlight from '@liquify/highlight';
 import markdown from 'markdown-it';
-import { $ } from '~state';
-import { log, c, hrs, ARR } from '~log';
-import { handleize, toUpcase } from '~utils/utils';
-import { isArray, isBoolean, isObject, isRegex, isUndefined, nil } from '~utils/native';
+import Turndown from 'turndown';
+import * as pages from '~requests/pages';
+import * as cache from '~process/caches';
+import { gfm } from '~forks/gfm';
 import { Kind } from '~process/files';
 import { getPageMetafields } from '~process/metafields';
 import { lastPath } from '~utils/paths';
-import highlight from '@liquify/highlight';
-import { nwl } from '~log/loggers';
-import * as pages from '~requests/pages';
-import * as cache from '~process/caches';
-import * as timer from '~utils/timer';
+import { isArray, isBoolean, isObject, isRegex, isUndefined, handleize, toUpcase } from '~utils';
+import { timer } from '~timer';
+import { log, c, hrs, ARR } from '~log';
+import { $ } from '~state';
 
 enum PromptActions {
   /**
@@ -221,9 +219,9 @@ async function promptOverwrite (remote: Requests.Page): Promise<{
 
   if (prompt.action === PromptActions.View) {
 
-    nwl('');
+    log.nwl('');
     log.out(highlight(remote.body_html));
-    nwl('');
+    log.nwl('');
 
     const next = await prompts({
       type: 'select',
@@ -273,13 +271,13 @@ function getPayloadFromFrontmatter (file: File, data: PageFrontmatter): Requests
 
     if (/^[./]{1,2}/.test(handle)) {
       before = handle;
-      handle = handle.replace(/^[./]{1,2}/, nil);
+      handle = handle.replace(/^[./]{1,2}/, NIL);
       log.warn(`handle ${c.CHV} ${before} ${c.ARR} ${handle}`, 'fixed start');
     }
 
     if (/^pages\//.test(handle)) {
       before = handle;
-      handle = handle.replace(/^pages\//, nil);
+      handle = handle.replace(/^pages\//, NIL);
       log.warn(`handle ${c.CHV} ${before} ${c.ARR} ${handle}`, 'fixed sub-path');
     }
 

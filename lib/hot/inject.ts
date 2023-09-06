@@ -1,6 +1,5 @@
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { basename } from 'pathe';
-import { nl } from '~utils/native';
 import { log, tui } from '~log';
 import { $ } from '~state';
 import * as request from '~requests/assets';
@@ -82,7 +81,7 @@ export function writeRender (content: string) {
   const ender = content.indexOf('<head>') + 6;
   const start = content.slice(0, ender);
 
-  return start + nl + $.hot.renderer + nl + content.slice(ender);
+  return start + NWL + $.hot.renderer + NWL + content.slice(ender);
 
 }
 

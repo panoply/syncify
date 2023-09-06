@@ -1,69 +1,12 @@
-import { isType, join } from 'rambdax';
-
 /**
  * Native Console Log
  */
 export const { error, log, warn } = console;
 
 /**
- * Empty String
+ * Native Object methods
  */
-export const nil = '';
-
-/**
- * Whitespace
- */
-export const ws = ' ';
-
-/**
- * Newline
- */
-export const nl = '\n';
-
-/**
- * Repeat Whitespacing
- */
-export const wsr = (i: number) => ws.repeat(i);
-
-/**
- * Newline Repeat
- */
-export const nlr = (i: number) => nl.repeat(i);
-
-/**
- * Newline Join from an array list
- */
-export const nlj = join(nl);
-
-/**
- * Join array list of strings
- */
-export const glue = join(nil);
-
-/**
- * Native Object assign
- */
-export const create = Object.create;
-
-/**
- * Native Object assign
- */
-export const assign = Object.assign;
-
-/**
- * Native Object Define Property
- */
-export const defineProperty = Object.defineProperty;
-
-/**
- * Native Object keys
- */
-export const keys = Object.keys;
-
-/**
- * Native Object keys
- */
-export const values = Object.values;
+export const { create, assign, defineProperty, defineProperties, keys, values } = Object;
 
 /**
  * Native Array from Method
@@ -76,51 +19,11 @@ export const toArray = Array.from;
 export const toBuffer = Buffer.from;
 
 /**
- * Native isArray Methods
+ * Native Math methods
  */
-export const isArray = Array.isArray;
+export const { abs } = Math;
 
 /**
- * Is Buffer
+ * Native prototype `toString` for type checks
  */
-export const isBuffer = Buffer.isBuffer;
-
-/**
- * is Undefined
- */
-export const isUndefined = isType('Undefined');
-
-/**
- * is Object
- */
-export const isObject = isType('Object');
-
-/**
- * is Boolean
- */
-export const isBoolean = isType('Boolean');
-
-/**
- * is Regular Expression
- */
-export const isRegex = isType('RegExp');
-
-/**
- * is Boolean
- */
-export const isNumber = isType('Number');
-
-/**
- * is String
- */
-export const isString = isType('String');
-
-/**
- * is Function
- */
-export const isFunction = isType('Function');
-
-/**
- * is Async
- */
-export const isAsync = isType('Async');
+export const { toString } = Object.prototype;

@@ -1,15 +1,12 @@
 /* eslint-disable no-unused-vars */
-
+import type { File, PathBundle } from 'types';
 import { join, parse, relative, basename } from 'pathe';
-import { File, PathBundle } from 'types';
-import { assign } from '~utils/native';
+import { script, section, snippet, style, svg } from '~process/context';
 import { lastPath } from '~utils/paths';
+import { uuid } from '~utils';
+import { assign } from '~native';
 import { Partial } from 'rambdax';
-import * as context from '~process/context';
 import { $ } from '~state';
-import merge from 'mergerino';
-import { Tester } from 'anymatch';
-import { uuid } from '~utils/utils';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -247,7 +244,7 @@ export function setImportFile (parsedFile: Partial<File>, output: string) {
 }
 /**
  * Parses the filename and returns a workable object that we will pass
- * into requests and transforms. The function returns file context.
+ * into requests and transforms. The function returns file context
  * Some files use an anymatch test to determine their handling whereas
  * others will determine handling based on extension name.
  *
@@ -264,9 +261,9 @@ export function parseFile (paths: PathBundle, output: string) {
     if (file.ext === '.liquid') {
 
       if (paths.sections.match(path)) {
-        return context.section(define('sections', Type.Section, Kind.Liquid));
+        return section(define('sections', Type.Section, Kind.Liquid));
       } else if (paths.snippets.match(path)) {
-        return context.snippet(define('snippets', Type.Snippet, Kind.Liquid));
+        return snippet(define('snippets', Type.Snippet, Kind.Liquid));
       } else if (paths.layout.match(path)) {
         return define('layout', Type.Layout, Kind.Liquid);
       } else if (paths.templates.match(path)) {
@@ -277,7 +274,7 @@ export function parseFile (paths: PathBundle, output: string) {
         return define('templates/metaobject', Type.Template, Kind.Liquid);
       } else if (paths.transforms.has(path)) {
         if (paths.transforms.get(path) === Type.Style) {
-          return context.style(define('snippets', Type.Style, Kind.CSS));
+          return style(define('snippets', Type.Style, Kind.CSS));
         }
       }
 
@@ -322,7 +319,7 @@ export function parseFile (paths: PathBundle, output: string) {
       if (paths.metafields.match(path)) {
         return define('metafields', Type.Metafield, Kind.JSON);
       } else if (paths.sections.match(path)) {
-        return context.section(define('sections', Type.Section, Kind.JSON));
+        return section(define('sections', Type.Section, Kind.JSON));
       } else if (paths.templates.match(path)) {
         return define('templates', Type.Template, Kind.JSON);
       } else if (paths.config.match(path)) {
@@ -336,22 +333,22 @@ export function parseFile (paths: PathBundle, output: string) {
       }
 
     } else if (file.ext === '.svg') {
-      return context.svg(define('assets', Type.Svg, Kind.SVG));
+      return svg(define('assets', Type.Svg, Kind.SVG));
     } else if (file.ext === '.css') {
-      return context.style(define('assets', Type.Style, Kind.CSS));
+      return style(define('assets', Type.Style, Kind.CSS));
     } else if (file.ext === '.scss') {
-      return context.style(define('assets', Type.Style, Kind.SCSS));
+      return style(define('assets', Type.Style, Kind.SCSS));
     } else if (file.ext === '.sass') {
-      return context.style(define('assets', Type.Style, Kind.SASS));
+      return style(define('assets', Type.Style, Kind.SASS));
 
     } else if (file.ext === '.js' || file.ext === '.mjs') {
-      return context.script(define('assets', Type.Script, Kind.JavaScript));
+      return script(define('assets', Type.Script, Kind.JavaScript));
     } else if (file.ext === '.ts') {
-      return context.script(define('assets', Type.Script, Kind.TypeScript));
+      return script(define('assets', Type.Script, Kind.TypeScript));
     } else if (file.ext === '.jsx') {
-      return context.script(define('assets', Type.Script, Kind.JSX));
+      return script(define('assets', Type.Script, Kind.JSX));
     } else if (file.ext === '.tsx') {
-      return context.script(define('assets', Type.Script, Kind.TSX));
+      return script(define('assets', Type.Script, Kind.TSX));
 
     }
 

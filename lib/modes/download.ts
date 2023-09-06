@@ -3,16 +3,15 @@ import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { join, relative } from 'pathe';
 import { delay, has } from 'rambdax';
 import { writeFileSync } from 'fs-extra';
-import { $ } from '~state';
-import { log, c, tui, error } from '~log';
-import { importFile } from '~process/files';
-import { addSuffix, event } from '~utils/utils';
-import { Progress } from '~cli/progress';
-import { NIL, NWL } from '~utils/chars';
-import { queue } from '~requests/queue';
-import * as timer from '~utils/timer';
-import * as n from '~utils/native';
 import * as request from '~requests/assets';
+import { importFile } from '~process/files';
+import { Progress } from '~cli/progress';
+import { queue } from '~requests/queue';
+import { timer } from '~utils/timer';
+import { assign } from '~native';
+import { log, c, tui } from '~log';
+import { addSuffix, event, glue } from '~utils';
+import { $ } from '~state';
 
 interface EventParams {
   /**
@@ -235,8 +234,12 @@ export async function download (cb?: Syncify): Promise<void> {
   log.group('Download', true);
   log.spinner('Preparing');
 
-  const hashook = n.isFunction(cb);
   const sync = await getModel();
+
+  // TODO
+  // PLUGIN SUPPORT
+  //
+  // const hashook = isFunction(cb);
 
   await delay(500);
 
@@ -254,13 +257,13 @@ export async function download (cb?: Syncify): Promise<void> {
     const preview = `https://${theme.store}?preview_theme_id=${theme.id}`;
     const prefix: string = [
 
-      tui.suffix('gray', 'Duration   ', c.whiteBright(`  ${timer.now('download')}`)),
+      tui.suffix('gray', 'Duration', c.whiteBright(`  ${timer.now('download')}`)),
       NWL,
-      tui.suffix('gray', 'Transfers  ', c.whiteBright.bold(`  ${transfers++}`)),
+      tui.suffix('gray', 'Transfers', c.whiteBright.bold(`  ${transfers++}`)),
       NWL,
-      tui.suffix('gray', 'Syncing    ', `  ${c.pink(`${c.bold(theme.target)}  ${c.ARR}  ${theme.store}`)}`),
+      tui.suffix('gray', 'Syncing', `  ${c.pink(`${c.bold(theme.target)}  ${c.ARR}  ${theme.store}`)}`),
       NWL,
-      tui.suffix('gray', 'Preview    ', `  ${c.underline(preview)}`),
+      tui.suffix('gray', 'Preview', `  ${c.underline(preview)}`),
       c.newline,
       c.hrs(preview.length + 17),
       c.newline
@@ -368,7 +371,7 @@ export async function download (cb?: Syncify): Promise<void> {
       }
     }
 
-    log.update(message.join(NIL));
+    log.update(glue(message));
 
   }
 
@@ -391,7 +394,7 @@ export async function download (cb?: Syncify): Promise<void> {
     for (const { key } of record.files) {
 
       const file = importFile(key, output);
-      const payload = n.assign<Request, AxiosRequestConfig>({
+      const payload = assign<Request, AxiosRequestConfig>({
         url: record.theme.url,
         method: 'get',
         params: {
@@ -420,14 +423,18 @@ export async function download (cb?: Syncify): Promise<void> {
 
     if (errors.remote.size > 0) {
 
-      let errno: number = 0;
+      // TODO
+      // POST DOWNLOAD ERRORS
+      //
 
-      for (const [ path, ref ] of errors.remote) {
+      // let errno: number = 0;
 
-        log.nwl();
-        log.write(c.redBright.bold(`ERROR ${errno++}`));
+      // for (const [ path, ref ] of errors.remote) {
 
-      }
+      //   log.nwl();
+      //   log.write(c.redBright.bold(`ERROR ${errno++}`));
+
+      // }
 
     }
 

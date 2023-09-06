@@ -5,11 +5,12 @@ import { join, relative } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, mapAsync } from 'rambdax';
 import { toArray, assign } from '~utils/native';
-import { log, error, c } from '~log';
-import { $ } from '~state';
 import { Kind, renameFile } from '~process/files';
 import { byteSize, fileSize, plural } from '~utils/utils';
-import * as timer from '~utils/timer';
+import { timer } from '~timer';
+import { log, error, c } from '~log';
+import { $ } from '~state';
+
 /* -------------------------------------------- */
 /* DYNAMIC IMPORTS                              */
 /* -------------------------------------------- */

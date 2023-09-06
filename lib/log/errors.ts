@@ -3,14 +3,15 @@ import type { AxiosResponse } from 'axios';
 import type { Exception } from 'sass';
 import type { NodeErrorOptions } from 'postcss';
 import type { Message } from 'esbuild';
-import { hasPath } from 'rambdax';
-import { nil, nl, error, glue, assign } from '~utils/native';
-import cleanStack from 'clean-stack';
 import wrap from 'wrap-ansi';
+import cleanStack from 'clean-stack';
+import { hasPath } from 'rambdax';
 import { SHOPIFY_REQUEST_ERRORS } from '~const';
+import { assign, error } from '~native';
+import { glue } from '~utils';
+import { $ } from '~state';
 import * as tui from '~log/tui';
 import * as c from '~cli/ansi';
-import { $ } from '~state';
 
 /**
  * Error Reporting
@@ -46,12 +47,12 @@ export function spawn (data: string) {
 
   if (/\berror\b:?/i.test(data) && stackerr > 0) {
 
-    message = data.slice(0, stackerr).split(nl);
+    message = data.slice(0, stackerr).split(NWL);
 
     const stack = cleanStack(data.slice(stackerr), { pretty: true, basePath: $.cwd });
-    const lines = wrap(stack, $.terminal.wrap).split(nl);
+    const lines = wrap(stack, $.terminal.wrap).split(NWL);
 
-    stderr.push(nl);
+    stderr.push(NWL);
 
     while (lines.length !== 0) {
       const line = lines.shift();
@@ -59,14 +60,14 @@ export function spawn (data: string) {
     }
   }
 
-  if (message.length === 0) message = data.split(nl);
+  if (message.length === 0) message = data.split(NWL);
 
   while (message.length !== 0) {
     const line = message.shift();
     if (line.trim().length > 0) stdout.push(c.reset(c.line.gray) + line);
   }
 
-  error(`${stdout.join(nl)}${stderr.length > 1 ? stderr.join(nl) : nil}`);
+  error(`${stdout.join(NWL)}${stderr.length > 1 ? stderr.join(NWL) : NIL}`);
 
 };
 
@@ -122,7 +123,7 @@ export function request <T> (file: string, e: AxiosResponse, options: {
 
     const output = glue([
       c.line.red,
-      nl,
+      NWL,
       info,
       tui.context(context as any)
     ]);
@@ -150,7 +151,7 @@ export function request <T> (file: string, e: AxiosResponse, options: {
 
     const output = glue([
       c.line.red,
-      nl,
+      NWL,
       info +
       tui.context(context as any)
     ]);
@@ -178,7 +179,7 @@ export function request <T> (file: string, e: AxiosResponse, options: {
 
     const output = glue([
       c.line.red,
-      nl,
+      NWL,
       c.redBright(info) +
       tui.context({
         stack: false,

@@ -1,12 +1,11 @@
 import type PostCSS from 'postcss';
 import type SASS from 'sass';
-import { join, relative } from 'pathe';
-import { File, StyleTransform, Syncify, Processors } from 'types';
-import { readFile, writeFile } from 'fs-extra';
+import type { File, StyleTransform, Syncify, Processors } from 'types';
 import { isNil } from 'rambdax';
-import { isFunction, isString, isUndefined, isBuffer, nl, wsr } from '~utils/native';
-import { byteSize, fileSize } from '~utils/utils';
-import * as timer from '~utils/timer';
+import { join, relative } from 'pathe';
+import { readFile, writeFile } from 'fs-extra';
+import { isFunction, isString, isUndefined, isBuffer, byteSize, fileSize, sanitize } from '~utils';
+import { timer } from '~timer';
 import { error, log, bold, warning } from '~log';
 import { $ } from '~state';
 
@@ -63,7 +62,7 @@ function write (file: File<StyleTransform>, cb: Syncify) {
       if (isUndefined(update) || update === false) {
         content = data;
       } else if (isString(update) || isBuffer(update)) {
-        content = update;
+        content = sanitize(update);
       }
     } else {
       content = data;
@@ -214,7 +213,7 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
  */
 function snippet (css: string) {
 
-  return `<style>${nl + wsr(2) + css}</style>`;
+  return `<style>${NWL + WSP.repeat(2) + css}</style>`;
 
 };
 

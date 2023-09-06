@@ -1,19 +1,17 @@
 import type { Config, StyleTransform, Processors, WatchBundle, StyleBundle, SASSConfig } from 'types';
-import type { Merge } from 'type-fest';
 import glob from 'fast-glob';
 import merge from 'mergerino';
-import anymatch, { Tester } from 'anymatch';
+import anymatch from 'anymatch';
 import { has, hasPath, isNil, uniq } from 'rambdax';
-import { join, extname } from 'path';
+import { join, extname } from 'pathe';
 import { existsSync } from 'fs-extra';
-import { getModules, renameFile, readConfigFile } from '~utils/options';
+import { typeError, invalidError, warnOption, missingDependency, throwError } from '~log/validate';
 import { normalPath } from '~utils/paths';
-import { typeError, invalidError, warnOption, missingDependency, throwError } from '~options/validate';
+import { getModules, renameFile, readConfigFile, getTransform } from '~utils/options';
+import { isObject, isBoolean, isArray, isString, uuid } from '~utils';
 import { load } from '~transform/styles';
-import { getTransform } from './utilities';
-import { isObject, isBoolean, isArray, isString, defineProperty } from '~utils/native';
-import { uuid } from '~utils/utils';
 import { Type } from '~process/files';
+import { defineProperty } from '~native';
 import { $ } from '~state';
 
 /* -------------------------------------------- */
@@ -22,11 +20,6 @@ import { $ } from '~state';
 
 type PostCSSProcess = Processors['postcss']
 type SassDartProcess = Processors['sass']
-type StylesFlattened = Merge<StyleTransform, {
-  uuid: string;
-  input: string;
-  watch: Tester
-}>
 
 /**
  *
@@ -80,7 +73,7 @@ export async function setStyleConfig (config: Config) {
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const styles = getTransform<StylesFlattened[]>(config.transforms.style, {
+  const styles = getTransform <StyleTransform<string>[]>(config.transforms.style, {
     addWatch: false,
     flatten: true
   });

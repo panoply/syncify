@@ -1,5 +1,4 @@
 import ansis from 'ansis';
-import { nil, nl } from '~utils/native';
 import { size } from '~cli/size';
 
 /* -------------------------------------------- */
@@ -168,7 +167,7 @@ export const line = {
  *
  * ```
  */
-export const newline = lightGray(`${nl}│${nl}`);
+export const newline = lightGray(`${NWL}│${NWL}`);
 
 /**
  * TUI Branch - line
@@ -192,7 +191,7 @@ export const top = lightGray('├─ ');
  * TUI Arrow - line
  *
  * ```bash
- * │  ┌┘
+ * │  └─
  * ```
  */
 export const bottom = lightGray('│  └─ ');
@@ -209,7 +208,7 @@ export const close = lightGray('└─ ');
 /**
  * TUI Horizontal Rule Size
  *
- * Same as `hr()` but only applies horizonal lines `x` amount of times
+ * Same as `hr()` but oNWLy applies horizonal lines `x` amount of times
  *
  * ```bash
  * │
@@ -231,7 +230,7 @@ export const hrs = (x: number = size().cols - 10) => lightGray(`│ ${'─'.repe
  * │
  * ```
  */
-export const hr = (minus: number) => lightGray(`│${nl}├${'─'.repeat(size().cols - minus)}${nl}│`);
+export const hr = (minus: number) => lightGray(`│${NWL}├${'─'.repeat(size().cols - minus)}${NWL}│`);
 
 /* -------------------------------------------- */
 /* CHARACTER HELPERS                            */
@@ -378,4 +377,4 @@ export const error = redBright(` ~ Type ${bold('v')} and press ${bold('enter')} 
  *
  * ```
  */
-export const time = (now: string) => now ? reset.gray(` ~ ${now}`) : nil;
+export const time = (now: string) => now ? reset.gray(` ~ ${now}`) : NIL;

@@ -1,10 +1,10 @@
 import { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { isBoolean, isObject, isRegex } from '~utils/native';
-import { $ } from '~state';
-import { throwError, typeError, unknownError, warnOption } from '~options/validate';
 import { ESBUILD_NOT_INSTALLED } from '~const';
-import { getResolvedPaths } from './utilities';
+import { throwError, typeError, unknownError, warnOption } from '~log/validate';
+import { getResolvedPaths } from '~utils/options';
+import { isBoolean, isObject, isRegex } from '~utils';
+import { $ } from '~state';
 
 /**
  * Minification Options

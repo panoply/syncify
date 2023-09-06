@@ -1,4 +1,4 @@
-import { ProcessorsBundle } from 'types';
+import type { ProcessorsBundle } from 'types';
 
 /**
  * Processor Configuration

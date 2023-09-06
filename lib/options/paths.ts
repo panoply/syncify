@@ -3,11 +3,11 @@ import glob from 'fast-glob';
 import anymatch from 'anymatch';
 import { dirname, join, relative } from 'pathe';
 import { has } from 'rambdax';
-import { lastPath, normalPath } from '~utils/paths';
-import { warnOption } from '~options/validate';
 import { PATH_KEYS } from '~const';
+import { isArray } from '~utils';
+import { lastPath, normalPath } from '~utils/paths';
+import { warnOption } from '~log/validate';
 import { $ } from '~state';
-import { isArray } from '~utils/native';
 
 /**
  * Get Paths

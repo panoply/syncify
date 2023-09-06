@@ -1,16 +1,15 @@
-import { Merge } from 'type-fest';
-import { Tester } from 'anymatch';
-import { Config, SVGBundle, SVGOConfig, SVGSprite, SVGFile, SVGSpriteConfig } from 'types';
+import type { Config, SVGBundle, SVGOConfig, SVGSprite, SVGFile, SVGSpriteConfig } from 'types';
+import type { Merge } from 'type-fest';
+import type { Tester } from 'anymatch';
 import { extname, relative } from 'pathe';
 import { has } from 'rambdax';
 import merge from 'mergerino';
 import { cyan } from '~log';
-import { unknownError, throwError, missingOption, invalidError, warnOption, missingDependency } from '~options/validate';
-import { isObject } from '~utils/native';
+import { unknownError, throwError, missingOption, invalidError, warnOption, missingDependency } from '~log/validate';
 import { load } from '~transform/svgs';
 import { $ } from '~state';
-import { getTransform, getModules } from '~options/utilities';
-import { uuid } from '~utils/utils';
+import { getTransform, getModules } from '~utils/options';
+import { uuid, isObject } from '~utils';
 
 /**
  * SVG Icon Transforms
@@ -25,7 +24,7 @@ export async function setSvgOptions (config: Config) {
   const { sprite, svgo } = $.processor;
   const warn = warnOption('svg transform');
 
-  svgo.installed = getModules('svgo');
+  svgo.installed = getModules($.pkg, 'svgo');
 
   // Load SVGO module
   if (svgo.installed) {
@@ -33,7 +32,7 @@ export async function setSvgOptions (config: Config) {
     if (!loaded) throwError('Unable to dynamically import SVGO', 'Ensure you have installed svgo');
   }
 
-  sprite.installed = getModules('svg-sprite');
+  sprite.installed = getModules($.pkg, 'svg-sprite');
 
   // Load SVG Sprite module
   if (sprite.installed) {
@@ -47,7 +46,7 @@ export async function setSvgOptions (config: Config) {
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const svgs = getTransform<Merge<SVGFile, SVGSprite>[]>(config.transforms.svg, {
+  const svgs = getTransform<SVGTransform[]>(config.transforms.svg, {
     addWatch: true,
     flatten: false
   });

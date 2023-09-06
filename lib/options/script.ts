@@ -1,15 +1,13 @@
-import { Config, ESBuildConfig, ScriptBundle, ScriptTransform, WatchBundle } from 'types';
+import type { Config, ESBuildConfig, ScriptBundle, ScriptTransform, WatchBundle } from 'types';
 import { join } from 'pathe';
-import { has, isEmpty, isNil, omit } from 'rambdax';
-import merge from 'mergerino';
-import { getModules, readConfigFile } from '~utils/options';
-import { warnOption, missingDependency, invalidError, typeError, throwError } from '~options/validate';
-import { getResolvedPaths, getTransform, renameFile } from './utilities';
-import { isArray, isBoolean } from '~utils/native';
-import { $ } from '~state';
-import { esbuildModule, esbuildBundle } from '~transform/script';
-import { uuid } from '~utils/utils';
 import anymatch from 'anymatch';
+import merge from 'mergerino';
+import { has, isEmpty, isNil, omit } from 'rambdax';
+import { isArray, isBoolean, uuid } from '~utils';
+import { getModules, readConfigFile, getResolvedPaths, getTransform, renameFile } from '~utils/options';
+import { esbuildModule, esbuildBundle } from '~transform/script';
+import { warnOption, missingDependency, invalidError, typeError, throwError } from '~log/validate';
+import { $ } from '~state';
 
 /**
  * Script Transform

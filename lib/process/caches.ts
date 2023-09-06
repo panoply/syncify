@@ -40,6 +40,23 @@ export async function updateCacheSync () {
 }
 
 /**
+ * Update Errors
+ *
+ * Update or create page cache reference. Requires the `$.sync` (`store.domain`)
+ * the page `handle` and the remote Shopify page response. Returns a enum describing
+ * what operation took place.
+ */
+export async function errors (file: string, content: any) {
+
+  await writeJson(file, content, { spaces: 2 });
+
+  await update();
+
+  return Cached.Updated;
+
+}
+
+/**
  * Update Pages
  *
  * Update or create page cache reference. Requires the `$.sync` (`store.domain`)

@@ -3,26 +3,27 @@ import { join } from 'pathe';
 import { has } from 'rambdax';
 import { FSWatcher } from 'chokidar';
 import { pathExists, readJSON, remove } from 'fs-extra';
-import { missingConfig } from '~options/validate';
-import { configFile, getPackageJson } from '~options/files';
-import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from '~options/dirs';
-import { setJsonOptions } from '~options/json';
-import { setModes } from '~options/modes';
-import { setSnippetOptions } from '~options/snippets';
-import { setSectionOptions } from '~options/sections';
-import { setStores } from '~options/stores';
-import { setPaths } from '~options/paths';
-import { setSpawns } from '~options/spawn';
-import { setScriptOptions } from '~options/script';
-import { setStyleConfig } from '~options/style';
-import { setSvgOptions } from '~options/svgs';
-import { setHotReloads } from '~options/hot';
-import { setFilters } from '~options/filters';
-import { setMinifyOptions } from '~options/terser';
+import { missingConfig } from '~log/validate';
+import { configFile, getPackageJson } from './files';
+import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from './dirs';
+import { setJsonOptions } from './json';
+import { setModes } from './modes';
+import { setSnippetOptions } from './snippets';
+import { setSectionOptions } from './sections';
+import { setStores } from './stores';
+import { setPaths } from './paths';
+import { setSpawns } from './spawn';
+import { setScriptOptions } from './script';
+import { setStyleConfig } from './style';
+import { setSvgOptions } from './svgs';
+import { setHotReloads } from './hot';
+import { setFilters } from './filters';
+import { setMinifyOptions } from './terser';
 import { setPageOptions } from './pages';
 import { log } from '~log';
+import { isArray } from '~utils';
+import { assign, toArray } from '~native';
 import { $ } from '~state';
-import * as u from '~utils/native';
 
 /**
  * Define Options
@@ -37,7 +38,6 @@ export async function define (cli: Commands, _options?: Config) {
   await getPackageJson(cli.cwd);
   await getConfig(cli);
 
-  // @ts-expect-error
   $.version = VERSION;
   $.restart = false;
   $.cli = cli;
@@ -114,7 +114,7 @@ export function setChokidar (watch: boolean, cwd: string) {
     },
     paths: {
       get () {
-        return u.toArray($.watch.values());
+        return toArray($.watch.values());
       }
     },
     watching: {
@@ -134,9 +134,9 @@ export function setChokidar (watch: boolean, cwd: string) {
 function setProcessors (config: Config) {
 
   for (const prop in config.processors) {
-    $.processor[prop].config = u.isArray(config.processors[prop])
+    $.processor[prop].config = isArray(config.processors[prop])
       ? config.processors[prop]
-      : u.assign($.processor[prop].config, config.processors[prop]);
+      : assign($.processor[prop].config, config.processors[prop]);
   }
 
 };
@@ -150,7 +150,7 @@ function setProcessors (config: Config) {
 function setPlugins (config: Config) {
 
   if (!has('plugins', config)) return;
-  if (!u.isArray(config.plugins)) return; // TODO: Throw error if not array
+  if (!isArray(config.plugins)) return; // TODO: Throw error if not array
 
   for (const plugin of config.plugins) {
 

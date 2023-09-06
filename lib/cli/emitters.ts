@@ -19,6 +19,7 @@ export function signal () {
   // kill(p.process.pid, 'SIGKILL');
 
   log.out(gray('SIGINT'));
+
   process.exit();
   // process.exit(0);
 

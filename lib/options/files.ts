@@ -1,9 +1,9 @@
 import type { Config, ENV, Tsconfig } from 'types';
-import { join, relative, basename } from 'pathe';
+import { join, relative, basename, extname } from 'pathe';
 import { pathExists, readFile, readJson } from 'fs-extra';
 import stripJsonComments from 'strip-json-comments';
 import { bundleRequire } from '~utils/require';
-import { jsonc } from '~utils/utils';
+import { jsonc } from '~utils';
 import { $ } from '~state';
 
 /**
@@ -30,8 +30,11 @@ export async function configFile (cwd: string): Promise<Config> {
   ]) {
 
     path = join(cwd, file);
+
     const exists = await pathExists(path);
+
     if (exists) break;
+
     path = null;
 
   }
@@ -40,7 +43,7 @@ export async function configFile (cwd: string): Promise<Config> {
 
   try {
 
-    if (path.endsWith('.json')) {
+    if (extname(path) === '.json') {
 
       $.file.path = path;
       $.file.relative = relative(cwd, path);
@@ -56,7 +59,10 @@ export async function configFile (cwd: string): Promise<Config> {
       $.file.relative = relative(cwd, path);
       $.file.base = basename(path);
 
-      const config = await bundleRequire({ filepath: path });
+      const config = await bundleRequire({
+        cwd,
+        filepath: path
+      });
 
       return config.mod.syncify || config.mod.default || config.mod;
 

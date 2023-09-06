@@ -1,19 +1,20 @@
+import type { File, Syncify } from 'types';
+import type { BuildReport, BuildModeReport } from 'types/internal';
 import anymatch from 'anymatch';
-import { File, Syncify, BuildReport, BuildModeReport } from 'types';
 import glob from 'fast-glob';
+import { has, isEmpty, mapAsync } from 'rambdax';
 import { compile as assets } from '~transform/asset';
 import { compile as liquid } from '~transform/liquid';
 import { compile as json } from '~transform/json';
 import { compile as script } from '~transform/script';
 import { compile as styles } from '~transform/styles';
 import { compile as svg } from '~transform/svgs';
-import { isUndefined, nil, toArray } from '~utils/native';
 import { parseFile, Type } from '~process/files';
-import { $ } from '~state';
+import { toArray } from '~native';
 import { log, line, gray, tui, c } from '~log';
-import { has, isEmpty, mapAsync } from 'rambdax';
-import { fileSize } from '~utils/utils';
-import * as timer from '~utils/timer';
+import { fileSize, isUndefined } from '~utils';
+import { timer } from '~timer';
+import { $ } from '~state';
 import * as cache from '~process/caches';
 
 /**
@@ -93,67 +94,67 @@ export async function build (callback?: Syncify) {
 
   }, <{ [group: string]: BuildReport }>{
     styles: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     scripts: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     svgs: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     sections: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     layouts: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     metaobject: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     templates: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     snippets: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     locales: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     configs: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     pages: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     metafields: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     },
     assets: {
-      time: nil,
+      time: NIL,
       files: [],
       report: null
     }

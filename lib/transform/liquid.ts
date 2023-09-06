@@ -1,16 +1,15 @@
-import { minify as terser } from 'html-minifier-terser';
+import type { File, Syncify } from 'types';
+import { minify } from 'html-minifier-terser';
+import glob from 'fast-glob';
 import { join, basename } from 'pathe';
-import { File, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { has, isNil, isType } from 'rambdax';
 import { Type } from '~process/files';
-import { isArray, nil } from '~utils/native';
-import { byteConvert, byteSize, fileSize } from '~utils/utils';
-import { $ } from '~state';
-import * as timer from '~utils/timer';
-import { log } from '~log';
 import { hasSnippet, inject, removeRender } from '~hot/inject';
-import glob from 'fast-glob';
+import { byteConvert, byteSize, fileSize, isArray } from '~utils';
+import { timer } from '~timer';
+import { log } from '~log';
+import { $ } from '~state';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -49,8 +48,8 @@ const ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
 function removeComments (content: string) {
 
   return $.terser.liquid.removeComments ? content
-    .replace(LiquidBlockComments, nil)
-    .replace(LiquidLineComments, nil) : content;
+    .replace(LiquidBlockComments, NIL)
+    .replace(LiquidLineComments, NIL) : content;
 
 };
 
@@ -62,7 +61,7 @@ function removeComments (content: string) {
  */
 function minifyLiquidTag (content: string) {
 
-  return content.replace(LiquidTag, (tag) => '\n' + tag.replace(/#.*?$/gm, nil) + '\n');
+  return content.replace(LiquidTag, (tag) => '\n' + tag.replace(/#.*?$/gm, NIL) + '\n');
 
 };
 
@@ -124,7 +123,7 @@ async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await terser(content, $.terser.markup);
+    const htmlmin = await minify(content, $.terser.markup);
 
     return htmlmin;
 
@@ -164,8 +163,8 @@ const transform = (file: File) => async (data: string) => {
   if (file.base.endsWith('.js.liquid')) {
 
     htmlmin = data
-      .replace(ScriptJsonWhitespace, nil)
-      .replace(/(?<=[:,]) +(?=['"{[])/g, nil)
+      .replace(ScriptJsonWhitespace, NIL)
+      .replace(/(?<=[:,]) +(?=['"{[])/g, NIL)
       .replace(/{{%/g, '{ {%')
       .replace(/%}}/g, '%} }')
       .replace(/(?<=[%}]})\s+(?=[\]}])/g, ' ')
@@ -195,7 +194,7 @@ const transform = (file: File) => async (data: string) => {
     return data;
   }
 
-  const postmin = removeDashes(htmlmin).replace(/^\s+/gm, nil);
+  const postmin = removeDashes(htmlmin).replace(/^\s+/gm, NIL);
 
   await writeFile(file.output, postmin);
 

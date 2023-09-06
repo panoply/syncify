@@ -1,4 +1,4 @@
-import { PathBundle } from 'types';
+import type { PathBundle } from 'types';
 
 /**
  * Log Snipper frames

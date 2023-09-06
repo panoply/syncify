@@ -3,9 +3,9 @@ import type { Bundle } from '~state';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import { allFalse, anyTrue, isEmpty } from 'rambdax';
 import { relative } from 'pathe';
-import { getTime, plural, toUpcase } from '~utils/utils';
-import { keys, nil, nl, wsr, log, toArray, values, ws } from '~utils/native';
-import { warnings } from '../options/validate';
+import { toArray, values, keys, log } from '~native';
+import { getTime, plural, toUpcase } from '~utils';
+import { warnings } from './validate';
 import * as c from '~cli/ansi';
 
 /**
@@ -75,7 +75,7 @@ export function start ($: Bundle) {
 
   const text: string[] = [];
 
-  if ($.mode.metafields) return nil;
+  if ($.mode.metafields) return NIL;
 
   text.push(
     `${c.open}${c.gray('Syncify')} ${c.gray('~')} ${c.gray(getTime())}`,
@@ -129,7 +129,7 @@ export function start ($: Bundle) {
     text.push(`${c.line.gray}Running ${c.cyan.bold('export')} mode`);
   }
 
-  text.push(`${c.line.gray}${(_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : nil)}`);
+  text.push(`${c.line.gray}${(_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : NIL)}`);
 
   /* -------------------------------------------- */
   /* APPLIED FILTERS                              */
@@ -213,7 +213,7 @@ export function start ($: Bundle) {
   // Ensure an addition trunk line if in HOT mode
   if ($.mode.hot) text.push(`${c.line.gray}`);
 
-  log(text.join(nl));
+  log(text.join(NWL));
 
 };
 
@@ -227,14 +227,14 @@ function getFilters (cwd: string, filters: Filters) {
   return values(filters).flat().reduce<string>((string, path, index, size) => {
 
     string += (
-      (index > 0 ? (nl + c.line.gray) : '') +
-      ws + ws +
+      (index > 0 ? (NWL + c.line.gray) : NIL) +
+      WSP.repeat(2) +
       c.white(relative(cwd, path))
     );
 
     return string;
 
-  }, nil);
+  }, NIL);
 
 }
 
@@ -284,7 +284,7 @@ function getRuntimeWarnings ($: Bundle, text: string[]) {
         c.line.yellow,
         c.line.yellow + c.yellow.bold(`${warn.length} ${prop} ${plural('warning', warn.length)}`),
         c.line.yellow,
-        warn.join(nl)
+        warn.join(NWL)
       );
 
     }
@@ -303,9 +303,9 @@ function getSpawnProcessors (spwns: [string, ChildProcessWithoutNullStreams][]) 
   return spwns.reduce<string>((string, [ name, child ]) => {
 
     string += (
-      nl +
+      NWL +
       c.line.gray +
-      wsr(width - name.length) +
+      WSP.repeat(width - name.length) +
       c.neonCyan(toUpcase(name)) + `${c.COL} ` +
       c.gray('PID') + ' → ' + c.gray('#') +
       c.pink(`${child.pid}`)
@@ -313,7 +313,7 @@ function getSpawnProcessors (spwns: [string, ChildProcessWithoutNullStreams][]) 
 
     return string;
 
-  }, nil);
+  }, NIL);
 
 }
 
@@ -349,15 +349,15 @@ function getThemeURLS (themes: Theme[], url: 'preview' | 'editor'): string {
       : `https://${store}?preview_theme_id=${id}`;
 
     string += (
-      nl +
+      NWL +
       c.line.gray +
-      c.pink(name) + wsr(width.store - name.length) + c.white('  →  ') +
-      c.pink.bold(target) + wsr(width.theme - target.length) + c.white(' →  ') +
+      c.pink(name) + WSP.repeat(width.store - name.length) + c.white('  →  ') +
+      c.pink.bold(target) + WSP.repeat(width.theme - target.length) + c.white(' →  ') +
       c.gray.underline(type)
     );
 
     return string;
 
-  }, nil);
+  }, NIL);
 
 }

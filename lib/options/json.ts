@@ -1,9 +1,9 @@
 import { Config } from 'types';
 import anymatch from 'anymatch';
 import { has, isEmpty, isNil } from 'rambdax';
-import { typeError } from '~options/validate';
+import { typeError } from '~log/validate';
+import { isArray, isBoolean, isNumber, isObject, isString } from '~utils';
 import { $ } from '~state';
-import * as u from '~utils/native';
 
 /**
  * JSON Options
@@ -18,10 +18,10 @@ export function setJsonOptions (config: Config) {
   const { json } = config.processors;
 
   if (isNil(json)) return;
-  if (u.isObject(json) && isEmpty(json)) return;
+  if (isObject(json) && isEmpty(json)) return;
 
   // Ensure the section option is an object
-  if (!u.isObject(json)) {
+  if (!isObject(json)) {
     typeError({
       option: 'processors',
       name: 'json',
@@ -35,7 +35,7 @@ export function setJsonOptions (config: Config) {
 
     // Validate theindent number
     if (option === 'indent') {
-      if (u.isNumber(json[option])) {
+      if (isNumber(json[option])) {
         $.processor.json[option] = json[option];
         continue;
       } else {
@@ -50,7 +50,7 @@ export function setJsonOptions (config: Config) {
 
     // Validate the useTabs options, when true we indent with tabs
     if (option === 'useTab') {
-      if (u.isBoolean(json[option])) {
+      if (isBoolean(json[option])) {
         $.processor.json[option] = json[option];
         continue;
       } else {
@@ -67,9 +67,9 @@ export function setJsonOptions (config: Config) {
     // Validate the global globs which should have no prefixes applied.
     if (option === 'exclude') {
 
-      const exclude = u.isString(json[option]) ? [ json[option] ] : json[option];
+      const exclude = isString(json[option]) ? [ json[option] ] : json[option];
 
-      if (u.isArray(exclude)) {
+      if (isArray(exclude)) {
         $.processor.json[option] = anymatch(exclude as string[]);
         continue;
       } else {

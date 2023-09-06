@@ -3,10 +3,9 @@ import type { Warning } from 'postcss';
 import type { SourceSpan } from 'sass';
 import type { Message } from 'esbuild';
 import { has } from 'rambdax';
-import { isNumber, nil, warn, log } from '~utils/native';
-import * as tui from '~log/tui';
-import * as c from '~cli/ansi';
-import { plural } from '~utils/utils';
+import { log, warn } from '~native';
+import { isNumber, plural } from '~utils';
+import { tui, c } from '~log';
 
 /**
  * Error stacks, maintains a store of log messages
@@ -25,7 +24,7 @@ export const sass = (file: File) => (message: string, options: {
   stack?: string;
 }) => {
 
-  let output: string = nil;
+  let output: string = NIL;
 
   if (!has(file.input, warnings)) {
     warnings[file.input] = new Map([ [ 'sass', new Set() ] ]);
@@ -99,7 +98,7 @@ export function esbuild (data: Message[]) {
  */
 export function postcss (file: File, data: Warning) {
 
-  let output: string = nil;
+  let output: string = NIL;
 
   if (!has(file.input, warnings)) {
     warnings[file.input] = new Map([ [ 'postcss', new Set() ] ]);

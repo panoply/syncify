@@ -3,6 +3,7 @@ import morph from 'morphdom';
 import { LiteralUnion } from 'type-fest';
 
 declare global {
+
   export interface Window {
     syncify: {
       /**

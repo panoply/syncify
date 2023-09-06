@@ -1,15 +1,12 @@
 import type { Syncify, File, ClientParam, ScriptBundle, WatchBundle } from 'types';
-import pNext, { getImport, getSizeStr, byteSize, fileSize } from '~utils/utils';
+import { writeFile } from 'fs-extra';
 import ESBuild, { Metafile } from 'esbuild';
 import { join, relative } from 'pathe';
 import { has, isNil, isType } from 'rambdax';
-import { isBuffer } from '~utils/native';
-import { writeFile } from 'fs-extra';
-import { log, error, bold } from '~log';
+import { timer } from '~timer';
+import { log, error, bold, warning } from '~log';
+import { pNext, getImport, getSizeStr, byteSize, fileSize, isBuffer } from '~utils';
 import { $ } from '~state';
-import * as timer from '~utils/timer';
-import * as warn from '~log/warnings';
-
 /**
  * ESBuild Instance
  */
@@ -180,7 +177,7 @@ export async function compile <T extends ScriptBundle> (
       }
 
       if (warnings.length > 0) {
-        warn.esbuild(warnings);
+        warning.esbuild(warnings);
       }
 
       for (const { text, path } of outputFiles) {

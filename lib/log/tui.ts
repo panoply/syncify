@@ -1,13 +1,19 @@
-import type { Colors } from '~cli/ansi';
-import { has, hasPath } from 'rambdax';
+import type { LiteralUnion } from 'type-fest';
 import readline from 'node:readline';
+import { has, hasPath } from 'rambdax';
 import wrap from 'wrap-ansi';
-import { REGEX_LINE_NO, REGEX_ADDRESS, REGEX_OBJECT, REGEX_QUOTES, REGEX_STRING, REGEX_FILENAME } from '~const';
-import { glue, isArray, log, nil, nl, nlr, ws, wsr } from '~utils/native';
-import { getTime } from '~utils/utils';
-import * as c from '~cli/ansi';
-import { LiteralUnion } from 'type-fest';
+import { log } from '~native';
+import { isArray, getTime, glue } from '~utils';
 import { $ } from '~state';
+import { c, Colors } from '~log';
+import {
+  REGEX_LINE_NO,
+  REGEX_ADDRESS,
+  REGEX_OBJECT,
+  REGEX_QUOTES,
+  REGEX_STRING,
+  REGEX_FILENAME
+} from '~const';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -56,7 +62,7 @@ type Prefixes = LiteralUnion<string, (
   | 'ignored'
 )>
 
-export let stack: string = nil;
+export let stack: string = NIL;
 
 /* -------------------------------------------- */
 /* UTILITIES                                    */
@@ -72,7 +78,7 @@ export let stack: string = nil;
 export function clear () {
 
   const count = process.stdout.rows - 2;
-  const blank = count > 0 ? nlr(count) : nil;
+  const blank = count > 0 ? NWL.repeat(count) : NIL;
 
   log(blank);
 
@@ -124,7 +130,7 @@ export function suffix (color: Colors, prefix: Prefixes, message: string) {
 
   if (space < 0) space = 0;
 
-  return line + c[color](prefix) + wsr(space) + c.ARR + ws + c[color](message);
+  return line + c[color](prefix) + WSP.repeat(space) + c.ARR + WSP + c[color](message);
 
 };
 
@@ -138,7 +144,7 @@ export function suffix (color: Colors, prefix: Prefixes, message: string) {
 export function opener (name: string) {
 
   return (
-    nl +
+    NWL +
     c.open +
     c.gray(`${name} ~ ${getTime()}`)
   );
@@ -171,7 +177,7 @@ export function tree (direction: 'top' | 'bottom', name: string) {
 export function closer (name: string) {
 
   return (
-    c.line.gray + nl +
+    c.line.gray + NWL +
     c.close +
     c.gray(`${name} ~ ${getTime()}`)
   );
@@ -203,11 +209,11 @@ export function message (color: Colors, message: string) {
  */
 export function shopify (message: string | string[]) {
 
-  if (isArray(message)) return glue(message.map(shopify));
+  if (isArray(message)) return message.map(shopify).join(NIL);
 
   let output: string = message;
 
-  output = output.replace(REGEX_LINE_NO, c.gray('$1') + c.white('$2') + c.gray('$3') + c.white('$4') + nlr(2));
+  output = output.replace(REGEX_LINE_NO, c.gray('$1') + c.white('$2') + c.gray('$3') + c.white('$4') + NWL.repeat(2));
   output = output.replace(REGEX_QUOTES, c.yellow.bold('$1'));
   output = output.replace(REGEX_OBJECT, c.cyan('$1') + c.whiteBright('$2') + c.cyan('$3'));
   output = output.replace(REGEX_ADDRESS, c.underline('$1'));
@@ -232,15 +238,15 @@ export function sample (code: string, data: {
 
     const end = has('end', data.span) ? data.span.end : data.span.start + 1;
 
-    return line + nl + glue([
-      `${line}${c.blue(`${data.span.start - 1}`)}${c.COL + nl}` +
-      `${line}${c.blue(`${data.span.start}`)}${c.COL} ${code + nl}` +
-      `${line}${c.blue(`${end}`)}${c.COL + nl}`
+    return line + NWL + glue([
+      `${line}${c.blue(`${data.span.start - 1}`)}${c.COL + NWL}` +
+      `${line}${c.blue(`${data.span.start}`)}${c.COL} ${code + NWL}` +
+      `${line}${c.blue(`${end}`)}${c.COL + NWL}`
     ]);
 
   }
 
-  return line + nl + line + code;
+  return line + NWL + line + code;
 
 }
 
@@ -250,10 +256,10 @@ export function indent (message: string | string[], ansi: {
   line?: typeof c.line.red,
 } = {}) {
 
-  const lines = isArray(message) ? message : message.split(nl).filter(Boolean);
+  const lines = isArray(message) ? message : message.split(NWL).filter(Boolean);
   const line = has('line', ansi) ? ansi.line : c.line.gray;
 
-  let output: string = has('nwl', ansi) ? `${line + nl}` : nil;
+  let output: string = has('nwl', ansi) ? `${line + NWL}` : NIL;
 
   while (lines.length !== 0) {
 
@@ -261,12 +267,12 @@ export function indent (message: string | string[], ansi: {
 
     if (text.trim().length > 0) {
       if (!text.trim().startsWith(line)) {
-        output += line + (has('text', ansi) ? ansi.text(text.trimStart()) : text.trimStart()) + nl;
+        output += line + (has('text', ansi) ? ansi.text(text.trimStart()) : text.trimStart()) + NWL;
       } else {
-        output += (has('text', ansi) ? ansi.text(text) : text) + nl;
+        output += (has('text', ansi) ? ansi.text(text) : text) + NWL;
       }
     } else {
-      output += line + nl;
+      output += line + NWL;
     }
   }
 
@@ -299,7 +305,7 @@ export function context (data: {
 }) {
 
   let space: number = 0;
-  let output: string = c.line.red + nl;
+  let output: string = c.line.red + NWL;
 
   // equalize indent spaces
   for (const k in data.entries) if (space < k.length && data.entries[k]) space = k.length;
@@ -307,26 +313,30 @@ export function context (data: {
   // generate output
   for (const k in data.entries) {
     if (data.entries[k]) {
-      output += glue([
-        c.line.red,
-        c.white(k),
-        c.COL + ws,
-        wsr(space - k.length),
-        c.gray(`${k === 'source' ? c.underline(`${data.entries[k]}`) : data.entries[k]}`) + nl
-      ]);
+      output += glue(
+        [
+          c.line.red,
+          c.white(k),
+          c.COL + WSP,
+          WSP.repeat(space - k.length),
+          c.gray(`${k === 'source' ? c.underline(`${data.entries[k]}`) : data.entries[k]}`) + NWL
+        ]
+      );
     }
   }
 
   if (data.stack) {
     stack = data.stack;
-    output += glue([
-      c.line.red,
-      c.white('stack'),
-      c.COL + ws,
-      wsr(space - 5),
-      c.gray(`Type ${c.bold('s')} and press ${c.bold('enter')} to view stack trace`),
-      nl + c.line.gray
-    ]);
+    output += glue(
+      [
+        c.line.red,
+        c.white('stack'),
+        c.COL + WSP,
+        WSP.repeat(space - 5),
+        c.gray(`Type ${c.bold('s')} and press ${c.bold('enter')} to view stack trace`),
+        NWL + c.line.gray
+      ]
+    );
   }
 
   return output.trimEnd();
@@ -359,13 +369,13 @@ export function multiline (type: Loggers, message: string): string {
 
   const stdout = [];
   const input = message.trim();
-  const lines = wrap(input, $.terminal.wrap).split(nl);
+  const lines = wrap(input, $.terminal.wrap).split(NWL);
 
   while (lines.length !== 0) {
     const text = lines.shift();
     if (text.trim().length > 0) stdout.push(line + color(text));
   }
 
-  return line + nl + stdout.join(nl) + nl;
+  return line + NWL + stdout.join(NWL) + NWL;
 
 };
