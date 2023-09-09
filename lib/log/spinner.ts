@@ -1,7 +1,7 @@
-import type { Colors } from '~cli/ansi';
+import { line, type Colors } from 'syncify:cli/ansi';
 import update from 'log-update';
-import { c } from '~log';
-import { defineProperty } from '~native';
+import ansis from 'ansis';
+import { defineProperty } from 'syncify:native';
 
 export interface Spinner {
   /**
@@ -26,10 +26,13 @@ export interface Spinner {
    * @param text
    * The text to append on the right side of the spinner
    *
+   * @param line
+   * Whether or not to apply line prefix
+   *
    * @param color
    * Spinner defaults to using pink.
    */
-  (text?: string, color?: Colors): void;
+  (text?: string, line?: boolean, color?: Colors): void;
   /**
    * Clears the interval and stops the spinner. Optionally
    * provide preserve text, if none passed, line is cleared.
@@ -82,7 +85,7 @@ export function getSpinner () {
    *
    * Generates a log spinner.
    */
-  const spinner: Spinner = function spinner (text?, color = 'pink') {
+  const spinner: Spinner = function spinner (text?, ln = true, color = 'pink') {
 
     active = true;
 
@@ -90,7 +93,7 @@ export function getSpinner () {
 
     interval = setInterval(() => {
       if (!active) return;
-      update(`${c.line.gray}${c[color](`${frames[f = ++f % size]}`)}${text ? ` ${text}` : NIL}`);
+      update(`${ln ? line.gray : NIL}${ansis[color](`${frames[f = ++f % size]}`)}${text ? ` ${text}` : NIL}`);
     }, 50);
 
   };
@@ -104,7 +107,7 @@ export function getSpinner () {
     active = false;
 
     if (text) {
-      update(c.line.gray + text);
+      update(line.gray + text);
       update.done();
     } else {
       update.clear();

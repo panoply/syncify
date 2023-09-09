@@ -1,9 +1,9 @@
 import { Config } from 'types';
 import anymatch from 'anymatch';
 import { has, isEmpty, isNil } from 'rambdax';
-import { typeError } from '~log/validate';
-import { isArray, isBoolean, isNumber, isObject, isString } from '~utils';
-import { $ } from '~state';
+import { typeError } from 'syncify:log/throws';
+import { isArray, isBoolean, isNumber, isObject, isString } from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 /**
  * JSON Options

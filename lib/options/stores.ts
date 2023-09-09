@@ -2,12 +2,12 @@ import type { Commands, Config } from 'types';
 import dotenv from 'dotenv';
 import { join } from 'pathe';
 import { anyTrue, has, includes } from 'rambdax';
-import { DSH, blue, white } from '~log';
-import { throwError, invalidCommand, invalidTarget } from '~log/validate';
-import { authURL } from '~utils/options';
-import { $ } from '~state';
-import { keys } from '~native';
-import { isArray } from '~utils';
+import { DSH, blue, white } from 'syncify:ansi';
+import { throwError, invalidCommand, invalidTarget } from 'syncify:log/throws';
+import { authURL } from 'syncify:utils/options';
+import { $ } from 'syncify:state';
+import { keys } from 'syncify:native';
+import { isArray } from 'syncify:utils';
 
 /**
  * Resolve Stores
@@ -33,7 +33,7 @@ export function setStores (cli: Commands, config: Config) {
   const themeRequired = anyTrue(
     $.mode.watch,
     $.mode.upload,
-    $.mode.download
+    $.mode.import
   );
 
   if (cli._.length === 0) {

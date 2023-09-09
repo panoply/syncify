@@ -1,6 +1,7 @@
 import type { PageMetafield, File } from 'types';
 import { has } from 'rambdax';
-import { c, log } from '~log';
+import * as c from 'syncify:ansi';
+import { log } from 'syncify:log';
 
 /**
  * Check Metafield Type

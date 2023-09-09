@@ -13,6 +13,67 @@ import type { JSONBundle } from '../transforms/json';
 import type * as Config from '../config/index';
 
 /* -------------------------------------------- */
+/* STATS                                        */
+/* -------------------------------------------- */
+
+export interface Stats {
+  /**
+   * File count within output assets directory
+   *
+   * @default 0;
+   */
+  assets?: number;
+  /**
+   * File count within output snippets directory
+   *
+   * @default 0;
+   */
+  snippets?: number;
+  /**
+   * File count within output snippets directory
+   *
+   * @default 0;
+   */
+  sections?: number;
+  /**
+   * File count within output layout directory
+   *
+   * @default 0;
+   */
+  layout?: number;
+  /**
+   * File count within output templates directory
+   *
+   * @default 0;
+   */
+  templates?: number;
+  /**
+   * File count within output templates/metaobject directory
+   *
+   * @default 0;
+   */
+  metaobject?: number;
+  /**
+   * File count within output templates/customers directory
+   *
+   * @default 0;
+   */
+  customers?: number;
+  /**
+   * File count within output config directory
+   *
+   * @default 0;
+   */
+  config?: number;
+  /**
+   * File count within output locales directory
+   *
+   * @default 0;
+   */
+  locales?: number;
+}
+
+/* -------------------------------------------- */
 /* PROCESSORS                                   */
 /* -------------------------------------------- */
 
@@ -238,15 +299,11 @@ export interface Modes {
   /**
    * Execute Download, alias: `-d`
    */
-  download: boolean;
+  import: boolean;
   /**
    * Execute Clean, alias: `-c`
    */
   clean: boolean;
-  /**
-   * Generates VSC Schema spec file
-   */
-  vsc: boolean;
   /**
    * Execute metafields action, `--metafields`
    */
@@ -296,7 +353,7 @@ export interface Modes {
    */
   terse: boolean;
   /**
-   * Trigger export, alias: `-e`
+   * Trigger export, `--export`
    */
   export: boolean;
 }
@@ -524,6 +581,89 @@ export interface PathBundle {
    * @default 'source/assets'
    */
   transforms?: Map<string, 7 | 8 | 9>
+}
+
+/* -------------------------------------------- */
+/* SYVER                                        */
+/* -------------------------------------------- */
+
+/**
+ * **INTERNAL USE**
+ *
+ * Version control settings
+ */
+export interface VC {
+ /**
+   * The resolved version URI
+   *
+   * @default 'export/v1'
+   */
+  dir: string;
+  /**
+   * The current resolved `.zip` file path
+   *
+   * @default 'export/v1/1.2.0.zip'
+   */
+  zip: string;
+  /**
+   * The version number in string format
+   *
+   * @example 'v1.1.4'
+   */
+  number: string;
+  /**
+   * The current major version number
+   */
+  major: number;
+  /**
+   * The current minor version number
+   */
+  minor: number;
+  /**
+   * The current patch version number
+   */
+  patch: number;
+  /**
+   * Update model. This is populated when `--bump` flags
+   * is passed or when an export has applied.
+   */
+  update: {
+    /**
+     * The version bump type
+     *
+     */
+    bump?: string;
+    /**
+     * The resolved `.zip` file path of next version
+     *
+     * @default 'export/v1/1.2.1.zip'
+     */
+    zip?: string;
+    /**
+     * The resolved version URI
+     *
+     * @default 'export/v2'
+     */
+    dir?: string;
+    /**
+     * The version number in string format
+     *
+     * @example 'v1.2.1'
+     */
+    number?: string;
+    /**
+     * The current major version number
+     */
+    major?: number;
+    /**
+     * The current minor version number
+     */
+    minor?: number;
+    /**
+     * The current patch version number
+     */
+    patch?: number;
+  }
 }
 
 /* -------------------------------------------- */

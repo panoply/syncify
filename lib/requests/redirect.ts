@@ -1,10 +1,10 @@
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import type { Request, Theme, File, FileKeys } from 'types';
-import { queue, axios } from '~requests/queue';
-import { assign } from '~utils/native';
-import * as timer from '~utils/timer';
-import { log, error } from '~log';
-import { $ } from '~state';
+import { queue, axios } from 'syncify:requests/queue';
+import { assign } from 'syncify:utils/native';
+import * as timer from 'syncify:utils/timer';
+import { log, error } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 /**
  * Has Redirect

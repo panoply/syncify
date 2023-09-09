@@ -6,12 +6,12 @@ import type { Message } from 'esbuild';
 import wrap from 'wrap-ansi';
 import cleanStack from 'clean-stack';
 import { hasPath } from 'rambdax';
-import { SHOPIFY_REQUEST_ERRORS } from '~const';
-import { assign, error } from '~native';
-import { glue } from '~utils';
-import { $ } from '~state';
-import * as tui from '~log/tui';
-import * as c from '~cli/ansi';
+import { SHOPIFY_REQUEST_ERRORS } from 'syncify:const';
+import { assign, error } from 'syncify:native';
+import { glue } from 'syncify:utils';
+import { $ } from 'syncify:state';
+import * as tui from 'syncify:log/tui';
+import * as c from 'syncify:cli/ansi';
 
 /**
  * Error Reporting

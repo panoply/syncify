@@ -3,11 +3,11 @@ import { join } from 'pathe';
 import anymatch from 'anymatch';
 import merge from 'mergerino';
 import { has, isEmpty, isNil, omit } from 'rambdax';
-import { isArray, isBoolean, uuid } from '~utils';
-import { getModules, readConfigFile, getResolvedPaths, getTransform, renameFile } from '~utils/options';
-import { esbuildModule, esbuildBundle } from '~transform/script';
-import { warnOption, missingDependency, invalidError, typeError, throwError } from '~log/validate';
-import { $ } from '~state';
+import { isArray, isBoolean, uuid } from 'syncify:utils';
+import { getModules, readConfigFile, getResolvedPaths, getTransform, renameFile } from 'syncify:utils/options';
+import { esbuildModule, esbuildBundle } from 'syncify:transform/script';
+import { warnOption, missingDependency, invalidError, typeError, throwError } from 'syncify:log/throws';
+import { $ } from 'syncify:state';
 
 /**
  * Script Transform

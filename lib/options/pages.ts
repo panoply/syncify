@@ -1,8 +1,8 @@
 import type { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { typeError, unknownError, invalidError } from '~log/validate';
-import { isBoolean, isArray, isString, isObject } from '~utils';
-import { $ } from '~state';
+import { typeError, unknownError, invalidError } from 'syncify:log/throws';
+import { isBoolean, isArray, isString, isObject } from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 export function setPageOptions (config: Config) {
 

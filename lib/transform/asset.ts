@@ -1,11 +1,11 @@
 import type { ClientParam, File, Syncify, WatchBundle } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isEmpty, isType } from 'rambdax';
-import { AssetRequest } from '~requests/client';
-import { Kind, Type } from '~process/files';
-import { isFunction, isBuffer, isUndefined } from '~utils';
-import { error, log } from '~log';
-import { $ } from '~state';
+import { AssetRequest } from 'syncify:requests/client';
+import { Kind, Type } from 'syncify:process/files';
+import { isFunction, isBuffer, isUndefined } from 'syncify:utils';
+import { error, log } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */

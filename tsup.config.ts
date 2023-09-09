@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsup';
 import { build } from 'esbuild';
-import * as pkg from './package.json';
+import * as pkg from '../package.json';
 
 const json = JSON.stringify;
 
@@ -20,6 +20,7 @@ const noExternal = [
 
 const external = [
   'anymatch',
+  'archiver',
   'axios',
   'pathe',
   'chokidar',
@@ -74,15 +75,25 @@ export default defineConfig(options => ([
     treeshake: true,
     noExternal,
     external,
+    cjsInterop: true,
     define: {
+
+      // SYNCIFY VERSION
+
+      VERSION: `"${pkg.version}"`,
+
+      // CHARACTER SUGAR INJECTIONS
+
       NIL: json(''),
       NWL: json('\n'),
       NLR: json('\n\n'),
-      WSP: json(' '),
-      VERSION: `"${pkg.version}"`
+      WSP: json(' ')
+
     },
     esbuildOptions (options) {
       options.chunkNames = 'cjs';
+      options.treeShaking = true;
+      options.ignoreAnnotations = true;
     },
     async onSuccess () {
 

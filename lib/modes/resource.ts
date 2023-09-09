@@ -1,7 +1,7 @@
 import prompts from 'prompts';
 import * as pages from '../requests/pages';
 import * as metafields from '../requests/metafields';
-import { $ } from '~state';
+import { $ } from 'syncify:state';
 
 export async function resource () {
 

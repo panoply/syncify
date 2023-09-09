@@ -1,6 +1,6 @@
 import { SpawnCommand } from 'types';
 import spawn from 'cross-spawn';
-import { $ } from '~state';
+import { $ } from 'syncify:state';
 
 /**
  * Spawn Processes

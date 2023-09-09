@@ -17,14 +17,14 @@ import anymatch from 'anymatch';
 import merge from 'mergerino';
 import { pathExists } from 'fs-extra';
 import { has } from 'rambdax';
-import { CONFIG_FILE_EXT } from '~const';
-import { typeError, invalidError, warnOption, throwError } from '~log/validate';
-import { bundleRequire } from '~utils/require';
-import { lastPath, normalPath, globPath } from '~utils/paths';
-import { assign } from '~native';
-import { isArray, isObject, isString, isUndefined, isFunction } from '~utils';
-import { cyan } from '~log';
-import { $ } from '~state';
+import { CONFIG_FILE_EXT } from 'syncify:const';
+import { typeError, invalidError, warnOption, throwError } from 'syncify:log/throws';
+import { bundleRequire } from 'syncify:requests/require';
+import { lastPath, normalPath, globPath } from 'syncify:utils/paths';
+import { assign } from 'syncify:native';
+import { isArray, isObject, isString, isUndefined, isFunction } from 'syncify:utils';
+import { cyan } from 'syncify:ansi';
+import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
 /* TYPES                                        */

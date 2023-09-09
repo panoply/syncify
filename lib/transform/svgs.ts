@@ -4,12 +4,13 @@ import type SVGO from 'svgo';
 import { join, relative } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil, mapAsync } from 'rambdax';
-import { toArray, assign } from '~utils/native';
-import { Kind, renameFile } from '~process/files';
-import { byteSize, fileSize, plural } from '~utils/utils';
-import { timer } from '~timer';
-import { log, error, c } from '~log';
-import { $ } from '~state';
+import { toArray, assign } from 'syncify:utils/native';
+import { Kind, renameFile } from 'syncify:process/files';
+import { byteSize, fileSize, plural } from 'syncify:utils/utils';
+import { timer } from 'syncify:timer';
+import * as c from 'syncify:ansi';
+import { log, error } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
 /* DYNAMIC IMPORTS                              */

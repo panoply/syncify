@@ -1,8 +1,8 @@
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { basename } from 'pathe';
-import { log, tui } from '~log';
-import { $ } from '~state';
-import * as request from '~requests/assets';
+import { log, tui } from 'syncify:log';
+import { $ } from 'syncify:state';
+import * as request from 'syncify:requests/assets';
 
 const EXP = /{%-?\s*render\s+['"]hot\.js['"]/;
 

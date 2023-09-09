@@ -1,12 +1,12 @@
 import type { Store, Requests, File } from 'types';
 import type { AxiosError } from 'axios';
 import { allFalse, has, hasPath } from 'rambdax';
-import { queue, axios, requeue } from '~requests/queue';
-import { event, getSizeStr } from '~utils';
-import { timer } from '~timer';
-import { log, error } from '~log';
-import { $ } from '~state';
-import * as cache from '~process/caches';
+import { queue, axios, requeue } from 'syncify:requests/queue';
+import { event, getSizeStr } from 'syncify:utils';
+import { timer } from 'syncify:timer';
+import { log, error } from 'syncify:log';
+import { $ } from 'syncify:state';
+import * as cache from 'syncify:process/caches';
 
 /**
  * Get Page

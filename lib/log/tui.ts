@@ -1,11 +1,14 @@
 import type { LiteralUnion } from 'type-fest';
+import type { Colors } from 'syncify:ansi';
 import readline from 'node:readline';
+import { stdout } from 'node:process';
 import { has, hasPath } from 'rambdax';
 import wrap from 'wrap-ansi';
-import { log } from '~native';
-import { isArray, getTime, glue } from '~utils';
-import { $ } from '~state';
-import { c, Colors } from '~log';
+import { log } from 'syncify:native';
+import { isArray, getTime, glue } from 'syncify:utils';
+import { $ } from 'syncify:state';
+import * as c from 'syncify:ansi';
+import ansis from 'ansis';
 import {
   REGEX_LINE_NO,
   REGEX_ADDRESS,
@@ -13,7 +16,7 @@ import {
   REGEX_QUOTES,
   REGEX_STRING,
   REGEX_FILENAME
-} from '~const';
+} from 'syncify:const';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -77,13 +80,13 @@ export let stack: string = NIL;
  */
 export function clear () {
 
-  const count = process.stdout.rows - 2;
+  const count = stdout.rows - 2;
   const blank = count > 0 ? NWL.repeat(count) : NIL;
 
   log(blank);
 
-  readline.cursorTo(process.stdout, 0, 0);
-  readline.clearScreenDown(process.stdout);
+  readline.cursorTo(stdout, 0, 0);
+  readline.clearScreenDown(stdout);
 
 }
 
@@ -120,7 +123,7 @@ export function hline (minus = 15) {
  */
 export function suffix (color: Colors, prefix: Prefixes, message: string) {
 
-  const line = $.mode.build ? c.dash : (prefix === 'invalid' || prefix === 'failed')
+  let ln = (prefix === 'invalid' || prefix === 'failed')
     ? c.line.red
     : prefix === 'warning'
       ? c.line.yellow
@@ -130,7 +133,17 @@ export function suffix (color: Colors, prefix: Prefixes, message: string) {
 
   if (space < 0) space = 0;
 
-  return line + c[color](prefix) + WSP.repeat(space) + c.ARR + WSP + c[color](message);
+  if ($.mode.build) {
+    if (prefix.startsWith('✓ ')) {
+      prefix = prefix.replace('✓ ', '');
+      space = 10 - prefix.length;
+      ln = ln + c.CHK;
+    }
+  }
+
+  const cl = ansis[color];
+
+  return ln + cl(prefix) + WSP.repeat(space) + c.ARR + WSP + cl(message);
 
 };
 
@@ -146,7 +159,7 @@ export function opener (name: string) {
   return (
     NWL +
     c.open +
-    c.gray(`${name} ~ ${getTime()}`)
+    c.reset.gray(`${name} ~ ${getTime()}`)
   );
 }
 
@@ -177,9 +190,9 @@ export function tree (direction: 'top' | 'bottom', name: string) {
 export function closer (name: string) {
 
   return (
-    c.line.gray + NWL +
+  // c.line.gray + NWL +
     c.close +
-    c.gray(`${name} ~ ${getTime()}`)
+    c.reset.gray(`${name} ~ ${getTime()}`)
   );
 }
 
@@ -197,7 +210,7 @@ export function message (color: Colors, message: string) {
 
   return (
     c.line.gray +
-    c[color](message)
+    ansis[color](message)
   );
 }
 
@@ -232,21 +245,21 @@ export function sample (code: string, data: {
   }
 } = {}) {
 
-  const line = has('line', data) ? data.line : c.line.gray;
+  const ln = has('line', data) ? data.line : c.line.gray;
 
   if (hasPath('span.start', data)) {
 
     const end = has('end', data.span) ? data.span.end : data.span.start + 1;
 
-    return line + NWL + glue([
-      `${line}${c.blue(`${data.span.start - 1}`)}${c.COL + NWL}` +
-      `${line}${c.blue(`${data.span.start}`)}${c.COL} ${code + NWL}` +
-      `${line}${c.blue(`${end}`)}${c.COL + NWL}`
+    return ln + NWL + glue([
+      `${ln}${c.blue(`${data.span.start - 1}`)}${c.COL + NWL}` +
+      `${ln}${c.blue(`${data.span.start}`)}${c.COL} ${code + NWL}` +
+      `${ln}${c.blue(`${end}`)}${c.COL + NWL}`
     ]);
 
   }
 
-  return line + NWL + line + code;
+  return ln + NWL + ln + code;
 
 }
 
@@ -257,22 +270,22 @@ export function indent (message: string | string[], ansi: {
 } = {}) {
 
   const lines = isArray(message) ? message : message.split(NWL).filter(Boolean);
-  const line = has('line', ansi) ? ansi.line : c.line.gray;
+  const ln = has('line', ansi) ? ansi.line : c.line.gray;
 
-  let output: string = has('nwl', ansi) ? `${line + NWL}` : NIL;
+  let output: string = has('nwl', ansi) ? `${ln + NWL}` : NIL;
 
   while (lines.length !== 0) {
 
     const text = lines.shift();
 
     if (text.trim().length > 0) {
-      if (!text.trim().startsWith(line)) {
-        output += line + (has('text', ansi) ? ansi.text(text.trimStart()) : text.trimStart()) + NWL;
+      if (!text.trim().startsWith(ln)) {
+        output += ln + (has('text', ansi) ? ansi.text(text.trimStart()) : text.trimStart()) + NWL;
       } else {
         output += (has('text', ansi) ? ansi.text(text) : text) + NWL;
       }
     } else {
-      output += line + NWL;
+      output += ln + NWL;
     }
   }
 
@@ -356,14 +369,14 @@ export function context (data: {
  */
 export function multiline (type: Loggers, message: string): string {
 
-  let line = c.line.gray;
+  let ln = c.line.gray;
   let color = c.white;
 
   if (type === 'error') {
-    line = c.line.red;
+    ln = c.line.red;
     color = c.red;
   } else if (type === 'warning') {
-    line = c.line.yellow;
+    ln = c.line.yellow;
     color = c.yellowBright;
   }
 
@@ -373,9 +386,9 @@ export function multiline (type: Loggers, message: string): string {
 
   while (lines.length !== 0) {
     const text = lines.shift();
-    if (text.trim().length > 0) stdout.push(line + color(text));
+    if (text.trim().length > 0) stdout.push(ln + color(text));
   }
 
-  return line + NWL + stdout.join(NWL) + NWL;
+  return ln + NWL + stdout.join(NWL) + NWL;
 
 };

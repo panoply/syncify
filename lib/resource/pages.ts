@@ -1,7 +1,7 @@
 import type { Store } from 'types';
 import prompts from 'prompts';
-import * as pages from '~requests/pages';
-import * as cache from '~process/caches';
+import * as pages from 'syncify:requests/pages';
+import * as cache from 'syncify:process/caches';
 
 export async function resource (store: Store): Promise<number> {
 

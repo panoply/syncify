@@ -1,14 +1,15 @@
 import type { Config } from 'types';
 import { isNil, has } from 'rambdax';
 import treeKill from 'tree-kill';
-import { create, keys } from '~native';
-import { isObject, isString, isArray } from '~utils';
-import { log, gray } from '~log';
-import { typeError } from '~log/validate';
-import { queue } from '~requests/queue';
-import { spawned } from '~cli/spawn';
-import { kill } from '~cli/exit';
-import { $ } from '~state';
+import { create, keys } from 'syncify:native';
+import { isObject, isString, isArray } from 'syncify:utils';
+import { gray } from 'syncify:ansi';
+import { log } from 'syncify:log';
+import { typeError } from 'syncify:log/throws';
+import { queue } from 'syncify:requests/queue';
+import { spawned } from 'syncify:cli/spawn';
+import { kill } from 'syncify:cli/exit';
+import { $ } from 'syncify:state';
 
 /**
  * Set Spawns

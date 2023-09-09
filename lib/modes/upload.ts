@@ -4,17 +4,19 @@ import { relative } from 'pathe';
 import { readFile } from 'fs-extra';
 import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
-import { outputFile } from '~process/files';
+import { outputFile } from 'syncify:process/files';
 import { delay } from 'rambdax';
-import { event, byteSize, getSizeStr, glue, isBuffer, isFunction, isString, isUndefined, toUpcase } from '~utils';
+import { event, byteSize, getSizeStr, glue, isFunction, toUpcase } from 'syncify:utils';
 import { AxiosResponse } from 'axios';
-import { hasSnippet, removeRender } from '~hot/inject';
-import { throwError } from '~log/validate';
-import { Progress } from '~cli/progress';
-import { Events } from '~requests/assets';
-import { c, error, log, tui } from '~log';
-import { timer } from '~timer';
-import { $ } from '~state';
+import { onAsset } from 'syncify:plugins/hooks';
+import { hasSnippet, removeRender } from 'syncify:hot/inject';
+import { throwError } from 'syncify:log/throws';
+import { Progress } from 'syncify:cli/progress';
+import { Events } from 'syncify:requests/assets';
+import { error, log, tui } from 'syncify:log';
+import * as c from 'syncify:ansi';
+import { timer } from 'syncify:timer';
+import { $ } from 'syncify:state';
 
 interface RequestParams {
   /**
@@ -302,15 +304,8 @@ export async function upload (cb?: Syncify): Promise<void> {
 
         const update = cb.apply({ ...file }, input);
 
-        if (isUndefined(update) || update === false) {
-          await request.assets('put', file, input);
-        } else if (isString(update)) {
-          await request.assets('put', file, update);
-        } else if (isBuffer(update)) {
-          await request.assets('put', file, update.toString());
-        } else {
-          await request.assets('put', file, input);
-        }
+        await onAsset(file, input, update, request.assets);
+
       }
 
     } catch (e) {

@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import type { File, PathBundle } from 'types';
 import { join, parse, relative, basename } from 'pathe';
-import { script, section, snippet, style, svg } from '~process/context';
-import { lastPath } from '~utils/paths';
-import { uuid } from '~utils';
-import { assign } from '~native';
+import { script, section, snippet, style, svg } from 'syncify:process/context';
+import { lastPath } from 'syncify:utils/paths';
+import { uuid } from 'syncify:utils';
+import { assign } from 'syncify:native';
 import { Partial } from 'rambdax';
-import { $ } from '~state';
+import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
 /* TYPES                                        */

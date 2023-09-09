@@ -18,6 +18,13 @@ export const timer = new class Timer {
   public time: { [id: string]: number } = {};
 
   /**
+   * Timer Cache
+   *
+   * Used to stop a timer but maintain a reference.
+   */
+  public cache: { [id: string]: string } = {};
+
+  /**
    * Current Time
    *
    * Sugar for the `stop` function.
@@ -26,6 +33,19 @@ export const timer = new class Timer {
 
     return this.stop(id || true);
 
+  }
+
+  /**
+   * Pause Timer
+   *
+   * Pauses a timer and sets it into `cache` -
+   * Use `now()` to retreive and remove.
+   */
+  pause (id: string) {
+
+    if (id in this.marks) {
+      this.cache[id] = this.stop(id || true);
+    }
   }
 
   /**
@@ -55,6 +75,11 @@ export const timer = new class Timer {
         delete this.time[id];
         return;
       }
+
+      if (id in this.cache) {
+        delete this.cache[id];
+        return;
+      }
     }
 
     while (this.marks.length !== 0) this.marks.pop();
@@ -82,6 +107,13 @@ export const timer = new class Timer {
     if (typeof now === 'boolean') {
       gt = now ? this.marks[this.marks.length - 1] : this.marks.pop();
     } else if (now) {
+
+      if (now in this.cache) {
+        const s = this.cache[now];
+        delete this.cache[now];
+        return s;
+      }
+
       if (end) {
         gt = this.time[now];
         delete this.time[now];

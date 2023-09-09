@@ -12,6 +12,25 @@ export const BASE_DIRS = [
 ];
 
 /**
+ * Syncify build groups
+ */
+export const BUILD_GROUPS = [
+  'styles',
+  'scripts',
+  'svgs',
+  'sections',
+  'layouts',
+  'metaobject',
+  'templates',
+  'snippets',
+  'locales',
+  'configs',
+  'pages',
+  'metafields',
+  'assets'
+];
+
+/**
  * Syncify path Keys
  */
 export const PATH_KEYS: Array<Exclude<keyof PathBundle, 'transforms'>> = [

@@ -1,10 +1,10 @@
 import type { Config, HOTConfig } from 'types';
 import { join } from 'pathe';
 import { allFalse, isNil, isEmpty, has } from 'rambdax';
-import { socket } from '~hot/server';
-import { isObject, isBoolean } from '~utils';
-import { warnOption, typeError, unknownError, invalidError } from '~log/validate';
-import { $ } from '~state';
+import { socket } from 'syncify:hot/server';
+import { isObject, isBoolean } from 'syncify:utils';
+import { warnOption, typeError, unknownError, invalidError } from 'syncify:log/throws';
+import { $ } from 'syncify:state';
 
 /**
  * Hot Reloading Setup

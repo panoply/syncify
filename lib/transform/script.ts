@@ -3,10 +3,11 @@ import { writeFile } from 'fs-extra';
 import ESBuild, { Metafile } from 'esbuild';
 import { join, relative } from 'pathe';
 import { has, isNil, isType } from 'rambdax';
-import { timer } from '~timer';
-import { log, error, bold, warning } from '~log';
-import { pNext, getImport, getSizeStr, byteSize, fileSize, isBuffer } from '~utils';
-import { $ } from '~state';
+import { timer } from 'syncify:timer';
+import { bold } from 'syncify:ansi';
+import { log, error, warn } from 'syncify:log';
+import { pNext, getImport, getSizeStr, byteSize, fileSize, isBuffer } from 'syncify:utils';
+import { $ } from 'syncify:state';
 /**
  * ESBuild Instance
  */
@@ -177,7 +178,7 @@ export async function compile <T extends ScriptBundle> (
       }
 
       if (warnings.length > 0) {
-        warning.esbuild(warnings);
+        warn.esbuild(warnings);
       }
 
       for (const { text, path } of outputFiles) {

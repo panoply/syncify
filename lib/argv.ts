@@ -13,7 +13,7 @@
 }] */
 
 import { argv } from 'node:process';
-import { log } from '~log';
+import { log } from 'syncify:log';
 import { run } from '.';
 import mm from 'minimist';
 
@@ -88,9 +88,14 @@ run(mm(argv.slice(1), {
     redirects  : false,
 
     /* OPERATIONS --------------------------------- */
+
     clean  : false,
     silent : false,
     force  : false,
+
+    /* VERSION BUMP ------------------------------- */
+
+    bump : null,
 
     /* TODO --------------------------------------- */
 

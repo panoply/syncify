@@ -4,12 +4,12 @@ import glob from 'fast-glob';
 import { join, basename } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
 import { has, isNil, isType } from 'rambdax';
-import { Type } from '~process/files';
-import { hasSnippet, inject, removeRender } from '~hot/inject';
-import { byteConvert, byteSize, fileSize, isArray } from '~utils';
-import { timer } from '~timer';
-import { log } from '~log';
-import { $ } from '~state';
+import { Type } from 'syncify:process/files';
+import { hasSnippet, inject, removeRender } from 'syncify:hot/inject';
+import { byteConvert, byteSize, fileSize, isArray } from 'syncify:utils';
+import { timer } from 'syncify:timer';
+import { log } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */

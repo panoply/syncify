@@ -4,11 +4,11 @@ import { join, relative } from 'pathe';
 import { File, StyleTransform, Syncify, Processors } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';
-import { isFunction, isString, isUndefined, isBuffer, nl, wsr } from '~utils/native';
-import { byteSize, fileSize } from '~utils/utils';
-import * as timer from '~utils/timer';
-import { error, log, bold, warning } from '~log';
-import { $, cache, processor } from '~state';
+import { isFunction, isString, isUndefined, isBuffer, nl, wsr } from 'syncify:utils/native';
+import { byteSize, fileSize } from 'syncify:utils/utils';
+import * as timer from 'syncify:utils/timer';
+import { error, log, bold, warning } from 'syncify:log';
+import { $, cache, processor } from 'syncify:state';
 
 /**
  * PostCSS Module

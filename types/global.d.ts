@@ -6,7 +6,7 @@ declare global {
   /* TSUP DEFINE                                  */
   /* -------------------------------------------- */
 
-  // ESBuild will replace there occurances via TSUP
+  // ESBuild will replace there Occurances via TSUP
   // The globals are merely sugars. See the tsup.config.ts
   // file for replacements.
 

@@ -1,13 +1,13 @@
 import type { BundleRequire, BundleResolve } from 'types/internal';
+import { pathToFileURL } from 'node:url';
 import { readFile, unlink, writeFile, existsSync, readFileSync } from 'fs-extra';
 import { isAbsolute, dirname, extname, join, parse, resolve } from 'pathe';
-import { pathToFileURL } from 'node:url';
-import { inferLoader, dynamicImport, uuid, isRegex, jsonc, isArray, glue } from './utils';
-import { assign, keys } from './native';
 import { build, BuildResult, Plugin } from 'esbuild';
-import { REGEX_EXTJS } from '~const';
-import { $ } from '~state';
 import { has } from 'rambdax';
+import { inferLoader, dynamicImport, uuid, isRegex, jsonc, isArray, glue } from 'syncify:utils';
+import { assign, keys } from 'syncify:native';
+import { REGEX_EXTJS } from 'syncify:const';
+import { $ } from 'syncify:state';
 
 function findUp (name: string, startDir: string, stopDir = parse(startDir).root) {
 

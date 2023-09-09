@@ -1,12 +1,34 @@
 import type { Filters, Theme } from 'types';
-import type { Bundle } from '~state';
+import type { Bundle } from 'syncify:state';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import { allFalse, anyTrue, isEmpty } from 'rambdax';
 import { relative } from 'pathe';
-import { toArray, values, keys, log } from '~native';
-import { getTime, plural, toUpcase } from '~utils';
-import { warnings } from './validate';
-import * as c from '~cli/ansi';
+import { toArray, values, keys, log } from 'syncify:native';
+import { getTime, plural, toUpcase } from 'syncify:utils';
+import { warnings } from './throws';
+import * as c from 'syncify:cli/ansi';
+
+export function runtime ($: Bundle) {
+
+  log(c.clear);
+
+  const text: string[] = [];
+
+  text.push(
+    `${c.open}${c.gray('Syncify')} ${c.gray('~')} ${c.gray(getTime())}`,
+    `${c.line.gray}`
+  );
+
+  getTerminalWarning(text, $.terminal.cols);
+
+  text.push(
+    `${c.line.gray}${c.whiteBright.bold(`v${$.version}`)}`,
+    `${c.line.gray}`
+  );
+
+  log(text.join(NWL));
+
+}
 
 /**
  * Log Heading
@@ -17,8 +39,7 @@ import * as c from '~cli/ansi';
  * ```
  * ┌─ Syncify v0.1.0.beta
  * │
- * │ Watch (production)
- * │
+ * │ Running watch in production
  * │ Syncing 2 stores and 2 themes
  * │ Spawned 2 child processes
  * │
@@ -73,30 +94,9 @@ import * as c from '~cli/ansi';
  */
 export function start ($: Bundle) {
 
-  const text: string[] = [];
-
   if ($.mode.metafields) return NIL;
 
-  text.push(
-    `${c.open}${c.gray('Syncify')} ${c.gray('~')} ${c.gray(getTime())}`,
-    `${c.line.gray}`
-  );
-
-  getTerminalWarning(text, $.terminal.cols);
-
-  text.push(
-    `${c.line.gray}${c.whiteBright.bold(`v${$.version}`)}`,
-    `${c.line.gray}`
-  );
-
-  /** Plural store/s length */
-  const _st = $.sync.stores.length;
-
-  /** Plural theme/s length */
-  const _th = keys($.sync.themes).length;
-
-  /** Plural spawns/s length */
-  const _ss = keys($.spawn.commands).length;
+  const text: string[] = [];
 
   /* -------------------------------------------- */
   /* BEGIN                                        */
@@ -104,32 +104,72 @@ export function start ($: Bundle) {
 
   const { mode, spawn, sync } = $;
 
+  /** Plural store/s length */
+  const _st = sync.stores.length;
+
+  /** Plural theme/s length */
+  const _th = sync.themes.length;
+
+  /** Plural spawns/s length */
+  const _ss = keys($.spawn.commands).length;
+
+  /** Shortcut Color Open */
+  const oNC = c.neonRouge.bold.open;
+
+  /** Shortcut Color Close */
+  const cNC = c.neonRouge.bold.close;
+
   /** Prints store, eg: `1 store` or `2 stores` */
-  const stores = c.cyan.bold(String(_st)) + (_st > 1 ? ' stores' : ' store');
+  const stores = oNC + String(_st) + cNC + (_st > 1 ? ' stores' : ' store');
 
   /** Prints theme, eg: `1 theme` or `2 themes` */
-  const themes = c.cyan.bold(String(_th)) + (_th > 1 ? ' themes' : ' theme');
+  const themes = oNC + String(_th) + cNC + (_th > 1 ? ' themes' : ' theme');
 
   /** Prints Environment, eg: `(development)` or `(production)` */
-  const env = c.cyan.bold(`${$.env.dev ? 'development' : 'production'}`);
+  const env = oNC + `${$.env.dev ? 'development' : 'production'}`.toUpperCase() + cNC;
 
-  if (mode.build) {
-    text.push(`${c.line.gray}Running ${c.cyan.bold('build')} in ${env}`);
-  } else if (mode.watch) {
-    text.push(`${c.line.gray}Running ${c.cyan.bold('watch')} in ${env}`);
-  } else if (mode.upload) {
-    text.push(`${c.line.gray}Running ${c.cyan.bold('upload')} mode`);
-  } else if (mode.download) {
-    text.push(`${c.line.gray}Running ${c.cyan.bold('download')} mode`);
-  } else if (mode.vsc) {
-    text.push(`${c.line.gray}Generate ${c.cyan.bold('vscode')} schema`);
-  } else if (mode.clean) {
-    text.push(`${c.line.gray}Running ${c.cyan.bold('clean')} mode`);
-  } else if (mode.export) {
-    text.push(`${c.line.gray}Running ${c.cyan.bold('export')} mode`);
+  if (mode.export) {
+
+    if (mode.build) {
+      text.push(`${c.line.gray}Running  ${c.ARR}  ${oNC + 'clean' + cNC}   ${c.gray('--clean')}`);
+      text.push(`${c.line.gray}Running  ${c.ARR}  ${oNC + 'build' + cNC}   ${c.gray('--build')}`);
+    }
+
+    if ($.vc.update !== null) {
+
+      text.push(`${c.line.gray}Running  ${c.ARR}  ${oNC + 'bump' + cNC}  ${c.gray('--bump')}`);
+
+    }
+
+    text.push(`${c.line.gray}Running  ${c.ARR}  ${oNC + 'export' + cNC}  ${c.gray('--export')}`);
+  } else {
+
+    if (mode.build) {
+      text.push(`${c.line.gray}${env}`, c.line.gray);
+      text.push(`${c.line.gray}Running  ${c.ARR}  ${oNC + 'clean' + cNC}   ${c.gray('--clean')}`);
+      text.push(`${c.line.gray}Running  ${c.ARR}  ${oNC + 'build' + cNC}   ${c.gray('--build')}`);
+    } else if (mode.watch) {
+      text.push(`${c.line.gray}Running ${oNC + 'watch' + cNC} in ${env}`);
+    } else if (mode.upload) {
+      text.push(`${c.line.gray}Running ${oNC + 'upload' + cNC} mode`);
+    } else if (mode.import) {
+      text.push(`${c.line.gray}Running ${oNC + 'import' + cNC} mode`);
+    } else if (mode.clean) {
+      text.push(`${c.line.gray}Running ${oNC + 'clean' + cNC} mode`);
+    }
+
   }
 
-  text.push(`${c.line.gray}${(_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : NIL)}`);
+  if (!mode.export) {
+
+    text.push(`${c.line.gray}${(_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : NIL)}`);
+
+  } else {
+
+    if (_st > 0 && _th > 0) {
+      text.push(`${c.line.gray}${(_st > 0 && _th > 0 ? `Exporting ${themes} for ${stores}` : NIL)}`);
+    }
+  }
 
   /* -------------------------------------------- */
   /* APPLIED FILTERS                              */
@@ -156,7 +196,7 @@ export function start ($: Bundle) {
   if (anyTrue(mode.build, mode.watch) && _ss > 0) {
 
     text.push(
-      `${c.line.gray}Spawned ${c.cyan.bold(`${_ss}`)} child ${_ss > 1 ? 'processes' : 'process'}`,
+      `${c.line.gray}Spawned ${oNC + _ss + cNC} child ${_ss > 1 ? 'processes' : 'process'}`,
       `${c.line.gray}`
     );
 
@@ -166,7 +206,7 @@ export function start ($: Bundle) {
 
   }
 
-  if (allFalse(mode.upload, mode.download, mode.build, mode.clean, mode.vsc)) {
+  if (allFalse(mode.upload, mode.import, mode.build, mode.clean)) {
 
     /* -------------------------------------------- */
     /* CHILD PROCESSES                              */
@@ -194,7 +234,7 @@ export function start ($: Bundle) {
 
   }
 
-  if (anyTrue(mode.upload, mode.download, mode.watch)) {
+  if (anyTrue(mode.upload, mode.import, mode.watch)) {
 
     /* -------------------------------------------- */
     /* THEME PREVIEWS                               */
@@ -203,7 +243,7 @@ export function start ($: Bundle) {
     if (_th > 0) {
 
       text.push(
-        `${c.line.gray}${c.bold((mode.upload || mode.download) ? 'Theme Targets:' : 'Theme Previews:')}`,
+        `${c.line.gray}${c.bold((mode.upload || mode.import) ? 'Theme Targets:' : 'Theme Previews:')}`,
         `${c.line.gray}${getThemeURLS(sync.themes, 'preview')}`
       );
 

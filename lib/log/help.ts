@@ -1,4 +1,4 @@
-import { gray, bold, COL } from '~log';
+import { gray, bold, COL } from 'syncify:ansi';
 
 /**
  * Help Text

@@ -6,9 +6,10 @@ import glob from 'fast-glob';
 import { pathExists, readFile, writeFile } from 'fs-extra';
 import { join, basename } from 'pathe';
 import { Server } from 'ws';
-import { kill } from '~cli/exit';
-import { log, tui, bold, gray, line, redBright, ARR, neonCyan, COL } from '~log';
-import { $ } from '~state';
+import { kill } from 'syncify:cli/exit';
+import { bold, gray, line, redBright, ARR, neonCyan, COL } from 'syncify:ansi';
+import { log, tui } from 'syncify:log';
+import { $ } from 'syncify:state';
 import { injectSnippet, injectRender } from './inject';
 
 export const HOTError: {

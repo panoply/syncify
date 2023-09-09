@@ -1,9 +1,21 @@
-import ansis from 'ansis';
-import { size } from '~cli/size';
+import { size } from './size';
+import type { Merge } from 'type-fest';
+import ansis, { AnsiColorsExtend, Ansis } from 'ansis';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
 /* -------------------------------------------- */
+
+type AnsisExtend = Merge<Ansis, {
+  readonly lightGray: Ansis
+  readonly pink: Ansis
+  readonly orange: Ansis
+  readonly lavender: Ansis
+  readonly neonGreen: Ansis
+  readonly neonCyan: Ansis
+  readonly neonRouge: Ansis
+  readonly neonMagenta: Ansis
+}>
 
 export type Colors = (
   | 'cyan'
@@ -37,24 +49,62 @@ export type Colors = (
 )
 
 /* -------------------------------------------- */
-/* HELPER UTILITIES                             */
+/* EXTEND COLORS                                */
 /* -------------------------------------------- */
 
-/**
- * Clear console but preserve history
- */
-export const clear = '\x1B[H\x1B[2J';
-
-/**
- * Clear console and history
- */
-export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
+ansis.extend({
+  lightGray: '#2a2a2e',
+  pink: '#ff75d1',
+  orange: '#FFAB40',
+  lavender: '#8080FF',
+  neonGreen: '#56ef83',
+  neonCyan: '#69d5fd',
+  neonRouge: '#FF8095',
+  neonMagenta: '#B319FF'
+});
 
 /* -------------------------------------------- */
-/* STANDARD COLORS                              */
+/* EXTEND COLORS                                */
+/* -------------------------------------------- */
+// /**
+//  * Light gray
+//  */
+// export const lightGray = ansis.hex('#2a2a2e');
+// /**
+//  * Pink
+//  */
+// export const pink = ansis.hex('#ff75d1');
+// /**
+//  * Orange
+//  */
+// export const orange = ansis.hex('#FFAB40');
+// /**
+//  * Dark Pink
+//  */
+// export const lavender = ansis.hex('#8080FF');
+// /**
+//  * Neon Green
+//  */
+// export const neonGreen = ansis.hex('#56ef83');
+// /**
+//  * Neon Cyan
+//  */
+// export const neonCyan = ansis.hex('#69d5fd');
+// /**
+//  * Neon Rouge
+//  */
+// export const neonRouge = ansis.hex('#FF8095');
+// /**
+//  * Neon Magenta
+//  */
+// export const neonMagenta = ansis.hex('#B319FF');
+
+/* -------------------------------------------- */
+/* REXPORT COLORS                               */
 /* -------------------------------------------- */
 
 export const {
+
   cyan,
   cyanBright,
   red,
@@ -70,58 +120,44 @@ export const {
   white,
   whiteBright,
   gray,
+  dim,
+
+  // OTHER
+  strip,
+
+  // STYLES
   underline,
   bold,
   reset,
   italic,
   strike,
-  dim,
-  strip
-} = ansis;
+
+  // CUSTOM
+
+  lightGray,
+  pink,
+  orange,
+  lavender,
+  neonGreen,
+  neonCyan,
+  neonRouge,
+  neonMagenta
+
+}: AnsisExtend = ansis;
 
 /* -------------------------------------------- */
-/* EXTEND COLORS                                */
+/* HELPER UTILITIES                             */
 /* -------------------------------------------- */
 
 /**
- * Light gray
+ * Clear console but preserve history
  */
-export const lightGray = ansis.hex('#2a2a2e');
+export const clear = '\x1B[H\x1B[2J';
 
 /**
- * Pink
+ * Clear console and history
  */
-export const pink = ansis.hex('#ff75d1');
-
-/**
- * Orange
- */
-export const orange = ansis.hex('#FFAB40');
-
-/**
- * Dark Pink
- */
-export const lavender = ansis.hex('#8080FF');
-
-/**
- * Neon Green
- */
-export const neonGreen = ansis.hex('#56ef83');
-
-/**
- * Neon Cyan
- */
-export const neonCyan = ansis.hex('#69d5fd');
-
-/**
- * Neon Rouge
- */
-export const neonRouge = ansis.hex('#FF8095');
-
-/**
- * Neon Magenta
- */
-export const neonMagenta = ansis.hex('#B319FF');
+export const purge = '\x1B[2J\x1B[3J\x1B[H\x1Bc';
 
 /* -------------------------------------------- */
 /* TREE CHARACTERS                              */
@@ -134,7 +170,7 @@ export const neonMagenta = ansis.hex('#B319FF');
  * ┌─
  * ```
  */
-export const open = lightGray('┌─ ');
+export const open = `${lightGray.open}┌─ ${lightGray.close}`;
 
 /**
  * TUI Tree - line
@@ -147,16 +183,26 @@ export const line = {
   /**
    * Light Gray (default) line
    */
-  gray: lightGray('│  '),
+  gray: `${lightGray.open}│  ${lightGray.close}`,
   /**
    * Red dim - used in errors
    */
-  red: red.dim('│  '),
+  red: `${red.dim.open}│  ${red.dim.close}`,
   /**
    * Yellow dim - used in warnings
    */
-  yellow: yellow.dim('│  ')
+  yellow: `${yellow.dim.open}│  ${yellow.dim.close}`
 };
+
+/**
+ * TUI Tree - newline plus line, ie: `\n` is prepended but not appended
+ *
+ * ```bash
+ *
+ * │
+ * ```
+ */
+export const nextline = `${lightGray.open}${NWL}│${lightGray.close}`;
 
 /**
  * TUI Tree - newline lines, ie: `\n` are prepended and appended
@@ -167,7 +213,7 @@ export const line = {
  *
  * ```
  */
-export const newline = lightGray(`${NWL}│${NWL}`);
+export const newline = `${lightGray.open}${NWL}│${NWL}${lightGray.close}`;
 
 /**
  * TUI Branch - line
@@ -176,7 +222,7 @@ export const newline = lightGray(`${NWL}│${NWL}`);
  * ├─
  * ```
  */
-export const dash = lightGray('│  ├─ ');
+export const dash = `${lightGray.open}│  ├─ ${lightGray.close}`;
 
 /**
  * TUI Arrow - line
@@ -185,7 +231,7 @@ export const dash = lightGray('│  ├─ ');
  *├─
  * ```
  */
-export const top = lightGray('├─ ');
+export const top = `${lightGray.open}├─ ${lightGray.close}`;
 
 /**
  * TUI Arrow - line
@@ -194,7 +240,7 @@ export const top = lightGray('├─ ');
  * │  └─
  * ```
  */
-export const bottom = lightGray('│  └─ ');
+export const bottom = `${lightGray.open}│  └─ ${lightGray.close}`;
 
 /**
  * TUI Tree - close
@@ -203,7 +249,7 @@ export const bottom = lightGray('│  └─ ');
  * └─
  * ```
  */
-export const close = lightGray('└─ ');
+export const close = `${lightGray.open}└─ ${lightGray.close}`;
 
 /**
  * TUI Horizontal Rule Size
@@ -216,7 +262,7 @@ export const close = lightGray('└─ ');
  * │
  * ```
  */
-export const hrs = (x: number = size().cols - 10) => lightGray(`│ ${'─'.repeat(x)}`);
+export const hrs = (x: number = size().cols - 10) => `${lightGray.open}│ ${'─'.repeat(x)}${lightGray.close}`;
 
 /**
  * TUI Horizontal Row
@@ -230,7 +276,7 @@ export const hrs = (x: number = size().cols - 10) => lightGray(`│ ${'─'.repe
  * │
  * ```
  */
-export const hr = (minus: number) => lightGray(`│${NWL}├${'─'.repeat(size().cols - minus)}${NWL}│`);
+export const hr = (m: number) => `${lightGray.open}│${NWL}├${'─'.repeat(size().cols - m)}${NWL}│${lightGray.close}`;
 
 /* -------------------------------------------- */
 /* CHARACTER HELPERS                            */
@@ -243,7 +289,7 @@ export const hr = (minus: number) => lightGray(`│${NWL}├${'─'.repeat(size(
  * ✓
  * ```
  */
-export const CHK = neonGreen('✓ ');
+export const CHK = `${neonGreen.open}✓ ${neonGreen.close}`;
 
 /**
  * Cross character in redBright
@@ -252,7 +298,7 @@ export const CHK = neonGreen('✓ ');
  * 𐄂
  * ```
  */
-export const BAD = redBright('𐄂');
+export const BAD = `${redBright.open}𐄂${redBright.close}`;
 
 /**
  * Colon character in gray suffixed with single space
@@ -261,7 +307,7 @@ export const BAD = redBright('𐄂');
  * :
  * ```
  */
-export const COL = gray(':');
+export const COL = `${gray.open}:${gray.close}`;
 
 /**
  * Right Arrow character in gray
@@ -270,7 +316,7 @@ export const COL = gray(':');
  * →
  * ```
  */
-export const ARR = gray('→');
+export const ARR = `${gray.open}→${gray.close}`;
 
 /**
  * Right Chevron solid character in gray
@@ -279,7 +325,7 @@ export const ARR = gray('→');
  * ‣
  * ```
  */
-export const CHV = gray('‣');
+export const CHV = `${gray.open}‣${gray.close}`;
 
 /**
  * Right + Small Left Arrow character in gray
@@ -288,7 +334,7 @@ export const CHV = gray('‣');
  * ⥂
  * ```
  */
-export const ARL = gray('⥂');
+export const ARL = `${gray.open}⥂${gray.close}`;
 
 /**
  * Tilde character in gray
@@ -297,7 +343,7 @@ export const ARL = gray('⥂');
  * ~
  * ```
  */
-export const TLD = gray('~');
+export const TLD = `${gray.open}~${gray.close}`;
 
 /**
  * Long EnDash character in gray
@@ -306,7 +352,7 @@ export const TLD = gray('~');
  * —
  * ```
  */
-export const DSH = gray('—');
+export const DSH = `${gray.open}—${gray.close}`;
 
 /**
  * Left Parenthesis in gray
@@ -315,7 +361,7 @@ export const DSH = gray('—');
  * (
  * ```
  */
-export const LPR = gray('(');
+export const LPR = `${gray.open}(${gray.close}`;
 
 /**
  * Right Parenthesis in gray
@@ -324,7 +370,7 @@ export const LPR = gray('(');
  * )
  * ```
  */
-export const RPR = gray(')');
+export const RPR = `${gray.open})${gray.close}`;
 
 /**
  * Left Curly Brace in gray
@@ -333,7 +379,7 @@ export const RPR = gray(')');
  * {
  * ```
  */
-export const LCB = gray('{');
+export const LCB = `${gray.open}{${gray.close}`;
 
 /**
  * Right Curly Brace in gray
@@ -342,7 +388,7 @@ export const LCB = gray('{');
  * }
  * ```
  */
-export const RCB = gray('}');
+export const RCB = `${gray.open}}${gray.close}`;
 
 /* -------------------------------------------- */
 /* EXTENDED HELPERS                             */
@@ -360,20 +406,12 @@ export const warning = yellowBright(` ~ Type ${bold('w')} and press ${bold('ente
 /**
  * Error stdin suffix
  *
- * ```bash
- *
- *  ~ Type v and press enter to view
- *
  * ```
  */
 export const error = redBright(` ~ Type ${bold('v')} and press ${bold('enter')} to view`);
 
 /**
  * Time Suffix
- *
- * ```bash
- *
- *  ~ 01:59:20
  *
  * ```
  */

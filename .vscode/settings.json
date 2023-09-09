@@ -76,13 +76,19 @@
         },
       ]
     },
-    "(?<=\\b(?:from) ')(\\~)(?=[a-z])": {
+    "(?<=\\b(?:from) ')(syncify)(:)(.*?)(?=')": {
       "regexFlags": "g",
       "filterLanguageRegex": "typescript",
       "decorations": [
         {
+          // "color": "#fcc06c",
+        },
+        {
           "color": "#E91E63",
           "fontStyle": "bold"
+        },
+        {
+          // "color": "#fcc06c",
         },
       ]
     }
@@ -132,6 +138,7 @@
     "pnpx",
     "purgecss",
     "Spriter",
+    "syver",
     "tailwindcss"
   ],
   "[liquid]": {

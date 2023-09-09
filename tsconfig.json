@@ -41,71 +41,85 @@
     "skipDefaultLibCheck": true,
     "noStrictGenericChecks": true,
     "noEmit": true,
-    "suppressExcessPropertyErrors": true,
     "noEmitOnError": true,
     "noUnusedLocals": true,
     "rootDir": "lib",
     "baseUrl": ".",
     "paths": {
+      /*
+      /* TYPE DECLARATIONS
+      /* -------------------------------------------- */
       "types": [
         "./types/index.d.ts"
       ],
       "types/internal": [
         "./types/internal.d.ts"
       ],
-      "~state": [
+      /*
+      /* FILES
+      /* -------------------------------------------- */
+      "syncify:state": [
         "./lib/model/$.ts"
       ],
-      "~const": [
+      "syncify:const": [
         "./lib/const.ts"
       ],
-      "~process/*": [
+      "syncify:native": [
+        "./lib/utils/native.ts"
+      ],
+      "syncify:timer": [
+        "./lib/utils/timer.ts"
+      ],
+      "syncify:chars": [
+        "./lib/utils/chars.ts"
+      ],
+      "syncify:utils": [
+        "./lib/utils/utils.ts"
+      ],
+      "syncify:ansi": [
+        "./lib/cli/ansi.ts"
+      ],
+      "syncify:log": [
+        "./lib/log/index.ts",
+      ],
+      /*
+      /* DIRECTORIES
+      /* -------------------------------------------- */
+      "syncify:process/*": [
         "./lib/process/*"
       ],
-      "~cli/*": [
+      "syncify:cli/*": [
         "./lib/cli/*"
       ],
-      "~options/*": [
+      "syncify:options/*": [
         "./lib/options/*"
       ],
-      "~transform/*": [
+      "syncify:transform/*": [
         "./lib/transform/*"
       ],
-      "~modes/*": [
+      "syncify:modes/*": [
         "./lib/modes/*"
       ],
-      "~resource/*": [
+      "syncify:resource/*": [
         "./lib/resource/*"
       ],
-      "~requests/*": [
+      "syncify:requests/*": [
         "./lib/requests/*"
       ],
-      "~forks/*": [
+      "syncify:plugins/*": [
+        "lib/plugins/*"
+      ],
+      "syncify:forks/*": [
         "./lib/forks/*"
       ],
-      "~hot/*": [
+      "syncify:hot/*": [
         "./lib/hot/*"
       ],
-      "~log": [
-        "./lib/log/index.ts"
-      ],
-      "~log/*": [
+      "syncify:log/*": [
         "./lib/log/*.ts",
         "!./src/log/index.ts"
       ],
-      "~native": [
-        "./lib/utils/native.ts"
-      ],
-      "~timer": [
-        "./lib/utils/timer.ts"
-      ],
-      "~chars": [
-        "./lib/utils/chars.ts"
-      ],
-      "~utils": [
-        "./lib/utils/utils.ts"
-      ],
-      "~utils/*": [
+      "syncify:utils/*": [
         "./lib/utils/*",
       ]
     }

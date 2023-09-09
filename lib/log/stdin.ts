@@ -1,8 +1,9 @@
-import { $, warning } from '~state';
-import { log, c, tui } from '~log';
-import { error, keys } from '~native';
 import { errors } from './errors';
-import { isString } from '~utils';
+import { log, tui } from 'syncify:log';
+import * as c from 'syncify:ansi';
+import { error, keys } from 'syncify:native';
+import { isString } from 'syncify:utils';
+import { $, warning } from 'syncify:state';
 
 export const stacks: Set<string> = new Set();
 

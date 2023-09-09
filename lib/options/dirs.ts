@@ -1,13 +1,13 @@
 import type { Commands } from 'types';
 import { has, uniq } from 'rambdax';
-import { mkdir, emptyDir, pathExists, remove } from 'fs-extra';
+import { mkdir, emptyDir, pathExists, remove, readdirSync } from 'fs-extra';
 import { join } from 'pathe';
-import { isArray, isString } from '~utils';
-import { basePath } from '~utils/paths';
-import { $ } from '~state';
-import { THEME_DIRS, BASE_DIRS } from '~const';
-import { typeError } from '~log/validate';
-import * as cache from '~process/caches';
+import { isArray, isString } from 'syncify:utils';
+import { basePath } from 'syncify:utils/paths';
+import { $ } from 'syncify:state';
+import { THEME_DIRS, BASE_DIRS } from 'syncify:const';
+import { typeError } from 'syncify:log/throws';
+import * as cache from 'syncify:process/caches';
 
 /**
  * Create Cache Directories
@@ -22,6 +22,7 @@ export async function setCacheDirs (path: string, options = { purge: false }) {
   $.cache = {
     uri: join(path, 'build.map'),
     version: $.version,
+    themeVersion: $.pkg.version,
     errors: {
       uri: join(path, 'errors'),
       files: []
@@ -207,11 +208,13 @@ export async function setThemeDirs (basePath: string) {
   if (hasBase) {
 
     if ($.mode.clean) {
+
       try {
         await emptyDir(basePath);
       } catch (e) {
         console.error(e);
       }
+
     }
 
   } else {
@@ -228,13 +231,26 @@ export async function setThemeDirs (basePath: string) {
 
     const uri = join(basePath, dir);
     const has = await pathExists(uri);
+    const name = dir.startsWith('templates/') ? dir.slice(10) : dir;
 
     if (!has) {
+
       try {
+
         await mkdir(uri);
+
+        $.stats[name] = 0;
+
       } catch (e) {
+
         throw new Error(e);
+
       }
+
+    } else {
+
+      $.stats[name] = readdirSync(uri).length;
+
     }
 
   }
@@ -259,7 +275,7 @@ export function setBaseDirs (cli: Commands) {
 
     if (dir === 'import') {
 
-      if (mode.download) {
+      if (mode.import) {
         if (has('output', cli)) {
           $.dirs[dir] = base(cli.output);
         } else {
@@ -273,7 +289,7 @@ export function setBaseDirs (cli: Commands) {
 
     } else if (dir === 'export') {
 
-      if (mode.download) {
+      if (mode.export) {
         if (has('output', cli)) {
           $.dirs[dir] = base(cli.output);
         } else {
@@ -336,7 +352,7 @@ export async function setImportDirs () {
 
   const { dirs, sync, mode } = $;
 
-  if (!mode.download) return;
+  if (!mode.import) return;
 
   const hasBase = await pathExists(dirs.import);
 

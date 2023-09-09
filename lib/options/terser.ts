@@ -1,10 +1,10 @@
 import { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { ESBUILD_NOT_INSTALLED } from '~const';
-import { throwError, typeError, unknownError, warnOption } from '~log/validate';
-import { getResolvedPaths } from '~utils/options';
-import { isBoolean, isObject, isRegex } from '~utils';
-import { $ } from '~state';
+import { ESBUILD_NOT_INSTALLED } from 'syncify:const';
+import { throwError, typeError, unknownError, warnOption } from 'syncify:log/throws';
+import { getResolvedPaths } from 'syncify:utils/options';
+import { isBoolean, isObject, isRegex } from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 /**
  * Minification Options

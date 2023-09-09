@@ -5,14 +5,14 @@ import anymatch from 'anymatch';
 import { has, hasPath, isNil, uniq } from 'rambdax';
 import { join, extname } from 'pathe';
 import { existsSync } from 'fs-extra';
-import { typeError, invalidError, warnOption, missingDependency, throwError } from '~log/validate';
-import { normalPath } from '~utils/paths';
-import { getModules, renameFile, readConfigFile, getTransform } from '~utils/options';
-import { isObject, isBoolean, isArray, isString, uuid } from '~utils';
-import { load } from '~transform/styles';
-import { Type } from '~process/files';
-import { defineProperty } from '~native';
-import { $ } from '~state';
+import { typeError, invalidError, warnOption, missingDependency, throwError } from 'syncify:log/throws';
+import { normalPath } from 'syncify:utils/paths';
+import { getModules, renameFile, readConfigFile, getTransform } from 'syncify:utils/options';
+import { isObject, isBoolean, isArray, isString, uuid } from 'syncify:utils';
+import { load } from 'syncify:transform/styles';
+import { Type } from 'syncify:process/files';
+import { defineProperty } from 'syncify:native';
+import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
 /* TYPES                                        */

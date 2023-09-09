@@ -1,5 +1,5 @@
-import { Config, Resource, Syncify } from 'types';
-import { isObject, isString, isUndefined } from '~utils';
+import type { Config, Resource, Syncify } from 'types';
+import { isObject, isString, isUndefined } from 'syncify:utils';
 import { run } from '.';
 
 /**

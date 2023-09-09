@@ -7,10 +7,10 @@ var cjs_js = require('./cjs.js');
 
 
 Object.defineProperty(exports, 'default', {
-	enumerable: true,
-	get: function () { return cjs_js.c; }
+  enumerable: true,
+  get: function () { return cjs_js.api_default; }
 });
 Object.defineProperty(exports, 'defineConfig', {
-	enumerable: true,
-	get: function () { return cjs_js.b; }
+  enumerable: true,
+  get: function () { return cjs_js.defineConfig; }
 });

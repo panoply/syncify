@@ -1,7 +1,7 @@
 import { last } from 'rambdax';
 import { join, dirname } from 'pathe';
-import { COL, yellowBright } from '~log';
-import { throwError } from '~log/validate';
+import { COL, yellowBright } from 'syncify:ansi';
+import { throwError } from 'syncify:log/throws';
 import { isArray } from './utils';
 
 /**

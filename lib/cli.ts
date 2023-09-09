@@ -1,5 +1,5 @@
 import { argv } from 'node:process';
-import { log } from '~log';
+import { log } from 'syncify:log';
 import { run } from '.';
 import mm from 'minimist';
 
@@ -17,7 +17,6 @@ run(mm(argv.slice(1), {
     build: 'b',
     watch: 'w',
     upload: 'u',
-    download: 'd',
 
     /* RESOURCE ----------------------------------- */
 
@@ -29,7 +28,7 @@ run(mm(argv.slice(1), {
 
     resource: 'r',
     filter: 'f',
-    delete: 'del'
+    delete: 'd'
 
   },
   default: {
@@ -54,7 +53,6 @@ run(mm(argv.slice(1), {
     build: false,
     watch: false,
     upload: false,
-    download: false,
     terse: false,
     hot: false,
     help: false,
@@ -80,6 +78,10 @@ run(mm(argv.slice(1), {
     silent: false,
     force: false,
 
+    /* VERSIONING -------------------------------- */
+
+    bump: null,
+
     /* TODO --------------------------------------- */
 
     setup: false,
@@ -91,7 +93,6 @@ run(mm(argv.slice(1), {
 
     'build',
     'watch',
-    'download',
     'upload',
     'import',
     'export',
@@ -121,7 +122,6 @@ run(mm(argv.slice(1), {
 
     /* GENERATORS --------------------------------- */
 
-    'vsc',
     'strap',
 
     /* TRANSFORMS --------------------------------- */
@@ -170,6 +170,7 @@ run(mm(argv.slice(1), {
     // --filter templates/theme.liquid
     // --filter /**/* | -f /**/*
     ,
+
     /* TODO --------------------------------------- */
 
     'strap'

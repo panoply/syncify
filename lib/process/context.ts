@@ -1,9 +1,9 @@
 import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
 import { join, dirname, basename } from 'pathe';
-import { defineProperty } from '~native';
-import { isRegex, isUndefined } from '~utils';
-import { $ } from '~state';
-import { lastPath, parentPath } from '../utils/paths';
+import { defineProperty } from 'syncify:native';
+import { isRegex, isUndefined } from 'syncify:utils';
+import { $ } from 'syncify:state';
+import { lastPath, parentPath } from 'syncify:utils/paths';
 
 /**
  * Script Context

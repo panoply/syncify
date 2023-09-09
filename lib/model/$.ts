@@ -26,16 +26,18 @@ import type {
   SectionBundle,
   WatchBundle,
   ProcessorsBundle,
-  PathBundle
+  PathBundle,
+  Stats,
+  VC
 } from 'types';
 
 import type { ChildProcess } from 'node:child_process';
 import type { PackageJson } from 'type-fest';
 import { argv } from 'node:process';
 import merge from 'mergerino';
-import { size } from '~cli/size';
-import { create } from '~native';
-import { PATH_KEYS } from '~const';
+import { size } from 'syncify:cli/size';
+import { create } from 'syncify:native';
+import { PATH_KEYS } from 'syncify:const';
 import { terser } from './terser';
 import { defaults } from './defaults';
 import { processor } from './processor';
@@ -136,6 +138,13 @@ export const $ = new class Bundle {
   public wss: WSS = null;
 
   /**
+   * Stats information for the output directory
+   *
+   * @default null
+   */
+  public stats: Stats = create(null);
+
+  /**
    * CLI provided filters
    *
    * @default null
@@ -154,7 +163,7 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public version: string = null;
+  public version: string = VERSION;
 
   /**
    * The current working directory
@@ -168,7 +177,7 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public argv: string = argv.slice(2).join(' ');
+  public argv: string = argv.slice(2).join(WSP);
 
   /**
    * Error store, holds reference to errors
@@ -176,6 +185,19 @@ export const $ = new class Bundle {
    * @default Set<string>
    */
   public errors: Set<string> = new Set();
+
+  /**
+   * Syver reference
+   */
+  public vc: VC = {
+    dir: null,
+    number: null,
+    zip: null,
+    patch: 0,
+    major: 0,
+    minor: 0,
+    update: null
+  };
 
   /**
    * Execution options which describe the invocation and operation
@@ -262,14 +284,13 @@ export const $ = new class Bundle {
     watch: false,
     clean: false,
     upload: false,
-    download: false,
+    import: false,
     metafields: false,
     terse: false,
     hot: false,
     pages: false,
     pull: false,
     force: false,
-    vsc: false,
     views: false,
     script: false,
     image: false,

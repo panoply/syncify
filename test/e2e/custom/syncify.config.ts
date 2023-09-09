@@ -137,7 +137,7 @@ export default defineConfig({
       'snippets/example.css.liquid': {
         input: 'styles/snippet.scss',
         postcss: true,
-        sass: true
+        sass: true,
       }
     },
 

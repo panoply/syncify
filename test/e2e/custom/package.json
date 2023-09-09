@@ -13,8 +13,8 @@
     "upload": "syncify syncify -t custom --upload",
     "upload:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --upload",
     "upload:multi:filter": "syncify syncify,boefje --syncify custom --boefje dev,prod --upload --filter templates/*",
-    "download": "syncify syncify -t custom --download",
-    "download:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --download",
+    "download": "syncify syncify -t custom --import",
+    "download:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --import",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "ISC",

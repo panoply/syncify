@@ -1,6 +1,6 @@
 example
 test
-lib
+lib/**/*.ts
 bin
 package
 demos/**
@@ -8,3 +8,4 @@ demos/**
 *.js
 *.mjs
 *.cjs
+/tsconfig.json

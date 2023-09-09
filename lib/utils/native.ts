@@ -6,7 +6,15 @@ export const { error, log, warn } = console;
 /**
  * Native Object methods
  */
-export const { create, assign, defineProperty, defineProperties, keys, values } = Object;
+export const {
+  create,
+  assign,
+  defineProperty,
+  defineProperties,
+  keys,
+  values,
+  setPrototypeOf
+} = Object;
 
 /**
  * Native Array from Method

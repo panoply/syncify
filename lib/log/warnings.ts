@@ -3,14 +3,15 @@ import type { Warning } from 'postcss';
 import type { SourceSpan } from 'sass';
 import type { Message } from 'esbuild';
 import { has } from 'rambdax';
-import { log, warn } from '~native';
-import { isNumber, plural } from '~utils';
-import { tui, c } from '~log';
+import { log, warn } from 'syncify:native';
+import { isNumber, plural } from 'syncify:utils';
+import { tui } from 'syncify:log';
+import * as c from 'syncify:ansi';
 
 /**
  * Error stacks, maintains a store of log messages
  */
-export const warnings: { [file: string]: Map<string, Set<string>> } = {};
+export const stack: { [file: string]: Map<string, Set<string>> } = {};
 
 /**
  * File Write Errors
@@ -26,15 +27,15 @@ export const sass = (file: File) => (message: string, options: {
 
   let output: string = NIL;
 
-  if (!has(file.input, warnings)) {
-    warnings[file.input] = new Map([ [ 'sass', new Set() ] ]);
+  if (!has(file.input, stack)) {
+    stack[file.input] = new Map([ [ 'sass', new Set() ] ]);
   } else {
-    if (!warnings[file.input].has('sass')) {
-      warnings[file.input].set('sass', new Set());
+    if (!stack[file.input].has('sass')) {
+      stack[file.input].set('sass', new Set());
     }
   }
 
-  const cache = warnings[file.input].get('sass');
+  const cache = stack[file.input].get('sass');
 
   output += tui.indent(message, {
     nwl: true,
@@ -94,21 +95,21 @@ export function esbuild (data: Message[]) {
 /**
  * PostCSS Warning Parser
  *
- * Pretty formatted log for postcss warnings.
+ * Pretty formatted log for postcss stack.
  */
 export function postcss (file: File, data: Warning) {
 
   let output: string = NIL;
 
-  if (!has(file.input, warnings)) {
-    warnings[file.input] = new Map([ [ 'postcss', new Set() ] ]);
+  if (!has(file.input, stack)) {
+    stack[file.input] = new Map([ [ 'postcss', new Set() ] ]);
   } else {
-    if (!warnings[file.input].has('postcss')) {
-      warnings[file.input].set('postcss', new Set());
+    if (!stack[file.input].has('postcss')) {
+      stack[file.input].set('postcss', new Set());
     }
   }
 
-  const cache = warnings[file.input].get('postcss');
+  const cache = stack[file.input].get('postcss');
 
   output += tui.sample(data.node.toString(), {
     line: c.line.yellow,

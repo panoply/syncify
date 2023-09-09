@@ -2,9 +2,9 @@ import type { Config, ENV, Tsconfig } from 'types';
 import { join, relative, basename, extname } from 'pathe';
 import { pathExists, readFile, readJson } from 'fs-extra';
 import stripJsonComments from 'strip-json-comments';
-import { bundleRequire } from '~utils/require';
-import { jsonc } from '~utils';
-import { $ } from '~state';
+import { bundleRequire } from 'syncify:requests/require';
+import { jsonc } from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 /**
  * Config Files

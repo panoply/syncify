@@ -2,16 +2,17 @@ import { has } from 'rambdax';
 import { Commands, Syncify, Config } from 'types';
 import { exception, rejection, signal } from './cli/emitters';
 import { upload } from './modes/upload';
-import { download } from './modes/download';
 import { build } from './modes/build';
 import { watch } from './modes/watch';
+import { importing } from './modes/import';
+import { exporting } from './modes/export';
 import { server } from './hot/server';
-import { stdin } from '~log/stdin';
-import { $ } from '~state';
+import { stdin } from 'syncify:log/stdin';
+import { $ } from 'syncify:state';
 // import { resource } from 'modes/resource';
 // import { readConfig } from 'config/config';
-import { help } from '~log/help';
-import { log } from '~log';
+import { help } from 'syncify:log/help';
+import { log } from 'syncify:log';
 import { define } from './options/define';
 
 /* -------------------------------------------- */
@@ -72,7 +73,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   process.on('SIGINT', signal);
   // process.on('unhandledRejection', rejection);
   // process.on('uncaughtException', exception);
-  process.on('rejectionHandled', rejection);
+  // process.on('rejectionHandled', rejection);
 
   if ($.mode.hot) await server();
 
@@ -82,7 +83,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
 
   try {
 
-    if ($.mode.build) {
+    if ($.mode.build && $.mode.export === false) {
 
       return build(callback);
 
@@ -94,13 +95,21 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
 
       return upload(callback);
 
-    } else if ($.mode.download) {
+    } else if ($.mode.import) {
 
-      return download(callback);
+      return importing(callback);
 
     } else if ($.mode.export) {
 
-      return console.log('TODO');
+      return exporting(callback);
+
+    } else if ($.mode.interactive) {
+
+      return console.log('TODO: --interactive is not yet supported');
+
+    } else if ($.mode.metafields) {
+
+      return console.log('TODO: --metafields is not yet supported');
 
     }
 

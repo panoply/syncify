@@ -3,7 +3,7 @@ import { join } from 'pathe';
 import { has } from 'rambdax';
 import { FSWatcher } from 'chokidar';
 import { pathExists, readJSON, remove } from 'fs-extra';
-import { missingConfig } from '~log/validate';
+import { missingConfig } from 'syncify:log/throws';
 import { configFile, getPackageJson } from './files';
 import { setCacheDirs, setImportDirs, setThemeDirs, setBaseDirs } from './dirs';
 import { setJsonOptions } from './json';
@@ -12,18 +12,19 @@ import { setSnippetOptions } from './snippets';
 import { setSectionOptions } from './sections';
 import { setStores } from './stores';
 import { setPaths } from './paths';
+import { setVersion } from './version';
 import { setSpawns } from './spawn';
 import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
-import { setSvgOptions } from './svgs';
+import { setSvgOptions } from './svg';
 import { setHotReloads } from './hot';
 import { setFilters } from './filters';
 import { setMinifyOptions } from './terser';
 import { setPageOptions } from './pages';
-import { log } from '~log';
-import { isArray } from '~utils';
-import { assign, toArray } from '~native';
-import { $ } from '~state';
+import { log } from 'syncify:log';
+import { isArray } from 'syncify:utils';
+import { assign, toArray } from 'syncify:native';
+import { $ } from 'syncify:state';
 
 /**
  * Define Options
@@ -33,12 +34,11 @@ import { $ } from '~state';
  */
 export async function define (cli: Commands, _options?: Config) {
 
-  log.clear();
+  log.runtime($);
 
   await getPackageJson(cli.cwd);
   await getConfig(cli);
 
-  $.version = VERSION;
   $.restart = false;
   $.cli = cli;
   $.mode = setModes(cli);
@@ -57,6 +57,7 @@ export async function define (cli: Commands, _options?: Config) {
     setChokidar(cli.watch || cli.upload, cwd),
     setBaseDirs(cli),
     setCaches(cwd),
+    setVersion(cli),
     setThemeDirs($.dirs.output),
     setImportDirs(),
     setStores(cli, config),
@@ -80,6 +81,7 @@ export async function define (cli: Commands, _options?: Config) {
 
   });
 
+  log.spinner.stop();
   log.start($);
 
   return promise;
@@ -213,11 +215,18 @@ async function setCaches (cwd: string) {
   $.dirs.cache = join(cwd, 'node_modules/.syncify');
 
   const uri = join($.dirs.cache, 'build.map');
-  const has = await pathExists(uri);
+  const exists = await pathExists(uri);
 
-  if (!has) return setCacheDirs($.dirs.cache);
+  if (!exists) return setCacheDirs($.dirs.cache);
 
   $.cache = await readJSON(uri);
+
+  // TODO
+  // THIS LOGIC NEEDS IMPROVEMENTS WHEREIN MISSING
+  // PROPS IN CACHE GET POPULATED - THIS IS JUST A QUICKFIX FOR NOW
+  if (!has('themeVersion', $.cache)) {
+    $.cache.themeVersion = $.pkg.version;
+  }
 
   if ($.cache.version !== $.version && $.version === '0.3.0-beta') {
     if (await (pathExists($.dirs.cache))) {

@@ -3,27 +3,41 @@ import type { File, Store, Theme } from 'types';
 import { inspect } from 'node:util';
 import notifier from 'node-notifier';
 import { has, isEmpty } from 'rambdax';
-import { $, warning } from '~state';
-import { queue } from '~requests/queue';
-import { addSuffix, sanitize, plural, toUpcase, isArray, isObject } from '~utils';
-import { error, log } from '~native';
-import { timer } from '~timer';
-import { intercept } from '~cli/intercept';
-import { Kind } from '~process/files';
-import * as errors from '~log/errors';
-import * as c from '~cli/ansi';
+import { $, warning } from 'syncify:state';
+import { queue } from 'syncify:requests/queue';
+import { addSuffix, sanitize, plural, toUpcase, isArray, isObject, isString } from 'syncify:utils';
+import { error, log } from 'syncify:native';
+import { timer } from 'syncify:timer';
+import { intercept } from 'syncify:cli/intercept';
+import { Kind } from 'syncify:process/files';
+import * as errors from 'syncify:log/errors';
 import { opener, clear, closer, message, suffix, tree } from './tui';
-import { getSpinner } from './spinner';
+import { getSpinner } from 'syncify:log/spinner';
+import {
+  ARL,
+  ARR,
+  CHV,
+  TLD,
+  bold,
+  gray,
+  line,
+  neonCyan,
+  newline,
+  nextline,
+  red,
+  time,
+  yellowBright
+} from 'syncify:ansi';
 
 /* -------------------------------------------- */
-/* RE-EXPORTS                                   */
+/* REXPORT                                      */
 /* -------------------------------------------- */
 
+export { log as out };
 export { default as update } from 'log-update';
-export { progress } from '~cli/progress';
-export { start } from './start';
-export { clear, hline } from './tui';
-export { log as out } from '~native';
+export { progress } from 'syncify:cli/progress';
+export { clear, hline } from 'syncify:log/tui';
+export { runtime, start } from 'syncify:log/start';
 
 /* -------------------------------------------- */
 /* INTERNAL                                     */
@@ -117,7 +131,6 @@ export function build (id: string, count: number, file: File | string) {
   // close previous group
   if (close) {
     log(closer(state.group));
-
   }
 
   // clear if first run
@@ -126,18 +139,14 @@ export function build (id: string, count: number, file: File | string) {
   // open new group
   if (close) {
 
-    log(opener(state.group));
-    nwl();
-    log(c.line.gray + c.bold(`${count} ${toUpcase(id)}`));
-    nwl();
+    log(opener(state.group) + newline + bold(`${count} ${toUpcase(id)}`) + nextline);
 
     // update group
     state.group = id;
     state.title = id;
   }
 
-  nwl();
-  log(tree('top', c.neonCyan(typeof file === 'string' ? file : file.relative)));
+  log(nextline + tree('top', neonCyan(isString(file) ? file : file.relative)));
 
 };
 
@@ -146,7 +155,7 @@ export function build (id: string, count: number, file: File | string) {
  *
  * Inserts a newline _trunk_ character. Optionally pass
  * an empty string (ie: `''`) to insert a newline without
- * without c.line character
+ * without line character
  *
  * `│`
  */
@@ -155,7 +164,7 @@ export function nwl (entry: string | 'red' | 'yellow' | 'gray' | undefined = 'gr
   if (isEmpty(entry)) {
     log(NWL);
   } else {
-    log(c.line[entry]);
+    log(line[entry]);
   }
 
 }
@@ -170,9 +179,9 @@ export function nwl (entry: string | 'red' | 'yellow' | 'gray' | undefined = 'gr
 export function err (input: string | string[]) {
 
   if (isArray(input)) {
-    error(c.red(input.map(text => c.line.red + sanitize(text)).join(NWL)));
+    error(red(input.map(text => line.red + sanitize(text)).join(NWL)));
   } else {
-    error(c.line.red + sanitize(input));
+    error(line.red + sanitize(input));
   }
 }
 
@@ -186,9 +195,9 @@ export function err (input: string | string[]) {
 export function write (input: string | string[]) {
 
   if (isArray(input)) {
-    log(input.map(text => c.line.gray + sanitize(text)).join(NWL));
+    log(input.map(text => line.gray + sanitize(text)).join(NWL));
   } else {
-    log(c.line.gray + sanitize(input));
+    log(line.gray + sanitize(input));
   }
 }
 
@@ -228,7 +237,7 @@ export function hook (name: string) {
       const text = data.split(NWL);
 
       while (text.length !== 0) {
-        warning.process[name].add(`${c.yellowBright(text.shift().trimStart())}`);
+        warning.process[name].add(`${yellowBright(text.shift().trimStart())}`);
       }
     }
 
@@ -258,7 +267,7 @@ export function unhook () {
  * │
  * └─ Name ~ 01:59:20
  */
-export function group (name: string, clearLog = false) {
+export function group (name?: string, clearLog = false) {
 
   // close previous group
   log(closer(state.group));
@@ -266,11 +275,10 @@ export function group (name: string, clearLog = false) {
   // do not clear if first run
   if (clearLog) clear();
 
-  log(opener(name));
-
-  state.group = name;
-
-  nwl();
+  if (isString(name)) {
+    log(opener(name) + nextline);
+    state.group = name;
+  }
 
 }
 
@@ -281,7 +289,7 @@ export function group (name: string, clearLog = false) {
  */
 export function updated (file: File, msg?: string) {
 
-  log(suffix('greenBright', 'updated', `${file.relative} ${suffix ? c.gray(`~ ${msg}`) : NIL}`));
+  log(suffix('greenBright', 'updated', `${file.relative} ${suffix ? gray(`~ ${msg}`) : NIL}`));
 
 }
 
@@ -323,8 +331,7 @@ export function changed (file: File) {
   if (state.uri !== file.relative) state.uri = file.relative;
 
   if ($.mode.watch) {
-    nwl();
-    log(suffix('neonCyan', 'changed', file.relative));
+    log(nextline + suffix('neonCyan', 'changed', file.relative));
   }
 };
 
@@ -335,7 +342,7 @@ export function changed (file: File) {
  */
 export function hot () {
 
-  log(suffix('neonRouge', 'reloaded', `${c.bold('HOT RELOAD')}${c.time(timer.now())}`));
+  log(suffix('neonRouge', 'reloaded', `${bold('HOT RELOAD')}${time(timer.now())}`));
 
 }
 
@@ -366,10 +373,10 @@ export function resource (type: string, store: Store) {
       for (const [
         type,
         store,
-        time
+        ctime
       ] of state.queue) {
 
-        log(suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store}` + c.time(time)));
+        log(suffix('neonGreen', 'uploaded', `${bold(type)} → ${store}` + time(ctime)));
 
       }
 
@@ -380,7 +387,7 @@ export function resource (type: string, store: Store) {
 
   } else {
 
-    log(suffix('neonGreen', 'uploaded', `${c.bold(type)} → ${store.domain}` + c.time(timer.stop())));
+    log(suffix('neonGreen', 'uploaded', `${bold(type)} → ${store.domain}` + time(timer.stop())));
 
   }
 
@@ -411,10 +418,10 @@ export function upload (theme: Theme) {
       for (const [
         target,
         store,
-        time
+        ctime
       ] of state.queue) {
 
-        log(suffix('neonGreen', 'uploaded', `${c.bold(target)} → ${store}` + c.time(time)));
+        log(suffix('neonGreen', 'uploaded', `${bold(target)} → ${store}` + time(ctime)));
 
       }
 
@@ -425,7 +432,7 @@ export function upload (theme: Theme) {
 
   } else {
 
-    log(suffix('neonGreen', 'uploaded', `${c.bold(theme.target)} → ${theme.store}` + c.time(timer.stop())));
+    log(suffix('neonGreen', 'uploaded', `${bold(theme.target)} → ${theme.store}` + time(timer.stop())));
 
   }
 
@@ -459,13 +466,13 @@ export function prompt (message: string, notify?: notifier.Notification) {
   // close previous group
 
   log(suffix('orange', 'prompt', message));
+  nwl();
   log(closer(state.group) + NWL);
 
   if (isObject(notify)) notifier.notify(notify).notify();
 
   return () => {
-    log(opener(state.group));
-    nwl();
+    log(opener(state.group) + nextline);
   };
 
 }
@@ -476,6 +483,8 @@ export function prompt (message: string, notify?: notifier.Notification) {
  * @example '│ syncing → dir/file.ext'
  */
 export function syncing (path: string, hot = false) {
+
+  if ($.mode.export || $.mode.build) return;
 
   if (warning.count > 0) {
     log(suffix(
@@ -498,7 +507,7 @@ export function syncing (path: string, hot = false) {
       log(suffix(
         'orange',
         'queued',
-        `${path} ${c.TLD} ${c.bold(addSuffix(queue.pending))} in queue`
+        `${path} ${TLD} ${bold(addSuffix(queue.pending))} in queue`
       ));
     }
 
@@ -515,7 +524,7 @@ export function syncing (path: string, hot = false) {
       log(suffix(
         'orange',
         'queued',
-        `${path} ${c.TLD} ${c.bold(addSuffix(queue.pending))} in queue`
+        `${path} ${TLD} ${bold(addSuffix(queue.pending))} in queue`
       ));
     }
   }
@@ -538,18 +547,20 @@ export function syncing (path: string, hot = false) {
  */
 export function process (name: string, ...message: [message?: string, time?: string]) {
 
-  let time: string = message[0];
+  if ($.mode.export || $.mode.build) return;
+
+  let cnow: string = message[0];
   let text: string = NIL;
 
   if (message.length === 2) {
-    text = ` ${c.CHV} ${message[0]}`;
-    time = message[1];
+    text = ` ${CHV} ${message[0]}`;
+    cnow = message[1];
   }
 
   log(suffix(
     'whiteBright',
     'process',
-    `${c.bold(name)}${text}${c.time(time)}`
+    `${bold(name)}${text}${time(cnow)}`
   ));
 
 };
@@ -601,6 +612,8 @@ export function importer (message: string) {
  */
 export function transform (message: string) {
 
+  if ($.mode.export || $.mode.build) return;
+
   log(suffix(
     'whiteBright',
     'transform',
@@ -619,7 +632,7 @@ export function warn (message: string, fix?: string) {
   log(suffix(
     'yellowBright',
     'warning',
-    `${message}${fix ? c.gray(` ~ ${fix}`) : NIL}`
+    `${message}${fix ? gray(` ~ ${fix}`) : NIL}`
   ));
 
 };
@@ -634,7 +647,7 @@ export function retrying (file: string, theme: Theme) {
   log(suffix(
     'orange',
     'retrying',
-    `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`
+    `${file} → ${theme.target} ${gray(`~ ${theme.store}`)}`
   ));
 
 }
@@ -649,7 +662,7 @@ export function deleted (file: string, theme: Theme) {
   log(suffix(
     'blueBright',
     'deleted',
-    `${file} → ${theme.target} ${c.gray(`~ ${theme.store}`)}`
+    `${file} ${ARR} ${theme.target} ${gray(`~ ${theme.store}`)}`
   ));
 
 };
@@ -661,9 +674,11 @@ export function deleted (file: string, theme: Theme) {
  */
 export function minified (kind: string, before: string, after: string, saved: string) {
 
+  if ($.mode.export || $.mode.build) return;
+
   const msg = kind
-    ? `${c.bold(kind)} ${c.ARR} ${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`
-    : `${before} ${c.ARL} ${after} ${c.gray(`~ saved ${saved}`)}`;
+    ? `${bold(kind)} ${ARR} ${before} ${ARL} ${after} ${gray(`~ saved ${saved}`)}`
+    : `${before} ${ARL} ${after} ${gray(`~ saved ${saved}`)}`;
 
   log(suffix('whiteBright', 'minified', msg));
 
@@ -690,6 +705,8 @@ export function reloaded (path: string, time: string) {
  * @example '│ skipped → dir/file.ext'
  */
 export function skipped (file: File | string, reason: string) {
+
+  if ($.mode.export || $.mode.build) return;
 
   log(suffix(
     'gray',
@@ -735,12 +752,10 @@ export function invalid (path: string, message?: string | string[]) {
 
   if (message) {
 
-    nwl();
-
     if (isArray(message)) {
-      error(c.red(message.map(text => `${c.line.red}${sanitize(text)}`).join(NWL)));
+      error(NWL, red(message.map(text => `${line.red}${sanitize(text)}`).join(NWL)));
     } else {
-      error(`${c.line.red}${sanitize(message)}`);
+      error(NWL, `${line.red}${sanitize(message)}`);
     }
   }
 
@@ -770,13 +785,13 @@ export function failed (path: string) {
 export function configChanges () {
 
   nwl('yellow');
-  log(`${c.line.yellow}${c.bold.yellow(`WARNING ${c.TLD} RESTART IS REQUIRED`)}`);
+  log(`${line.yellow}${bold.yellow(`WARNING ${TLD} RESTART IS REQUIRED`)}`);
   nwl('yellow');
   log(
-    c.line.yellow +
-    c.bold.yellow(`Changes to ${c.neonCyan($.file.base)} require you restart watch mode.`) + NWL +
-    c.line.yellow +
-    c.bold.yellow('Failure to restart watch mode will prevent changes from being reflected.')
+    line.yellow +
+    bold.yellow(`Changes to ${neonCyan($.file.base)} require you restart watch mode.`) + NWL +
+    line.yellow +
+    bold.yellow('Failure to restart watch mode will prevent changes from being reflected.')
   );
 
   nwl('yellow');

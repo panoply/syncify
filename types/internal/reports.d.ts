@@ -64,7 +64,7 @@ export interface BuildModeReport {
    * @example
    * 'templates/index.liquid'
    */
-   output: string;
+  output: string;
   /**
    * The processing time it took to build
    *
@@ -109,9 +109,17 @@ export interface BuildModeReport {
 
 export interface BuildReport {
   /**
+   * The name of the transform group
+   */
+  group: string;
+  /**
    * List of files in the transform group
    */
   files: File[]
+  /**
+   * The files count
+   */
+  size: number;
   /**
    * The amount of time the transform group took to process.
    */

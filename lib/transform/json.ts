@@ -1,9 +1,9 @@
 import type { File, Syncify } from 'types';
 import { isEmpty, isNil } from 'rambdax';
 import { readFile, writeFile } from 'fs-extra';
-import { Type } from '~process/files';
-import { timer } from '~timer';
-import { log, error } from '~log';
+import { Type } from 'syncify:process/files';
+import { timer } from 'syncify:timer';
+import { log, error } from 'syncify:log';
 import {
   isBuffer,
   isArray,
@@ -15,8 +15,8 @@ import {
   byteConvert,
   fileSize,
   sanitize
-} from '~utils';
-import { $ } from '~state';
+} from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 /**
  * Parse JSON

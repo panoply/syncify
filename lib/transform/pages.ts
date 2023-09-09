@@ -7,16 +7,17 @@ import prompts from 'prompts';
 import highlight from '@liquify/highlight';
 import markdown from 'markdown-it';
 import Turndown from 'turndown';
-import * as pages from '~requests/pages';
-import * as cache from '~process/caches';
-import { gfm } from '~forks/gfm';
-import { Kind } from '~process/files';
-import { getPageMetafields } from '~process/metafields';
-import { lastPath } from '~utils/paths';
-import { isArray, isBoolean, isObject, isRegex, isUndefined, handleize, toUpcase } from '~utils';
-import { timer } from '~timer';
-import { log, c, hrs, ARR } from '~log';
-import { $ } from '~state';
+import * as pages from 'syncify:requests/pages';
+import * as cache from 'syncify:process/caches';
+import { gfm } from 'syncify:forks/gfm';
+import { Kind } from 'syncify:process/files';
+import { getPageMetafields } from 'syncify:process/metafields';
+import { lastPath } from 'syncify:utils/paths';
+import { isArray, isBoolean, isObject, isRegex, isUndefined, handleize, toUpcase } from 'syncify:utils';
+import { timer } from 'syncify:timer';
+import * as c from 'syncify:ansi';
+import { log } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 enum PromptActions {
   /**
@@ -141,7 +142,7 @@ async function selectPage (store: Store): Promise<number> {
 
   choices.push(
     {
-      title: hrs(20),
+      title: c.hrs(20),
       disabled: true,
       selected: false
     },
@@ -493,7 +494,7 @@ export async function compile (file: File, _cb: Syncify) {
 
         if ($.page.importLanguage === 'markdown') {
           const markdown = toMarkdown(convert);
-          log.transform(`${file.name}.html ${ARR} ${file.base}`);
+          log.transform(`${file.name}.html ${c.ARR} ${file.base}`);
           convert = stringify('\n' + markdown, frontmatter.data);
         }
 

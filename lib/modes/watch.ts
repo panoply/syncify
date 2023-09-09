@@ -1,17 +1,17 @@
 import type { Syncify, File, WatchBundle } from 'types';
 import { isNil } from 'rambdax';
-import { client, queue } from '~requests/client';
-import { compile as liquid } from '~transform/liquid';
-import { compile as styles } from '~transform/styles';
-import { compile as script } from '~transform/script';
-import { compile as asset } from '~transform/asset';
-import { compile as json } from '~transform/json';
-import { compile as pages } from '~transform/pages';
-import { compile as svgs } from '~transform/svgs';
-import { isUndefined } from '~utils';
-import { Kind, parseFile, Type } from '~process/files';
-import { log } from '~log';
-import { $ } from '~state';
+import { client, queue } from 'syncify:requests/client';
+import { compile as liquid } from 'syncify:transform/liquid';
+import { compile as styles } from 'syncify:transform/styles';
+import { compile as script } from 'syncify:transform/script';
+import { compile as asset } from 'syncify:transform/asset';
+import { compile as json } from 'syncify:transform/json';
+import { compile as pages } from 'syncify:transform/pages';
+import { compile as svgs } from 'syncify:transform/svgs';
+import { isUndefined } from 'syncify:utils';
+import { Kind, parseFile, Type } from 'syncify:process/files';
+import { log } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 /**
  * Watch Function

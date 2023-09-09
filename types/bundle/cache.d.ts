@@ -1,4 +1,4 @@
-import { Requests, Resource } from '../internal/requests';
+import { Requests, Resource } from './requests';
 
 export interface Cache {
   /**
@@ -16,7 +16,11 @@ export interface Cache {
   /**
    * The last time a build was executed
    */
-  lastResource?: Resource;
+  lastResource?: string;
+  /**
+   * The theme version
+   */
+  themeVersion?: string;
  /**
   * Cache Build File
   *

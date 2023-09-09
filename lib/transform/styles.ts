@@ -4,10 +4,11 @@ import type { File, StyleTransform, Syncify, Processors } from 'types';
 import { isNil } from 'rambdax';
 import { join, relative } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
-import { isFunction, isString, isUndefined, isBuffer, byteSize, fileSize, sanitize } from '~utils';
-import { timer } from '~timer';
-import { error, log, bold, warning } from '~log';
-import { $ } from '~state';
+import { isFunction, isString, isUndefined, isBuffer, byteSize, fileSize, sanitize } from 'syncify:utils';
+import { timer } from 'syncify:timer';
+import { bold } from 'syncify:ansi';
+import { log, error, warn } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 /**
  * PostCSS Module
@@ -113,7 +114,7 @@ async function sassProcess (file: File<StyleTransform>) {
         style: opts.style,
         logger: {
           debug: msg => console.log('DEBUG', msg),
-          warn: warning.sass(file)
+          warn: warn.sass(file)
         }
       });
 
@@ -140,9 +141,11 @@ async function sassProcess (file: File<StyleTransform>) {
 
     } catch (e) {
 
-      log.invalid(file.relative);
-      error.sass(file, e);
+      if (!$.mode.build) {
 
+        log.invalid(file.relative);
+        error.sass(file, e);
+      }
       return null;
 
     }
@@ -193,7 +196,11 @@ async function postcssProcess (file: File<StyleTransform>, css: string, map: any
 
     const issues = result.warnings();
 
-    if (issues.length > 0) for (const warn of issues) warning.postcss(file, warn);
+    if (issues.length > 0) {
+      for (const warning of issues) {
+        warn.postcss(file, warning);
+      }
+    }
 
     return result.toString();
 

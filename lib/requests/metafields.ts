@@ -2,13 +2,13 @@ import { allFalse, has } from 'rambdax';
 import { AxiosError } from 'axios';
 import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
 import { Config, Store, Requests } from 'types';
-import { join } from 'path';
+import { join } from 'pathe';
 import prompts from 'prompts';
-
-import { assign } from '~utils/native';
-import { queue, axios, requeue } from '~requests/queue';
-import { log, c, error } from '~log';
-import { $, Bundle } from '~state';
+import { assign } from 'syncify:utils/native';
+import { queue, axios, requeue } from 'syncify:requests/queue';
+import { log, error } from 'syncify:log';
+import * as c from 'syncify:ansi';
+import { $, Bundle } from 'syncify:state';
 
 /**
  * Write Metafields

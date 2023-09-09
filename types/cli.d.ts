@@ -142,16 +142,16 @@ export interface Commands {
    * ```
    */
   upload?: boolean;
-  /**
-   * Exports the theme and generates a `.zip` compressed directory.
+   /**
+   * Download a theme from a store. Will be placed in `import` driectory. Requires a store
+   * target and theme target to be passed.
    *
    * ---
    *
    * Example:
    *
    * ```bash
-   * $ syncify --import # import to the defined directory in syncify config
-   * $ syncify --import -o ./some-dir # override and import to a specific directory
+   * $ syncify store_1 -t dev_theme --import
    * ```
    */
   import?: boolean;
@@ -163,8 +163,11 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --import # export to the defined directory in syncify config
-   * $ syncify --import -o ./some-dir # override and export to a specific directory
+   * # export to the defined directory in syncify config
+   * $ syncify --import
+   *
+   * # override and export to a specific directory
+   * $ syncify --import -o ./some-dir
    * ```
    */
   export?: boolean;
@@ -174,20 +177,6 @@ export interface Commands {
    * @default ''
    */
   resource?: string;
-   /**
-   * Download a theme from a store. Will be place in `import` driectory. Requires a store
-   * target and theme target to be passed.
-   *
-   * ---
-   *
-   * Example:
-   *
-   * ```bash
-   * $ syncify store_1 -t dev_theme -d
-   * $ syncify store_1 -t dev_theme --download
-   * ```
-   */
-  download?: boolean;
   /**
    * Triggers the metafields resource, presents the interactive shell with list of
    * options to choose from. Requires a store target to be passed.

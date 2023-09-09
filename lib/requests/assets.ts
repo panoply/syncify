@@ -5,12 +5,12 @@ import type { Request, Theme, File, FileKeys } from 'types';
 import merge from 'mergerino';
 import { delay } from 'rambdax';
 import { pMapSkip } from 'p-map';
-import { Type } from '~process/files';
-import { queue, axios } from '~requests/queue';
-import { timer } from '~timer';
-import { event } from '~utils';
-import { log, error } from '~log';
-import { $ } from '~state';
+import { Type } from 'syncify:process/files';
+import { queue, axios } from 'syncify:requests/queue';
+import { timer } from 'syncify:timer';
+import { event } from 'syncify:utils';
+import { log, error } from 'syncify:log';
+import { $ } from 'syncify:state';
 
 export const enum Events {
   /**
@@ -174,11 +174,11 @@ export async function sync (theme: Theme, file: File, config: Request) {
     queue.concurrency++;
   }
 
-  if (!mode.upload && !mode.download) timer.start();
+  if (!mode.upload && !mode.import) timer.start();
 
   const promise = await axios(config).then(({ headers, data }) => {
 
-    if (mode.download === false && config.method === 'get') return data;
+    if (mode.import === false && config.method === 'get') return data;
 
     if (config.method === 'delete') {
 
@@ -200,9 +200,9 @@ export async function sync (theme: Theme, file: File, config: Request) {
           get file () { return file; }
         });
 
-      } else if (mode.download) {
+      } else if (mode.import) {
 
-        event.emit('download', {
+        event.emit('import', {
           status: Events.Success,
           get theme () { return theme; },
           get file () { return file; },
@@ -221,7 +221,7 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
     if (e.response && (e.response.status === 429 || e.response.status === 500)) {
 
-      if (!mode.upload && !mode.download) log.retrying(file.key, theme);
+      if (!mode.upload && !mode.import) log.retrying(file.key, theme);
 
       queue.add(() => sync(theme, file, config));
 
@@ -233,9 +233,9 @@ export async function sync (theme: Theme, file: File, config: Request) {
           get file () { return file; }
         });
 
-      } else if (mode.download) {
+      } else if (mode.import) {
 
-        event.emit('download', {
+        event.emit('import', {
           status: Events.Retry,
           get theme () { return theme; },
           get file () { return file; }
@@ -254,11 +254,11 @@ export async function sync (theme: Theme, file: File, config: Request) {
           get file () { return file; }
         });
 
-      } else if (mode.download) {
+      } else if (mode.import) {
 
         if (e.response === undefined) {
 
-          event.emit('download', {
+          event.emit('import', {
             status: Events.Empty,
             get theme () { return theme; },
             get file () { return file; }
@@ -266,7 +266,7 @@ export async function sync (theme: Theme, file: File, config: Request) {
 
         } else {
 
-          return event.emit('download', {
+          return event.emit('import', {
             status: Events.Failed,
             error: e.response,
             get theme () { return theme; },

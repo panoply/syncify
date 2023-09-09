@@ -1,5 +1,7 @@
-import { c, Colors } from '~log';
-import { assign } from '~native';
+import type { Colors } from 'syncify:ansi';
+import ansis from 'ansis';
+import { lightGray, line } from 'syncify:ansi';
+import { assign } from 'syncify:native';
 
 export interface Progress {
   /**
@@ -120,7 +122,7 @@ export function progress (total: number, opts: ProgressOptions = {}): Progress {
 
   function align (output: string) {
 
-    return c.line.gray + output + ' '.repeat(Math.max(0, options.barSize - output.length));
+    return line.gray + output + ' '.repeat(Math.max(0, options.barSize - output.length));
 
   }
 
@@ -175,7 +177,7 @@ export function progress (total: number, opts: ProgressOptions = {}): Progress {
     const filled = bar(progress);
     const empty = bar(options.barSize - progress, true);
 
-    let output = c[options.barColor](filled) + c.lightGray(empty);
+    let output = ansis[options.barColor](filled) + lightGray(empty);
 
     if (options.showPercentage) {
       output += ` ${String(Math.round((percent / total) * 100))}%`;

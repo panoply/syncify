@@ -1,8 +1,8 @@
 import { Config } from 'types';
 import { has, isEmpty, isNil } from 'rambdax';
-import { typeError, invalidError } from '~log/validate';
-import { isObject, isString, isArray, isBoolean } from '~utils';
-import { $ } from '~state';
+import { typeError, invalidError } from 'syncify:log/throws';
+import { isObject, isString, isArray, isBoolean } from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 /**
  * Snippet Options

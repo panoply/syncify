@@ -1,6 +1,7 @@
-import { log, gray } from '~log';
+import { log } from 'syncify:log';
+import { gray } from 'syncify:ansi';
 // import kill from 'tree-kill';
-import { $ } from '~state';
+import { $ } from 'syncify:state';
 // import { readJsonSync } from 'fs-extra';
 
 /**

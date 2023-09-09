@@ -1,15 +1,15 @@
 import type { Request, Store, File, Methods, Sync, Requests } from 'types';
 import pMap from 'p-map';
 import { mapParallelAsync } from 'rambdax';
-import { Type } from '~process/files';
+import { Type } from 'syncify:process/files';
 import { queue } from '../requests/queue';
-import { timer } from '~timer';
-import { isUndefined } from '~utils';
-import { assign } from '~native';
-import { $ } from '~state';
-import * as asset from '~requests/assets';
-import * as pages from '~requests/pages';
-import * as metafields from '~requests/metafields';
+import { timer } from 'syncify:timer';
+import { isUndefined } from 'syncify:utils';
+import { assign } from 'syncify:native';
+import { $ } from 'syncify:state';
+import * as asset from 'syncify:requests/assets';
+import * as pages from 'syncify:requests/pages';
+import * as metafields from 'syncify:requests/metafields';
 
 // import merge from 'mergerino';
 // import * as pages from '../requests/pages';

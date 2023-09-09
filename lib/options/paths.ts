@@ -3,11 +3,11 @@ import glob from 'fast-glob';
 import anymatch from 'anymatch';
 import { dirname, join, relative } from 'pathe';
 import { has } from 'rambdax';
-import { PATH_KEYS } from '~const';
-import { isArray } from '~utils';
-import { lastPath, normalPath } from '~utils/paths';
-import { warnOption } from '~log/validate';
-import { $ } from '~state';
+import { PATH_KEYS } from 'syncify:const';
+import { isArray } from 'syncify:utils';
+import { lastPath, normalPath } from 'syncify:utils/paths';
+import { warnOption } from 'syncify:log/throws';
+import { $ } from 'syncify:state';
 
 /**
  * Get Paths
@@ -81,6 +81,8 @@ export async function setPaths (config: Config) {
         const paths = await glob(p, { cwd: $.cwd });
 
         if (paths.length === 0) {
+
+          if (key === 'assets' && p === join($.dirs.output, 'assets/*')) continue;
 
           warn('No files could be resolved in', relative($.cwd, p));
 

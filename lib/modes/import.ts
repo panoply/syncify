@@ -3,15 +3,16 @@ import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { join, relative } from 'pathe';
 import { delay, has } from 'rambdax';
 import { writeFileSync } from 'fs-extra';
-import * as request from '~requests/assets';
-import { importFile } from '~process/files';
-import { Progress } from '~cli/progress';
-import { queue } from '~requests/queue';
-import { timer } from '~utils/timer';
-import { assign } from '~native';
-import { log, c, tui } from '~log';
-import { addSuffix, event, glue } from '~utils';
-import { $ } from '~state';
+import * as request from 'syncify:requests/assets';
+import { importFile } from 'syncify:process/files';
+import { Progress } from 'syncify:cli/progress';
+import { queue } from 'syncify:requests/queue';
+import { timer } from 'syncify:utils/timer';
+import { assign } from 'syncify:native';
+import * as c from 'syncify:ansi';
+import { log, tui } from 'syncify:log';
+import { addSuffix, event, glue } from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 interface EventParams {
   /**
@@ -223,15 +224,15 @@ function getWaitLog (record: SyncRecord) {
 
 }
 
-export async function download (cb?: Syncify): Promise<void> {
+export async function importing (cb?: Syncify): Promise<void> {
 
-  $.cache.lastResource = 'download';
+  $.cache.lastResource = 'import';
 
   let remaining: number = 0;
   let transfers: number = 0;
 
-  timer.start('download');
-  log.group('Download', true);
+  timer.start('import');
+  log.group('Import', true);
   log.spinner('Preparing');
 
   const sync = await getModel();
@@ -257,7 +258,7 @@ export async function download (cb?: Syncify): Promise<void> {
     const preview = `https://${theme.store}?preview_theme_id=${theme.id}`;
     const prefix: string = [
 
-      tui.suffix('gray', 'Duration', c.whiteBright(`  ${timer.now('download')}`)),
+      tui.suffix('gray', 'Duration', c.whiteBright(`  ${timer.now('import')}`)),
       NWL,
       tui.suffix('gray', 'Transfers', c.whiteBright.bold(`  ${transfers++}`)),
       NWL,
@@ -379,7 +380,7 @@ export async function download (cb?: Syncify): Promise<void> {
   /* FUNCTIONS                                    */
   /* -------------------------------------------- */
 
-  event.on('download', callback);
+  event.on('import', callback);
 
   remaining = sync.size - 1;
 

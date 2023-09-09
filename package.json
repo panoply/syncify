@@ -62,11 +62,14 @@
     "rules": {
       "object-curly-newline": "off",
       "no-import-assign": "off",
-      "no-new-func": "off"
+      "no-new-func": "off",
+      "no-control-regex": "off"
     }
   },
   "dependencies": {
     "@liquify/highlight": "^0.1.0",
+    "adm-zip": "^0.5.10",
+    "ansis": "^1.5.5",
     "anymatch": "^3.1.3",
     "axios": "^1.5.0",
     "chokidar": "^3.5.3",
@@ -78,6 +81,7 @@
     "fs-extra": "^11.1.1",
     "gray-matter": "^4.0.3",
     "html-minifier-terser": "7.2.0",
+    "jszip": "^3.10.1",
     "load-tsconfig": "^0.2.5",
     "markdown-it": "^13.0.1",
     "minimist": "^1.2.8",
@@ -90,7 +94,9 @@
     "serve-static": "^1.15.0",
     "tree-kill": "^1.2.2",
     "turndown": "^7.1.2",
-    "ws": "^8.13.0"
+    "ws": "^8.13.0",
+    "yauzl": "^2.10.0",
+    "yazl": "^2.5.1"
   },
   "devDependencies": {
     "@sissel/eslint-config": "^1.1.0",
@@ -103,7 +109,7 @@
     "@types/serve-static": "^1.15.2",
     "@types/svg-sprite": "^0.0.34",
     "@types/ws": "^8.5.5",
-    "ansis": "^1.5.5",
+    "@types/yazl": "^2.4.2",
     "ava": "^5.3.1",
     "clean-stack": "^5.2.0",
     "esbuild": "^0.19.2",
@@ -121,7 +127,6 @@
     "svg-sprite": "^2.0.2",
     "svgo": "^3.0.2",
     "tailwindcss": "^3.3.3",
-    "tiny-spinner": "^2.0.3",
     "tsconfig-type": "^1.27.0",
     "tsup": "^7.2.0",
     "type-fest": "^4.3.1",

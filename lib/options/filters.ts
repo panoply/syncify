@@ -1,11 +1,12 @@
 import type { Commands } from 'types';
 import { has } from 'rambdax';
 import { join } from 'pathe';
-import { PATH_KEYS, THEME_DIRS } from '~const';
-import { blue, bold, log, white, yellow } from '~log';
-import { invalidCommand } from '~log/validate';
-import { isArray } from '~utils';
-import { $ } from '~state';
+import { PATH_KEYS, THEME_DIRS } from 'syncify:const';
+import { blue, bold, white, yellow } from 'syncify:ansi';
+import { log } from 'syncify:log';
+import { invalidCommand } from 'syncify:log/throws';
+import { isArray } from 'syncify:utils';
+import { $ } from 'syncify:state';
 
 /**
  * Throws filter error
@@ -122,7 +123,8 @@ function parseFilter (base: string, input: string, regexp: RegExp) {
   // --filter /
   // --filter .
   //
-  // Filters need to begin with base paths, eg:
+  // Filters need to begin with base paths.
+  // Example of passes:
   //
   // --filter snippets/
   // --filter templates/
@@ -196,7 +198,9 @@ export async function setFilters (cli: Commands) {
       .filter(Boolean)
       .map(entry => entry.trim());
 
-    for (const input of multiple) parseFilter(base, input, regexp);
+    for (const input of multiple) {
+      parseFilter(base, input, regexp);
+    }
 
   } else {
 

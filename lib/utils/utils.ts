@@ -4,9 +4,9 @@ import { EventEmitter } from 'node:events';
 import { createRequire } from 'node:module';
 import zlib from 'node:zlib';
 import strip from 'strip-json-comments';
-import { UNITS } from '~const';
-import { COL, DSH, bold } from '~log';
 import { toBuffer, toString } from './native';
+import { UNITS } from 'syncify:const';
+import { COL, DSH, bold } from 'syncify:ansi';
 
 /**
  * Event emitter instance

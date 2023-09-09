@@ -1,236 +1,11179 @@
 'use strict';
 
-var util = require('util');
-var es = require('process');
-var child_process = require('child_process');
-var pathe = require('pathe');
-var url = require('url');
-var Kl = require('axios');
 var events = require('events');
 var module$1 = require('module');
-var sc = require('zlib');
+var zlib = require('zlib');
+var process2 = require('process');
+var child_process = require('child_process');
+var url = require('url');
+var pathe = require('pathe');
+var readline = require('readline');
+var util = require('util');
+var notifier = require('node-notifier');
+var connect = require('axios');
+var perf_hooks = require('perf_hooks');
 var stream = require('stream');
 var console$1 = require('console');
-var perf_hooks = require('perf_hooks');
-var ic = require('os');
-var mu = require('readline');
-var ks = require('node-notifier');
-var cl = require('fast-glob');
+var os = require('os');
+var glob7 = require('fast-glob');
 var fsExtra = require('fs-extra');
-var path = require('path');
-var Ys = require('prompts');
-var utils = require('markdown-it/lib/common/utils');
-var pl = require('anymatch');
+var prompts2 = require('prompts');
+var anymatch3 = require('anymatch');
 var htmlMinifierTerser = require('html-minifier-terser');
-var Zf = require('gray-matter');
-var tm = require('turndown');
-var rm = require('markdown-it');
-var sm = require('@liquify/highlight');
-var ws$1 = require('ws');
-var pm = require('serve-static');
-var fm = require('finalhandler');
-var mm = require('http');
+var matter = require('gray-matter');
+var highlight = require('@liquify/highlight');
+var markdown = require('markdown-it');
+var Turndown = require('turndown');
+var AdmZip = require('adm-zip');
+var http = require('http');
+var statics = require('serve-static');
+var handler = require('finalhandler');
+var ws = require('ws');
 var chokidar = require('chokidar');
-var loadTsconfig = require('load-tsconfig');
-var esbuild = require('esbuild');
-var Om = require('dotenv');
-var Mm = require('cross-spawn');
-var qm = require('tree-kill');
+var esbuild$1 = require('esbuild');
+var dotenv = require('dotenv');
+var treeKill = require('tree-kill');
+var spawn3 = require('cross-spawn');
 
 function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 
-var es__default = /*#__PURE__*/_interopDefault(es);
-var Kl__default = /*#__PURE__*/_interopDefault(Kl);
-var sc__default = /*#__PURE__*/_interopDefault(sc);
-var ic__default = /*#__PURE__*/_interopDefault(ic);
-var mu__default = /*#__PURE__*/_interopDefault(mu);
-var ks__default = /*#__PURE__*/_interopDefault(ks);
-var cl__default = /*#__PURE__*/_interopDefault(cl);
-var Ys__default = /*#__PURE__*/_interopDefault(Ys);
-var pl__default = /*#__PURE__*/_interopDefault(pl);
-var Zf__default = /*#__PURE__*/_interopDefault(Zf);
-var tm__default = /*#__PURE__*/_interopDefault(tm);
-var rm__default = /*#__PURE__*/_interopDefault(rm);
-var sm__default = /*#__PURE__*/_interopDefault(sm);
-var pm__default = /*#__PURE__*/_interopDefault(pm);
-var fm__default = /*#__PURE__*/_interopDefault(fm);
-var mm__default = /*#__PURE__*/_interopDefault(mm);
-var Om__default = /*#__PURE__*/_interopDefault(Om);
-var Mm__default = /*#__PURE__*/_interopDefault(Mm);
-var qm__default = /*#__PURE__*/_interopDefault(qm);
+var zlib__default = /*#__PURE__*/_interopDefault(zlib);
+var process2__default = /*#__PURE__*/_interopDefault(process2);
+var readline__default = /*#__PURE__*/_interopDefault(readline);
+var notifier__default = /*#__PURE__*/_interopDefault(notifier);
+var connect__default = /*#__PURE__*/_interopDefault(connect);
+var os__default = /*#__PURE__*/_interopDefault(os);
+var glob7__default = /*#__PURE__*/_interopDefault(glob7);
+var prompts2__default = /*#__PURE__*/_interopDefault(prompts2);
+var anymatch3__default = /*#__PURE__*/_interopDefault(anymatch3);
+var matter__default = /*#__PURE__*/_interopDefault(matter);
+var highlight__default = /*#__PURE__*/_interopDefault(highlight);
+var markdown__default = /*#__PURE__*/_interopDefault(markdown);
+var Turndown__default = /*#__PURE__*/_interopDefault(Turndown);
+var AdmZip__default = /*#__PURE__*/_interopDefault(AdmZip);
+var http__default = /*#__PURE__*/_interopDefault(http);
+var statics__default = /*#__PURE__*/_interopDefault(statics);
+var handler__default = /*#__PURE__*/_interopDefault(handler);
+var dotenv__default = /*#__PURE__*/_interopDefault(dotenv);
+var treeKill__default = /*#__PURE__*/_interopDefault(treeKill);
+var spawn3__default = /*#__PURE__*/_interopDefault(spawn3);
 
-var kl=Object.create;var tn=Object.defineProperty;var Pl=Object.getOwnPropertyDescriptor;var Ol=Object.getOwnPropertyNames;var jl=Object.getPrototypeOf,Nl=Object.prototype.hasOwnProperty;var rn=(e=>typeof require<"u"?require:typeof Proxy<"u"?new Proxy(e,{get:(t,s)=>(typeof require<"u"?require:t)[s]}):e)(function(e){if(typeof require<"u")return require.apply(this,arguments);throw Error('Dynamic require of "'+e+'" is not supported')});var Ze=(e,t)=>()=>(t||e((t={exports:{}}).exports,t),t.exports),gr=(e,t)=>{for(var s in t)tn(e,s,{get:t[s],enumerable:!0});},Il=(e,t,s,r)=>{if(t&&typeof t=="object"||typeof t=="function")for(let n of Ol(t))!Nl.call(e,n)&&n!==s&&tn(e,n,{get:()=>t[n],enumerable:!(r=Pl(t,n))||r.enumerable});return e};var zt=(e,t,s)=>(s=e!=null?kl(jl(e)):{},Il(t||!e||!e.__esModule?tn(s,"default",{value:e,enumerable:!0}):s,e));var Fo=Ze((vD,hn)=>{var Yl=Object.prototype.hasOwnProperty,Ee="~";function Cr(){}Object.create&&(Cr.prototype=Object.create(null),new Cr().__proto__||(Ee=!1));function Ql(e,t,s){this.fn=e,this.context=t,this.once=s||!1;}function wo(e,t,s,r,n){if(typeof s!="function")throw new TypeError("The listener must be a function");var i=new Ql(s,r||e,n),o=Ee?Ee+t:t;return e._events[o]?e._events[o].fn?e._events[o]=[e._events[o],i]:e._events[o].push(i):(e._events[o]=i,e._eventsCount++),e}function ns(e,t){--e._eventsCount===0?e._events=new Cr:delete e._events[t];}function xe(){this._events=new Cr,this._eventsCount=0;}xe.prototype.eventNames=function(){var t=[],s,r;if(this._eventsCount===0)return t;for(r in s=this._events)Yl.call(s,r)&&t.push(Ee?r.slice(1):r);return Object.getOwnPropertySymbols?t.concat(Object.getOwnPropertySymbols(s)):t};xe.prototype.listeners=function(t){var s=Ee?Ee+t:t,r=this._events[s];if(!r)return [];if(r.fn)return [r.fn];for(var n=0,i=r.length,o=new Array(i);n<i;n++)o[n]=r[n].fn;return o};xe.prototype.listenerCount=function(t){var s=Ee?Ee+t:t,r=this._events[s];return r?r.fn?1:r.length:0};xe.prototype.emit=function(t,s,r,n,i,o){var a=Ee?Ee+t:t;if(!this._events[a])return !1;var c=this._events[a],h=arguments.length,p,l;if(c.fn){switch(c.once&&this.removeListener(t,c.fn,void 0,!0),h){case 1:return c.fn.call(c.context),!0;case 2:return c.fn.call(c.context,s),!0;case 3:return c.fn.call(c.context,s,r),!0;case 4:return c.fn.call(c.context,s,r,n),!0;case 5:return c.fn.call(c.context,s,r,n,i),!0;case 6:return c.fn.call(c.context,s,r,n,i,o),!0}for(l=1,p=new Array(h-1);l<h;l++)p[l-1]=arguments[l];c.fn.apply(c.context,p);}else {var m=c.length,D;for(l=0;l<m;l++)switch(c[l].once&&this.removeListener(t,c[l].fn,void 0,!0),h){case 1:c[l].fn.call(c[l].context);break;case 2:c[l].fn.call(c[l].context,s);break;case 3:c[l].fn.call(c[l].context,s,r);break;case 4:c[l].fn.call(c[l].context,s,r,n);break;default:if(!p)for(D=1,p=new Array(h-1);D<h;D++)p[D-1]=arguments[D];c[l].fn.apply(c[l].context,p);}}return !0};xe.prototype.on=function(t,s,r){return wo(this,t,s,r,!1)};xe.prototype.once=function(t,s,r){return wo(this,t,s,r,!0)};xe.prototype.removeListener=function(t,s,r,n){var i=Ee?Ee+t:t;if(!this._events[i])return this;if(!s)return ns(this,i),this;var o=this._events[i];if(o.fn)o.fn===s&&(!n||o.once)&&(!r||o.context===r)&&ns(this,i);else {for(var a=0,c=[],h=o.length;a<h;a++)(o[a].fn!==s||n&&!o[a].once||r&&o[a].context!==r)&&c.push(o[a]);c.length?this._events[i]=c.length===1?c[0]:c:ns(this,i);}return this};xe.prototype.removeAllListeners=function(t){var s;return t?(s=Ee?Ee+t:t,this._events[s]&&ns(this,s)):(this._events=new Cr,this._eventsCount=0),this};xe.prototype.off=xe.prototype.removeListener;xe.prototype.addListener=xe.prototype.on;xe.prefixed=Ee;xe.EventEmitter=xe;typeof hn<"u"&&(hn.exports=xe);});var Uo=Ze((ah,Pn)=>{var Dt={};typeof Pn>"u"?window.eastasianwidth=Dt:Pn.exports=Dt;Dt.eastAsianWidth=function(e){var t=e.charCodeAt(0),s=e.length==2?e.charCodeAt(1):0,r=t;return 55296<=t&&t<=56319&&56320<=s&&s<=57343&&(t&=1023,s&=1023,r=t<<10|s,r+=65536),r==12288||65281<=r&&r<=65376||65504<=r&&r<=65510?"F":r==8361||65377<=r&&r<=65470||65474<=r&&r<=65479||65482<=r&&r<=65487||65490<=r&&r<=65495||65498<=r&&r<=65500||65512<=r&&r<=65518?"H":4352<=r&&r<=4447||4515<=r&&r<=4519||4602<=r&&r<=4607||9001<=r&&r<=9002||11904<=r&&r<=11929||11931<=r&&r<=12019||12032<=r&&r<=12245||12272<=r&&r<=12283||12289<=r&&r<=12350||12353<=r&&r<=12438||12441<=r&&r<=12543||12549<=r&&r<=12589||12593<=r&&r<=12686||12688<=r&&r<=12730||12736<=r&&r<=12771||12784<=r&&r<=12830||12832<=r&&r<=12871||12880<=r&&r<=13054||13056<=r&&r<=19903||19968<=r&&r<=42124||42128<=r&&r<=42182||43360<=r&&r<=43388||44032<=r&&r<=55203||55216<=r&&r<=55238||55243<=r&&r<=55291||63744<=r&&r<=64255||65040<=r&&r<=65049||65072<=r&&r<=65106||65108<=r&&r<=65126||65128<=r&&r<=65131||110592<=r&&r<=110593||127488<=r&&r<=127490||127504<=r&&r<=127546||127552<=r&&r<=127560||127568<=r&&r<=127569||131072<=r&&r<=194367||177984<=r&&r<=196605||196608<=r&&r<=262141?"W":32<=r&&r<=126||162<=r&&r<=163||165<=r&&r<=166||r==172||r==175||10214<=r&&r<=10221||10629<=r&&r<=10630?"Na":r==161||r==164||167<=r&&r<=168||r==170||173<=r&&r<=174||176<=r&&r<=180||182<=r&&r<=186||188<=r&&r<=191||r==198||r==208||215<=r&&r<=216||222<=r&&r<=225||r==230||232<=r&&r<=234||236<=r&&r<=237||r==240||242<=r&&r<=243||247<=r&&r<=250||r==252||r==254||r==257||r==273||r==275||r==283||294<=r&&r<=295||r==299||305<=r&&r<=307||r==312||319<=r&&r<=322||r==324||328<=r&&r<=331||r==333||338<=r&&r<=339||358<=r&&r<=359||r==363||r==462||r==464||r==466||r==468||r==470||r==472||r==474||r==476||r==593||r==609||r==708||r==711||713<=r&&r<=715||r==717||r==720||728<=r&&r<=731||r==733||r==735||768<=r&&r<=879||913<=r&&r<=929||931<=r&&r<=937||945<=r&&r<=961||963<=r&&r<=969||r==1025||1040<=r&&r<=1103||r==1105||r==8208||8211<=r&&r<=8214||8216<=r&&r<=8217||8220<=r&&r<=8221||8224<=r&&r<=8226||8228<=r&&r<=8231||r==8240||8242<=r&&r<=8243||r==8245||r==8251||r==8254||r==8308||r==8319||8321<=r&&r<=8324||r==8364||r==8451||r==8453||r==8457||r==8467||r==8470||8481<=r&&r<=8482||r==8486||r==8491||8531<=r&&r<=8532||8539<=r&&r<=8542||8544<=r&&r<=8555||8560<=r&&r<=8569||r==8585||8592<=r&&r<=8601||8632<=r&&r<=8633||r==8658||r==8660||r==8679||r==8704||8706<=r&&r<=8707||8711<=r&&r<=8712||r==8715||r==8719||r==8721||r==8725||r==8730||8733<=r&&r<=8736||r==8739||r==8741||8743<=r&&r<=8748||r==8750||8756<=r&&r<=8759||8764<=r&&r<=8765||r==8776||r==8780||r==8786||8800<=r&&r<=8801||8804<=r&&r<=8807||8810<=r&&r<=8811||8814<=r&&r<=8815||8834<=r&&r<=8835||8838<=r&&r<=8839||r==8853||r==8857||r==8869||r==8895||r==8978||9312<=r&&r<=9449||9451<=r&&r<=9547||9552<=r&&r<=9587||9600<=r&&r<=9615||9618<=r&&r<=9621||9632<=r&&r<=9633||9635<=r&&r<=9641||9650<=r&&r<=9651||9654<=r&&r<=9655||9660<=r&&r<=9661||9664<=r&&r<=9665||9670<=r&&r<=9672||r==9675||9678<=r&&r<=9681||9698<=r&&r<=9701||r==9711||9733<=r&&r<=9734||r==9737||9742<=r&&r<=9743||9748<=r&&r<=9749||r==9756||r==9758||r==9792||r==9794||9824<=r&&r<=9825||9827<=r&&r<=9829||9831<=r&&r<=9834||9836<=r&&r<=9837||r==9839||9886<=r&&r<=9887||9918<=r&&r<=9919||9924<=r&&r<=9933||9935<=r&&r<=9953||r==9955||9960<=r&&r<=9983||r==10045||r==10071||10102<=r&&r<=10111||11093<=r&&r<=11097||12872<=r&&r<=12879||57344<=r&&r<=63743||65024<=r&&r<=65039||r==65533||127232<=r&&r<=127242||127248<=r&&r<=127277||127280<=r&&r<=127337||127344<=r&&r<=127386||917760<=r&&r<=917999||983040<=r&&r<=1048573||1048576<=r&&r<=1114109?"A":"N"};Dt.characterLength=function(e){var t=this.eastAsianWidth(e);return t=="F"||t=="W"||t=="A"?2:1};function zo(e){return e.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[^\uD800-\uDFFF]/g)||[]}Dt.length=function(e){for(var t=zo(e),s=0,r=0;r<t.length;r++)s=s+this.characterLength(t[r]);return s};Dt.slice=function(e,t,s){textLen=Dt.length(e),t=t||0,s=s||1,t<0&&(t=textLen+t),s<0&&(s=textLen+s);for(var r="",n=0,i=zo(e),o=0;o<i.length;o++){var a=i[o],c=Dt.length(a);if(n>=t-(c==2?1:0))if(n+c<=s)r+=a;else break;n+=c;}return r};});var Ho=Ze((lh,Vo)=>{Vo.exports=function(){return /\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62(?:\uDB40\uDC77\uDB40\uDC6C\uDB40\uDC73|\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74|\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67)\uDB40\uDC7F|(?:\uD83E\uDDD1\uD83C\uDFFF\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB-\uDFFE])|(?:\uD83E\uDDD1\uD83C\uDFFE\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB-\uDFFD\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFD\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFC\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB\uDFFD-\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFB\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFB\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFC-\uDFFF])|\uD83D\uDC68(?:\uD83C\uDFFB(?:\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF]))|\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFC-\uDFFF])|[\u2695\u2696\u2708]\uFE0F|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))?|(?:\uD83C[\uDFFC-\uDFFF])\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF]))|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83D\uDC68|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFE])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])\uFE0F|\u200D(?:(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D[\uDC66\uDC67])|\uD83D[\uDC66\uDC67])|\uD83C\uDFFF|\uD83C\uDFFE|\uD83C\uDFFD|\uD83C\uDFFC)?|(?:\uD83D\uDC69(?:\uD83C\uDFFB\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69])|(?:\uD83C[\uDFFC-\uDFFF])\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69]))|\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1)(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|\uD83D\uDC69(?:\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFB\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))|\uD83E\uDDD1(?:\u200D(?:\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFB\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))|\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D[\uDC66\uDC67])|\uD83D\uDC69\u200D\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D\uDC41\uFE0F\u200D\uD83D\uDDE8|\uD83E\uDDD1(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])|\uD83D\uDC69(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])|\uD83D\uDE36\u200D\uD83C\uDF2B|\uD83C\uDFF3\uFE0F\u200D\u26A7|\uD83D\uDC3B\u200D\u2744|(?:(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC6F|\uD83E[\uDD3C\uDDDE\uDDDF])\u200D[\u2640\u2642]|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|\uD83C\uDFF4\u200D\u2620|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD])\u200D[\u2640\u2642]|[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u2328\u23CF\u23ED-\u23EF\u23F1\u23F2\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB\u25FC\u2600-\u2604\u260E\u2611\u2618\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u2692\u2694-\u2697\u2699\u269B\u269C\u26A0\u26A7\u26B0\u26B1\u26C8\u26CF\u26D1\u26D3\u26E9\u26F0\u26F1\u26F4\u26F7\u26F8\u2702\u2708\u2709\u270F\u2712\u2714\u2716\u271D\u2721\u2733\u2734\u2744\u2747\u2763\u27A1\u2934\u2935\u2B05-\u2B07\u3030\u303D\u3297\u3299]|\uD83C[\uDD70\uDD71\uDD7E\uDD7F\uDE02\uDE37\uDF21\uDF24-\uDF2C\uDF36\uDF7D\uDF96\uDF97\uDF99-\uDF9B\uDF9E\uDF9F\uDFCD\uDFCE\uDFD4-\uDFDF\uDFF5\uDFF7]|\uD83D[\uDC3F\uDCFD\uDD49\uDD4A\uDD6F\uDD70\uDD73\uDD76-\uDD79\uDD87\uDD8A-\uDD8D\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA\uDECB\uDECD-\uDECF\uDEE0-\uDEE5\uDEE9\uDEF0\uDEF3])\uFE0F|\uD83C\uDFF3\uFE0F\u200D\uD83C\uDF08|\uD83D\uDC69\u200D\uD83D\uDC67|\uD83D\uDC69\u200D\uD83D\uDC66|\uD83D\uDE35\u200D\uD83D\uDCAB|\uD83D\uDE2E\u200D\uD83D\uDCA8|\uD83D\uDC15\u200D\uD83E\uDDBA|\uD83E\uDDD1(?:\uD83C\uDFFF|\uD83C\uDFFE|\uD83C\uDFFD|\uD83C\uDFFC|\uD83C\uDFFB)?|\uD83D\uDC69(?:\uD83C\uDFFF|\uD83C\uDFFE|\uD83C\uDFFD|\uD83C\uDFFC|\uD83C\uDFFB)?|\uD83C\uDDFD\uD83C\uDDF0|\uD83C\uDDF6\uD83C\uDDE6|\uD83C\uDDF4\uD83C\uDDF2|\uD83D\uDC08\u200D\u2B1B|\u2764\uFE0F\u200D(?:\uD83D\uDD25|\uD83E\uDE79)|\uD83D\uDC41\uFE0F|\uD83C\uDFF3\uFE0F|\uD83C\uDDFF(?:\uD83C[\uDDE6\uDDF2\uDDFC])|\uD83C\uDDFE(?:\uD83C[\uDDEA\uDDF9])|\uD83C\uDDFC(?:\uD83C[\uDDEB\uDDF8])|\uD83C\uDDFB(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA])|\uD83C\uDDFA(?:\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF])|\uD83C\uDDF9(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF])|\uD83C\uDDF8(?:\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF])|\uD83C\uDDF7(?:\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC])|\uD83C\uDDF5(?:\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE])|\uD83C\uDDF3(?:\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF])|\uD83C\uDDF2(?:\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF])|\uD83C\uDDF1(?:\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE])|\uD83C\uDDF0(?:\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF])|\uD83C\uDDEF(?:\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5])|\uD83C\uDDEE(?:\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9])|\uD83C\uDDED(?:\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA])|\uD83C\uDDEC(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE])|\uD83C\uDDEB(?:\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7])|\uD83C\uDDEA(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA])|\uD83C\uDDE9(?:\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF])|\uD83C\uDDE8(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF])|\uD83C\uDDE7(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF])|\uD83C\uDDE6(?:\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF])|[#\*0-9]\uFE0F\u20E3|\u2764\uFE0F|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])|\uD83C\uDFF4|(?:[\u270A\u270B]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD0C\uDD0F\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5])(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u261D\u270C\u270D]|\uD83D[\uDD74\uDD90])(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])|[\u270A\u270B]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC08\uDC15\uDC3B\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE2E\uDE35\uDE36\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD0C\uDD0F\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5]|\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD]|\uD83D\uDC6F|\uD83E[\uDD3C\uDDDE\uDDDF]|[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF84\uDF86-\uDF93\uDFA0-\uDFC1\uDFC5\uDFC6\uDFC8\uDFC9\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC07\uDC09-\uDC14\uDC16-\uDC3A\uDC3C-\uDC3E\uDC40\uDC44\uDC45\uDC51-\uDC65\uDC6A\uDC79-\uDC7B\uDC7D-\uDC80\uDC84\uDC88-\uDC8E\uDC90\uDC92-\uDCA9\uDCAB-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDDA4\uDDFB-\uDE2D\uDE2F-\uDE34\uDE37-\uDE44\uDE48-\uDE4A\uDE80-\uDEA2\uDEA4-\uDEB3\uDEB7-\uDEBF\uDEC1-\uDEC5\uDED0-\uDED2\uDED5-\uDED7\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB]|\uD83E[\uDD0D\uDD0E\uDD10-\uDD17\uDD1D\uDD20-\uDD25\uDD27-\uDD2F\uDD3A\uDD3F-\uDD45\uDD47-\uDD76\uDD78\uDD7A-\uDDB4\uDDB7\uDDBA\uDDBC-\uDDCB\uDDD0\uDDE0-\uDDFF\uDE70-\uDE74\uDE78-\uDE7A\uDE80-\uDE86\uDE90-\uDEA8\uDEB0-\uDEB6\uDEC0-\uDEC2\uDED0-\uDED6]|(?:[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u270A\u270B\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF93\uDFA0-\uDFCA\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF4\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC3E\uDC40\uDC42-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDD7A\uDD95\uDD96\uDDA4\uDDFB-\uDE4F\uDE80-\uDEC5\uDECC\uDED0-\uDED2\uDED5-\uDED7\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB]|\uD83E[\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDD78\uDD7A-\uDDCB\uDDCD-\uDDFF\uDE70-\uDE74\uDE78-\uDE7A\uDE80-\uDE86\uDE90-\uDEA8\uDEB0-\uDEB6\uDEC0-\uDEC2\uDED0-\uDED6])|(?:[#\*0-9\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u261D\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26A7\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE\u26C4\u26C5\u26C8\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC04\uDCCF\uDD70\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE02\uDE1A\uDE2F\uDE32-\uDE3A\uDE50\uDE51\uDF00-\uDF21\uDF24-\uDF93\uDF96\uDF97\uDF99-\uDF9B\uDF9E-\uDFF0\uDFF3-\uDFF5\uDFF7-\uDFFF]|\uD83D[\uDC00-\uDCFD\uDCFF-\uDD3D\uDD49-\uDD4E\uDD50-\uDD67\uDD6F\uDD70\uDD73-\uDD7A\uDD87\uDD8A-\uDD8D\uDD90\uDD95\uDD96\uDDA4\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA-\uDE4F\uDE80-\uDEC5\uDECB-\uDED2\uDED5-\uDED7\uDEE0-\uDEE5\uDEE9\uDEEB\uDEEC\uDEF0\uDEF3-\uDEFC\uDFE0-\uDFEB]|\uD83E[\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDD78\uDD7A-\uDDCB\uDDCD-\uDDFF\uDE70-\uDE74\uDE78-\uDE7A\uDE80-\uDE86\uDE90-\uDEA8\uDEB0-\uDEB6\uDEC0-\uDEC2\uDED0-\uDED6])\uFE0F|(?:[\u261D\u26F9\u270A-\u270D]|\uD83C[\uDF85\uDFC2-\uDFC4\uDFC7\uDFCA-\uDFCC]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66-\uDC78\uDC7C\uDC81-\uDC83\uDC85-\uDC87\uDC8F\uDC91\uDCAA\uDD74\uDD75\uDD7A\uDD90\uDD95\uDD96\uDE45-\uDE47\uDE4B-\uDE4F\uDEA3\uDEB4-\uDEB6\uDEC0\uDECC]|\uD83E[\uDD0C\uDD0F\uDD18-\uDD1F\uDD26\uDD30-\uDD39\uDD3C-\uDD3E\uDD77\uDDB5\uDDB6\uDDB8\uDDB9\uDDBB\uDDCD-\uDDCF\uDDD1-\uDDDD])/g};});var lu=Ze(ys=>{Object.defineProperty(ys,"__esModule",{value:!0});var In=e=>{let[,t]=/([a-f\d]{3,6})/i.exec(e)||[],s=t?t.length:0;if(s===3)t=t[0]+t[0]+t[1]+t[1]+t[2]+t[2];else if(s!==6)return [0,0,0];let r=parseInt(t,16);return [r>>16&255,r>>8&255,255&r]},gt=(e,t,s)=>t>e?t:e>s?s:e,gc=(e,t,s)=>{if(t==="")return e;let r=e.indexOf(t);if(r<0)return e;let n=t.length,i=0,o="";for(;~r;)o+=e.slice(i,r)+s,i=r+n,r=e.indexOf(t,i);return o+e.slice(i)},iu={open:"",close:""},T=(e=>{let t=D=>!!o.find(C=>D.test(C)),s=e||(typeof process<"u"?process:{}),{stdout:r,platform:n}=s,i=s.env||{},o=s.argv||[],a="FORCE_COLOR"in i,c=i.FORCE_COLOR,h=c==="true"||parseInt(c)>0,p="NO_COLOR"in i||a&&!h||t(/^-{1,2}(no-color|color=false|color=never)$/),l=a&&h||t(/^-{1,2}(color|color=true|color=always)$/),m=r&&"isTTY"in r&&/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(i.TERM);return !p&&(l||m||n==="win32"||"CI"in i)})()?(e,t)=>({open:`\x1B[${e}m`,close:`\x1B[${t}m`}):()=>iu,Ln=(e,t,s)=>T(`38;2;${e};${t};${s}`,39),su=(e,t,s)=>T(`48;2;${e};${t};${s}`,49),yc={visible:iu,reset:T(0,0),inverse:T(7,27),hidden:T(8,28),bold:T(1,22),dim:T(2,22),faint:T(2,22),italic:T(3,23),underline:T(4,24),doubleUnderline:T(21,24),strikethrough:T(9,29),strike:T(9,29),frame:T(51,54),encircle:T(52,54),overline:T(53,55),black:T(30,39),red:T(31,39),green:T(32,39),yellow:T(33,39),blue:T(34,39),magenta:T(35,39),cyan:T(36,39),white:T(37,39),grey:T(90,39),gray:T(90,39),blackBright:T(90,39),redBright:T(91,39),greenBright:T(92,39),yellowBright:T(93,39),blueBright:T(94,39),magentaBright:T(95,39),cyanBright:T(96,39),whiteBright:T(97,39),bgBlack:T(40,49),bgRed:T(41,49),bgGreen:T(42,49),bgYellow:T(43,49),bgBlue:T(44,49),bgMagenta:T(45,49),bgCyan:T(46,49),bgWhite:T(47,49),bgBlackBright:T(100,49),bgRedBright:T(101,49),bgGreenBright:T(102,49),bgYellowBright:T(103,49),bgBlueBright:T(104,49),bgMagentaBright:T(105,49),bgCyanBright:T(106,49),bgWhiteBright:T(107,49)},{defineProperty:xc,defineProperties:wc,setPrototypeOf:ou}=Object,Fc=/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,Cc=/(\r*\n)/g,uu=function(){let e=t=>t;return e.strip=t=>t.replace(Fc,""),e.extend=t=>{for(let s in t){let r=t[s],n=r.open!=null?r:Ln(...In(r));it[s]={get(){let i=au(this,n);return xc(this,s,{value:i}),i}};}Mn=wc(()=>{},it),ou(e,Mn);},e.extend(yc),e},au=({props:e},{open:t,close:s})=>{let r=(o,...a)=>Ec(o,a,r.props),n=t,i=s;return e!==void 0&&(n=e.openStack+t,i=s+e.closeStack),ou(r,Mn),r.props={open:t,close:s,openStack:n,closeStack:i,parent:e},r.open=n,r.close=i,r},Ec=(e,t,s)=>{if(!e)return "";let{openStack:r,closeStack:n}=s,i=e.raw!=null?String.raw(e,...t):e;if(~i.indexOf("\x1B"))for(;s!==void 0;)i=gc(i,s.close,s.open),s=s.parent;return ~i.indexOf(`
-`)&&(i=i.replace(Cc,n+"$1"+r)),r+i+n},nu={ansi:e=>(t=>T(`38;5;${t}`,39))(gt(e,0,255)),bgAnsi:e=>(t=>T(`48;5;${t}`,49))(gt(e,0,255)),hex:e=>Ln(...In(e)),bgHex:e=>su(...In(e)),rgb:(e,t,s)=>Ln(gt(e,0,255),gt(t,0,255),gt(s,0,255)),bgRgb:(e,t,s)=>su(gt(e,0,255),gt(t,0,255),gt(s,0,255))},it={},Mn;for(let e in nu)it[e]={get(){return (...t)=>au(this,nu[e](...t))}};it.ansi256=it.fg=it.ansi,it.bgAnsi256=it.bg=it.bgAnsi;var bc=new uu;ys.Ansis=uu,ys.default=bc;});var pu=Ze((wh,qn)=>{var cu=lu();qn.exports=cu.default;qn.exports.Ansis=cu.Ansis;});var gu=Ze((Nh,ni)=>{var hu=(e,t)=>{for(let s of Reflect.ownKeys(t))Object.defineProperty(e,s,Object.getOwnPropertyDescriptor(t,s));return e};ni.exports=hu;ni.exports.default=hu;});var xu=Ze((Ih,bs)=>{var Jc=gu(),Es=new WeakMap,yu=(e,t={})=>{if(typeof e!="function")throw new TypeError("Expected a function");let s,r=0,n=e.displayName||e.name||"<anonymous>",i=function(...o){if(Es.set(i,++r),r===1)s=e.apply(this,o),e=null;else if(t.throw===!0)throw new Error(`Function \`${n}\` can only be called once`);return s};return Jc(i,e),Es.set(i,r),i};bs.exports=yu;bs.exports.default=yu;bs.exports.callCount=e=>{if(!Es.has(e))throw new Error(`The given function \`${e.name}\` is not wrapped by the \`onetime\` package`);return Es.get(e)};});var wu=Ze((Lh,Ss)=>{Ss.exports=["SIGABRT","SIGALRM","SIGHUP","SIGINT","SIGTERM"];process.platform!=="win32"&&Ss.exports.push("SIGVTALRM","SIGXCPU","SIGXFSZ","SIGUSR2","SIGTRAP","SIGSYS","SIGQUIT","SIGIOT");process.platform==="linux"&&Ss.exports.push("SIGIO","SIGPOLL","SIGPWR","SIGSTKFLT","SIGUNUSED");});var Su=Ze((Mh,Zt)=>{var ne=global.process,Nt=function(e){return e&&typeof e=="object"&&typeof e.removeListener=="function"&&typeof e.emit=="function"&&typeof e.reallyExit=="function"&&typeof e.listeners=="function"&&typeof e.kill=="function"&&typeof e.pid=="number"&&typeof e.on=="function"};Nt(ne)?(Fu=rn("assert"),Kt=wu(),Cu=/^win/i.test(ne.platform),Nr=rn("events"),typeof Nr!="function"&&(Nr=Nr.EventEmitter),ne.__signal_exit_emitter__?he=ne.__signal_exit_emitter__:(he=ne.__signal_exit_emitter__=new Nr,he.count=0,he.emitted={}),he.infinite||(he.setMaxListeners(1/0),he.infinite=!0),Zt.exports=function(e,t){if(!Nt(global.process))return function(){};Fu.equal(typeof e,"function","a callback must be provided for exit handler"),Xt===!1&&ii();var s="exit";t&&t.alwaysLast&&(s="afterexit");var r=function(){he.removeListener(s,e),he.listeners("exit").length===0&&he.listeners("afterexit").length===0&&$s();};return he.on(s,e),r},$s=function(){!Xt||!Nt(global.process)||(Xt=!1,Kt.forEach(function(t){try{ne.removeListener(t,vs[t]);}catch{}}),ne.emit=Bs,ne.reallyExit=oi,he.count-=1);},Zt.exports.unload=$s,It=function(t,s,r){he.emitted[t]||(he.emitted[t]=!0,he.emit(t,s,r));},vs={},Kt.forEach(function(e){vs[e]=function(){if(Nt(global.process)){var s=ne.listeners(e);s.length===he.count&&($s(),It("exit",null,e),It("afterexit",null,e),Cu&&e==="SIGHUP"&&(e="SIGINT"),ne.kill(ne.pid,e));}};}),Zt.exports.signals=function(){return Kt},Xt=!1,ii=function(){Xt||!Nt(global.process)||(Xt=!0,he.count+=1,Kt=Kt.filter(function(t){try{return ne.on(t,vs[t]),!0}catch{return !1}}),ne.emit=bu,ne.reallyExit=Eu);},Zt.exports.load=ii,oi=ne.reallyExit,Eu=function(t){Nt(global.process)&&(ne.exitCode=t||0,It("exit",ne.exitCode,null),It("afterexit",ne.exitCode,null),oi.call(ne,ne.exitCode));},Bs=ne.emit,bu=function(t,s){if(t==="exit"&&Nt(global.process)){s!==void 0&&(ne.exitCode=s);var r=Bs.apply(this,arguments);return It("exit",ne.exitCode,null),It("afterexit",ne.exitCode,null),r}else return Bs.apply(this,arguments)}):Zt.exports=function(){return function(){}};var Fu,Kt,Cu,Nr,he,$s,It,vs,Xt,ii,oi,Eu,Bs,bu;});function ae(e){if(e===null)return "Null";if(e===void 0)return "Undefined";if(Number.isNaN(e))return "NaN";let t=Object.prototype.toString.call(e).slice(8,-1);return t==="AsyncFunction"?"Promise":t}var{isArray:Ue}=Array;function Ut(e){return Ue(e)?e.length>0:ae(e)==="Object"?Object.keys(e).length>0:!!e}function Me(...e){let t=0;for(;t<e.length;){let s=e[t];if(ae(s)==="Function"){if(Ut(s()))return !1}else if(Ut(s))return !1;t++;}return !0}function sn(e){return Ue(e)?e.length===0:ae(e)==="Object"?Object.keys(e).length===0:!e}function Yi(...e){let t=0;for(;t<e.length;){let s=e[t];if(ae(s)==="Function"){if(sn(s()))return !1}else if(sn(s))return !1;t++;}return !0}function ge(...e){let t=0;for(;t<e.length;){let s=e[t];if(ae(s)==="Function"){if(Ut(s()))return !0}else if(Ut(s))return !0;t++;}return !1}function Vr(e,t="."){return typeof e=="string"?e.split(t):e}function Ll(e,t){let s=t,r=0,n=Vr(e);for(;r<n.length;){if(s==null||s[n[r]]===null)return;s=s[n[r]],r++;}return s}function nn(e,t){if(arguments.length===1)return s=>nn(e,s);if(t!=null)return Ll(e,t)}function yr(e,t){if(!Ue(t))throw new Error(`Cannot read property 'indexOf' of ${t}`);let s=ae(e);if(!["Object","Array","NaN","RegExp"].includes(s))return t.indexOf(e);let r=-1,n=-1,{length:i}=t;for(;++r<i&&n===-1;)Hr(t[r],e)&&(n=r);return n}function Qi(e){let t=[],s;for(;!(s=e.next()).done;)t.push(s.value);return t}function Ml(e,t){if(e.size!==t.size)return !1;let s=Qi(e.values()),r=Qi(t.values());return s.filter(i=>yr(i,r)===-1).length===0}function Ki(e){let t=e.__proto__.toString();return ["Error","TypeError"].includes(t)?[t,e.message]:[]}function Xi(e){return e.toDateString?[!0,e.getTime()]:[!1]}function Zi(e){return e.constructor!==RegExp?[!1]:[!0,e.toString()]}function Hr(e,t){if(arguments.length===1)return h=>Hr(e,h);let s=ae(e);if(s!==ae(t))return !1;if(s==="Function")return e.name===void 0?!1:e.name===t.name;if(["NaN","Undefined","Null"].includes(s))return !0;if(s==="Number")return Object.is(-0,e)!==Object.is(-0,t)?!1:e.toString()===t.toString();if(["String","Boolean"].includes(s))return e.toString()===t.toString();if(s==="Array"){let h=Array.from(e),p=Array.from(t);if(h.toString()!==p.toString())return !1;let l=!0;return h.forEach((m,D)=>{l&&m!==p[D]&&!Hr(m,p[D])&&(l=!1);}),l}let r=Zi(e),n=Zi(t);if(r[0])return n[0]?r[1]===n[1]:!1;if(n[0])return !1;let i=Xi(e),o=Xi(t);if(i[0])return o[0]?i[1]===o[1]:!1;if(o[0])return !1;let a=Ki(e),c=Ki(t);if(a[0])return c[0]?a[0]===c[0]&&a[1]===c[1]:!1;if(s==="Set")return Ml(e,t);if(s==="Object"){let h=Object.keys(e);if(h.length!==Object.keys(t).length)return !1;let p=!0;return h.forEach(l=>{if(p){let m=e[l],D=t[l];m!==D&&!Hr(m,D)&&(p=!1);}}),p}return !1}var ql="RAMBDAX_DELAY";function on(e){return new Promise(t=>{setTimeout(()=>{t(ql);},e);})}function un(e,t){if(arguments.length===1)return s=>un(e,s);if(typeof t=="string")return t.includes(e);if(!t)throw new TypeError(`Cannot read property 'indexOf' of ${t}`);return Ue(t)?yr(e,t)>-1:!1}async function eo(e,t){if(Ue(t)){let r=[],n=0;for(let i of t)r.push(await e(i,n++));return r}let s={};for(let r in t)s[r]=await e(t[r],r);return s}function et(e,t){return arguments.length===1?async s=>eo(e,s):new Promise((s,r)=>{eo(e,t).then(s).catch(r);})}function me(e,t){return arguments.length===1?s=>me(e,s):ae(t)===e}async function to(e,t){let s=t.map((r,n)=>e(r,n));return Promise.all(s)}function ro(e,t){return arguments.length===1?async s=>to(e,s):new Promise((s,r)=>{to(e,t).then(s).catch(r);})}function an(e,t){if(arguments.length===1)return n=>an(e,n);if(t==null)return;let s=Vr(e,","),r={};for(let n in t)s.includes(n)||(r[n]=t[n]);return r}var Jr=class{constructor(){this.set=new Set,this.items={};}checkUniqueness(t){let s=ae(t);if(["Null","Undefined","NaN"].includes(s))return s in this.items?!1:(this.items[s]=!0,!0);if(!["Object","Array"].includes(s)){let r=this.set.size;return this.set.add(t),this.set.size!==r}return s in this.items?yr(t,this.items[s])===-1?(this.items[s].push(t),!0):!1:(this.items[s]=[t],!0)}};function Yr(e){let t=new Jr,s=[];return e.forEach(r=>{t.checkUniqueness(r)&&s.push(r);}),s}function d(e,t){return arguments.length===1?s=>d(e,s):t?t.hasOwnProperty(e):!1}function Ve(e,t){return arguments.length===1?s=>Ve(e,s):nn(e,t)!==void 0}function J(e){let t=ae(e);return ["Undefined","NaN","Number","Null"].includes(t)?!1:e?t==="Object"?Object.keys(e).length===0:t==="Array"?e.length===0:!1:!0}function j(e){return e==null}function Qr(e,t){return arguments.length===1?s=>Qr(e,s):t.join(e)}function so(e){return typeof e=="string"?e[e.length-1]||"":e[e.length-1]}var {error:te,log:B,warn:no}=console,A="",ye=" ",w=`
-`,He=e=>ye.repeat(e),P=e=>w.repeat(e);Qr(w);var Te=Qr(A),Je=Object.create,U=Object.assign,Vt=Object.defineProperty,Re=Object.keys,Kr=Object.values,at=Array.from;Buffer.from;var S=Array.isArray,_e=Buffer.isBuffer,X=me("Undefined"),I=me("Object"),oe=me("Boolean"),Bt=me("RegExp"),Xr=me("Number"),L=me("String"),Se=me("Function");me("Async");var f={};gr(f,{build:()=>lp,changed:()=>gp,clear:()=>ot,configChanges:()=>Op,console:()=>ap,deleted:()=>Bp,err:()=>cp,exported:()=>Ep,external:()=>fp,failed:()=>Pp,hline:()=>Xn,hook:()=>mp,hot:()=>yp,ignored:()=>_p,importer:()=>bp,invalid:()=>kp,minified:()=>Ap,newGroup:()=>Dp,nwl:()=>Ae,out:()=>B,process:()=>qu,progress:()=>Lu,prompt:()=>Fp,reloaded:()=>Tp,resource:()=>xp,retrying:()=>vp,skipped:()=>Rp,spawn:()=>Np,spinner:()=>pi,start:()=>Iu,syncing:()=>Cp,throws:()=>jp,transform:()=>Sp,unhook:()=>dp,update:()=>Lt,updated:()=>hp,upload:()=>wp,warn:()=>$p,write:()=>pp});var Gl=Object.assign||((e,t)=>(t&&Object.keys(t).forEach(s=>e[s]=t[s]),e)),ln=(e,t,s)=>{let r=typeof s;if(s&&r==="object")if(Array.isArray(s))for(let n of s)t=ln(e,t,n);else for(let n of Object.keys(s)){let i=s[n];typeof i=="function"?t[n]=i(t[n],Zr):i===void 0?e&&!isNaN(n)?t.splice(n,1):delete t[n]:i===null||typeof i!="object"||Array.isArray(i)?t[n]=i:typeof t[n]=="object"?t[n]=i===t[n]?i:Zr(t[n],i):t[n]=ln(!1,{},i);}else r==="function"&&(t=s(t,Zr));return t},Zr=(e,...t)=>{let s=Array.isArray(e);return ln(s,s?e.slice():Gl({},e),t)},de=Zr;var io=()=>({json:{assets:!0,config:!0,locales:!0,metafields:!0,metaobject:!0,groups:!0,templates:!0,exclude:[]},script:{minifySyntax:!0,minifyIdentifiers:!0,minifyWhitespace:!0,mangleProps:void 0,legalComments:"none",mangleQuoted:!1,keepNames:!1,exclude:[]},liquid:{minifyJavascript:!1,minifyStylesheet:!1,minifyStyle:!0,minifySchema:!0,removeComments:!0,collapseInner:!1,collapseWhitespace:!0,stripDashes:!0,exclude:[]},style:{exclude:[],format:!1,inline:!1,purgeUnusedCSS:!1,obfuscateAlphabet:"abcefghijklmnopqrstuvwxyz0123456789",obfuscateClassNames:!1,obfuscateWhitelist:[]},markup:{caseSensitive:!1,collapseBooleanAttributes:!1,collapseInlineTagWhitespace:!1,conservativeCollapse:!1,keepClosingSlash:!1,noNewlinesBeforeTagClose:!1,preventAttributesEscaping:!1,removeEmptyAttributes:!1,removeEmptyElements:!1,removeOptionalTags:!1,removeRedundantAttributes:!1,removeScriptTypeAttributes:!0,removeStyleLinkTypeAttributes:!0,useShortDoctype:!1,collapseWhitespace:!0,continueOnParseError:!0,removeComments:!0,minifyCSS:!0,minifyJS:!0,trimCustomFragments:!1,ignoreCustomFragments:[/(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,/<style[\s\S]*?<\/style>/,/<script[\s\S]*?<\/script>/,/{%[\s\S]*?%}/]}});var oo=()=>({input:"source",output:"theme",import:"import",export:"export",config:".",hot:!1,stores:null,spawn:{build:null,watch:null},logger:{clear:!0,silent:!1,stats:!0,warnings:!0},paths:{assets:"assets/*",config:"config/*.json",layout:"layout/*.liquid",locales:"locales/*.json",snippets:"snippets/*.liquid",metafields:"metafields/**/*.json",metaobject:"templates/customers/*.json",redirects:"redirects.yaml",sections:["sections/**/*.json","sections/**/*.liquid"],pages:["pages/*.html","pages/*.md"],templates:["templates/customers/*.liquid","templates/customers/*.json"],customers:["templates/customers/*.liquid","templates/customers/*.json"]},views:{sections:{prefixDir:!1,separator:"-",global:[]},snippets:{prefixDir:!1,separator:"-",global:[]},pages:{author:"",safeSync:!0,importLanguage:"html",suffixDir:!1,global:[]}},transforms:{svg:null,style:null,script:null},terser:{json:!1,markup:!1,liquid:!1,script:!1}});var uo=()=>({json:{indent:2,useTab:!1,crlf:!1,exclude:null},postcss:{installed:!1,loaded:!1,file:!1,config:[]},sass:{installed:!1,loaded:!1,file:!1,config:{warnings:!0,style:"compressed",sourcemap:!0,include:["node_modules"]}},esbuild:{installed:!1,loaded:!1,file:!1,config:{bundle:!0,format:"esm",globalName:void 0,target:"es2016",metafile:!0,external:[],platform:"browser",splitting:!1,sourcemap:"linked",write:!1,logLevel:"silent",plugins:[]}},sharp:{installed:!1,required:!1,loaded:!1,file:!1,config:{}},sprite:{installed:!1,loaded:!1,file:!1,config:{mode:{inline:!0,symbol:{example:!1}},shape:{transform:["svgo"],id:{generator:"svg-%s"}},svg:{xmlDeclaration:!1,doctypeDeclaration:!1,dimensionAttributes:!1,namespaceClassnames:!1,namespaceIDs:!1}}},svgo:{installed:!1,loaded:!1,file:!1,config:{multipass:!0,datauri:"enc",js2svg:{indent:2,pretty:!0},plugins:["preset-default"]}}});var ao=()=>({onBuild:[],onChange:[],onReload:[],onTransform:[],onWatch:[]});function ts(e,t,s){return child_process.execFileSync(e,t,{encoding:"utf8",shell:s,stdio:["ignore","pipe","ignore"]}).trim()}function lo(e,t){let s=pathe.dirname(url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('out.js', document.baseURI).href))));return ts(pathe.join(s,e),[],t).split(/\r?\n/)}function lt(e,t){return {cols:Number.parseInt(e,10),rows:Number.parseInt(t,10)}}function rs(){let{env:e,stdout:t,stderr:s}=es__default.default;if(t&&t.columns&&t.rows)return lt(t.columns,t.rows);if(s&&s.columns&&s.rows)return lt(s.columns,s.rows);if(e.COLUMNS&&e.LINES)return lt(e.COLUMNS,e.LINES);if(es__default.default.platform==="win32")try{let r=lo("vendor/windows/term-size.exe",!1);if(r.length===2)return lt(r[0],r[1])}catch{}else {if(es__default.default.platform==="darwin")try{let r=lo("vendor/macos/term-size",!0);if(r.length===2)return lt(r[0],r[1])}catch{}try{let r=ts("resize",["-u"]).match(/\d+/g);if(r.length===2)return lt(r[0],r[1])}catch{}if(es__default.default.env.TERM)try{let r=ts("tput",["cols"]),n=ts("tput",["lines"]);if(r&&n)return lt(r,n)}catch{}}return lt(80,24)}var cn=["\u280B","\u2819","\u2839","\u2838","\u283C","\u2834","\u2826","\u2827","\u2807","\u280F"];var co=["caches","sourcemaps","sourcemaps/style","sourcemaps/script"],po=[["input","source"],["output","theme"],["export","export"],["import","import"],["config","."]],At=["assets","config","layout","customers","locales","sections","snippets","templates","metaobject","metafields","pages","redirects"],wr=["templates","templates/customers","templates/metaobject","assets","config","layout","locales","sections","snippets"];var pn=["b","kb","mb","gb","tb"],fo=["You cannot use script minification without esbuild installed","and configured as a processor. Install esbuild and configure Syncify","to apply transforms to leverage script minification."],fn="__injected_dirname__",mn="__injected_filename__",dn="__injected_import_meta_url__",Fr=/([|,])/g,ss=/\.(mjs|cjs|ts|js|tsx|jsx)$/,mo=/(\()(line\s[0-9]+)(\))(:)/g,Do=/('[\w\s.-]*?'|"[\w\s.-]*?")/g,ho=/({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g,go=/((?:www|http:|https:)+[^\s]+[\w])/g,yo=/(?<=Filename\s)([\w._-]+)(?=\salready)/,xo=/(\/)(.*?)(\/)/g,Dn={404:"The requested resource was not found.",400:"The request was not understood by the server, generally due to bad syntax or because the Content-Type header was not correctly set to application / json. This status is also returned when the request provides an invalid code parameter during the OAuth token exchange process.",303:"The response to the request can be found under a different URL in the Location header and can be retrieved using a GET method on that resource.",401:"The necessary authentication credentials are not present in the request or are incorrect",402:"The requested shop is currently frozen. The shop owner needs to log in to the shop's admin, and pay the outstanding balance to unfreeze the shop.",406:"The requested resource is only capable of generating content not acceptable according to the Accept headers sent in the request.",423:"The requested shop is currently locked. Shops are locked if they repeatedly exceed their API request limit. or if there is an issue with the account, such as a detected compromise or fraud risk.",403:"The server is refusing to respond to the request. This is generally because you have not requested the appropriate scope for this action.",501:"The requested endpoint is not available on that particular shop, e.g. requesting access to a Shopify Plus\u2013only API on a non-Plus shop. This response may also indicate that this endpoint is reserved for future use.",503:"The server is currently unavailable. Check the Shopify status page for reported service outages. See https://www.shopifystatus.com"};var De={current:null,count:0,process:{}};function Jl(){let e=Je(null);for(let t of At)e[t]=Je(null),e[t].input=null,e[t].match=null;return e.transforms=new Map,e}var u=new class Ce{static defaults=oo();static plugins=ao();static terser=io();static processor=uo();static package=Je(null);static cache=Je(null);static watch=new Set;process;restart=!1;cli=Je(null);wss=null;filters=Je(null);commands=Je(null);version=null;cwd=null;argv=es.argv.slice(2).join(" ");errors=new Set;env={cli:!1,dev:!0,prod:!1,sync:0};hot={inject:!0,server:3e3,socket:8089,history:!1,method:"hot",strategy:"hydrate",scroll:"preserved",layouts:["theme.liquid"],label:"visible",snippet:null,output:null,alive:{},renderer:"{% render 'hot.js'"+["","server: 3000","socket: 8089",'strategy: "hydrate"','scroll: "preserved"','label: "visible"',"history: false",'method: "hot"'].join(", ")+" %}"};logger={clear:!0,silent:!1,stats:!0,warnings:!0};mode={build:!1,interactive:!1,watch:!1,clean:!1,upload:!1,download:!1,metafields:!1,terse:!1,hot:!1,pages:!1,pull:!1,force:!1,vsc:!1,views:!1,script:!1,image:!1,style:!1,svg:!1,redirects:!1,export:!1};file={base:null,path:null,relative:null};files=new Map;dirs={};cmd={config:null,delete:null,filter:null,input:null,output:null};sync={themes:[],stores:[]};spawn={paths:new Set,streams:new Map,invoked:!1,commands:{}};section={prefixDir:!1,separator:"-",global:null,baseDir:new Set};snippet={prefixDir:!1,separator:"-",global:null,baseDir:new Set};paths=Jl();page={safeSync:!0,author:"",global:null,suffixDir:!1,importLanguage:"html",export:{quotes:"\u201C\u201D\u2018\u2019",html:!0,linkify:!1,typographer:!1,xhtmlOut:!1,breaks:!0,langPrefix:"language-"},import:{codeBlockStyle:"fenced",emDelimiter:"_",fence:"```",headingStyle:"atx",hr:"---",linkReferenceStyle:"full",linkStyle:"inlined",strongDelimiter:"**",bulletListMarker:"-"}};script=[];style=[];svg=[];image;terse={json:!1,liquid:!1,markup:!1,style:!1,script:!1};get watch(){return Ce.watch}set watch(t){Ce.watch=t;}get cache(){return Ce.cache}set cache(t){Ce.cache=t;}get terser(){return Ce.terser}set terser(t){Ce.terser=de(Ce.terser,t);}get processor(){return Ce.processor}set config(t){Ce.defaults=de(Ce.defaults,t);}get config(){return Ce.defaults}set pkg(t){Ce.package=t;}get pkg(){return Ce.package}get plugins(){return Ce.plugins}get terminal(){return rs()}};var gn=zt(Fo(),1);var Er=class extends Error{constructor(t){super(t),this.name="TimeoutError";}},yn=class extends Error{constructor(t){super(),this.name="AbortError",this.message=t;}},Co=e=>globalThis.DOMException===void 0?new yn(e):new DOMException(e),Eo=e=>{let t=e.reason===void 0?Co("This operation was aborted."):e.reason;return t instanceof Error?t:Co(t)};function xn(e,t,s,r){let n,i=new Promise((o,a)=>{if(typeof t!="number"||Math.sign(t)!==1)throw new TypeError(`Expected \`milliseconds\` to be a positive number, got \`${t}\``);if(t===Number.POSITIVE_INFINITY){o(e);return}if(r={customTimers:{setTimeout,clearTimeout},...r},r.signal){let{signal:c}=r;c.aborted&&a(Eo(c)),c.addEventListener("abort",()=>{a(Eo(c));});}n=r.customTimers.setTimeout.call(void 0,()=>{if(typeof s=="function"){try{o(s());}catch(p){a(p);}return}let c=typeof s=="string"?s:`Promise timed out after ${t} milliseconds`,h=s instanceof Error?s:new Er(c);typeof e.cancel=="function"&&e.cancel(),a(h);},t),(async()=>{try{o(await e);}catch(c){a(c);}finally{r.customTimers.clearTimeout.call(void 0,n);}})();});return i.clear=()=>{clearTimeout(n),n=void 0;},i}function wn(e,t,s){let r=0,n=e.length;for(;n>0;){let i=Math.trunc(n/2),o=r+i;s(e[o],t)<=0?(r=++o,n-=i+1):n=i;}return r}var Tt=function(e,t,s,r){if(s==="a"&&!r)throw new TypeError("Private accessor was defined without a getter");if(typeof t=="function"?e!==t||!r:!t.has(e))throw new TypeError("Cannot read private member from an object whose class did not declare it");return s==="m"?r:s==="a"?r.call(e):r?r.value:t.get(e)},tt,Fn=class{constructor(){tt.set(this,[]);}enqueue(t,s){s={priority:0,...s};let r={priority:s.priority,run:t};if(this.size&&Tt(this,tt,"f")[this.size-1].priority>=s.priority){Tt(this,tt,"f").push(r);return}let n=wn(Tt(this,tt,"f"),r,(i,o)=>o.priority-i.priority);Tt(this,tt,"f").splice(n,0,r);}dequeue(){let t=Tt(this,tt,"f").shift();return t?.run}filter(t){return Tt(this,tt,"f").filter(s=>s.priority===t.priority).map(s=>s.run)}get size(){return Tt(this,tt,"f").length}};tt=new WeakMap;var bo=Fn;var ue=function(e,t,s,r,n){if(r==="m")throw new TypeError("Private method is not writable");if(r==="a"&&!n)throw new TypeError("Private accessor was defined without a setter");if(typeof t=="function"?e!==t||!n:!t.has(e))throw new TypeError("Cannot write private member to an object whose class did not declare it");return r==="a"?n.call(e,s):n?n.value=s:t.set(e,s),s},$=function(e,t,s,r){if(s==="a"&&!r)throw new TypeError("Private accessor was defined without a getter");if(typeof t=="function"?e!==t||!r:!t.has(e))throw new TypeError("Cannot read private member from an object whose class did not declare it");return s==="m"?r:s==="a"?r.call(e):r?r.value:t.get(e)},pe,Sr,$r,pt,ps,vr,os,qe,br,ke,us,Pe,Br,ct,as,So,$o,Ao,vo,Bo,ls,Cn,En,fs,To,cs,ms=class extends Error{},bn=class extends gn.default{constructor(t){var s,r,n,i;if(super(),pe.add(this),Sr.set(this,void 0),$r.set(this,void 0),pt.set(this,0),ps.set(this,void 0),vr.set(this,void 0),os.set(this,0),qe.set(this,void 0),br.set(this,void 0),ke.set(this,void 0),us.set(this,void 0),Pe.set(this,0),Br.set(this,void 0),ct.set(this,void 0),as.set(this,void 0),Object.defineProperty(this,"timeout",{enumerable:!0,configurable:!0,writable:!0,value:void 0}),t={carryoverConcurrencyCount:!1,intervalCap:Number.POSITIVE_INFINITY,interval:0,concurrency:Number.POSITIVE_INFINITY,autoStart:!0,queueClass:bo,...t},!(typeof t.intervalCap=="number"&&t.intervalCap>=1))throw new TypeError(`Expected \`intervalCap\` to be a number from 1 and up, got \`${(r=(s=t.intervalCap)===null||s===void 0?void 0:s.toString())!==null&&r!==void 0?r:""}\` (${typeof t.intervalCap})`);if(t.interval===void 0||!(Number.isFinite(t.interval)&&t.interval>=0))throw new TypeError(`Expected \`interval\` to be a finite number >= 0, got \`${(i=(n=t.interval)===null||n===void 0?void 0:n.toString())!==null&&i!==void 0?i:""}\` (${typeof t.interval})`);ue(this,Sr,t.carryoverConcurrencyCount,"f"),ue(this,$r,t.intervalCap===Number.POSITIVE_INFINITY||t.interval===0,"f"),ue(this,ps,t.intervalCap,"f"),ue(this,vr,t.interval,"f"),ue(this,ke,new t.queueClass,"f"),ue(this,us,t.queueClass,"f"),this.concurrency=t.concurrency,this.timeout=t.timeout,ue(this,as,t.throwOnTimeout===!0,"f"),ue(this,ct,t.autoStart===!1,"f");}get concurrency(){return $(this,Br,"f")}set concurrency(t){if(!(typeof t=="number"&&t>=1))throw new TypeError(`Expected \`concurrency\` to be a number from 1 and up, got \`${t}\` (${typeof t})`);ue(this,Br,t,"f"),$(this,pe,"m",fs).call(this);}async add(t,s={}){return s={timeout:this.timeout,throwOnTimeout:$(this,as,"f"),...s},new Promise((r,n)=>{$(this,ke,"f").enqueue(async()=>{var i,o,a;ue(this,Pe,(o=$(this,Pe,"f"),o++,o),"f"),ue(this,pt,(a=$(this,pt,"f"),a++,a),"f");try{if(!((i=s.signal)===null||i===void 0)&&i.aborted)throw new ms("The task was aborted.");let c=t({signal:s.signal});s.timeout&&(c=xn(Promise.resolve(c),s.timeout)),s.signal&&(c=Promise.race([c,$(this,pe,"m",To).call(this,s.signal)]));let h=await c;r(h),this.emit("completed",h);}catch(c){if(c instanceof Er&&!s.throwOnTimeout){r();return}n(c),this.emit("error",c);}finally{$(this,pe,"m",Ao).call(this);}},s),this.emit("add"),$(this,pe,"m",ls).call(this);})}async addAll(t,s){return Promise.all(t.map(async r=>this.add(r,s)))}start(){return $(this,ct,"f")?(ue(this,ct,!1,"f"),$(this,pe,"m",fs).call(this),this):this}pause(){ue(this,ct,!0,"f");}clear(){ue(this,ke,new($(this,us,"f")),"f");}async onEmpty(){$(this,ke,"f").size!==0&&await $(this,pe,"m",cs).call(this,"empty");}async onSizeLessThan(t){$(this,ke,"f").size<t||await $(this,pe,"m",cs).call(this,"next",()=>$(this,ke,"f").size<t);}async onIdle(){$(this,Pe,"f")===0&&$(this,ke,"f").size===0||await $(this,pe,"m",cs).call(this,"idle");}get size(){return $(this,ke,"f").size}sizeBy(t){return $(this,ke,"f").filter(t).length}get pending(){return $(this,Pe,"f")}get isPaused(){return $(this,ct,"f")}};Sr=new WeakMap,$r=new WeakMap,pt=new WeakMap,ps=new WeakMap,vr=new WeakMap,os=new WeakMap,qe=new WeakMap,br=new WeakMap,ke=new WeakMap,us=new WeakMap,Pe=new WeakMap,Br=new WeakMap,ct=new WeakMap,as=new WeakMap,pe=new WeakSet,So=function(){return $(this,$r,"f")||$(this,pt,"f")<$(this,ps,"f")},$o=function(){return $(this,Pe,"f")<$(this,Br,"f")},Ao=function(){var t;ue(this,Pe,(t=$(this,Pe,"f"),t--,t),"f"),$(this,pe,"m",ls).call(this),this.emit("next");},vo=function(){$(this,pe,"m",En).call(this),$(this,pe,"m",Cn).call(this),ue(this,br,void 0,"f");},Bo=function(){let t=Date.now();if($(this,qe,"f")===void 0){let s=$(this,os,"f")-t;if(s<0)ue(this,pt,$(this,Sr,"f")?$(this,Pe,"f"):0,"f");else return $(this,br,"f")===void 0&&ue(this,br,setTimeout(()=>{$(this,pe,"m",vo).call(this);},s),"f"),!0}return !1},ls=function(){if($(this,ke,"f").size===0)return $(this,qe,"f")&&clearInterval($(this,qe,"f")),ue(this,qe,void 0,"f"),this.emit("empty"),$(this,Pe,"f")===0&&this.emit("idle"),!1;if(!$(this,ct,"f")){let t=!$(this,pe,"a",Bo);if($(this,pe,"a",So)&&$(this,pe,"a",$o)){let s=$(this,ke,"f").dequeue();return s?(this.emit("active"),s(),t&&$(this,pe,"m",Cn).call(this),!0):!1}}return !1},Cn=function(){$(this,$r,"f")||$(this,qe,"f")!==void 0||(ue(this,qe,setInterval(()=>{$(this,pe,"m",En).call(this);},$(this,vr,"f")),"f"),ue(this,os,Date.now()+$(this,vr,"f"),"f"));},En=function(){$(this,pt,"f")===0&&$(this,Pe,"f")===0&&$(this,qe,"f")&&(clearInterval($(this,qe,"f")),ue(this,qe,void 0,"f")),ue(this,pt,$(this,Sr,"f")?$(this,Pe,"f"):0,"f"),$(this,pe,"m",fs).call(this);},fs=function(){for(;$(this,pe,"m",ls).call(this););},To=async function(t){return new Promise((s,r)=>{t.addEventListener("abort",()=>{r(new ms("The task was aborted."));},{once:!0});})},cs=async function(t,s){return new Promise(r=>{let n=()=>{s&&!s()||(this.off(t,n),r());};this.on(t,n);})};var Ro=bn;var $e=Kl__default.default.create({responseType:"json",headers:{}}),G=new Ro({concurrency:5,interval:250,intervalCap:2});function ft(e){return e===429||e===500?!0:(G.isPaused||G.pause(),!1)}var Sn=Symbol("singleComment"),_o=Symbol("multiComment"),Xl=()=>"",Zl=(e,t,s)=>e.slice(t,s).replace(/\S/g," "),ec=(e,t)=>{let s=t-1,r=0;for(;e[s]==="\\";)s-=1,r+=1;return !!(r%2)};function ds(e,{whitespace:t=!0,trailingCommas:s=!1}={}){if(typeof e!="string")throw new TypeError(`Expected argument \`jsonString\` to be a \`string\`, got \`${typeof e}\``);let r=t?Zl:Xl,n=!1,i=!1,o=0,a="",c="",h=-1;for(let p=0;p<e.length;p++){let l=e[p],m=e[p+1];if(!i&&l==='"'&&(ec(e,p)||(n=!n)),!n)if(!i&&l+m==="//")a+=e.slice(o,p),o=p,i=Sn,p++;else if(i===Sn&&l+m===`\r
-`){p++,i=!1,a+=r(e,o,p),o=p;continue}else if(i===Sn&&l===`
-`)i=!1,a+=r(e,o,p),o=p;else if(!i&&l+m==="/*"){a+=e.slice(o,p),o=p,i=_o,p++;continue}else if(i===_o&&l+m==="*/"){p++,i=!1,a+=r(e,o,p+1),o=p+1;continue}else s&&!i&&(h!==-1?l==="}"||l==="]"?(a+=e.slice(o,p),c+=r(a,0,1)+a.slice(1),a="",o=p,h=-1):l!==" "&&l!=="	"&&l!=="\r"&&l!==`
-`&&(a+=e.slice(o,p),o=p,h=-1):l===","&&(c+=a+e.slice(o,p),a="",o=p,h=p));}return c+a+(i?r(e.slice(o)):e.slice(o))}var Ie=new events.EventEmitter;function ko(e){try{return JSON.parse(ds(e).trim())}catch(t){throw new Error(t)}}function Po(e){return /\[(?:file|dir|ext)\]/.test(e)}function Oo(e){return e.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"").replace(/^-/,"")}function st(e,t,s=!1){return t>1?`${e}s`:e}function mt(e){return _e(e)?e.toString():I(e)||S(e)?JSON.stringify(e):String(e)}async function jo(e,{format:t}){return t==="esm"?s=>import(s):vn(e)}function No(e){return e===".mjs"||e===".cjs"?"js":e.slice(1)}function Rt(e){return e.charAt(0).toUpperCase()+e.slice(1)}function nt(e){return rt(ve(e))}function ve(e){return L(e)?Buffer.from(e).toString().length:e.toString().length}function rt(e){if(e===0)return "0b";let t=parseInt(`${Math.floor(Math.log(e)/Math.log(1024))}`,10);return t===0?`${F(String(e))}${pn[t]}`:`${F((e/1024**t).toFixed(1))}${pn[t]}`}function Oe(e,t){let s=ve(e),r=rt(sc__default.default.gzipSync(e).length),n=rt(t),i=rt(s),o=rt(t-s);return {isSmaller:s>t||s===t,gzip:r,before:n,after:i,saved:o}}function Ar(){let e=new Date,t=e.getHours(),s=e.getMinutes(),r=e.getSeconds(),n=g(":");return (t<10?`0${t}`:t)+n+(s<10?`0${s}`:s)+n+(r<10?`0${r}`:r)}function $n(e){let t=e%10,s=e%100;return e+(t===1&&s!==11?"st":t===2&&s!==12?"nd":t===3&&s!==13?"rd":"th")}function vn(e){return Se(globalThis.require)?globalThis.require(e):module$1.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('out.js', document.baseURI).href)))(e)}function Ye(){return Math.random().toString(36).slice(2)}function Bn(){return new Promise(e=>{typeof setImmediate=="function"?setImmediate(e):setTimeout(e);})}var An=new Map,Lo=["assert","count","countReset","debug","dir","dirxml","error","group","groupCollapsed","groupEnd","info","log","table","time","timeEnd","timeLog","trace","warn"];function Mo(e){let t=new stream.PassThrough,s=new stream.PassThrough;t.write=n=>e("stdout",n),s.write=n=>e("stderr",n);let r=new console$1.Console(t,s);for(let n of Lo)An.set(n,console[n]),console[n]=r[n];return ()=>{for(let n of Lo)console[n]=An.get(n);An.clear();}}var Ds=[],hs={},dt=e=>Y(e||!0),W=e=>{e?hs[e]=perf_hooks.performance.now():Ds.push(perf_hooks.performance.now());};function Y(e=!1,t=!1){let s;typeof e=="boolean"?s=e?Ds[Ds.length-1]:Ds.pop():e&&(t?(s=hs[e],delete hs[e]):s=hs[e]);let r=perf_hooks.performance.now()-s;if(r<1e3)return `${r.toFixed(0)}ms`;let n=r/1e3;if(n<60)return `${n.toFixed(0)}s ${+r.toFixed(0).slice(1,4)}ms`;let i=(n/60).toFixed(0);return `${i}m ${(n-60*Number(i)).toFixed(0)}s ${+r.toFixed(0).slice(1,4)}ms`}var q={};gr(q,{errors:()=>Yt,esbuild:()=>Vc,postcss:()=>Hc,request:()=>Wc,sass:()=>Uc,spawn:()=>ri,write:()=>zc});function Rn(e){if(typeof e!="string")throw new TypeError("Expected a string");return e.replace(/[|\\{}()[\]^$+*?.]/g,"\\$&").replace(/-/g,"\\x2d")}var oc=()=>ic__default.default.homedir().replace(/\\/g,"/"),qo=oc;var Go=/\s+at.*[(\s](.*)\)?/,Wo=/^(?:(?:(?:node|node:[\w/]+|(?:(?:node:)?internal\/[\w/]*|.*node_modules\/(?:babel-polyfill|pirates)\/.*)?\w+)(?:\.js)?:\d+:\d+)|native)/;function _n(e,{pretty:t=!1,basePath:s,pathFilter:r}={}){let n=s&&new RegExp(`(file://)?${Rn(s.replace(/\\/g,"/"))}/?`,"g"),i=t?qo():"";if(typeof e=="string")return e.replace(/\\/g,"/").split(`
-`).filter(o=>{let a=o.match(Go);if(a===null||!a[1])return !0;let c=a[1];return c.includes(".app/Contents/Resources/electron.asar")||c.includes(".app/Contents/Resources/default_app.asar")||c.includes("node_modules/electron/dist/resources/electron.asar")||c.includes("node_modules/electron/dist/resources/default_app.asar")?!1:r?!Wo.test(c)&&r(c):!Wo.test(c)}).filter(o=>o.trim()!=="").map(o=>(n&&(o=o.replace(n,"")),t&&(o=o.replace(Go,(a,c)=>a.replace(c,c.replace(i,"~")))),o)).join(`
-`)}function kn({onlyFirst:e=!1}={}){let t=["[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)","(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))"].join("|");return new RegExp(t,e?void 0:"g")}var uc=kn();function _t(e){if(typeof e!="string")throw new TypeError(`Expected a \`string\`, got \`${typeof e}\``);return e.replace(uc,"")}var Jo=zt(Uo(),1),Yo=zt(Ho(),1);function kt(e,t={}){if(typeof e!="string"||e.length===0||(t={ambiguousIsNarrow:!0,...t},e=_t(e),e.length===0))return 0;e=e.replace((0, Yo.default)(),"  ");let s=t.ambiguousIsNarrow?1:2,r=0;for(let n of e){let i=n.codePointAt(0);if(i<=31||i>=127&&i<=159||i>=768&&i<=879)continue;switch(Jo.default.eastAsianWidth(n)){case"F":case"W":r+=2;break;case"A":r+=s;break;default:r+=1;}}return r}var Qo=(e=0)=>t=>`\x1B[${t+e}m`,Ko=(e=0)=>t=>`\x1B[${38+e};5;${t}m`,Xo=(e=0)=>(t,s,r)=>`\x1B[${38+e};2;${t};${s};${r}m`,re={modifier:{reset:[0,0],bold:[1,22],dim:[2,22],italic:[3,23],underline:[4,24],overline:[53,55],inverse:[7,27],hidden:[8,28],strikethrough:[9,29]},color:{black:[30,39],red:[31,39],green:[32,39],yellow:[33,39],blue:[34,39],magenta:[35,39],cyan:[36,39],white:[37,39],blackBright:[90,39],gray:[90,39],grey:[90,39],redBright:[91,39],greenBright:[92,39],yellowBright:[93,39],blueBright:[94,39],magentaBright:[95,39],cyanBright:[96,39],whiteBright:[97,39]},bgColor:{bgBlack:[40,49],bgRed:[41,49],bgGreen:[42,49],bgYellow:[43,49],bgBlue:[44,49],bgMagenta:[45,49],bgCyan:[46,49],bgWhite:[47,49],bgBlackBright:[100,49],bgGray:[100,49],bgGrey:[100,49],bgRedBright:[101,49],bgGreenBright:[102,49],bgYellowBright:[103,49],bgBlueBright:[104,49],bgMagentaBright:[105,49],bgCyanBright:[106,49],bgWhiteBright:[107,49]}};Object.keys(re.modifier);var ac=Object.keys(re.color),lc=Object.keys(re.bgColor);[...ac,...lc];function cc(){let e=new Map;for(let[t,s]of Object.entries(re)){for(let[r,n]of Object.entries(s))re[r]={open:`\x1B[${n[0]}m`,close:`\x1B[${n[1]}m`},s[r]=re[r],e.set(n[0],n[1]);Object.defineProperty(re,t,{value:s,enumerable:!1});}return Object.defineProperty(re,"codes",{value:e,enumerable:!1}),re.color.close="\x1B[39m",re.bgColor.close="\x1B[49m",re.color.ansi=Qo(),re.color.ansi256=Ko(),re.color.ansi16m=Xo(),re.bgColor.ansi=Qo(10),re.bgColor.ansi256=Ko(10),re.bgColor.ansi16m=Xo(10),Object.defineProperties(re,{rgbToAnsi256:{value:(t,s,r)=>t===s&&s===r?t<8?16:t>248?231:Math.round((t-8)/247*24)+232:16+36*Math.round(t/255*5)+6*Math.round(s/255*5)+Math.round(r/255*5),enumerable:!1},hexToRgb:{value:t=>{let s=/[a-f\d]{6}|[a-f\d]{3}/i.exec(t.toString(16));if(!s)return [0,0,0];let[r]=s;r.length===3&&(r=[...r].map(i=>i+i).join(""));let n=Number.parseInt(r,16);return [n>>16&255,n>>8&255,n&255]},enumerable:!1},hexToAnsi256:{value:t=>re.rgbToAnsi256(...re.hexToRgb(t)),enumerable:!1},ansi256ToAnsi:{value:t=>{if(t<8)return 30+t;if(t<16)return 90+(t-8);let s,r,n;if(t>=232)s=((t-232)*10+8)/255,r=s,n=s;else {t-=16;let a=t%36;s=Math.floor(t/36)/5,r=Math.floor(a/6)/5,n=a%6/5;}let i=Math.max(s,r,n)*2;if(i===0)return 30;let o=30+(Math.round(n)<<2|Math.round(r)<<1|Math.round(s));return i===2&&(o+=60),o},enumerable:!1},rgbToAnsi:{value:(t,s,r)=>re.ansi256ToAnsi(re.rgbToAnsi256(t,s,r)),enumerable:!1},hexToAnsi:{value:t=>re.ansi256ToAnsi(re.hexToAnsi256(t)),enumerable:!1}}),re}var pc=cc(),Tr=pc;var gs=new Set(["\x1B","\x9B"]),fc=39,jn="\x07",tu="[",mc="]",ru="m",Nn=`${mc}8;;`,Zo=e=>`${gs.values().next().value}${tu}${e}${ru}`,eu=e=>`${gs.values().next().value}${Nn}${e}${jn}`,dc=e=>e.split(" ").map(t=>kt(t)),On=(e,t,s)=>{let r=[...t],n=!1,i=!1,o=kt(_t(e[e.length-1]));for(let[a,c]of r.entries()){let h=kt(c);if(o+h<=s?e[e.length-1]+=c:(e.push(c),o=0),gs.has(c)&&(n=!0,i=r.slice(a+1).join("").startsWith(Nn)),n){i?c===jn&&(n=!1,i=!1):c===ru&&(n=!1);continue}o+=h,o===s&&a<r.length-1&&(e.push(""),o=0);}!o&&e[e.length-1].length>0&&e.length>1&&(e[e.length-2]+=e.pop());},Dc=e=>{let t=e.split(" "),s=t.length;for(;s>0&&!(kt(t[s-1])>0);)s--;return s===t.length?e:t.slice(0,s).join(" ")+t.slice(s).join("")},hc=(e,t,s={})=>{if(s.trim!==!1&&e.trim()==="")return "";let r="",n,i,o=dc(e),a=[""];for(let[h,p]of e.split(" ").entries()){s.trim!==!1&&(a[a.length-1]=a[a.length-1].trimStart());let l=kt(a[a.length-1]);if(h!==0&&(l>=t&&(s.wordWrap===!1||s.trim===!1)&&(a.push(""),l=0),(l>0||s.trim===!1)&&(a[a.length-1]+=" ",l++)),s.hard&&o[h]>t){let m=t-l,D=1+Math.floor((o[h]-m-1)/t);Math.floor((o[h]-1)/t)<D&&a.push(""),On(a,p,t);continue}if(l+o[h]>t&&l>0&&o[h]>0){if(s.wordWrap===!1&&l<t){On(a,p,t);continue}a.push("");}if(l+o[h]>t&&s.wordWrap===!1){On(a,p,t);continue}a[a.length-1]+=p;}s.trim!==!1&&(a=a.map(h=>Dc(h)));let c=[...a.join(`
-`)];for(let[h,p]of c.entries()){if(r+=p,gs.has(p)){let{groups:m}=new RegExp(`(?:\\${tu}(?<code>\\d+)m|\\${Nn}(?<uri>.*)${jn})`).exec(c.slice(h).join(""))||{groups:{}};if(m.code!==void 0){let D=Number.parseFloat(m.code);n=D===fc?void 0:D;}else m.uri!==void 0&&(i=m.uri.length===0?void 0:m.uri);}let l=Tr.codes.get(Number(n));c[h+1]===`
-`?(i&&(r+=eu("")),n&&l&&(r+=Zo(l))):p===`
-`&&(n&&l&&(r+=Zo(n)),i&&(r+=eu(i)));}return r};function ht(e,t,s){return String(e).normalize().replace(/\r\n/g,`
-`).split(`
-`).map(r=>hc(r,t,s)).join(`
-`)}var R={};gr(R,{clear:()=>ot,closer:()=>Ot,context:()=>Ge,hline:()=>Xn,indent:()=>Ct,message:()=>ei,multiline:()=>ti,opener:()=>Pt,sample:()=>jt,shopify:()=>Fs,stack:()=>du,suffix:()=>V,tree:()=>Zn});var y={};gr(y,{ARL:()=>xs,ARR:()=>be,BAD:()=>Lc,CHK:()=>Ic,CHV:()=>Jn,COL:()=>N,DSH:()=>Jt,LCB:()=>Qn,LPR:()=>Mc,RCB:()=>Kn,RPR:()=>qc,TLD:()=>Yn,blue:()=>v,blueBright:()=>Gn,bold:()=>F,bottom:()=>Un,clear:()=>Sc,close:()=>Vn,cyan:()=>M,cyanBright:()=>vc,dash:()=>Wn,dim:()=>kc,error:()=>Gc,gray:()=>g,green:()=>Bc,greenBright:()=>Ac,hr:()=>Or,hrs:()=>Hn,italic:()=>Rc,lavender:()=>Oc,lightGray:()=>Ke,line:()=>x,magenta:()=>Ht,magentaBright:()=>Tc,neonCyan:()=>Xe,neonGreen:()=>fu,neonMagenta:()=>Nc,neonRouge:()=>jc,newline:()=>wt,open:()=>Pr,orange:()=>Pc,pink:()=>kr,purge:()=>$c,red:()=>O,redBright:()=>se,reset:()=>_r,strike:()=>_c,time:()=>Ft,top:()=>zn,underline:()=>Rr,warning:()=>ws,white:()=>b,whiteBright:()=>xt,yellow:()=>yt,yellowBright:()=>le});var Qe=zt(pu());var Sc="\x1B[H\x1B[2J",$c="\x1B[2J\x1B[3J\x1B[H\x1Bc",{cyan:M,cyanBright:vc,red:O,redBright:se,green:Bc,greenBright:Ac,yellow:yt,yellowBright:le,magenta:Ht,magentaBright:Tc,blue:v,blueBright:Gn,white:b,whiteBright:xt,gray:g,underline:Rr,bold:F,reset:_r,italic:Rc,strike:_c,dim:kc}=Qe.default,Ke=Qe.default.hex("#2a2a2e"),kr=Qe.default.hex("#ff75d1"),Pc=Qe.default.hex("#FFAB40"),Oc=Qe.default.hex("#8080FF"),fu=Qe.default.hex("#56ef83"),Xe=Qe.default.hex("#69d5fd"),jc=Qe.default.hex("#FF8095"),Nc=Qe.default.hex("#B319FF"),Pr=Ke("\u250C\u2500 "),x={gray:Ke("\u2502  "),red:O.dim("\u2502  "),yellow:yt.dim("\u2502  ")},wt=Ke(`${w}\u2502${w}`),Wn=Ke("\u2502  \u251C\u2500 "),zn=Ke("\u251C\u2500 "),Un=Ke("\u2502  \u2514\u2500 "),Vn=Ke("\u2514\u2500 "),Hn=e=>Ke(`${"\u2500".repeat(e)}`),Or=e=>Ke(`\u2502${w}\u251C${"\u2500".repeat(rs().cols-e)}${w}\u2502`),Ic=fu("\u2713 "),Lc=se("\u{10102}"),N=g(":"),be=g("\u2192"),Jn=g("\u2023"),xs=g("\u2942"),Yn=g("~"),Jt=g("\u2014"),Mc=g("("),qc=g(")"),Qn=g("{"),Kn=g("}"),ws=le(` ~ Type ${F("w")} and press ${F("enter")} to view`),Gc=se(` ~ Type ${F("v")} and press ${F("enter")} to view`),Ft=e=>e?_r.gray(` ~ ${e}`):A;var du=A;function ot(){let e=process.stdout.rows-2,t=e>0?P(e):A;B(t),mu__default.default.cursorTo(process.stdout,0,0),mu__default.default.clearScreenDown(process.stdout);}function Xn(e=15){B(Or(e));}function V(e,t,s){let r=u.mode.build?Wn:t==="invalid"||t==="failed"?x.red:t==="warning"?x.yellow:x.gray,n=10-t.length;return n<0&&(n=0),r+y[e](t)+He(n)+be+ye+y[e](s)}function Pt(e){return w+Pr+g(`${e} ~ ${Ar()}`)}function Zn(e,t){return e==="top"?zn+t:Un+t}function Ot(e){return x.gray+w+Vn+g(`${e} ~ ${Ar()}`)}function ei(e,t){return x.gray+y[e](t)}function Fs(e){if(S(e))return Te(e.map(Fs));let t=e;return t=t.replace(mo,g("$1")+b("$2")+g("$3")+b("$4")+P(2)),t=t.replace(Do,yt.bold("$1")),t=t.replace(ho,M("$1")+xt("$2")+M("$3")),t=t.replace(go,Rr("$1")),t=t.replace(xo,Ht("$1")+M("$2")+Ht("$3")),t=t.replace(yo,Xe.bold("$1")),Ct(se(ht(t,u.terminal.wrap)),{line:x.red})}function jt(e,t={}){let s=d("line",t)?t.line:x.gray;if(Ve("span.start",t)){let r=d("end",t.span)?t.span.end:t.span.start+1;return s+w+Te([`${s}${v(`${t.span.start-1}`)}${N+w}${s}${v(`${t.span.start}`)}${N} ${e+w}${s}${v(`${r}`)}${N+w}`])}return s+w+s+e}function Ct(e,t={}){let s=S(e)?e:e.split(w).filter(Boolean),r=d("line",t)?t.line:x.gray,n=d("nwl",t)?`${r+w}`:A;for(;s.length!==0;){let i=s.shift();i.trim().length>0?i.trim().startsWith(r)?n+=(d("text",t)?t.text(i):i)+w:n+=r+(d("text",t)?t.text(i.trimStart()):i.trimStart())+w:n+=r+w;}return n}function Ge(e){let t=0,s=x.red+w;for(let r in e.entries)t<r.length&&e.entries[r]&&(t=r.length);for(let r in e.entries)e.entries[r]&&(s+=Te([x.red,b(r),N+ye,He(t-r.length),g(`${e.entries[r]}`)+w]));return e.stack&&(du=e.stack,s+=Te([x.red,b("stack"),N+ye,He(t-5),g(`Type ${F("s")} and press ${F("enter")} to view stack trace`),w+x.gray])),s.trimEnd()}function ti(e,t){let s=x.gray,r=b;e==="error"?(s=x.red,r=O):e==="warning"&&(s=x.yellow,r=le);let n=[],i=t.trim(),o=ht(i,u.terminal.wrap).split(w);for(;o.length!==0;){let a=o.shift();a.trim().length>0&&n.push(s+r(a));}return s+w+n.join(w)+w}var Yt={};function ri(e){let t=[],s=[x.red],r=e.search(/(?:\n {4}at .*)/),n=[];if(/\berror\b:?/i.test(e)&&r>0){n=e.slice(0,r).split(w);let i=_n(e.slice(r),{pretty:!0,basePath:u.cwd}),o=ht(i,u.terminal.wrap).split(w);for(s.push(w);o.length!==0;){let a=o.shift();a.trim().length>0&&s.push(_r(x.red+a));}}for(n.length===0&&(n=e.split(w));n.length!==0;){let i=n.shift();i.trim().length>0&&t.push(_r(x.gray)+i);}te(`${t.join(w)}${s.length>1?s.join(w):A}`);}function Wc(e,t,s=!0){let r=Ve("error.asset",t.data)?t.data.error.asset:Ve("errors.asset",t.data)?t.data.errors.asset:null;if(t.status===422){let n=Te([x.red,w,Fs(r),Ge({stack:!1,entries:{status:t.status,message:t.statusText,source:Rr(`${e}`)}})]);return s?te(n):n}else if(t.status in Dn){let n=Te([x.red,w,ti("error",Dn[t.status])+Ge({stack:!1,entries:{status:t.status,message:t.statusText,source:`${e}`}})]);return s?te(n):n}else {let n=Te([x.red,w,O("Unknown error has occured")+Ge({stack:!1,entries:{status:t.status,message:t.statusText,source:`${e}`}})]);return s?te(n):n}}var zc=(e,t)=>s=>{te(Ct(s.message,{nwl:!0,line:x.red,text:O.bold})+Ge({stack:s.stack,entries:{...t,code:s.code,name:s.name,details:e}}));};function Uc(e,t){te(Ct(t.message,{nwl:!0,line:x.red,text:O})+Ge({stack:t.sassStack,entries:{input:e.relative,message:t.sassMessage}}));}function Vc(e){te(Ct(e.text,{nwl:!0,line:x.red,text:O})+jt(e.location.lineText,{line:x.red,span:{start:e.location.line,end:e.location.line+1}})+Ge({stack:!1,entries:{file:e.location.file,line:e.location.line,column:e.location.column,plugin:e.pluginName}}));}function Hc(e){}var Q="\x1B[",jr="\x1B]",Qt="\x07",Cs=";",Du=process.env.TERM_PROGRAM==="Apple_Terminal",z={};z.cursorTo=(e,t)=>{if(typeof e!="number")throw new TypeError("The `x` argument is required");return typeof t!="number"?Q+(e+1)+"G":Q+(t+1)+";"+(e+1)+"H"};z.cursorMove=(e,t)=>{if(typeof e!="number")throw new TypeError("The `x` argument is required");let s="";return e<0?s+=Q+-e+"D":e>0&&(s+=Q+e+"C"),t<0?s+=Q+-t+"A":t>0&&(s+=Q+t+"B"),s};z.cursorUp=(e=1)=>Q+e+"A";z.cursorDown=(e=1)=>Q+e+"B";z.cursorForward=(e=1)=>Q+e+"C";z.cursorBackward=(e=1)=>Q+e+"D";z.cursorLeft=Q+"G";z.cursorSavePosition=Du?"\x1B7":Q+"s";z.cursorRestorePosition=Du?"\x1B8":Q+"u";z.cursorGetPosition=Q+"6n";z.cursorNextLine=Q+"E";z.cursorPrevLine=Q+"F";z.cursorHide=Q+"?25l";z.cursorShow=Q+"?25h";z.eraseLines=e=>{let t="";for(let s=0;s<e;s++)t+=z.eraseLine+(s<e-1?z.cursorUp():"");return e&&(t+=z.cursorLeft),t};z.eraseEndLine=Q+"K";z.eraseStartLine=Q+"1K";z.eraseLine=Q+"2K";z.eraseDown=Q+"J";z.eraseUp=Q+"1J";z.eraseScreen=Q+"2J";z.scrollUp=Q+"S";z.scrollDown=Q+"T";z.clearScreen="\x1Bc";z.clearTerminal=process.platform==="win32"?`${z.eraseScreen}${Q}0f`:`${z.eraseScreen}${Q}3J${Q}H`;z.beep=Qt;z.link=(e,t)=>[jr,"8",Cs,Cs,t,Qt,e,jr,"8",Cs,Cs,Qt].join("");z.image=(e,t={})=>{let s=`${jr}1337;File=inline=1`;return t.width&&(s+=`;width=${t.width}`),t.height&&(s+=`;height=${t.height}`),t.preserveAspectRatio===!1&&(s+=";preserveAspectRatio=0"),s+":"+e.toString("base64")+Qt};z.iTerm={setCwd:(e=process.cwd())=>`${jr}50;CurrentDir=${e}${Qt}`,annotation:(e,t={})=>{let s=`${jr}1337;`,r=typeof t.x<"u",n=typeof t.y<"u";if((r||n)&&!(r&&n&&typeof t.length<"u"))throw new Error("`x`, `y` and `length` must be defined when `x` or `y` is defined");return e=e.replace(/\|/g,""),s+=t.isHidden?"AddHiddenAnnotation=":"AddAnnotation=",t.length>0?s+=(r?[e,t.length,t.x,t.y]:[t.length,e]).join("|"):s+=e,s+Qt}};var si=z;var $u=zt(xu(),1),vu=zt(Su(),1);var Qc=(0, $u.default)(()=>{(0, vu.default)(()=>{es__default.default.stderr.write("\x1B[?25h");},{alwaysLast:!0});}),Bu=Qc;var As=!1,er={};er.show=(e=es__default.default.stderr)=>{e.isTTY&&(As=!1,e.write("\x1B[?25h"));};er.hide=(e=es__default.default.stderr)=>{e.isTTY&&(Bu(),As=!0,e.write("\x1B[?25l"));};er.toggle=(e,t)=>{e!==void 0&&(As=e),As?er.show(t):er.hide(t);};var ui=er;function ai(e){return Number.isInteger(e)?e>=4352&&(e<=4447||e===9001||e===9002||11904<=e&&e<=12871&&e!==12351||12880<=e&&e<=19903||19968<=e&&e<=42182||43360<=e&&e<=43388||44032<=e&&e<=55203||63744<=e&&e<=64255||65040<=e&&e<=65049||65072<=e&&e<=65131||65281<=e&&e<=65376||65504<=e&&e<=65510||110592<=e&&e<=110593||127488<=e&&e<=127569||131072<=e&&e<=262141):!1}var Kc=/^[\uD800-\uDBFF][\uDC00-\uDFFF]$/,Ru=["\x1B","\x9B"],Ts=e=>`${Ru[0]}[${e}m`,Tu=(e,t,s)=>{let r=[];e=[...e];for(let n of e){let i=n;n.includes(";")&&(n=n.split(";")[0][0]+"0");let o=Tr.codes.get(Number.parseInt(n,10));if(o){let a=e.indexOf(o.toString());a===-1?r.push(Ts(t?o:i)):e.splice(a,1);}else if(t){r.push(Ts(0));break}else r.push(Ts(i));}if(t&&(r=r.filter((n,i)=>r.indexOf(n)===i),s!==void 0)){let n=Ts(Tr.codes.get(Number.parseInt(s,10)));r=r.reduce((i,o)=>o===n?[o,...i]:[...i,o],[]);}return r.join("")};function li(e,t,s){let r=[...e],n=[],i=typeof s=="number"?s:r.length,o=!1,a,c=0,h="";for(let[p,l]of r.entries()){let m=!1;if(Ru.includes(l)){let D=/\d[^m]*/.exec(e.slice(p,p+18));a=D&&D.length>0?D[0]:void 0,c<i&&(o=!0,a!==void 0&&n.push(a));}else o&&l==="m"&&(o=!1,m=!0);if(!o&&!m&&c++,!Kc.test(l)&&ai(l.codePointAt())&&(c++,typeof s!="number"&&i++),c>t&&c<=i)h+=l;else if(c===t&&!o&&a!==void 0)h=Tu(n);else if(c>=i){h+=Tu(n,!0,a);break}}return h}var Xc=24,Rs=e=>{let{columns:t}=e;return t||80},Zc=(e,t)=>{let s=e.rows||Xc,r=t.split(`
-`),n=r.length-s;return n<=0?t:li(t,_t(r.slice(0,n).join(`
-`)).length+1)};function ku(e,{showCursor:t=!1}={}){let s=0,r=Rs(e),n="",i=(...o)=>{t||ui.hide();let a=o.join(" ")+`
-`;a=Zc(e,a);let c=Rs(e);a===n&&r===c||(n=a,r=c,a=ht(a,c,{trim:!1,hard:!0,wordWrap:!1}),e.write(si.eraseLines(s)+a),s=a.split(`
-`).length);};return i.clear=()=>{e.write(si.eraseLines(s)),n="",r=Rs(e),s=0;},i.done=()=>{n="",r=Rs(e),s=0,t||ui.show();},i}var ep=ku(es__default.default.stdout),Lt=ep;ku(es__default.default.stderr);var Mt={};function Be(e){return d(e,Mt)||(Mt[e]=[]),(t,s)=>{X(s)?Mt[e].push(x.yellow+le(t)):Mt[e].push(x.yellow+le(t+N+ye+F(s)));}}function k({option:e,name:t,provided:s,expects:r}){te(P(2),O(`${F(`Invalid ${M(e)} type value provided`)}`)+P(2),O(`The ${M(t)} option has an incorrect type value`)+P(2),O(`provided${N} ${le(ae(s).toLowerCase())}`)+w,O(`expected${N} ${v(r.replace(/([|,])/g,g("$1")))}`)+P(2),O(`in${N} ${g.underline(u.file.base)}`)+P(2),b.bold("How to fix?")+w,`
-    ${g("You need to change the option value to use the")} ${v("expected")} ${g("type.")}
-    ${g(`Use the ${M("defineConfig")} named export for type checking`)}
-    `),process.exit(0);}function Et({message:e,expected:t,fix:s}){let r=es.argv.slice(2).join(" ");t=b("syncify "+r+" ")+v(t.replace(/([|,])/g,g("$1"))),te(P(2),O(`${F("Invalid or incomplete command passed")}`)+P(2),O(S(e)?e.join(`
- `):e)+P(2),O(`provided${N} ${b("$")} ${b("syncify "+r)}`)+w,O(`expected${N} ${b("$")} ${t}`)+P(2),b.bold("How to fix?")+w,g(S(s)?s.join(w):s)),process.exit(0);}function Pu({type:e,message:t,provided:s,expected:r,fix:n}){Fr.test(s)&&(s=s.replace(Fr,g("$1"))),Fr.test(r)&&(r=r.replace(Fr,g("$1"))),S(t)&&(t=t.join(`
- `)),te(P(2),O(F(`Invalid ${M(e)} target provided`))+P(2),O(t)+P(2),O(`provided${N} ${le(r)}`)+w,O(`expected${N} ${v(s)}`)+P(2),b.bold("How to fix?")+w,g(S(n)?n.join(w):n)),process.exit(0);}function Le(e){L(e)?te(P(2),O(`${F(`Missing ${M(e)} dependency`)}`)+P(2),O(`You need to install ${M(e)} to use it as a processor`)+P(2),b.bold("How to fix?")+w+w,`$ ${v.bold("pnpm add "+e+" -D")}`+P(2),g("If you are using a different package manager (i.e: Yarn or NPM) then"),g("please consider adopting pnpm. Pnpm is dope and does dope shit.")):te(P(2),O(`${F(`Missing ${M(`${e.length}`)} dependencies`)}`)+P(2),O("You are attempting to use processors which are not yet installed!")+P(2),xt(g("-")+ye+e.join(w+g(" -")+ye))+P(2),b.bold("How to fix?")+w,`
-     $ ${Gn("pnpm add "+e.join(ye)+" -D")}
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined")
+    return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
+var __commonJS = (cb, mod) => function __require2() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __export = (target, all2) => {
+  for (var name in all2)
+    __defProp(target, name, { get: all2[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 
-     ${g("If you are using a different package manager (i.e: Yarn or NPM) then")}
-     ${g("please consider adopting pnpm. Pnpm is dope and does dope shit.")}
-     `),process.exit(0);}function Ou(e,t,s,r){e.indexOf(".")>-1&&(e=e.split(".").filter(Boolean).join(g(" \u2192 "))),te(P(2),O(`${F(`Missing ${Qn} ${M(e)} ${Kn} configuration option`)}`)+P(2),O(`The ${M(t)} option needs to be defined`)+P(2),O(`expects${N} ${v(s.replace(/([|,])/g,g("$1")))}`)+P(2),O(`at${N} ${g.underline(u.file.base)}`)+P(2),b.bold("Why?")+w+w+g(S(r)?` ${r.join(`
- `)}`:` ${r}`)+w+w),process.exit(0);}function fe(e,t,s,r){te(P(2),se.bold("ERROR (!)"),P(2),O(`${F(`Invalid ${M(e)} configuration`)}`)+P(2),O(`The ${M(t)} option has an invalid or missing value`)+P(2),O(`provided${N} ${le(s)}`)+w,O(`expected${N} ${v(r.replace(/([|,])/g,g("$1")))}`)+P(2),b.bold("How to fix?")+w,`
-    ${g("You need to update the option and use one of the expected values.")}
-    ${g(`Use the ${M("defineConfig")} named export for type checking`)}
-    `),process.exit(0);}function ju(e){te(P(2),se.bold("ERROR (!)"),P(2),O(`${F(`Missing ${M("syncify.config.js")} configuration`)}`)+P(2),O("Unable to resolve a configuration file within the workspace")+P(2),O(`at${N} ${g.underline(e)}`)+P(2),b.bold("How to fix?")+w,`
-    ${g("You need to add one the following files to your project")}
+// node_modules/.pnpm/ansis@1.5.5/node_modules/ansis/bundle.js
+var require_bundle = __commonJS({
+  "node_modules/.pnpm/ansis@1.5.5/node_modules/ansis/bundle.js"(exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var e2 = (e3) => {
+      let [, t3] = /([a-f\d]{3,6})/i.exec(e3) || [], r2 = t3 ? t3.length : 0;
+      if (3 === r2)
+        t3 = t3[0] + t3[0] + t3[1] + t3[1] + t3[2] + t3[2];
+      else if (6 !== r2)
+        return [0, 0, 0];
+      let n2 = parseInt(t3, 16);
+      return [n2 >> 16 & 255, n2 >> 8 & 255, 255 & n2];
+    };
+    var t2 = (e3, t3, r2) => t3 > e3 ? t3 : e3 > r2 ? r2 : e3;
+    var r = (e3, t3, r2) => {
+      if ("" === t3)
+        return e3;
+      let n2 = e3.indexOf(t3);
+      if (n2 < 0)
+        return e3;
+      let i2 = t3.length, o3 = 0, l2 = "";
+      for (; ~n2; )
+        l2 += e3.slice(o3, n2) + r2, o3 = n2 + i2, n2 = e3.indexOf(t3, o3);
+      return l2 + e3.slice(o3);
+    };
+    var n = { open: "", close: "" };
+    var i = ((e3) => {
+      const t3 = (e4) => !!l2.find((t4) => e4.test(t4)), r2 = e3 || ("undefined" != typeof process ? process : {}), { stdout: n2, platform: i2 } = r2, o3 = r2.env || {}, l2 = r2.argv || [], s2 = "FORCE_COLOR" in o3, g2 = o3.FORCE_COLOR, c2 = "true" === g2 || parseInt(g2) > 0, a2 = "NO_COLOR" in o3 || s2 && !c2 || t3(/^-{1,2}(no-color|color=false|color=never)$/), b2 = s2 && c2 || t3(/^-{1,2}(color|color=true|color=always)$/), p2 = n2 && "isTTY" in n2 && /^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(o3.TERM);
+      return !a2 && (b2 || p2 || "win32" === i2 || "CI" in o3);
+    })() ? (e3, t3) => ({ open: `\x1B[${e3}m`, close: `\x1B[${t3}m` }) : () => n;
+    var o2 = (e3, t3, r2) => i(`38;2;${e3};${t3};${r2}`, 39);
+    var l = (e3, t3, r2) => i(`48;2;${e3};${t3};${r2}`, 49);
+    var s = { visible: n, reset: i(0, 0), inverse: i(7, 27), hidden: i(8, 28), bold: i(1, 22), dim: i(2, 22), faint: i(2, 22), italic: i(3, 23), underline: i(4, 24), doubleUnderline: i(21, 24), strikethrough: i(9, 29), strike: i(9, 29), frame: i(51, 54), encircle: i(52, 54), overline: i(53, 55), black: i(30, 39), red: i(31, 39), green: i(32, 39), yellow: i(33, 39), blue: i(34, 39), magenta: i(35, 39), cyan: i(36, 39), white: i(37, 39), grey: i(90, 39), gray: i(90, 39), blackBright: i(90, 39), redBright: i(91, 39), greenBright: i(92, 39), yellowBright: i(93, 39), blueBright: i(94, 39), magentaBright: i(95, 39), cyanBright: i(96, 39), whiteBright: i(97, 39), bgBlack: i(40, 49), bgRed: i(41, 49), bgGreen: i(42, 49), bgYellow: i(43, 49), bgBlue: i(44, 49), bgMagenta: i(45, 49), bgCyan: i(46, 49), bgWhite: i(47, 49), bgBlackBright: i(100, 49), bgRedBright: i(101, 49), bgGreenBright: i(102, 49), bgYellowBright: i(103, 49), bgBlueBright: i(104, 49), bgMagentaBright: i(105, 49), bgCyanBright: i(106, 49), bgWhiteBright: i(107, 49) };
+    var { defineProperty: g, defineProperties: c, setPrototypeOf: a } = Object;
+    var b = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+    var p = /(\r*\n)/g;
+    var u = function() {
+      const t3 = (e3) => e3;
+      return t3.strip = (e3) => e3.replace(b, ""), t3.extend = (r2) => {
+        for (let t4 in r2) {
+          let n2 = r2[t4], i2 = null != n2.open ? n2 : o2(...e2(n2));
+          B[t4] = { get() {
+            const e3 = f(this, i2);
+            return g(this, t4, { value: e3 }), e3;
+          } };
+        }
+        O = c(() => {
+        }, B), a(t3, O);
+      }, t3.extend(s), t3;
+    };
+    var f = ({ props: e3 }, { open: t3, close: r2 }) => {
+      const n2 = (e4, ...t4) => d(e4, t4, n2.props);
+      let i2 = t3, o3 = r2;
+      return void 0 !== e3 && (i2 = e3.openStack + t3, o3 = r2 + e3.closeStack), a(n2, O), n2.props = { open: t3, close: r2, openStack: i2, closeStack: o3, parent: e3 }, n2.open = i2, n2.close = o3, n2;
+    };
+    var d = (e3, t3, n2) => {
+      if (!e3)
+        return "";
+      const { openStack: i2, closeStack: o3 } = n2;
+      let l2 = null != e3.raw ? String.raw(e3, ...t3) : e3;
+      if (~l2.indexOf("\x1B"))
+        for (; void 0 !== n2; )
+          l2 = r(l2, n2.close, n2.open), n2 = n2.parent;
+      return ~l2.indexOf("\n") && (l2 = l2.replace(p, o3 + "$1" + i2)), i2 + l2 + o3;
+    };
+    var h = { ansi: (e3) => ((e4) => i(`38;5;${e4}`, 39))(t2(e3, 0, 255)), bgAnsi: (e3) => ((e4) => i(`48;5;${e4}`, 49))(t2(e3, 0, 255)), hex: (t3) => o2(...e2(t3)), bgHex: (t3) => l(...e2(t3)), rgb: (e3, r2, n2) => o2(t2(e3, 0, 255), t2(r2, 0, 255), t2(n2, 0, 255)), bgRgb: (e3, r2, n2) => l(t2(e3, 0, 255), t2(r2, 0, 255), t2(n2, 0, 255)) };
+    var B = {};
+    var O;
+    for (let e3 in h)
+      B[e3] = { get() {
+        return (...t3) => f(this, h[e3](...t3));
+      } };
+    B.ansi256 = B.fg = B.ansi, B.bgAnsi256 = B.bg = B.bgAnsi;
+    var x = new u();
+    exports.Ansis = u, exports.default = x;
+  }
+});
 
-    ${g("-")} ${b("syncify.config.ts")}
-    ${g("-")} ${b("syncify.config.js")}
-    ${g("-")} ${b("syncify.config.mjs")}
-    ${g("-")} ${b("syncify.config.cjs")}
-    ${g("-")} ${b("syncify.config.json")}
+// node_modules/.pnpm/ansis@1.5.5/node_modules/ansis/index.js
+var require_ansis = __commonJS({
+  "node_modules/.pnpm/ansis@1.5.5/node_modules/ansis/index.js"(exports, module) {
+    var bundle = require_bundle();
+    module.exports = bundle.default;
+    module.exports.Ansis = bundle.Ansis;
+  }
+});
 
-    ${g("You can also provide configuration in your")} ${b("package.json")}
-    ${g("file using on a")} ${le('"syncify": {}')} ${g("property.")}
-    `),process.exit(0);}function ce(e,t){te(P(2),se.bold("(!) ERROR"),P(2),O.bold(e)+P(2),b.bold("How to fix?")+w,g(S(t)?t.join(w).trimStart():t),P(2)),process.exit(0);}function bt(e,t){e.indexOf(".")>-1&&(e=g.bold("{ ")+e.split(".").filter(Boolean).join(g(" \u2192 "))+g(" \u2192 ")+se.bold(t)+g.bold(" }"));let s=u.file.base==="package.json"?`${v("syncify")} config in the ${v("package.json")} file.`:`${v(u.file.base)} file.`;te(P(2),se.bold("ERROR (!)"),P(2),se(`Unknown ${e} option provided.`)+P(2),b.bold("How to fix?")+w,`
-    ${g(`The ${v(t)} option is invalid or unsupported.`)}
-    ${g(`You need to remove it from the ${s}`)}
-    `),process.exit(0);}function Iu(e){let t=[];if(e.mode.metafields)return A;t.push(`${Pr}${g("Syncify")} ${g("~")} ${g(Ar())}`,`${x.gray}`),np(t,e.terminal.cols),t.push(`${x.gray}${xt.bold(`v${e.version}`)}`,`${x.gray}`);let s=e.sync.stores.length,r=Re(e.sync.themes).length,n=Re(e.spawn.commands).length,{mode:i,spawn:o,sync:a}=e,c=M.bold(String(s))+(s>1?" stores":" store"),h=M.bold(String(r))+(r>1?" themes":" theme"),p=M.bold(`${e.env.dev?"development":"production"}`);i.build?t.push(`${x.gray}Running ${M.bold("build")} in ${p}`):i.watch?t.push(`${x.gray}Running ${M.bold("watch")} in ${p}`):i.upload?t.push(`${x.gray}Running ${M.bold("upload")} mode`):i.download?t.push(`${x.gray}Running ${M.bold("download")} mode`):i.vsc?t.push(`${x.gray}Generate ${M.bold("vscode")} schema`):i.clean?t.push(`${x.gray}Running ${M.bold("clean")} mode`):i.export&&t.push(`${x.gray}Running ${M.bold("export")} mode`),t.push(`${x.gray}${s>0&&r>0?`Syncing ${h} to ${c}`:A}`),J(e.filters)||t.push(x.gray,`${x.gray}${xt.bold("--filters")}`,`${x.gray}`+sp(e.cwd,e.filters)),e.logger.warnings&&ip(e,t),ge(i.build,i.watch)&&n>0?t.push(`${x.gray}Spawned ${M.bold(`${n}`)} child ${n>1?"processes":"process"}`,`${x.gray}`):t.push(x.gray),Me(i.upload,i.download,i.build,i.clean,i.vsc)&&(n>0&&t.push(`${x.gray}${F("Child Processes:")}`,`${x.gray}${op(at(o.streams))}`,`${x.gray}`),r>0&&t.push(`${x.gray}${F("Theme Editors:")}`,`${x.gray}${Nu(a.themes,"editor")}`,`${x.gray}`)),ge(i.upload,i.download,i.watch)&&r>0&&t.push(`${x.gray}${F(i.upload||i.download?"Theme Targets:":"Theme Previews:")}`,`${x.gray}${Nu(a.themes,"preview")}`),e.mode.hot&&t.push(`${x.gray}`),B(t.join(w));}function sp(e,t){return Kr(t).flat().reduce((s,r,n,i)=>(s+=(n>0?w+x.gray:"")+ye+ye+b(pathe.relative(e,r)),s),A)}function np(e,t){t>=100||e.push(`${x.gray}${O.bold("TERMINAL WIDTH WARNING")}`,`${x.gray}`,`${x.gray}${O(`Your terminal width is below ${F("100")} columns (currently ${F(`${t}`)})`)}`,`${x.gray}${O("This is not recommended for usage with Syncify (size matters).")}`,`${x.gray}${O("Expand your terminal wider for an optimal logging experience.")}`,`${x.gray}`);}function ip(e,t){let s=!1;for(let r in Mt){let n=Mt[r];n.length>0&&(s===!1&&(s=!0,t.push(`${x.gray}`,`${x.yellow}${le(`${F("Warnings")} in ${F(e.file.base)}`)}`)),t.push(x.yellow,x.yellow+yt.bold(`${n.length} ${r} ${st("warning",n.length)}`),x.yellow,n.join(w)));}}function op(e){let t=e.reduce((s,[r])=>r.length>s?r.length:s,0);return e.reduce((s,[r,n])=>(s+=w+x.gray+He(t-r.length)+Xe(Rt(r))+`${N} `+g("PID")+" \u2192 "+g("#")+kr(`${n.pid}`),s),A)}function Nu(e,t){let s=e.reduce((r,{target:n,store:i})=>{let o=i.indexOf(".");return o>r.store&&(r.store=o),n.length>r.theme&&(r.theme=n.length),r},{store:0,theme:0});return e.reduce((r,{target:n,store:i,id:o})=>{let a=i.slice(0,i.indexOf(".")),c=t==="editor"?`https://${i}/admin/themes/${o}/editor`:`https://${i}?preview_theme_id=${o}`;return r+=w+x.gray+kr(a)+He(s.store-a.length)+b("  \u2192  ")+kr.bold(n)+He(s.theme-n.length)+b(" \u2192  ")+g.underline(c),r},A)}var ci,_s=!1,pi=function(t,s="pink"){_s=!0;let r=0,n=cn.length;ci=setInterval(()=>{_s&&Lt(`${x.gray} ${y[s](`${cn[r=++r%n]}`)}${t?` ${t}`:A}`);},50);};pi.stop=e=>{_s&&(_s=!1,e?(Lt(x.gray+e),Lt.done()):Lt.clear(),clearInterval(ci),ci=void 0);};function Lu(e,t={}){let s=U({showPercentage:!0,barColor:"neonGreen",percentColor:"whiteBright",barSize:40,clearOnComplete:!1},t),r=0;function n(p){return y.line.gray+p+" ".repeat(Math.max(0,s.barSize-p.length))}function i(p,l=!1){return (l?"\u25B1":"\u25B0").repeat(p)}function o(){s.clearOnComplete&&console.clear();}function a(p=1){let l=r+p;r=Math.min(l,e),r===e&&o();}function c(p=1){let l=r-p;r=Math.max(l,0);}function h(){let p=Math.round(r/e*s.barSize),l=i(p),m=i(s.barSize-p,!0),D=y[s.barColor](l)+y.lightGray(m);return s.showPercentage&&(D+=` ${String(Math.round(r/e*100))}%`),n(D)}return {stop:o,increment:a,decrement:c,render:h,get percent(){return r}}}function ap(...e){B(util.inspect(e,{colors:!0,showHidden:!0}));}var tr=new Set,fi=null,rr=!1,we="Syncify",sr=A,Mu=A;function lp(e,t,s){let r=sr!==e;W(),r&&B(Ot(we)),we==="Syncify"&&ot(),r&&(B(Pt(we)),Ae(),B(x.gray+F(`${t} ${Rt(e)}`)),Ae(),we=e,sr=e),Ae(),B(Zn("top",Xe(typeof s=="string"?s:s.relative)));}function Ae(e="gray"){J(e)?B(w):B(x[e]);}function cp(e){S(e)?te(O(e.map(t=>x.red+mt(t)).join(w))):te(x.red+mt(e));}function pp(e){S(e)?B(e.map(t=>x.gray+mt(t)).join(w)):B(x.gray+mt(e));}function fp(e){B(V("cyan","external",e));}function mp(e){De.current!==e&&(De.current=e),d(e,De.process)||(De.current=e,De.process[e]=new Set),fi=Mo((t,s)=>{if(s.charCodeAt(0)===9474)qu[t].write(s);else {De.count+=1;let r=s.split(`
-`);for(;r.length!==0;)De.process[e].add(`${le(r.shift().trimStart())}`);}});}function dp(){fi(),fi=null;}function Dp(e,t=!1){B(Ot(we)),t&&ot(),B(Pt(e)),we=e,Ae();}function hp(e,t){B(V("greenBright","updated",`${e.relative} ${t?g(`~ ${t}`):A}`));}function gp(e){let t=sr!==e.namespace;W(),t&&B(Ot(we)),we!=="Syncify"&&t&&ot(),we=`${e.kind} ${Rt(e.namespace)}`,t&&(ot(),B(Pt(we)),sr=e.namespace),d(e.relative,De)||(De[e.relative]=new Set),Mu!==e.relative&&(Mu=e.relative),u.mode.watch&&(Ae(),B(V("neonCyan","changed",e.relative)));}function yp(){B(V("neonRouge","reloaded",`${F("HOT RELOAD")}${Ft(dt())}`));}function xp(e,t){if(u.mode.watch){if(tr.add([e,t.domain,Y()]),rr)return;rr=!0,G.onIdle().then(()=>{for(let[s,r,n]of tr)B(V("neonGreen","uploaded",`${F(s)} \u2192 ${r}`+Ft(n)));tr.clear(),rr=!1;});}else B(V("neonGreen","uploaded",`${F(e)} \u2192 ${t.domain}`+Ft(Y())));}function wp(e){if(u.mode.watch){if(tr.add([e.target,e.store,Y()]),rr)return;rr=!0,G.onIdle().then(()=>{for(let[t,s,r]of tr)B(V("neonGreen","uploaded",`${F(t)} \u2192 ${s}`+Ft(r)));tr.clear(),rr=!1;});}else B(V("neonGreen","uploaded",`${F(e.target)} \u2192 ${e.store}`+Ft(Y())));}function Fp(e,t){return B(V("orange","prompt",e)),B(Ot(we)+w),I(t)&&ks__default.default.notify(t).notify(),()=>{B(Pt(we)),Ae();}}function Cp(e,t=!1){De.count>0&&V("yellowBright","warning",`${De.count} ${st("warning",De.count)}`),t?(B(V("magentaBright","syncing",e)),G.pending>2&&B(V("orange","queued",`${e} ~ ${F($n(G.pending))} in queue`))):(B(V("magentaBright","syncing",e)),G.pending>0&&B(V("orange","queued",`${e} ~ ${F($n(G.pending))} in queue`)));}function qu(e,...t){let s=t[0],r=A;t.length===2&&(r=` ${Jn} ${t[0]}`,s=t[1]),B(V("whiteBright","process",F(e)+r+Ft(s)));}function Ep(e){B(V("whiteBright","exports",e));}function bp(e){u.mode.build||B(V("lavender","importer",e));}function Sp(e){B(V("whiteBright","transform",e));}function $p(e,t){B(V("yellowBright","warning",`${e}${t?g(` ~ ${t}`):""}`));}function vp(e,t){B(V("orange","retrying",`${e} \u2192 ${t.target} ${g(`~ ${t.store}`)}`));}function Bp(e,t){B(V("blueBright","deleted",`${e} \u2192 ${t.target} ${g(`~ ${t.store}`)}`));}function Ap(e,t,s,r){let n=e?`${F(e)} ${be} ${t} ${xs} ${s} ${g(`~ saved ${r}`)}`:`${t} ${xs} ${s} ${g(`~ saved ${r}`)}`;B(V("whiteBright","minified",n));}function Tp(e,t){B(V("whiteBright","reloaded",e+t));}function Rp(e,t){B(V("gray","skipped",`${typeof e=="string"?e:e.key} ~ ${t}`));}function _p(e){B(V("gray","ignored",e));}function kp(e,t){B(V("red","invalid",e)),ks__default.default.notify({title:"Syncify Error",sound:"Pop",open:e,subtitle:e,message:"Invalid error"}).notify(),t&&(Ae(),S(t)?te(O(t.map(r=>x.red+mt(r)).join(w))):te(x.red+mt(t)));}function Pp(e){B(V("red","failed",e)),ks__default.default.notify({title:"Syncify Error",sound:"Pop",open:e,subtitle:e,message:"Request failed"}).notify();}function Op(){Ae("yellow"),B(x.yellow+F.yellow(`WARNING ${Yn} RESTART IS REQUIRED`)),Ae("yellow"),B(x.yellow+F.yellow(`Changes to ${Xe(u.file.base)} require you restart watch mode.`)+w+x.yellow+F.yellow("Failure to restart watch mode will prevent changes from being reflected.")),Ae("yellow"),ks__default.default.notify({title:"WARNING",sound:"Pop",wait:!0,message:`Changes in ${u.file.base} will not reflect until you to restart watch mode.`}).notify();}function jp(e){throw new Error(e)}function Np(e){return (...t)=>{u.spawn.invoked||(u.spawn.invoked=!0),we!=="Spawn"&&(B(Ot(we)),we!=="Syncify"&&ot(),B(Pt("Spawn")),we="Spawn"),sr!==e&&(B(ei("pink",e)),sr=e),ri(mt(t.shift()));}}var nr={};gr(nr,{esbuild:()=>Gu,postcss:()=>Lp,sass:()=>Ip,warnings:()=>We});var We={},Ip=e=>(t,s)=>{let r=A;d(e.input,We)?We[e.input].has("sass")||We[e.input].set("sass",new Set):We[e.input]=new Map([["sass",new Set]]);let n=We[e.input].get("sass");if(r+=Ct(t,{nwl:!0,line:x.yellow,text:le.bold}),d("span",s)){let i=d("start",s.span)&&d("end",s.span)?{start:s.span.start.line,end:s.span.end.line}:null,o=d("context",s.span)?s.span.context:d("text",s.span)?s.span.text:null;o!==null&&(i!==null?r+=jt(o,{line:x.yellow,span:i}):r+=jt(o));}r+=Ge({stack:s.stack,entries:{file:e.relative,deprecated:s.deprecation?"Yes":"No"}}),n.has(r)?B(V("yellowBright","warning",`${n.size} ${st("warning",n.size)+ws}`)):(n.add(r),B(V("yellowBright","warning",`${n.size} ${st("warning",n.size)+ws}`)));};function Gu(e){}function Lp(e,t){let s=A;d(e.input,We)?We[e.input].has("postcss")||We[e.input].set("postcss",new Set):We[e.input]=new Map([["postcss",new Set]]);let r=We[e.input].get("postcss");s+=jt(t.node.toString(),{line:x.yellow,span:Xr(t.endLine)?{start:t.line,end:t.endLine}:{start:t.line,end:t.endLine}}),s+=Ge({stack:!1,entries:{column:t.column,file:e.relative,plugin:t.plugin}}),r.has(s)||(r.add(s),no(s));}function Wu(){f.nwl(""),f.out(g("SIGINT")),process.exit();}function zu(e,t){f.nwl(),f.err(`Unhandled Promise Rejection at: ${t}`),f.nwl("red"),f.out(e?g(e):"Unkown Reason");}var mi=class extends Error{constructor(t){super(),this.name="AbortError",this.message=t;}},Uu=e=>globalThis.DOMException===void 0?new mi(e):new DOMException(e),Vu=e=>{let t=e.reason===void 0?Uu("This operation was aborted."):e.reason;return t instanceof Error?t:Uu(t)};async function Os(e,t,{concurrency:s=Number.POSITIVE_INFINITY,stopOnError:r=!0,signal:n}={}){return new Promise((i,o)=>{if(e[Symbol.iterator]===void 0&&e[Symbol.asyncIterator]===void 0)throw new TypeError(`Expected \`input\` to be either an \`Iterable\` or \`AsyncIterable\`, got (${typeof e})`);if(typeof t!="function")throw new TypeError("Mapper function is required");if(!((Number.isSafeInteger(s)||s===Number.POSITIVE_INFINITY)&&s>=1))throw new TypeError(`Expected \`concurrency\` to be an integer from 1 and up or \`Infinity\`, got \`${s}\` (${typeof s})`);let a=[],c=[],h=new Map,p=!1,l=!1,m=!1,D=0,C=0,E=e[Symbol.iterator]===void 0?e[Symbol.asyncIterator]():e[Symbol.iterator](),_=K=>{p=!0,l=!0,o(K);};n&&(n.aborted&&_(Vu(n)),n.addEventListener("abort",()=>{_(Vu(n));}));let H=async()=>{if(l)return;let K=await E.next(),ee=C;if(C++,K.done){if(m=!0,D===0&&!l){if(!r&&c.length>0){_(new AggregateError(c));return}if(l=!0,h.size===0){i(a);return}let Ne=[];for(let[ie,en]of a.entries())h.get(ie)!==Ps&&Ne.push(en);i(Ne);}return}D++,(async()=>{try{let Ne=await K.value;if(l)return;let ie=await t(Ne,ee);ie===Ps&&h.set(ee,ie),a[ee]=ie,D--,await H();}catch(Ne){if(r)_(Ne);else {c.push(Ne),D--;try{await H();}catch(ie){_(ie);}}}})();};(async()=>{for(let K=0;K<s;K++){try{await H();}catch(ee){_(ee);break}if(m||p)break}})();})}var Ps=Symbol("skip");function St(e){return S(e)?e.filter(t=>/\*/.test(t)):/\*/.test(e)?e:null}function Fe(e){if(S(e))return e.map(Fe);if(e.indexOf("/")===-1)return e;let t=path.dirname(e),s=t.lastIndexOf("/")+1;return t.slice(s)}function di(e){if(S(e))return e.map(di);let t=e.lastIndexOf("/");if(t===-1)return e;let s=e.indexOf("*");return s===-1?e.slice(0,t):e.slice(0,s)}function ir(e){let t=new RegExp(`^\\.?\\/?${e}\\/`);return function s(r){if(S(r))return r.map(s);let n=r.charCodeAt(0)===33;return n&&(r=r.slice(1)),t.test(r)?n?"!"+r:r:(r.charCodeAt(0)===46&&r.charCodeAt(1)===46&&r.charCodeAt(2)===47&&ce(`Invalid path defined at: ${N} ${le(`"${r}"`)}`,"Paths must be relative to source"),(n?"!":"")+path.join(e,r))}}var Ju=e=>t=>{if(t.indexOf("*")!==-1&&ce(`Base directory path cannot contain glob${N} ${le(`"${t}"`)}`,"Ensure that path you are resolving is correctly formed"),t.charCodeAt(0)===46){if(t.length===1)return e+"/";t.charCodeAt(1)===47?t=t.slice(1):ce(`Directory path is invalid at${N} ${le(`"${t}"`)}`,"Ensure that path you are resolving is correctly formed");}if(t.charCodeAt(0)===47){if(t.length===1)return e+"/";t=t.slice(1);}if(/^[a-zA-Z0-9_-]+/.test(t))return t=path.join(e,t),so(t).charCodeAt(0)===47?t:t+"/";ce(`Directory path is invalid at${N} ${le(`"${t}"`)}`,"Ensure that path you are resolving is correctly formed");};function Qu(e){let t=u.svg.filter(s=>s.input.has(e.input)?!0:s.match(e.input)?(s.input.add(e.input),!0):!1);return X(t)||Vt(e,"data",{get(){return t}}),e}function Ir(e){let t=u.style.find(s=>s.watch(e.input));return X(t)||(Vt(e,"data",{get(){return t}}),t.snippet?(e.namespace="snippets",e.key=pathe.join("snippets",t.rename)):e.key=pathe.join("assets",t.rename),e.output?e.data.rename!==pathe.basename(e.output)&&(t.snippet?e.output=pathe.join(u.dirs.output,e.key):e.output=pathe.join(di(e.output),e.data.rename)):e.output=pathe.join(u.dirs.output,e.key)),e}function Lr(e){let t=u.script.filter(s=>s.watch.has(e.input));return t.length===0||Vt(e,"data",{get(){return t}}),e}function Di(e){if(u.section.prefixDir){if(e.base.endsWith("-group.json")||Bt(u.section.global)&&u.section.global.test(e.input))return e;let t=Fe(e.input);if(u.section.baseDir.has(t))return e;let s=Fe(e.input)+u.section.separator+e.base;e.name=s,e.key=pathe.join(e.namespace,s),e.output=pathe.join(pathe.dirname(e.output),s);}return e}function Ku(e){if(u.snippet.prefixDir){if(Bt(u.snippet.global)&&u.snippet.global.test(e.input))return e;let t=Fe(e.input);if(u.snippet.baseDir.has(t))return e;let s=t+u.snippet.separator+e.base;e.name=s,e.key=pathe.join(e.namespace,s),e.output=pathe.join(pathe.dirname(e.output),s);}return e}function Mr({name:e,dir:t,ext:s,namespace:r},n){let i=n;return /\[dir\]/.test(i)&&(i=i.replace(/\[dir\]/g,t)),/\[file\]/.test(i)&&(i=i.replace(/\[file\]/g,e)),/\[ext\]/.test(i)&&(i=i.replace(/\[ext\]/g,s)),r==="snippets"&&n.endsWith(".liquid")===!1?i+".liquid":!n.endsWith(".[ext]")||!n.endsWith(s)?/\.[a-z]+$/.test(n)?i:i+s:i}function Zu(e,t,s){let r=e;return (n,i,o)=>{let a;return i===14||i===15?(a=pathe.join(Fe(r.dir),r.base),s=null):(a=pathe.join(n,r.base),s=pathe.join(s,a)),o===-1&&(t=u.cache.maps[t]),U({},r,{uuid:Ye(),type:i,input:t,output:s,key:a,namespace:n,kind:o,relative:pathe.relative(u.cwd,t),size:NaN,data:void 0})}}function js(e,t){return s=>{let r=pathe.parse(s),n=Zu(r,s,t);if(r.ext===".liquid"){if(e.sections.match(s))return Di(n("sections",4,"Liquid"));if(e.snippets.match(s))return Ku(n("snippets",3,"Liquid"));if(e.layout.match(s))return n("layout",2,"Liquid");if(e.templates.match(s))return n("templates",1,"Liquid");if(e.customers.match(s))return n("templates/customers",1,"Liquid");if(e.metaobject.match(s))return n("templates/metaobject",1,"Liquid");if(e.transforms.has(s)&&e.transforms.get(s)===8)return Ir(n("snippets",8,"CSS"))}else if(e.assets.match(s)){if(u.spawn.invoked)return n("assets",16);if(r.ext===".jpg"||r.ext===".png"||r.ext===".gif"||r.ext===".pjpg")return n("assets",13,"Image");if(r.ext===".mov"||r.ext===".mp4"||r.ext===".webm"||r.ext===".ogg")return n("assets",13,"Video");if(r.ext===".pdf")return n("assets",13,"PDF");if(r.ext===".eot"||r.ext===".ttf"||r.ext===".woff"||r.ext===".woff2")return n("assets",13,"Font");if(r.ext===".js"||r.ext===".mjs")return n("assets",13,"JavaScript");if(r.ext===".json")return n("assets",13,"JSON");if(r.ext===".svg")return n("assets",13,"SVG");if(r.ext===".css")return n("assets",13,"CSS")}else {if(r.ext===".md"||r.ext===".html")return r.ext===".html"?n("pages",15,"HTML"):n("pages",15,"Markdown");if(r.ext===".json"){if(e.metafields.match(s))return n("metafields",14,"JSON");if(e.sections.match(s))return Di(n("sections",4,"JSON"));if(e.templates.match(s))return n("templates",1,"JSON");if(e.config.match(s))return n("config",6,"JSON");if(e.locales.match(s))return n("locales",7,"JSON");if(e.customers.match(s))return n("templates/customers",1,"JSON");if(e.metaobject.match(s))return n("templates/metaobject",1,"JSON")}else {if(r.ext===".svg")return Qu(n("assets",10,"SVG"));if(r.ext===".css")return Ir(n("assets",8,"CSS"));if(r.ext===".scss")return Ir(n("assets",8,"SCSS"));if(r.ext===".sass")return Ir(n("assets",8,"SASS"));if(r.ext===".js"||r.ext===".mjs")return Lr(n("assets",9,"JavaScript"));if(r.ext===".ts")return Lr(n("assets",9,"TypeScript"));if(r.ext===".jsx")return Lr(n("assets",9,"JSX"));if(r.ext===".tsx")return Lr(n("assets",9,"TSK"))}}}}function ea(e){return e.startsWith("sections/")?U({key:e,namspace:"sections"}):e.startsWith("snippets/")?U({key:e,namspace:"snippets"}):e.startsWith("layout/")?U({key:e,namspace:"layout"}):e.startsWith("customers/",10)?U({key:e,namspace:"templates/customers"}):e.startsWith("metaobject/",10)?U({key:e,namspace:"templates/metaobject"}):e.startsWith("templates/")?U({key:e,namspace:"templates"}):e.startsWith("config/")?U({key:e,namspace:"config"}):e.startsWith("locales/")?U({key:e,namspace:"locales"}):e.startsWith("assets/")?U({key:e,namspace:"assets"}):U({key:e,namspace:"assets"})}var ta=e=>t=>{let s=pathe.parse(t),r=Zu(s,t,e);switch(pathe.basename(s.dir)){case"sections":return r("sections",4,-1);case"snippets":return r("snippets",3,-1);case"layout":return r("layout",2);case"templates":return r("templates",1,-1);case"customers":return r("templates/customers",1,-1);case"metaobject":return r("templates/metaobject",1,-1);case"config":return r("config",6,-1);case"locales":return r("locales",7,-1);case"assets":return r("assets",13,-1)}};async function ra(e,t){return $e({...u.sync.stores[t.sidx].client,method:"get",url:t.url,params:{"asset[key]":e}}).then(({data:s})=>s.asset).catch(()=>!1)}async function gi(e,t){let s=de(u.sync.stores[t.theme.sidx].client,{method:"put",url:t.theme.url,data:{asset:{key:t.key,value:e}}});return $e(s).then(()=>!0).catch(r=>(f.failed(t.key),q.request(t.key,r.response),!1))}async function yi(e,t){let s=typeof e=="string"?e:e.url;return $e.get(s,t).then(({data:r})=>r).catch(r=>{if(r.response&&(r.response.status===429||r.response.status===500))t.params["asset[key]"]&&(f.retrying(t.params["asset[key]"],e),G.add(()=>yi(e,t)));else {if(u.mode.upload)throw r.response;t.params["asset[key]"]&&(f.failed(t.params["asset[key]"]),q.request(t.params["asset[key]"],r.response));}})}var Ns;async function xi(e,t,s){if(G.isPaused)return;let{mode:r}=u;return G.concurrency>2?(Ns>=20&&G.concurrency--,Ns>=35&&G.concurrency--):G.concurrency<3&&Ns<30&&G.concurrency++,!r.upload&&!r.download&&W(),await $e(s).then(({headers:i,data:o})=>{if(r.download===!1&&s.method==="get")return o;if(s.method==="delete")f.deleted(t.relative,e);else if(r.watch)t.type!==9&&t.type!==8&&f.hot(),f.upload(e);else if(r.upload){let a="";"asset"in s.data&&(a=nt(s.data.asset.value)),Ie.emit("upload","uploaded",e,{key:t.key,namespace:t.namespace,fileSize:a});}else r.download&&Ie.emit("download","downloads",e,{key:t.key,namespace:t.namespace,data:o});Ns=parseInt(i["x-shopify-shop-api-call-limit"].slice(0,2),10);}).catch(i=>{if(i.response&&(i.response.status===429||i.response.status===500))!r.upload&&!r.download&&f.retrying(t.key,e),G.add(()=>xi(e,t,s)),r.download&&Ie.emit("download","retry",e,{key:t.key,namespace:t.namespace,get file(){return t}});else if(r.upload){let o="";"asset"in s.data&&(o=nt(s.data.asset.value)),Ie.emit("upload","failed",e,{key:t.key,namespace:t.namespace,fileSize:o,get file(){return t},get error(){return i.response}});}else r.download?Ie.emit("download","failed",e,{key:t.key,namespace:t.namespace,get file(){return t},get error(){return i.response}}):(f.failed(t.key),i.isAxiosError&&q.request(t.relative,i.response));return Ps})}var wi=class{constructor(t=process.stdin){this.onKeypress=(s,r)=>{if(r.ctrl&&r.name==="c")return process.exit(0)},this.isBlocked=()=>this.blocked,this.block=()=>this.toggle(!0),this.unblock=()=>this.toggle(!1),this.toggle=(s=!this.blocked)=>{this.blocked=s,s?(this.stream.isTTY&&this.stream.setRawMode(!0),this.interface=mu__default.default.createInterface({input:this.stream,escapeCodeTimeout:50}),mu__default.default.emitKeypressEvents(this.stream,this.interface),this.stream.on("keypress",this.onKeypress)):(this.stream.isTTY&&this.stream.setRawMode(!1),this.interface&&this.interface.close(),this.stream.off("keypress",this.onKeypress));},this.stream=t,this.blocked=!1;}},ia=wi;new ia;var oa=globalThis.process?.env||{},ua=globalThis.process?.argv||[],aa=!("NO_COLOR"in oa)&&oa.TERM!=="dumb"&&!ua.includes("--no-color")&&!ua.includes("--no-colors")&&(!globalThis.process?.stdout||globalThis.process?.stdout?.isTTY===!0);var ca=e=>new Proxy(e,{get(t,s){return s in la?ca(r=>e(la[s](r))):t[s]}}),Z=(e,t)=>ca(s=>aa?`\x1B[${e}m${s}\x1B[${t}m`:s),la={reset:Z(0,0),bold:Z(1,22),dim:Z(2,22),italic:Z(3,23),underline:Z(4,24),overline:Z(53,55),inverse:Z(7,27),hidden:Z(8,28),strikethrough:Z(9,29),black:Z(30,39),red:Z(31,39),green:Z(32,39),yellow:Z(33,39),blue:Z(34,39),magenta:Z(35,39),cyan:Z(36,39),white:Z(37,39),gray:Z(90,39),bgBlack:Z(40,49),bgRed:Z(41,49),bgGreen:Z(42,49),bgYellow:Z(43,49),bgBlue:Z(44,49),bgMagenta:Z(45,49),bgCyan:Z(46,49),bgWhite:Z(47,49),bgGray:Z(100,49)};var fa=es__default.default.platform==="linux",ma=es__default.default.platform==="win32";var Fi=["SIGABRT","SIGALRM","SIGHUP","SIGINT","SIGTERM"];ma||Fi.push("SIGVTALRM","SIGXCPU","SIGXFSZ","SIGUSR2","SIGTRAP","SIGSYS","SIGQUIT","SIGIOT");fa&&Fi.push("SIGIO","SIGPOLL","SIGPWR","SIGSTKFLT","SIGUNUSED");var da=Fi;var Ci=class{constructor(){this.callbacks=new Set,this.exited=!1,this.exit=t=>{if(!this.exited){this.exited=!0;for(let s of this.callbacks)s();t&&es__default.default.kill(es__default.default.pid,t);}},this.hook=()=>{es__default.default.once("exit",()=>this.exit());for(let t of da)es__default.default.once(t,()=>this.exit(t));},this.register=t=>(this.callbacks.add(t),()=>{this.callbacks.delete(t);}),this.hook();}},Da=new Ci;var Up=Da.register,ha=Up;var Ei=class{constructor(t=process.stdout){this.has=()=>this.visible,this.hide=()=>this.toggle(!1),this.show=()=>this.toggle(!0),this.toggle=(s=!this.visible)=>{if(!this.stream.isTTY)return;this.visible=s;let r=s?"\x1B[?25h":"\x1B[?25l";this.stream.write(r);},this.stream=t,this.visible=!0,ha(this.show);}},ga=Ei;new ga;async function ya(e,t){if(is(arguments.length,1))return s=>ya(e,s);if(Me(d("namespace",t),d("key",t))){f.error("invalid fields");return}return $e.get("metafields.json",e.client).then(({data:s})=>s.metafields.find(r=>t.namespace===r.namespace&&t.key===r.key)).catch(s=>{console.log(s);})}async function bi(e,t){return is(arguments.length,1)?s=>bi(e,s):(t.type="json",t.namespace="email",t.value_type="json_string",t.key="eng",$e.post("metafields.json",{metafield:t},e.client).then(({data:s})=>(console.log("created",s),s.metafield)).catch(s=>{if(console.log(s),!e.queue)return q(t.namespace,s.response);if(ft(s.response.status)){G.add(()=>bi(e,t));return}else return q(e.store,s.response)}))}async function Si(e,t,s){return is(arguments.length,1)?(r,n)=>Si(e,r,n):$e.put(`metafields/${t}.json`,{metafield:s},e.client).then(r=>(console.log("created"),r.data.metafield)).catch(r=>{if(!e.queue)return q(s.namespace,r.response);if(ft(r.response.status))G.add(()=>Si(e,t,s));else return q(e.store,r.response)})}async function Ls(e,t){if(is(arguments.length,1))return r=>Ls(e,r);let s=await ya(e,t);return s?Si(e,s.id,U(t,{id:s.id,type:"json"})).catch(r=>{if(!e.queue)return q(t.namespace,r.response);if(ft(r.response.status))G.add(()=>Ls(e,t));else return q(e.store,r.response)}):bi(e,t)}function ur({stores:e,themes:t}){return {assets:async(s,r,n)=>{let i=X(n)?{method:s,params:{"asset[key]":r.key}}:{method:s,data:{asset:{key:r.key,value:n}}};await G.add(()=>Os(t,async o=>{(u.mode.upload||u.mode.download)&&W(),await xi(o,r,utils.assign({url:o.url},e[o.sidx].client,i));}));},pages:async(s,r,n)=>{await G.add(()=>Os(e,async i=>{u.mode.upload&&W(),console.log(n);}));},metafields:s=>G.add(function(){return ro(async function(r){await Ls(r,s);},e)})}}var Ms=/{%-?\s*render\s+['"]hot\.js['"]/;async function wa(){let e="snippets/hot.js.liquid",[t]=u.sync.themes,s=await fsExtra.readFile(u.hot.snippet),r=await gi(s.toString(),{theme:t,key:e});return f.update(R.message("gray",`${e} uploaded snippet injection`)),r}function ar(e){return Ms.test(e)}function Fa(e){if(!ar(e))return Ca(e)}function qr(e){let t=e.search(Ms);if(t>-1){let s=e.slice(0,t),r=e.slice(e.indexOf("%}")+2);return s+r}return e}function Ca(e){let t=e.indexOf("<head>")+6;return e.slice(0,t)+w+u.hot.renderer+w+e.slice(t)}async function Ea(e){if(!await fsExtra.pathExists(e))return null;let r=(await fsExtra.readFile(e)).toString();Ms.test(r)||(r=Ca(r),await fsExtra.writeFile(e,r),f.update(R.message("gray","injected render tag in output layout")));let[n]=u.sync.themes,i=pathe.basename(e),o=`layout/${i}`,a=await ra(`layout/${i}`,n);return Ms.test(a)&&(r=qr(r)),await gi(r,{theme:n,key:o})?(f.update(R.message("gray","uploaded and inject render tag")),!0):!1}function rf(e){e===0&&ce("Empty output directory",[`There are no files within ${v(pathe.relative(u.cwd,u.dirs.output)+"/**")}`,`You may need to run the ${v("syncify build")} command and try again.`]);let t={local:[],remote:{}},s={},r=0;for(let{store:n,target:i}of u.sync.themes)i.length>r&&(r=i.length),d(n,s)||(s[n]={}),d(n,t.remote)||(t.remote[n]=new Map),s[n][i]={theme:i,uploaded:0,failed:0,progress:f.progress(e),errors:[]};return {sync:s,errors:t,size:e}}function sf(e,t){let s=0;for(let r in e)t.remote[r].size>0?s=s+1:delete t.remote[r];return s}async function ba(e){u.cache.lastResource="upload",f.newGroup("Upload",!0),f.spinner("Preparing"),W("upload");let t=ur(u.sync),s=Se(e),r=ta(u.dirs.output),n=cl__default.default.sync(`${u.dirs.output}/templates/*`).sort(),{sync:i,errors:o,size:a}=rf(n.length);await on(250),Ie.on("upload",function(h,{target:p,store:l},m){f.spinner.stop();let D=h==="failed",C=[R.message("whiteBright",F(m.namespace)),wt,R.message(D?"redBright":"neonGreen",m.key),wt,R.suffix("white","size ",`  ${m.fileSize}`),w,R.suffix("white","duration ",`  ${Y()}`),w,R.suffix("white","elapsed ",`  ${dt("upload")}`),wt];i[l][p][h]+=1,i[l][p].progress.increment(1);for(let E in i)for(let _ in i[E]){let H=i[E][_],K=`  ${F(`${H.uploaded}`)} ${b("of")} ${F(`${a}`)}`,ee=`  ${F(`${H.failed}`)}`;C.push(R.message("neonCyan",`${F(_.toUpperCase())}  ${be}  ${E}`),wt,R.suffix("whiteBright","uploaded ",K),w,R.suffix(H.failed>0?"redBright":"white","failed ",ee),wt,H.progress.render(),wt);}D&&(i[l][p].errors.push(m.file.key),o.remote[l].has(m.file.output)?o.remote[l].get(m.file.output).push({store:l,theme:p,file:m.file,attempts:0,response:m.error}):o.remote[l].set(m.file.output,[{store:l,theme:p,file:m.file,attempts:0,response:m.error}])),f.update(Te(C));}),await on(500);for(let h of n){let p=r(h),l;try{if(l=(await fsExtra.readFile(p.output)).toString(),p.namespace==="layout"&&ar(l)&&(l=qr(l)),!s)await t.assets("put",p,l);else {let D=e.apply({...p},l);X(D)||D===!1?await t.assets("put",p,l):L(D)?await t.assets("put",p,D):_e(D)?await t.assets("put",p,D.toString()):await t.assets("put",p,l);}}catch(m){o.local.push({file:p,attempts:0,response:m.message});}}f.update.clear();for(let h in i)for(let p in i[h]){let l=i[h][p];if(l.failed===0)continue;let m=F(`${p.toUpperCase()} THEME`),D=`  ${F(`${l.failed}`)}`,C=`  ${F(`${l.uploaded}`)} ${b("of")} ${F(`${a}`)}`;f.out(R.message("whiteBright",`${F(m)}  ${be}  ${h}`)),f.nwl(),f.out(R.suffix("whiteBright","uploaded ",C)),f.out(R.suffix("whiteBright","failed ",D)),f.nwl(),f.write([g("Syncify is now watching all rejected files. Changes will be resynced if successful."),g("In some cases, you may need to perform more detailed adjustments and then resync.")]);let E=1;for(let[_,H]of o.remote[h].entries()){let K=H.find(({theme:ee})=>ee===p);if(K){let ee=`${(E<10?"0":"")+E++}`;f.nwl(),f.write(se.bold(`ERROR ${ee}`)),q.request(_,K.response);}}f.out(Or(20));}sf(i,o)>0&&(f.write([b("Syncify is now watching file for changes."),b("The file failed to sync with 2 on. Below are the errors:")]),f.nwl(),f.write(Ht("Waiting for changes..."))),f.nwl(),f.update(`${x.gray}Upload Completed`),f.nwl(),process.exit(0);}async function uf(){let e={local:[],remote:{},retry:{}},t={},s=0;for(let r of u.sync.themes){let n=u.sync.stores[r.sidx],{assets:i}=await yi(r,n.client);r.target.length>s&&(s=r.target.length),d(r.store,t)||(t[r.store]={}),d(r.store,e.remote)||(e.remote[r.store]={}),d(r.target,e.remote[r.store])||(e.remote[r.store][r.target]=new Map),d(r.store,e.retry)||(e.retry[r.store]={}),d(r.target,e.retry[r.store])||(e.retry[r.store][r.target]=new Map),t[r.store][r.target]={get files(){return i},theme:r.target,data:[],downloads:0,failed:0,retry:0,previous:{key:"",size:""},progress:f.progress(i.length),errors:[]};}return {sync:t,errors:e}}async function Sa(e){u.cache.lastResource="download",W("download"),f.newGroup("Download",!0);Se(e);let s=ur(u.sync),{sync:r,errors:n}=await uf();Ie.on("download",function(i,{target:o,store:a},c){f.spinner.stop();let h=i!=="failed"&&i!=="retry",p=[R.message("whiteBright",y.bold(c.namespace)),y.newline];if(r[a][o][i]+=1,r[a][o].progress.increment(1),h){let l=d("attachment",c.data.asset)?Buffer.from(c.data.asset.attachment,"base64"):Buffer.from(c.data.asset.value||null,"utf8");n.retry[a][o].has(c.key)&&(n.retry[a][o].delete(c.key),r[a][o].retry=n.retry[a][o].size),p.push(R.suffix("white","duration ",`  ${Y()}`),w,R.suffix("white","elapsed ",`  ${dt("download")}`),y.newline);for(let m in r)for(let D in r[m]){let C=r[m][D],E=`  ${y.bold(`${C.downloads}`)} ${y.white("of")} ${y.bold(`${C.files.length}`)}`,_=`  ${y.bold(`${C.failed}`)}`,H=`  ${y.bold(`${C.retry}`)} ${y.white("of")} ${y.bold(`${C.files.length}`)}`;o===D&&m===a?(C.previous.key=c.key,C.previous.size=nt(l.toString()),p.push(R.message("neonCyan",`${y.bold(D.toUpperCase())}  ${y.ARR}  ${m}`),y.newline,R.message(h?"neonGreen":"redBright",c.key),w,R.message("whiteBright",C.previous.size),y.newline,R.suffix("whiteBright","download ",E),w,R.suffix(C.retry>0?"orange":"white","retrying ",H),w,R.suffix(C.failed>0?"redBright":"white","failed ",_),y.newline,C.progress.render(),y.newline)):p.push(R.message("neonCyan",`${y.bold(D.toUpperCase())}  ${y.ARR}  ${m}`),y.newline,R.message(h?"neonGreen":"redBright",C.previous.key),w,R.message("whiteBright",C.previous.size),y.newline,R.suffix("whiteBright","download ",E),w,R.suffix(C.retry>0?"orange":"white","retrying ",H),w,R.suffix(C.failed>0?"redBright":"white","failed ",_),y.newline,C.progress.render(),y.newline);}fsExtra.writeFileSync(path.join(u.dirs.import,a,o,c.key),l),f.update(Te(p));}else if(i==="retry")if(r[a][o].previous.key=y.orange(c.key),r[a][o].previous.size="",r[a][o].retry=r[a][o].retry+1,n.retry[a][o].has(c.key)){let l=n.retry[a][o].get(c.key);n.retry[a][o].set(c.key,{file:c.file,attempts:l.attempts+1});}else n.retry[a][o].set(c.key,{file:c.file,attempts:0});else r[a][o].errors.push(c.key),r[a][o].previous.key=c.key,r[a][o].previous.size="",n.remote[a][o].has(c.key)?n.remote[a][o].get(c.key).push({store:a,theme:o,file:c.file,attempts:0,response:c.error}):n.remote[a][o].set(c.key,[{store:a,theme:o,file:c.file,attempts:0,response:c.error}]);});for(let i in r)for(let o in r[i])for(let a of r[i][o].files)await s.assets("get",ea(a.key));}function cf(e,t){let{wss:s,mode:r,watch:n,env:i}=u,{type:o,relative:a,kind:c,key:h,output:p}=e;return async l=>{if(o!==16&&(r.watch&&n.unwatch(p),await fsExtra.writeFile(p,l).catch(q.write("Error writing asset to output",{file:a,source:a}))),r.hot&&(f.syncing(h,!0),c==="JavaScript"?s.script(h):c==="CSS"&&s.stylesheet(h)),i.sync!==0)return t("put",e,l)}}async function qs(e,t,s){let r=cf(e,t),n=await fsExtra.readFile(e.input).catch(q.write("Error reading asset file",{file:e.relative,source:e.relative}));if(n){let i=n.toString();if(J(i))return u.mode.watch&&f.skipped(e,"empty file"),null;if(!Se(s))return r(i);let o=s.apply({...e},i);return X(o)||o===!1?r(i):me(o)?r(o):_e(o)?r(o.toString()):r(i)}return null}var Df=/{%-?\s*#[\s\S]+?%}/g,hf=/{%-?\s*comment\s*-?%}[\s\S]+?{%-?\s*endcomment\s*-?%}/g,gf=/{%-?\s*liquid[\s\S]+?%}/g,yf=/[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;function Gs(e){return u.terser.liquid.removeComments?e.replace(hf,A).replace(Df,A):e}function xf(e){return e.replace(gf,t=>`
-`+t.replace(/#.*?$/gm,A)+`
-`)}function wf(e,t){if(!u.terser.liquid.minifySchema)return Gs(t);let s=t.search(/{%-?\s*schema/);if(s>-1){let r=t.indexOf("%}",s+2)+2,n=t.slice(r),i=r+n.search(/{%-?\s*endschema/);if(i>-1){let o=JSON.parse(t.slice(r,i)),a=JSON.stringify(o,null,0),c=t.slice(0,r)+a+t.slice(i);return Gs(c)}f.invalid(e.relative);}return Gs(t)}function Ff(e){return u.terser.liquid.stripDashes,e}async function Cf(e,t){try{return await htmlMinifierTerser.minify(t,u.terser.markup)}catch(s){return f.invalid(e.relative),console.error(s),null}}var Ef=e=>async t=>{if(e.type===2&&u.mode.hot&&ar(t)===!1&&(t=Fa(t)),!u.mode.terse)return await fsExtra.writeFile(e.output,t),f.transform(`${e.namespace} \u2192 ${rt(e.size)}`),t;let s;if(e.base.endsWith(".js.liquid"))s=t.replace(yf,A).replace(/(?<=[:,]) +(?=['"{[])/g,A).replace(/{{%/g,"{ {%").replace(/%}}/g,"%} }").replace(/(?<=[%}]})\s+(?=[\]}])/g," ").replace(/>\s+(?=[{[])/,">").replace(/(?<=[}\]])\s<\//g,"</");else if(e.base.endsWith(".json.liquid"))s=JSON.stringify(JSON.parse(t),null,0);else {let i=e.type===4?wf(e,t):Gs(t),o=await Cf(e,i);s=xf(o);}if(f.process("HTML Terser",dt()),j(s))return await fsExtra.writeFile(e.output,t),t;let r=Ff(s).replace(/^\s+/gm,A);await fsExtra.writeFile(e.output,r);let n=Oe(t,e.size);return n.isSmaller?f.transform(`${e.namespace} ${n.before} \u2192 gzip ${n.gzip}`):f.minified("Liquid",n.before,n.after,n.saved),r};async function bf(e){let s=(await fsExtra.readFile(e)).toString(),r=s.search(/{%-?\s*schema/);if(r<0)return;let n=s.indexOf("%}",r+2)+2,i=s.slice(n),o=n+i.search(/{%-?\s*endschema/);return o<0&&f.throws(e),JSON.parse(s.slice(n,o))}async function Sf(e,t){let s=t.search(/{%-?\s*schema/);if(s<0)return t;let r=t.indexOf("%}",s+2)+2,n=t.slice(r),i=r+n.search(/{%-?\s*endschema/);i<0&&f.throws(e.relative);let o=JSON.parse(t.slice(r,i));if(!d("use",o))return t;if(!S(o.use))throw new Error("Invalid type passed on schema");let a={},c=await cl__default.default(pathe.join(u.dirs.output,"sections")+"/**");for(let l of o.use)for(let m of c)if(pathe.basename(m,".liquid").endsWith(l)){let C=await bf(m);a[l]=C;}let h=[];for(let l=0;l<o.settings.length;l++)if(d("ref",o.settings[l])){let[m,D]=o.settings[l].ref.split(".").filter(Boolean),C=a[m].settings.find(E=>E.id===D);C&&(o.settings[l]=C,h.push(C));}for(let l=0;l<o.blocks.length;l++)for(let m=0;m<o.blocks[l].settings.length;m++){let D=o.blocks[l].settings[m];if(d("ref",D)){let[C,E,_]=D.ref.split(".").filter(Boolean),H=a[C].blocks.find(K=>K.type===E);if(H){let K=H.settings.find(ee=>ee.id===_);K&&(o.blocks[l].settings[m]=K,h.push(K));}}}return delete o.use,t.slice(0,r)+`
-`+JSON.stringify(o,null,2)+`
-`+t.slice(i)}async function qt(e,t){u.mode.watch&&W();let r=(await fsExtra.readFile(e.input)).toString();u.mode.build&&e.namespace==="layout"&&ar(r)&&(r=qr(r)),e.type===4&&(r=await Sf(e,r)),e.size=ve(r);let n=Ef(e);if(!me("Function",t))return n(r);let i=t.apply({...e},r);return me("Undefined",i)||i===!1?n(r):me("String",i)?n(i):Buffer.isBuffer(i)?n(i.toString()):n(r)}function Bi(e){try{return JSON.parse(e)}catch(t){return console.log(t),null}}function Bf(e,t=0){try{return JSON.stringify(e,null,t)}catch(s){return console.log(s),null}}async function lr(e,t,s=0){let r=Bf(t,s);if(j(r))return u.mode.watch&&Y(),t;if(s===0){let n=Oe(r,e.size);f.minified("JSON",n.before,n.after,n.saved);}else f.transform(`${e.namespace} \u2192 ${rt(e.size)}`);return e.type===14||fsExtra.writeFile(e.output,r).catch(q.write("Error writing JSON",{file:e.relative})),r}async function $t(e,t){u.mode.watch&&W();let s=await fsExtra.readFile(e.input).catch(q.write("Error reading JSON file",{file:e.relative}));if(_e(s)){let r=s.toString();if(e.size=ve(r),r.trim().length===0)return f.skipped(e,"empty file"),null;let n=Bi(r);if(J(n))return f.skipped(e,"empty file"),null;let i=u.processor.json.indent,{mode:o,terser:a}=u;if(o.terse&&(e.type===13?a.json.assets&&(i=0):e.type===7?a.json.locales&&(i=0):e.type===1?a.json.templates&&(i=0):e.type===14?a.json.metafields&&(i=0):e.type===5?a.json.metaobject&&(i=0):e.type===4?a.json.groups&&(i=0):e.type===6&&a.json.config&&(i=0)),!Se(t))return lr(e,n,i);let c=t.apply({...e},n);return X(c)?lr(e,n,i):S(c)||I(c)?lr(e,c,i):L(c)?lr(e,Bi(c),i):_e(c)?lr(e,Bi(c.toString()),i):lr(e,n,i)}}var Gr=null;function Aa(){return Gr=vn("esbuild"),j(Gr)?(Gr=null,!1):!0}async function Ta(e){u.processor.esbuild.loaded&&e.watch.clear();let t=await Gr.build(e.esbuild);u.mode.terse&&u.mode.build&&(e.size=ve(t.outputFiles[0].text)),u.mode.watch?Ra(e,t.metafile.inputs):(e.watch.has(e.input)||e.watch.add(e.input),u.watch.has(e.input)||u.watch.add(e.input));}async function Ra(e,t){let s=[],{cwd:r,watch:n,mode:i}=u;for(let o in t){if(o.indexOf("/node_modules/")>-1)continue;let a=pathe.join(r,o);e.watch.has(a)||e.watch.add(a),n.has(a)||n.add(a),i.watch&&s.push(a);}i.watch&&u.processor.esbuild.loaded&&await Bn().then(()=>{for(let o of e.watch)o.indexOf("/node_modules/")>-1||e.watchCustom!==null&&e.watchCustom(o)||d(o.slice(r.length+1),t)||(e.watch.delete(o),n.unwatch(o));});}function Af(e){return "<script>"+e+"</script>"}function Tf(e){return me("Function",e)?function(t,s){let r=e.apply({...t},s);return r===!1?(f.external("cancelled"),null):me("String",r)?(f.external("augment"),r):_e(r)?(f.external("augment"),r.toString()):s}:!1}async function Ws(e,t,s){if(!e.data)return;u.mode.watch&&W();let r=Tf(s),{errors:n,wss:i,mode:o,cwd:a}=u,c=e.data.length,h=[];for(let p of e.data){let{key:l,input:m,output:D,snippet:C,esbuild:{format:E}}=p;try{let{metafile:_,outputFiles:H,warnings:K}=await Gr.build(p.esbuild);c>1&&(f.nwl(),f.importer(pathe.relative(a,m))),o.watch&&await Ra(p,_.inputs),K.length>0&&void 0;for(let{text:ee,path:Ne}of H)if(Ne.endsWith(".map")){let ie=pathe.join(u.cache.sourcemaps.script,e.base+".map");fsExtra.writeFile(ie,ee).catch(q.write("Error writing JavaScript Source Map to cache",{file:pathe.relative(a,ie),source:e.relative}));}else {if(o.terse){let{before:en,after:Rl,saved:_l}=Oe(ee,p.size);f.transform(`${F(E.toUpperCase())} bundle`),f.minified(null,en,Rl,_l);}else f.transform(`${F(E.toUpperCase())} bundle \u2192 ${F(nt(ee))}`);let ie;if(C){if(ie=Af(ee),r&&(ie=r(e,ie),ie===null))continue;await fsExtra.writeFile(D,ie).catch(q.write("Error writing inline <script> snippet",{file:e.relative})),f.transform(`exported as ${F("snippet")}`);}else {if(ie=ee,r&&(ie=r(e,ie),ie===null))continue;await fsExtra.writeFile(D,ie).catch(q.write("Error writing JavaScript asset",{file:e.relative}));}o.hot?(f.syncing(l,!0),i.script(l),h.push(t("put",p,ie))):o.build||(f.syncing(l),h.push(t("put",p,ie)));}}catch(_){d("errors",_)&&(f.invalid(e.relative),n.add(m),_.errors.forEach(q.esbuild));}}c>1&&f.nwl(),await Promise.all(h);}var zs=null,Ti=null;async function Ri(e){if(e==="postcss")return zs=(await import('postcss')).default,j(zs)===!1;if(e==="sass")return Ti=rn("sass"),j(Ti)===!1}function kf(e,t){let s=Se(t)?{...e}:!1;return async function(r){if(j(r))return null;let n;if(s!==!1){let o=t.apply({...e},Buffer.from(r));X(o)||o===!1?n=r:(L(o)||_e(o))&&(n=o);}else n=r;fsExtra.writeFile(e.output,n).catch(q.write("Error writing stylesheet to output",{input:e.relative,output:pathe.relative(u.cwd,e.output)}));let i=Oe(r,e.size);return i.isSmaller?f.transform(`${F("CSS")} ${i.before} \u2192 gzip ${i.gzip}`):f.minified("CSS",i.before,i.after,i.saved),u.mode.hot&&u.wss.stylesheet(e.key),n}}async function Pf(e){let{data:t}=e,s=t.sass===!0?u.processor.sass.config:t.sass;if(e.ext===".scss"||e.ext===".sass"){u.mode.watch&&W();try{let{css:r,sourceMap:n}=Ti.compile(t.input,{loadPaths:s.include,sourceMapIncludeSources:!1,sourceMap:s.sourcemap,style:s.style,logger:{debug:i=>console.log("DEBUG",i),warn:nr.sass(e)}});if(s.sourcemap){let i=pathe.join(u.cache.sourcemaps.style,e.base+".map");fsExtra.writeFile(i,JSON.stringify(n)).catch(q.write("Error writing SASS Source Map file to the cache directory",{file:pathe.relative(u.cwd,i),source:e.relative}));}return f.process("SASS Dart",Y()),e.size=ve(r),{css:r,map:n}}catch(r){return f.invalid(e.relative),q.sass(e,r),null}}try{let r=await fsExtra.readFile(e.input);return e.size=ve(r),{css:r.toString(),map:null}}catch(r){return f.invalid(e.relative),f.throws(r),null}}async function Of(e,t,s){let{data:r}=e;try{u.mode.watch&&W();let n=await zs(u.processor.postcss.config).process(t,{from:r.rename,to:r.rename,map:s?{prev:s,inline:!1}:null});u.mode.watch&&f.process("PostCSS",Y());let i=n.warnings();if(i.length>0)for(let o of i)nr.postcss(e,o);return n.toString()}catch(n){return f.invalid(e.relative),console.log(n),null}}function _a(e){return `<style>${w+He(2)+e}</style>`}async function Us(e,t){u.mode.watch&&W();let s=kf(e,t);try{let r=await Pf(e);if(r===null)return null;if(j(zs)||!e.data.postcss&&!e.data.snippet)return s(r.css);if(e.data.postcss){let n=await Of(e,r.css,r.map);if(n===null)return null;if(e.data.snippet)return s(_a(n))}return e.data.snippet?s(_a(r.css)):s(r.css)}catch(r){return console.log(r),null}}var _i=null,ki=null;async function Pi(e){if(e==="svg-sprite")return ki=(await import('svg-sprite')).default,j(ki)===!1;if(e==="svgo")return _i=(await import('svgo')).default,j(_i)===!1}async function Nf(e){let t=await fsExtra.readFile(e);return [e,t.toString(),ve(t)]}function If(e){return new Promise(function(t,s){e.compile((r,n)=>{if(r)return s(r);for(let i in n)for(let o in n[i])t(n[i][o].contents.toString());});})}function Lf(e,t,s){async function r(n){let i=U({},e);u.mode.watch&&W(),i.kind="SVG Sprite",n.snippet?(i.namespace="snippets",i.key=pathe.join("snippets",Mr(i,n.rename)),i.output=pathe.join(u.dirs.output,i.key)):(i.key=pathe.join("assets",Mr(i,n.rename)),i.output=pathe.join(u.dirs.output,i.key));let o=n.sprite===!0?u.processor.sprite.config:n.sprite,a=new ki(o),c=await et(Nf,at(n.input)).catch(q.write("Error reading an SVG file",{file:i.base,source:i.relative}));if(c){let h=c.filter(([D,C])=>Na(C)?(f.skipped(pathe.relative(u.cwd,D),"Liquid Detected"),!1):!0);i.size=0;for(let[D,C,E]of h)a.add(D,null,C),i.size=i.size+E;let p=await If(a),l=h.length;f.process("SVG Sprite",`${l} ${st("SVG",l)}`,Y()),await fsExtra.writeFile(i.output,p).catch(q.write("Error writing SVG Sprite",{file:i.key,caller:e.relative}));let m=Oe(p,i.size);m.isSmaller?f.transform(`${i.kind} ${m.before} \u2192 gzip ${m.gzip}`):f.minified(i.kind,m.before,m.after,m.saved),t&&(f.syncing(i.key),await t("put",i,p));}}return r}function Na(e){return /^(?:{{[\s\S]+?}}|{%[\s\S]+?%})|[^"'](?:{{[\s\S]+?}}|{%[\s\S]+?%})[^'"]/m.test(e)}function Mf(e){if(/<path[^>]*[a-zA-Z"'\s](>)(?!\s*<\/path>)/g.test(e)){let s=`${y.gray(`<${y.white("path")}>`)}`,r=`${y.neonGreen(`<${y.white("path")} />`)}`;return f.transform(`${s} ${y.ARR} ${r} ${y.TLD} ${y.gray("patched solidus")}`),e.replace(/(<path[^>]*[a-zA-Z"'\s])(>)(?!\s*<\/path>)/g,"$1 /$2")}return e}function qf(e,t,s){let r=U({},e);async function n(i){u.mode.watch&&W(),i.snippet?(r.namespace="snippets",r.key=pathe.join("snippets",Mr(r,i.rename)),r.output=pathe.join(u.dirs.output,r.key)):(r.key=pathe.join("assets",Mr(r,i.rename)),r.output=pathe.join(u.dirs.output,r.key));let o=i.svgo===!0?u.processor.svgo:i.svgo,c=(await fsExtra.readFile(r.input)).toString();if(Na(c))return f.skipped(r,"Liquid Detected"),null;let h=Mf(c);r.size=ve(h);let p;try{p=_i.optimize(h,o);}catch(D){return f.err(D.toString()),null}f.process("SVGO",Y());let{data:l}=p,m=Oe(l,r.size);m.isSmaller?f.transform(`${r.kind} ${m.before} \u2192 gzip ${m.gzip}`):f.minified(r.kind,m.before,m.after,m.saved),await fsExtra.writeFile(r.output,l).catch(q.write("Error writing SVG",{file:r.key,caller:e.relative})),t&&(f.syncing(r.key),await t("put",r,l));}return n}async function Vs(e,t,s){u.mode.watch&&W();let r=Lf(e,t),n=qf(e,t),i=e.data.length;for(let o=0;o<i;o++){let a=e.data[o];o>0&&u.mode.watch&&f.changed(e),a.format==="sprite"&&await r(a),a.format==="file"&&await n(a);}}async function cr(e,t){return d(e,u.cache.pages)?t.id in u.cache.pages[e]?(u.cache.pages[e][t.id]=t,await Gt(),2):(u.cache.pages[e][t.id]=t,await Gt(),1):(u.cache.pages[e]={[t.id]:t},await Gt(),1)}async function Gt(){u.cache.updated=Date.now();try{await fsExtra.writeJson(u.cache.uri,u.cache,{spaces:0});}catch(e){throw console.error(e)}}async function Ia(e){u.cache.lastResource="build",W();let{paths:t,dirs:s,watch:r,filters:n,mode:i}=u,o=J(n)===!1,a=js(t,s.output),c=pl__default.default(at(r.values())),h=await cl__default.default("**",{absolute:!0,cwd:s.input}),p={},l=h.filter(c).reduce((D,C)=>{let E=a(C);if(X(E))return D;switch(E.type){case 8:D.styles.files.push(E);break;case 9:D.scripts.files.push(E);break;case 4:D.sections.files.push(E);break;case 2:D.layouts.files.push(E);break;case 3:D.snippets.files.push(E);break;case 7:D.locales.files.push(E);break;case 6:D.configs.files.push(E);break;case 1:D.templates.files.push(E);break;case 15:D.pages.files.push(E);break;case 13:D.assets.files.push(E);break;case 14:D.metafields.files.push(E);break;case 10:{for(let{uuid:_,format:H,input:K}of E.data)if(!d(_,p))if(p[_]=!0,H==="sprite")D.svgs.files.push(E);else for(let ee of K)D.svgs.files.push(a(ee));break}}return D},{styles:{time:A,files:[],report:null},scripts:{time:A,files:[],report:null},svgs:{time:A,files:[],report:null},sections:{time:A,files:[],report:null},layouts:{time:A,files:[],report:null},metaobject:{time:A,files:[],report:null},templates:{time:A,files:[],report:null},snippets:{time:A,files:[],report:null},locales:{time:A,files:[],report:null},configs:{time:A,files:[],report:null},pages:{time:A,files:[],report:null},metafields:{time:A,files:[],report:null},assets:{time:A,files:[],report:null}}),m=(D,C,E)=>async _=>{W();try{f.build(D,C,_);let H=await(_.ext===".json"?$t(_,e):E(_,e));return u.cache.maps[_.output]=_.input,f.out(R.tree("bottom",y.neonGreen(_.key))),H===null||isNaN(_.size)?{name:_.base,input:_.relative,time:Y(),output:_.key,error:"Skipped File"}:{name:_.base,input:_.relative,output:_.key,error:null,time:"",size:Oe(H,_.size)}}catch(H){return f.out(R.tree("bottom",y.redBright(_.key))),{name:_.base,input:_.relative,output:_.key,time:Y(),error:H.message}}};for(let D in l){W();let C=l[D].files,E=C.length;if(D==="styles"&&i.style){if(o&&!(d(D,n)&&n[D].includes(D)))continue;l[D].report=await et(m(D,E,Us),C),l[D].time=Y();}else if(D==="scripts"&&i.script){if(o&&!(d(D,n)&&n[D].includes(D)))continue;l[D].report=await et(m(D,E,Ws),C),l[D].time=Y();}else if(D==="layouts"||D==="snippets"||D==="sections"||D==="templates"){if(i.views){if(o&&!(d(D,n)&&n[D].includes(D)))continue;l[D].report=await et(m(D,E,qt),C),l[D].time=Y();}}else if(D==="locales"||D==="configs"||D==="metafields"){if(i.views){if(o&&!(d(D,n)&&n[D].includes(D)))continue;l[D].report=await et(m(D,E,$t),C),l[D].time=Y();}}else if(!(D==="pages"&&i.views)){if(D==="assets"&&i.views){if(o&&!(d(D,n)&&n[D].includes(D)))continue;l[D].report=await et(m(D,E,qs),C),l[D].time=Y();}else if(D==="svgs"&&i.svg){if(o&&!(d(D,n)&&n[D].includes(D)))continue;l[D].report=await et(m(D,E,Vs),C),l[D].time=Y();}}}u.cache.lastBuild=Date.now(),await Gt(),f.nwl(),f.update(`${x.gray}Build Completed ${g(`~ ${Y()}`)}`),f.nwl(),process.exit(0);}function Uf(e){e.addRule("taskListItems",{filter:function(t){return t.type==="checkbox"&&t.parentNode.nodeName==="LI"},replacement:function(t,s){return (s.checked?"[x]":"[ ]")+" "}});}function Vf(e){let t=/highlight-(?:text|source)-([a-z0-9]+)/;e.addRule("highlightedCodeBlock",{filter:function(s){let r=s.firstChild;return s.nodeName==="DIV"&&t.test(s.className)&&r&&r.nodeName==="PRE"},replacement:function(s,r,n){let o=((r.className||"").match(t)||[null,""])[1];return `
+// node_modules/.pnpm/eastasianwidth@0.2.0/node_modules/eastasianwidth/eastasianwidth.js
+var require_eastasianwidth = __commonJS({
+  "node_modules/.pnpm/eastasianwidth@0.2.0/node_modules/eastasianwidth/eastasianwidth.js"(exports, module) {
+    var eaw = {};
+    if ("undefined" == typeof module) {
+      window.eastasianwidth = eaw;
+    } else {
+      module.exports = eaw;
+    }
+    eaw.eastAsianWidth = function(character) {
+      var x = character.charCodeAt(0);
+      var y = character.length == 2 ? character.charCodeAt(1) : 0;
+      var codePoint = x;
+      if (55296 <= x && x <= 56319 && (56320 <= y && y <= 57343)) {
+        x &= 1023;
+        y &= 1023;
+        codePoint = x << 10 | y;
+        codePoint += 65536;
+      }
+      if (12288 == codePoint || 65281 <= codePoint && codePoint <= 65376 || 65504 <= codePoint && codePoint <= 65510) {
+        return "F";
+      }
+      if (8361 == codePoint || 65377 <= codePoint && codePoint <= 65470 || 65474 <= codePoint && codePoint <= 65479 || 65482 <= codePoint && codePoint <= 65487 || 65490 <= codePoint && codePoint <= 65495 || 65498 <= codePoint && codePoint <= 65500 || 65512 <= codePoint && codePoint <= 65518) {
+        return "H";
+      }
+      if (4352 <= codePoint && codePoint <= 4447 || 4515 <= codePoint && codePoint <= 4519 || 4602 <= codePoint && codePoint <= 4607 || 9001 <= codePoint && codePoint <= 9002 || 11904 <= codePoint && codePoint <= 11929 || 11931 <= codePoint && codePoint <= 12019 || 12032 <= codePoint && codePoint <= 12245 || 12272 <= codePoint && codePoint <= 12283 || 12289 <= codePoint && codePoint <= 12350 || 12353 <= codePoint && codePoint <= 12438 || 12441 <= codePoint && codePoint <= 12543 || 12549 <= codePoint && codePoint <= 12589 || 12593 <= codePoint && codePoint <= 12686 || 12688 <= codePoint && codePoint <= 12730 || 12736 <= codePoint && codePoint <= 12771 || 12784 <= codePoint && codePoint <= 12830 || 12832 <= codePoint && codePoint <= 12871 || 12880 <= codePoint && codePoint <= 13054 || 13056 <= codePoint && codePoint <= 19903 || 19968 <= codePoint && codePoint <= 42124 || 42128 <= codePoint && codePoint <= 42182 || 43360 <= codePoint && codePoint <= 43388 || 44032 <= codePoint && codePoint <= 55203 || 55216 <= codePoint && codePoint <= 55238 || 55243 <= codePoint && codePoint <= 55291 || 63744 <= codePoint && codePoint <= 64255 || 65040 <= codePoint && codePoint <= 65049 || 65072 <= codePoint && codePoint <= 65106 || 65108 <= codePoint && codePoint <= 65126 || 65128 <= codePoint && codePoint <= 65131 || 110592 <= codePoint && codePoint <= 110593 || 127488 <= codePoint && codePoint <= 127490 || 127504 <= codePoint && codePoint <= 127546 || 127552 <= codePoint && codePoint <= 127560 || 127568 <= codePoint && codePoint <= 127569 || 131072 <= codePoint && codePoint <= 194367 || 177984 <= codePoint && codePoint <= 196605 || 196608 <= codePoint && codePoint <= 262141) {
+        return "W";
+      }
+      if (32 <= codePoint && codePoint <= 126 || 162 <= codePoint && codePoint <= 163 || 165 <= codePoint && codePoint <= 166 || 172 == codePoint || 175 == codePoint || 10214 <= codePoint && codePoint <= 10221 || 10629 <= codePoint && codePoint <= 10630) {
+        return "Na";
+      }
+      if (161 == codePoint || 164 == codePoint || 167 <= codePoint && codePoint <= 168 || 170 == codePoint || 173 <= codePoint && codePoint <= 174 || 176 <= codePoint && codePoint <= 180 || 182 <= codePoint && codePoint <= 186 || 188 <= codePoint && codePoint <= 191 || 198 == codePoint || 208 == codePoint || 215 <= codePoint && codePoint <= 216 || 222 <= codePoint && codePoint <= 225 || 230 == codePoint || 232 <= codePoint && codePoint <= 234 || 236 <= codePoint && codePoint <= 237 || 240 == codePoint || 242 <= codePoint && codePoint <= 243 || 247 <= codePoint && codePoint <= 250 || 252 == codePoint || 254 == codePoint || 257 == codePoint || 273 == codePoint || 275 == codePoint || 283 == codePoint || 294 <= codePoint && codePoint <= 295 || 299 == codePoint || 305 <= codePoint && codePoint <= 307 || 312 == codePoint || 319 <= codePoint && codePoint <= 322 || 324 == codePoint || 328 <= codePoint && codePoint <= 331 || 333 == codePoint || 338 <= codePoint && codePoint <= 339 || 358 <= codePoint && codePoint <= 359 || 363 == codePoint || 462 == codePoint || 464 == codePoint || 466 == codePoint || 468 == codePoint || 470 == codePoint || 472 == codePoint || 474 == codePoint || 476 == codePoint || 593 == codePoint || 609 == codePoint || 708 == codePoint || 711 == codePoint || 713 <= codePoint && codePoint <= 715 || 717 == codePoint || 720 == codePoint || 728 <= codePoint && codePoint <= 731 || 733 == codePoint || 735 == codePoint || 768 <= codePoint && codePoint <= 879 || 913 <= codePoint && codePoint <= 929 || 931 <= codePoint && codePoint <= 937 || 945 <= codePoint && codePoint <= 961 || 963 <= codePoint && codePoint <= 969 || 1025 == codePoint || 1040 <= codePoint && codePoint <= 1103 || 1105 == codePoint || 8208 == codePoint || 8211 <= codePoint && codePoint <= 8214 || 8216 <= codePoint && codePoint <= 8217 || 8220 <= codePoint && codePoint <= 8221 || 8224 <= codePoint && codePoint <= 8226 || 8228 <= codePoint && codePoint <= 8231 || 8240 == codePoint || 8242 <= codePoint && codePoint <= 8243 || 8245 == codePoint || 8251 == codePoint || 8254 == codePoint || 8308 == codePoint || 8319 == codePoint || 8321 <= codePoint && codePoint <= 8324 || 8364 == codePoint || 8451 == codePoint || 8453 == codePoint || 8457 == codePoint || 8467 == codePoint || 8470 == codePoint || 8481 <= codePoint && codePoint <= 8482 || 8486 == codePoint || 8491 == codePoint || 8531 <= codePoint && codePoint <= 8532 || 8539 <= codePoint && codePoint <= 8542 || 8544 <= codePoint && codePoint <= 8555 || 8560 <= codePoint && codePoint <= 8569 || 8585 == codePoint || 8592 <= codePoint && codePoint <= 8601 || 8632 <= codePoint && codePoint <= 8633 || 8658 == codePoint || 8660 == codePoint || 8679 == codePoint || 8704 == codePoint || 8706 <= codePoint && codePoint <= 8707 || 8711 <= codePoint && codePoint <= 8712 || 8715 == codePoint || 8719 == codePoint || 8721 == codePoint || 8725 == codePoint || 8730 == codePoint || 8733 <= codePoint && codePoint <= 8736 || 8739 == codePoint || 8741 == codePoint || 8743 <= codePoint && codePoint <= 8748 || 8750 == codePoint || 8756 <= codePoint && codePoint <= 8759 || 8764 <= codePoint && codePoint <= 8765 || 8776 == codePoint || 8780 == codePoint || 8786 == codePoint || 8800 <= codePoint && codePoint <= 8801 || 8804 <= codePoint && codePoint <= 8807 || 8810 <= codePoint && codePoint <= 8811 || 8814 <= codePoint && codePoint <= 8815 || 8834 <= codePoint && codePoint <= 8835 || 8838 <= codePoint && codePoint <= 8839 || 8853 == codePoint || 8857 == codePoint || 8869 == codePoint || 8895 == codePoint || 8978 == codePoint || 9312 <= codePoint && codePoint <= 9449 || 9451 <= codePoint && codePoint <= 9547 || 9552 <= codePoint && codePoint <= 9587 || 9600 <= codePoint && codePoint <= 9615 || 9618 <= codePoint && codePoint <= 9621 || 9632 <= codePoint && codePoint <= 9633 || 9635 <= codePoint && codePoint <= 9641 || 9650 <= codePoint && codePoint <= 9651 || 9654 <= codePoint && codePoint <= 9655 || 9660 <= codePoint && codePoint <= 9661 || 9664 <= codePoint && codePoint <= 9665 || 9670 <= codePoint && codePoint <= 9672 || 9675 == codePoint || 9678 <= codePoint && codePoint <= 9681 || 9698 <= codePoint && codePoint <= 9701 || 9711 == codePoint || 9733 <= codePoint && codePoint <= 9734 || 9737 == codePoint || 9742 <= codePoint && codePoint <= 9743 || 9748 <= codePoint && codePoint <= 9749 || 9756 == codePoint || 9758 == codePoint || 9792 == codePoint || 9794 == codePoint || 9824 <= codePoint && codePoint <= 9825 || 9827 <= codePoint && codePoint <= 9829 || 9831 <= codePoint && codePoint <= 9834 || 9836 <= codePoint && codePoint <= 9837 || 9839 == codePoint || 9886 <= codePoint && codePoint <= 9887 || 9918 <= codePoint && codePoint <= 9919 || 9924 <= codePoint && codePoint <= 9933 || 9935 <= codePoint && codePoint <= 9953 || 9955 == codePoint || 9960 <= codePoint && codePoint <= 9983 || 10045 == codePoint || 10071 == codePoint || 10102 <= codePoint && codePoint <= 10111 || 11093 <= codePoint && codePoint <= 11097 || 12872 <= codePoint && codePoint <= 12879 || 57344 <= codePoint && codePoint <= 63743 || 65024 <= codePoint && codePoint <= 65039 || 65533 == codePoint || 127232 <= codePoint && codePoint <= 127242 || 127248 <= codePoint && codePoint <= 127277 || 127280 <= codePoint && codePoint <= 127337 || 127344 <= codePoint && codePoint <= 127386 || 917760 <= codePoint && codePoint <= 917999 || 983040 <= codePoint && codePoint <= 1048573 || 1048576 <= codePoint && codePoint <= 1114109) {
+        return "A";
+      }
+      return "N";
+    };
+    eaw.characterLength = function(character) {
+      var code = this.eastAsianWidth(character);
+      if (code == "F" || code == "W" || code == "A") {
+        return 2;
+      } else {
+        return 1;
+      }
+    };
+    function stringToArray(string) {
+      return string.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[^\uD800-\uDFFF]/g) || [];
+    }
+    eaw.length = function(string) {
+      var characters = stringToArray(string);
+      var len = 0;
+      for (var i = 0; i < characters.length; i++) {
+        len = len + this.characterLength(characters[i]);
+      }
+      return len;
+    };
+    eaw.slice = function(text, start2, end) {
+      textLen = eaw.length(text);
+      start2 = start2 ? start2 : 0;
+      end = end ? end : 1;
+      if (start2 < 0) {
+        start2 = textLen + start2;
+      }
+      if (end < 0) {
+        end = textLen + end;
+      }
+      var result = "";
+      var eawLen = 0;
+      var chars = stringToArray(text);
+      for (var i = 0; i < chars.length; i++) {
+        var char = chars[i];
+        var charLen = eaw.length(char);
+        if (eawLen >= start2 - (charLen == 2 ? 1 : 0)) {
+          if (eawLen + charLen <= end) {
+            result += char;
+          } else {
+            break;
+          }
+        }
+        eawLen += charLen;
+      }
+      return result;
+    };
+  }
+});
 
-`+n.fence+o+`
-`+r.firstChild.textContent+`
-`+n.fence+`
+// node_modules/.pnpm/emoji-regex@9.2.2/node_modules/emoji-regex/index.js
+var require_emoji_regex = __commonJS({
+  "node_modules/.pnpm/emoji-regex@9.2.2/node_modules/emoji-regex/index.js"(exports, module) {
+    module.exports = function() {
+      return /\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62(?:\uDB40\uDC77\uDB40\uDC6C\uDB40\uDC73|\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74|\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67)\uDB40\uDC7F|(?:\uD83E\uDDD1\uD83C\uDFFF\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB-\uDFFE])|(?:\uD83E\uDDD1\uD83C\uDFFE\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB-\uDFFD\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFD\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFC\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB\uDFFD-\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFB\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFB\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFC-\uDFFF])|\uD83D\uDC68(?:\uD83C\uDFFB(?:\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF]))|\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFC-\uDFFF])|[\u2695\u2696\u2708]\uFE0F|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))?|(?:\uD83C[\uDFFC-\uDFFF])\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFF]))|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83D\uDC68|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFE])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])\uFE0F|\u200D(?:(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D[\uDC66\uDC67])|\uD83D[\uDC66\uDC67])|\uD83C\uDFFF|\uD83C\uDFFE|\uD83C\uDFFD|\uD83C\uDFFC)?|(?:\uD83D\uDC69(?:\uD83C\uDFFB\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69])|(?:\uD83C[\uDFFC-\uDFFF])\u200D\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69]))|\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1)(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|\uD83D\uDC69(?:\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69])|\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFB\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))|\uD83E\uDDD1(?:\u200D(?:\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFB\u200D(?:\uD83C[\uDF3E\uDF73\uDF7C\uDF84\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))|\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D[\uDC66\uDC67])|\uD83D\uDC69\u200D\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D\uDC41\uFE0F\u200D\uD83D\uDDE8|\uD83E\uDDD1(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])|\uD83D\uDC69(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])|\uD83D\uDE36\u200D\uD83C\uDF2B|\uD83C\uDFF3\uFE0F\u200D\u26A7|\uD83D\uDC3B\u200D\u2744|(?:(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|\uD83D\uDC6F|\uD83E[\uDD3C\uDDDE\uDDDF])\u200D[\u2640\u2642]|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|\uD83C\uDFF4\u200D\u2620|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD])\u200D[\u2640\u2642]|[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u2328\u23CF\u23ED-\u23EF\u23F1\u23F2\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB\u25FC\u2600-\u2604\u260E\u2611\u2618\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u2692\u2694-\u2697\u2699\u269B\u269C\u26A0\u26A7\u26B0\u26B1\u26C8\u26CF\u26D1\u26D3\u26E9\u26F0\u26F1\u26F4\u26F7\u26F8\u2702\u2708\u2709\u270F\u2712\u2714\u2716\u271D\u2721\u2733\u2734\u2744\u2747\u2763\u27A1\u2934\u2935\u2B05-\u2B07\u3030\u303D\u3297\u3299]|\uD83C[\uDD70\uDD71\uDD7E\uDD7F\uDE02\uDE37\uDF21\uDF24-\uDF2C\uDF36\uDF7D\uDF96\uDF97\uDF99-\uDF9B\uDF9E\uDF9F\uDFCD\uDFCE\uDFD4-\uDFDF\uDFF5\uDFF7]|\uD83D[\uDC3F\uDCFD\uDD49\uDD4A\uDD6F\uDD70\uDD73\uDD76-\uDD79\uDD87\uDD8A-\uDD8D\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA\uDECB\uDECD-\uDECF\uDEE0-\uDEE5\uDEE9\uDEF0\uDEF3])\uFE0F|\uD83C\uDFF3\uFE0F\u200D\uD83C\uDF08|\uD83D\uDC69\u200D\uD83D\uDC67|\uD83D\uDC69\u200D\uD83D\uDC66|\uD83D\uDE35\u200D\uD83D\uDCAB|\uD83D\uDE2E\u200D\uD83D\uDCA8|\uD83D\uDC15\u200D\uD83E\uDDBA|\uD83E\uDDD1(?:\uD83C\uDFFF|\uD83C\uDFFE|\uD83C\uDFFD|\uD83C\uDFFC|\uD83C\uDFFB)?|\uD83D\uDC69(?:\uD83C\uDFFF|\uD83C\uDFFE|\uD83C\uDFFD|\uD83C\uDFFC|\uD83C\uDFFB)?|\uD83C\uDDFD\uD83C\uDDF0|\uD83C\uDDF6\uD83C\uDDE6|\uD83C\uDDF4\uD83C\uDDF2|\uD83D\uDC08\u200D\u2B1B|\u2764\uFE0F\u200D(?:\uD83D\uDD25|\uD83E\uDE79)|\uD83D\uDC41\uFE0F|\uD83C\uDFF3\uFE0F|\uD83C\uDDFF(?:\uD83C[\uDDE6\uDDF2\uDDFC])|\uD83C\uDDFE(?:\uD83C[\uDDEA\uDDF9])|\uD83C\uDDFC(?:\uD83C[\uDDEB\uDDF8])|\uD83C\uDDFB(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA])|\uD83C\uDDFA(?:\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF])|\uD83C\uDDF9(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF])|\uD83C\uDDF8(?:\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF])|\uD83C\uDDF7(?:\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC])|\uD83C\uDDF5(?:\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE])|\uD83C\uDDF3(?:\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF])|\uD83C\uDDF2(?:\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF])|\uD83C\uDDF1(?:\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE])|\uD83C\uDDF0(?:\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF])|\uD83C\uDDEF(?:\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5])|\uD83C\uDDEE(?:\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9])|\uD83C\uDDED(?:\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA])|\uD83C\uDDEC(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE])|\uD83C\uDDEB(?:\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7])|\uD83C\uDDEA(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA])|\uD83C\uDDE9(?:\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF])|\uD83C\uDDE8(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF])|\uD83C\uDDE7(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF])|\uD83C\uDDE6(?:\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF])|[#\*0-9]\uFE0F\u20E3|\u2764\uFE0F|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])|\uD83C\uDFF4|(?:[\u270A\u270B]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD0C\uDD0F\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5])(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u261D\u270C\u270D]|\uD83D[\uDD74\uDD90])(?:\uFE0F|\uD83C[\uDFFB-\uDFFF])|[\u270A\u270B]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC08\uDC15\uDC3B\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDC8F\uDC91\uDCAA\uDD7A\uDD95\uDD96\uDE2E\uDE35\uDE36\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD0C\uDD0F\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD34\uDD36\uDD77\uDDB5\uDDB6\uDDBB\uDDD2\uDDD3\uDDD5]|\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC70\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD35\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD4\uDDD6-\uDDDD]|\uD83D\uDC6F|\uD83E[\uDD3C\uDDDE\uDDDF]|[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF84\uDF86-\uDF93\uDFA0-\uDFC1\uDFC5\uDFC6\uDFC8\uDFC9\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC07\uDC09-\uDC14\uDC16-\uDC3A\uDC3C-\uDC3E\uDC40\uDC44\uDC45\uDC51-\uDC65\uDC6A\uDC79-\uDC7B\uDC7D-\uDC80\uDC84\uDC88-\uDC8E\uDC90\uDC92-\uDCA9\uDCAB-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDDA4\uDDFB-\uDE2D\uDE2F-\uDE34\uDE37-\uDE44\uDE48-\uDE4A\uDE80-\uDEA2\uDEA4-\uDEB3\uDEB7-\uDEBF\uDEC1-\uDEC5\uDED0-\uDED2\uDED5-\uDED7\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB]|\uD83E[\uDD0D\uDD0E\uDD10-\uDD17\uDD1D\uDD20-\uDD25\uDD27-\uDD2F\uDD3A\uDD3F-\uDD45\uDD47-\uDD76\uDD78\uDD7A-\uDDB4\uDDB7\uDDBA\uDDBC-\uDDCB\uDDD0\uDDE0-\uDDFF\uDE70-\uDE74\uDE78-\uDE7A\uDE80-\uDE86\uDE90-\uDEA8\uDEB0-\uDEB6\uDEC0-\uDEC2\uDED0-\uDED6]|(?:[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u270A\u270B\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF93\uDFA0-\uDFCA\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF4\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC3E\uDC40\uDC42-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDD7A\uDD95\uDD96\uDDA4\uDDFB-\uDE4F\uDE80-\uDEC5\uDECC\uDED0-\uDED2\uDED5-\uDED7\uDEEB\uDEEC\uDEF4-\uDEFC\uDFE0-\uDFEB]|\uD83E[\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDD78\uDD7A-\uDDCB\uDDCD-\uDDFF\uDE70-\uDE74\uDE78-\uDE7A\uDE80-\uDE86\uDE90-\uDEA8\uDEB0-\uDEB6\uDEC0-\uDEC2\uDED0-\uDED6])|(?:[#\*0-9\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u261D\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26A7\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE\u26C4\u26C5\u26C8\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC04\uDCCF\uDD70\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE02\uDE1A\uDE2F\uDE32-\uDE3A\uDE50\uDE51\uDF00-\uDF21\uDF24-\uDF93\uDF96\uDF97\uDF99-\uDF9B\uDF9E-\uDFF0\uDFF3-\uDFF5\uDFF7-\uDFFF]|\uD83D[\uDC00-\uDCFD\uDCFF-\uDD3D\uDD49-\uDD4E\uDD50-\uDD67\uDD6F\uDD70\uDD73-\uDD7A\uDD87\uDD8A-\uDD8D\uDD90\uDD95\uDD96\uDDA4\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA-\uDE4F\uDE80-\uDEC5\uDECB-\uDED2\uDED5-\uDED7\uDEE0-\uDEE5\uDEE9\uDEEB\uDEEC\uDEF0\uDEF3-\uDEFC\uDFE0-\uDFEB]|\uD83E[\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDD78\uDD7A-\uDDCB\uDDCD-\uDDFF\uDE70-\uDE74\uDE78-\uDE7A\uDE80-\uDE86\uDE90-\uDEA8\uDEB0-\uDEB6\uDEC0-\uDEC2\uDED0-\uDED6])\uFE0F|(?:[\u261D\u26F9\u270A-\u270D]|\uD83C[\uDF85\uDFC2-\uDFC4\uDFC7\uDFCA-\uDFCC]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66-\uDC78\uDC7C\uDC81-\uDC83\uDC85-\uDC87\uDC8F\uDC91\uDCAA\uDD74\uDD75\uDD7A\uDD90\uDD95\uDD96\uDE45-\uDE47\uDE4B-\uDE4F\uDEA3\uDEB4-\uDEB6\uDEC0\uDECC]|\uD83E[\uDD0C\uDD0F\uDD18-\uDD1F\uDD26\uDD30-\uDD39\uDD3C-\uDD3E\uDD77\uDDB5\uDDB6\uDDB8\uDDB9\uDDBB\uDDCD-\uDDCF\uDDD1-\uDDDD])/g;
+    };
+  }
+});
 
-`}});}function Hf(e){e.addRule("strikethrough",{filter:["del","s","strike"],replacement:function(t){return "~"+t+"~"}});}function Jf(e){let{indexOf:t,every:s}=Array.prototype;function r(l){let m=l.parentNode;return m.nodeName==="THEAD"||m.firstChild===l&&(m.nodeName==="TABLE"||n(m))&&s.call(l.childNodes,function(D){return D.nodeName==="TH"})}function n(l){let m=l.previousSibling;return l.nodeName==="TBODY"&&(!m||m.nodeName==="THEAD"&&/^\s*$/i.test(m.textContent))}function i(l,m=null,D=null){D===null&&(D=t.call(m.parentNode.childNodes,m));let C=" ";D===0&&(C="| ");let E=l.trim().replace(/\n\r/g,"<br>").replace(/\n/g,"<br>");for(E=E.replace(/\|+/g,"\\|");E.length<3;)E+=" ";return m&&(E=h(E,m," ")),C+E+" |"}function o(l){if(!l.childNodes)return !1;for(let m=0;m<l.childNodes.length;m++){let D=l.childNodes[m];if(D.nodeName==="TABLE"||o(D))return !0}return !1}function a(l){return !!(!l||!l.rows||l.rows.length===1&&l.rows[0].childNodes.length<=1||o(l))}function c(l){let m=l.parentNode;for(;m.nodeName!=="TABLE";)if(m=m.parentNode,!m)return null;return m}function h(l,m,D){let C=Number(m.getAttribute("colspan"))||1;for(let E=1;E<C;E++)l+=" | "+D.repeat(3);return l}function p(l){let m=0;for(let D=0;D<l.rows.length;D++){let E=l.rows[D].childNodes.length;E>m&&(m=E);}return m}e.keep(function(l){return l.nodeName==="TABLE"}),e.addRule("tableCell",{filter:["th","td"],replacement:function(l,m){return a(c(m))?l:i(l,m)}}),e.addRule("tableRow",{filter:"tr",replacement:function(l,m){let D=c(m);if(a(D))return l;let C="",E={left:":--",right:"--:",center:":-:"};if(r(m)){let _=p(D);for(let H=0;H<_;H++){let K=_>=m.childNodes.length?null:m.childNodes[H],ee="---",Ne=K?(K.getAttribute("align")||"").toLowerCase():"";Ne&&(ee=E[Ne]||ee),K?C+=i(ee,m.childNodes[H]):C+=i(ee,null,H);}}return `
-`+l+(C?`
-`+C:"")}}),e.addRule("tableSection",{filter:["thead","tbody","tfoot"],replacement:function(l){return l}}),e.addRule("table",{filter:function(l){return l.nodeName==="TABLE"},replacement:function(l,m){if(a(m))return l;l=l.replace(/\n+/g,`
-`);let D=l.trim().split(`
-`);D.length>=2&&(D=D[1]);let C=D.indexOf("| ---")===0,E=p(m),_="";return E&&!C&&(_="|"+"     |".repeat(E)+`
-|`+" --- |".repeat(E)),`
+// node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.js
+var require_eventemitter3 = __commonJS({
+  "node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.js"(exports, module) {
+    var has2 = Object.prototype.hasOwnProperty;
+    var prefix = "~";
+    function Events2() {
+    }
+    if (Object.create) {
+      Events2.prototype = /* @__PURE__ */ Object.create(null);
+      if (!new Events2().__proto__)
+        prefix = false;
+    }
+    function EE(fn, context2, once) {
+      this.fn = fn;
+      this.context = context2;
+      this.once = once || false;
+    }
+    function addListener(emitter, event2, fn, context2, once) {
+      if (typeof fn !== "function") {
+        throw new TypeError("The listener must be a function");
+      }
+      var listener = new EE(fn, context2 || emitter, once), evt = prefix ? prefix + event2 : event2;
+      if (!emitter._events[evt])
+        emitter._events[evt] = listener, emitter._eventsCount++;
+      else if (!emitter._events[evt].fn)
+        emitter._events[evt].push(listener);
+      else
+        emitter._events[evt] = [emitter._events[evt], listener];
+      return emitter;
+    }
+    function clearEvent(emitter, evt) {
+      if (--emitter._eventsCount === 0)
+        emitter._events = new Events2();
+      else
+        delete emitter._events[evt];
+    }
+    function EventEmitter3() {
+      this._events = new Events2();
+      this._eventsCount = 0;
+    }
+    EventEmitter3.prototype.eventNames = function eventNames() {
+      var names = [], events, name;
+      if (this._eventsCount === 0)
+        return names;
+      for (name in events = this._events) {
+        if (has2.call(events, name))
+          names.push(prefix ? name.slice(1) : name);
+      }
+      if (Object.getOwnPropertySymbols) {
+        return names.concat(Object.getOwnPropertySymbols(events));
+      }
+      return names;
+    };
+    EventEmitter3.prototype.listeners = function listeners(event2) {
+      var evt = prefix ? prefix + event2 : event2, handlers = this._events[evt];
+      if (!handlers)
+        return [];
+      if (handlers.fn)
+        return [handlers.fn];
+      for (var i = 0, l = handlers.length, ee = new Array(l); i < l; i++) {
+        ee[i] = handlers[i].fn;
+      }
+      return ee;
+    };
+    EventEmitter3.prototype.listenerCount = function listenerCount(event2) {
+      var evt = prefix ? prefix + event2 : event2, listeners = this._events[evt];
+      if (!listeners)
+        return 0;
+      if (listeners.fn)
+        return 1;
+      return listeners.length;
+    };
+    EventEmitter3.prototype.emit = function emit(event2, a1, a2, a3, a4, a5) {
+      var evt = prefix ? prefix + event2 : event2;
+      if (!this._events[evt])
+        return false;
+      var listeners = this._events[evt], len = arguments.length, args, i;
+      if (listeners.fn) {
+        if (listeners.once)
+          this.removeListener(event2, listeners.fn, void 0, true);
+        switch (len) {
+          case 1:
+            return listeners.fn.call(listeners.context), true;
+          case 2:
+            return listeners.fn.call(listeners.context, a1), true;
+          case 3:
+            return listeners.fn.call(listeners.context, a1, a2), true;
+          case 4:
+            return listeners.fn.call(listeners.context, a1, a2, a3), true;
+          case 5:
+            return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+          case 6:
+            return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+        }
+        for (i = 1, args = new Array(len - 1); i < len; i++) {
+          args[i - 1] = arguments[i];
+        }
+        listeners.fn.apply(listeners.context, args);
+      } else {
+        var length2 = listeners.length, j;
+        for (i = 0; i < length2; i++) {
+          if (listeners[i].once)
+            this.removeListener(event2, listeners[i].fn, void 0, true);
+          switch (len) {
+            case 1:
+              listeners[i].fn.call(listeners[i].context);
+              break;
+            case 2:
+              listeners[i].fn.call(listeners[i].context, a1);
+              break;
+            case 3:
+              listeners[i].fn.call(listeners[i].context, a1, a2);
+              break;
+            case 4:
+              listeners[i].fn.call(listeners[i].context, a1, a2, a3);
+              break;
+            default:
+              if (!args)
+                for (j = 1, args = new Array(len - 1); j < len; j++) {
+                  args[j - 1] = arguments[j];
+                }
+              listeners[i].fn.apply(listeners[i].context, args);
+          }
+        }
+      }
+      return true;
+    };
+    EventEmitter3.prototype.on = function on(event2, fn, context2) {
+      return addListener(this, event2, fn, context2, false);
+    };
+    EventEmitter3.prototype.once = function once(event2, fn, context2) {
+      return addListener(this, event2, fn, context2, true);
+    };
+    EventEmitter3.prototype.removeListener = function removeListener(event2, fn, context2, once) {
+      var evt = prefix ? prefix + event2 : event2;
+      if (!this._events[evt])
+        return this;
+      if (!fn) {
+        clearEvent(this, evt);
+        return this;
+      }
+      var listeners = this._events[evt];
+      if (listeners.fn) {
+        if (listeners.fn === fn && (!once || listeners.once) && (!context2 || listeners.context === context2)) {
+          clearEvent(this, evt);
+        }
+      } else {
+        for (var i = 0, events = [], length2 = listeners.length; i < length2; i++) {
+          if (listeners[i].fn !== fn || once && !listeners[i].once || context2 && listeners[i].context !== context2) {
+            events.push(listeners[i]);
+          }
+        }
+        if (events.length)
+          this._events[evt] = events.length === 1 ? events[0] : events;
+        else
+          clearEvent(this, evt);
+      }
+      return this;
+    };
+    EventEmitter3.prototype.removeAllListeners = function removeAllListeners(event2) {
+      var evt;
+      if (event2) {
+        evt = prefix ? prefix + event2 : event2;
+        if (this._events[evt])
+          clearEvent(this, evt);
+      } else {
+        this._events = new Events2();
+        this._eventsCount = 0;
+      }
+      return this;
+    };
+    EventEmitter3.prototype.off = EventEmitter3.prototype.removeListener;
+    EventEmitter3.prototype.addListener = EventEmitter3.prototype.on;
+    EventEmitter3.prefixed = prefix;
+    EventEmitter3.EventEmitter = EventEmitter3;
+    if ("undefined" !== typeof module) {
+      module.exports = EventEmitter3;
+    }
+  }
+});
 
-`+_+l+`
+// node_modules/.pnpm/mimic-fn@2.1.0/node_modules/mimic-fn/index.js
+var require_mimic_fn = __commonJS({
+  "node_modules/.pnpm/mimic-fn@2.1.0/node_modules/mimic-fn/index.js"(exports, module) {
+    var mimicFn = (to, from) => {
+      for (const prop2 of Reflect.ownKeys(from)) {
+        Object.defineProperty(to, prop2, Object.getOwnPropertyDescriptor(from, prop2));
+      }
+      return to;
+    };
+    module.exports = mimicFn;
+    module.exports.default = mimicFn;
+  }
+});
 
-`}});}function La(e){e.use([Vf,Hf,Jf,Uf]);}function Yf(e){return e==="boolean"||e==="color"||e==="date"||e==="date_time"||e==="dimension"||e==="json"||e==="money"||e==="multi_line_text_field"||e==="number_decimal"||e==="number_integer"||e==="rating"||e==="rich_text_field"||e==="single_line_text_field"||e==="url"||e==="volume"||e==="weight"}function Ma(e,t){for(let s of t)for(let r of ["key","type","value","namespace","description"]){if(r!=="description"&&!d(r,s))return f.invalid(e.relative,[`Missing ${y.blue.bold(r)} property key value in a ${y.yellowBright.bold("metafields")}`,"value of page frontmatter. Frontmatter metafields require you provide the following keys:","",`${y.gray("-")} ${y.white("key")}`,`${y.gray("-")} ${y.white("type")}`,`${y.gray("-")} ${y.white("value")}`,`${y.gray("-")} ${y.white("namespace")}`,"",`${y.gray("Update the metafield entry to include")} ${y.white(r)}`]),!1;if(r==="type"){let n=s[r];if(!Yf(n))return f.invalid(e.relative,[`Invalid type ${y.blue.bold(n)} provided in a page frontmatter ${y.yellowBright.bold("metafields")}`,`value. Frontmatter metafields ${y.bold("must")} be one of following types:`,"",`${y.gray("-")} ${y.white("boolean")}`,`${y.gray("-")} ${y.white("color")}`,`${y.gray("-")} ${y.white("date")}`,`${y.gray("-")} ${y.white("date_time")}`,`${y.gray("-")} ${y.white("dimension")}`,`${y.gray("-")} ${y.white("json")}`,`${y.gray("-")} ${y.white("money")}`,`${y.gray("-")} ${y.white("multi_line_text_field")}`,`${y.gray("-")} ${y.white("number_decimal")}`,`${y.gray("-")} ${y.white("number_integer")}`,`${y.gray("-")} ${y.white("rating")}`,`${y.gray("-")} ${y.white("rich_text_field")}`,`${y.gray("-")} ${y.white("single_line_text_field")}`,`${y.gray("-")} ${y.white("url")}`,`${y.gray("-")} ${y.white("volume")}`,`${y.gray("-")} ${y.white("weigh")}`,"",`${y.gray("Update the metafield entry to an accepted")} ${y.white("type")}`]),!1}}return !0}async function Oi(e){return $e.get("pages.json",e.client).then(({data:t})=>t.pages).catch(t=>{ft(t.response.status)?G.add(()=>Oi(e)):console.error(t);})}async function qa(e,t){if(Me(d("handle",t),d("title",t))){console.log("invalid fields");return}return $e.get("pages.json",e.client).then(({data:s})=>d("handle",t)&&d("title",t)?s.pages.find(r=>t.title===r.title&&t.handle===r.handle):d("handle",t)?s.pages.find(r=>t.handle===r.handle):d("title",t)?s.pages.find(r=>t.title===r.title):void 0).catch(s=>{console.log(s);})}async function Js(e,t){u.mode.upload||W();let s=await $e.post("/pages.json",{page:t},e.client).then(({data:r})=>(f.resource("page",e),r.page)).catch(r=>{ft(r.response.status)?G.add(()=>Js(e,t)):Ve("response.data",r.response)&&q.request(t.title,r.response);});if(s)return await cr(e.domain,s),s}async function ji(e,t,s){let{mode:r}=u;r.upload||W();let n=`pages/${s.id}.json`,i=await $e.put(n,{page:s},e.client).then(({data:o})=>(r.watch?f.resource("page",e):r.upload&&Ie.emit("upload","uploaded",s,{key:t.key,namespace:t.namespace,fileSize:nt(s.body_html)}),o.page)).catch(o=>{ft(o.response.status)?G.add(()=>ji(e,t,s)):console.log(o);});if(i)return i}function nm(e){let t=new tm__default.default(u.page.import);return t.use(La),t.turndown(e)}async function im(e){let t=f.prompt("No matching pages, select an option",{title:"No matching pages",message:"Open CLI and select an option"}),s=await Ys__default.default({type:"select",name:"action",message:"Page Resources",hint:" ",instructions:!1,choices:[{title:"Create Page",description:`Create a new page on ${e.domain}`,value:1},{title:"Select Page",description:`Select a page to overwrite on ${e.domain}`,value:2},{title:"Cancel",description:"Cancel, and skip this sync operation",value:4}]});return {resume:t,action:s.action}}async function om(e){let t=await Oi(e);if(!t)return;let s=t.map(n=>({title:n.title,description:`https://admin.shopify.com/store/${e.store.toLowerCase()}/pages/${n.id}`,value:n.id}));return s.push({title:Hn(20),disabled:!0,selected:!1},{title:"Create New Page",description:`Create a new page on ${e.domain}`,value:1},{title:"Cancel",description:"Cancel, and skip this sync operation",value:4}),(await Ys__default.default({type:"select",name:"action",message:"Choose Page",hint:" ",instructions:!1,choices:s})).action}async function um(e){let t=[{title:"View Source",description:"Prints the page source in the CLI",value:5},{title:"Update Local",description:"Update the local source with remote version",value:3},{title:"Overwrite Remote",description:"Overwrite the remote version with local source",value:6},{title:"Cancel",description:"Cancel, and skip this sync operation",value:4}],s=f.prompt("Remote version is newer than local version",{title:"Remote \u2192 Local",message:"Remote version has changed"}),r=await Ys__default.default({type:"select",name:"action",message:"Page Resources",hint:" ",instructions:!1,choices:t});if(r.action===5){Ae(""),f.out(sm__default.default(e.body_html)),Ae("");let n=await Ys__default.default({type:"select",name:"action",message:"Page Resources",hint:" ",instructions:!1,choices:t.slice(1)});return {resume:s,action:n.action}}else return {resume:s,action:r.action}}function am(e,t){let s={};if(d("title",t)?s.title=`${t.title}`:s.title=Rt(e.name.replace(/[._-]/g," ")),d("handle",t)){let r,n=t.handle;/^[./]{1,2}/.test(n)&&(r=n,n=n.replace(/^[./]{1,2}/,A),f.warn(`handle ${y.CHV} ${r} ${y.ARR} ${n}`,"fixed start")),/^pages\//.test(n)&&(r=n,n=n.replace(/^pages\//,A),f.warn(`handle ${y.CHV} ${r} ${y.ARR} ${n}`,"fixed sub-path")),/[_/]/.test(t.handle)&&(r=n,n=n.replace(/[_/]/g,"-"),f.warn(`handle ${y.CHV} ${r} ${y.ARR} ${n}`,"fixed invalid characters")),s.handle=n;}else d("title",t)?s.handle=Oo(t.title):s.handle=e.name.toLowerCase();if(d("author",t)&&u.page.author!==""){let r,n=t.author;/\//.test(t.author)&&(r=t.author,n=r.replace(/\//g," "),f.warn(`author ${y.CHV} ${r} ${y.ARR} ${n}`,"fixed invalid characters")),s.author=n;}else t.author=u.page.author;return d("published",t)?oe(t.published)?s.published=t.published:(f.warn(`published ${y.CHV} expected boolean, got ${typeof t.published}`,"defaulted to false"),s.published=!1):s.published=!0,d("template_suffix",t)&&(d("template",t)?(f.warn("duplicate template_suffix references","using template"),delete t.template_suffix):(t.template=t.template_suffix,delete t.template_suffix)),d("template",t)?s.template_suffix=t.template:u.page.suffixDir&&Bt(u.page.global)&&u.page.global.test(e.input)!==!1&&(s.template_suffix=Fe(e.input)),d("metafield",t)&&(f.warn("use metafields instead of metafield","sync will still process"),t.metafields=t.metafield,delete t.metafield),d("metafields",t)?I(t.metafields)&&(s.metafields=[t.metafields]):s.metafields=void 0,s}async function Ga(e,t){if(u.sync.stores.length>1)return f.skipped(e,"pages do not support multistore sync"),null;let s=await fsExtra.readFile(e.input);if(J(s.toString()))return u.mode.watch&&f.skipped(e,"empty file"),null;let r=Zf__default.default(s),{data:n,content:i}={...r},o=am(e,n);if(S(o.metafields)&&!Ma(e,o.metafields))return null;e.kind==="Markdown"?(W(),o.body_html=rm__default.default(u.page.export).render(i),f.transform(`${y.bold("Markdown")} ${y.ARR} ${y.bold("HTML")} ${y.TLD} ${Y()}`)):(f.process("HTML"),o.body_html=i);let a=u.sync.stores[0],c=await qa(a,{handle:o.handle});if(S(c))return f.invalid(e.relative,[`Multiple pages returned when matching on handle ${y.blue.bold(o.handle)}`,"Syncify is unsure of to handle this request and has cancelled the sync. Please","check the provided handle in your webshop."]),null;let h;if(I(c)&&(o.id=c.id,c.id in u.cache.pages?.[a.domain]?h=u.cache.pages[a.domain][c.id]:(await cr(a.domain,c),h=c)),X(c)&&u.page.safeSync){let l=await im(a);if(l.action===2){let m=await om(a);if(m===4)return l.resume();if(m===1)return l.resume(),f.syncing(`/pages/${o.handle} ${y.ARR} ${o.title} ${y.gray(`${y.TLD} ${e.relative}`)}`),Js(a,o);o.id=m,l.resume();}else return l.action===1?(l.resume(),f.syncing(`/pages/${o.handle} ${y.ARR} ${o.title} ${y.gray(`${y.TLD} ${e.relative}`)}`),Js(a,o)):l.resume()}if(u.page.safeSync&&I(c)){let l=new Date(c.updated_at).getTime(),m=new Date(h.updated_at).getTime();if(l>m&&c.body_html!==o.body_html){let D=await um(c);if(D.action===3){D.resume(),f.updated(e,"local source aligned with remote");let C=c.body_html;if(u.page.importLanguage==="markdown"){let E=nm(C);f.transform(`${e.name}.html ${be} ${e.base}`),C=Zf.stringify(`
-`+E,r.data);}u.watch.unwatch(e.input),await fsExtra.writeFile(e.input,C),await cr(a.domain,c),u.watch.add(e.input);}else {if(D.action===4)return D.resume();D.action===6&&D.resume();}}}if(u.mode.build)return o.body_html;f.syncing(`/pages/${o.handle} ${y.ARR} ${o.title} ${y.gray(`${y.TLD} ${e.relative}`)}`);let p=await ji(a,e,o);p&&await cr(a.domain,p);}function Wa(e){u.cache.lastResource="watch";let{sync:t,watch:s,mode:r,paths:n,wss:i,dirs:o}=u,a=ur(t),c=js(n,o.output);r.hot&&u.wss.connected(),s.on("all",function(p,l){let m=c(l);if(!X(m)){if(m.base===u.file.base)return f.configChanges();if(m.type!==16&&f.changed(m),p==="change"||p==="add")h(m);else if(p==="unlink")return m.type===15?a.pages("delete",m):a.assets("delete",m)}});async function h(p){try{let l=null;if(p.type===9)return Ws(p,a.assets,e);if(p.type===15)return Ga(p,e);if(p.type===10)return Vs(p,a.assets,e);if(p.type===13||p.type===16)return qs(p,a.assets,e);if(p.type===8?l=await Us(p,e):p.type===4&&p.kind==="Liquid"&&(l=await qt(p,e)),p.type===4&&p.kind==="JSON")l=await $t(p,e);else if(p.type===2)l=await qt(p,e);else if(p.type===3)l=await qt(p,e);else if(p.type===7||p.type===6)l=await $t(p,e);else {if(p.type===14)return l=await $t(p,e),a.metafields({value:l,namespace:p.namespace,key:p.key});p.type===1&&p.kind==="JSON"?l=await $t(p,e):p.type===1&&p.kind==="Liquid"&&(l=await qt(p,e));}j(l)||(f.syncing(p.key),await a.assets("put",p,l),r.hot&&(p.type===4?i.section(p.name):p.type!==9&&p.type!==8&&await G.onIdle().then(()=>i.replace())));}catch(l){console.error(l),f.err(l);}}}var za=!1,Ua=!1,Ni=new Set;function Qs(e,t){if(!za){za=!0;for(let s of Ni)s();e&&process.exit(128+t);}}function Ks(e){return Ni.add(e),Ua||(Ua=!0,process.once("exit",Qs),process.once("SIGINT",Qs.bind(void 0,!0,2)),process.once("SIGTERM",Qs.bind(void 0,!0,15)),process.on("message",t=>{t==="shutdown"&&Qs(!0,-128);})),()=>Ni.delete(e)}var Wt={enable:!0,output:[]};async function ym(){if(f.update(R.message("gray","validating snippet injection")),await wa()){f.update(R.message("gray","validating layouts"));for(let t in u.hot.alive){if(!await fsExtra.pathExists(t)){f.update(R.message("gray","layout has not yet been bundled, building now..."));let n=cl__default.default.sync(u.config.paths.layout,{cwd:u.dirs.input,absolute:!0});for(let i of n)if(pathe.basename(i)===pathe.basename(t)){let o=await fsExtra.readFile(i);await fsExtra.writeFile(t,o);}f.update(R.message("gray","layout was bundled from source, injecting hot snippet"));}await Ea(t)||(f.update.clear(),f.err("Failed to inject hot reload render tag"));}f.update.clear();}else f.update.clear(),f.err("Failed to upload snippet");}async function Va(){if(!Wt.enable)return Wt.output.push(x.red,x.red+se("Change the socket port address or kill the session occupying it."),x.red+se("This error typically occurs when multiple Syncify instances are active.")),f.err(se(`${F("ERROR")} on ${F(`${u.hot.method==="hot"?"HOT":"LIVE"} Reload:`)}`)),f.out(Wt.output.join(w)),null;f.out(R.message("whiteBright",F(`${u.hot.method==="hot"?"HOT":"LIVE"} Reloading:`))),f.nwl(),f.update(R.message("gray","configuring HOT Reload")),await ym();function e(a){a.setHeader("Access-Control-Allow-Origin","*"),a.setHeader("Cache-Control","public, max-age=0");}let t=pm__default.default(pathe.join(u.dirs.output,"assets"),{setHeaders:e}),s=mm__default.default.createServer((a,c)=>t(a,c,fm__default.default(a,c))),r=`http://localhost:${u.hot.server}`,n=a=>{if(a.code==="EADDRINUSE")return Wt.output.push(x.red+se(`${F("EADDRINUSE")} ${be} ${r}`),x.red,x.red+se.bold(`Server Port ${u.hot.server} address already in use`),x.red,x.red+se("Change the server port address or kill the session occupying it."),x.red+se("This error typically occurs when multiple Syncify instances are active.")),f.update.clear(),f.out(Wt.output.join(w)),u.wss.http.close(),null},i=()=>{f.update.done(),u.wss.connected(),s.removeListener("error",n),s.removeListener("connect",i);};s.on("error",n),s.on("connect",i),s.listen(u.hot.server);let o=Xe("PORT")+N+g(`${u.hot.server}`);f.update(R.message("pink",`server ${be} ${F("localhost")} ${be} ${o}`));}function Ha(){if(u.mode.hot===!1)return;let e=new ws$1.Server({port:u.hot.socket,path:"/ws",skipUTF8Validation:!0});Ks(()=>{e.emit("disconnect"),e.close();});let t=n=>{n.code==="EADDRINUSE"&&(e.close(),Wt.enable=!1,Wt.output.push(x.red+se(`${F("EADDRINUSE")} ${be} ws://localhost:${u.hot.server}`),x.red,x.red+se.bold(`Socket Port ${u.hot.server} address already in use`)));},s=()=>{e.removeAllListeners("script"),e.removeAllListeners("stylesheet"),e.removeAllListeners("section"),e.removeAllListeners("svg"),e.removeAllListeners("assets"),e.removeAllListeners("reload"),e.removeAllListeners("replace");},r=n=>{e.removeListener("error",t),e.prependListener("script",i=>n.send(`script,${i}`)),e.prependListener("stylesheet",i=>n.send(`stylesheet,${i}`)),e.prependListener("section",i=>n.send(`section,${i}`)),e.prependListener("svg",i=>n.send(`svg,${i}`)),e.prependListener("assets",()=>n.send("assets")),e.prependListener("reload",()=>n.send("reload")),e.prependListener("replace",()=>n.send("replace")),e.prependListener("connected",()=>n.send("connected")),e.prependListener("disconnect",()=>n.send("disconnect"));};return e.on("close",s),e.on("error",t),e.on("connection",r),{get http(){return e},script:n=>e.emit("script",pathe.basename(n)),stylesheet:n=>e.emit("stylesheet",pathe.basename(n)),section:n=>e.emit("section",n),svg:n=>e.emit("svg",n),assets:()=>e.emit("assets"),reload:()=>e.emit("reload"),replace:()=>e.emit("replace"),connected:()=>e.emit("connected"),disconnect:()=>e.emit("disconnected")}}function Ja(e){let t=e.toString().trim().toLowerCase();if(t==="v"){let s=Re(Yt);for(let r=0,n=s.length;r<n;r++){let i=s[r];if(Yt[i].size!==0){r>0&&f.hline(10),f.write(y.bold.whiteBright(i));for(let o of Yt[i].values())typeof o=="string"&&o.length>0&&te(o);Yt[i].clear();}}u.mode.upload&&(B(R.closer("Upload"),w),process.exit(0));}else if(t==="w"){for(let s in De.process)if(De.process[s].size!==0){f.nwl(),f.write(y.bold.yellow(s)),f.nwl();for(let r of De.process[s].values())typeof r=="string"&&r.length>0&&f.write(R.multiline("warning",r));De.process[s].clear();}De.count=0;}}`
-  ${g("-----------------------------------------------------------------------------")}
-  ${F("Syncify CLI Examples")}                                             ${g("by Panoply")}
-  ${g("-----------------------------------------------------------------------------")}
+// node_modules/.pnpm/onetime@5.1.2/node_modules/onetime/index.js
+var require_onetime = __commonJS({
+  "node_modules/.pnpm/onetime@5.1.2/node_modules/onetime/index.js"(exports, module) {
+    var mimicFn = require_mimic_fn();
+    var calledFunctions = /* @__PURE__ */ new WeakMap();
+    var onetime2 = (function_, options = {}) => {
+      if (typeof function_ !== "function") {
+        throw new TypeError("Expected a function");
+      }
+      let returnValue;
+      let callCount = 0;
+      const functionName = function_.displayName || function_.name || "<anonymous>";
+      const onetime3 = function(...arguments_) {
+        calledFunctions.set(onetime3, ++callCount);
+        if (callCount === 1) {
+          returnValue = function_.apply(this, arguments_);
+          function_ = null;
+        } else if (options.throw === true) {
+          throw new Error(`Function \`${functionName}\` can only be called once`);
+        }
+        return returnValue;
+      };
+      mimicFn(onetime3, function_);
+      calledFunctions.set(onetime3, callCount);
+      return onetime3;
+    };
+    module.exports = onetime2;
+    module.exports.default = onetime2;
+    module.exports.callCount = (function_) => {
+      if (!calledFunctions.has(function_)) {
+        throw new Error(`The given function \`${function_.name}\` is not wrapped by the \`onetime\` package`);
+      }
+      return calledFunctions.get(function_);
+    };
+  }
+});
 
-  ${F("Watching"+N)}
+// node_modules/.pnpm/signal-exit@3.0.7/node_modules/signal-exit/signals.js
+var require_signals = __commonJS({
+  "node_modules/.pnpm/signal-exit@3.0.7/node_modules/signal-exit/signals.js"(exports, module) {
+    module.exports = [
+      "SIGABRT",
+      "SIGALRM",
+      "SIGHUP",
+      "SIGINT",
+      "SIGTERM"
+    ];
+    if (process.platform !== "win32") {
+      module.exports.push(
+        "SIGVTALRM",
+        "SIGXCPU",
+        "SIGXFSZ",
+        "SIGUSR2",
+        "SIGTRAP",
+        "SIGSYS",
+        "SIGQUIT",
+        "SIGIOT"
+        // should detect profiler and enable/disable accordingly.
+        // see #21
+        // 'SIGPROF'
+      );
+    }
+    if (process.platform === "linux") {
+      module.exports.push(
+        "SIGIO",
+        "SIGPOLL",
+        "SIGPWR",
+        "SIGSTKFLT",
+        "SIGUNUSED"
+      );
+    }
+  }
+});
 
-  ${g("Targeting 1 store and 1 theme")}:
-  $ sync your-store${g("=")}theme-1 --watch
+// node_modules/.pnpm/signal-exit@3.0.7/node_modules/signal-exit/index.js
+var require_signal_exit = __commonJS({
+  "node_modules/.pnpm/signal-exit@3.0.7/node_modules/signal-exit/index.js"(exports, module) {
+    var process7 = global.process;
+    var processOk = function(process8) {
+      return process8 && typeof process8 === "object" && typeof process8.removeListener === "function" && typeof process8.emit === "function" && typeof process8.reallyExit === "function" && typeof process8.listeners === "function" && typeof process8.kill === "function" && typeof process8.pid === "number" && typeof process8.on === "function";
+    };
+    if (!processOk(process7)) {
+      module.exports = function() {
+        return function() {
+        };
+      };
+    } else {
+      assert = __require("assert");
+      signals = require_signals();
+      isWin = /^win/i.test(process7.platform);
+      EE = __require("events");
+      if (typeof EE !== "function") {
+        EE = EE.EventEmitter;
+      }
+      if (process7.__signal_exit_emitter__) {
+        emitter = process7.__signal_exit_emitter__;
+      } else {
+        emitter = process7.__signal_exit_emitter__ = new EE();
+        emitter.count = 0;
+        emitter.emitted = {};
+      }
+      if (!emitter.infinite) {
+        emitter.setMaxListeners(Infinity);
+        emitter.infinite = true;
+      }
+      module.exports = function(cb, opts) {
+        if (!processOk(global.process)) {
+          return function() {
+          };
+        }
+        assert.equal(typeof cb, "function", "a callback must be provided for exit handler");
+        if (loaded === false) {
+          load3();
+        }
+        var ev = "exit";
+        if (opts && opts.alwaysLast) {
+          ev = "afterexit";
+        }
+        var remove3 = function() {
+          emitter.removeListener(ev, cb);
+          if (emitter.listeners("exit").length === 0 && emitter.listeners("afterexit").length === 0) {
+            unload();
+          }
+        };
+        emitter.on(ev, cb);
+        return remove3;
+      };
+      unload = function unload2() {
+        if (!loaded || !processOk(global.process)) {
+          return;
+        }
+        loaded = false;
+        signals.forEach(function(sig) {
+          try {
+            process7.removeListener(sig, sigListeners[sig]);
+          } catch (er) {
+          }
+        });
+        process7.emit = originalProcessEmit;
+        process7.reallyExit = originalProcessReallyExit;
+        emitter.count -= 1;
+      };
+      module.exports.unload = unload;
+      emit = function emit2(event2, code, signal2) {
+        if (emitter.emitted[event2]) {
+          return;
+        }
+        emitter.emitted[event2] = true;
+        emitter.emit(event2, code, signal2);
+      };
+      sigListeners = {};
+      signals.forEach(function(sig) {
+        sigListeners[sig] = function listener() {
+          if (!processOk(global.process)) {
+            return;
+          }
+          var listeners = process7.listeners(sig);
+          if (listeners.length === emitter.count) {
+            unload();
+            emit("exit", null, sig);
+            emit("afterexit", null, sig);
+            if (isWin && sig === "SIGHUP") {
+              sig = "SIGINT";
+            }
+            process7.kill(process7.pid, sig);
+          }
+        };
+      });
+      module.exports.signals = function() {
+        return signals;
+      };
+      loaded = false;
+      load3 = function load4() {
+        if (loaded || !processOk(global.process)) {
+          return;
+        }
+        loaded = true;
+        emitter.count += 1;
+        signals = signals.filter(function(sig) {
+          try {
+            process7.on(sig, sigListeners[sig]);
+            return true;
+          } catch (er) {
+            return false;
+          }
+        });
+        process7.emit = processEmit;
+        process7.reallyExit = processReallyExit;
+      };
+      module.exports.load = load3;
+      originalProcessReallyExit = process7.reallyExit;
+      processReallyExit = function processReallyExit2(code) {
+        if (!processOk(global.process)) {
+          return;
+        }
+        process7.exitCode = code || /* istanbul ignore next */
+        0;
+        emit("exit", process7.exitCode, null);
+        emit("afterexit", process7.exitCode, null);
+        originalProcessReallyExit.call(process7, process7.exitCode);
+      };
+      originalProcessEmit = process7.emit;
+      processEmit = function processEmit2(ev, arg) {
+        if (ev === "exit" && processOk(global.process)) {
+          if (arg !== void 0) {
+            process7.exitCode = arg;
+          }
+          var ret = originalProcessEmit.apply(this, arguments);
+          emit("exit", process7.exitCode, null);
+          emit("afterexit", process7.exitCode, null);
+          return ret;
+        } else {
+          return originalProcessEmit.apply(this, arguments);
+        }
+      };
+    }
+    var assert;
+    var signals;
+    var isWin;
+    var EE;
+    var emitter;
+    var unload;
+    var emit;
+    var sigListeners;
+    var loaded;
+    var load3;
+    var originalProcessReallyExit;
+    var processReallyExit;
+    var originalProcessEmit;
+    var processEmit;
+  }
+});
 
-  ${g("Targeting 1 store and 2 themes with hot reloading")}:
-  $ sync your-store${g("=")}theme-1,theme-2 --watch --hot
+// node_modules/.pnpm/strip-json-comments@5.0.1/node_modules/strip-json-comments/index.js
+var singleComment = Symbol("singleComment");
+var multiComment = Symbol("multiComment");
+var stripWithoutWhitespace = () => "";
+var stripWithWhitespace = (string, start2, end) => string.slice(start2, end).replace(/\S/g, " ");
+var isEscaped = (jsonString, quotePosition) => {
+  let index = quotePosition - 1;
+  let backslashCount = 0;
+  while (jsonString[index] === "\\") {
+    index -= 1;
+    backslashCount += 1;
+  }
+  return Boolean(backslashCount % 2);
+};
+function stripJsonComments(jsonString, { whitespace = true, trailingCommas = false } = {}) {
+  if (typeof jsonString !== "string") {
+    throw new TypeError(`Expected argument \`jsonString\` to be a \`string\`, got \`${typeof jsonString}\``);
+  }
+  const strip2 = whitespace ? stripWithWhitespace : stripWithoutWhitespace;
+  let isInsideString = false;
+  let isInsideComment = false;
+  let offset = 0;
+  let buffer = "";
+  let result = "";
+  let commaIndex = -1;
+  for (let index = 0; index < jsonString.length; index++) {
+    const currentCharacter = jsonString[index];
+    const nextCharacter = jsonString[index + 1];
+    if (!isInsideComment && currentCharacter === '"') {
+      const escaped = isEscaped(jsonString, index);
+      if (!escaped) {
+        isInsideString = !isInsideString;
+      }
+    }
+    if (isInsideString) {
+      continue;
+    }
+    if (!isInsideComment && currentCharacter + nextCharacter === "//") {
+      buffer += jsonString.slice(offset, index);
+      offset = index;
+      isInsideComment = singleComment;
+      index++;
+    } else if (isInsideComment === singleComment && currentCharacter + nextCharacter === "\r\n") {
+      index++;
+      isInsideComment = false;
+      buffer += strip2(jsonString, offset, index);
+      offset = index;
+      continue;
+    } else if (isInsideComment === singleComment && currentCharacter === "\n") {
+      isInsideComment = false;
+      buffer += strip2(jsonString, offset, index);
+      offset = index;
+    } else if (!isInsideComment && currentCharacter + nextCharacter === "/*") {
+      buffer += jsonString.slice(offset, index);
+      offset = index;
+      isInsideComment = multiComment;
+      index++;
+      continue;
+    } else if (isInsideComment === multiComment && currentCharacter + nextCharacter === "*/") {
+      index++;
+      isInsideComment = false;
+      buffer += strip2(jsonString, offset, index + 1);
+      offset = index + 1;
+      continue;
+    } else if (trailingCommas && !isInsideComment) {
+      if (commaIndex !== -1) {
+        if (currentCharacter === "}" || currentCharacter === "]") {
+          buffer += jsonString.slice(offset, index);
+          result += strip2(buffer, 0, 1) + buffer.slice(1);
+          buffer = "";
+          offset = index;
+          commaIndex = -1;
+        } else if (currentCharacter !== " " && currentCharacter !== "	" && currentCharacter !== "\r" && currentCharacter !== "\n") {
+          buffer += jsonString.slice(offset, index);
+          offset = index;
+          commaIndex = -1;
+        }
+      } else if (currentCharacter === ",") {
+        result += buffer + jsonString.slice(offset, index);
+        buffer = "";
+        offset = index;
+        commaIndex = index;
+      }
+    }
+  }
+  return result + buffer + (isInsideComment ? strip2(jsonString.slice(offset)) : jsonString.slice(offset));
+}
 
-  ${g("Targeting 2 stores and 1 theme")}:
-  $ sync --your-store${g("=")}theme-1 --another-store${g("=")}some-theme --watch
+// lib/utils/native.ts
+var { error, log, warn } = console;
+var {
+  create,
+  assign,
+  defineProperty,
+  defineProperties,
+  keys,
+  values,
+  setPrototypeOf
+} = Object;
+var toArray = Array.from;
+var toBuffer = Buffer.from;
+var { abs } = Math;
+var { toString } = Object.prototype;
 
-  ${g("Targeting 2 stores and 2 themes")}:
-  $ sync --your-store${g("=")}theme-1,theme-2 --another-store${g("=")}some-theme,test-theme --watch
+// lib/const.ts
+var BASE_DIRS = [
+  ["input", "source"],
+  ["output", "theme"],
+  ["export", "export"],
+  ["import", "import"],
+  ["config", "."]
+];
+var BUILD_GROUPS = [
+  "styles",
+  "scripts",
+  "svgs",
+  "sections",
+  "layouts",
+  "metaobject",
+  "templates",
+  "snippets",
+  "locales",
+  "configs",
+  "pages",
+  "metafields",
+  "assets"
+];
+var PATH_KEYS = [
+  "assets",
+  "config",
+  "layout",
+  "customers",
+  "locales",
+  "sections",
+  "snippets",
+  "templates",
+  "metaobject",
+  "metafields",
+  "pages",
+  "redirects"
+];
+var THEME_DIRS = [
+  "templates",
+  "templates/customers",
+  "templates/metaobject",
+  "assets",
+  "config",
+  "layout",
+  "locales",
+  "sections",
+  "snippets"
+];
+var CONFIG_FILE_EXT = [
+  "js",
+  "cjs",
+  "mjs",
+  "ts"
+];
+var UNITS = [
+  "b",
+  "kb",
+  "mb",
+  "gb",
+  "tb"
+];
+var ESBUILD_NOT_INSTALLED = [
+  "You cannot use script minification without esbuild installed",
+  "and configured as a processor. Install esbuild and configure Syncify",
+  "to apply transforms to leverage script minification."
+];
+var REGEX_OR_CHARS = /([|,])/g;
+var REGEX_EXTJS = /\.(mjs|cjs|ts|js|tsx|jsx)$/;
+var REGEX_LINE_NO = /(\()(line\s[0-9]+)(\))(:)/g;
+var REGEX_QUOTES = /('[\w\s.-]*?'|"[\w\s.-]*?")/g;
+var REGEX_OBJECT = /({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g;
+var REGEX_ADDRESS = /((?:www|http:|https:)+[^\s]+[\w])/g;
+var REGEX_FILENAME = /(?<=Filename\s)([\w._-]+)(?=\salready)/;
+var REGEX_STRING = /(\/)(.*?)(\/)/g;
+var SHOPIFY_REQUEST_ERRORS = {
+  /**
+   * 404 ERROR
+   */
+  404: "The requested resource was not found.",
+  /**
+   * 400 ERROR
+   */
+  400: "The request was not understood by the server, generally due to bad syntax or because the Content-Type header was not correctly set to application / json. This status is also returned when the request provides an invalid code parameter during the OAuth token exchange process.",
+  /**
+   * 303 ERROR
+   */
+  303: "The response to the request can be found under a different URL in the Location header and can be retrieved using a GET method on that resource.",
+  /**
+   * 401 ERROR
+   */
+  401: "The necessary authentication credentials are not present in the request or are incorrect",
+  /**
+   * 402 ERROR
+   */
+  402: "The requested shop is currently frozen. The shop owner needs to log in to the shop's admin, and pay the outstanding balance to unfreeze the shop.",
+  /**
+   * 406 ERROR
+   */
+  406: "The requested resource is only capable of generating content not acceptable according to the Accept headers sent in the request.",
+  /**
+   * 423 ERROR
+   */
+  423: "The requested shop is currently locked. Shops are locked if they repeatedly exceed their API request limit. or if there is an issue with the account, such as a detected compromise or fraud risk.",
+  /**
+   * 403 ERROR
+   */
+  403: "The server is refusing to respond to the request. This is generally because you have not requested the appropriate scope for this action.",
+  /**
+   * 501 ERROR
+   */
+  501: "The requested endpoint is not available on that particular shop, e.g. requesting access to a Shopify Plus\u2013only API on a non-Plus shop. This response may also indicate that this endpoint is reserved for future use.",
+  /**
+   * 503 ERROR
+   */
+  503: "The server is currently unavailable. Check the Shopify status page for reported service outages. See https://www.shopifystatus.com"
+};
+function exec(command, args, shell) {
+  return child_process.execFileSync(command, args, {
+    encoding: "utf8",
+    shell,
+    stdio: [
+      "ignore",
+      "pipe",
+      "ignore"
+    ]
+  }).trim();
+}
+function execNative(command, shell) {
+  const __dirname = pathe.dirname(url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('out.js', document.baseURI).href))));
+  return exec(pathe.join(__dirname, command), [], shell).split(/\r?\n/);
+}
+function create2(columns, rows) {
+  return {
+    cols: Number.parseInt(columns, 10),
+    rows: Number.parseInt(rows, 10)
+  };
+}
+function size() {
+  const { env: env2, stdout: stdout2, stderr } = process2__default.default;
+  if (stdout2 && stdout2.columns && stdout2.rows)
+    return create2(stdout2.columns, stdout2.rows);
+  if (stderr && stderr.columns && stderr.rows)
+    return create2(stderr.columns, stderr.rows);
+  if (env2.COLUMNS && env2.LINES)
+    return create2(env2.COLUMNS, env2.LINES);
+  if (process2__default.default.platform === "win32") {
+    try {
+      const size2 = execNative("vendor/windows/term-size.exe", false);
+      if (size2.length === 2)
+        return create2(size2[0], size2[1]);
+    } catch {
+    }
+  } else {
+    if (process2__default.default.platform === "darwin") {
+      try {
+        const size2 = execNative("vendor/macos/term-size", true);
+        if (size2.length === 2)
+          return create2(size2[0], size2[1]);
+      } catch {
+      }
+    }
+    try {
+      const size2 = exec("resize", ["-u"]).match(/\d+/g);
+      if (size2.length === 2)
+        return create2(size2[0], size2[1]);
+    } catch {
+    }
+    if (process2__default.default.env.TERM) {
+      try {
+        const cols = exec("tput", ["cols"]);
+        const rows = exec("tput", ["lines"]);
+        if (cols && rows)
+          return create2(cols, rows);
+      } catch {
+      }
+    }
+  }
+  return create2(80, 24);
+}
 
-  ${g("Targeting 1 store with 2 themes and clean mode with hot live reloads")}:
-  $ sync your-store${g("=")}theme-1,theme-2 --watch --clean --hot
+// lib/cli/ansi.ts
+var import_ansis = __toESM(require_ansis());
+import_ansis.default.extend({
+  lightGray: "#2a2a2e",
+  pink: "#ff75d1",
+  orange: "#FFAB40",
+  lavender: "#8080FF",
+  neonGreen: "#56ef83",
+  neonCyan: "#69d5fd",
+  neonRouge: "#FF8095",
+  neonMagenta: "#B319FF"
+});
+var {
+  cyan,
+  cyanBright,
+  red,
+  redBright,
+  green,
+  greenBright,
+  yellow,
+  yellowBright,
+  magenta,
+  magentaBright,
+  blue,
+  blueBright,
+  white,
+  whiteBright,
+  gray,
+  dim,
+  // OTHER
+  strip,
+  // STYLES
+  underline,
+  bold,
+  reset,
+  italic,
+  strike,
+  // CUSTOM
+  lightGray,
+  pink,
+  orange,
+  lavender,
+  neonGreen,
+  neonCyan,
+  neonRouge,
+  neonMagenta
+} = import_ansis.default;
+var clear = "\x1B[H\x1B[2J";
+var open = `${lightGray.open}\u250C\u2500 ${lightGray.close}`;
+var line = {
+  /**
+   * Light Gray (default) line
+   */
+  gray: `${lightGray.open}\u2502  ${lightGray.close}`,
+  /**
+   * Red dim - used in errors
+   */
+  red: `${red.dim.open}\u2502  ${red.dim.close}`,
+  /**
+   * Yellow dim - used in warnings
+   */
+  yellow: `${yellow.dim.open}\u2502  ${yellow.dim.close}`
+};
+var nextline = `${lightGray.open}${"\n"}\u2502${lightGray.close}`;
+var newline = `${lightGray.open}${"\n"}\u2502${"\n"}${lightGray.close}`;
+`${lightGray.open}\u2502  \u251C\u2500 ${lightGray.close}`;
+var top = `${lightGray.open}\u251C\u2500 ${lightGray.close}`;
+var bottom = `${lightGray.open}\u2502  \u2514\u2500 ${lightGray.close}`;
+var close = `${lightGray.open}\u2514\u2500 ${lightGray.close}`;
+var hrs = (x = size().cols - 10) => `${lightGray.open}\u2502 ${"\u2500".repeat(x)}${lightGray.close}`;
+var hr = (m) => `${lightGray.open}\u2502${"\n"}\u251C${"\u2500".repeat(size().cols - m)}${"\n"}\u2502${lightGray.close}`;
+var CHK = `${neonGreen.open}\u2713 ${neonGreen.close}`;
+`${redBright.open}\u{10102}${redBright.close}`;
+var COL = `${gray.open}:${gray.close}`;
+var ARR = `${gray.open}\u2192${gray.close}`;
+var CHV = `${gray.open}\u2023${gray.close}`;
+var ARL = `${gray.open}\u2942${gray.close}`;
+var TLD = `${gray.open}~${gray.close}`;
+var DSH = `${gray.open}\u2014${gray.close}`;
+var LPR = `${gray.open}(${gray.close}`;
+var RPR = `${gray.open})${gray.close}`;
+var LCB = `${gray.open}{${gray.close}`;
+var RCB = `${gray.open}}${gray.close}`;
+var warning = yellowBright(` ~ Type ${bold("w")} and press ${bold("enter")} to view`);
+redBright(` ~ Type ${bold("v")} and press ${bold("enter")} to view`);
+var time = (now) => now ? reset.gray(` ~ ${now}`) : "";
 
-  ${g("Targeting 1 store with 2 themes in production mode")}:
-  $ sync your-store${g("=")}theme-1,theme-2 --prod --watch
+// lib/utils/utils.ts
+var event = new events.EventEmitter();
+function glue(input, char = "") {
+  return input.join(char);
+}
+function jsonc(data) {
+  try {
+    return JSON.parse(stripJsonComments(data).trim());
+  } catch (e2) {
+    throw new Error(e2);
+  }
+}
+function handleize(string) {
+  return string.toLowerCase().replace(/[^a-z0-9_:]+/g, "-").replace(/-$/, "").replace(/^-/, "");
+}
+function plural(word, size2, zero = false) {
+  if (isUndefined(size2))
+    size2 = word.length;
+  return length > 1 ? `${word}s` : zero ? `${word}s` : word;
+}
+function sanitize(message2) {
+  if (isBuffer(message2))
+    return message2.toString();
+  if (isObject(message2) || isArray(message2))
+    return JSON.stringify(message2);
+  if (isBoolean(message2) || isNumber(message2))
+    return `${message2}`;
+  return String(message2);
+}
+async function dynamicImport(id, { format }) {
+  if (format === "esm") {
+    return (file) => import(file);
+  } else {
+    return getImport(id);
+  }
+}
+function inferLoader(ext) {
+  if (ext === ".mjs" || ext === ".cjs")
+    return "js";
+  return ext.slice(1);
+}
+function toUpcase(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+function getSizeStr(value) {
+  return typeof value === "number" ? byteConvert(value) : byteConvert(byteSize(value));
+}
+function byteSize(string) {
+  return isString(string) ? toBuffer(string).toString().length : string.toString().length;
+}
+function byteConvert(bytes) {
+  if (bytes === 0)
+    return "0b";
+  const size2 = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
+  return size2 === 0 ? `${bold(String(bytes))}${UNITS[size2]}` : `${bold((bytes / 1024 ** size2).toFixed(1))}${UNITS[size2]}`;
+}
+function fileSize(content, beforeSize) {
+  const size2 = byteSize(content);
+  const gzip = byteConvert(zlib__default.default.gzipSync(content).length);
+  const before = byteConvert(beforeSize);
+  const after = byteConvert(size2);
+  const saved = byteConvert(beforeSize - size2);
+  return {
+    isSmaller: size2 > beforeSize || size2 === beforeSize,
+    gzip,
+    before,
+    after,
+    saved
+  };
+}
+function getTime() {
+  const now = /* @__PURE__ */ new Date();
+  const hur = now.getHours();
+  const min = now.getMinutes();
+  const sec = now.getSeconds();
+  return (hur < 10 ? `0${hur}` : hur) + COL + (min < 10 ? `0${min}` : min) + COL + (sec < 10 ? `0${sec}` : sec);
+}
+function addSuffix(number) {
+  const a = number % 10;
+  const b = number % 100;
+  return number + (a === 1 && b !== 11 ? "st" : a === 2 && b !== 12 ? "nd" : a === 3 && b !== 13 ? "rd" : "th");
+}
+function getImport(name) {
+  if (isFunction(globalThis.require)) {
+    return globalThis.require(name);
+  }
+  return module$1.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('out.js', document.baseURI).href)))(name);
+}
+function uuid() {
+  return Math.random().toString(36).slice(2);
+}
+function pNext() {
+  return new Promise((resolve2) => {
+    if (isFunction(setImmediate)) {
+      setImmediate(resolve2);
+    } else {
+      setTimeout(resolve2);
+    }
+  });
+}
+function isArray(param) {
+  return toString.call(param).slice(8, -1) === "Array";
+}
+function isObject(param) {
+  return toString.call(param).slice(8, -1) === "Object";
+}
+function isString(param) {
+  return toString.call(param).slice(8, -1) === "String";
+}
+function isRegex(param) {
+  return toString.call(param).slice(8, -1) === "RegExp";
+}
+function isFunction(param) {
+  return toString.call(param).slice(8, -1) === "Function";
+}
+function isBoolean(param) {
+  return toString.call(param).slice(8, -1) === "Boolean";
+}
+function isNumber(param) {
+  return toString.call(param).slice(8, -1) === "Number";
+}
+function isUndefined(param) {
+  return toString.call(param).slice(8, -1) === "Undefined";
+}
+function isBuffer(param) {
+  return Buffer.isBuffer(param);
+}
 
-`;var Ya=`
-  ${g("-----------------------------------------------------------------------------")}
-  ${F("Syncify")}  <!version!>                                               ${g("by Panoply")}
-  ${g("-----------------------------------------------------------------------------")}
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/type.js
+function type(input) {
+  if (input === null) {
+    return "Null";
+  } else if (input === void 0) {
+    return "Undefined";
+  } else if (Number.isNaN(input)) {
+    return "NaN";
+  }
+  const typeResult = Object.prototype.toString.call(input).slice(8, -1);
+  return typeResult === "AsyncFunction" ? "Promise" : typeResult;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/_internals/isArray.js
+var { isArray: isArray2 } = Array;
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/_internals/isTruthy.js
+function isTruthy(x) {
+  if (isArray2(x)) {
+    return x.length > 0;
+  }
+  if (type(x) === "Object") {
+    return Object.keys(x).length > 0;
+  }
+  return Boolean(x);
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/allFalse.js
+function allFalse(...inputs) {
+  let counter = 0;
+  while (counter < inputs.length) {
+    const x = inputs[counter];
+    if (type(x) === "Function") {
+      if (isTruthy(x())) {
+        return false;
+      }
+    } else if (isTruthy(x)) {
+      return false;
+    }
+    counter++;
+  }
+  return true;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/_internals/isFalsy.js
+function isFalsy(x) {
+  if (isArray2(x)) {
+    return x.length === 0;
+  }
+  if (type(x) === "Object") {
+    return Object.keys(x).length === 0;
+  }
+  return !x;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/allTrue.js
+function allTrue(...inputs) {
+  let counter = 0;
+  while (counter < inputs.length) {
+    const x = inputs[counter];
+    if (type(x) === "Function") {
+      if (isFalsy(x())) {
+        return false;
+      }
+    } else if (isFalsy(x)) {
+      return false;
+    }
+    counter++;
+  }
+  return true;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/anyTrue.js
+function anyTrue(...inputs) {
+  let counter = 0;
+  while (counter < inputs.length) {
+    const x = inputs[counter];
+    if (type(x) === "Function") {
+      if (isTruthy(x())) {
+        return true;
+      }
+    } else if (isTruthy(x)) {
+      return true;
+    }
+    counter++;
+  }
+  return false;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/_internals/createPath.js
+function createPath(path2, delimiter = ".") {
+  return typeof path2 === "string" ? path2.split(delimiter) : path2;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/curry.js
+function curry(fn, args = []) {
+  return (..._args) => ((rest) => rest.length >= fn.length ? fn(...rest) : curry(fn, rest))([
+    ...args,
+    ..._args
+  ]);
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/path.js
+function pathFn(pathInput, obj) {
+  let willReturn = obj;
+  let counter = 0;
+  const pathArrValue = createPath(pathInput);
+  while (counter < pathArrValue.length) {
+    if (willReturn === null || willReturn === void 0) {
+      return void 0;
+    }
+    if (willReturn[pathArrValue[counter]] === null)
+      return void 0;
+    willReturn = willReturn[pathArrValue[counter]];
+    counter++;
+  }
+  return willReturn;
+}
+function path(pathInput, obj) {
+  if (arguments.length === 1)
+    return (_obj) => path(pathInput, _obj);
+  if (obj === null || obj === void 0) {
+    return void 0;
+  }
+  return pathFn(pathInput, obj);
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/equals.js
+function _indexOf(valueToFind, list2) {
+  if (!isArray2(list2)) {
+    throw new Error(`Cannot read property 'indexOf' of ${list2}`);
+  }
+  const typeOfValue = type(valueToFind);
+  if (!["Object", "Array", "NaN", "RegExp"].includes(typeOfValue))
+    return list2.indexOf(valueToFind);
+  let index = -1;
+  let foundIndex = -1;
+  const { length: length2 } = list2;
+  while (++index < length2 && foundIndex === -1) {
+    if (equals(list2[index], valueToFind)) {
+      foundIndex = index;
+    }
+  }
+  return foundIndex;
+}
+function _arrayFromIterator(iter) {
+  const list2 = [];
+  let next;
+  while (!(next = iter.next()).done) {
+    list2.push(next.value);
+  }
+  return list2;
+}
+function _equalsSets(a, b) {
+  if (a.size !== b.size) {
+    return false;
+  }
+  const aList = _arrayFromIterator(a.values());
+  const bList = _arrayFromIterator(b.values());
+  const filtered = aList.filter((aInstance) => _indexOf(aInstance, bList) === -1);
+  return filtered.length === 0;
+}
+function parseError(maybeError) {
+  const typeofError = maybeError.__proto__.toString();
+  if (!["Error", "TypeError"].includes(typeofError))
+    return [];
+  return [typeofError, maybeError.message];
+}
+function parseDate(maybeDate) {
+  if (!maybeDate.toDateString)
+    return [false];
+  return [true, maybeDate.getTime()];
+}
+function parseRegex(maybeRegex) {
+  if (maybeRegex.constructor !== RegExp)
+    return [false];
+  return [true, maybeRegex.toString()];
+}
+function equals(a, b) {
+  if (arguments.length === 1)
+    return (_b) => equals(a, _b);
+  const aType = type(a);
+  if (aType !== type(b))
+    return false;
+  if (aType === "Function") {
+    return a.name === void 0 ? false : a.name === b.name;
+  }
+  if (["NaN", "Undefined", "Null"].includes(aType))
+    return true;
+  if (aType === "Number") {
+    if (Object.is(-0, a) !== Object.is(-0, b))
+      return false;
+    return a.toString() === b.toString();
+  }
+  if (["String", "Boolean"].includes(aType)) {
+    return a.toString() === b.toString();
+  }
+  if (aType === "Array") {
+    const aClone = Array.from(a);
+    const bClone = Array.from(b);
+    if (aClone.toString() !== bClone.toString()) {
+      return false;
+    }
+    let loopArrayFlag = true;
+    aClone.forEach((aCloneInstance, aCloneIndex) => {
+      if (loopArrayFlag) {
+        if (aCloneInstance !== bClone[aCloneIndex] && !equals(aCloneInstance, bClone[aCloneIndex])) {
+          loopArrayFlag = false;
+        }
+      }
+    });
+    return loopArrayFlag;
+  }
+  const aRegex = parseRegex(a);
+  const bRegex = parseRegex(b);
+  if (aRegex[0]) {
+    return bRegex[0] ? aRegex[1] === bRegex[1] : false;
+  } else if (bRegex[0])
+    return false;
+  const aDate = parseDate(a);
+  const bDate = parseDate(b);
+  if (aDate[0]) {
+    return bDate[0] ? aDate[1] === bDate[1] : false;
+  } else if (bDate[0])
+    return false;
+  const aError = parseError(a);
+  const bError = parseError(b);
+  if (aError[0]) {
+    return bError[0] ? aError[0] === bError[0] && aError[1] === bError[1] : false;
+  }
+  if (aType === "Set") {
+    return _equalsSets(a, b);
+  }
+  if (aType === "Object") {
+    const aKeys = Object.keys(a);
+    if (aKeys.length !== Object.keys(b).length) {
+      return false;
+    }
+    let loopObjectFlag = true;
+    aKeys.forEach((aKeyInstance) => {
+      if (loopObjectFlag) {
+        const aValue = a[aKeyInstance];
+        const bValue = b[aKeyInstance];
+        if (aValue !== bValue && !equals(aValue, bValue)) {
+          loopObjectFlag = false;
+        }
+      }
+    });
+    return loopObjectFlag;
+  }
+  return false;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/delay.js
+var DELAY = "RAMBDAX_DELAY";
+function delay(ms) {
+  return new Promise((resolve2) => {
+    setTimeout(() => {
+      resolve2(DELAY);
+    }, ms);
+  });
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/includes.js
+function includes(valueToFind, iterable) {
+  if (arguments.length === 1)
+    return (_iterable) => includes(valueToFind, _iterable);
+  if (typeof iterable === "string") {
+    return iterable.includes(valueToFind);
+  }
+  if (!iterable) {
+    throw new TypeError(`Cannot read property 'indexOf' of ${iterable}`);
+  }
+  if (!isArray2(iterable))
+    return false;
+  return _indexOf(valueToFind, iterable) > -1;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/mapAsync.js
+async function mapAsyncFn(fn, listOrObject) {
+  if (isArray2(listOrObject)) {
+    const willReturn2 = [];
+    let i = 0;
+    for (const a of listOrObject) {
+      willReturn2.push(await fn(a, i++));
+    }
+    return willReturn2;
+  }
+  const willReturn = {};
+  for (const prop2 in listOrObject) {
+    willReturn[prop2] = await fn(listOrObject[prop2], prop2);
+  }
+  return willReturn;
+}
+function mapAsync(fn, listOrObject) {
+  if (arguments.length === 1) {
+    return async (_listOrObject) => mapAsyncFn(fn, _listOrObject);
+  }
+  return new Promise((resolve2, reject) => {
+    mapAsyncFn(fn, listOrObject).then(resolve2).catch(reject);
+  });
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/isType.js
+function isType(xType, x) {
+  if (arguments.length === 1) {
+    return (xHolder) => isType(xType, xHolder);
+  }
+  return type(x) === xType;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/mapParallelAsync.js
+async function mapParallelAsyncFn(fn, arr) {
+  const promised = arr.map((a, i) => fn(a, i));
+  return Promise.all(promised);
+}
+function mapParallelAsync(fn, arr) {
+  if (arguments.length === 1) {
+    return async (holder) => mapParallelAsyncFn(fn, holder);
+  }
+  return new Promise((resolve2, reject) => {
+    mapParallelAsyncFn(fn, arr).then(resolve2).catch(reject);
+  });
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/reduce.js
+var ReduceStopper = class {
+  constructor(value) {
+    this.value = value;
+  }
+};
+function reduceFn(reducer, acc, list2) {
+  if (list2 == null) {
+    return acc;
+  }
+  if (!isArray2(list2)) {
+    throw new TypeError("reduce: list must be array or iterable");
+  }
+  let index = 0;
+  const len = list2.length;
+  while (index < len) {
+    acc = reducer(
+      acc,
+      list2[index],
+      index,
+      list2
+    );
+    if (acc instanceof ReduceStopper) {
+      return acc.value;
+    }
+    index++;
+  }
+  return acc;
+}
+var reduce = curry(reduceFn);
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/omit.js
+function omit(propsToOmit, obj) {
+  if (arguments.length === 1)
+    return (_obj) => omit(propsToOmit, _obj);
+  if (obj === null || obj === void 0) {
+    return void 0;
+  }
+  const propsToOmitValue = createPath(propsToOmit, ",");
+  const willReturn = {};
+  for (const key in obj) {
+    if (!propsToOmitValue.includes(key)) {
+      willReturn[key] = obj[key];
+    }
+  }
+  return willReturn;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/_internals/set.js
+var _Set = class {
+  constructor() {
+    this.set = /* @__PURE__ */ new Set();
+    this.items = {};
+  }
+  checkUniqueness(item) {
+    const type2 = type(item);
+    if (["Null", "Undefined", "NaN"].includes(type2)) {
+      if (type2 in this.items) {
+        return false;
+      }
+      this.items[type2] = true;
+      return true;
+    }
+    if (!["Object", "Array"].includes(type2)) {
+      const prevSize = this.set.size;
+      this.set.add(item);
+      return this.set.size !== prevSize;
+    }
+    if (!(type2 in this.items)) {
+      this.items[type2] = [item];
+      return true;
+    }
+    if (_indexOf(item, this.items[type2]) === -1) {
+      this.items[type2].push(item);
+      return true;
+    }
+    return false;
+  }
+};
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/uniq.js
+function uniq(list2) {
+  const set2 = new _Set();
+  const willReturn = [];
+  list2.forEach((item) => {
+    if (set2.checkUniqueness(item)) {
+      willReturn.push(item);
+    }
+  });
+  return willReturn;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/has.js
+function has(prop2, obj) {
+  if (arguments.length === 1)
+    return (_obj) => has(prop2, _obj);
+  if (!obj)
+    return false;
+  return obj.hasOwnProperty(prop2);
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/hasPath.js
+function hasPath(pathInput, obj) {
+  if (arguments.length === 1) {
+    return (objHolder) => hasPath(pathInput, objHolder);
+  }
+  return path(pathInput, obj) !== void 0;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/isEmpty.js
+function isEmpty(input) {
+  const inputType = type(input);
+  if (["Undefined", "NaN", "Number", "Null"].includes(inputType))
+    return false;
+  if (!input)
+    return true;
+  if (inputType === "Object") {
+    return Object.keys(input).length === 0;
+  }
+  if (inputType === "Array") {
+    return input.length === 0;
+  }
+  return false;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/isNil.js
+function isNil(x) {
+  return x === void 0 || x === null;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/keys.js
+function keys3(x) {
+  return Object.keys(x);
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/last.js
+function last(listOrString) {
+  if (typeof listOrString === "string") {
+    return listOrString[listOrString.length - 1] || "";
+  }
+  return listOrString[listOrString.length - 1];
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/multiply.js
+function multiply(x, y) {
+  if (arguments.length === 1)
+    return (_y) => multiply(x, _y);
+  return x * y;
+}
+
+// node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/product.js
+reduce(multiply, 1);
+
+// lib/log/tui.ts
+var tui_exports = {};
+__export(tui_exports, {
+  clear: () => clear2,
+  closer: () => closer,
+  context: () => context,
+  hline: () => hline,
+  indent: () => indent,
+  message: () => message,
+  multiline: () => multiline,
+  opener: () => opener,
+  sample: () => sample,
+  shopify: () => shopify,
+  stack: () => stack,
+  suffix: () => suffix,
+  tree: () => tree
+});
+
+// node_modules/.pnpm/ansi-regex@6.0.1/node_modules/ansi-regex/index.js
+function ansiRegex({ onlyFirst = false } = {}) {
+  const pattern = [
+    "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
+    "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))"
+  ].join("|");
+  return new RegExp(pattern, onlyFirst ? void 0 : "g");
+}
+
+// node_modules/.pnpm/strip-ansi@7.1.0/node_modules/strip-ansi/index.js
+var regex = ansiRegex();
+function stripAnsi(string) {
+  if (typeof string !== "string") {
+    throw new TypeError(`Expected a \`string\`, got \`${typeof string}\``);
+  }
+  return string.replace(regex, "");
+}
+
+// node_modules/.pnpm/string-width@5.1.2/node_modules/string-width/index.js
+var import_eastasianwidth = __toESM(require_eastasianwidth(), 1);
+var import_emoji_regex = __toESM(require_emoji_regex(), 1);
+function stringWidth(string, options = {}) {
+  if (typeof string !== "string" || string.length === 0) {
+    return 0;
+  }
+  options = {
+    ambiguousIsNarrow: true,
+    ...options
+  };
+  string = stripAnsi(string);
+  if (string.length === 0) {
+    return 0;
+  }
+  string = string.replace((0, import_emoji_regex.default)(), "  ");
+  const ambiguousCharacterWidth = options.ambiguousIsNarrow ? 1 : 2;
+  let width = 0;
+  for (const character of string) {
+    const codePoint = character.codePointAt(0);
+    if (codePoint <= 31 || codePoint >= 127 && codePoint <= 159) {
+      continue;
+    }
+    if (codePoint >= 768 && codePoint <= 879) {
+      continue;
+    }
+    const code = import_eastasianwidth.default.eastAsianWidth(character);
+    switch (code) {
+      case "F":
+      case "W":
+        width += 2;
+        break;
+      case "A":
+        width += ambiguousCharacterWidth;
+        break;
+      default:
+        width += 1;
+    }
+  }
+  return width;
+}
+
+// node_modules/.pnpm/ansi-styles@6.2.1/node_modules/ansi-styles/index.js
+var ANSI_BACKGROUND_OFFSET = 10;
+var wrapAnsi16 = (offset = 0) => (code) => `\x1B[${code + offset}m`;
+var wrapAnsi256 = (offset = 0) => (code) => `\x1B[${38 + offset};5;${code}m`;
+var wrapAnsi16m = (offset = 0) => (red2, green2, blue2) => `\x1B[${38 + offset};2;${red2};${green2};${blue2}m`;
+var styles = {
+  modifier: {
+    reset: [0, 0],
+    // 21 isn't widely supported and 22 does the same thing
+    bold: [1, 22],
+    dim: [2, 22],
+    italic: [3, 23],
+    underline: [4, 24],
+    overline: [53, 55],
+    inverse: [7, 27],
+    hidden: [8, 28],
+    strikethrough: [9, 29]
+  },
+  color: {
+    black: [30, 39],
+    red: [31, 39],
+    green: [32, 39],
+    yellow: [33, 39],
+    blue: [34, 39],
+    magenta: [35, 39],
+    cyan: [36, 39],
+    white: [37, 39],
+    // Bright color
+    blackBright: [90, 39],
+    gray: [90, 39],
+    // Alias of `blackBright`
+    grey: [90, 39],
+    // Alias of `blackBright`
+    redBright: [91, 39],
+    greenBright: [92, 39],
+    yellowBright: [93, 39],
+    blueBright: [94, 39],
+    magentaBright: [95, 39],
+    cyanBright: [96, 39],
+    whiteBright: [97, 39]
+  },
+  bgColor: {
+    bgBlack: [40, 49],
+    bgRed: [41, 49],
+    bgGreen: [42, 49],
+    bgYellow: [43, 49],
+    bgBlue: [44, 49],
+    bgMagenta: [45, 49],
+    bgCyan: [46, 49],
+    bgWhite: [47, 49],
+    // Bright color
+    bgBlackBright: [100, 49],
+    bgGray: [100, 49],
+    // Alias of `bgBlackBright`
+    bgGrey: [100, 49],
+    // Alias of `bgBlackBright`
+    bgRedBright: [101, 49],
+    bgGreenBright: [102, 49],
+    bgYellowBright: [103, 49],
+    bgBlueBright: [104, 49],
+    bgMagentaBright: [105, 49],
+    bgCyanBright: [106, 49],
+    bgWhiteBright: [107, 49]
+  }
+};
+Object.keys(styles.modifier);
+var foregroundColorNames = Object.keys(styles.color);
+var backgroundColorNames = Object.keys(styles.bgColor);
+[...foregroundColorNames, ...backgroundColorNames];
+function assembleStyles() {
+  const codes = /* @__PURE__ */ new Map();
+  for (const [groupName, group2] of Object.entries(styles)) {
+    for (const [styleName, style2] of Object.entries(group2)) {
+      styles[styleName] = {
+        open: `\x1B[${style2[0]}m`,
+        close: `\x1B[${style2[1]}m`
+      };
+      group2[styleName] = styles[styleName];
+      codes.set(style2[0], style2[1]);
+    }
+    Object.defineProperty(styles, groupName, {
+      value: group2,
+      enumerable: false
+    });
+  }
+  Object.defineProperty(styles, "codes", {
+    value: codes,
+    enumerable: false
+  });
+  styles.color.close = "\x1B[39m";
+  styles.bgColor.close = "\x1B[49m";
+  styles.color.ansi = wrapAnsi16();
+  styles.color.ansi256 = wrapAnsi256();
+  styles.color.ansi16m = wrapAnsi16m();
+  styles.bgColor.ansi = wrapAnsi16(ANSI_BACKGROUND_OFFSET);
+  styles.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
+  styles.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
+  Object.defineProperties(styles, {
+    rgbToAnsi256: {
+      value: (red2, green2, blue2) => {
+        if (red2 === green2 && green2 === blue2) {
+          if (red2 < 8) {
+            return 16;
+          }
+          if (red2 > 248) {
+            return 231;
+          }
+          return Math.round((red2 - 8) / 247 * 24) + 232;
+        }
+        return 16 + 36 * Math.round(red2 / 255 * 5) + 6 * Math.round(green2 / 255 * 5) + Math.round(blue2 / 255 * 5);
+      },
+      enumerable: false
+    },
+    hexToRgb: {
+      value: (hex) => {
+        const matches = /[a-f\d]{6}|[a-f\d]{3}/i.exec(hex.toString(16));
+        if (!matches) {
+          return [0, 0, 0];
+        }
+        let [colorString] = matches;
+        if (colorString.length === 3) {
+          colorString = [...colorString].map((character) => character + character).join("");
+        }
+        const integer = Number.parseInt(colorString, 16);
+        return [
+          /* eslint-disable no-bitwise */
+          integer >> 16 & 255,
+          integer >> 8 & 255,
+          integer & 255
+          /* eslint-enable no-bitwise */
+        ];
+      },
+      enumerable: false
+    },
+    hexToAnsi256: {
+      value: (hex) => styles.rgbToAnsi256(...styles.hexToRgb(hex)),
+      enumerable: false
+    },
+    ansi256ToAnsi: {
+      value: (code) => {
+        if (code < 8) {
+          return 30 + code;
+        }
+        if (code < 16) {
+          return 90 + (code - 8);
+        }
+        let red2;
+        let green2;
+        let blue2;
+        if (code >= 232) {
+          red2 = ((code - 232) * 10 + 8) / 255;
+          green2 = red2;
+          blue2 = red2;
+        } else {
+          code -= 16;
+          const remainder = code % 36;
+          red2 = Math.floor(code / 36) / 5;
+          green2 = Math.floor(remainder / 6) / 5;
+          blue2 = remainder % 6 / 5;
+        }
+        const value = Math.max(red2, green2, blue2) * 2;
+        if (value === 0) {
+          return 30;
+        }
+        let result = 30 + (Math.round(blue2) << 2 | Math.round(green2) << 1 | Math.round(red2));
+        if (value === 2) {
+          result += 60;
+        }
+        return result;
+      },
+      enumerable: false
+    },
+    rgbToAnsi: {
+      value: (red2, green2, blue2) => styles.ansi256ToAnsi(styles.rgbToAnsi256(red2, green2, blue2)),
+      enumerable: false
+    },
+    hexToAnsi: {
+      value: (hex) => styles.ansi256ToAnsi(styles.hexToAnsi256(hex)),
+      enumerable: false
+    }
+  });
+  return styles;
+}
+var ansiStyles = assembleStyles();
+var ansi_styles_default = ansiStyles;
+
+// node_modules/.pnpm/wrap-ansi@8.1.0/node_modules/wrap-ansi/index.js
+var ESCAPES = /* @__PURE__ */ new Set([
+  "\x1B",
+  "\x9B"
+]);
+var END_CODE = 39;
+var ANSI_ESCAPE_BELL = "\x07";
+var ANSI_CSI = "[";
+var ANSI_OSC = "]";
+var ANSI_SGR_TERMINATOR = "m";
+var ANSI_ESCAPE_LINK = `${ANSI_OSC}8;;`;
+var wrapAnsiCode = (code) => `${ESCAPES.values().next().value}${ANSI_CSI}${code}${ANSI_SGR_TERMINATOR}`;
+var wrapAnsiHyperlink = (uri) => `${ESCAPES.values().next().value}${ANSI_ESCAPE_LINK}${uri}${ANSI_ESCAPE_BELL}`;
+var wordLengths = (string) => string.split(" ").map((character) => stringWidth(character));
+var wrapWord = (rows, word, columns) => {
+  const characters = [...word];
+  let isInsideEscape = false;
+  let isInsideLinkEscape = false;
+  let visible = stringWidth(stripAnsi(rows[rows.length - 1]));
+  for (const [index, character] of characters.entries()) {
+    const characterLength = stringWidth(character);
+    if (visible + characterLength <= columns) {
+      rows[rows.length - 1] += character;
+    } else {
+      rows.push(character);
+      visible = 0;
+    }
+    if (ESCAPES.has(character)) {
+      isInsideEscape = true;
+      isInsideLinkEscape = characters.slice(index + 1).join("").startsWith(ANSI_ESCAPE_LINK);
+    }
+    if (isInsideEscape) {
+      if (isInsideLinkEscape) {
+        if (character === ANSI_ESCAPE_BELL) {
+          isInsideEscape = false;
+          isInsideLinkEscape = false;
+        }
+      } else if (character === ANSI_SGR_TERMINATOR) {
+        isInsideEscape = false;
+      }
+      continue;
+    }
+    visible += characterLength;
+    if (visible === columns && index < characters.length - 1) {
+      rows.push("");
+      visible = 0;
+    }
+  }
+  if (!visible && rows[rows.length - 1].length > 0 && rows.length > 1) {
+    rows[rows.length - 2] += rows.pop();
+  }
+};
+var stringVisibleTrimSpacesRight = (string) => {
+  const words = string.split(" ");
+  let last2 = words.length;
+  while (last2 > 0) {
+    if (stringWidth(words[last2 - 1]) > 0) {
+      break;
+    }
+    last2--;
+  }
+  if (last2 === words.length) {
+    return string;
+  }
+  return words.slice(0, last2).join(" ") + words.slice(last2).join("");
+};
+var exec2 = (string, columns, options = {}) => {
+  if (options.trim !== false && string.trim() === "") {
+    return "";
+  }
+  let returnValue = "";
+  let escapeCode;
+  let escapeUrl;
+  const lengths = wordLengths(string);
+  let rows = [""];
+  for (const [index, word] of string.split(" ").entries()) {
+    if (options.trim !== false) {
+      rows[rows.length - 1] = rows[rows.length - 1].trimStart();
+    }
+    let rowLength = stringWidth(rows[rows.length - 1]);
+    if (index !== 0) {
+      if (rowLength >= columns && (options.wordWrap === false || options.trim === false)) {
+        rows.push("");
+        rowLength = 0;
+      }
+      if (rowLength > 0 || options.trim === false) {
+        rows[rows.length - 1] += " ";
+        rowLength++;
+      }
+    }
+    if (options.hard && lengths[index] > columns) {
+      const remainingColumns = columns - rowLength;
+      const breaksStartingThisLine = 1 + Math.floor((lengths[index] - remainingColumns - 1) / columns);
+      const breaksStartingNextLine = Math.floor((lengths[index] - 1) / columns);
+      if (breaksStartingNextLine < breaksStartingThisLine) {
+        rows.push("");
+      }
+      wrapWord(rows, word, columns);
+      continue;
+    }
+    if (rowLength + lengths[index] > columns && rowLength > 0 && lengths[index] > 0) {
+      if (options.wordWrap === false && rowLength < columns) {
+        wrapWord(rows, word, columns);
+        continue;
+      }
+      rows.push("");
+    }
+    if (rowLength + lengths[index] > columns && options.wordWrap === false) {
+      wrapWord(rows, word, columns);
+      continue;
+    }
+    rows[rows.length - 1] += word;
+  }
+  if (options.trim !== false) {
+    rows = rows.map((row) => stringVisibleTrimSpacesRight(row));
+  }
+  const pre = [...rows.join("\n")];
+  for (const [index, character] of pre.entries()) {
+    returnValue += character;
+    if (ESCAPES.has(character)) {
+      const { groups } = new RegExp(`(?:\\${ANSI_CSI}(?<code>\\d+)m|\\${ANSI_ESCAPE_LINK}(?<uri>.*)${ANSI_ESCAPE_BELL})`).exec(pre.slice(index).join("")) || { groups: {} };
+      if (groups.code !== void 0) {
+        const code2 = Number.parseFloat(groups.code);
+        escapeCode = code2 === END_CODE ? void 0 : code2;
+      } else if (groups.uri !== void 0) {
+        escapeUrl = groups.uri.length === 0 ? void 0 : groups.uri;
+      }
+    }
+    const code = ansi_styles_default.codes.get(Number(escapeCode));
+    if (pre[index + 1] === "\n") {
+      if (escapeUrl) {
+        returnValue += wrapAnsiHyperlink("");
+      }
+      if (escapeCode && code) {
+        returnValue += wrapAnsiCode(code);
+      }
+    } else if (character === "\n") {
+      if (escapeCode && code) {
+        returnValue += wrapAnsiCode(escapeCode);
+      }
+      if (escapeUrl) {
+        returnValue += wrapAnsiHyperlink(escapeUrl);
+      }
+    }
+  }
+  return returnValue;
+};
+function wrapAnsi(string, columns, options) {
+  return String(string).normalize().replace(/\r\n/g, "\n").split("\n").map((line2) => exec2(line2, columns, options)).join("\n");
+}
+
+// node_modules/.pnpm/mergerino@0.4.0/node_modules/mergerino/dist/mergerino.min.js
+var e = Object.assign || ((e2, t2) => (t2 && Object.keys(t2).forEach((o2) => e2[o2] = t2[o2]), e2));
+var t = (e2, r, s) => {
+  const c = typeof s;
+  if (s && "object" === c)
+    if (Array.isArray(s))
+      for (const o2 of s)
+        r = t(e2, r, o2);
+    else
+      for (const c2 of Object.keys(s)) {
+        const f = s[c2];
+        "function" == typeof f ? r[c2] = f(r[c2], o) : void 0 === f ? e2 && !isNaN(c2) ? r.splice(c2, 1) : delete r[c2] : null === f || "object" != typeof f || Array.isArray(f) ? r[c2] = f : "object" == typeof r[c2] ? r[c2] = f === r[c2] ? f : o(r[c2], f) : r[c2] = t(false, {}, f);
+      }
+  else
+    "function" === c && (r = s(r, o));
+  return r;
+};
+var o = (o2, ...r) => {
+  const s = Array.isArray(o2);
+  return t(s, s ? o2.slice() : e({}, o2), r);
+};
+var mergerino_min_default = o;
+
+// lib/model/terser.ts
+var terser = () => ({
+  json: {
+    assets: true,
+    config: true,
+    locales: true,
+    metafields: true,
+    metaobject: true,
+    groups: true,
+    templates: true,
+    exclude: []
+  },
+  script: {
+    minifySyntax: true,
+    minifyIdentifiers: true,
+    minifyWhitespace: true,
+    mangleProps: void 0,
+    legalComments: "none",
+    mangleQuoted: false,
+    keepNames: false,
+    exclude: []
+  },
+  liquid: {
+    minifyJavascript: false,
+    minifyStylesheet: false,
+    minifyStyle: true,
+    minifySchema: true,
+    removeComments: true,
+    collapseInner: false,
+    collapseWhitespace: true,
+    stripDashes: true,
+    exclude: []
+  },
+  style: {
+    exclude: [],
+    format: false,
+    inline: false,
+    purgeUnusedCSS: false,
+    obfuscateAlphabet: "abcefghijklmnopqrstuvwxyz0123456789",
+    obfuscateClassNames: false,
+    obfuscateWhitelist: []
+  },
+  markup: {
+    caseSensitive: false,
+    collapseBooleanAttributes: false,
+    collapseInlineTagWhitespace: false,
+    conservativeCollapse: false,
+    keepClosingSlash: false,
+    noNewlinesBeforeTagClose: false,
+    preventAttributesEscaping: false,
+    removeEmptyAttributes: false,
+    removeEmptyElements: false,
+    removeOptionalTags: false,
+    removeRedundantAttributes: false,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
+    useShortDoctype: false,
+    collapseWhitespace: true,
+    continueOnParseError: true,
+    removeComments: true,
+    minifyCSS: true,
+    minifyJS: true,
+    trimCustomFragments: false,
+    ignoreCustomFragments: [
+      /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+      /<style[\s\S]*?<\/style>/,
+      /<script[\s\S]*?<\/script>/,
+      /{%[\s\S]*?%}/
+    ]
+  }
+});
+
+// lib/model/defaults.ts
+var defaults = () => ({
+  input: "source",
+  output: "theme",
+  import: "import",
+  export: "export",
+  config: ".",
+  hot: false,
+  stores: null,
+  spawn: {
+    build: null,
+    watch: null
+  },
+  logger: {
+    clear: true,
+    silent: false,
+    stats: true,
+    warnings: true
+  },
+  paths: {
+    assets: "assets/*",
+    config: "config/*.json",
+    layout: "layout/*.liquid",
+    locales: "locales/*.json",
+    snippets: "snippets/*.liquid",
+    metafields: "metafields/**/*.json",
+    metaobject: "templates/customers/*.json",
+    redirects: "redirects.yaml",
+    sections: [
+      "sections/**/*.json",
+      "sections/**/*.liquid"
+    ],
+    pages: [
+      "pages/*.html",
+      "pages/*.md"
+    ],
+    templates: [
+      "templates/customers/*.liquid",
+      "templates/customers/*.json"
+    ],
+    customers: [
+      "templates/customers/*.liquid",
+      "templates/customers/*.json"
+    ]
+  },
+  views: {
+    sections: {
+      prefixDir: false,
+      separator: "-",
+      global: []
+    },
+    snippets: {
+      prefixDir: false,
+      separator: "-",
+      global: []
+    },
+    pages: {
+      author: "",
+      safeSync: true,
+      importLanguage: "html",
+      suffixDir: false,
+      global: []
+    }
+  },
+  transforms: {
+    svg: null,
+    style: null,
+    script: null
+  },
+  terser: {
+    json: false,
+    markup: false,
+    liquid: false,
+    script: false
+  }
+});
+
+// lib/model/processor.ts
+var processor = () => ({
+  json: {
+    indent: 2,
+    useTab: false,
+    crlf: false,
+    exclude: null
+  },
+  postcss: {
+    installed: false,
+    loaded: false,
+    file: false,
+    config: []
+  },
+  sass: {
+    installed: false,
+    loaded: false,
+    file: false,
+    config: {
+      warnings: true,
+      style: "compressed",
+      sourcemap: true,
+      include: ["node_modules"]
+    }
+  },
+  esbuild: {
+    installed: false,
+    loaded: false,
+    file: false,
+    config: {
+      bundle: true,
+      format: "esm",
+      globalName: void 0,
+      target: "es2016",
+      metafile: true,
+      external: [],
+      platform: "browser",
+      splitting: false,
+      sourcemap: "linked",
+      write: false,
+      logLevel: "silent",
+      plugins: []
+    }
+  },
+  sharp: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: {}
+  },
+  sprite: {
+    installed: false,
+    loaded: false,
+    file: false,
+    config: {
+      mode: {
+        inline: true,
+        symbol: {
+          example: false
+        }
+      },
+      shape: {
+        transform: ["svgo"],
+        id: {
+          generator: "svg-%s"
+        }
+      },
+      svg: {
+        xmlDeclaration: false,
+        doctypeDeclaration: false,
+        dimensionAttributes: false,
+        namespaceClassnames: false,
+        namespaceIDs: false
+      }
+    }
+  },
+  svgo: {
+    installed: false,
+    loaded: false,
+    file: false,
+    config: {
+      multipass: true,
+      datauri: "enc",
+      js2svg: {
+        indent: 2,
+        pretty: true
+      },
+      plugins: [
+        "preset-default"
+      ]
+    }
+  }
+});
+
+// lib/model/plugins.ts
+var plugins = () => ({
+  onBuild: [],
+  onChange: [],
+  onReload: [],
+  onTransform: [],
+  onWatch: []
+});
+
+// lib/model/$.ts
+var warning2 = {
+  current: null,
+  count: 0,
+  process: {}
+};
+function paths() {
+  const state2 = create(null);
+  for (const path2 of PATH_KEYS) {
+    state2[path2] = create(null);
+    state2[path2].input = null;
+    state2[path2].match = null;
+  }
+  state2.transforms = /* @__PURE__ */ new Map();
+  return state2;
+}
+var $ = new class Bundle {
+  /**
+   * The users configuration settings merged with defaults
+   */
+  static defaults = defaults();
+  /**
+   * Plugins
+   */
+  static plugins = plugins();
+  /**
+   * The terse minification configuration settings
+   */
+  static terser = terser();
+  /**
+   * The processors configuration settings
+   */
+  static processor = processor();
+  /**
+   * The parsed contents of `package.json` file
+   */
+  static package = create(null);
+  /**
+   * Cache file reference
+   */
+  static cache = create(null);
+  /**
+   * Chokidar watch instance
+   */
+  static watch = /* @__PURE__ */ new Set();
+  /**
+   * Process Child
+   */
+  process;
+  /**
+   * Whether or not to restart process
+   */
+  restart = false;
+  /**
+   * Cached reference of the CLI commands passed
+   */
+  cli = create(null);
+  /**
+   * Websockets HOT reloading
+   */
+  wss = null;
+  /**
+   * Stats information for the output directory
+   *
+   * @default null
+   */
+  stats = create(null);
+  /**
+   * CLI provided filters
+   *
+   * @default null
+   */
+  filters = create(null);
+  /**
+   * Cache copy of the invoked commands in which syncify was started
+   *
+   * @default null
+   */
+  commands = create(null);
+  /**
+   * The version defined in the package.json
+   *
+   * @default null
+   */
+  version = "1.0.0";
+  /**
+   * The current working directory
+   *
+   * @default null
+   */
+  cwd = null;
+  /**
+   * The provided command passed on the CLI.
+   *
+   * @default null
+   */
+  argv = process2.argv.slice(2).join(" ");
+  /**
+   * Error store, holds reference to errors
+   *
+   * @default Set<string>
+   */
+  errors = /* @__PURE__ */ new Set();
+  /**
+   * Syver reference
+   */
+  vc = {
+    dir: null,
+    number: null,
+    zip: null,
+    patch: 0,
+    major: 0,
+    minor: 0,
+    update: null
+  };
+  /**
+   * Execution options which describe the invocation and operation
+   * instructions which Syncify was initialised.
+   *
+   * @default
+   * {
+   *  cli: false,
+   *  dev: true,
+   *  prod: false
+   *  sync: 0
+   * }
+   */
+  env = {
+    cli: false,
+    dev: true,
+    prod: false,
+    sync: 0
+  };
+  /**
+   * Hot reload mode options - Use the `mode.hot` reference to
+   * determine whether or not HOT reloading is enabled.
+   *
+   * @default
+   * {
+   *  inject: true,
+   *  server: 3000,
+   *  socket: 8089,
+   *  method: 'hot',
+   *  scroll: 'preserved',
+   *  layouts: [ 'theme.liquid' ],
+   *  label: 'visible',
+   *  renderer: '{% render \'hot.js\', server: 3000, socket: 8089 %}',
+   *  snippet: null,
+   *  output: null,
+   *  alive: {}
+   * }
+   */
+  hot = {
+    inject: true,
+    server: 3e3,
+    socket: 8089,
+    history: false,
+    method: "hot",
+    strategy: "hydrate",
+    scroll: "preserved",
+    layouts: ["theme.liquid"],
+    label: "visible",
+    snippet: null,
+    output: null,
+    alive: {},
+    renderer: "{% render 'hot.js'" + [
+      "",
+      "server: 3000",
+      "socket: 8089",
+      'strategy: "hydrate"',
+      'scroll: "preserved"',
+      'label: "visible"',
+      "history: false",
+      'method: "hot"'
+    ].join(", ") + " %}"
+  };
+  /**
+   * Logger Options
+   */
+  logger = {
+    clear: true,
+    silent: false,
+    stats: true,
+    warnings: true
+  };
+  /**
+   * The operation mode executing
+   *
+   * @default false // all modes are false by default
+   */
+  mode = {
+    build: false,
+    interactive: false,
+    watch: false,
+    clean: false,
+    upload: false,
+    import: false,
+    metafields: false,
+    terse: false,
+    hot: false,
+    pages: false,
+    pull: false,
+    force: false,
+    views: false,
+    script: false,
+    image: false,
+    style: false,
+    svg: false,
+    redirects: false,
+    export: false
+  };
+  /**
+   * The configuration file name resolution
+   *
+   * @default
+   * {
+   *  base: null,
+   *  ext: null,
+   *  path: null,
+   *  relative: null
+   *  type: null
+   * }
+   */
+  file = {
+    base: null,
+    path: null,
+    relative: null
+  };
+  /**
+   * Files store - Holds a `Set` reference to all files
+   */
+  files = /* @__PURE__ */ new Map();
+  /**
+   * Base directory path references
+   */
+  dirs = {};
+  /**
+   * Passed commands that may be of importance in the transform or build processes.
+   *
+   * @default
+   * {
+   *   config: null,
+   *   delete: null,
+   *   filter: null,
+   *   input: null,
+   *   output: null
+   * }
+   */
+  cmd = {
+    config: null,
+    delete: null,
+    filter: null,
+    input: null,
+    output: null
+  };
+  /**
+   * The sync clients. Multiple stores and themes can run concurrently.
+   *
+   * @default
+   * {
+   *   themes: [],
+   *   stores: []
+   * }
+   */
+  sync = {
+    themes: [],
+    stores: []
+  };
+  /**
+   * Spawn related configuration operations
+   */
+  spawn = {
+    paths: /* @__PURE__ */ new Set(),
+    streams: /* @__PURE__ */ new Map(),
+    invoked: false,
+    commands: {}
+  };
+  /**
+   * Section sub-directory configuration
+   *
+   * @todo
+   * Allow anymatch global patterns
+   *
+   * @default
+   * {
+   *   prefixDir: false,
+   *   separator: '-',
+   *   global: null
+   * }
+   */
+  section = {
+    prefixDir: false,
+    separator: "-",
+    global: null,
+    baseDir: /* @__PURE__ */ new Set()
+  };
+  /**
+   * Snippet sub-directory configuration
+   *
+   * @todo
+   * Allow anymatch global patterns
+   *
+   * @default
+   * {
+   *   prefixDir: false,
+   *   separator: '-',
+   *   global: null
+   * }
+   */
+  snippet = {
+    prefixDir: false,
+    separator: "-",
+    global: null,
+    baseDir: /* @__PURE__ */ new Set()
+  };
+  /**
+   * Directory structure paths.
+   *
+   * Includes a special `transforms` Map reference for transform related files
+   * which may potentially be using an extension that would lead to it being identified
+   * as a different file type. This occurs when (for example) snippet generated transforms
+   * are inferred. The `transform` option will point to resolved file names and the values
+   * for each entry will equal an enum `Type` number. The following transforms are identifiable:
+   *
+   * - `7` > `Type.Style`
+   * - `8` > `Type.Script`
+   * - `9` > `Type.SVG`
+   */
+  paths = paths();
+  /**
+   * Page transforms
+   *
+   * @default
+   * {
+   *  export: {
+   *    quotes: '“”‘’',
+   *    html: true,
+   *    linkify: false,
+   *    typographer: false,
+   *    xhtmlOut: false,
+   *    breaks: true,
+   *    langPrefix: 'language-'
+   *  },
+   *  import: {
+   *    codeBlockStyle: 'fenced',
+   *    emDelimiter: '_',
+   *    fence: '```',
+   *    headingStyle: 'atx',
+   *    hr: '---',
+   *    linkReferenceStyle: 'full',
+   *    linkStyle: 'inlined',
+   *    strongDelimiter: '**',
+   *    bulletListMarker: '-'
+   *  }
+   *}
+   */
+  page = {
+    safeSync: true,
+    author: "",
+    global: null,
+    suffixDir: false,
+    importLanguage: "html",
+    export: {
+      quotes: "\u201C\u201D\u2018\u2019",
+      html: true,
+      linkify: false,
+      typographer: false,
+      xhtmlOut: false,
+      breaks: true,
+      langPrefix: "language-"
+    },
+    import: {
+      codeBlockStyle: "fenced",
+      emDelimiter: "_",
+      fence: "```",
+      headingStyle: "atx",
+      hr: "---",
+      linkReferenceStyle: "full",
+      linkStyle: "inlined",
+      strongDelimiter: "**",
+      bulletListMarker: "-"
+    }
+  };
+  /**
+   * Script transforms
+   *
+   * @default []
+   */
+  script = [];
+  /**
+   * Style tranforms
+   *
+   * @default []
+   */
+  style = [];
+  /**
+   * SVG transforms
+   *
+   * @default []
+   */
+  svg = [];
+  /**
+   * Image transforms
+   */
+  image;
+  /**
+   * Terser Minification Options
+   */
+  terse = {
+    /**
+     * Terse JSON Minification
+     *
+     * @default false
+     */
+    json: false,
+    /**
+     * Terse Liquid minification
+     */
+    liquid: false,
+    /**
+     * Terse Markup (HTML) minification
+     */
+    markup: false,
+    /**
+      * **NOTE YET AVAILABLE**
+      *
+      * Terse Style (CSS) Minification
+      */
+    style: false,
+    /**
+      * Terse Script (JS/TS) Minification
+      */
+    script: false
+  };
+  /**
+   * Holds an instance of FSWatcher. Chokidar is leveraged in for watching,
+   * and this value exposes the instance and it can be used anywhere in the
+   * module. In addition, the main Chokidar is extended to support `.has()`
+   *
+   * @default null // defaults to null unless watch mode is invoked
+   */
+  get watch() {
+    return Bundle.watch;
+  }
+  /**
+   * Set the FSWatch instance reference
+   */
+  set watch(instance) {
+    Bundle.watch = instance;
+  }
+  /**
+   * Cache reference
+   */
+  get cache() {
+    return Bundle.cache;
+  }
+  /**
+   * Re-assign the cache reference
+   */
+  set cache(cache) {
+    Bundle.cache = cache;
+  }
+  /**
+  * Merged terse minification configuration
+  */
+  get terser() {
+    return Bundle.terser;
+  }
+  /**
+    * Merged terse minification configuration
+    */
+  set terser(options) {
+    Bundle.terser = mergerino_min_default(Bundle.terser, options);
+  }
+  /**
+   * Processor Configurations
+   */
+  get processor() {
+    return Bundle.processor;
+  }
+  /**
+   * Merge users configuration with default
+   */
+  set config(data) {
+    Bundle.defaults = mergerino_min_default(Bundle.defaults, data);
+  }
+  /**
+   * Returns the merged configuration of users syncify configuration with defaults
+   */
+  get config() {
+    return Bundle.defaults;
+  }
+  /**
+   * Merge the `package.json` contents
+   */
+  set pkg(data) {
+    Bundle.package = data;
+  }
+  /**
+   * Returns the `package.json` contents
+   */
+  get pkg() {
+    return Bundle.package;
+  }
+  /**
+   * Plugins
+   */
+  get plugins() {
+    return Bundle.plugins;
+  }
+  /**
+   * The terminal rows and columns size
+   */
+  get terminal() {
+    return size();
+  }
+}();
+
+// lib/log/tui.ts
+var import_ansis2 = __toESM(require_ansis());
+var stack = "";
+function clear2() {
+  const count = process2.stdout.rows - 2;
+  const blank = count > 0 ? "\n".repeat(count) : "";
+  log(blank);
+  readline__default.default.cursorTo(process2.stdout, 0, 0);
+  readline__default.default.clearScreenDown(process2.stdout);
+}
+function hline(minus = 15) {
+  log(hr(minus));
+}
+function suffix(color, prefix, message2) {
+  let ln = prefix === "invalid" || prefix === "failed" ? line.red : prefix === "warning" ? line.yellow : line.gray;
+  let space = 10 - prefix.length;
+  if (space < 0)
+    space = 0;
+  if ($.mode.build) {
+    if (prefix.startsWith("\u2713 ")) {
+      prefix = prefix.replace("\u2713 ", "");
+      space = 10 - prefix.length;
+      ln = ln + CHK;
+    }
+  }
+  const cl = import_ansis2.default[color];
+  return ln + cl(prefix) + " ".repeat(space) + ARR + " " + cl(message2);
+}
+function opener(name) {
+  return "\n" + open + reset.gray(`${name} ~ ${getTime()}`);
+}
+function tree(direction, name) {
+  return direction === "top" ? top + name : bottom + name;
+}
+function closer(name) {
+  return (
+    // c.line.gray + NWL +
+    close + reset.gray(`${name} ~ ${getTime()}`)
+  );
+}
+function message(color, message2) {
+  return line.gray + import_ansis2.default[color](message2);
+}
+function shopify(message2) {
+  if (isArray(message2))
+    return message2.map(shopify).join("");
+  let output = message2;
+  output = output.replace(REGEX_LINE_NO, gray("$1") + white("$2") + gray("$3") + white("$4") + "\n".repeat(2));
+  output = output.replace(REGEX_QUOTES, yellow.bold("$1"));
+  output = output.replace(REGEX_OBJECT, cyan("$1") + whiteBright("$2") + cyan("$3"));
+  output = output.replace(REGEX_ADDRESS, underline("$1"));
+  output = output.replace(REGEX_STRING, magenta("$1") + cyan("$2") + magenta("$3"));
+  output = output.replace(REGEX_FILENAME, neonCyan.bold("$1"));
+  return indent(redBright(wrapAnsi(output, $.terminal.wrap)), { line: line.red });
+}
+function sample(code, data = {}) {
+  const ln = has("line", data) ? data.line : line.gray;
+  if (hasPath("span.start", data)) {
+    const end = has("end", data.span) ? data.span.end : data.span.start + 1;
+    return ln + "\n" + glue([
+      `${ln}${blue(`${data.span.start - 1}`)}${COL + "\n"}${ln}${blue(`${data.span.start}`)}${COL} ${code + "\n"}${ln}${blue(`${end}`)}${COL + "\n"}`
+    ]);
+  }
+  return ln + "\n" + ln + code;
+}
+function indent(message2, ansi = {}) {
+  const lines = isArray(message2) ? message2 : message2.split("\n").filter(Boolean);
+  const ln = has("line", ansi) ? ansi.line : line.gray;
+  let output = has("nwl", ansi) ? `${ln + "\n"}` : "";
+  while (lines.length !== 0) {
+    const text = lines.shift();
+    if (text.trim().length > 0) {
+      if (!text.trim().startsWith(ln)) {
+        output += ln + (has("text", ansi) ? ansi.text(text.trimStart()) : text.trimStart()) + "\n";
+      } else {
+        output += (has("text", ansi) ? ansi.text(text) : text) + "\n";
+      }
+    } else {
+      output += ln + "\n";
+    }
+  }
+  return output;
+}
+function context(data) {
+  let space = 0;
+  let output = line.red + "\n";
+  for (const k in data.entries)
+    if (space < k.length && data.entries[k])
+      space = k.length;
+  for (const k in data.entries) {
+    if (data.entries[k]) {
+      output += glue(
+        [
+          line.red,
+          white(k),
+          COL + " ",
+          " ".repeat(space - k.length),
+          gray(`${k === "source" ? underline(`${data.entries[k]}`) : data.entries[k]}`) + "\n"
+        ]
+      );
+    }
+  }
+  if (data.stack) {
+    stack = data.stack;
+    output += glue(
+      [
+        line.red,
+        white("stack"),
+        COL + " ",
+        " ".repeat(space - 5),
+        gray(`Type ${bold("s")} and press ${bold("enter")} to view stack trace`),
+        "\n" + line.gray
+      ]
+    );
+  }
+  return output.trimEnd();
+}
+function multiline(type2, message2) {
+  let ln = line.gray;
+  let color = white;
+  if (type2 === "error") {
+    ln = line.red;
+    color = red;
+  } else if (type2 === "warning") {
+    ln = line.yellow;
+    color = yellowBright;
+  }
+  const stdout2 = [];
+  const input = message2.trim();
+  const lines = wrapAnsi(input, $.terminal.wrap).split("\n");
+  while (lines.length !== 0) {
+    const text = lines.shift();
+    if (text.trim().length > 0)
+      stdout2.push(ln + color(text));
+  }
+  return ln + "\n" + stdout2.join("\n") + "\n";
+}
+
+// lib/log/loggers.ts
+var loggers_exports = {};
+__export(loggers_exports, {
+  build: () => build,
+  changed: () => changed,
+  clear: () => clear2,
+  configChanges: () => configChanges,
+  console: () => console2,
+  deleted: () => deleted,
+  err: () => err,
+  exported: () => exported,
+  external: () => external,
+  failed: () => failed,
+  group: () => group,
+  hline: () => hline,
+  hook: () => hook,
+  hot: () => hot,
+  ignored: () => ignored,
+  importer: () => importer,
+  invalid: () => invalid,
+  minified: () => minified,
+  nwl: () => nwl,
+  out: () => log,
+  process: () => process6,
+  progress: () => progress,
+  prompt: () => prompt,
+  reloaded: () => reloaded,
+  resource: () => resource,
+  retrying: () => retrying,
+  runtime: () => runtime,
+  skipped: () => skipped,
+  spawn: () => spawn2,
+  spinner: () => spinner,
+  start: () => start,
+  syncing: () => syncing,
+  throws: () => throws,
+  transform: () => transform,
+  unhook: () => unhook,
+  update: () => log_update_default,
+  updated: () => updated,
+  upload: () => upload,
+  warn: () => warn2,
+  write: () => write2
+});
+
+// node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.mjs
+var import_index = __toESM(require_eventemitter3(), 1);
+
+// node_modules/.pnpm/p-timeout@5.1.0/node_modules/p-timeout/index.js
+var TimeoutError = class extends Error {
+  constructor(message2) {
+    super(message2);
+    this.name = "TimeoutError";
+  }
+};
+var AbortError = class extends Error {
+  constructor(message2) {
+    super();
+    this.name = "AbortError";
+    this.message = message2;
+  }
+};
+var getDOMException = (errorMessage) => globalThis.DOMException === void 0 ? new AbortError(errorMessage) : new DOMException(errorMessage);
+var getAbortedReason = (signal2) => {
+  const reason = signal2.reason === void 0 ? getDOMException("This operation was aborted.") : signal2.reason;
+  return reason instanceof Error ? reason : getDOMException(reason);
+};
+function pTimeout(promise, milliseconds, fallback, options) {
+  let timer2;
+  const cancelablePromise = new Promise((resolve2, reject) => {
+    if (typeof milliseconds !== "number" || Math.sign(milliseconds) !== 1) {
+      throw new TypeError(`Expected \`milliseconds\` to be a positive number, got \`${milliseconds}\``);
+    }
+    if (milliseconds === Number.POSITIVE_INFINITY) {
+      resolve2(promise);
+      return;
+    }
+    options = {
+      customTimers: { setTimeout, clearTimeout },
+      ...options
+    };
+    if (options.signal) {
+      const { signal: signal2 } = options;
+      if (signal2.aborted) {
+        reject(getAbortedReason(signal2));
+      }
+      signal2.addEventListener("abort", () => {
+        reject(getAbortedReason(signal2));
+      });
+    }
+    timer2 = options.customTimers.setTimeout.call(void 0, () => {
+      if (typeof fallback === "function") {
+        try {
+          resolve2(fallback());
+        } catch (error3) {
+          reject(error3);
+        }
+        return;
+      }
+      const message2 = typeof fallback === "string" ? fallback : `Promise timed out after ${milliseconds} milliseconds`;
+      const timeoutError = fallback instanceof Error ? fallback : new TimeoutError(message2);
+      if (typeof promise.cancel === "function") {
+        promise.cancel();
+      }
+      reject(timeoutError);
+    }, milliseconds);
+    (async () => {
+      try {
+        resolve2(await promise);
+      } catch (error3) {
+        reject(error3);
+      } finally {
+        options.customTimers.clearTimeout.call(void 0, timer2);
+      }
+    })();
+  });
+  cancelablePromise.clear = () => {
+    clearTimeout(timer2);
+    timer2 = void 0;
+  };
+  return cancelablePromise;
+}
+
+// node_modules/.pnpm/p-queue@7.4.1/node_modules/p-queue/dist/lower-bound.js
+function lowerBound(array, value, comparator) {
+  let first = 0;
+  let count = array.length;
+  while (count > 0) {
+    const step = Math.trunc(count / 2);
+    let it = first + step;
+    if (comparator(array[it], value) <= 0) {
+      first = ++it;
+      count -= step + 1;
+    } else {
+      count = step;
+    }
+  }
+  return first;
+}
+
+// node_modules/.pnpm/p-queue@7.4.1/node_modules/p-queue/dist/priority-queue.js
+var __classPrivateFieldGet = function(receiver, state2, kind, f) {
+  if (kind === "a" && !f)
+    throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state2 === "function" ? receiver !== state2 || !f : !state2.has(receiver))
+    throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state2.get(receiver);
+};
+var _PriorityQueue_queue;
+var PriorityQueue = class {
+  constructor() {
+    _PriorityQueue_queue.set(this, []);
+  }
+  enqueue(run2, options) {
+    options = {
+      priority: 0,
+      ...options
+    };
+    const element = {
+      priority: options.priority,
+      run: run2
+    };
+    if (this.size && __classPrivateFieldGet(this, _PriorityQueue_queue, "f")[this.size - 1].priority >= options.priority) {
+      __classPrivateFieldGet(this, _PriorityQueue_queue, "f").push(element);
+      return;
+    }
+    const index = lowerBound(__classPrivateFieldGet(this, _PriorityQueue_queue, "f"), element, (a, b) => b.priority - a.priority);
+    __classPrivateFieldGet(this, _PriorityQueue_queue, "f").splice(index, 0, element);
+  }
+  dequeue() {
+    const item = __classPrivateFieldGet(this, _PriorityQueue_queue, "f").shift();
+    return item === null || item === void 0 ? void 0 : item.run;
+  }
+  filter(options) {
+    return __classPrivateFieldGet(this, _PriorityQueue_queue, "f").filter((element) => element.priority === options.priority).map((element) => element.run);
+  }
+  get size() {
+    return __classPrivateFieldGet(this, _PriorityQueue_queue, "f").length;
+  }
+};
+_PriorityQueue_queue = /* @__PURE__ */ new WeakMap();
+var priority_queue_default = PriorityQueue;
+
+// node_modules/.pnpm/p-queue@7.4.1/node_modules/p-queue/dist/index.js
+var __classPrivateFieldSet = function(receiver, state2, value, kind, f) {
+  if (kind === "m")
+    throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f)
+    throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state2 === "function" ? receiver !== state2 || !f : !state2.has(receiver))
+    throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state2.set(receiver, value), value;
+};
+var __classPrivateFieldGet2 = function(receiver, state2, kind, f) {
+  if (kind === "a" && !f)
+    throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state2 === "function" ? receiver !== state2 || !f : !state2.has(receiver))
+    throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state2.get(receiver);
+};
+var _PQueue_instances;
+var _PQueue_carryoverConcurrencyCount;
+var _PQueue_isIntervalIgnored;
+var _PQueue_intervalCount;
+var _PQueue_intervalCap;
+var _PQueue_interval;
+var _PQueue_intervalEnd;
+var _PQueue_intervalId;
+var _PQueue_timeoutId;
+var _PQueue_queue;
+var _PQueue_queueClass;
+var _PQueue_pending;
+var _PQueue_concurrency;
+var _PQueue_isPaused;
+var _PQueue_throwOnTimeout;
+var _PQueue_doesIntervalAllowAnother_get;
+var _PQueue_doesConcurrentAllowAnother_get;
+var _PQueue_next;
+var _PQueue_onResumeInterval;
+var _PQueue_isIntervalPaused_get;
+var _PQueue_tryToStartAnother;
+var _PQueue_initializeIntervalIfNeeded;
+var _PQueue_onInterval;
+var _PQueue_processQueue;
+var _PQueue_throwOnAbort;
+var _PQueue_onEvent;
+var AbortError2 = class extends Error {
+};
+var PQueue = class extends import_index.default {
+  // TODO: The `throwOnTimeout` option should affect the return types of `add()` and `addAll()`
+  constructor(options) {
+    var _a, _b, _c, _d;
+    super();
+    _PQueue_instances.add(this);
+    _PQueue_carryoverConcurrencyCount.set(this, void 0);
+    _PQueue_isIntervalIgnored.set(this, void 0);
+    _PQueue_intervalCount.set(this, 0);
+    _PQueue_intervalCap.set(this, void 0);
+    _PQueue_interval.set(this, void 0);
+    _PQueue_intervalEnd.set(this, 0);
+    _PQueue_intervalId.set(this, void 0);
+    _PQueue_timeoutId.set(this, void 0);
+    _PQueue_queue.set(this, void 0);
+    _PQueue_queueClass.set(this, void 0);
+    _PQueue_pending.set(this, 0);
+    _PQueue_concurrency.set(this, void 0);
+    _PQueue_isPaused.set(this, void 0);
+    _PQueue_throwOnTimeout.set(this, void 0);
+    Object.defineProperty(this, "timeout", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: void 0
+    });
+    options = {
+      carryoverConcurrencyCount: false,
+      intervalCap: Number.POSITIVE_INFINITY,
+      interval: 0,
+      concurrency: Number.POSITIVE_INFINITY,
+      autoStart: true,
+      queueClass: priority_queue_default,
+      ...options
+    };
+    if (!(typeof options.intervalCap === "number" && options.intervalCap >= 1)) {
+      throw new TypeError(`Expected \`intervalCap\` to be a number from 1 and up, got \`${(_b = (_a = options.intervalCap) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : ""}\` (${typeof options.intervalCap})`);
+    }
+    if (options.interval === void 0 || !(Number.isFinite(options.interval) && options.interval >= 0)) {
+      throw new TypeError(`Expected \`interval\` to be a finite number >= 0, got \`${(_d = (_c = options.interval) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : ""}\` (${typeof options.interval})`);
+    }
+    __classPrivateFieldSet(this, _PQueue_carryoverConcurrencyCount, options.carryoverConcurrencyCount, "f");
+    __classPrivateFieldSet(this, _PQueue_isIntervalIgnored, options.intervalCap === Number.POSITIVE_INFINITY || options.interval === 0, "f");
+    __classPrivateFieldSet(this, _PQueue_intervalCap, options.intervalCap, "f");
+    __classPrivateFieldSet(this, _PQueue_interval, options.interval, "f");
+    __classPrivateFieldSet(this, _PQueue_queue, new options.queueClass(), "f");
+    __classPrivateFieldSet(this, _PQueue_queueClass, options.queueClass, "f");
+    this.concurrency = options.concurrency;
+    this.timeout = options.timeout;
+    __classPrivateFieldSet(this, _PQueue_throwOnTimeout, options.throwOnTimeout === true, "f");
+    __classPrivateFieldSet(this, _PQueue_isPaused, options.autoStart === false, "f");
+  }
+  get concurrency() {
+    return __classPrivateFieldGet2(this, _PQueue_concurrency, "f");
+  }
+  set concurrency(newConcurrency) {
+    if (!(typeof newConcurrency === "number" && newConcurrency >= 1)) {
+      throw new TypeError(`Expected \`concurrency\` to be a number from 1 and up, got \`${newConcurrency}\` (${typeof newConcurrency})`);
+    }
+    __classPrivateFieldSet(this, _PQueue_concurrency, newConcurrency, "f");
+    __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_processQueue).call(this);
+  }
+  async add(function_, options = {}) {
+    options = {
+      timeout: this.timeout,
+      throwOnTimeout: __classPrivateFieldGet2(this, _PQueue_throwOnTimeout, "f"),
+      ...options
+    };
+    return new Promise((resolve2, reject) => {
+      __classPrivateFieldGet2(this, _PQueue_queue, "f").enqueue(async () => {
+        var _a;
+        var _b, _c;
+        __classPrivateFieldSet(this, _PQueue_pending, (_b = __classPrivateFieldGet2(this, _PQueue_pending, "f"), _b++, _b), "f");
+        __classPrivateFieldSet(this, _PQueue_intervalCount, (_c = __classPrivateFieldGet2(this, _PQueue_intervalCount, "f"), _c++, _c), "f");
+        try {
+          if ((_a = options.signal) === null || _a === void 0 ? void 0 : _a.aborted) {
+            throw new AbortError2("The task was aborted.");
+          }
+          let operation = function_({ signal: options.signal });
+          if (options.timeout) {
+            operation = pTimeout(Promise.resolve(operation), options.timeout);
+          }
+          if (options.signal) {
+            operation = Promise.race([operation, __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_throwOnAbort).call(this, options.signal)]);
+          }
+          const result = await operation;
+          resolve2(result);
+          this.emit("completed", result);
+        } catch (error3) {
+          if (error3 instanceof TimeoutError && !options.throwOnTimeout) {
+            resolve2();
+            return;
+          }
+          reject(error3);
+          this.emit("error", error3);
+        } finally {
+          __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_next).call(this);
+        }
+      }, options);
+      this.emit("add");
+      __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_tryToStartAnother).call(this);
+    });
+  }
+  async addAll(functions, options) {
+    return Promise.all(functions.map(async (function_) => this.add(function_, options)));
+  }
+  /**
+  Start (or resume) executing enqueued tasks within concurrency limit. No need to call this if queue is not paused (via `options.autoStart = false` or by `.pause()` method.)
+  */
+  start() {
+    if (!__classPrivateFieldGet2(this, _PQueue_isPaused, "f")) {
+      return this;
+    }
+    __classPrivateFieldSet(this, _PQueue_isPaused, false, "f");
+    __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_processQueue).call(this);
+    return this;
+  }
+  /**
+  Put queue execution on hold.
+  */
+  pause() {
+    __classPrivateFieldSet(this, _PQueue_isPaused, true, "f");
+  }
+  /**
+  Clear the queue.
+  */
+  clear() {
+    __classPrivateFieldSet(this, _PQueue_queue, new (__classPrivateFieldGet2(this, _PQueue_queueClass, "f"))(), "f");
+  }
+  /**
+      Can be called multiple times. Useful if you for example add additional items at a later time.
+  
+      @returns A promise that settles when the queue becomes empty.
+      */
+  async onEmpty() {
+    if (__classPrivateFieldGet2(this, _PQueue_queue, "f").size === 0) {
+      return;
+    }
+    await __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_onEvent).call(this, "empty");
+  }
+  /**
+      @returns A promise that settles when the queue size is less than the given limit: `queue.size < limit`.
+  
+      If you want to avoid having the queue grow beyond a certain size you can `await queue.onSizeLessThan()` before adding a new item.
+  
+      Note that this only limits the number of items waiting to start. There could still be up to `concurrency` jobs already running that this call does not include in its calculation.
+      */
+  async onSizeLessThan(limit2) {
+    if (__classPrivateFieldGet2(this, _PQueue_queue, "f").size < limit2) {
+      return;
+    }
+    await __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_onEvent).call(this, "next", () => __classPrivateFieldGet2(this, _PQueue_queue, "f").size < limit2);
+  }
+  /**
+      The difference with `.onEmpty` is that `.onIdle` guarantees that all work from the queue has finished. `.onEmpty` merely signals that the queue is empty, but it could mean that some promises haven't completed yet.
+  
+      @returns A promise that settles when the queue becomes empty, and all promises have completed; `queue.size === 0 && queue.pending === 0`.
+      */
+  async onIdle() {
+    if (__classPrivateFieldGet2(this, _PQueue_pending, "f") === 0 && __classPrivateFieldGet2(this, _PQueue_queue, "f").size === 0) {
+      return;
+    }
+    await __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_onEvent).call(this, "idle");
+  }
+  /**
+  Size of the queue, the number of queued items waiting to run.
+  */
+  get size() {
+    return __classPrivateFieldGet2(this, _PQueue_queue, "f").size;
+  }
+  /**
+      Size of the queue, filtered by the given options.
+  
+      For example, this can be used to find the number of items remaining in the queue with a specific priority level.
+      */
+  sizeBy(options) {
+    return __classPrivateFieldGet2(this, _PQueue_queue, "f").filter(options).length;
+  }
+  /**
+  Number of running items (no longer in the queue).
+  */
+  get pending() {
+    return __classPrivateFieldGet2(this, _PQueue_pending, "f");
+  }
+  /**
+  Whether the queue is currently paused.
+  */
+  get isPaused() {
+    return __classPrivateFieldGet2(this, _PQueue_isPaused, "f");
+  }
+};
+_PQueue_carryoverConcurrencyCount = /* @__PURE__ */ new WeakMap(), _PQueue_isIntervalIgnored = /* @__PURE__ */ new WeakMap(), _PQueue_intervalCount = /* @__PURE__ */ new WeakMap(), _PQueue_intervalCap = /* @__PURE__ */ new WeakMap(), _PQueue_interval = /* @__PURE__ */ new WeakMap(), _PQueue_intervalEnd = /* @__PURE__ */ new WeakMap(), _PQueue_intervalId = /* @__PURE__ */ new WeakMap(), _PQueue_timeoutId = /* @__PURE__ */ new WeakMap(), _PQueue_queue = /* @__PURE__ */ new WeakMap(), _PQueue_queueClass = /* @__PURE__ */ new WeakMap(), _PQueue_pending = /* @__PURE__ */ new WeakMap(), _PQueue_concurrency = /* @__PURE__ */ new WeakMap(), _PQueue_isPaused = /* @__PURE__ */ new WeakMap(), _PQueue_throwOnTimeout = /* @__PURE__ */ new WeakMap(), _PQueue_instances = /* @__PURE__ */ new WeakSet(), _PQueue_doesIntervalAllowAnother_get = function _PQueue_doesIntervalAllowAnother_get2() {
+  return __classPrivateFieldGet2(this, _PQueue_isIntervalIgnored, "f") || __classPrivateFieldGet2(this, _PQueue_intervalCount, "f") < __classPrivateFieldGet2(this, _PQueue_intervalCap, "f");
+}, _PQueue_doesConcurrentAllowAnother_get = function _PQueue_doesConcurrentAllowAnother_get2() {
+  return __classPrivateFieldGet2(this, _PQueue_pending, "f") < __classPrivateFieldGet2(this, _PQueue_concurrency, "f");
+}, _PQueue_next = function _PQueue_next2() {
+  var _a;
+  __classPrivateFieldSet(this, _PQueue_pending, (_a = __classPrivateFieldGet2(this, _PQueue_pending, "f"), _a--, _a), "f");
+  __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_tryToStartAnother).call(this);
+  this.emit("next");
+}, _PQueue_onResumeInterval = function _PQueue_onResumeInterval2() {
+  __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_onInterval).call(this);
+  __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_initializeIntervalIfNeeded).call(this);
+  __classPrivateFieldSet(this, _PQueue_timeoutId, void 0, "f");
+}, _PQueue_isIntervalPaused_get = function _PQueue_isIntervalPaused_get2() {
+  const now = Date.now();
+  if (__classPrivateFieldGet2(this, _PQueue_intervalId, "f") === void 0) {
+    const delay2 = __classPrivateFieldGet2(this, _PQueue_intervalEnd, "f") - now;
+    if (delay2 < 0) {
+      __classPrivateFieldSet(this, _PQueue_intervalCount, __classPrivateFieldGet2(this, _PQueue_carryoverConcurrencyCount, "f") ? __classPrivateFieldGet2(this, _PQueue_pending, "f") : 0, "f");
+    } else {
+      if (__classPrivateFieldGet2(this, _PQueue_timeoutId, "f") === void 0) {
+        __classPrivateFieldSet(this, _PQueue_timeoutId, setTimeout(() => {
+          __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_onResumeInterval).call(this);
+        }, delay2), "f");
+      }
+      return true;
+    }
+  }
+  return false;
+}, _PQueue_tryToStartAnother = function _PQueue_tryToStartAnother2() {
+  if (__classPrivateFieldGet2(this, _PQueue_queue, "f").size === 0) {
+    if (__classPrivateFieldGet2(this, _PQueue_intervalId, "f")) {
+      clearInterval(__classPrivateFieldGet2(this, _PQueue_intervalId, "f"));
+    }
+    __classPrivateFieldSet(this, _PQueue_intervalId, void 0, "f");
+    this.emit("empty");
+    if (__classPrivateFieldGet2(this, _PQueue_pending, "f") === 0) {
+      this.emit("idle");
+    }
+    return false;
+  }
+  if (!__classPrivateFieldGet2(this, _PQueue_isPaused, "f")) {
+    const canInitializeInterval = !__classPrivateFieldGet2(this, _PQueue_instances, "a", _PQueue_isIntervalPaused_get);
+    if (__classPrivateFieldGet2(this, _PQueue_instances, "a", _PQueue_doesIntervalAllowAnother_get) && __classPrivateFieldGet2(this, _PQueue_instances, "a", _PQueue_doesConcurrentAllowAnother_get)) {
+      const job = __classPrivateFieldGet2(this, _PQueue_queue, "f").dequeue();
+      if (!job) {
+        return false;
+      }
+      this.emit("active");
+      job();
+      if (canInitializeInterval) {
+        __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_initializeIntervalIfNeeded).call(this);
+      }
+      return true;
+    }
+  }
+  return false;
+}, _PQueue_initializeIntervalIfNeeded = function _PQueue_initializeIntervalIfNeeded2() {
+  if (__classPrivateFieldGet2(this, _PQueue_isIntervalIgnored, "f") || __classPrivateFieldGet2(this, _PQueue_intervalId, "f") !== void 0) {
+    return;
+  }
+  __classPrivateFieldSet(this, _PQueue_intervalId, setInterval(() => {
+    __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_onInterval).call(this);
+  }, __classPrivateFieldGet2(this, _PQueue_interval, "f")), "f");
+  __classPrivateFieldSet(this, _PQueue_intervalEnd, Date.now() + __classPrivateFieldGet2(this, _PQueue_interval, "f"), "f");
+}, _PQueue_onInterval = function _PQueue_onInterval2() {
+  if (__classPrivateFieldGet2(this, _PQueue_intervalCount, "f") === 0 && __classPrivateFieldGet2(this, _PQueue_pending, "f") === 0 && __classPrivateFieldGet2(this, _PQueue_intervalId, "f")) {
+    clearInterval(__classPrivateFieldGet2(this, _PQueue_intervalId, "f"));
+    __classPrivateFieldSet(this, _PQueue_intervalId, void 0, "f");
+  }
+  __classPrivateFieldSet(this, _PQueue_intervalCount, __classPrivateFieldGet2(this, _PQueue_carryoverConcurrencyCount, "f") ? __classPrivateFieldGet2(this, _PQueue_pending, "f") : 0, "f");
+  __classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_processQueue).call(this);
+}, _PQueue_processQueue = function _PQueue_processQueue2() {
+  while (__classPrivateFieldGet2(this, _PQueue_instances, "m", _PQueue_tryToStartAnother).call(this)) {
+  }
+}, _PQueue_throwOnAbort = async function _PQueue_throwOnAbort2(signal2) {
+  return new Promise((_resolve, reject) => {
+    signal2.addEventListener("abort", () => {
+      reject(new AbortError2("The task was aborted."));
+    }, { once: true });
+  });
+}, _PQueue_onEvent = async function _PQueue_onEvent2(event2, filter2) {
+  return new Promise((resolve2) => {
+    const listener = () => {
+      if (filter2 && !filter2()) {
+        return;
+      }
+      this.off(event2, listener);
+      resolve2();
+    };
+    this.on(event2, listener);
+  });
+};
+var dist_default = PQueue;
+var axios = connect__default.default.create({
+  responseType: "json",
+  headers: {}
+});
+var queue = new dist_default({
+  // concurrency: 5,
+  interval: 500,
+  intervalCap: 2
+});
+function requeue(status) {
+  if (status === 429 || status === 500)
+    return true;
+  if (!queue.isPaused)
+    queue.pause();
+  return false;
+}
+var timer = new class Timer {
+  /**
+   * Timer cache
+   *
+   * Holds reference to different running timers
+   */
+  marks = [];
+  /**
+   * Timer Reference
+   *
+   * Similar to `mark[]` but provides identifer timers.
+   */
+  time = {};
+  /**
+   * Timer Cache
+   *
+   * Used to stop a timer but maintain a reference.
+   */
+  cache = {};
+  /**
+   * Current Time
+   *
+   * Sugar for the `stop` function.
+   */
+  now(id) {
+    return this.stop(id || true);
+  }
+  /**
+   * Pause Timer
+   *
+   * Pauses a timer and sets it into `cache` -
+   * Use `now()` to retreive and remove.
+   */
+  pause(id) {
+    if (id in this.marks) {
+      this.cache[id] = this.stop(id || true);
+    }
+  }
+  /**
+   * Start timer
+   *
+   * Captures the current timestamp and applies it to the mark model.
+   */
+  start(id) {
+    if (id) {
+      this.time[id] = perf_hooks.performance.now();
+    } else {
+      this.marks.push(perf_hooks.performance.now());
+    }
+  }
+  /**
+   * Clear timers
+   *
+   * Removes all the timing references from the mark model.
+   */
+  clear(id) {
+    if (id) {
+      if (id in this.time) {
+        delete this.time[id];
+        return;
+      }
+      if (id in this.cache) {
+        delete this.cache[id];
+        return;
+      }
+    }
+    while (this.marks.length !== 0)
+      this.marks.pop();
+  }
+  /**
+   * Stop timer
+   *
+   * Stops the timer and returns the execution time as a string.
+   * The function will remove the mark from cache by default, unless
+   * passing a `boolean` value `true` which will return the _current_
+   * elapsed time of the last known mark in cache without removing it.
+   *
+   * Supports following formats:
+   *
+   * - Miliseconds: `10ms`
+   * - Seconds and Miliseconds: `2s 45ms`
+   * - Minutes, Seconds and Miliseconds: `2m 35sec 33ms`
+   */
+  stop(now = false, end = false) {
+    let gt;
+    if (typeof now === "boolean") {
+      gt = now ? this.marks[this.marks.length - 1] : this.marks.pop();
+    } else if (now) {
+      if (now in this.cache) {
+        const s2 = this.cache[now];
+        delete this.cache[now];
+        return s2;
+      }
+      if (end) {
+        gt = this.time[now];
+        delete this.time[now];
+      } else {
+        gt = this.time[now];
+      }
+    }
+    const ms = perf_hooks.performance.now() - gt;
+    if (ms < 1e3)
+      return `${abs(+ms.toFixed(0))}ms`;
+    const s = ms / 1e3;
+    if (s < 60)
+      return `${abs(+s.toFixed(0))}s ${abs(+ms.toFixed(0).slice(1, 4))}ms`;
+    const m = abs(+(s / 60).toFixed(0));
+    return `${m}m ${abs(+(s - 60 * Number(m)).toFixed(0))}s ${abs(+ms.toFixed(0).slice(1, 4))}ms`;
+  }
+}();
+var native = /* @__PURE__ */ new Map();
+var methods = [
+  "assert",
+  "count",
+  "countReset",
+  "debug",
+  "dir",
+  "dirxml",
+  "error",
+  "group",
+  "groupCollapsed",
+  "groupEnd",
+  "info",
+  "log",
+  "table",
+  "time",
+  "timeEnd",
+  "timeLog",
+  "trace",
+  "warn"
+];
+function intercept(callback) {
+  const stdout2 = new stream.PassThrough();
+  const stderr = new stream.PassThrough();
+  stdout2.write = (data) => callback("stdout", data);
+  stderr.write = (data) => callback("stderr", data);
+  const internal = new console$1.Console(stdout2, stderr);
+  for (const method of methods) {
+    native.set(method, console[method]);
+    console[method] = internal[method];
+  }
+  return () => {
+    for (const method of methods) {
+      console[method] = native.get(method);
+    }
+    native.clear();
+  };
+}
+
+// lib/log/errors.ts
+var errors_exports = {};
+__export(errors_exports, {
+  errors: () => errors,
+  esbuild: () => esbuild,
+  postcss: () => postcss,
+  request: () => request,
+  sass: () => sass,
+  spawn: () => spawn,
+  write: () => write
+});
+
+// node_modules/.pnpm/escape-string-regexp@5.0.0/node_modules/escape-string-regexp/index.js
+function escapeStringRegexp(string) {
+  if (typeof string !== "string") {
+    throw new TypeError("Expected a string");
+  }
+  return string.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
+}
+var getHomeDirectory = () => os__default.default.homedir().replace(/\\/g, "/");
+var home_directory_default = getHomeDirectory;
+
+// node_modules/.pnpm/clean-stack@5.2.0/node_modules/clean-stack/index.js
+var extractPathRegex = /\s+at.*[(\s](.*)\)?/;
+var pathRegex = /^(?:(?:(?:node|node:[\w/]+|(?:(?:node:)?internal\/[\w/]*|.*node_modules\/(?:babel-polyfill|pirates)\/.*)?\w+)(?:\.js)?:\d+:\d+)|native)/;
+function cleanStack(stack3, { pretty = false, basePath: basePath2, pathFilter } = {}) {
+  const basePathRegex = basePath2 && new RegExp(`(file://)?${escapeStringRegexp(basePath2.replace(/\\/g, "/"))}/?`, "g");
+  const homeDirectory = pretty ? home_directory_default() : "";
+  if (typeof stack3 !== "string") {
+    return void 0;
+  }
+  return stack3.replace(/\\/g, "/").split("\n").filter((line2) => {
+    const pathMatches = line2.match(extractPathRegex);
+    if (pathMatches === null || !pathMatches[1]) {
+      return true;
+    }
+    const match2 = pathMatches[1];
+    if (match2.includes(".app/Contents/Resources/electron.asar") || match2.includes(".app/Contents/Resources/default_app.asar") || match2.includes("node_modules/electron/dist/resources/electron.asar") || match2.includes("node_modules/electron/dist/resources/default_app.asar")) {
+      return false;
+    }
+    return pathFilter ? !pathRegex.test(match2) && pathFilter(match2) : !pathRegex.test(match2);
+  }).filter((line2) => line2.trim() !== "").map((line2) => {
+    if (basePathRegex) {
+      line2 = line2.replace(basePathRegex, "");
+    }
+    if (pretty) {
+      line2 = line2.replace(extractPathRegex, (m, p1) => m.replace(p1, p1.replace(homeDirectory, "~")));
+    }
+    return line2;
+  }).join("\n");
+}
+
+// lib/log/errors.ts
+var errors = {};
+function spawn(data) {
+  const stdout2 = [];
+  const stderr = [line.red];
+  const stackerr = data.search(/(?:\n {4}at .*)/);
+  let message2 = [];
+  if (/\berror\b:?/i.test(data) && stackerr > 0) {
+    message2 = data.slice(0, stackerr).split("\n");
+    const stack3 = cleanStack(data.slice(stackerr), { pretty: true, basePath: $.cwd });
+    const lines = wrapAnsi(stack3, $.terminal.wrap).split("\n");
+    stderr.push("\n");
+    while (lines.length !== 0) {
+      const line2 = lines.shift();
+      if (line2.trim().length > 0)
+        stderr.push(reset(line.red + line2));
+    }
+  }
+  if (message2.length === 0)
+    message2 = data.split("\n");
+  while (message2.length !== 0) {
+    const line2 = message2.shift();
+    if (line2.trim().length > 0)
+      stdout2.push(reset(line.gray) + line2);
+  }
+  error(`${stdout2.join("\n")}${stderr.length > 1 ? stderr.join("\n") : ""}`);
+}
+function request(file, e2, options = {}) {
+  const o2 = assign({ log: true, store: false }, options);
+  if (o2.store)
+    o2.data = {};
+  const message2 = hasPath("error.asset", e2.data) ? e2.data.error.asset : hasPath("errors.asset", e2.data) ? e2.data.errors.asset : null;
+  if (e2.status === 422) {
+    const info = shopify(message2);
+    const context2 = {
+      stack: false,
+      entries: {
+        details: "File did not sync because Shopify rejected the request",
+        status: e2.status,
+        message: e2.statusText,
+        source: file
+      }
+    };
+    if (o2.store) {
+      o2.data.message = strip(info);
+      o2.data.context = context2;
+    }
+    const output = glue([
+      line.red,
+      "\n",
+      info,
+      context(context2)
+    ]);
+    if (o2.log)
+      error(output);
+    return o2.store ? o2.data : output;
+  } else if (e2.status in SHOPIFY_REQUEST_ERRORS) {
+    const info = multiline("error", SHOPIFY_REQUEST_ERRORS[e2.status]);
+    const context2 = {
+      stack: false,
+      entries: {
+        status: e2.status,
+        message: e2.statusText,
+        source: `${file}`
+      }
+    };
+    if (o2.store) {
+      o2.data.message = strip(info);
+      o2.data.context = context2;
+    }
+    const output = glue([
+      line.red,
+      "\n",
+      info + context(context2)
+    ]);
+    if (o2.log)
+      error(output);
+    return o2.store ? o2.data : output;
+  } else {
+    const info = "Unknown error has occured";
+    const context2 = {
+      stack: false,
+      entries: {
+        status: e2.status,
+        message: e2.statusText,
+        source: `${file}`
+      }
+    };
+    if (o2.store) {
+      o2.data.message = info;
+      o2.data.context = context2;
+    }
+    const output = glue([
+      line.red,
+      "\n",
+      redBright(info) + context({
+        stack: false,
+        entries: {
+          status: e2.status,
+          message: e2.statusText,
+          source: `${file}`
+        }
+      })
+    ]);
+    if (o2.log)
+      error(output);
+    return o2.store ? o2.data : output;
+  }
+}
+var write = (message2, context2) => (e2) => {
+  error(
+    indent(e2.message, {
+      nwl: true,
+      line: line.red,
+      text: red.bold
+    }) + context({
+      stack: e2.stack,
+      entries: {
+        ...context2,
+        code: e2.code,
+        name: e2.name,
+        details: message2
+      }
+    })
+  );
+};
+function sass(file, e2) {
+  error(
+    indent(e2.message, {
+      nwl: true,
+      line: line.red,
+      text: red
+    }) + context({
+      stack: e2.sassStack,
+      entries: {
+        input: file.relative,
+        message: e2.sassMessage
+      }
+    })
+  );
+}
+function esbuild(e2) {
+  error(
+    indent(e2.text, {
+      nwl: true,
+      line: line.red,
+      text: red
+    }) + sample(e2.location.lineText, {
+      line: line.red,
+      span: {
+        start: e2.location.line,
+        end: e2.location.line + 1
+      }
+    }) + context({
+      stack: false,
+      entries: {
+        file: e2.location.file,
+        line: e2.location.line,
+        column: e2.location.column,
+        plugin: e2.pluginName
+      }
+    })
+  );
+}
+function postcss(e2) {
+}
+
+// node_modules/.pnpm/ansi-escapes@5.0.0/node_modules/ansi-escapes/index.js
+var ESC = "\x1B[";
+var OSC = "\x1B]";
+var BEL = "\x07";
+var SEP = ";";
+var isTerminalApp = process.env.TERM_PROGRAM === "Apple_Terminal";
+var ansiEscapes = {};
+ansiEscapes.cursorTo = (x, y) => {
+  if (typeof x !== "number") {
+    throw new TypeError("The `x` argument is required");
+  }
+  if (typeof y !== "number") {
+    return ESC + (x + 1) + "G";
+  }
+  return ESC + (y + 1) + ";" + (x + 1) + "H";
+};
+ansiEscapes.cursorMove = (x, y) => {
+  if (typeof x !== "number") {
+    throw new TypeError("The `x` argument is required");
+  }
+  let returnValue = "";
+  if (x < 0) {
+    returnValue += ESC + -x + "D";
+  } else if (x > 0) {
+    returnValue += ESC + x + "C";
+  }
+  if (y < 0) {
+    returnValue += ESC + -y + "A";
+  } else if (y > 0) {
+    returnValue += ESC + y + "B";
+  }
+  return returnValue;
+};
+ansiEscapes.cursorUp = (count = 1) => ESC + count + "A";
+ansiEscapes.cursorDown = (count = 1) => ESC + count + "B";
+ansiEscapes.cursorForward = (count = 1) => ESC + count + "C";
+ansiEscapes.cursorBackward = (count = 1) => ESC + count + "D";
+ansiEscapes.cursorLeft = ESC + "G";
+ansiEscapes.cursorSavePosition = isTerminalApp ? "\x1B7" : ESC + "s";
+ansiEscapes.cursorRestorePosition = isTerminalApp ? "\x1B8" : ESC + "u";
+ansiEscapes.cursorGetPosition = ESC + "6n";
+ansiEscapes.cursorNextLine = ESC + "E";
+ansiEscapes.cursorPrevLine = ESC + "F";
+ansiEscapes.cursorHide = ESC + "?25l";
+ansiEscapes.cursorShow = ESC + "?25h";
+ansiEscapes.eraseLines = (count) => {
+  let clear3 = "";
+  for (let i = 0; i < count; i++) {
+    clear3 += ansiEscapes.eraseLine + (i < count - 1 ? ansiEscapes.cursorUp() : "");
+  }
+  if (count) {
+    clear3 += ansiEscapes.cursorLeft;
+  }
+  return clear3;
+};
+ansiEscapes.eraseEndLine = ESC + "K";
+ansiEscapes.eraseStartLine = ESC + "1K";
+ansiEscapes.eraseLine = ESC + "2K";
+ansiEscapes.eraseDown = ESC + "J";
+ansiEscapes.eraseUp = ESC + "1J";
+ansiEscapes.eraseScreen = ESC + "2J";
+ansiEscapes.scrollUp = ESC + "S";
+ansiEscapes.scrollDown = ESC + "T";
+ansiEscapes.clearScreen = "\x1Bc";
+ansiEscapes.clearTerminal = process.platform === "win32" ? `${ansiEscapes.eraseScreen}${ESC}0f` : (
+  // 1. Erases the screen (Only done in case `2` is not supported)
+  // 2. Erases the whole screen including scrollback buffer
+  // 3. Moves cursor to the top-left position
+  // More info: https://www.real-world-systems.com/docs/ANSIcode.html
+  `${ansiEscapes.eraseScreen}${ESC}3J${ESC}H`
+);
+ansiEscapes.beep = BEL;
+ansiEscapes.link = (text, url) => {
+  return [
+    OSC,
+    "8",
+    SEP,
+    SEP,
+    url,
+    BEL,
+    text,
+    OSC,
+    "8",
+    SEP,
+    SEP,
+    BEL
+  ].join("");
+};
+ansiEscapes.image = (buffer, options = {}) => {
+  let returnValue = `${OSC}1337;File=inline=1`;
+  if (options.width) {
+    returnValue += `;width=${options.width}`;
+  }
+  if (options.height) {
+    returnValue += `;height=${options.height}`;
+  }
+  if (options.preserveAspectRatio === false) {
+    returnValue += ";preserveAspectRatio=0";
+  }
+  return returnValue + ":" + buffer.toString("base64") + BEL;
+};
+ansiEscapes.iTerm = {
+  setCwd: (cwd = process.cwd()) => `${OSC}50;CurrentDir=${cwd}${BEL}`,
+  annotation: (message2, options = {}) => {
+    let returnValue = `${OSC}1337;`;
+    const hasX = typeof options.x !== "undefined";
+    const hasY = typeof options.y !== "undefined";
+    if ((hasX || hasY) && !(hasX && hasY && typeof options.length !== "undefined")) {
+      throw new Error("`x`, `y` and `length` must be defined when `x` or `y` is defined");
+    }
+    message2 = message2.replace(/\|/g, "");
+    returnValue += options.isHidden ? "AddHiddenAnnotation=" : "AddAnnotation=";
+    if (options.length > 0) {
+      returnValue += (hasX ? [message2, options.length, options.x, options.y] : [options.length, message2]).join("|");
+    } else {
+      returnValue += message2;
+    }
+    return returnValue + BEL;
+  }
+};
+var ansi_escapes_default = ansiEscapes;
+
+// node_modules/.pnpm/restore-cursor@4.0.0/node_modules/restore-cursor/index.js
+var import_onetime = __toESM(require_onetime(), 1);
+var import_signal_exit = __toESM(require_signal_exit(), 1);
+var restoreCursor = (0, import_onetime.default)(() => {
+  (0, import_signal_exit.default)(() => {
+    process2__default.default.stderr.write("\x1B[?25h");
+  }, { alwaysLast: true });
+});
+var restore_cursor_default = restoreCursor;
+
+// node_modules/.pnpm/cli-cursor@4.0.0/node_modules/cli-cursor/index.js
+var isHidden = false;
+var cliCursor = {};
+cliCursor.show = (writableStream = process2__default.default.stderr) => {
+  if (!writableStream.isTTY) {
+    return;
+  }
+  isHidden = false;
+  writableStream.write("\x1B[?25h");
+};
+cliCursor.hide = (writableStream = process2__default.default.stderr) => {
+  if (!writableStream.isTTY) {
+    return;
+  }
+  restore_cursor_default();
+  isHidden = true;
+  writableStream.write("\x1B[?25l");
+};
+cliCursor.toggle = (force, writableStream) => {
+  if (force !== void 0) {
+    isHidden = force;
+  }
+  if (isHidden) {
+    cliCursor.show(writableStream);
+  } else {
+    cliCursor.hide(writableStream);
+  }
+};
+var cli_cursor_default = cliCursor;
+
+// node_modules/.pnpm/is-fullwidth-code-point@4.0.0/node_modules/is-fullwidth-code-point/index.js
+function isFullwidthCodePoint(codePoint) {
+  if (!Number.isInteger(codePoint)) {
+    return false;
+  }
+  return codePoint >= 4352 && (codePoint <= 4447 || // Hangul Jamo
+  codePoint === 9001 || // LEFT-POINTING ANGLE BRACKET
+  codePoint === 9002 || // RIGHT-POINTING ANGLE BRACKET
+  // CJK Radicals Supplement .. Enclosed CJK Letters and Months
+  11904 <= codePoint && codePoint <= 12871 && codePoint !== 12351 || // Enclosed CJK Letters and Months .. CJK Unified Ideographs Extension A
+  12880 <= codePoint && codePoint <= 19903 || // CJK Unified Ideographs .. Yi Radicals
+  19968 <= codePoint && codePoint <= 42182 || // Hangul Jamo Extended-A
+  43360 <= codePoint && codePoint <= 43388 || // Hangul Syllables
+  44032 <= codePoint && codePoint <= 55203 || // CJK Compatibility Ideographs
+  63744 <= codePoint && codePoint <= 64255 || // Vertical Forms
+  65040 <= codePoint && codePoint <= 65049 || // CJK Compatibility Forms .. Small Form Variants
+  65072 <= codePoint && codePoint <= 65131 || // Halfwidth and Fullwidth Forms
+  65281 <= codePoint && codePoint <= 65376 || 65504 <= codePoint && codePoint <= 65510 || // Kana Supplement
+  110592 <= codePoint && codePoint <= 110593 || // Enclosed Ideographic Supplement
+  127488 <= codePoint && codePoint <= 127569 || // CJK Unified Ideographs Extension B .. Tertiary Ideographic Plane
+  131072 <= codePoint && codePoint <= 262141);
+}
+
+// node_modules/.pnpm/slice-ansi@5.0.0/node_modules/slice-ansi/index.js
+var astralRegex = /^[\uD800-\uDBFF][\uDC00-\uDFFF]$/;
+var ESCAPES2 = [
+  "\x1B",
+  "\x9B"
+];
+var wrapAnsi2 = (code) => `${ESCAPES2[0]}[${code}m`;
+var checkAnsi = (ansiCodes, isEscapes, endAnsiCode) => {
+  let output = [];
+  ansiCodes = [...ansiCodes];
+  for (let ansiCode of ansiCodes) {
+    const ansiCodeOrigin = ansiCode;
+    if (ansiCode.includes(";")) {
+      ansiCode = ansiCode.split(";")[0][0] + "0";
+    }
+    const item = ansi_styles_default.codes.get(Number.parseInt(ansiCode, 10));
+    if (item) {
+      const indexEscape = ansiCodes.indexOf(item.toString());
+      if (indexEscape === -1) {
+        output.push(wrapAnsi2(isEscapes ? item : ansiCodeOrigin));
+      } else {
+        ansiCodes.splice(indexEscape, 1);
+      }
+    } else if (isEscapes) {
+      output.push(wrapAnsi2(0));
+      break;
+    } else {
+      output.push(wrapAnsi2(ansiCodeOrigin));
+    }
+  }
+  if (isEscapes) {
+    output = output.filter((element, index) => output.indexOf(element) === index);
+    if (endAnsiCode !== void 0) {
+      const fistEscapeCode = wrapAnsi2(ansi_styles_default.codes.get(Number.parseInt(endAnsiCode, 10)));
+      output = output.reduce((current, next) => next === fistEscapeCode ? [next, ...current] : [...current, next], []);
+    }
+  }
+  return output.join("");
+};
+function sliceAnsi(string, begin, end) {
+  const characters = [...string];
+  const ansiCodes = [];
+  let stringEnd = typeof end === "number" ? end : characters.length;
+  let isInsideEscape = false;
+  let ansiCode;
+  let visible = 0;
+  let output = "";
+  for (const [index, character] of characters.entries()) {
+    let leftEscape = false;
+    if (ESCAPES2.includes(character)) {
+      const code = /\d[^m]*/.exec(string.slice(index, index + 18));
+      ansiCode = code && code.length > 0 ? code[0] : void 0;
+      if (visible < stringEnd) {
+        isInsideEscape = true;
+        if (ansiCode !== void 0) {
+          ansiCodes.push(ansiCode);
+        }
+      }
+    } else if (isInsideEscape && character === "m") {
+      isInsideEscape = false;
+      leftEscape = true;
+    }
+    if (!isInsideEscape && !leftEscape) {
+      visible++;
+    }
+    if (!astralRegex.test(character) && isFullwidthCodePoint(character.codePointAt())) {
+      visible++;
+      if (typeof end !== "number") {
+        stringEnd++;
+      }
+    }
+    if (visible > begin && visible <= stringEnd) {
+      output += character;
+    } else if (visible === begin && !isInsideEscape && ansiCode !== void 0) {
+      output = checkAnsi(ansiCodes);
+    } else if (visible >= stringEnd) {
+      output += checkAnsi(ansiCodes, true, ansiCode);
+      break;
+    }
+  }
+  return output;
+}
+
+// node_modules/.pnpm/log-update@5.0.1/node_modules/log-update/index.js
+var defaultTerminalHeight = 24;
+var getWidth = (stream) => {
+  const { columns } = stream;
+  if (!columns) {
+    return 80;
+  }
+  return columns;
+};
+var fitToTerminalHeight = (stream, text) => {
+  const terminalHeight = stream.rows || defaultTerminalHeight;
+  const lines = text.split("\n");
+  const toRemove = lines.length - terminalHeight;
+  if (toRemove <= 0) {
+    return text;
+  }
+  return sliceAnsi(
+    text,
+    stripAnsi(lines.slice(0, toRemove).join("\n")).length + 1
+  );
+};
+function createLogUpdate(stream, { showCursor = false } = {}) {
+  let previousLineCount = 0;
+  let previousWidth = getWidth(stream);
+  let previousOutput = "";
+  const render = (...arguments_) => {
+    if (!showCursor) {
+      cli_cursor_default.hide();
+    }
+    let output = arguments_.join(" ") + "\n";
+    output = fitToTerminalHeight(stream, output);
+    const width = getWidth(stream);
+    if (output === previousOutput && previousWidth === width) {
+      return;
+    }
+    previousOutput = output;
+    previousWidth = width;
+    output = wrapAnsi(output, width, {
+      trim: false,
+      hard: true,
+      wordWrap: false
+    });
+    stream.write(ansi_escapes_default.eraseLines(previousLineCount) + output);
+    previousLineCount = output.split("\n").length;
+  };
+  render.clear = () => {
+    stream.write(ansi_escapes_default.eraseLines(previousLineCount));
+    previousOutput = "";
+    previousWidth = getWidth(stream);
+    previousLineCount = 0;
+  };
+  render.done = () => {
+    previousOutput = "";
+    previousWidth = getWidth(stream);
+    previousLineCount = 0;
+    if (!showCursor) {
+      cli_cursor_default.show();
+    }
+  };
+  return render;
+}
+var logUpdate = createLogUpdate(process2__default.default.stdout);
+var log_update_default = logUpdate;
+createLogUpdate(process2__default.default.stderr);
+
+// lib/log/spinner.ts
+var import_ansis3 = __toESM(require_ansis());
+function getSpinner() {
+  let interval;
+  let active = false;
+  const frames = [
+    "\u280B",
+    "\u2819",
+    "\u2839",
+    "\u2838",
+    "\u283C",
+    "\u2834",
+    "\u2826",
+    "\u2827",
+    "\u2807",
+    "\u280F"
+  ];
+  const size2 = frames.length;
+  const spinner2 = function spinner3(text, ln = true, color = "pink") {
+    active = true;
+    let f = 0;
+    interval = setInterval(() => {
+      if (!active)
+        return;
+      log_update_default(`${ln ? line.gray : ""}${import_ansis3.default[color](`${frames[f = ++f % size2]}`)}${text ? ` ${text}` : ""}`);
+    }, 50);
+  };
+  defineProperty(spinner2, "active", { get() {
+    return active;
+  } });
+  spinner2.stop = function(text) {
+    if (!active)
+      return;
+    active = false;
+    if (text) {
+      log_update_default(line.gray + text);
+      log_update_default.done();
+    } else {
+      log_update_default.clear();
+    }
+    clearInterval(interval);
+    interval = void 0;
+  };
+  return spinner2;
+}
+
+// lib/cli/progress.ts
+var import_ansis4 = __toESM(require_ansis());
+function progress(total, opts = {}) {
+  const options = assign({
+    showPercentage: true,
+    barColor: "neonGreen",
+    percentColor: "whiteBright",
+    barSize: 40,
+    clearOnComplete: false
+  }, opts);
+  let percent = 0;
+  function align(output) {
+    return line.gray + output + " ".repeat(Math.max(0, options.barSize - output.length));
+  }
+  function bar(length2, empty = false) {
+    return (empty ? "\u25B1" : "\u25B0").repeat(length2);
+  }
+  function stop() {
+    if (options.clearOnComplete)
+      console.clear();
+  }
+  function increment(incrementBy = 1) {
+    const filled = percent + incrementBy;
+    percent = Math.min(filled, total);
+    if (percent === total)
+      stop();
+  }
+  function decrement(decrementBy = 1) {
+    const filled = percent - decrementBy;
+    percent = Math.max(filled, 0);
+  }
+  function render() {
+    const progress2 = Math.round(percent / total * options.barSize);
+    const filled = bar(progress2);
+    const empty = bar(options.barSize - progress2, true);
+    let output = import_ansis4.default[options.barColor](filled) + lightGray(empty);
+    if (options.showPercentage) {
+      output += ` ${String(Math.round(percent / total * 100))}%`;
+    }
+    return align(output);
+  }
+  return {
+    stop,
+    increment,
+    decrement,
+    render,
+    /**
+     * Returns the percent filled amount
+     */
+    get percent() {
+      return percent;
+    }
+  };
+}
+var warnings = {};
+function warnOption(group2) {
+  if (!has(group2, warnings))
+    warnings[group2] = [];
+  return (message2, value) => {
+    if (isUndefined(value)) {
+      warnings[group2].push(line.yellow + yellowBright(message2));
+    } else {
+      warnings[group2].push(line.yellow + yellowBright(message2 + COL + " " + bold(value)));
+    }
+  };
+}
+function typeError({
+  option,
+  name,
+  provided,
+  expects
+}) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  error(
+    "\n\n",
+    red(`${bold(`Invalid ${cyan(option)} type value provided`)}`) + "\n\n",
+    red(`The ${cyan(name)} option has an incorrect type value`) + "\n\n",
+    red(`provided${COL} ${yellowBright(type(provided).toLowerCase())}`) + "\n",
+    red(`expected${COL} ${blue(expects.replace(/([|,])/g, gray("$1")))}`) + "\n\n",
+    red(`in${COL} ${gray.underline($.file.base)}`) + "\n\n",
+    white.bold("How to fix?") + "\n",
+    `
+    ${gray("You need to change the option value to use the")} ${blue("expected")} ${gray("type.")}
+    ${gray(`Use the ${cyan("defineConfig")} named export for type checking`)}
+    `
+  );
+  process.exit(0);
+}
+function invalidCommand({
+  message: message2,
+  expected,
+  provided = void 0,
+  fix
+}) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  if (!provided) {
+    provided = process2.argv.slice(2).join(" ");
+    expected = white("syncify " + provided + " ") + blue(expected.replace(/([|,])/g, gray("$1")));
+  } else {
+    expected = white("syncify " + expected + " ");
+  }
+  error(
+    "\n\n",
+    // ERROR DESCRIPTION
+    red(`${bold("Invalid or incomplete command passed")}`) + "\n\n",
+    red(isArray(message2) ? message2.join("\n ") : message2) + "\n\n",
+    // PROVIDED / EXPECTED
+    red(`provided${COL} ${white("$")} ${white("syncify " + provided)}`) + "\n",
+    red(`expected${COL} ${white("$")} ${expected}`) + "\n\n",
+    // HOW TO FIX
+    white.bold("How to fix?") + "\n",
+    gray(isArray(fix) ? fix.join("\n ") : fix),
+    "\n"
+  );
+  process.exit(0);
+}
+function invalidTarget({
+  type: type2,
+  message: message2,
+  provided,
+  expected,
+  fix
+}) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  if (REGEX_OR_CHARS.test(provided)) {
+    provided = provided.replace(REGEX_OR_CHARS, gray("$1"));
+  }
+  if (REGEX_OR_CHARS.test(expected)) {
+    expected = expected.replace(REGEX_OR_CHARS, gray("$1"));
+  }
+  if (isArray(message2)) {
+    message2 = message2.join("\n ");
+  }
+  error(
+    "\n\n",
+    // ERROR DESCRIPTION
+    red(bold(`Invalid ${cyan(type2)} target provided`)) + "\n\n",
+    red(message2) + "\n\n",
+    // PROVIDED / EXPECTED
+    red(`provided${COL} ${yellowBright(expected)}`) + "\n",
+    red(`expected${COL} ${blue(provided)}`) + "\n\n",
+    // HOW TO FIX
+    white.bold("How to fix?") + "\n",
+    gray(isArray(fix) ? fix.join("\n") : fix)
+  );
+  process.exit(0);
+}
+function missingDependency(deps) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  if (isString(deps)) {
+    error(
+      "\n\n",
+      // ERROR MESSAGE
+      red(`${bold(`Missing ${cyan(deps)} dependency`)}`) + "\n\n",
+      red(`You need to install ${cyan(deps)} to use it as a processor`) + "\n\n",
+      // HOW TO FIX
+      white.bold("How to fix?") + "\n\n",
+      `$ ${blue.bold("pnpm add " + deps + " -D")}
+
+`,
+      gray("If you are using a different package manager (i.e: Yarn or NPM) then"),
+      gray("please consider adopting pnpm. Pnpm is dope and does dope shit.")
+    );
+  } else {
+    error(
+      "\n\n",
+      red(`${bold(`Missing ${cyan(`${deps.length}`)} dependencies`)}`) + "\n\n",
+      red("You are attempting to use processors which are not yet installed!") + "\n\n",
+      whiteBright(gray("-") + " " + deps.join("\n" + gray(" -") + " ")) + "\n\n",
+      white.bold("How to fix?") + "\n",
+      `
+     $ ${blueBright("pnpm add " + deps.join(" ") + " -D")}
+
+     ${gray("If you are using a different package manager (i.e: Yarn or NPM) then")}
+     ${gray("please consider adopting pnpm. Pnpm is dope and does dope shit.")}
+     `
+    );
+  }
+  process.exit(0);
+}
+function missingOption(option, name, expects, why) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  if (option.indexOf(".") > -1)
+    option = option.split(".").filter(Boolean).join(gray(" \u2192 "));
+  error(
+    "\n\n",
+    red(`${bold(`Missing ${LCB} ${cyan(option)} ${RCB} configuration option`)}`) + "\n\n",
+    red(`The ${cyan(name)} option needs to be defined`) + "\n\n",
+    red(`expects${COL} ${blue(expects.replace(/([|,])/g, gray("$1")))}`) + "\n\n",
+    red(`at${COL} ${gray.underline($.file.base)}`) + "\n\n",
+    white.bold("Why?") + "\n\n" + gray(isArray(why) ? ` ${why.join("\n ")}` : ` ${why}`) + "\n\n"
+  );
+  process.exit(0);
+}
+function invalidError(option, name, value, expects) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  error(
+    "\n\n",
+    redBright.bold("ERROR (!)"),
+    "\n\n",
+    red(`${bold(`Invalid ${cyan(option)} configuration`)}`) + "\n\n",
+    red(`The ${cyan(name)} option has an invalid or missing value`) + "\n\n",
+    red(`provided${COL} ${yellowBright(value)}`) + "\n",
+    red(`expected${COL} ${blue(expects.replace(/([|,])/g, gray("$1")))}`) + "\n\n",
+    white.bold("How to fix?") + "\n",
+    `
+    ${gray("You need to update the option and use one of the expected values.")}
+    ${gray(`Use the ${cyan("defineConfig")} named export for type checking`)}
+    `
+  );
+  process.exit(0);
+}
+function missingConfig(cwd) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  error(
+    "\n\n",
+    redBright.bold("ERROR (!)"),
+    "\n\n",
+    red(`${bold(`Missing ${cyan("syncify.config.js")} configuration`)}`) + "\n\n",
+    red("Unable to resolve a configuration file within the workspace") + "\n\n",
+    red(`at${COL} ${gray.underline(cwd)}`) + "\n\n",
+    white.bold("How to fix?") + "\n",
+    `
+    ${gray("You need to add one the following files to your project")}
+
+    ${gray("-")} ${white("syncify.config.ts")}
+    ${gray("-")} ${white("syncify.config.js")}
+    ${gray("-")} ${white("syncify.config.mjs")}
+    ${gray("-")} ${white("syncify.config.cjs")}
+    ${gray("-")} ${white("syncify.config.json")}
+
+    ${gray("You can also provide configuration in your")} ${white("package.json")}
+    ${gray("file using on a")} ${yellowBright('"syncify": {}')} ${gray("property.")}
+    `
+  );
+  process.exit(0);
+}
+function throwError(message2, solution) {
+  loggers_exports.group();
+  error(
+    "\n\n",
+    redBright.bold("(!) ERROR"),
+    "\n\n",
+    red.bold(message2) + "\n\n",
+    white.bold("How to fix?") + "\n",
+    gray(isArray(solution) ? solution.join("\n").trimStart() : solution),
+    "\n\n"
+  );
+  process.exit(0);
+}
+function unknownError(option, value) {
+  loggers_exports.write(redBright.bold("\u26D2 FAILED"));
+  loggers_exports.group();
+  if (option.indexOf(".") > -1) {
+    option = gray.bold("{ ") + option.split(".").filter(Boolean).join(gray(" \u2192 ")) + gray(" \u2192 ") + redBright.bold(value) + gray.bold(" }");
+  }
+  const cfile = $.file.base === "package.json" ? `${blue("syncify")} config in the ${blue("package.json")} file.` : `${blue($.file.base)} file.`;
+  error(
+    "\n\n",
+    redBright.bold("ERROR (!)"),
+    "\n\n",
+    redBright(`Unknown ${option} option provided.`) + "\n\n",
+    white.bold("How to fix?") + "\n",
+    `
+    ${gray(`The ${blue(value)} option is invalid or unsupported.`)}
+    ${gray(`You need to remove it from the ${cfile}`)}
+    `
+  );
+  process.exit(0);
+}
+
+// lib/log/start.ts
+function runtime($2) {
+  log(clear);
+  const text = [];
+  text.push(
+    `${open}${gray("Syncify")} ${gray("~")} ${gray(getTime())}`,
+    `${line.gray}`
+  );
+  getTerminalWarning(text, $2.terminal.cols);
+  text.push(
+    `${line.gray}${whiteBright.bold(`v${$2.version}`)}`,
+    `${line.gray}`
+  );
+  log(text.join("\n"));
+}
+function start($2) {
+  if ($2.mode.metafields)
+    return "";
+  const text = [];
+  const { mode, spawn: spawn4, sync: sync4 } = $2;
+  const _st = sync4.stores.length;
+  const _th = sync4.themes.length;
+  const _ss = keys($2.spawn.commands).length;
+  const oNC = neonRouge.bold.open;
+  const cNC = neonRouge.bold.close;
+  const stores = oNC + String(_st) + cNC + (_st > 1 ? " stores" : " store");
+  const themes = oNC + String(_th) + cNC + (_th > 1 ? " themes" : " theme");
+  const env2 = oNC + `${$2.env.dev ? "development" : "production"}`.toUpperCase() + cNC;
+  if (mode.export) {
+    if (mode.build) {
+      text.push(`${line.gray}Running  ${ARR}  ${oNC + "clean" + cNC}   ${gray("--clean")}`);
+      text.push(`${line.gray}Running  ${ARR}  ${oNC + "build" + cNC}   ${gray("--build")}`);
+    }
+    if ($2.vc.update !== null) {
+      text.push(`${line.gray}Running  ${ARR}  ${oNC + "bump" + cNC}  ${gray("--bump")}`);
+    }
+    text.push(`${line.gray}Running  ${ARR}  ${oNC + "export" + cNC}  ${gray("--export")}`);
+  } else {
+    if (mode.build) {
+      text.push(`${line.gray}${env2}`, line.gray);
+      text.push(`${line.gray}Running  ${ARR}  ${oNC + "clean" + cNC}   ${gray("--clean")}`);
+      text.push(`${line.gray}Running  ${ARR}  ${oNC + "build" + cNC}   ${gray("--build")}`);
+    } else if (mode.watch) {
+      text.push(`${line.gray}Running ${oNC + "watch" + cNC} in ${env2}`);
+    } else if (mode.upload) {
+      text.push(`${line.gray}Running ${oNC + "upload" + cNC} mode`);
+    } else if (mode.import) {
+      text.push(`${line.gray}Running ${oNC + "import" + cNC} mode`);
+    } else if (mode.clean) {
+      text.push(`${line.gray}Running ${oNC + "clean" + cNC} mode`);
+    }
+  }
+  if (!mode.export) {
+    text.push(`${line.gray}${_st > 0 && _th > 0 ? `Syncing ${themes} to ${stores}` : ""}`);
+  } else {
+    if (_st > 0 && _th > 0) {
+      text.push(`${line.gray}${_st > 0 && _th > 0 ? `Exporting ${themes} for ${stores}` : ""}`);
+    }
+  }
+  if (!isEmpty($2.filters)) {
+    text.push(
+      line.gray,
+      `${line.gray}${whiteBright.bold("--filters")}`,
+      `${line.gray}` + getFilters($2.cwd, $2.filters)
+    );
+  }
+  if ($2.logger.warnings)
+    getRuntimeWarnings($2, text);
+  if (anyTrue(mode.build, mode.watch) && _ss > 0) {
+    text.push(
+      `${line.gray}Spawned ${oNC + _ss + cNC} child ${_ss > 1 ? "processes" : "process"}`,
+      `${line.gray}`
+    );
+  } else {
+    text.push(line.gray);
+  }
+  if (allFalse(mode.upload, mode.import, mode.build, mode.clean)) {
+    if (_ss > 0) {
+      text.push(
+        `${line.gray}${bold("Child Processes:")}`,
+        `${line.gray}${getSpawnProcessors(toArray(spawn4.streams))}`,
+        `${line.gray}`
+      );
+    }
+    if (_th > 0) {
+      text.push(
+        `${line.gray}${bold("Theme Editors:")}`,
+        `${line.gray}${getThemeURLS(sync4.themes, "editor")}`,
+        `${line.gray}`
+      );
+    }
+  }
+  if (anyTrue(mode.upload, mode.import, mode.watch)) {
+    if (_th > 0) {
+      text.push(
+        `${line.gray}${bold(mode.upload || mode.import ? "Theme Targets:" : "Theme Previews:")}`,
+        `${line.gray}${getThemeURLS(sync4.themes, "preview")}`
+      );
+    }
+  }
+  if ($2.mode.hot)
+    text.push(`${line.gray}`);
+  log(text.join("\n"));
+}
+function getFilters(cwd, filters) {
+  return values(filters).flat().reduce((string, path2, index, size2) => {
+    string += (index > 0 ? "\n" + line.gray : "") + " ".repeat(2) + white(pathe.relative(cwd, path2));
+    return string;
+  }, "");
+}
+function getTerminalWarning(text, cs) {
+  if (cs >= 100)
+    return;
+  text.push(
+    `${line.gray}${red.bold("TERMINAL WIDTH WARNING")}`,
+    `${line.gray}`,
+    `${line.gray}${red(`Your terminal width is below ${bold(`${100}`)} columns (currently ${bold(`${cs}`)})`)}`,
+    `${line.gray}${red("This is not recommended for usage with Syncify (size matters).")}`,
+    `${line.gray}${red("Expand your terminal wider for an optimal logging experience.")}`,
+    `${line.gray}`
+  );
+}
+function getRuntimeWarnings($2, text) {
+  let title = false;
+  for (const prop2 in warnings) {
+    const warn3 = warnings[prop2];
+    if (warn3.length > 0) {
+      if (title === false) {
+        title = true;
+        text.push(
+          `${line.gray}`,
+          `${line.yellow}${yellowBright(`${bold("Warnings")} in ${bold($2.file.base)}`)}`
+        );
+      }
+      text.push(
+        line.yellow,
+        line.yellow + yellow.bold(`${warn3.length} ${prop2} ${plural("warning", warn3.length)}`),
+        line.yellow,
+        warn3.join("\n")
+      );
+    }
+  }
+}
+function getSpawnProcessors(spwns) {
+  const width = spwns.reduce((size2, [name]) => name.length > size2 ? name.length : size2, 0);
+  return spwns.reduce((string, [name, child]) => {
+    string += "\n" + line.gray + " ".repeat(width - name.length) + neonCyan(toUpcase(name)) + `${COL} ` + gray("PID") + " \u2192 " + gray("#") + pink(`${child.pid}`);
+    return string;
+  }, "");
+}
+function getThemeURLS(themes, url) {
+  const width = themes.reduce((size2, { target, store }) => {
+    const name = store.indexOf(".");
+    if (name > size2.store)
+      size2.store = name;
+    if (target.length > size2.theme)
+      size2.theme = target.length;
+    return size2;
+  }, {
+    store: 0,
+    theme: 0
+  });
+  return themes.reduce((string, { target, store, id }) => {
+    const name = store.slice(0, store.indexOf("."));
+    const type2 = url === "editor" ? `https://${store}/admin/themes/${id}/editor` : `https://${store}?preview_theme_id=${id}`;
+    string += "\n" + line.gray + pink(name) + " ".repeat(width.store - name.length) + white("  \u2192  ") + pink.bold(target) + " ".repeat(width.theme - target.length) + white(" \u2192  ") + gray.underline(type2);
+    return string;
+  }, "");
+}
+
+// lib/log/loggers.ts
+function console2(...message2) {
+  log(util.inspect(message2, { colors: true, showHidden: true }));
+}
+var spinner = getSpinner();
+var state = {
+  idle: false,
+  group: "Syncify",
+  title: "",
+  uri: "",
+  listen: null,
+  queue: /* @__PURE__ */ new Set()
+};
+function build(id, count, file) {
+  const close2 = state.title !== id;
+  timer.start();
+  if (close2) {
+    log(closer(state.group));
+  }
+  if (state.group === "Syncify")
+    clear2();
+  if (close2) {
+    log(opener(state.group) + newline + bold(`${count} ${toUpcase(id)}`) + nextline);
+    state.group = id;
+    state.title = id;
+  }
+  log(nextline + tree("top", neonCyan(isString(file) ? file : file.relative)));
+}
+function nwl(entry = "gray") {
+  if (isEmpty(entry)) {
+    log("\n");
+  } else {
+    log(line[entry]);
+  }
+}
+function err(input) {
+  if (isArray(input)) {
+    error(red(input.map((text) => line.red + sanitize(text)).join("\n")));
+  } else {
+    error(line.red + sanitize(input));
+  }
+}
+function write2(input) {
+  if (isArray(input)) {
+    log(input.map((text) => line.gray + sanitize(text)).join("\n"));
+  } else {
+    log(line.gray + sanitize(input));
+  }
+}
+function external(operation) {
+  log(suffix("cyan", "external", operation));
+}
+function hook(name) {
+  if (warning2.current !== name)
+    warning2.current = name;
+  if (!has(name, warning2.process)) {
+    warning2.current = name;
+    warning2.process[name] = /* @__PURE__ */ new Set();
+  }
+  state.listen = intercept((stream, data) => {
+    if (data.charCodeAt(0) === 9474) {
+      process6[stream].write(data);
+    } else {
+      warning2.count += 1;
+      const text = data.split("\n");
+      while (text.length !== 0) {
+        warning2.process[name].add(`${yellowBright(text.shift().trimStart())}`);
+      }
+    }
+  });
+}
+function unhook() {
+  state.listen();
+  state.listen = null;
+}
+function group(name, clearLog = false) {
+  log(closer(state.group));
+  if (clearLog)
+    clear2();
+  if (isString(name)) {
+    log(opener(name) + nextline);
+    state.group = name;
+  }
+}
+function updated(file, msg) {
+  log(suffix("greenBright", "updated", `${file.relative} ${suffix ? gray(`~ ${msg}`) : ""}`));
+}
+function changed(file) {
+  const close2 = state.title !== file.namespace;
+  timer.start();
+  if (close2)
+    log(closer(state.group));
+  if (state.group !== "Syncify" && close2)
+    clear2();
+  state.group = `${file.kind} ${toUpcase(file.namespace)}`;
+  if (close2) {
+    clear2();
+    log(opener(state.group));
+    state.title = file.namespace;
+  }
+  if (!has(file.relative, warning2))
+    warning2[file.relative] = /* @__PURE__ */ new Set();
+  if (state.uri !== file.relative)
+    state.uri = file.relative;
+  if ($.mode.watch) {
+    log(nextline + suffix("neonCyan", "changed", file.relative));
+  }
+}
+function hot() {
+  log(suffix("neonRouge", "reloaded", `${bold("HOT RELOAD")}${time(timer.now())}`));
+}
+function resource(type2, store) {
+  if ($.mode.watch) {
+    state.queue.add([
+      type2,
+      store.domain,
+      timer.stop()
+    ]);
+    if (state.idle)
+      return;
+    state.idle = true;
+    queue.onIdle().then(() => {
+      for (const [
+        type3,
+        store2,
+        ctime
+      ] of state.queue) {
+        log(suffix("neonGreen", "uploaded", `${bold(type3)} \u2192 ${store2}` + time(ctime)));
+      }
+      state.queue.clear();
+      state.idle = false;
+    });
+  } else {
+    log(suffix("neonGreen", "uploaded", `${bold(type2)} \u2192 ${store.domain}` + time(timer.stop())));
+  }
+}
+function upload(theme) {
+  if ($.mode.watch) {
+    state.queue.add(
+      [
+        theme.target,
+        theme.store,
+        timer.stop()
+      ]
+    );
+    if (state.idle)
+      return;
+    state.idle = true;
+    queue.onIdle().then(() => {
+      for (const [
+        target,
+        store,
+        ctime
+      ] of state.queue) {
+        log(suffix("neonGreen", "uploaded", `${bold(target)} \u2192 ${store}` + time(ctime)));
+      }
+      state.queue.clear();
+      state.idle = false;
+    });
+  } else {
+    log(suffix("neonGreen", "uploaded", `${bold(theme.target)} \u2192 ${theme.store}` + time(timer.stop())));
+  }
+}
+function prompt(message2, notify) {
+  log(suffix("orange", "prompt", message2));
+  nwl();
+  log(closer(state.group) + "\n");
+  if (isObject(notify))
+    notifier__default.default.notify(notify).notify();
+  return () => {
+    log(opener(state.group) + nextline);
+  };
+}
+function syncing(path2, hot2 = false) {
+  if ($.mode.export || $.mode.build)
+    return;
+  if (warning2.count > 0) {
+    log(suffix(
+      "yellowBright",
+      "warning",
+      `${warning2.count} ${plural("warning", warning2.count)}`
+    ));
+  }
+  if (hot2) {
+    log(suffix(
+      "magentaBright",
+      "syncing",
+      path2
+    ));
+    if (queue.pending > 2) {
+      log(suffix(
+        "orange",
+        "queued",
+        `${path2} ${TLD} ${bold(addSuffix(queue.pending))} in queue`
+      ));
+    }
+  } else {
+    log(suffix(
+      "magentaBright",
+      "syncing",
+      path2
+    ));
+    if (queue.pending > 0) {
+      log(suffix(
+        "orange",
+        "queued",
+        `${path2} ${TLD} ${bold(addSuffix(queue.pending))} in queue`
+      ));
+    }
+  }
+}
+function process6(name, ...message2) {
+  if ($.mode.export || $.mode.build)
+    return;
+  let cnow = message2[0];
+  let text = "";
+  if (message2.length === 2) {
+    text = ` ${CHV} ${message2[0]}`;
+    cnow = message2[1];
+  }
+  log(suffix(
+    "whiteBright",
+    "process",
+    `${bold(name)}${text}${time(cnow)}`
+  ));
+}
+function exported(file) {
+  log(suffix(
+    "whiteBright",
+    "exports",
+    file
+  ));
+}
+function importer(message2) {
+  if (!$.mode.build) {
+    log(suffix(
+      "lavender",
+      "importer",
+      message2
+    ));
+  }
+}
+function transform(message2) {
+  if ($.mode.export || $.mode.build)
+    return;
+  log(suffix(
+    "whiteBright",
+    "transform",
+    message2
+  ));
+}
+function warn2(message2, fix) {
+  log(suffix(
+    "yellowBright",
+    "warning",
+    `${message2}${fix ? gray(` ~ ${fix}`) : ""}`
+  ));
+}
+function retrying(file, theme) {
+  log(suffix(
+    "orange",
+    "retrying",
+    `${file} \u2192 ${theme.target} ${gray(`~ ${theme.store}`)}`
+  ));
+}
+function deleted(file, theme) {
+  log(suffix(
+    "blueBright",
+    "deleted",
+    `${file} ${ARR} ${theme.target} ${gray(`~ ${theme.store}`)}`
+  ));
+}
+function minified(kind, before, after, saved) {
+  if ($.mode.export || $.mode.build)
+    return;
+  const msg = kind ? `${bold(kind)} ${ARR} ${before} ${ARL} ${after} ${gray(`~ saved ${saved}`)}` : `${before} ${ARL} ${after} ${gray(`~ saved ${saved}`)}`;
+  log(suffix("whiteBright", "minified", msg));
+}
+function reloaded(path2, time2) {
+  log(suffix(
+    "whiteBright",
+    "reloaded",
+    `${path2}${time2}`
+  ));
+}
+function skipped(file, reason) {
+  if ($.mode.export || $.mode.build)
+    return;
+  log(suffix(
+    "gray",
+    "skipped",
+    `${typeof file === "string" ? file : file.key} ~ ${reason}`
+  ));
+}
+function ignored(path2) {
+  log(suffix("gray", "ignored", path2));
+}
+function invalid(path2, message2) {
+  log(suffix("red", "invalid", path2));
+  const notification = notifier__default.default.notify({
+    title: "Syncify Error",
+    sound: "Pop",
+    open: path2,
+    subtitle: path2,
+    message: "Invalid error"
+  });
+  notification.notify();
+  if (message2) {
+    if (isArray(message2)) {
+      error("\n", red(message2.map((text) => `${line.red}${sanitize(text)}`).join("\n")));
+    } else {
+      error("\n", `${line.red}${sanitize(message2)}`);
+    }
+  }
+}
+function failed(path2) {
+  log(suffix("red", "failed", path2));
+  const notification = notifier__default.default.notify({
+    title: "Syncify Error",
+    sound: "Pop",
+    open: path2,
+    subtitle: path2,
+    message: "Request failed"
+  });
+  notification.notify();
+}
+function configChanges() {
+  nwl("yellow");
+  log(`${line.yellow}${bold.yellow(`WARNING ${TLD} RESTART IS REQUIRED`)}`);
+  nwl("yellow");
+  log(
+    line.yellow + bold.yellow(`Changes to ${neonCyan($.file.base)} require you restart watch mode.`) + "\n" + line.yellow + bold.yellow("Failure to restart watch mode will prevent changes from being reflected.")
+  );
+  nwl("yellow");
+  const notification = notifier__default.default.notify({
+    title: "WARNING",
+    sound: "Pop",
+    wait: true,
+    message: `Changes in ${$.file.base} will not reflect until you to restart watch mode.`
+  });
+  notification.notify();
+}
+function throws(data) {
+  throw new Error(data);
+}
+function spawn2(name) {
+  return (...input) => {
+    if (!$.spawn.invoked)
+      $.spawn.invoked = true;
+    if (state.group !== "Spawn") {
+      log(closer(state.group));
+      if (state.group !== "Syncify")
+        clear2();
+      log(opener("Spawn"));
+      state.group = "Spawn";
+    }
+    if (state.title !== name) {
+      log(message("pink", name));
+      state.title = name;
+    }
+    spawn(sanitize(input.shift()));
+  };
+}
+
+// lib/log/warnings.ts
+var warnings_exports = {};
+__export(warnings_exports, {
+  esbuild: () => esbuild2,
+  postcss: () => postcss2,
+  sass: () => sass2,
+  stack: () => stack2
+});
+var stack2 = {};
+var sass2 = (file) => (message2, options) => {
+  let output = "";
+  if (!has(file.input, stack2)) {
+    stack2[file.input] = /* @__PURE__ */ new Map([["sass", /* @__PURE__ */ new Set()]]);
+  } else {
+    if (!stack2[file.input].has("sass")) {
+      stack2[file.input].set("sass", /* @__PURE__ */ new Set());
+    }
+  }
+  const cache = stack2[file.input].get("sass");
+  output += tui_exports.indent(message2, {
+    nwl: true,
+    line: line.yellow,
+    text: yellowBright.bold
+  });
+  if (has("span", options)) {
+    const span = has("start", options.span) && has("end", options.span) ? {
+      start: options.span.start.line,
+      end: options.span.end.line
+    } : null;
+    const code = has("context", options.span) ? options.span.context : has("text", options.span) ? options.span.text : null;
+    if (code !== null) {
+      if (span !== null) {
+        output += tui_exports.sample(code, {
+          line: line.yellow,
+          span
+        });
+      } else {
+        output += tui_exports.sample(code);
+      }
+    }
+  }
+  output += tui_exports.context({
+    stack: options.stack,
+    entries: {
+      file: file.relative,
+      deprecated: options.deprecation ? "Yes" : "No"
+    }
+  });
+  if (!cache.has(output)) {
+    cache.add(output);
+    log(tui_exports.suffix("yellowBright", "warning", `${cache.size} ${plural("warning", cache.size) + warning}`));
+  } else {
+    log(tui_exports.suffix("yellowBright", "warning", `${cache.size} ${plural("warning", cache.size) + warning}`));
+  }
+};
+function esbuild2(data) {
+}
+function postcss2(file, data) {
+  let output = "";
+  if (!has(file.input, stack2)) {
+    stack2[file.input] = /* @__PURE__ */ new Map([["postcss", /* @__PURE__ */ new Set()]]);
+  } else {
+    if (!stack2[file.input].has("postcss")) {
+      stack2[file.input].set("postcss", /* @__PURE__ */ new Set());
+    }
+  }
+  const cache = stack2[file.input].get("postcss");
+  output += tui_exports.sample(data.node.toString(), {
+    line: line.yellow,
+    span: isNumber(data.endLine) ? {
+      start: data.line,
+      end: data.endLine
+    } : {
+      start: data.line,
+      end: data.endLine
+    }
+  });
+  output += tui_exports.context({
+    stack: false,
+    entries: {
+      column: data.column,
+      file: file.relative,
+      plugin: data.plugin
+    }
+  });
+  if (!cache.has(output)) {
+    cache.add(output);
+    warn(output);
+  }
+}
+
+// lib/cli/emitters.ts
+function signal() {
+  loggers_exports.nwl("");
+  loggers_exports.out(gray("SIGINT"));
+  process.exit();
+}
+
+// node_modules/.pnpm/p-map@6.0.0/node_modules/p-map/index.js
+var AbortError3 = class extends Error {
+  constructor(message2) {
+    super();
+    this.name = "AbortError";
+    this.message = message2;
+  }
+};
+var getDOMException2 = (errorMessage) => globalThis.DOMException === void 0 ? new AbortError3(errorMessage) : new DOMException(errorMessage);
+var getAbortedReason2 = (signal2) => {
+  const reason = signal2.reason === void 0 ? getDOMException2("This operation was aborted.") : signal2.reason;
+  return reason instanceof Error ? reason : getDOMException2(reason);
+};
+async function pMap(iterable, mapper, {
+  concurrency = Number.POSITIVE_INFINITY,
+  stopOnError = true,
+  signal: signal2
+} = {}) {
+  return new Promise((resolve2, reject_) => {
+    if (iterable[Symbol.iterator] === void 0 && iterable[Symbol.asyncIterator] === void 0) {
+      throw new TypeError(`Expected \`input\` to be either an \`Iterable\` or \`AsyncIterable\`, got (${typeof iterable})`);
+    }
+    if (typeof mapper !== "function") {
+      throw new TypeError("Mapper function is required");
+    }
+    if (!((Number.isSafeInteger(concurrency) || concurrency === Number.POSITIVE_INFINITY) && concurrency >= 1)) {
+      throw new TypeError(`Expected \`concurrency\` to be an integer from 1 and up or \`Infinity\`, got \`${concurrency}\` (${typeof concurrency})`);
+    }
+    const result = [];
+    const errors2 = [];
+    const skippedIndexesMap = /* @__PURE__ */ new Map();
+    let isRejected = false;
+    let isResolved = false;
+    let isIterableDone = false;
+    let resolvingCount = 0;
+    let currentIndex = 0;
+    const iterator = iterable[Symbol.iterator] === void 0 ? iterable[Symbol.asyncIterator]() : iterable[Symbol.iterator]();
+    const reject = (reason) => {
+      isRejected = true;
+      isResolved = true;
+      reject_(reason);
+    };
+    if (signal2) {
+      if (signal2.aborted) {
+        reject(getAbortedReason2(signal2));
+      }
+      signal2.addEventListener("abort", () => {
+        reject(getAbortedReason2(signal2));
+      });
+    }
+    const next = async () => {
+      if (isResolved) {
+        return;
+      }
+      const nextItem = await iterator.next();
+      const index = currentIndex;
+      currentIndex++;
+      if (nextItem.done) {
+        isIterableDone = true;
+        if (resolvingCount === 0 && !isResolved) {
+          if (!stopOnError && errors2.length > 0) {
+            reject(new AggregateError(errors2));
+            return;
+          }
+          isResolved = true;
+          if (skippedIndexesMap.size === 0) {
+            resolve2(result);
+            return;
+          }
+          const pureResult = [];
+          for (const [index2, value] of result.entries()) {
+            if (skippedIndexesMap.get(index2) === pMapSkip) {
+              continue;
+            }
+            pureResult.push(value);
+          }
+          resolve2(pureResult);
+        }
+        return;
+      }
+      resolvingCount++;
+      (async () => {
+        try {
+          const element = await nextItem.value;
+          if (isResolved) {
+            return;
+          }
+          const value = await mapper(element, index);
+          if (value === pMapSkip) {
+            skippedIndexesMap.set(index, value);
+          }
+          result[index] = value;
+          resolvingCount--;
+          await next();
+        } catch (error3) {
+          if (stopOnError) {
+            reject(error3);
+          } else {
+            errors2.push(error3);
+            resolvingCount--;
+            try {
+              await next();
+            } catch (error4) {
+              reject(error4);
+            }
+          }
+        }
+      })();
+    };
+    (async () => {
+      for (let index = 0; index < concurrency; index++) {
+        try {
+          await next();
+        } catch (error3) {
+          reject(error3);
+          break;
+        }
+        if (isIterableDone || isRejected) {
+          break;
+        }
+      }
+    })();
+  });
+}
+var pMapSkip = Symbol("skip");
+function globPath(path2) {
+  return isArray(path2) ? path2.filter((uri) => /\*/.test(uri)) : /\*/.test(path2) ? path2 : null;
+}
+function lastPath(path2) {
+  if (isArray(path2))
+    return path2.map(lastPath);
+  if (path2.indexOf("/") === -1)
+    return path2;
+  const dir = pathe.dirname(path2);
+  const ender = dir.lastIndexOf("/") + 1;
+  return dir.slice(ender);
+}
+function parentPath(path2) {
+  if (isArray(path2))
+    return path2.map(parentPath);
+  const last2 = path2.lastIndexOf("/");
+  if (last2 === -1)
+    return path2;
+  const glob10 = path2.indexOf("*");
+  return glob10 === -1 ? path2.slice(0, last2) : path2.slice(0, glob10);
+}
+function normalPath(input) {
+  const regex2 = new RegExp(`^\\.?\\/?${input}\\/`);
+  return function prepend(path2) {
+    if (isArray(path2))
+      return path2.map(prepend);
+    const ignore = path2.charCodeAt(0) === 33;
+    if (ignore)
+      path2 = path2.slice(1);
+    if (regex2.test(path2))
+      return ignore ? "!" + path2 : path2;
+    if (path2.charCodeAt(0) === 46 && path2.charCodeAt(1) === 46 && path2.charCodeAt(2) === 47) {
+      throwError(
+        `Invalid path defined at: ${COL} ${yellowBright(`"${path2}"`)}`,
+        "Paths must be relative to source"
+      );
+    }
+    return (ignore ? "!" : "") + pathe.join(input, path2);
+  };
+}
+var basePath = (cwd) => (path2) => {
+  if (path2.indexOf("*") !== -1) {
+    throwError(
+      `Base directory path cannot contain glob${COL} ${yellowBright(`"${path2}"`)}`,
+      "Ensure that path you are resolving is correctly formed"
+    );
+  }
+  if (path2.charCodeAt(0) === 46) {
+    if (path2.length === 1)
+      return cwd + "/";
+    if (path2.charCodeAt(1) === 47) {
+      path2 = path2.slice(1);
+    } else {
+      throwError(
+        `Directory path is invalid at${COL} ${yellowBright(`"${path2}"`)}`,
+        "Ensure that path you are resolving is correctly formed"
+      );
+    }
+  }
+  if (path2.charCodeAt(0) === 47) {
+    if (path2.length === 1) {
+      return cwd + "/";
+    } else {
+      path2 = path2.slice(1);
+    }
+  }
+  if (/^[a-zA-Z0-9_-]+/.test(path2)) {
+    path2 = pathe.join(cwd, path2);
+    return last(path2).charCodeAt(0) === 47 ? path2 : path2 + "/";
+  } else {
+    throwError(
+      `Directory path is invalid at${COL} ${yellowBright(`"${path2}"`)}`,
+      "Ensure that path you are resolving is correctly formed"
+    );
+  }
+};
+
+// lib/process/context.ts
+function svg(file) {
+  const config = $.svg.filter((context2) => {
+    if (context2.input.has(file.input))
+      return true;
+    if (!context2.match(file.input))
+      return false;
+    context2.input.add(file.input);
+    return true;
+  });
+  if (isUndefined(config))
+    return file;
+  defineProperty(file, "data", { get() {
+    return config;
+  } });
+  return file;
+}
+function style(file) {
+  const config = $.style.find((x) => x.watch(file.input));
+  if (isUndefined(config))
+    return file;
+  defineProperty(file, "data", { get() {
+    return config;
+  } });
+  if (config.snippet) {
+    file.namespace = "snippets";
+    file.key = pathe.join("snippets", config.rename);
+  } else {
+    file.key = pathe.join("assets", config.rename);
+  }
+  if (file.output) {
+    if (file.data.rename !== pathe.basename(file.output)) {
+      if (config.snippet) {
+        file.output = pathe.join($.dirs.output, file.key);
+      } else {
+        file.output = pathe.join(parentPath(file.output), file.data.rename);
+      }
+    }
+  } else {
+    file.output = pathe.join($.dirs.output, file.key);
+  }
+  return file;
+}
+function script(file) {
+  const config = $.script.filter((config2) => config2.watch.has(file.input));
+  if (config.length === 0)
+    return file;
+  defineProperty(file, "data", { get() {
+    return config;
+  } });
+  return file;
+}
+function section(file) {
+  if ($.section.prefixDir) {
+    if (file.base.endsWith("-group.json"))
+      return file;
+    if (isRegex($.section.global) && $.section.global.test(file.input))
+      return file;
+    const last2 = lastPath(file.input);
+    if ($.section.baseDir.has(last2))
+      return file;
+    const rename = lastPath(file.input) + $.section.separator + file.base;
+    file.name = rename;
+    file.key = pathe.join(file.namespace, rename);
+    file.output = pathe.join(pathe.dirname(file.output), rename);
+  }
+  return file;
+}
+function snippet(file) {
+  if ($.snippet.prefixDir) {
+    if (isRegex($.snippet.global) && $.snippet.global.test(file.input))
+      return file;
+    const last2 = lastPath(file.input);
+    if ($.snippet.baseDir.has(last2))
+      return file;
+    const rename = last2 + $.snippet.separator + file.base;
+    file.name = rename;
+    file.key = pathe.join(file.namespace, rename);
+    file.output = pathe.join(pathe.dirname(file.output), rename);
+  }
+  return file;
+}
+
+// lib/process/files.ts
+function getFileKind(ext) {
+  switch (ext) {
+    case ".liquid":
+      return "Liquid" /* Liquid */;
+    case ".json":
+      return "JSON" /* JSON */;
+    case ".html":
+      return "HTML" /* HTML */;
+    case ".md":
+      return "Markdown" /* Markdown */;
+    case ".js":
+    case ".mjs":
+      return "JavaScript" /* JavaScript */;
+    case ".jsx":
+      return "JSX" /* JSX */;
+    case ".ts":
+      return "TypeScript" /* TypeScript */;
+    case ".tsx":
+      return "TSK" /* TSX */;
+    case ".svg":
+      return "SVG" /* SVG */;
+    case ".css":
+      return "CSS" /* CSS */;
+    case ".scss":
+      return "SCSS" /* SCSS */;
+    case ".sass":
+      return "SASS" /* SASS */;
+    case ".mov":
+    case ".mp4":
+    case ".webm":
+    case ".ogg":
+      return "Video" /* Video */;
+    case ".ico":
+    case ".jpg":
+    case ".png":
+    case ".gif":
+    case ".pjpg":
+    case ".webp":
+      return "Image" /* Image */;
+    case ".eot":
+    case ".ttf":
+    case ".woff":
+    case ".woff2":
+      return "Font" /* Font */;
+    case ".pdf":
+      return "PDF" /* PDF */;
+    case ".yaml":
+    case ".yml":
+      return "YAML" /* Yaml */;
+  }
+  return "Unknown" /* Unknown */;
+}
+function renameFile({ name, dir, ext, namespace }, rename) {
+  let newName = rename;
+  if (/\[dir\]/.test(newName))
+    newName = newName.replace(/\[dir\]/g, dir);
+  if (/\[file\]/.test(newName))
+    newName = newName.replace(/\[file\]/g, name);
+  if (/\[ext\]/.test(newName))
+    newName = newName.replace(/\[ext\]/g, ext);
+  if (namespace === "snippets" && rename.endsWith(".liquid") === false)
+    return newName + ".liquid";
+  if (!rename.endsWith(".[ext]") || !rename.endsWith(ext)) {
+    return /\.[a-z]+$/.test(rename) ? newName : newName + ext;
+  }
+  return newName;
+}
+function setFile(parsedFile, input, output) {
+  const file = parsedFile;
+  return (namespace, type2, kind) => {
+    let key;
+    if (type2 === 14 /* Metafield */ || type2 === 15 /* Page */) {
+      key = pathe.join(lastPath(file.dir), file.base);
+      output = null;
+    } else {
+      key = pathe.join(namespace, file.base);
+      output = pathe.join(output, key);
+    }
+    if (kind === -1)
+      input = $.cache.maps[input];
+    return assign({}, file, {
+      uuid: uuid(),
+      type: type2,
+      input,
+      output,
+      key,
+      namespace,
+      kind,
+      relative: pathe.relative($.cwd, input),
+      size: NaN,
+      data: void 0
+    });
+  };
+}
+function setImportFile(parsedFile, output) {
+  const file = parsedFile;
+  return (key, namespace) => {
+    return assign({}, file, {
+      uuid: uuid(),
+      key,
+      namespace,
+      output,
+      kind: getFileKind(file.ext),
+      relative: pathe.relative($.cwd, output)
+    });
+  };
+}
+function parseFile(paths2, output) {
+  return (path2) => {
+    const file = pathe.parse(path2);
+    const define2 = setFile(file, path2, output);
+    if (file.ext === ".liquid") {
+      if (paths2.sections.match(path2)) {
+        return section(define2("sections", 4 /* Section */, "Liquid" /* Liquid */));
+      } else if (paths2.snippets.match(path2)) {
+        return snippet(define2("snippets", 3 /* Snippet */, "Liquid" /* Liquid */));
+      } else if (paths2.layout.match(path2)) {
+        return define2("layout", 2 /* Layout */, "Liquid" /* Liquid */);
+      } else if (paths2.templates.match(path2)) {
+        return define2("templates", 1 /* Template */, "Liquid" /* Liquid */);
+      } else if (paths2.customers.match(path2)) {
+        return define2("templates/customers", 1 /* Template */, "Liquid" /* Liquid */);
+      } else if (paths2.metaobject.match(path2)) {
+        return define2("templates/metaobject", 1 /* Template */, "Liquid" /* Liquid */);
+      } else if (paths2.transforms.has(path2)) {
+        if (paths2.transforms.get(path2) === 8 /* Style */) {
+          return style(define2("snippets", 8 /* Style */, "CSS" /* CSS */));
+        }
+      }
+    } else if (paths2.assets.match(path2)) {
+      if ($.spawn.invoked) {
+        return define2("assets", 16 /* Spawn */);
+      } else if (file.ext === ".ico" || file.ext === ".jpg" || file.ext === ".png" || file.ext === ".gif" || file.ext === ".webp" || file.ext === ".pjpg") {
+        return define2("assets", 13 /* Asset */, "Image" /* Image */);
+      } else if (file.ext === ".mov" || file.ext === ".mp4" || file.ext === ".webm" || file.ext === ".ogg") {
+        return define2("assets", 13 /* Asset */, "Video" /* Video */);
+      } else if (file.ext === ".pdf") {
+        return define2("assets", 13 /* Asset */, "PDF" /* PDF */);
+      } else if (file.ext === ".eot" || file.ext === ".ttf" || file.ext === ".woff" || file.ext === ".woff2") {
+        return define2("assets", 13 /* Asset */, "Font" /* Font */);
+      } else if (file.ext === ".js" || file.ext === ".mjs") {
+        return define2("assets", 13 /* Asset */, "JavaScript" /* JavaScript */);
+      } else if (file.ext === ".json") {
+        return define2("assets", 13 /* Asset */, "JSON" /* JSON */);
+      } else if (file.ext === ".svg") {
+        return define2("assets", 13 /* Asset */, "SVG" /* SVG */);
+      } else if (file.ext === ".css") {
+        return define2("assets", 13 /* Asset */, "CSS" /* CSS */);
+      }
+    } else if (file.ext === ".md" || file.ext === ".html") {
+      if (file.ext === ".html") {
+        return define2("pages", 15 /* Page */, "HTML" /* HTML */);
+      } else {
+        return define2("pages", 15 /* Page */, "Markdown" /* Markdown */);
+      }
+    } else if (file.ext === ".json") {
+      if (paths2.metafields.match(path2)) {
+        return define2("metafields", 14 /* Metafield */, "JSON" /* JSON */);
+      } else if (paths2.sections.match(path2)) {
+        return section(define2("sections", 4 /* Section */, "JSON" /* JSON */));
+      } else if (paths2.templates.match(path2)) {
+        return define2("templates", 1 /* Template */, "JSON" /* JSON */);
+      } else if (paths2.config.match(path2)) {
+        return define2("config", 6 /* Config */, "JSON" /* JSON */);
+      } else if (paths2.locales.match(path2)) {
+        return define2("locales", 7 /* Locale */, "JSON" /* JSON */);
+      } else if (paths2.customers.match(path2)) {
+        return define2("templates/customers", 1 /* Template */, "JSON" /* JSON */);
+      } else if (paths2.metaobject.match(path2)) {
+        return define2("templates/metaobject", 1 /* Template */, "JSON" /* JSON */);
+      }
+    } else if (file.ext === ".svg") {
+      return svg(define2("assets", 10 /* Svg */, "SVG" /* SVG */));
+    } else if (file.ext === ".css") {
+      return style(define2("assets", 8 /* Style */, "CSS" /* CSS */));
+    } else if (file.ext === ".scss") {
+      return style(define2("assets", 8 /* Style */, "SCSS" /* SCSS */));
+    } else if (file.ext === ".sass") {
+      return style(define2("assets", 8 /* Style */, "SASS" /* SASS */));
+    } else if (file.ext === ".js" || file.ext === ".mjs") {
+      return script(define2("assets", 9 /* Script */, "JavaScript" /* JavaScript */));
+    } else if (file.ext === ".ts") {
+      return script(define2("assets", 9 /* Script */, "TypeScript" /* TypeScript */));
+    } else if (file.ext === ".jsx") {
+      return script(define2("assets", 9 /* Script */, "JSX" /* JSX */));
+    } else if (file.ext === ".tsx") {
+      return script(define2("assets", 9 /* Script */, "TSK" /* TSX */));
+    }
+    return void 0;
+  };
+}
+function importFile(key, outputPath) {
+  const path2 = pathe.join(outputPath, key);
+  const file = pathe.parse(path2);
+  const define2 = setImportFile(file, path2);
+  if (key.startsWith("sections/")) {
+    return define2(key, "sections" /* Sections */);
+  } else if (key.startsWith("snippets/")) {
+    return define2(key, "snippets" /* Snippets */);
+  } else if (key.startsWith("layout/")) {
+    return define2(key, "layout" /* Layout */);
+  } else if (key.startsWith("customers/", 10)) {
+    return define2(key, "templates/customers" /* Customers */);
+  } else if (key.startsWith("metaobject/", 10)) {
+    return define2(key, "templates/metaobject" /* Metaobject */);
+  } else if (key.startsWith("templates/")) {
+    return define2(key, "templates" /* Templates */);
+  } else if (key.startsWith("config/")) {
+    return define2(key, "config" /* Config */);
+  } else if (key.startsWith("locales/")) {
+    return define2(key, "locales" /* Locales */);
+  } else if (key.startsWith("assets/")) {
+    return define2(key, "assets" /* Assets */);
+  }
+}
+var outputFile = (output) => (path2) => {
+  const file = pathe.parse(path2);
+  const merge = setFile(file, path2, output);
+  switch (pathe.basename(file.dir)) {
+    case "sections":
+      return merge("sections", 4 /* Section */, -1);
+    case "snippets":
+      return merge("snippets", 3 /* Snippet */, -1);
+    case "layout":
+      return merge("layout", 2 /* Layout */);
+    case "templates":
+      return merge("templates", 1 /* Template */, -1);
+    case "customers":
+      return merge("templates/customers", 1 /* Template */, -1);
+    case "metaobject":
+      return merge("templates/metaobject", 1 /* Template */, -1);
+    case "config":
+      return merge("config", 6 /* Config */, -1);
+    case "locales":
+      return merge("locales", 7 /* Locale */, -1);
+    case "assets":
+      return merge("assets", 13 /* Asset */, -1);
+  }
+};
+
+// lib/requests/assets.ts
+async function find(asset, theme) {
+  const request2 = mergerino_min_default($.sync.stores[theme.sidx].client, {
+    method: "get",
+    url: theme.url,
+    params: {
+      "asset[key]": asset
+    }
+  });
+  return axios(request2).then(({ data }) => data.asset).catch(() => false);
+}
+async function upload2(asset, config) {
+  const request2 = mergerino_min_default($.sync.stores[config.theme.sidx].client, {
+    method: "put",
+    url: config.theme.url,
+    data: {
+      asset: {
+        key: config.key,
+        value: asset
+      }
+    }
+  });
+  return axios(request2).then(() => {
+    return true;
+  }).catch((e2) => {
+    loggers_exports.failed(config.key);
+    errors_exports.request(config.key, e2.response);
+    return false;
+  });
+}
+async function get(theme, config) {
+  const url = typeof theme === "string" ? theme : theme.url;
+  return axios.get(url, config).then(({ data }) => {
+    return data;
+  }).catch((e2) => {
+    if (e2.response && (e2.response.status === 429 || e2.response.status === 500)) {
+      if (config.params["asset[key]"]) {
+        loggers_exports.retrying(config.params["asset[key]"], theme);
+        queue.add(() => get(theme, config));
+      }
+    } else {
+      if ($.mode.upload) {
+        throw e2.response;
+      } else {
+        if (config.params["asset[key]"]) {
+          loggers_exports.failed(config.params["asset[key]"]);
+          errors_exports.request(config.params["asset[key]"], e2.response);
+        }
+      }
+    }
+  });
+}
+var limit;
+async function sync(theme, file, config) {
+  if (queue.isPaused)
+    return;
+  const { mode } = $;
+  if (queue.concurrency > 2) {
+    if (limit >= 20)
+      queue.concurrency--;
+    if (limit >= 32)
+      queue.concurrency--;
+    if (limit >= 39)
+      await delay(500);
+  } else if (queue.concurrency < 3 && limit < 30) {
+    queue.concurrency++;
+  }
+  if (!mode.upload && !mode.import)
+    timer.start();
+  const promise = await axios(config).then(({ headers, data }) => {
+    if (mode.import === false && config.method === "get")
+      return data;
+    if (config.method === "delete") {
+      loggers_exports.deleted(file.relative, theme);
+    } else {
+      if (mode.watch) {
+        if (file.type !== 9 /* Script */ && file.type !== 8 /* Style */)
+          loggers_exports.hot();
+        loggers_exports.upload(theme);
+      } else if (mode.upload) {
+        event.emit("upload", {
+          status: 0 /* Success */,
+          get theme() {
+            return theme;
+          },
+          get file() {
+            return file;
+          }
+        });
+      } else if (mode.import) {
+        event.emit("import", {
+          status: 0 /* Success */,
+          get theme() {
+            return theme;
+          },
+          get file() {
+            return file;
+          },
+          get data() {
+            return data;
+          }
+        });
+      }
+    }
+    limit = parseInt(headers["x-shopify-shop-api-call-limit"].slice(0, 2), 10);
+  }).catch((e2) => {
+    if (e2.response && (e2.response.status === 429 || e2.response.status === 500)) {
+      if (!mode.upload && !mode.import)
+        loggers_exports.retrying(file.key, theme);
+      queue.add(() => sync(theme, file, config));
+      if (mode.upload) {
+        event.emit("upload", {
+          status: 1 /* Retry */,
+          get theme() {
+            return theme;
+          },
+          get file() {
+            return file;
+          }
+        });
+      } else if (mode.import) {
+        event.emit("import", {
+          status: 1 /* Retry */,
+          get theme() {
+            return theme;
+          },
+          get file() {
+            return file;
+          }
+        });
+      }
+    } else {
+      if (mode.upload) {
+        return event.emit("upload", {
+          status: 2 /* Failed */,
+          error: e2.response,
+          get theme() {
+            return theme;
+          },
+          get file() {
+            return file;
+          }
+        });
+      } else if (mode.import) {
+        if (e2.response === void 0) {
+          event.emit("import", {
+            status: 3 /* Empty */,
+            get theme() {
+              return theme;
+            },
+            get file() {
+              return file;
+            }
+          });
+        } else {
+          return event.emit("import", {
+            status: 2 /* Failed */,
+            error: e2.response,
+            get theme() {
+              return theme;
+            },
+            get file() {
+              return file;
+            }
+          });
+        }
+      } else {
+        loggers_exports.failed(file.key);
+        if (e2.isAxiosError) {
+          errors_exports.request(file.relative, e2.response);
+        }
+      }
+    }
+    return pMapSkip;
+  });
+  return promise;
+}
+async function find2(store, field) {
+  if (is(arguments.length, 1))
+    return (_field) => find2(store, _field);
+  if (allFalse(has("namespace", field), has("key", field))) {
+    loggers_exports.error("invalid fields");
+    return void 0;
+  }
+  return axios.get("metafields.json", store.client).then(({ data }) => {
+    return data.metafields.find((m) => field.namespace === m.namespace && field.key === m.key);
+  }).catch((e2) => {
+    console.log(e2);
+    return void 0;
+  });
+}
+async function create3(store, metafield) {
+  if (is(arguments.length, 1))
+    return (_metafield) => create3(store, _metafield);
+  metafield.type = "json";
+  metafield.namespace = "email";
+  metafield.value_type = "json_string";
+  metafield.key = "eng";
+  return axios.post("metafields.json", { metafield }, store.client).then(({ data }) => {
+    console.log("created", data);
+    return data.metafield;
+  }).catch((e2) => {
+    console.log(e2);
+    if (!store.queue)
+      return errors_exports(metafield.namespace, e2.response);
+    if (requeue(e2.response.status)) {
+      queue.add(() => create3(store, metafield));
+      return void 0;
+    } else {
+      return errors_exports(store.store, e2.response);
+    }
+  });
+}
+async function update2(store, id, metafield) {
+  if (is(arguments.length, 1))
+    return (_id, _field) => update2(store, _id, _field);
+  return axios.put(`metafields/${id}.json`, { metafield }, store.client).then((d) => {
+    console.log("created");
+    return d.data.metafield;
+  }).catch((e2) => {
+    if (!store.queue)
+      return errors_exports(metafield.namespace, e2.response);
+    if (requeue(e2.response.status)) {
+      queue.add(() => update2(store, id, metafield));
+    } else {
+      return errors_exports(store.store, e2.response);
+    }
+  });
+}
+async function sync2(store, field) {
+  if (is(arguments.length, 1))
+    return (_field) => sync2(store, _field);
+  const data = await find2(store, field);
+  if (!data)
+    return create3(store, field);
+  return update2(store, data.id, assign(field, { id: data.id, type: "json" })).catch((e2) => {
+    if (!store.queue)
+      return errors_exports(field.namespace, e2.response);
+    if (requeue(e2.response.status)) {
+      queue.add(() => sync2(store, field));
+    } else {
+      return errors_exports(store.store, e2.response);
+    }
+  });
+}
+
+// lib/requests/client.ts
+function client({ stores, themes }) {
+  return {
+    assets: async (method, file, content) => {
+      const payload = isUndefined(content) ? {
+        method,
+        params: {
+          "asset[key]": file.key
+        }
+      } : {
+        method,
+        data: {
+          asset: {
+            key: file.key,
+            value: content
+          }
+        }
+      };
+      await queue.add(() => pMap(themes, async (theme) => {
+        if ($.mode.upload)
+          timer.start(file.uuid);
+        await sync(theme, file, assign(
+          { url: theme.url },
+          stores[theme.sidx].client,
+          payload
+        ));
+      }));
+    },
+    pages: async (method, file, content) => {
+      await queue.add(() => pMap(stores, async (store) => {
+        if ($.mode.upload)
+          timer.start();
+        console.log(content);
+      }));
+    },
+    metafields: (content) => {
+      return queue.add(function() {
+        return mapParallelAsync(async function(store) {
+          await sync2(store, content);
+        }, stores);
+      });
+    }
+  };
+}
+
+// lib/plugins/hooks.ts
+async function onAsset(file, input, update4, request2) {
+  if (isUndefined(update4) || update4 === false) {
+    await request2("put", file, input);
+  } else if (isString(update4)) {
+    await request2("put", file, update4);
+  } else if (isBuffer(update4)) {
+    await request2("put", file, update4.toString());
+  } else {
+    await request2("put", file, input);
+  }
+}
+var EXP = /{%-?\s*render\s+['"]hot\.js['"]/;
+async function injectSnippet() {
+  const key = "snippets/hot.js.liquid";
+  const [theme] = $.sync.themes;
+  const snippet3 = await fsExtra.readFile($.hot.snippet);
+  const upload4 = await upload2(snippet3.toString(), { theme, key });
+  loggers_exports.update(tui_exports.message("gray", `${key} uploaded snippet injection`));
+  return upload4;
+}
+function hasSnippet(content) {
+  return EXP.test(content);
+}
+function inject(content) {
+  if (!hasSnippet(content))
+    return writeRender(content);
+}
+function removeRender(content) {
+  const render = content.search(EXP);
+  if (render > -1) {
+    const start2 = content.slice(0, render);
+    const slice2 = content.slice(content.indexOf("%}") + 2);
+    return start2 + slice2;
+  }
+  return content;
+}
+function writeRender(content) {
+  const ender = content.indexOf("<head>") + 6;
+  const start2 = content.slice(0, ender);
+  return start2 + "\n" + $.hot.renderer + "\n" + content.slice(ender);
+}
+async function injectRender(path2) {
+  const exists = await fsExtra.pathExists(path2);
+  if (!exists)
+    return null;
+  const local = await fsExtra.readFile(path2);
+  let content = local.toString();
+  if (!EXP.test(content)) {
+    content = writeRender(content);
+    await fsExtra.writeFile(path2, content);
+    loggers_exports.update(tui_exports.message("gray", "injected render tag in output layout"));
+  }
+  const [theme] = $.sync.themes;
+  const name = pathe.basename(path2);
+  const key = `layout/${name}`;
+  const string = await find(`layout/${name}`, theme);
+  if (EXP.test(string))
+    content = removeRender(content);
+  const upload4 = await upload2(content, { theme, key });
+  if (upload4) {
+    loggers_exports.update(tui_exports.message("gray", "uploaded and inject render tag"));
+    return true;
+  }
+  return false;
+}
+
+// lib/modes/upload.ts
+function getModel(size2) {
+  if (size2 === 0) {
+    throwError("Empty output directory", [
+      `There are no files within ${neonCyan(pathe.relative($.cwd, $.dirs.output) + "/**")}`,
+      `You may need to run the ${neonCyan.bold("syncify build")} command and try again.`
+    ]);
+  }
+  const sync4 = /* @__PURE__ */ new Map();
+  let width = 0;
+  for (const theme of $.sync.themes) {
+    if (theme.target.length > width)
+      width = theme.target.length;
+    const key = `${theme.store}:${theme.target}`;
+    if (!sync4.has(key)) {
+      sync4.set(key, {
+        active: sync4.size === 0,
+        log: null,
+        size: size2,
+        processed: "",
+        failed: 0,
+        success: 0,
+        retry: 0,
+        progress: loggers_exports.progress(size2),
+        get theme() {
+          return theme;
+        },
+        errors: {
+          remote: /* @__PURE__ */ new Map(),
+          retry: /* @__PURE__ */ new Set()
+        }
+      });
+    }
+  }
+  return sync4;
+}
+async function upload3(cb) {
+  $.cache.lastResource = "upload";
+  loggers_exports.group("Upload", true);
+  loggers_exports.spinner("Preparing");
+  timer.start("upload");
+  const request2 = client($.sync);
+  const hashook = isFunction(cb);
+  const parse5 = outputFile($.dirs.output);
+  const files = glob7__default.default.sync(`${$.dirs.output}/**`).sort();
+  const sync4 = getModel(files.length);
+  await delay(250);
+  function callback(item) {
+    loggers_exports.spinner.stop();
+    const { file, theme } = item;
+    const key = `${theme.store}:${theme.target}`;
+    const record = sync4.get(key);
+    const message2 = [
+      tui_exports.message("whiteBright", bold(toUpcase(file.namespace))),
+      newline,
+      tui_exports.suffix("gray", "Size       ", `  ${whiteBright(getSizeStr(file.size))}`),
+      "\n",
+      tui_exports.suffix("gray", "Elapsed    ", `  ${whiteBright(timer.now("upload"))}`),
+      "\n",
+      tui_exports.suffix("gray", "Duration   ", `  ${whiteBright(timer.stop(file.uuid))}`),
+      newline,
+      hrs(42),
+      newline
+    ];
+    if (item.status === 0 /* Success */) {
+      if (record.errors.retry.has(file.input)) {
+        record.retry -= 1;
+        record.errors.retry.delete(file.input);
+      }
+      record.success += 1;
+      record.progress.increment(1);
+      record.processed = tui_exports.message("neonGreen", file.key);
+    } else if (item.status === 1 /* Retry */) {
+      if (!record.errors.retry.has(file.input)) {
+        record.retry += 1;
+        record.errors.retry.add(file.input);
+      }
+      record.processed = tui_exports.message("orange", file.key);
+    } else if (item.status === 2 /* Failed */) {
+      if (record.errors.retry.has(file.output)) {
+        record.retry -= 1;
+        record.errors.retry.delete(file.output);
+      }
+      if (!record.errors.remote.has(file.output)) {
+        record.failed += 1;
+        record.progress.increment(1);
+        record.errors.remote.set(file.output, item);
+        record.processed = tui_exports.message("redBright", file.key);
+      }
+    }
+    for (const [id, { success, size: size2, failed: failed2, retry, progress: progress2, processed }] of sync4) {
+      const [store, target] = id.split(":");
+      const uploaded = `  ${bold(`${success}`)} ${white("of")} ${bold(`${size2}`)}`;
+      const retrying2 = `  ${bold(`${retry}`)}`;
+      const failures = `  ${bold(`${failed2}`)}`;
+      message2.push(
+        tui_exports.message("neonCyan", `${bold(target.toUpperCase())}  ${ARR}  ${store}`),
+        newline,
+        processed,
+        newline,
+        tui_exports.suffix("whiteBright", "synced ", uploaded),
+        "\n",
+        tui_exports.suffix(retry > 0 ? "orange" : "whiteBright", "retry ", retrying2),
+        "\n",
+        tui_exports.suffix(failed2 > 0 ? "redBright" : "whiteBright", "errors ", failures),
+        newline,
+        progress2.render(),
+        newline
+      );
+    }
+    loggers_exports.update(glue(message2));
+  }
+  event.on("upload", callback);
+  await delay(500);
+  for (const path2 of files) {
+    const file = parse5(path2);
+    let input;
+    try {
+      const read = await fsExtra.readFile(file.output);
+      input = read.toString();
+      if (file.namespace === "layout") {
+        if (hasSnippet(input)) {
+          input = removeRender(input);
+        }
+      }
+      file.size = byteSize(input);
+      if (!hashook) {
+        await request2.assets("put", file, input);
+      } else {
+        const update4 = cb.apply({ ...file }, input);
+        await onAsset(file, input, update4, request2.assets);
+      }
+    } catch (e2) {
+      errors_exports.write("Error reading output file", {
+        file: file.key,
+        source: file.relative
+      })(e2);
+    }
+  }
+  await queue.onIdle();
+  loggers_exports.update.clear();
+  loggers_exports.group("Errors", true);
+  let hasErrors = false;
+  for (const { errors: errors2, theme, failed: failed2, success, size: size2 } of sync4.values()) {
+    if (errors2.remote.size > 0) {
+      const name = bold(`${theme.target.toUpperCase()} THEME`);
+      const failures = `  ${bold(`${failed2}`)}`;
+      const uploaded = `  ${bold(`${success}`)} ${white("of")} ${bold(`${size2}`)}`;
+      loggers_exports.out(tui_exports.message("neonCyan", `${bold(name)}  ${ARR}  ${theme.store}`));
+      loggers_exports.nwl();
+      loggers_exports.out(tui_exports.suffix("neonGreen", "uploaded ", uploaded));
+      loggers_exports.out(tui_exports.suffix("redBright", "failures ", failures));
+      loggers_exports.nwl();
+      let number = 1;
+      for (const record of errors2.remote.values()) {
+        const errno = `${(number < 10 ? "0" : "") + number++}`;
+        loggers_exports.nwl();
+        loggers_exports.write(redBright.bold(`ERROR ${errno}`));
+        errors_exports.request(record.file.input, record.error);
+      }
+      loggers_exports.out(hr(20));
+      hasErrors = true;
+    }
+  }
+  await delay(500);
+  if (!hasErrors) {
+    loggers_exports.nwl();
+    loggers_exports.out(tui_exports.message("gray", "No errors!"));
+    loggers_exports.nwl();
+  }
+  loggers_exports.nwl();
+  loggers_exports.update(`${line.gray}Upload Completed`);
+  loggers_exports.nwl();
+  process.exit(0);
+}
+function passthrough(file, sync4) {
+  const { wss, mode, watch: watch2, env: env2 } = $;
+  const { type: type2, relative: relative13, kind, key, output } = file;
+  return async (data) => {
+    if (type2 !== 16 /* Spawn */) {
+      if (mode.watch) {
+        watch2.unwatch(output);
+      }
+      await fsExtra.writeFile(output, data).catch(
+        errors_exports.write("Error writing asset to output", {
+          file: relative13,
+          source: relative13
+        })
+      );
+    }
+    if (mode.hot) {
+      loggers_exports.syncing(key, true);
+      if (kind === "JavaScript" /* JavaScript */) {
+        wss.script(key);
+      } else if (kind === "CSS" /* CSS */) {
+        wss.stylesheet(key);
+      }
+    }
+    if (env2.sync !== 0) {
+      return sync4("put", file, data);
+    }
+  };
+}
+async function compile(file, sync4, cb) {
+  const copy = passthrough(file, sync4);
+  const data = await fsExtra.readFile(file.input).catch(
+    errors_exports.write("Error reading asset file", {
+      file: file.relative,
+      source: file.relative
+    })
+  );
+  if (data) {
+    const value = data.toString();
+    if (isEmpty(value)) {
+      if ($.mode.watch)
+        loggers_exports.skipped(file, "empty file");
+      return null;
+    }
+    if (!isFunction(cb))
+      return copy(value);
+    const update4 = cb.apply({ ...file }, value);
+    if (isUndefined(update4) || update4 === false) {
+      return copy(value);
+    } else if (isType(update4)) {
+      return copy(update4);
+    } else if (isBuffer(update4)) {
+      return copy(update4.toString());
+    }
+    return copy(value);
+  }
+  return null;
+}
+var LiquidLineComments = /{%-?\s*#[\s\S]+?%}/g;
+var LiquidBlockComments = /{%-?\s*comment\s*-?%}[\s\S]+?{%-?\s*endcomment\s*-?%}/g;
+var LiquidTag = /{%-?\s*liquid[\s\S]+?%}/g;
+var ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
+function removeComments(content) {
+  return $.terser.liquid.removeComments ? content.replace(LiquidBlockComments, "").replace(LiquidLineComments, "") : content;
+}
+function minifyLiquidTag(content) {
+  return content.replace(LiquidTag, (tag) => "\n" + tag.replace(/#.*?$/gm, "") + "\n");
+}
+function minifySchema(file, content) {
+  if (!$.terser.liquid.minifySchema)
+    return removeComments(content);
+  const open2 = content.search(/{%-?\s*schema/);
+  if (open2 > -1) {
+    const begin = content.indexOf("%}", open2 + 2) + 2;
+    const start2 = content.slice(begin);
+    const ender = begin + start2.search(/{%-?\s*endschema/);
+    if (ender > -1) {
+      const parse5 = JSON.parse(content.slice(begin, ender));
+      const minified2 = JSON.stringify(parse5, null, 0);
+      const schema = content.slice(0, begin) + minified2 + content.slice(ender);
+      return removeComments(schema);
+    }
+    loggers_exports.invalid(file.relative);
+  }
+  return removeComments(content);
+}
+function removeDashes(content) {
+  if (!$.terser.liquid.stripDashes)
+    return content;
+  return content;
+}
+async function htmlMinify(file, content) {
+  try {
+    const htmlmin = await htmlMinifierTerser.minify(content, $.terser.markup);
+    return htmlmin;
+  } catch (e2) {
+    loggers_exports.invalid(file.relative);
+    console.error(e2);
+    return null;
+  }
+}
+var transform2 = (file) => async (data) => {
+  if (file.type === 2 /* Layout */ && $.mode.hot) {
+    if (hasSnippet(data) === false) {
+      data = inject(data);
+    }
+  }
+  if (!$.mode.terse) {
+    await fsExtra.writeFile(file.output, data);
+    loggers_exports.transform(`${file.namespace} \u2192 ${byteConvert(file.size)}`);
+    return data;
+  }
+  let htmlmin;
+  if (file.base.endsWith(".js.liquid")) {
+    htmlmin = data.replace(ScriptJsonWhitespace, "").replace(/(?<=[:,]) +(?=['"{[])/g, "").replace(/{{%/g, "{ {%").replace(/%}}/g, "%} }").replace(/(?<=[%}]})\s+(?=[\]}])/g, " ").replace(/>\s+(?=[{[])/, ">").replace(/(?<=[}\]])\s<\//g, "</");
+  } else if (file.base.endsWith(".json.liquid")) {
+    htmlmin = JSON.stringify(JSON.parse(data), null, 0);
+  } else {
+    const content = file.type === 4 /* Section */ ? minifySchema(file, data) : removeComments(data);
+    const htmlterser = await htmlMinify(file, content);
+    htmlmin = minifyLiquidTag(htmlterser);
+  }
+  loggers_exports.process("HTML Terser", timer.now());
+  if (isNil(htmlmin)) {
+    await fsExtra.writeFile(file.output, data);
+    return data;
+  }
+  const postmin = removeDashes(htmlmin).replace(/^\s+/gm, "");
+  await fsExtra.writeFile(file.output, postmin);
+  const size2 = fileSize(data, file.size);
+  if (size2.isSmaller) {
+    loggers_exports.transform(`${file.namespace} ${size2.before} \u2192 gzip ${size2.gzip}`);
+  } else {
+    loggers_exports.minified("Liquid", size2.before, size2.after, size2.saved);
+  }
+  return postmin;
+};
+async function extractSchema(uri) {
+  const read = await fsExtra.readFile(uri);
+  const content = read.toString();
+  const open2 = content.search(/{%-?\s*schema/);
+  if (open2 < 0)
+    return;
+  const begin = content.indexOf("%}", open2 + 2) + 2;
+  const start2 = content.slice(begin);
+  const ender = begin + start2.search(/{%-?\s*endschema/);
+  if (ender < 0)
+    loggers_exports.throws(uri);
+  const parse5 = JSON.parse(content.slice(begin, ender));
+  return parse5;
+}
+async function sharedSections(file, content) {
+  const open2 = content.search(/{%-?\s*schema/);
+  if (open2 < 0)
+    return content;
+  const begin = content.indexOf("%}", open2 + 2) + 2;
+  const start2 = content.slice(begin);
+  const ender = begin + start2.search(/{%-?\s*endschema/);
+  if (ender < 0)
+    loggers_exports.throws(file.relative);
+  const parse5 = JSON.parse(content.slice(begin, ender));
+  if (!has("use", parse5))
+    return content;
+  if (!isArray(parse5.use)) {
+    throw new Error("Invalid type passed on schema");
+  }
+  const linked = {};
+  const dirs = await glob7__default.default(pathe.join($.dirs.output, "sections") + "/**");
+  for (const use of parse5.use) {
+    for (const dir of dirs) {
+      const base = pathe.basename(dir, ".liquid");
+      if (base.endsWith(use)) {
+        const read = await extractSchema(dir);
+        linked[use] = read;
+      }
+    }
+  }
+  for (let i = 0; i < parse5.settings.length; i++) {
+    if (has("ref", parse5.settings[i])) {
+      const [target, id] = parse5.settings[i].ref.split(".").filter(Boolean);
+      const entry = linked[target].settings.find((setting) => setting.id === id);
+      if (entry) {
+        parse5.settings[i] = entry;
+      }
+    }
+  }
+  for (let i = 0; i < parse5.blocks.length; i++) {
+    for (let b = 0; b < parse5.blocks[i].settings.length; b++) {
+      const block = parse5.blocks[i].settings[b];
+      if (has("ref", block)) {
+        const [target, name, id] = block.ref.split(".").filter(Boolean);
+        const blocks = linked[target].blocks.find((setting) => setting.type === name);
+        if (blocks) {
+          const entry = blocks.settings.find((setting) => setting.id === id);
+          if (entry) {
+            parse5.blocks[i].settings[b] = entry;
+          }
+        }
+      }
+    }
+  }
+  delete parse5.use;
+  const write4 = content.slice(0, begin) + "\n" + JSON.stringify(parse5, null, 2) + "\n" + content.slice(ender);
+  return write4;
+}
+async function compile2(file, cb) {
+  if ($.mode.watch)
+    timer.start();
+  const read = await fsExtra.readFile(file.input);
+  let input = read.toString();
+  if ($.mode.build) {
+    if (file.namespace === "layout") {
+      if (hasSnippet(input)) {
+        input = removeRender(input);
+      }
+    }
+  }
+  if (file.type === 4 /* Section */) {
+    input = await sharedSections(file, input);
+  }
+  file.size = byteSize(input);
+  const edit = transform2(file);
+  if (!isType("Function", cb))
+    return edit(input);
+  const update4 = cb.apply({ ...file }, input);
+  if (isType("Undefined", update4) || update4 === false) {
+    return edit(input);
+  } else if (isType("String", update4)) {
+    return edit(update4);
+  } else if (Buffer.isBuffer(update4)) {
+    return edit(update4.toString());
+  }
+  return edit(input);
+}
+function parse2(data) {
+  try {
+    return JSON.parse(data);
+  } catch (e2) {
+    console.log(e2);
+    return null;
+  }
+}
+function minifyJSON(data, space = 0) {
+  try {
+    return JSON.stringify(data, null, space);
+  } catch (e2) {
+    console.log(e2);
+    return null;
+  }
+}
+async function jsonCompile(file, data, space = 0) {
+  const minified2 = minifyJSON(data, space);
+  if (isNil(minified2)) {
+    if ($.mode.watch)
+      timer.stop();
+    return data;
+  }
+  if (space === 0) {
+    const size2 = fileSize(minified2, file.size);
+    loggers_exports.minified("JSON", size2.before, size2.after, size2.saved);
+  } else {
+    loggers_exports.transform(`${file.namespace} \u2192 ${byteConvert(file.size)}`);
+  }
+  if (file.type === 14 /* Metafield */)
+    return minified2;
+  fsExtra.writeFile(file.output, minified2).catch(
+    errors_exports.write("Error writing JSON", {
+      file: file.relative
+    })
+  );
+  return minified2;
+}
+async function compile3(file, cb) {
+  if ($.mode.watch)
+    timer.start();
+  const json = await fsExtra.readFile(file.input).catch(
+    errors_exports.write("Error reading JSON file", {
+      file: file.relative
+    })
+  );
+  if (isBuffer(json)) {
+    const read = json.toString();
+    file.size = byteSize(read);
+    if (read.trim().length === 0) {
+      loggers_exports.skipped(file, "empty file");
+      return null;
+    }
+    const data = parse2(read);
+    if (isEmpty(data)) {
+      loggers_exports.skipped(file, "empty file");
+      return null;
+    }
+    let space = $.processor.json.indent;
+    const { mode, terser: terser2 } = $;
+    if (mode.terse) {
+      if (file.type === 13 /* Asset */) {
+        if (terser2.json.assets)
+          space = 0;
+      } else if (file.type === 7 /* Locale */) {
+        if (terser2.json.locales)
+          space = 0;
+      } else if (file.type === 1 /* Template */) {
+        if (terser2.json.templates)
+          space = 0;
+      } else if (file.type === 14 /* Metafield */) {
+        if (terser2.json.metafields)
+          space = 0;
+      } else if (file.type === 5 /* Metaobject */) {
+        if (terser2.json.metaobject)
+          space = 0;
+      } else if (file.type === 4 /* Section */) {
+        if (terser2.json.groups)
+          space = 0;
+      } else if (file.type === 6 /* Config */) {
+        if (terser2.json.config)
+          space = 0;
+      }
+    }
+    if (!isFunction(cb))
+      return jsonCompile(file, data, space);
+    const update4 = cb.apply({ ...file }, data);
+    if (isUndefined(update4)) {
+      return jsonCompile(file, data, space);
+    } else if (isArray(update4) || isObject(update4)) {
+      return jsonCompile(file, sanitize(update4), space);
+    } else if (isString(update4)) {
+      return jsonCompile(file, parse2(update4), space);
+    } else if (isBuffer(update4)) {
+      return jsonCompile(file, parse2(update4.toString()), space);
+    }
+    return jsonCompile(file, data, space);
+  }
+}
+var esbuild3 = null;
+function esbuildModule() {
+  esbuild3 = getImport("esbuild");
+  if (isNil(esbuild3)) {
+    esbuild3 = null;
+    return false;
+  }
+  return true;
+}
+async function esbuildBundle(config) {
+  if ($.processor.esbuild.loaded)
+    config.watch.clear();
+  const result = await esbuild3.build(config.esbuild);
+  if ($.mode.terse && $.mode.build) {
+    config.size = byteSize(result.outputFiles[0].text);
+  }
+  if ($.mode.watch) {
+    getWatchPaths(config, result.metafile.inputs);
+  } else {
+    if (!config.watch.has(config.input))
+      config.watch.add(config.input);
+    if (!$.watch.has(config.input))
+      $.watch.add(config.input);
+  }
+}
+async function getWatchPaths(config, inputs) {
+  const { cwd, watch: watch2, mode } = $;
+  for (const file in inputs) {
+    if (file.indexOf("/node_modules/") > -1)
+      continue;
+    const path2 = pathe.join(cwd, file);
+    if (!config.watch.has(path2))
+      config.watch.add(path2);
+    if (!watch2.has(path2))
+      watch2.add(path2);
+    if (mode.watch)
+      ;
+  }
+  if (mode.watch && $.processor.esbuild.loaded) {
+    await pNext().then(() => {
+      for (const path2 of config.watch) {
+        if (path2.indexOf("/node_modules/") > -1)
+          continue;
+        if (config.watchCustom !== null && config.watchCustom(path2))
+          continue;
+        if (!has(path2.slice(cwd.length + 1), inputs)) {
+          config.watch.delete(path2);
+          watch2.unwatch(path2);
+        }
+      }
+    });
+  }
+}
+function createSnippet(string) {
+  return "<script>" + string + "</script>";
+}
+function runHook(hook2) {
+  if (!isType("Function", hook2))
+    return false;
+  return function(file, content) {
+    const update4 = hook2.apply({ ...file }, content);
+    if (update4 === false) {
+      loggers_exports.external("cancelled");
+      return null;
+    }
+    if (isType("String", update4)) {
+      loggers_exports.external("augment");
+      return update4;
+    }
+    if (isBuffer(update4)) {
+      loggers_exports.external("augment");
+      return update4.toString();
+    }
+    return content;
+  };
+}
+async function compile4(file, sync4, hooks2) {
+  if (!file.data)
+    return;
+  if ($.mode.watch)
+    timer.start();
+  const hook2 = runHook(hooks2);
+  const { errors: errors2, wss, mode, cwd } = $;
+  const trigger2 = file.data.length;
+  const req = [];
+  for (const config of file.data) {
+    const {
+      key,
+      input,
+      output,
+      snippet: snippet3,
+      esbuild: { format }
+    } = config;
+    try {
+      const { metafile, outputFiles, warnings: warnings2 } = await esbuild3.build(config.esbuild);
+      if (trigger2 > 1) {
+        loggers_exports.nwl();
+        loggers_exports.importer(pathe.relative(cwd, input));
+      }
+      if (mode.watch) {
+        await getWatchPaths(config, metafile.inputs);
+      }
+      if (warnings2.length > 0) {
+        warnings_exports.esbuild(warnings2);
+      }
+      for (const { text, path: path2 } of outputFiles) {
+        if (path2.endsWith(".map")) {
+          const map2 = pathe.join($.cache.sourcemaps.script, file.base + ".map");
+          fsExtra.writeFile(map2, text).catch(
+            errors_exports.write("Error writing JavaScript Source Map to cache", {
+              file: pathe.relative(cwd, map2),
+              source: file.relative
+            })
+          );
+        } else {
+          if (mode.terse) {
+            const { before, after, saved } = fileSize(text, config.size);
+            loggers_exports.transform(`${bold(format.toUpperCase())} bundle`);
+            loggers_exports.minified(null, before, after, saved);
+          } else {
+            loggers_exports.transform(`${bold(format.toUpperCase())} bundle \u2192 ${bold(getSizeStr(text))}`);
+          }
+          let content;
+          if (snippet3) {
+            content = createSnippet(text);
+            if (hook2) {
+              content = hook2(file, content);
+              if (content === null)
+                continue;
+            }
+            await fsExtra.writeFile(output, content).catch(
+              errors_exports.write("Error writing inline <script> snippet", {
+                file: file.relative
+              })
+            );
+            loggers_exports.transform(`exported as ${bold("snippet")}`);
+          } else {
+            content = text;
+            if (hook2) {
+              content = hook2(file, content);
+              if (content === null)
+                continue;
+            }
+            await fsExtra.writeFile(output, content).catch(
+              errors_exports.write("Error writing JavaScript asset", {
+                file: file.relative
+              })
+            );
+          }
+          if (mode.hot) {
+            loggers_exports.syncing(key, true);
+            wss.script(key);
+            req.push(sync4("put", config, content));
+          } else {
+            if (!mode.build) {
+              loggers_exports.syncing(key);
+              req.push(sync4("put", config, content));
+            }
+          }
+        }
+      }
+      ;
+    } catch (e2) {
+      if (has("errors", e2)) {
+        loggers_exports.invalid(file.relative);
+        errors2.add(input);
+        e2.errors.forEach(errors_exports.esbuild);
+      }
+    }
+  }
+  if (trigger2 > 1)
+    loggers_exports.nwl();
+  await Promise.all(req);
+}
+var postcss3 = null;
+var sass3 = null;
+async function load(id) {
+  if (id === "postcss") {
+    const pcss = await import('postcss');
+    postcss3 = pcss.default;
+    return isNil(postcss3) === false;
+  }
+  if (id === "sass") {
+    sass3 = __require("sass");
+    return isNil(sass3) === false;
+  }
+}
+function write3(file, cb) {
+  const scope = isFunction(cb) ? { ...file } : false;
+  return async function(data) {
+    if (isNil(data))
+      return null;
+    let content;
+    if (scope !== false) {
+      const update4 = cb.apply({ ...file }, Buffer.from(data));
+      if (isUndefined(update4) || update4 === false) {
+        content = data;
+      } else if (isString(update4) || isBuffer(update4)) {
+        content = sanitize(update4);
+      }
+    } else {
+      content = data;
+    }
+    fsExtra.writeFile(file.output, content).catch(
+      errors_exports.write("Error writing stylesheet to output", {
+        input: file.relative,
+        output: pathe.relative($.cwd, file.output)
+      })
+    );
+    const size2 = fileSize(data, file.size);
+    if (size2.isSmaller) {
+      loggers_exports.transform(`${bold("CSS")} ${size2.before} \u2192 gzip ${size2.gzip}`);
+    } else {
+      loggers_exports.minified("CSS", size2.before, size2.after, size2.saved);
+    }
+    if ($.mode.hot) {
+      $.wss.stylesheet(file.key);
+    }
+    return content;
+  };
+}
+async function sassProcess(file) {
+  const { data } = file;
+  const opts = data.sass === true ? $.processor.sass.config : data.sass;
+  if (file.ext === ".scss" || file.ext === ".sass") {
+    if ($.mode.watch)
+      timer.start();
+    try {
+      const { css, sourceMap } = sass3.compile(data.input, {
+        loadPaths: opts.include,
+        sourceMapIncludeSources: false,
+        sourceMap: opts.sourcemap,
+        style: opts.style,
+        logger: {
+          debug: (msg) => console.log("DEBUG", msg),
+          warn: warnings_exports.sass(file)
+        }
+      });
+      if (opts.sourcemap) {
+        const map2 = pathe.join($.cache.sourcemaps.style, file.base + ".map");
+        fsExtra.writeFile(map2, JSON.stringify(sourceMap)).catch(
+          errors_exports.write("Error writing SASS Source Map file to the cache directory", {
+            file: pathe.relative($.cwd, map2),
+            source: file.relative
+          })
+        );
+      }
+      loggers_exports.process("SASS Dart", timer.stop());
+      file.size = byteSize(css);
+      return {
+        css,
+        map: sourceMap
+      };
+    } catch (e2) {
+      if (!$.mode.build) {
+        loggers_exports.invalid(file.relative);
+        errors_exports.sass(file, e2);
+      }
+      return null;
+    }
+  }
+  try {
+    const css = await fsExtra.readFile(file.input);
+    file.size = byteSize(css);
+    return {
+      css: css.toString(),
+      map: null
+    };
+  } catch (e2) {
+    loggers_exports.invalid(file.relative);
+    loggers_exports.throws(e2);
+    return null;
+  }
+}
+async function postcssProcess(file, css, map2) {
+  const { data } = file;
+  try {
+    if ($.mode.watch)
+      timer.start();
+    const result = await postcss3($.processor.postcss.config).process(css, {
+      from: data.rename,
+      to: data.rename,
+      map: map2 ? { prev: map2, inline: false } : null
+    });
+    if ($.mode.watch)
+      loggers_exports.process("PostCSS", timer.stop());
+    const issues = result.warnings();
+    if (issues.length > 0) {
+      for (const warning3 of issues) {
+        warnings_exports.postcss(file, warning3);
+      }
+    }
+    return result.toString();
+  } catch (e2) {
+    loggers_exports.invalid(file.relative);
+    console.log(e2);
+    return null;
+  }
+}
+function snippet2(css) {
+  return `<style>${"\n" + " ".repeat(2) + css}</style>`;
+}
+async function compile5(file, cb) {
+  if ($.mode.watch)
+    timer.start();
+  const output = write3(file, cb);
+  try {
+    const out = await sassProcess(file);
+    if (out === null)
+      return null;
+    if (isNil(postcss3) || !file.data.postcss && !file.data.snippet) {
+      return output(out.css);
+    }
+    if (file.data.postcss) {
+      const post = await postcssProcess(file, out.css, out.map);
+      if (post === null)
+        return null;
+      if (file.data.snippet)
+        return output(snippet2(post));
+    }
+    return file.data.snippet ? output(snippet2(out.css)) : output(out.css);
+  } catch (e2) {
+    console.log(e2);
+    return null;
+  }
+}
+var Svgo = null;
+var SVGSprite = null;
+async function load2(id) {
+  if (id === "svg-sprite") {
+    SVGSprite = (await import('svg-sprite')).default;
+    return isNil(SVGSprite) === false;
+  }
+  if (id === "svgo") {
+    Svgo = (await import('svgo')).default;
+    return isNil(Svgo) === false;
+  }
+}
+async function getFile(path2) {
+  const svg2 = await fsExtra.readFile(path2);
+  return [
+    path2,
+    svg2.toString(),
+    byteSize(svg2)
+  ];
+}
+function getSprite(sprite) {
+  return new Promise(function(resolve2, reject) {
+    sprite.compile((error3, svg2) => {
+      if (error3)
+        return reject(error3);
+      for (const m in svg2) {
+        for (const p in svg2[m]) {
+          resolve2(svg2[m][p].contents.toString());
+        }
+      }
+    });
+  });
+}
+function compileSprite(context2, request2, _cb) {
+  async function run2(config) {
+    const file = assign({}, context2);
+    if ($.mode.watch)
+      timer.start();
+    file.kind = "SVG Sprite" /* Sprite */;
+    if (config.snippet) {
+      file.namespace = "snippets";
+      file.key = pathe.join("snippets", renameFile(file, config.rename));
+      file.output = pathe.join($.dirs.output, file.key);
+    } else {
+      file.key = pathe.join("assets", renameFile(file, config.rename));
+      file.output = pathe.join($.dirs.output, file.key);
+    }
+    const options = config.sprite === true ? $.processor.sprite.config : config.sprite;
+    const sprite = new SVGSprite(options);
+    const items = await mapAsync(getFile, toArray(config.input)).catch(
+      errors_exports.write("Error reading an SVG file", {
+        file: file.base,
+        source: file.relative
+      })
+    );
+    if (items) {
+      const svgs = items.filter(([path2, svg2]) => {
+        if (hasLiquid(svg2)) {
+          loggers_exports.skipped(pathe.relative($.cwd, path2), "Liquid Detected");
+          return false;
+        }
+        return true;
+      });
+      file.size = 0;
+      for (const [path2, svg2, size3] of svgs) {
+        sprite.add(path2, null, svg2);
+        file.size = file.size + size3;
+      }
+      const content = await getSprite(sprite);
+      const length2 = svgs.length;
+      loggers_exports.process("SVG Sprite", `${length2} ${plural("SVG", length2)}`, timer.stop());
+      await fsExtra.writeFile(file.output, content).catch(
+        errors_exports.write("Error writing SVG Sprite", {
+          file: file.key,
+          caller: context2.relative
+        })
+      );
+      const size2 = fileSize(content, file.size);
+      if (size2.isSmaller) {
+        loggers_exports.transform(`${file.kind} ${size2.before} \u2192 gzip ${size2.gzip}`);
+      } else {
+        loggers_exports.minified(file.kind, size2.before, size2.after, size2.saved);
+      }
+      if (request2) {
+        loggers_exports.syncing(file.key);
+        await request2("put", file, content);
+      }
+    }
+  }
+  return run2;
+}
+function hasLiquid(svg2) {
+  return /^(?:{{[\s\S]+?}}|{%[\s\S]+?%})|[^"'](?:{{[\s\S]+?}}|{%[\s\S]+?%})[^'"]/m.test(svg2);
+}
+function patchPathVoids(svg2) {
+  const patch = /<path[^>]*[a-zA-Z"'\s](>)(?!\s*<\/path>)/g;
+  if (patch.test(svg2)) {
+    const before = `${gray(`<${white("path")}>`)}`;
+    const after = `${neonGreen(`<${white("path")} />`)}`;
+    loggers_exports.transform(`${before} ${ARR} ${after} ${TLD} ${gray("patched solidus")}`);
+    return svg2.replace(/(<path[^>]*[a-zA-Z"'\s])(>)(?!\s*<\/path>)/g, "$1 /$2");
+  }
+  return svg2;
+}
+function compileInline(context2, request2, _cb) {
+  const file = assign({}, context2);
+  async function run2(config) {
+    if ($.mode.watch)
+      timer.start();
+    if (config.snippet) {
+      file.namespace = "snippets";
+      file.key = pathe.join("snippets", renameFile(file, config.rename));
+      file.output = pathe.join($.dirs.output, file.key);
+    } else {
+      file.key = pathe.join("assets", renameFile(file, config.rename));
+      file.output = pathe.join($.dirs.output, file.key);
+    }
+    const options = config.svgo === true ? $.processor.svgo : config.svgo;
+    const read = await fsExtra.readFile(file.input);
+    const node = read.toString();
+    if (hasLiquid(node)) {
+      loggers_exports.skipped(file, "Liquid Detected");
+      return null;
+    }
+    const patch = patchPathVoids(node);
+    file.size = byteSize(patch);
+    let svg2;
+    try {
+      svg2 = Svgo.optimize(patch, options);
+    } catch (error3) {
+      loggers_exports.err(error3.toString());
+      return null;
+    }
+    loggers_exports.process("SVGO", timer.stop());
+    const { data } = svg2;
+    const size2 = fileSize(data, file.size);
+    if (size2.isSmaller) {
+      loggers_exports.transform(`${file.kind} ${size2.before} \u2192 gzip ${size2.gzip}`);
+    } else {
+      loggers_exports.minified(file.kind, size2.before, size2.after, size2.saved);
+    }
+    await fsExtra.writeFile(file.output, data).catch(
+      errors_exports.write("Error writing SVG", {
+        file: file.key,
+        caller: context2.relative
+      })
+    );
+    if (request2) {
+      loggers_exports.syncing(file.key);
+      await request2("put", file, data);
+    }
+  }
+  return run2;
+}
+async function compile6(file, request2, cb) {
+  if ($.mode.watch)
+    timer.start();
+  const sprite = compileSprite(file, request2);
+  const inline = compileInline(file, request2);
+  const length2 = file.data.length;
+  for (let i = 0; i < length2; i++) {
+    const config = file.data[i];
+    if (i > 0 && $.mode.watch)
+      loggers_exports.changed(file);
+    if (config.format === "sprite") {
+      await sprite(config);
+    }
+    if (config.format === "file") {
+      await inline(config);
+    }
+  }
+}
+async function pages(domain, record) {
+  if (!has(domain, $.cache.pages)) {
+    $.cache.pages[domain] = { [record.id]: record };
+    await update3();
+    return 1 /* Created */;
+  }
+  if (!(record.id in $.cache.pages[domain])) {
+    $.cache.pages[domain][record.id] = record;
+    await update3();
+    return 1 /* Created */;
+  }
+  $.cache.pages[domain][record.id] = record;
+  await update3();
+  return 2 /* Updated */;
+}
+async function update3() {
+  $.cache.updated = Date.now();
+  try {
+    await fsExtra.writeJson($.cache.uri, $.cache, { spaces: 0 });
+  } catch (e2) {
+    throw console.error(e2);
+  }
+}
+
+// lib/modes/build.ts
+function getModel2() {
+  const report = {};
+  let width = 0;
+  for (const group2 of BUILD_GROUPS) {
+    if (group2.length > width)
+      width = group2.length;
+    report[group2] = {
+      group: group2,
+      time: "",
+      size: 0,
+      files: [],
+      report: null
+    };
+  }
+  return report;
+}
+async function build2(cb) {
+  $.cache.lastResource = "build";
+  const { paths: paths2, dirs, watch: watch2, filters, mode } = $;
+  if (!mode.export)
+    loggers_exports.group("Build");
+  timer.start("build");
+  const SVG = /* @__PURE__ */ new Set();
+  const report = getModel2();
+  const hasFilter = isEmpty(filters) === false;
+  const parse5 = parseFile(paths2, dirs.output);
+  const match2 = anymatch3__default.default(toArray(watch2.values()));
+  const globs = await glob7__default.default("**", { absolute: true, cwd: dirs.input });
+  for (const path2 of globs.filter(match2)) {
+    const file = parse5(path2);
+    if (isUndefined(file))
+      continue;
+    switch (file.type) {
+      case 8 /* Style */:
+        report.styles.files.push(file);
+        break;
+      case 9 /* Script */:
+        report.scripts.files.push(file);
+        break;
+      case 4 /* Section */:
+        report.sections.files.push(file);
+        break;
+      case 2 /* Layout */:
+        report.layouts.files.push(file);
+        break;
+      case 3 /* Snippet */:
+        report.snippets.files.push(file);
+        break;
+      case 7 /* Locale */:
+        report.locales.files.push(file);
+        break;
+      case 6 /* Config */:
+        report.configs.files.push(file);
+        break;
+      case 1 /* Template */:
+        report.templates.files.push(file);
+        break;
+      case 15 /* Page */:
+        report.pages.files.push(file);
+        break;
+      case 13 /* Asset */:
+        report.assets.files.push(file);
+        break;
+      case 14 /* Metafield */:
+        report.metafields.files.push(file);
+        break;
+      case 10 /* Svg */:
+        for (const { uuid: uuid2, format, input } of file.data) {
+          if (!SVG.has(uuid2)) {
+            SVG.add(uuid2);
+            if (format === "sprite") {
+              report.svgs.files.push(file);
+            } else {
+              for (const snippet3 of input) {
+                report.svgs.files.push(parse5(snippet3));
+              }
+            }
+          }
+        }
+        break;
+    }
+  }
+  function handle(record, transform3) {
+    return async function(file) {
+      timer.start(file.uuid);
+      try {
+        $.cache.maps[file.output] = file.input;
+        const value = file.ext === ".json" ? await compile3(file, cb) : await transform3(file, cb);
+        loggers_exports.update(tui_exports.message("neonCyan", file.key));
+        return value === null || isNaN(file.size) ? {
+          name: file.base,
+          input: file.relative,
+          time: timer.stop(file.uuid),
+          output: file.key,
+          error: "Skipped File"
+        } : {
+          name: file.base,
+          input: file.relative,
+          output: file.key,
+          error: null,
+          time: timer.stop(file.uuid),
+          size: fileSize(value, file.size)
+        };
+      } catch (e2) {
+        return {
+          name: file.base,
+          input: file.relative,
+          output: file.key,
+          time: timer.stop(file.uuid),
+          error: e2.message
+        };
+      }
+    };
+  }
+  let count = 0;
+  for (const group2 in report) {
+    const filter2 = hasFilter && has(group2, filters) ? filters[group2] : null;
+    const record = report[group2];
+    record.size = record.files.length;
+    if (filter2 && filter2.includes(group2) === false)
+      continue;
+    if (group2 === "styles") {
+      timer.start(group2);
+      record.report = await mapAsync(handle(record, compile5), record.files);
+      record.time = timer.stop(group2);
+      loggers_exports.update.clear();
+      count = count + record.report.length;
+      const n = bold(record.report.length < 10 ? ` ${record.report.length}` : `${record.report.length}`);
+      loggers_exports.out(tui_exports.suffix("whiteBright", `\u2713 ${group2}`, whiteBright(` ${n} files ${gray(`in ${record.time}`)}`)));
+    } else if (group2 === "scripts") {
+      timer.start(group2);
+      record.report = await mapAsync(handle(record, compile4), record.files);
+      record.time = timer.stop(group2);
+      loggers_exports.update.clear();
+      count = count + record.report.length;
+      const n = bold(record.report.length < 10 ? ` ${record.report.length}` : `${record.report.length}`);
+      loggers_exports.out(tui_exports.suffix("whiteBright", `\u2713 ${group2}`, whiteBright(` ${n} files ${gray(`in ${record.time}`)}`)));
+    } else if (group2 === "layouts" || group2 === "snippets" || group2 === "sections" || group2 === "templates") {
+      timer.start(group2);
+      record.report = await mapAsync(handle(record, compile2), record.files);
+      record.time = timer.stop(group2);
+      loggers_exports.update.clear();
+      count = count + record.report.length;
+      const n = bold(record.report.length < 10 ? ` ${record.report.length}` : `${record.report.length}`);
+      loggers_exports.out(tui_exports.suffix("whiteBright", `\u2713 ${group2}`, whiteBright(` ${n} files ${gray(`in ${record.time}`)}`)));
+    } else if (group2 === "locales" || group2 === "configs") {
+      timer.start(group2);
+      record.report = await mapAsync(handle(record, compile3), record.files);
+      record.time = timer.stop(group2);
+      loggers_exports.update.clear();
+      count = count + record.report.length;
+      const n = bold(record.report.length < 10 ? ` ${record.report.length}` : `${record.report.length}`);
+      loggers_exports.out(tui_exports.suffix("whiteBright", `\u2713 ${group2}`, whiteBright(` ${n} files ${gray(`in ${record.time}`)}`)));
+    } else if (group2 === "assets" && mode.views) {
+      timer.start(group2);
+      record.report = await mapAsync(handle(record, compile), record.files);
+      record.time = timer.stop(group2);
+      loggers_exports.update.clear();
+      count = count + record.report.length;
+      const n = bold(record.report.length < 10 ? ` ${record.report.length}` : `${record.report.length}`);
+      loggers_exports.out(tui_exports.suffix("whiteBright", `\u2713 ${group2}`, whiteBright(` ${n} files ${gray(`in ${record.time}`)}`)));
+    } else if (group2 === "svgs" && mode.svg) {
+      timer.start(group2);
+      record.report = await mapAsync(handle(record, compile6), record.files);
+      record.time = timer.stop(group2);
+      loggers_exports.update.clear();
+      count = count + record.report.length;
+      const n = bold(record.report.length < 10 ? ` ${record.report.length}` : `${record.report.length}`);
+      loggers_exports.out(tui_exports.suffix("whiteBright", `\u2713 ${group2}`, whiteBright(` ${n} files ${gray(`in ${record.time}`)}`)));
+    }
+  }
+  $.cache.lastBuild = Date.now();
+  await update3();
+  if (!mode.export) {
+    loggers_exports.nwl();
+    loggers_exports.out(`${line.gray}Build Completed ${gray(`~ ${timer.stop("build")}`)}`);
+    loggers_exports.nwl();
+    process.exit(0);
+  } else {
+    timer.pause("build");
+    loggers_exports.nwl();
+  }
+}
+
+// lib/requests/pages.ts
+async function list(store) {
+  return axios.get("pages.json", store.client).then(({ data }) => {
+    return data.pages;
+  }).catch((e2) => {
+    if (requeue(e2.response.status)) {
+      queue.add(() => list(store));
+    } else {
+      console.error(e2);
+    }
+  });
+}
+async function find3(store, page) {
+  if (allFalse(has("handle", page), has("title", page))) {
+    console.log("invalid fields");
+    return void 0;
+  }
+  return axios.get("pages.json", store.client).then(({ data }) => {
+    if (has("handle", page) && has("title", page)) {
+      return data.pages.find((p) => page.title === p.title && page.handle === p.handle);
+    } else if (has("handle", page)) {
+      return data.pages.find((p) => page.handle === p.handle);
+    } else if (has("title", page)) {
+      return data.pages.find((p) => page.title === p.title);
+    } else {
+      return void 0;
+    }
+  }).catch((e2) => {
+    console.log(e2);
+    return void 0;
+  });
+}
+async function create4(store, page) {
+  if (!$.mode.upload)
+    timer.start();
+  const promise = await axios.post("/pages.json", { page }, store.client).then(({ data }) => {
+    loggers_exports.resource("page", store);
+    return data.page;
+  }).catch((e2) => {
+    if (requeue(e2.response.status)) {
+      queue.add(() => create4(store, page));
+    } else {
+      if (hasPath("response.data", e2.response)) {
+        errors_exports.request(page.title, e2.response);
+      }
+    }
+  });
+  if (!promise)
+    return void 0;
+  await pages(store.domain, promise);
+  return promise;
+}
+async function sync3(store, file, page) {
+  const { mode } = $;
+  if (!mode.upload)
+    timer.start();
+  const url = `pages/${page.id}.json`;
+  const promise = await axios.put(url, { page }, store.client).then(({ data }) => {
+    if (mode.watch) {
+      loggers_exports.resource("page", store);
+    } else if (mode.upload) {
+      event.emit("upload", "uploaded", page, {
+        key: file.key,
+        namespace: file.namespace,
+        fileSize: getSizeStr(page.body_html)
+      });
+    }
+    return data.page;
+  }).catch((e2) => {
+    if (requeue(e2.response.status)) {
+      queue.add(() => sync3(store, file, page));
+    } else {
+      console.log(e2);
+    }
+  });
+  if (!promise)
+    return void 0;
+  return promise;
+}
+
+// lib/forks/gfm.ts
+function taskListItems(turndownService) {
+  turndownService.addRule("taskListItems", {
+    filter: function(node) {
+      return node.type === "checkbox" && node.parentNode.nodeName === "LI";
+    },
+    replacement: function(_content, node) {
+      return (node.checked ? "[x]" : "[ ]") + " ";
+    }
+  });
+}
+function highlightedCodeBlock(turndownService) {
+  const highlight2 = /highlight-(?:text|source)-([a-z0-9]+)/;
+  turndownService.addRule("highlightedCodeBlock", {
+    filter: function(node) {
+      const firstChild = node.firstChild;
+      return node.nodeName === "DIV" && highlight2.test(node.className) && firstChild && firstChild.nodeName === "PRE";
+    },
+    replacement: function(_content, node, options) {
+      const className = node.className || "";
+      const language = (className.match(highlight2) || [null, ""])[1];
+      return "\n\n" + options.fence + language + "\n" + node.firstChild.textContent + "\n" + options.fence + "\n\n";
+    }
+  });
+}
+function strikethrough(turndownService) {
+  turndownService.addRule("strikethrough", {
+    filter: ["del", "s", "strike"],
+    replacement: function(content) {
+      return "~" + content + "~";
+    }
+  });
+}
+function tables(turndownService) {
+  const { indexOf, every } = Array.prototype;
+  function isHeadingRow(tr) {
+    const parentNode = tr.parentNode;
+    return parentNode.nodeName === "THEAD" || parentNode.firstChild === tr && (parentNode.nodeName === "TABLE" || isFirstTbody(parentNode)) && every.call(tr.childNodes, function(n) {
+      return n.nodeName === "TH";
+    });
+  }
+  function isFirstTbody(element) {
+    const previousSibling = element.previousSibling;
+    return element.nodeName === "TBODY" && (!previousSibling || previousSibling.nodeName === "THEAD" && /^\s*$/i.test(previousSibling.textContent));
+  }
+  function cell(content, node = null, index = null) {
+    if (index === null)
+      index = indexOf.call(node.parentNode.childNodes, node);
+    let prefix = " ";
+    if (index === 0)
+      prefix = "| ";
+    let filteredContent = content.trim().replace(/\n\r/g, "<br>").replace(/\n/g, "<br>");
+    filteredContent = filteredContent.replace(/\|+/g, "\\|");
+    while (filteredContent.length < 3)
+      filteredContent += " ";
+    if (node)
+      filteredContent = handleColSpan(filteredContent, node, " ");
+    return prefix + filteredContent + " |";
+  }
+  function nodeContainsTable(node) {
+    if (!node.childNodes)
+      return false;
+    for (let i = 0; i < node.childNodes.length; i++) {
+      const child = node.childNodes[i];
+      if (child.nodeName === "TABLE")
+        return true;
+      if (nodeContainsTable(child))
+        return true;
+    }
+    return false;
+  }
+  function tableShouldBeSkipped(tableNode) {
+    if (!tableNode)
+      return true;
+    if (!tableNode.rows)
+      return true;
+    if (tableNode.rows.length === 1 && tableNode.rows[0].childNodes.length <= 1)
+      return true;
+    if (nodeContainsTable(tableNode))
+      return true;
+    return false;
+  }
+  function nodeParentTable(node) {
+    let parent = node.parentNode;
+    while (parent.nodeName !== "TABLE") {
+      parent = parent.parentNode;
+      if (!parent)
+        return null;
+    }
+    return parent;
+  }
+  function handleColSpan(content, node, emptyChar) {
+    const colspan = Number(node.getAttribute("colspan")) || 1;
+    for (let i = 1; i < colspan; i++)
+      content += " | " + emptyChar.repeat(3);
+    return content;
+  }
+  function tableColCount(node) {
+    let maxColCount = 0;
+    for (let i = 0; i < node.rows.length; i++) {
+      const row = node.rows[i];
+      const colCount = row.childNodes.length;
+      if (colCount > maxColCount)
+        maxColCount = colCount;
+    }
+    return maxColCount;
+  }
+  turndownService.keep(function(node) {
+    return node.nodeName === "TABLE";
+  });
+  turndownService.addRule("tableCell", {
+    filter: ["th", "td"],
+    replacement: function(content, node) {
+      if (tableShouldBeSkipped(nodeParentTable(node)))
+        return content;
+      return cell(content, node);
+    }
+  });
+  turndownService.addRule("tableRow", {
+    filter: "tr",
+    replacement: function(content, node) {
+      const parentTable = nodeParentTable(node);
+      if (tableShouldBeSkipped(parentTable))
+        return content;
+      let borderCells = "";
+      const alignMap = { left: ":--", right: "--:", center: ":-:" };
+      if (isHeadingRow(node)) {
+        const colCount = tableColCount(parentTable);
+        for (let i = 0; i < colCount; i++) {
+          const childNode = colCount >= node.childNodes.length ? null : node.childNodes[i];
+          let border = "---";
+          const align = childNode ? (childNode.getAttribute("align") || "").toLowerCase() : "";
+          if (align)
+            border = alignMap[align] || border;
+          if (childNode) {
+            borderCells += cell(border, node.childNodes[i]);
+          } else {
+            borderCells += cell(border, null, i);
+          }
+        }
+      }
+      return "\n" + content + (borderCells ? "\n" + borderCells : "");
+    }
+  });
+  turndownService.addRule("tableSection", {
+    filter: ["thead", "tbody", "tfoot"],
+    replacement: function(content) {
+      return content;
+    }
+  });
+  turndownService.addRule("table", {
+    // Only convert tables with a heading row.
+    // Tables with no heading row are kept using `keep` (see below).
+    filter: function(node) {
+      return node.nodeName === "TABLE";
+    },
+    replacement: function(content, node) {
+      if (tableShouldBeSkipped(node))
+        return content;
+      content = content.replace(/\n+/g, "\n");
+      let secondLine = content.trim().split("\n");
+      if (secondLine.length >= 2)
+        secondLine = secondLine[1];
+      const secondLineIsDivider = secondLine.indexOf("| ---") === 0;
+      const columnCount = tableColCount(node);
+      let emptyHeader = "";
+      if (columnCount && !secondLineIsDivider) {
+        emptyHeader = "|" + "     |".repeat(columnCount) + "\n|" + " --- |".repeat(columnCount);
+      }
+      return "\n\n" + emptyHeader + content + "\n\n";
+    }
+  });
+}
+function gfm(turndownService) {
+  turndownService.use([
+    highlightedCodeBlock,
+    strikethrough,
+    tables,
+    taskListItems
+  ]);
+}
+
+// lib/process/metafields.ts
+function checkMetafieldType(type2) {
+  return type2 === "boolean" || type2 === "color" || type2 === "date" || type2 === "date_time" || type2 === "dimension" || type2 === "json" || type2 === "money" || type2 === "multi_line_text_field" || type2 === "number_decimal" || type2 === "number_integer" || type2 === "rating" || type2 === "rich_text_field" || type2 === "single_line_text_field" || type2 === "url" || type2 === "volume" || type2 === "weight";
+}
+function getPageMetafields(file, metafields) {
+  for (const metafield of metafields) {
+    for (const prop2 of [
+      "key",
+      "type",
+      "value",
+      "namespace",
+      "description"
+    ]) {
+      if (prop2 !== "description" && !has(prop2, metafield)) {
+        loggers_exports.invalid(file.relative, [
+          `Missing ${blue.bold(prop2)} property key value in a ${yellowBright.bold("metafields")}`,
+          "value of page frontmatter. Frontmatter metafields require you provide the following keys:",
+          "",
+          `${gray("-")} ${white("key")}`,
+          `${gray("-")} ${white("type")}`,
+          `${gray("-")} ${white("value")}`,
+          `${gray("-")} ${white("namespace")}`,
+          "",
+          `${gray("Update the metafield entry to include")} ${white(prop2)}`
+        ]);
+        return false;
+      }
+      if (prop2 === "type") {
+        const type2 = metafield[prop2];
+        if (!checkMetafieldType(type2)) {
+          loggers_exports.invalid(file.relative, [
+            `Invalid type ${blue.bold(type2)} provided in a page frontmatter ${yellowBright.bold("metafields")}`,
+            `value. Frontmatter metafields ${bold("must")} be one of following types:`,
+            "",
+            `${gray("-")} ${white("boolean")}`,
+            `${gray("-")} ${white("color")}`,
+            `${gray("-")} ${white("date")}`,
+            `${gray("-")} ${white("date_time")}`,
+            `${gray("-")} ${white("dimension")}`,
+            `${gray("-")} ${white("json")}`,
+            `${gray("-")} ${white("money")}`,
+            `${gray("-")} ${white("multi_line_text_field")}`,
+            `${gray("-")} ${white("number_decimal")}`,
+            `${gray("-")} ${white("number_integer")}`,
+            `${gray("-")} ${white("rating")}`,
+            `${gray("-")} ${white("rich_text_field")}`,
+            `${gray("-")} ${white("single_line_text_field")}`,
+            `${gray("-")} ${white("url")}`,
+            `${gray("-")} ${white("volume")}`,
+            `${gray("-")} ${white("weigh")}`,
+            "",
+            `${gray("Update the metafield entry to an accepted")} ${white("type")}`
+          ]);
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+// lib/transform/pages.ts
+function toMarkdown(content) {
+  const td = new Turndown__default.default($.page.import);
+  td.use(gfm);
+  return td.turndown(content);
+}
+async function promptAction(store) {
+  const resume = loggers_exports.prompt("No matching pages, select an option", {
+    title: "No matching pages",
+    message: "Open CLI and select an option"
+  });
+  const prompt2 = await prompts2__default.default({
+    type: "select",
+    name: "action",
+    message: "Page Resources",
+    hint: " ",
+    instructions: false,
+    choices: [
+      {
+        title: "Create Page",
+        description: `Create a new page on ${store.domain}`,
+        value: 1 /* Create */
+      },
+      {
+        title: "Select Page",
+        description: `Select a page to overwrite on ${store.domain}`,
+        value: 2 /* Select */
+      },
+      {
+        title: "Cancel",
+        description: "Cancel, and skip this sync operation",
+        value: 4 /* Cancel */
+      }
+    ]
+  });
+  return {
+    resume,
+    action: prompt2.action
+  };
+}
+async function selectPage(store) {
+  const remote = await list(store);
+  if (!remote)
+    return;
+  const choices = remote.map(
+    (page) => ({
+      title: page.title,
+      description: `https://admin.shopify.com/store/${store.store.toLowerCase()}/pages/${page.id}`,
+      value: page.id
+    })
+  );
+  choices.push(
+    {
+      title: hrs(20),
+      disabled: true,
+      selected: false
+    },
+    {
+      title: "Create New Page",
+      description: `Create a new page on ${store.domain}`,
+      value: 1 /* Create */
+    },
+    {
+      title: "Cancel",
+      description: "Cancel, and skip this sync operation",
+      value: 4 /* Cancel */
+    }
+  );
+  const prompt2 = await prompts2__default.default({
+    type: "select",
+    name: "action",
+    message: "Choose Page",
+    hint: " ",
+    instructions: false,
+    choices
+  });
+  return prompt2.action;
+}
+async function promptOverwrite(remote) {
+  const choices = [
+    {
+      title: "View Source",
+      description: "Prints the page source in the CLI",
+      value: 5 /* View */
+    },
+    {
+      title: "Update Local",
+      description: "Update the local source with remote version",
+      value: 3 /* Update */
+    },
+    {
+      title: "Overwrite Remote",
+      description: "Overwrite the remote version with local source",
+      value: 6 /* Overwrite */
+    },
+    {
+      title: "Cancel",
+      description: "Cancel, and skip this sync operation",
+      value: 4 /* Cancel */
+    }
+  ];
+  const resume = loggers_exports.prompt("Remote version is newer than local version", {
+    title: "Remote \u2192 Local",
+    message: "Remote version has changed"
+  });
+  const prompt2 = await prompts2__default.default({
+    type: "select",
+    name: "action",
+    message: "Page Resources",
+    hint: " ",
+    instructions: false,
+    choices
+  });
+  if (prompt2.action === 5 /* View */) {
+    loggers_exports.nwl("");
+    loggers_exports.out(highlight__default.default(remote.body_html));
+    loggers_exports.nwl("");
+    const next = await prompts2__default.default({
+      type: "select",
+      name: "action",
+      message: "Page Resources",
+      hint: " ",
+      instructions: false,
+      choices: choices.slice(1)
+    });
+    return {
+      resume,
+      action: next.action
+    };
+  } else {
+    return {
+      resume,
+      action: prompt2.action
+    };
+  }
+}
+function getPayloadFromFrontmatter(file, data) {
+  const payload = {};
+  if (has("title", data)) {
+    payload.title = `${data.title}`;
+  } else {
+    payload.title = toUpcase(file.name.replace(/[._-]/g, " "));
+  }
+  if (has("handle", data)) {
+    let before;
+    let handle = data.handle;
+    if (/^[./]{1,2}/.test(handle)) {
+      before = handle;
+      handle = handle.replace(/^[./]{1,2}/, "");
+      loggers_exports.warn(`handle ${CHV} ${before} ${ARR} ${handle}`, "fixed start");
+    }
+    if (/^pages\//.test(handle)) {
+      before = handle;
+      handle = handle.replace(/^pages\//, "");
+      loggers_exports.warn(`handle ${CHV} ${before} ${ARR} ${handle}`, "fixed sub-path");
+    }
+    if (/[_/]/.test(data.handle)) {
+      before = handle;
+      handle = handle.replace(/[_/]/g, "-");
+      loggers_exports.warn(`handle ${CHV} ${before} ${ARR} ${handle}`, "fixed invalid characters");
+    }
+    payload.handle = handle;
+  } else {
+    if (has("title", data)) {
+      payload.handle = handleize(data.title);
+    } else {
+      payload.handle = file.name.toLowerCase();
+    }
+  }
+  if (has("author", data) && $.page.author !== "") {
+    let before;
+    let author = data.author;
+    if (/\//.test(data.author)) {
+      before = data.author;
+      author = before.replace(/\//g, " ");
+      loggers_exports.warn(`author ${CHV} ${before} ${ARR} ${author}`, "fixed invalid characters");
+    }
+    payload.author = author;
+  } else {
+    data.author = $.page.author;
+  }
+  if (has("published", data)) {
+    if (isBoolean(data.published)) {
+      payload.published = data.published;
+    } else {
+      loggers_exports.warn(`published ${CHV} expected boolean, got ${typeof data.published}`, "defaulted to false");
+      payload.published = false;
+    }
+  } else {
+    payload.published = true;
+  }
+  if (has("template_suffix", data)) {
+    if (has("template", data)) {
+      loggers_exports.warn("duplicate template_suffix references", "using template");
+      delete data.template_suffix;
+    } else {
+      data.template = data.template_suffix;
+      delete data.template_suffix;
+    }
+  }
+  if (has("template", data)) {
+    payload.template_suffix = data.template;
+  } else {
+    if ($.page.suffixDir && (isRegex($.page.global) && $.page.global.test(file.input) !== false)) {
+      payload.template_suffix = lastPath(file.input);
+    }
+  }
+  if (has("metafield", data)) {
+    loggers_exports.warn("use metafields instead of metafield", "sync will still process");
+    data.metafields = data.metafield;
+    delete data.metafield;
+  }
+  if (has("metafields", data)) {
+    if (isObject(data.metafields)) {
+      payload.metafields = [data.metafields];
+    }
+  } else {
+    payload.metafields = void 0;
+  }
+  return payload;
+}
+async function compile7(file, _cb) {
+  if ($.sync.stores.length > 1) {
+    loggers_exports.skipped(file, "pages do not support multistore sync");
+    return null;
+  }
+  const read = await fsExtra.readFile(file.input);
+  if (isEmpty(read.toString())) {
+    if ($.mode.watch)
+      loggers_exports.skipped(file, "empty file");
+    return null;
+  }
+  const frontmatter = matter__default.default(read);
+  const { data, content } = { ...frontmatter };
+  const payload = getPayloadFromFrontmatter(file, data);
+  if (isArray(payload.metafields) && !getPageMetafields(file, payload.metafields)) {
+    return null;
+  }
+  if (file.kind === "Markdown" /* Markdown */) {
+    timer.start();
+    payload.body_html = markdown__default.default($.page.export).render(content);
+    loggers_exports.transform(`${bold("Markdown")} ${ARR} ${bold("HTML")} ${TLD} ${timer.stop()}`);
+  } else {
+    loggers_exports.process("HTML");
+    payload.body_html = content;
+  }
+  const store = $.sync.stores[0];
+  const remote = await find3(store, { handle: payload.handle });
+  if (isArray(remote)) {
+    loggers_exports.invalid(file.relative, [
+      `Multiple pages returned when matching on handle ${blue.bold(payload.handle)}`,
+      "Syncify is unsure of to handle this request and has cancelled the sync. Please",
+      "check the provided handle in your webshop."
+    ]);
+    return null;
+  }
+  let cached;
+  if (isObject(remote)) {
+    payload.id = remote.id;
+    if (!(remote.id in $.cache.pages?.[store.domain])) {
+      await pages(store.domain, remote);
+      cached = remote;
+    } else {
+      cached = $.cache.pages[store.domain][remote.id];
+    }
+  }
+  if (isUndefined(remote)) {
+    if ($.page.safeSync) {
+      const prompt2 = await promptAction(store);
+      if (prompt2.action === 2 /* Select */) {
+        const action = await selectPage(store);
+        if (action === 4 /* Cancel */) {
+          return prompt2.resume();
+        } else if (action === 1 /* Create */) {
+          prompt2.resume();
+          loggers_exports.syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${gray(`${TLD} ${file.relative}`)}`);
+          return create4(store, payload);
+        } else {
+          payload.id = action;
+          prompt2.resume();
+        }
+      } else if (prompt2.action === 1 /* Create */) {
+        prompt2.resume();
+        loggers_exports.syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${gray(`${TLD} ${file.relative}`)}`);
+        return create4(store, payload);
+      } else {
+        return prompt2.resume();
+      }
+    }
+  }
+  if ($.page.safeSync && isObject(remote)) {
+    const online = new Date(remote.updated_at).getTime();
+    const local = new Date(cached.updated_at).getTime();
+    if (online > local && remote.body_html !== payload.body_html) {
+      const prompt2 = await promptOverwrite(remote);
+      if (prompt2.action === 3 /* Update */) {
+        prompt2.resume();
+        loggers_exports.updated(file, "local source aligned with remote");
+        let convert = remote.body_html;
+        if ($.page.importLanguage === "markdown") {
+          const markdown2 = toMarkdown(convert);
+          loggers_exports.transform(`${file.name}.html ${ARR} ${file.base}`);
+          convert = matter.stringify("\n" + markdown2, frontmatter.data);
+        }
+        $.watch.unwatch(file.input);
+        await fsExtra.writeFile(file.input, convert);
+        await pages(store.domain, remote);
+        $.watch.add(file.input);
+      } else if (prompt2.action === 4 /* Cancel */) {
+        return prompt2.resume();
+      } else if (prompt2.action === 6 /* Overwrite */) {
+        prompt2.resume();
+      }
+    }
+  }
+  if ($.mode.build)
+    return payload.body_html;
+  loggers_exports.syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${gray(`${TLD} ${file.relative}`)}`);
+  const update4 = await sync3(store, file, payload);
+  if (!update4)
+    return;
+  await pages(store.domain, update4);
+}
+
+// lib/modes/watch.ts
+function watch(callback) {
+  $.cache.lastResource = "watch";
+  const { sync: sync4, watch: watch2, mode, paths: paths2, wss, dirs } = $;
+  const request2 = client(sync4);
+  const parse5 = parseFile(paths2, dirs.output);
+  if (mode.hot)
+    $.wss.connected();
+  watch2.on("all", function(event2, path2) {
+    const file = parse5(path2);
+    if (isUndefined(file))
+      return;
+    if (file.base === $.file.base)
+      return loggers_exports.configChanges();
+    if (file.type !== 16 /* Spawn */)
+      loggers_exports.changed(file);
+    if (event2 === "change" || event2 === "add") {
+      handler2(file);
+    } else if (event2 === "unlink") {
+      if (file.type === 15 /* Page */) {
+        return request2.pages("delete", file);
+      } else {
+        return request2.assets("delete", file);
+      }
+    }
+  });
+  async function handler2(file) {
+    try {
+      let value = null;
+      if (file.type === 9 /* Script */) {
+        return compile4(file, request2.assets, callback);
+      } else if (file.type === 15 /* Page */) {
+        return compile7(file, callback);
+      } else if (file.type === 10 /* Svg */) {
+        return compile6(file, request2.assets, callback);
+      } else if (file.type === 13 /* Asset */ || file.type === 16 /* Spawn */) {
+        return compile(file, request2.assets, callback);
+      }
+      if (file.type === 8 /* Style */) {
+        value = await compile5(file, callback);
+      } else if (file.type === 4 /* Section */ && file.kind === "Liquid" /* Liquid */) {
+        value = await compile2(file, callback);
+      }
+      if (file.type === 4 /* Section */ && file.kind === "JSON" /* JSON */) {
+        value = await compile3(file, callback);
+      } else if (file.type === 2 /* Layout */) {
+        value = await compile2(file, callback);
+      } else if (file.type === 3 /* Snippet */) {
+        value = await compile2(file, callback);
+      } else if (file.type === 7 /* Locale */ || file.type === 6 /* Config */) {
+        value = await compile3(file, callback);
+      } else if (file.type === 14 /* Metafield */) {
+        value = await compile3(file, callback);
+        return request2.metafields({ value, namespace: file.namespace, key: file.key });
+      } else if (file.type === 1 /* Template */ && file.kind === "JSON" /* JSON */) {
+        value = await compile3(file, callback);
+      } else if (file.type === 1 /* Template */ && file.kind === "Liquid" /* Liquid */) {
+        value = await compile2(file, callback);
+      }
+      if (!isNil(value)) {
+        loggers_exports.syncing(file.key);
+        await request2.assets("put", file, value);
+        if (mode.hot) {
+          if (file.type === 4 /* Section */) {
+            wss.section(file.name);
+          } else if (file.type !== 9 /* Script */ && file.type !== 8 /* Style */) {
+            await queue.onIdle().then(() => wss.replace());
+          }
+        }
+      }
+    } catch (e2) {
+      console.error(e2);
+      loggers_exports.err(e2);
+    }
+  }
+}
+async function getModel3() {
+  const sync4 = /* @__PURE__ */ new Map();
+  let width = 0;
+  for (const theme of $.sync.themes) {
+    if (theme.target.length > width)
+      width = theme.target.length;
+    const store = $.sync.stores[theme.sidx];
+    const key = `${theme.store}:${theme.target}`;
+    const { assets } = await get(theme, store.client);
+    if (!sync4.has(key)) {
+      sync4.set(key, {
+        active: sync4.size === 0,
+        log: null,
+        number: sync4.size + 1,
+        size: assets.length,
+        transfers: 0,
+        warning: 0,
+        failed: 0,
+        success: 0,
+        retry: 0,
+        progress: loggers_exports.progress(assets.length),
+        get files() {
+          return assets;
+        },
+        get theme() {
+          return theme;
+        },
+        errors: {
+          local: /* @__PURE__ */ new Map(),
+          remote: /* @__PURE__ */ new Map(),
+          retry: /* @__PURE__ */ new Set()
+        }
+      });
+    }
+  }
+  return sync4;
+}
+function getDoneLog(record, output, time2) {
+  const success = `  ${bold(`${record.success}`)} ${white("of")} ${bold(`${record.size}`)}`;
+  const failed2 = `  ${bold(`${record.failed}`)}`;
+  const target = bold(`${record.theme.target.toUpperCase()}`);
+  return [
+    tui_exports.message("neonCyan", `${target}  ${ARR}  ${record.theme.store}`),
+    newline,
+    tui_exports.message("gray", `completed in ${gray(time2)}`),
+    newline,
+    tui_exports.suffix("whiteBright", "synced  ", success),
+    "\n",
+    tui_exports.suffix(record.failed > 0 ? "redBright" : "white", "errors", failed2),
+    "\n",
+    tui_exports.suffix("whiteBright", "location ", `  ${gray.underline(output)}`),
+    newline,
+    record.progress.render(),
+    newline
+  ].join("");
+}
+function getWaitLog(record) {
+  return [
+    tui_exports.message("neonCyan", `${bold(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`),
+    newline,
+    tui_exports.message("white", `${bold(addSuffix(record.number))} in queue`),
+    newline,
+    tui_exports.suffix("gray", "synced  ", `  ${bold("0")} ${white("of")} ${bold(`${record.size}`)}`),
+    "\n",
+    tui_exports.suffix("gray", "retry ", `  ${bold("0")}`),
+    "\n",
+    tui_exports.suffix("gray", "errors", `  ${bold("0")}`),
+    newline,
+    record.progress.render(),
+    newline
+  ].join("");
+}
+async function importing(cb) {
+  $.cache.lastResource = "import";
+  let transfers = 0;
+  timer.start("import");
+  loggers_exports.group("Import", true);
+  loggers_exports.spinner("Preparing");
+  const sync4 = await getModel3();
+  await delay(500);
+  function callback(item) {
+    loggers_exports.spinner.stop();
+    const { theme, file } = item;
+    const key = `${theme.store}:${theme.target}`;
+    const record = sync4.get(key);
+    const preview = `https://${theme.store}?preview_theme_id=${theme.id}`;
+    const prefix = [
+      tui_exports.suffix("gray", "Duration", whiteBright(`  ${timer.now("import")}`)),
+      "\n",
+      tui_exports.suffix("gray", "Transfers", whiteBright.bold(`  ${transfers++}`)),
+      "\n",
+      tui_exports.suffix("gray", "Syncing", `  ${pink(`${bold(theme.target)}  ${ARR}  ${theme.store}`)}`),
+      "\n",
+      tui_exports.suffix("gray", "Preview", `  ${underline(preview)}`),
+      newline,
+      hrs(preview.length + 17),
+      newline
+    ].join("");
+    let processing = "";
+    if (item.status === 3 /* Empty */) {
+      fsExtra.writeFileSync(file.output, "");
+      record.warning += 1;
+      record.transfers += 1;
+      record.progress.increment(1);
+      processing = tui_exports.message("yellowBright", file.key);
+    } else if (item.status === 0 /* Success */) {
+      if (record.errors.retry.has(file.output)) {
+        record.retry -= 1;
+        record.errors.retry.delete(file.output);
+      }
+      record.success += 1;
+      record.transfers += 1;
+      record.progress.increment(1);
+      const buffer = has("attachment", item.data.asset) ? Buffer.from(item.data.asset.attachment, "base64") : Buffer.from(item.data.asset.value || null, "utf8");
+      fsExtra.writeFileSync(file.output, buffer);
+      processing = tui_exports.message("neonGreen", file.key);
+    } else if (item.status === 1 /* Retry */) {
+      if (!record.errors.retry.has(file.output)) {
+        record.retry += 1;
+        record.errors.retry.add(file.output);
+      }
+      processing = tui_exports.message("orange", file.key);
+    } else if (item.status === 2 /* Failed */) {
+      if (record.errors.retry.has(file.output)) {
+        record.retry -= 1;
+        record.errors.retry.delete(file.output);
+      }
+      if (!record.errors.remote.has(file.output)) {
+        record.failed += 1;
+        record.transfers += 1;
+        record.progress.increment(1);
+        record.errors.remote.set(file.output, item);
+      }
+      processing = tui_exports.message("redBright", file.key);
+    }
+    const success = `  ${bold(`${record.success}`)} ${white("of")} ${bold(`${record.size}`)}`;
+    const retried = `  ${bold(`${record.retry}`)}`;
+    const failed2 = `  ${bold(`${record.failed}`)}`;
+    const warnings2 = `  ${bold(`${record.warning}`)}`;
+    const status = [
+      tui_exports.message("neonCyan", `${bold(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`),
+      newline,
+      processing,
+      newline,
+      tui_exports.suffix("whiteBright", "synced   ", success),
+      "\n",
+      tui_exports.suffix(record.retry > 0 ? "orange" : "whiteBright", "retry ", retried),
+      "\n",
+      tui_exports.suffix(record.warning > 0 ? "yellowBright" : "whiteBright", "warning ", warnings2),
+      "\n",
+      tui_exports.suffix(record.failed > 0 ? "redBright" : "whiteBright", "errors", failed2),
+      newline,
+      record.progress.render(),
+      newline
+    ].join("");
+    const message2 = [prefix];
+    let counter = 0;
+    for (const stream of sync4.values()) {
+      if (stream.active) {
+        message2.push(status);
+      } else {
+        if (stream.log === null) {
+          counter = counter + 1;
+          stream.number = counter;
+          message2.push(getWaitLog(stream));
+        } else {
+          message2.push(stream.log);
+        }
+      }
+    }
+    loggers_exports.update(glue(message2));
+  }
+  event.on("import", callback);
+  sync4.size - 1;
+  for (const [id, record] of sync4) {
+    const [store, target] = id.split(":");
+    const output = pathe.join($.dirs.import, store, target);
+    timer.start(id);
+    record.active = true;
+    for (const { key } of record.files) {
+      const file = importFile(key, output);
+      const payload = assign({
+        url: record.theme.url,
+        method: "get",
+        params: {
+          "asset[key]": file.key
+        }
+      }, $.sync.stores[record.theme.sidx].client);
+      await queue.add(() => sync(record.theme, file, payload));
+    }
+    await queue.onIdle();
+    record.active = false;
+    record.log = getDoneLog(sync4.get(id), pathe.relative($.cwd, output), timer.stop(id));
+  }
+  for (const { errors: errors2 } of sync4.values()) {
+    if (errors2.remote.size > 0) ;
+  }
+}
+async function hasTemplateMismatch(cwd) {
+  const files = await glob7.glob("templates/*", { cwd, absolute: true });
+  const exclude = /* @__PURE__ */ new Set();
+  const exists = /* @__PURE__ */ new Set();
+  for (const file of files) {
+    const { name } = pathe.parse(file);
+    const templates = files.filter((path2) => pathe.parse(path2).name === name);
+    if (templates.length > 1 && !exists.has(name))
+      exists.add(name);
+  }
+  if (exists.size === 0)
+    return 1 /* None */;
+  if (exists.size > 1) {
+    loggers_exports.out(tui_exports.suffix("redBright", "error", `${bold(`${exists.size}`)} mismatch template files`));
+  } else {
+    loggers_exports.out(tui_exports.suffix("redBright", "error", `${bold(`${exists.size}`)} mismatch template file`));
+  }
+  const resume = loggers_exports.prompt(`select ${bold(".json")} or ${bold(".liquid")} template`, {
+    title: "Export Error",
+    message: "Multiple templates detected"
+  });
+  const { action } = await prompts2__default.default([
+    {
+      name: "action",
+      type: "select",
+      message: "Select an Option",
+      hint: " ",
+      instructions: false,
+      choices: [
+        {
+          title: "Select Templates",
+          description: "Choose which templates to export",
+          value: "select"
+        },
+        {
+          title: "Export .json Templates",
+          description: "Exports the .json templates",
+          value: "json"
+        },
+        {
+          title: "Export .liquid Templates",
+          description: "Exports the .liquid templates",
+          value: "liquid"
+        },
+        {
+          title: "Cancel Export",
+          value: "cancel"
+        }
+      ]
+    }
+  ]);
+  if (action === "select") {
+    const choices = [];
+    for (const name of exists) {
+      choices.push({
+        name: "choice",
+        type: "toggle",
+        message: "templates",
+        hint: " ",
+        active: `${name}.json`,
+        inactive: `${name}.liquid`,
+        onState: ({ value }) => {
+          if (value) {
+            exclude.add(pathe.join(cwd, "templates", `${name}.liquid`));
+          } else {
+            exclude.add(pathe.join(cwd, "templates", `${name}.json`));
+          }
+        }
+      });
+    }
+    await prompts2__default.default(choices).then(() => resume());
+    return exclude;
+  } else if (action === "json") {
+    for (const name of exists) {
+      exclude.add(pathe.join(cwd, "templates", `${name}.json`));
+    }
+    resume();
+    return exclude;
+  } else if (action === "liquid") {
+    for (const name of exists) {
+      exclude.add(pathe.join(cwd, "templates", `${name}.liquid`));
+    }
+    resume();
+    return exclude;
+  } else if (action === "cancel") {
+    resume();
+  }
+  return 2 /* Cancel */;
+}
+function isEmptyOutputDir(stats) {
+  if (stats.assets === 0 && stats.config === 0 && stats.templates === 0 && stats.layout === 0 && stats.snippets === 0 && stats.sections === 0) {
+    throwError("Empty output directory", [
+      `There are no files within ${neonCyan(pathe.relative($.cwd, $.dirs.output) + "/**")}`,
+      `You may need to run the ${neonCyan.bold("syncify build")} command and try again.`
+    ]);
+  }
+}
+
+// lib/modes/export.ts
+async function exporting(cb) {
+  const { stats, mode, dirs, vc, cwd } = $;
+  timer.start("export");
+  $.cache.lastResource = "export";
+  if (!mode.build)
+    isEmptyOutputDir(stats);
+  loggers_exports.group("Export");
+  if (mode.build) {
+    loggers_exports.write(whiteBright.bold("CLEAN"));
+    loggers_exports.nwl();
+    loggers_exports.write(whiteBright(`${CHK}${neonCyan(pathe.relative($.cwd, $.dirs.output))}  ${ARR}  cleaned`));
+    loggers_exports.nwl();
+    loggers_exports.write(whiteBright.bold("BUILD"));
+    loggers_exports.nwl();
+    await build2(cb);
+  }
+  const validate = await hasTemplateMismatch(dirs.output);
+  if (validate === 2 /* Cancel */)
+    return;
+  if (validate === 1 /* None */) {
+    loggers_exports.out(`${line.gray}Build Completed ${gray(`~ ${timer.stop("build")}`)}`);
+    loggers_exports.nwl();
+  }
+  loggers_exports.write(whiteBright.bold("EXPORT"));
+  loggers_exports.nwl();
+  if (!await fsExtra.pathExists(dirs.export)) {
+    await fsExtra.mkdir(dirs.export);
+  }
+  const zip = new AdmZip__default.default();
+  for (const dir of THEME_DIRS) {
+    const uri = pathe.join(dirs.output, dir);
+    const has2 = await fsExtra.pathExists(uri);
+    if (has2) {
+      const files = await glob7.glob("*", { cwd: uri, absolute: true });
+      for (const file of files) {
+        const path2 = `${dir}/${pathe.basename(file)}`;
+        const stat2 = fsExtra.statSync(file);
+        if (stat2.size === 0) {
+          zip.addFile(path2, toBuffer(" "));
+        } else {
+          if (validate === 1 /* None */ || validate.has(file) === false) {
+            zip.addLocalFile(file, dir);
+          }
+        }
+      }
+    }
+  }
+  const size2 = byteSize(zip.toBuffer());
+  if (vc.update !== null) {
+    if (!await fsExtra.pathExists(vc.update.dir))
+      await fsExtra.mkdir(vc.update.dir);
+    loggers_exports.out(tui_exports.suffix("whiteBright", "process", `${pathe.relative(cwd, vc.update.zip)} ${TLD} ${timer.stop("export")}`));
+    loggers_exports.out(tui_exports.suffix("whiteBright", "version", `${bold(vc.update.bump)} ${vc.number} ${ARL} ${vc.update.number}`));
+    await zip.writeZipPromise(vc.update.zip);
+  } else {
+    if (!await fsExtra.pathExists(vc.dir))
+      await fsExtra.mkdir(vc.dir);
+    loggers_exports.out(tui_exports.suffix("whiteBright", "process", `${pathe.relative(cwd, vc.zip)} ${TLD} ${timer.stop("export")}`));
+    loggers_exports.out(tui_exports.suffix("whiteBright", "version", `${bold(vc.number)}`));
+    await zip.writeZipPromise(vc.zip);
+  }
+  loggers_exports.out(tui_exports.suffix("whiteBright", "transform", `${bold("ZIP")} ${TLD} ${gray(getSizeStr(size2))}`));
+  loggers_exports.nwl();
+  loggers_exports.group();
+  loggers_exports.nwl("");
+  process.exit(0);
+}
+
+// lib/cli/exit.ts
+var trigger = false;
+var register = false;
+var hooks = /* @__PURE__ */ new Set();
+function exit(manual, signal2) {
+  if (trigger)
+    return;
+  trigger = true;
+  for (const hook2 of hooks)
+    hook2();
+  if (manual)
+    process.exit(128 + signal2);
+}
+function kill(callback) {
+  hooks.add(callback);
+  if (!register) {
+    register = true;
+    process.once("exit", exit);
+    process.once("SIGINT", exit.bind(void 0, true, 2));
+    process.once("SIGTERM", exit.bind(void 0, true, 15));
+    process.on("message", (message2) => {
+      if (message2 === "shutdown")
+        exit(true, -128);
+    });
+  }
+  return () => hooks.delete(callback);
+}
+
+// lib/hot/server.ts
+var HOTError = {
+  enable: true,
+  output: []
+};
+async function injection() {
+  loggers_exports.update(tui_exports.message("gray", "validating snippet injection"));
+  const snippet3 = await injectSnippet();
+  if (snippet3) {
+    loggers_exports.update(tui_exports.message("gray", "validating layouts"));
+    for (const layout in $.hot.alive) {
+      const exists = await fsExtra.pathExists(layout);
+      if (!exists) {
+        loggers_exports.update(tui_exports.message("gray", "layout has not yet been bundled, building now..."));
+        const files = glob7__default.default.sync($.config.paths.layout, {
+          cwd: $.dirs.input,
+          absolute: true
+        });
+        for (const input of files) {
+          if (pathe.basename(input) === pathe.basename(layout)) {
+            const source = await fsExtra.readFile(input);
+            await fsExtra.writeFile(layout, source);
+          }
+        }
+        loggers_exports.update(tui_exports.message("gray", "layout was bundled from source, injecting hot snippet"));
+      }
+      const render = await injectRender(layout);
+      if (!render) {
+        loggers_exports.update.clear();
+        loggers_exports.err("Failed to inject hot reload render tag");
+      }
+    }
+    loggers_exports.update.clear();
+  } else {
+    loggers_exports.update.clear();
+    loggers_exports.err("Failed to upload snippet");
+  }
+}
+async function server() {
+  if (!HOTError.enable) {
+    HOTError.output.push(
+      line.red,
+      line.red + redBright("Change the socket port address or kill the session occupying it."),
+      line.red + redBright("This error typically occurs when multiple Syncify instances are active.")
+    );
+    loggers_exports.err(redBright(`${bold("ERROR")} on ${bold(`${$.hot.method === "hot" ? "HOT" : "LIVE"} Reload:`)}`));
+    loggers_exports.out(HOTError.output.join("\n"));
+    return null;
+  }
+  loggers_exports.out(tui_exports.message("whiteBright", bold(`${$.hot.method === "hot" ? "HOT" : "LIVE"} Reloading:`)));
+  loggers_exports.nwl();
+  loggers_exports.update(tui_exports.message("gray", "configuring HOT Reload"));
+  await injection();
+  function setHeaders(res) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cache-Control", "public, max-age=0");
+  }
+  const assets = statics__default.default(pathe.join($.dirs.output, "assets"), { setHeaders });
+  const server2 = http__default.default.createServer((req, res) => assets(req, res, handler__default.default(req, res)));
+  const localhost = `http://localhost:${$.hot.server}`;
+  const onerror = (e2) => {
+    if (e2.code === "EADDRINUSE") {
+      HOTError.output.push(
+        line.red + redBright(`${bold("EADDRINUSE")} ${ARR} ${localhost}`),
+        line.red,
+        line.red + redBright.bold(`Server Port ${$.hot.server} address already in use`),
+        line.red,
+        line.red + redBright("Change the server port address or kill the session occupying it."),
+        line.red + redBright("This error typically occurs when multiple Syncify instances are active.")
+      );
+      loggers_exports.update.clear();
+      loggers_exports.out(HOTError.output.join("\n"));
+      $.wss.http.close();
+      return null;
+    }
+  };
+  const onconnect = () => {
+    loggers_exports.update.done();
+    $.wss.connected();
+    server2.removeListener("error", onerror);
+    server2.removeListener("connect", onconnect);
+  };
+  server2.on("error", onerror);
+  server2.on("connect", onconnect);
+  server2.listen($.hot.server);
+  const port = neonCyan("PORT") + COL + gray(`${$.hot.server}`);
+  loggers_exports.update(tui_exports.message("pink", `server ${ARR} ${bold("localhost")} ${ARR} ${port}`));
+}
+function socket() {
+  if ($.mode.hot === false)
+    return;
+  const wss = new ws.Server({
+    port: $.hot.socket,
+    path: "/ws",
+    skipUTF8Validation: true
+  });
+  kill(() => {
+    wss.emit("disconnect");
+    wss.close();
+  });
+  const onerror = (error3) => {
+    if (error3.code === "EADDRINUSE") {
+      wss.close();
+      HOTError.enable = false;
+      HOTError.output.push(
+        line.red + redBright(`${bold("EADDRINUSE")} ${ARR} ws://localhost:${$.hot.server}`),
+        line.red,
+        line.red + redBright.bold(`Socket Port ${$.hot.server} address already in use`)
+      );
+    }
+  };
+  const onclose = () => {
+    wss.removeAllListeners("script");
+    wss.removeAllListeners("stylesheet");
+    wss.removeAllListeners("section");
+    wss.removeAllListeners("svg");
+    wss.removeAllListeners("assets");
+    wss.removeAllListeners("reload");
+    wss.removeAllListeners("replace");
+  };
+  const onconnection = (socket2) => {
+    wss.removeListener("error", onerror);
+    wss.prependListener("script", (src) => socket2.send(`script,${src}`));
+    wss.prependListener("stylesheet", (href) => socket2.send(`stylesheet,${href}`));
+    wss.prependListener("section", (id) => socket2.send(`section,${id}`));
+    wss.prependListener("svg", (id) => socket2.send(`svg,${id}`));
+    wss.prependListener("assets", () => socket2.send("assets"));
+    wss.prependListener("reload", () => socket2.send("reload"));
+    wss.prependListener("replace", () => socket2.send("replace"));
+    wss.prependListener("connected", () => socket2.send("connected"));
+    wss.prependListener("disconnect", () => socket2.send("disconnect"));
+  };
+  wss.on("close", onclose);
+  wss.on("error", onerror);
+  wss.on("connection", onconnection);
+  return {
+    get http() {
+      return wss;
+    },
+    script: (src) => wss.emit("script", pathe.basename(src)),
+    stylesheet: (href) => wss.emit("stylesheet", pathe.basename(href)),
+    section: (id) => wss.emit("section", id),
+    svg: (id) => wss.emit("svg", id),
+    assets: () => wss.emit("assets"),
+    reload: () => wss.emit("reload"),
+    replace: () => wss.emit("replace"),
+    connected: () => wss.emit("connected"),
+    disconnect: () => wss.emit("disconnected")
+  };
+}
+
+// lib/log/stdin.ts
+function stdin(data) {
+  const input = data.toString().trim().toLowerCase();
+  if (input === "v") {
+    const items = keys(errors);
+    for (let i = 0, l = items.length; i < l; i++) {
+      const prop2 = items[i];
+      if (errors[prop2].size === 0)
+        continue;
+      if (i > 0)
+        loggers_exports.hline(10);
+      loggers_exports.write(bold.whiteBright(prop2));
+      for (const message2 of errors[prop2].values()) {
+        if (isString(message2) && message2.length > 0) {
+          error(message2);
+        }
+      }
+      errors[prop2].clear();
+    }
+    if ($.mode.upload) {
+      loggers_exports.out(tui_exports.closer("Upload"), "\n");
+      process.exit(0);
+    }
+  } else if (input === "w") {
+    for (const prop2 in warning2.process) {
+      if (warning2.process[prop2].size === 0)
+        continue;
+      loggers_exports.nwl();
+      loggers_exports.write(bold.yellow(prop2));
+      loggers_exports.nwl();
+      for (const message2 of warning2.process[prop2].values()) {
+        if (typeof message2 === "string" && message2.length > 0) {
+          loggers_exports.write(tui_exports.multiline("warning", message2));
+        }
+      }
+      warning2.process[prop2].clear();
+    }
+    warning2.count = 0;
+  }
+}
+
+// lib/log/help.ts
+`
+  ${gray("-----------------------------------------------------------------------------")}
+  ${bold("Syncify CLI Examples")}                                             ${gray("by Panoply")}
+  ${gray("-----------------------------------------------------------------------------")}
+
+  ${bold("Watching" + COL)}
+
+  ${gray("Targeting 1 store and 1 theme")}:
+  $ sync your-store${gray("=")}theme-1 --watch
+
+  ${gray("Targeting 1 store and 2 themes with hot reloading")}:
+  $ sync your-store${gray("=")}theme-1,theme-2 --watch --hot
+
+  ${gray("Targeting 2 stores and 1 theme")}:
+  $ sync --your-store${gray("=")}theme-1 --another-store${gray("=")}some-theme --watch
+
+  ${gray("Targeting 2 stores and 2 themes")}:
+  $ sync --your-store${gray("=")}theme-1,theme-2 --another-store${gray("=")}some-theme,test-theme --watch
+
+  ${gray("Targeting 1 store with 2 themes and clean mode with hot live reloads")}:
+  $ sync your-store${gray("=")}theme-1,theme-2 --watch --clean --hot
+
+  ${gray("Targeting 1 store with 2 themes in production mode")}:
+  $ sync your-store${gray("=")}theme-1,theme-2 --prod --watch
+
+`;
+var help = `
+  ${gray("-----------------------------------------------------------------------------")}
+  ${bold("Syncify")}  <!version!>                                               ${gray("by Panoply")}
+  ${gray("-----------------------------------------------------------------------------")}
 
   Welcome to the Syncify CLI. The command line utility assumes that
-  you have defined stores, themes and setup credentials within a ${g(".env")} file.
+  you have defined stores, themes and setup credentials within a ${gray(".env")} file.
 
-  ${F("Aliases"+N)}
+  ${bold("Aliases" + COL)}
 
   $ sync
 
-  ${F("Commands"+N)}
+  ${bold("Commands" + COL)}
 
-  $ syncify                    ${g.italic("Interactive prompt")}
-  $ syncify {store} [theme]    ${g.italic("Prints list of connected stores")}
+  $ syncify                    ${gray.italic("Interactive prompt")}
+  $ syncify {store} [theme]    ${gray.italic("Prints list of connected stores")}
 
-  ${F("Themes"+N)}
+  ${bold("Themes" + COL)}
 
-       --<store>    [theme]     ${g.italic("A store reference command (run examples)")}
-    -t, --theme     [theme]     ${g.italic("A comma seprated list of themes")}
+       --<store>    [theme]     ${gray.italic("A store reference command (run examples)")}
+    -t, --theme     [theme]     ${gray.italic("A comma seprated list of themes")}
 
-  ${F("Paths"+N)}
+  ${bold("Paths" + COL)}
 
-    -c, --config    <path>     ${g.italic("Set configs path")}
-    -i, --input     <path>     ${g.italic("Set input path")}
-    -o, --output    <path>     ${g.italic("Set output path")}
+    -c, --config    <path>     ${gray.italic("Set configs path")}
+    -i, --input     <path>     ${gray.italic("Set input path")}
+    -o, --output    <path>     ${gray.italic("Set output path")}
 
-  ${F("Utility"+N)}
+  ${bold("Utility" + COL)}
 
-    -f, --filter    <path>     ${g.italic("Glob path, use with pull or push triggers")}
+    -f, --filter    <path>     ${gray.italic("Glob path, use with pull or push triggers")}
 
-  ${F("Environment"+N)}
+  ${bold("Environment" + COL)}
 
-    --dev                      ${g.italic("Build in development mode (default)")}
-    --prod                     ${g.italic("Build in production mode")}
-    --hot                      ${g.italic("Run watch with hot-reloads")}
+    --dev                      ${gray.italic("Build in development mode (default)")}
+    --prod                     ${gray.italic("Build in production mode")}
+    --hot                      ${gray.italic("Run watch with hot-reloads")}
 
-  ${F("Modes"+N)}
+  ${bold("Modes" + COL)}
 
-    -w, --watch                ${g.italic("Run watch mode")}
-    -b, --build                ${g.italic("Run build mode from input")}
-    -u, --upload               ${g.italic("Run upload mode theme to stores")}
-    -d, --download             ${g.italic("Run download mode from theme and stores")}
-    -m, --metafields           ${g.italic("Run metafields resource mode")}
-    -p, --pages                ${g.italic("Run pages resource mode")}
-    -r, --redirects            ${g.italic("Run redirects resource mode")}
+    -w, --watch                ${gray.italic("Run watch mode")}
+    -b, --build                ${gray.italic("Run build mode from input")}
+    -u, --upload               ${gray.italic("Run upload mode theme to stores")}
+    -d, --download             ${gray.italic("Run download mode from theme and stores")}
+    -m, --metafields           ${gray.italic("Run metafields resource mode")}
+    -p, --pages                ${gray.italic("Run pages resource mode")}
+    -r, --redirects            ${gray.italic("Run redirects resource mode")}
 
-  ${F("Resource"+N)}
+  ${bold("Resource" + COL)}
 
-    --pull                     ${g.italic("Pull a resource from a shop or theme")}
-    --push                     ${g.italic("Push a resource to a shop or theme")}
-    --silent                   ${g.italic("Silent logs, only warnings or errors are printed")}
+    --pull                     ${gray.italic("Pull a resource from a shop or theme")}
+    --push                     ${gray.italic("Push a resource to a shop or theme")}
+    --silent                   ${gray.italic("Silent logs, only warnings or errors are printed")}
 
-  ${F("Trigger"+N)}
+  ${bold("Trigger" + COL)}
 
-    --spawn   [list]           ${g.italic("Invoke a defined spawn child process/s")}
-    --delete  [list]           ${g.italic("Delete a remote and local file")}
-    --minify  [list]           ${g.italic("invoke minify mode, accepts resource/s")}
+    --spawn   [list]           ${gray.italic("Invoke a defined spawn child process/s")}
+    --delete  [list]           ${gray.italic("Delete a remote and local file")}
+    --minify  [list]           ${gray.italic("invoke minify mode, accepts resource/s")}
 
-  ${F("Other"+N)}
+  ${bold("Other" + COL)}
 
-    --strap                    ${g.italic("Import a strap into the project")}
-    --vsc                      ${g.italic("Generate vscode specific settings")}
-    --help                     ${g.italic("Show the screen")}
+    --strap                    ${gray.italic("Import a strap into the project")}
+    --vsc                      ${gray.italic("Generate vscode specific settings")}
+    --help                     ${gray.italic("Show the screen")}
 
-  ${F("Help"+N)}
+  ${bold("Help" + COL)}
 
-    -h, --help                 ${g.italic("Print this screen")}
-    -h, --help  {examples}     ${g.italic("Print a list of command examples")}
+    -h, --help                 ${gray.italic("Print this screen")}
+    -h, --help  {examples}     ${gray.italic("Print a list of command examples")}
 
- ${g("-----------------------------------------------------------------------------")}
+ ${gray("-----------------------------------------------------------------------------")}
 
-`;function $m(e,t){return e.replace(ss,`.bundled_${Ye()}.${t==="esm"?"mjs":"cjs"}`)}function vm(e){if(typeof jest>"u")return "cjs";let t=pathe.extname(e);return t===".js"?u.pkg.type==="module"?"esm":"cjs":t===".ts"||t===".mjs"?"esm":"cjs"}function Bm(e){return Re(e||{}).map(t=>new RegExp(`^${t.replace(/\*/,".*")}$`))}function Qa(e,t){return t?t.some(s=>s instanceof RegExp?s.test(e):e===s||e.startsWith(s+"/")):!1}function Am({external:e,notExternal:t}={}){return {name:"bundle-require:external",setup({onResolve:s}){s({filter:/.*/},async r=>{if(!(r.path.charCodeAt(0)===46||pathe.isAbsolute(r.path))){if(Qa(r.path,e))return {external:!0};if(!Qa(r.path,t))return {external:!0}}});}}}function Tm(){return {name:"bundle-require:inject-file-scope",setup(e){e.initialOptions.define={...e.initialOptions.define,__dirname:fn,__filename:mn,"import.meta.url":dn},e.onLoad({filter:ss},async t=>{let s=await fsExtra.readFile(t.path,"utf-8");return {contents:[`const ${mn} = ${JSON.stringify(t.path)};`,`const ${fn} = ${JSON.stringify(pathe.dirname(t.path))};`,`const ${dn} = ${JSON.stringify(url.pathToFileURL(t.path).href)};`].join("")+s,loader:No(pathe.extname(t.path))}});}}}async function Wr(e){if(!ss.test(e.filepath))throw new Error(`${e.filepath} is not a valid JS file`);let t=e.preserveTemporaryFile??!!process.env.BUNDLE_REQUIRE_PRESERVE,s=e.cwd||process.cwd(),r=e.format??vm(e.filepath),n=loadTsconfig.loadTsConfig(s,e.tsconfig),i=Bm(n?.data.compilerOptions?.paths||{});async function o(h){if(!h.outputFiles)throw new Error("[bundle-require] no output files");let{text:p}=h.outputFiles[0],m=(e.getOutputFile||$m)(e.filepath,r);await fsExtra.writeFile(m,p,"utf8");let D,C=e.require||jo;try{D=await C(r==="esm"?url.pathToFileURL(m).href:m,{format:r});}finally{t||await fsExtra.unlink(m);}return {mod:D,dependencies:h.metafile?Re(h.metafile.inputs):[]}}let a=await esbuild.build({...e.esbuildOptions,entryPoints:[e.filepath],absWorkingDir:s,outfile:"out.js",format:r,write:!1,platform:"node",sourcemap:"inline",bundle:!0,metafile:!0,plugins:[...e.esbuildOptions?.plugins||[],Am({external:e.external,notExternal:i}),Tm()]});return await o(a)}async function rl(e){let t=null;for(let s of ["syncify.config.js","syncify.config.mjs","syncify.config.cjs","syncify.config.ts","syncify.config.json"]){if(t=pathe.join(e,s),await fsExtra.pathExists(t))break;t=null;}if(t===null)return null;try{if(t.endsWith(".json")){u.file.path=t,u.file.relative=pathe.relative(e,t),u.file.base=pathe.basename(t);let s=await fsExtra.readFile(t);return ko(s.toString())}else {u.file.path=t,u.file.relative=pathe.relative(e,t),u.file.base=pathe.basename(t);let s=await Wr({filepath:t});return s.mod.syncify||s.mod.default||s.mod}}catch(s){console.log(s);let r=pathe.join(e,"syncify.config.json");return await fsExtra.pathExists(r)?fsExtra.readJson(r):null}}async function sl(e){let t=pathe.join(e,"package.json");if(!await fsExtra.pathExists(t))throw new Error('Missing "package.json" file');try{u.pkg=await fsExtra.readJson(t);}catch(r){throw new Error(r)}}async function qi(e,t={purge:!1}){if(await fsExtra.remove(e),u.cache={uri:pathe.join(e,"build.map"),version:u.version,maps:{},pages:{},metafields:{},sourcemaps:{script:null,style:null}},!await fsExtra.pathExists(e))try{await fsExtra.mkdir(e);}catch(r){throw new Error(r)}for(let r of co){let n=pathe.join(e,r,"/");if(r==="sourcemaps/script"?u.cache.sourcemaps.script=n:r==="sourcemaps/style"&&(u.cache.sourcemaps.style=n),await fsExtra.pathExists(n))t.purge&&await fsExtra.emptyDir(n);else try{await fsExtra.mkdir(n);}catch(o){throw new Error(o)}}await Gt();}async function Gi(e){if(await fsExtra.pathExists(e)){if(u.mode.clean)try{await fsExtra.emptyDir(e);}catch(s){console.error(s);}}else try{await fsExtra.mkdir(e);}catch(s){throw new Error(s)}for(let s of wr){let r=pathe.join(e,s);if(!await fsExtra.pathExists(r))try{await fsExtra.mkdir(r);}catch(i){throw new Error(i)}}}function nl(e){let{config:t,cwd:s,mode:r,dirs:n}=u,i=Ju(s);for(let[o,a]of po){let c;if(o==="import"){r.download?d("output",e)?u.dirs[o]=i(e.output):u.dirs[o]=i(t.import):u.dirs[o]=i(t.import);continue}else if(o==="export"){r.download?d("output",e)?u.dirs[o]=i(e.output):u.dirs[o]=i(t.export):u.dirs[o]=i(t.export);continue}else if(d(o,e)&&e[o]===a)if(t[o]===a){u.dirs[o]=i(e[o]);continue}else c=t[o];else L(e[o])?c=e[o]:c=t[o];if(S(c)){let h=Yr(c.map(i));n[o]=h.length===1?h[0]:h;}else L(c)?n[o]=i(c):k({option:"config",name:o,provided:c,expects:"string"});}u.watch.add(u.file.path);}async function il(){let{dirs:e,sync:t,mode:s}=u;if(!s.download)return;if(!await fsExtra.pathExists(e.import))try{await fsExtra.mkdir(e.import);}catch(n){throw new Error(n)}for(let n in t.themes){let{store:i,target:o}=t.themes[n],a=pathe.join(e.import,i);if(await fsExtra.pathExists(a)){if(s.clean)try{await fsExtra.emptyDir(a);}catch(h){console.error(h);}}else try{await fsExtra.mkdir(a);}catch(h){throw new Error(h)}await Gi(pathe.join(a,o));}}function ol(e){if(!d("json",e.processors))return;let{json:t}=e.processors;if(!j(t)&&!(I(t)&&J(t))){I(t)||k({option:"processors",name:"json",expects:"{}",provided:typeof t});for(let s in t){if(s==="indent")if(Xr(t[s])){u.processor.json[s]=t[s];continue}else k({option:"json",name:s,provided:t[s],expects:"number"});if(s==="useTab")if(oe(t[s])){u.processor.json[s]=t[s];continue}else k({option:"json",name:s,provided:t[s],expects:"boolean"});if(s==="exclude"){let r=L(t[s])?[t[s]]:t[s];if(S(r)){u.processor.json[s]=pl__default.default(r);continue}else k({option:"json",name:s,provided:r[s],expects:"string | string[]"});}}}}function ul(e){let t=ge(e.pages,e.metafields,e.redirects),s=ge(e.style,e.script,e.image,e.svg),r=ge(t,e.upload,e.download)?!1:e.watch,n=U(u.mode,{watch:r,hot:Yi(e.watch,e.hot),vsc:e.vsc,interactive:e.interactive,export:e.export,import:e.import,redirects:e.redirects,metafields:e.metafields,pages:e.pages,pull:e.pull,force:e.force,views:e.views,script:s?e.script:!1,style:s?e.style:!1,image:s?e.image:!1,svg:s?e.svg:!1,terse:ge(e.terse,e.prod),clean:ge(t,s,e.upload)?!1:e.clean,build:ge(e.export,e.watch,e.download)?!1:e.build,upload:ge(s,r)?!1:e.upload,download:ge(t,s,e.upload,e.watch,e.build)?!1:e.download});return Me(...Kr(n))&&Et({message:["Execution is unclear, you have not provided Syncify a operation mode to run."],expected:"--<cmd>",fix:["Syncify requires that you provide an operation. In most cases, this","error occurs when you have forgotten to pass the mode, for example:","",`${b("$")} ${b(`syncify ${u.argv} ${v("--watch")}`)}`,`${b("$")} ${b(`syncify ${u.argv} ${v("--build")}`)}`,`${b("$")} ${b(`syncify ${u.argv} ${v("--upload")}`)}`,"",`Run ${v("syncify --help")} for more information, or pass an execution`,`operation mode as per the ${v("expected")} value and ensure to replace ${v("--<cmd>")}`,"with one the examples provided or a supported mode."]}),n.build&&Me(n.script,n.style,n.svg,n.pages,n.metafields,n.image)&&(n.script=!0,n.style=!0,n.svg=!0,n.image=!0,n.views=!0),n}function al(e){if(!d("snippets",e.views))return;let{snippets:t}=e.views;if(!j(t)&&!(I(t)&&J(t))){I(t)||k({option:"views",name:"snippets",expects:"{}",provided:typeof t});for(let s in u.snippet){if(s==="prefixDir")if(oe(t[s])){u.snippet[s]=t[s];continue}else k({option:"views.snippets",name:s,provided:t[s],expects:"boolean"});if(s==="separator")if(L(t[s]))if(/[.@:_-]/.test(t[s])){u.section[s]=t[s];continue}else fe("snippets",s,t[s],"@ | _ | : | - | .");else k({option:"views.snippets",name:s,provided:t[s],expects:"string"});if(s==="global"){let r=L(t[s])?[t[s]]:t[s];if(S(r)){if(r.length>0){u.snippet[s]=new RegExp(`${r.join("|")}`);continue}}else k({option:"views.snippets",name:s,provided:t[s],expects:"string | string[]"});}}}}function ll(e){if(!d("sections",e.views))return;let{sections:t}=e.views;if(!j(e.views.sections)&&!(I(t)&&J(t))){I(t)||k({option:"views",name:"sections",expects:"{}",provided:typeof t});for(let s in u.section){if(s==="prefixDir")if(oe(t[s])){u.section[s]=t[s];continue}else k({option:"views.sections",name:s,provided:t[s],expects:"boolean"});if(s==="separator")if(L(t[s]))if(/[@:_-]/.test(t[s])){u.section[s]=t[s];continue}else fe("view.sections",s,t[s],"@ | _ | : | -");else k({option:"views.sections",name:s,provided:t[s],expects:"string"});if(s==="global"){let r=L(t[s])?[t[s]]:t[s];if(S(r)){if(r.length>0){u.section[s]=new RegExp(`${r.join("|")}`);continue}}else k({option:"views.sections",name:s,provided:t[s],expects:"string | string[]"});}}}}function Wi(e,t,s){let r=e+"_api_token";if(d(r,t)||(r=r.toUpperCase()),d(r,t))return {baseURL:`https://${e}.myshopify.com/admin`,headers:{"X-Shopify-Access-Token":t[r]}};let n=e+"_api_key",i=e+"_api_secret";if(d(n,t)||(n=n.toUpperCase()),d(i,t)||(i=i.toUpperCase()),d(n,t)&&d(i,t))return {baseURL:`https://${e}.myshopify.com/admin`,auth:{username:t[n],password:t[i]}};s===1?ce(`Invalid or missing ${M(e+".myshopify.com")} credentials`,[`Your shop credentials in the ${M.bold(".env")} file could`,"not be read correctly or are missing."]):s===2&&ce(`Missing credentials for: ${M(e+".myshopify.com")}`,`
-    You need to provide shop credentials within a ${M.bold(".env")} file.
-    Please check you project setup and ensure you have correctly provided authorization.`);}function ze(e,t){let{cwd:s}=u,r=Se(t)?[]:!1,n=Be("Path Resolver"),i=ir(u.dirs.input);if(S(e)){let o=[];for(let a of e){let c=i(a),h=cl__default.default.sync(c,{cwd:s,absolute:!0});if(r){let p=t(c);L(p)?r.push(p):S(p)&&r.push(...p);}h.length===0?n("No files can be resolved in",a):o.push(...h);}return r?{paths:o,match:pl__default.default(r)}:o}if(L(e)){let o=i(e),a=cl__default.default.sync(o,{cwd:s});if(a.length===0&&n("No files can be resolved in",e),r){let c=t(o);L(c)?r.push(c):S(c)&&r.push(...c);}return r?{paths:a,match:pl__default.default(r)}:a}k({option:"uri",name:"uri/path",provided:e,expects:"string | string[]"});}function dr(e,t){if(d("assertSnippet",t)||(t.assertSnippet=!0),L(e)){let{paths:s,match:r}=ze(e,n=>(t.addWatch&&u.watch.add(n),St(n)));if(s){if(t.flatten)return s.map(n=>t.assertSnippet?{input:n,rename:pathe.basename(n),snippet:!1}:{input:n,rename:pathe.basename(n)});{let n={input:s,rename:"[name].[ext]",match:r};return t.assertSnippet&&(n.snippet=!1),n}}}else if(S(e)){if(e.every(L)){let{paths:s,match:r}=ze(e,n=>(t.addWatch&&u.watch.add(n),St(n)));if(t.flatten)return s.map(n=>t.assertSnippet?{input:n,rename:pathe.basename(n),snippet:!1}:{input:n,rename:pathe.basename(n)});{let n={input:s,rename:"[name].[ext]",match:r};return t.assertSnippet&&(n.snippet=!1),n}}else if(e.every(I))return e.map(s=>{d("input",s)||fe("tranform","input",s,"{ input: string | string[] }");let{paths:r,match:n}=ze(e,i=>(t.addWatch&&u.watch.add(i),St(i)));return s.match=n,s.input=r,t.assertSnippet&&!d("snippet",s)&&(s.snippet=!1),d("rename",s)||(s.rename=s.snippet?"[name].liquid":"[name].[ext]"),s})}else if(I(e)){let s=[];if(d("input",e)){let{paths:r,match:n}=ze(e.input,i=>(t.addWatch&&u.watch.add(i),St(i)));if(t.assertSnippet&&!d("snippet",e)&&(e.snippet=!1),d("rename",e)||(e.rename=e.snippet?"[name].liquid":"[name].[ext]"),t.flatten)for(let i of r)s.push(U(e,{input:i}));else e.input=r,e.match=n,s.push(e);}else for(let r in e){let n={snippet:r.startsWith("snippets/")},i=r.startsWith("assets/"),o=e[r],a=i||n.snippet;if(L(o)){a&&(n.rename=i?r.slice(7):r.slice(9));let{paths:c,match:h}=ze(o,p=>(t.addWatch&&u.watch.add(p),St(p)));if(c)if(t.flatten)for(let p of c)s.push(U({},n,{input:p}));else s.push(U({},n,{input:c,match:h}));}else if(I(o)){d("input",o)||fe("tranform",r,o,"{ input: string | string[] }");let{paths:c,match:h}=ze(o.input,p=>(t.addWatch&&u.watch.add(p),St(p)));if(c){let p=a?U({},o,n,{rename:i?r.slice(7):r.slice(9)}):U({},n,o);if(t.flatten)for(let l of c)s.push(U({},p,{input:l}));else s.push(U(p,{input:c,match:h}));}}else if(S(o))if(o.every(L)){let{paths:c,match:h}=ze(o,p=>(t.addWatch&&u.watch.add(p),St(p)));if(Po(r)&&(n.rename=pathe.basename(r)),c)if(t.flatten)for(let p of c)s.push(U({},n,{input:p}));else s.push(U({},n,{input:c,match:h}));}else k({option:"transform",name:r,provided:o,expects:"string[]"});}return s}}function zi(e){let{pkg:t}=u;return ge(d("devDependencies",t)&&d(e,t.devDependencies),d("dependencies",t)&&d(e,t.dependencies),d("peerDependencies",t)&&d(e,t.peerDependencies),d("optionalDependencies",t)&&d(e,t.peerDependencies))}function fl(e,t){let s=t,r=Fe(e),n=pathe.extname(e),i=pathe.basename(e,n);return X(t)?{dir:r,ext:n,file:i,name:i}:(/(\[dir\])/.test(s)&&(s=s.replace("[dir]",r)),/(\[file\])/.test(s)&&(s=s.replace("[file]",i)),/(\.?\[ext\])/.test(s)&&(s=s.replace(/\.?\[ext\]/,n)),{ext:n,file:i,dir:r,name:t.replace(t,s)})}function ml(e,t){let s=ge(u.mode.metafields,u.mode.pages,u.mode.redirects),r=ge(u.mode.watch,u.mode.upload,u.mode.download);if(e._.length===0){s&&Et({message:["You have not provided store to target, which is required","when running in a resource mode that syncs to a remote source"],expected:"syncify <store>",fix:["Provide the store target name as the first command argument","followed by themes target/s and other flags."]});return}let n=e._[0].split(","),i=Om__default.default.config({path:pathe.join(u.cwd,".env")}),o=S(t.stores)?t.stores:[t.stores],a=o.filter(({domain:h})=>un(h,n)),c=a.length>1;for(let h of a){let p=`${h.domain}.myshopify.com`.toLowerCase(),l=i.error?Wi(h.domain,process.env,2):Wi(h.domain,i.parsed,1),m=u.sync.stores.push({store:h.domain,domain:p,client:l,queue:c})-1;if(u.mode.metafields||u.mode.pages)return;let D=d("theme",e)?e.theme.split(","):d(h.domain,e)?e[h.domain].split(","):Re(h.themes);for(let C of D)d(C,h.themes)||Pu({type:"theme",expected:Re(h.themes).join(","),provided:C,message:[`Unknown theme target (${v(C)}) provided to ${v(h.domain)} store`,`Your ${v(u.file.base)} file contains no such theme using this name.`],fix:[`Provide an ${v("expected")} theme target or update/add an existing target.`,`You have ${v(`${D.length}`)} theme targets defined for ${v(h.domain)}:`,"",`${Jt} ${D.join(`
-${Jt} `)}`,""]}),u.sync.themes.push({target:C,sidx:m,store:p,id:h.themes[C],url:`/themes/${h.themes[C]}/assets.json`});}if(s&&u.sync.stores.length===0)return Et({expected:"syncify <store>",message:["You have not provided store to target, which is required","when running in a resource mode that syncs to a remote source"],fix:["Provide the store target name as the first command argument followed by themes","target/s and other flags. Based on your current configuration:","",`${Jt} ${b("$")} syncify ${o.join(`
-${Jt} ${b("$")} syncify `)}`,""]});if(u.sync.themes.length===0&&r)return Et({expected:"-t <theme>",message:["You have not provided a theme to target, which is required","when running this resource mode."],fix:[`Provide a theme name to target following a ${v("-t")} or ${v("--theme")} flag.`,"Theme targets should be passed as the 2nd argument, the 1st argument should be store name/s."]});u.sync.stores.length===0&&ce("Unknown, missing or invalid store/theme targets","Check your store config"),u.sync.stores.length===1&&u.sync.themes.length===1?u.env.sync=1:(u.sync.stores.length>1||u.sync.themes.length>1)&&(u.env.sync=2);}async function hl(e){let t=ir(u.dirs.input),s=Be("path resolution");for(let r of At){let n;if(r==="customers")n=d(r,e.paths)?S(e.paths[r])?e.paths[r].map(t):[t(e.paths[r])]:[t("templates/customers")];else if(r==="metaobject")n=d(r,e.paths)?S(e.paths[r])?e.paths[r].map(t):[t(e.paths[r])]:[t("templates/metaobject")];else if(d(r,e.paths))if(n=S(e.paths[r])?e.paths[r].map(t):[t(e.paths[r])],r==="snippets")for(let i of n)u.snippet.baseDir.add(Fe(pathe.dirname(i)));else if(r==="sections")for(let i of n)u.section.baseDir.add(Fe(pathe.dirname(i)));else r==="assets"&&n.push(pathe.join(u.dirs.output,"assets/*"));else r==="redirects"&&d(r,e.paths)?n=[pathe.join(u.cwd,e.paths[r])]:n=[t(r)];for(let i of n){if(r!=="metafields"&&r!=="redirects"){let o=await cl__default.default(i,{cwd:u.cwd});if(o.length===0)s("No files could be resolved in",pathe.relative(u.cwd,i));else {if(u.paths[r].input===null)u.paths[r].input=new Set(o);else for(let a of o)u.paths[r].input.add(a);u.watch.add(i);}}u.paths[r].match=pl__default.default(n);}}}function Ui(e,t,s){let r=Mm__default.default(t.cmd,t.args,{stdio:"pipe"});r.stdio[0].on("data",s),r.stdio[1].on("data",s),r.stdio[2].on("data",s),t.pid=r.pid,u.spawn.streams.set(e,r);}function gl(e){let{mode:t,spawn:s}=u;if(!d("spawn",e)||j(e.spawn))return;I(e.spawn)||k({option:"config",name:"spawn",provided:e.spawn,expects:"{ build: {}, watch: {} }"});let r=null;if(t.build&&d("build",e.spawn)&&(r="build"),t.watch&&d("watch",e.spawn)&&(r="watch"),!(j(t)||j(e.spawn[r])||(I(e.spawn[r])||k({option:"spawn",name:r,provided:e.spawn[r],expects:"{ build: {}, watch: {} }"}),Re(e.spawn[r]).length===0))){for(let i in e.spawn[r]){let o=e.spawn[r][i];if(L(o)){u.spawn.commands[i]={cmd:A,args:[],pid:NaN};let a=o.trimStart().indexOf(ye)>-1?o.trimStart().split(ye):[o];u.spawn.commands[i].cmd=a.shift(),u.spawn.commands[i].args=a,Ui(i,u.spawn.commands[i],f.spawn(i));}else if(S(o)){let a=o.shift();u.spawn.commands[i]=Je(null),u.spawn.commands[i].cmd=a,u.spawn.commands[i].args=o,u.spawn.commands[i].pid=NaN,Ui(i,u.spawn.commands[i],f.spawn(i));}else k({option:"spawn",name:r,provided:e.spawn[r],expects:"string | string[]"});}Ks(()=>{G.pause(),G.clear(),f.nwl(A),s.streams.forEach((i,o)=>{f.out(`- ${g(`pid: #${i.pid} (${o}) process exited`)}`),qm__default.default(i.pid);}),f.nwl(A),s.streams.clear(),process.exit(0);});}}function Ur(e,t){return !!(d("devDependencies",e)&&d(t,e.devDependencies)&&d(t,e.devDependencies)||d("dependencies",e)&&d(t,e.dependencies)||d("peerDependencies",e)&&d(t,e.peerDependencies)||d("optionalDependencies",e)&&d(t,e.peerDependencies))}async function Um(e){for(let t of ["js","cjs","mjs"]){let s=`${e}.${t}`;if(await fsExtra.pathExists(`${s}.${t}`))return s}return null}async function Zs(e){try{let t=await Um(e);if(t!==null){let s=await Wr({filepath:t});return {path:t,config:s.mod.syncify||s.mod.default||s.mod}}return null}catch{return null}}function Vi(e,t){let s=t,r=Fe(e),n=path.extname(e),i=path.basename(e,n);return X(t)?{dir:r,ext:n,file:i,name:i}:(/(\[dir\])/.test(s)&&(s=s.replace("[dir]",r)),/(\[file\])/.test(s)&&(s=s.replace("[file]",i)),/(\.?\[ext\])/.test(s)&&(s=s.replace(/\.?\[ext\]/,n)),{ext:n,file:i,dir:r,name:t.replace(t,s)})}async function xl(e){if(!d("script",e.transforms)||e.transforms.script===!1)return;let t=Be("script transform option"),{esbuild:s}=u.processor,{script:r}=e.transforms;if(s.installed=Ur(u.pkg,"esbuild"),s.installed){Aa()||ce("failed to import ESBuild","Ensure you have installed esbuild");let a=await Zs("esbuild.config");a!==null&&(s.file=a.path,s.config=de(s.config,a.config));}else Le("esbuild");d("entryPoints",s.config)&&(t("processor option is not allowed and was omitted","entryPoints"),delete s.config.entryPoints);let n=dr(r,{addWatch:!1,flatten:!0}),i=an(["input","watch","rename","snippet"]);d("absWorkingDir",s.config)||(s.config.absWorkingDir=u.cwd);for(let o of n){let{snippet:a}=o,c=a?"snippets":"assets",{name:h}=fl(o.input,o.rename),p;!h.endsWith(".js")&&!h.endsWith(".mjs")?p=h+".js":h.endsWith(".cjs")?fe("rename","file extension",h,".js | .mjs"):p=h,a&&!/\.liquid$/.test(p)&&(p=p+".liquid");let l={uuid:Ye(),snippet:a,input:o.input,output:pathe.join(u.dirs.output,c,p),key:pathe.join(c,p),namespace:o.snippet?"snippets":"assets",size:NaN,watch:null,watchCustom:null,esbuild:null};if(s.config.outfile=l.output,u.mode.watch&&u.watch.unwatch(l.output),d("esbuild",o))if(oe(o.esbuild)||j(o.esbuild))J(i)?l.esbuild=de(s.config):l.esbuild=de(s.config,i);else if(typeof o.esbuild=="object"){for(let m in ["entryPoints","outdir","watch","absWorkingDir","watch","write","logLevel","incremental"])m==="entryPoints"&&d(m,o.esbuild)?t('Option is not allowed, use Syncify "input" instead',m):m==="outdir"&&d(m,o.esbuild)?t("Option is not allowed, Syncify will handle output",m):m==="watch"&&d(m,o.esbuild)?t("Option is not allowed, declare watch using Syncify",m):d(m,o.esbuild)&&t("Option is not allowed and will be ignored",m);d("plugins",o.esbuild)&&d("plugins",s.config)&&o.esbuild.plugins.unshift(...s.config.plugins),J(i)?l.esbuild=de(s.config,o.esbuild):l.esbuild=de(s.config,o.esbuild,i);}else k({option:"script",name:"esbuild",provided:typeof o.esbuild,expects:"boolean | null | {}"});else J(i)?l.esbuild=s.config:l.esbuild=de(s.config,i);if(l.esbuild.entryPoints=[l.input],u.mode.watch)if(!d("watch",o))l.watch=new Set;else {S(o.watch)||k({option:"script",name:"watch",provided:o.watch,expects:"string[]"});let m=ze(o.watch);l.watchCustom=pl__default.default(m),l.watch=new Set(m);}else l.watch=new Set;try{await Ta(l);}catch(m){throw new Error(m)}u.mode.terse&&(l.esbuild=de(l.esbuild,u.terser.script,{exclude:void 0})),u.script.push(l);}s.loaded=!0;}async function Fl(e){if(!d("style",e.transforms))return;let{postcss:t,sass:s}=u.processor,r=Be("style transform option");if(s.installed=Ur(u.pkg,"sass"),s.installed&&(await Ri("sass")||ce("Unable to dynamically import SASS","Ensure you have installed sass")),t.installed=Ur(u.pkg,"postcss"),t.installed){await Ri("postcss")||ce("Unable to dynamically import PostCSS","Ensure you have installed postcss");let a=await Zs("postcss.config");a!==null&&(t.file=a.path,t.config=a.config);}let n=dr(e.transforms.style,{addWatch:!1,flatten:!0}),i=ir(e.input);for(let o of n){let a={uuid:Ye(),input:o.input,watch:null,postcss:!1,sass:!1};if(d("postcss",o))if(t.installed||Le("postcss"),S(o.postcss))a.postcss=o.postcss;else {let p=I(o.postcss);(oe(o.postcss)||p)&&!j(o.postcss)?o.postcss!==!1&&(t.installed||Le("postcss"),a.postcss=p?de(t.config,o.postcss):!0):k({option:"style",name:"postcss",provided:a.postcss,expects:"boolean | {}"});}if(d("sass",o)&&o.sass!==!1&&s.installed===!0){let p=I(o.sass);if((oe(o.sass)||p)&&!j(o.sass))if(s.installed||Le("sass"),!p)Vt(a,"sass",{get(){return o.sass}});else {a.sass=de(s.config,o.sass);for(let l in o.sass)l==="sourcemap"||l==="warnings"?oe(o.sass[l])?a.sass[l]=o.sass[l]:k({option:"sass",name:l,provided:o.sass[l],expects:"boolean"}):l==="style"?(L(o.sass[l])||k({option:"sass",name:l,provided:o.sass[l],expects:"string"}),o.sass[l]==="expanded"||o.sass[l]==="compressed"?a.sass[l]=o.sass[l]:fe("sass",l,o.sass[l],"expanded | compressed")):l==="includePaths"&&(S(o.sass[l])?a.sass[l]=Yr(o.sass[l]).map(m=>path.join(u.cwd,m)):k({option:"sass",name:l,provided:o.sass[l],expects:"string[]"}));}else k({option:"style",name:"sass",provided:o.sass,expects:"boolean | {}"});!o.snippet&&!/\.s[ac]ss/.test(path.extname(a.input))&&r("Input is not a sass file",a.input);}let c=Vi(o.rename);d("rename",o)&&!j(o)&&(L(o.rename)||k({option:"styles",name:"rename",provided:o.rename,expects:"string"}),c=Vi(a.input,o.rename),/[a-zA-Z0-9_.-]+/.test(c.name)||k({option:"sass",name:"rename",provided:c,expects:"Characters: [a-zA-Z0-9_.-]"}),c.name.endsWith(".css")?a.rename=c.name:c.name.endsWith(".scss")?c.name=c.name.replace(".scss",".css"):c.name.endsWith(".sass")?c.name=c.name.replace(".sass",".css"):c.name.endsWith(".liquid")||(c.name=c.name+".css"));let h=[];if(u.mode.watch&&d("watch",o)){S(o.watch)||k({option:"styles",name:"watch",provided:o.watch,expects:"string[]"});for(let p of o.watch){let l=await cl__default.default(path.join(u.cwd,i(p)));l.length===0&&p[0]!=="!"&&r("Cannot resolve watch glob/path uri",p);for(let m of l)fsExtra.existsSync(m)?h.push(m):r("No file exists in path",m);}h.push(a.input),h.forEach(p=>u.watch.add(p)),a.watch=pl__default.default(h);}else a.watch=pl__default.default([a.input]),u.watch.add(a.input);typeof a.sass=="object"&&(a.sass.include.unshift(u.cwd,path.join(u.cwd,c.dir)),Ve("sass.include",o)&&(a.sass.include=o.sass.include.map(p=>path.join(u.cwd,p)))),d("snippet",o)&&(oe(o.snippet)||k({option:"styles",name:"snippet",provided:o.snippet,expects:"boolean"}),a.snippet=o.snippet),a.snippet?(d("rename",a)||(a.rename=c.name),(!c.name.endsWith(".liquid")||!a.rename.endsWith(".liquid"))&&(a.rename=c.name+".liquid"),u.paths.transforms.set(a.input,8),u.mode.watch&&u.watch.unwatch(path.join(u.cwd,e.output,"snippets",a.rename))):(a.rename=c.name,u.mode.watch&&u.watch.unwatch(path.join(u.cwd,e.output,"assets",c.name))),u.style.push(a);}}async function Cl(e){if(!d("svg",e.transforms))return;let{sprite:t,svgo:s}=u.processor,r=Be("svg transform");s.installed=zi("svgo"),s.installed&&(await Pi("svgo")||ce("Unable to dynamically import SVGO","Ensure you have installed svgo")),t.installed=zi("svg-sprite"),t.installed&&(await Pi("svg-sprite")||ce("Unable to dynamically import SVG Sprite","Ensure you have installed svg-sprite")),!t.installed&&!s.installed&&Le(["svgo","svg-sprite"]);let n=dr(e.transforms.svg,{addWatch:!0,flatten:!1});for(let i of n){let o=i.input.filter(c=>pathe.extname(c)!==".svg"?(r("Excluded file which is not an SVG type",pathe.relative(u.cwd,c)),!1):!0);if(o.length===0){r("No SVG file paths were resolved");continue}let a={uuid:Ye(),input:new Set(o),match:i.match,format:null,rename:i.rename,snippet:i.snippet};d("svgo",i)&&d("sprite",i)&&fe("transform","svg","svgo AND sprite","svgo OR sprite"),d("format",i)?i.format==="file"||i.format==="sprite"?(a.format=i.format,i.format==="file"?(a.svgo=!0,s.installed||Le("svgo")):(a.sprite=!0,t.installed||Le("svg-sprite"))):fe("transform > svg","format",i.format,'"sprite" | "file"'):d("svgo",i)?(s.installed||Le("svgo"),a.format="file",a.svgo=I(i.svgo)?de(s.config,i.svgo):!0):d("sprite",i)?(t.installed||Le("svg-sprite"),a.format="sprite",a.sprite=I(i.sprite)?de(t.config,i.sprite):!0):s.installed&&t.installed?Ou("transform.svg","format","sprite | file",[`SVG transforms require you to define ${M("format")} when both SVGO and SVG Sprite`,"processors are installed. Syncify needs to knows how is should handle the input and","which processor to use for the transform."]):s.installed&&!t.installed?(a.format="file",a.svgo=!0):t.installed&&!s.installed?(a.format="sprite",a.sprite=!0):bt("transform > svg","Cannot resolve processor, try defining a format."),u.svg.push(a);}}async function El(e){if(u.mode.watch!==!0||u.mode.hot===!1&&e.hot===!1)return;u.mode.hot===!1&&e.hot===!0&&(u.mode.hot=!0);let t=Be("HOT Reloads");if(u.env.sync>1){t("HOT Reloads can only be used on 1 store");return}else if(u.sync.themes.length>1){t("HOT Reloads can only be used on 1 theme");return}Me(I(e.hot),oe(e.hot),j(e.hot))&&k({option:"config",name:"hot",provided:e.hot,expects:"boolean | {}"});let{hot:s}=u;if(I(e.hot)&&J(e.hot)===!1)for(let r in e.hot)d(r,u.hot)||bt(`hot.${r}`,e.hot[r]),r==="label"?e.hot[r]==="visible"||e.hot[r]==="hidden"?s[r]=e.hot[r]:fe("hot",r,e.hot[r],"visible | hidden"):r==="strategy"?e.hot[r]==="hydrate"||e.hot[r]==="replace"?s[r]=e.hot[r]:fe("hot",r,e.hot[r],"hydrate | replace"):r==="method"?e.hot[r]==="hot"||e.hot[r]==="refresh"?s[r]=e.hot[r]:fe("hot",r,e.hot[r],"hot | refresh"):r==="scroll"?e.hot[r]==="preserved"||e.hot[r]==="top"?s[r]=e.hot[r]:fe("hot",r,e.hot[r],"preserved | top"):typeof s[r]==typeof e.hot[r]?s[r]=e.hot[r]:k({option:"hot",name:r,provided:e.hot[r],expects:typeof s[r]});s.snippet=pathe.join(u.cwd,"node_modules","@syncify/cli","hot.js.liquid"),s.output=pathe.join(u.dirs.output,"snippets","hot.js.liquid");for(let r of s.layouts)s.alive[pathe.join(u.dirs.output,"layout",r)]=!1;s.renderer="{% render 'hot.js'"+["",`server: ${s.server}`,`socket: ${s.socket}`,`strategy: "${s.strategy}"`,`scroll: "${s.scroll}"`,`label: "${s.label}"`,`history: "${s.history}`,`method: "${s.method}"`].join(", ")+" %}",u.wss=Ha();}function Ji(e,t){let s=[],r={};u.mode.upload?(r.base="output",r.from="output",r.dirs=wr.map(n=>`${b("-")} ${v(n)}`),r.fix=[`The ${v("--filter")} (or ${v("-f")}) flag command argument expects you`,"provide a theme output directory as the starting point. Filtering begins with","a Shopify output directory name, for example:","",`${b("$")} ${b(`syncify --filter ${v("sections/file.liquid")}`)}`,`${b("$")} ${b(`syncify --filter ${v("snippets/*")}`)}`,`${b("$")} ${b(`syncify --filter ${v("templates/*.json")}`)}`,`${b("$")} ${b(`syncify --filter ${v("!assets/some-file.ext")}`)}`,"",`Syncify will automatically resolve files from within your defined ${F(r.base)} directory`,"based on the starting point directory name. You can pass glob star matches following the",`directory namespace or starting point ignores (${v("!")}) as long the directory can match.`]):(r.base="input",r.from="paths",r.dirs=At.map(n=>`${b("-")} ${v(n)}`),r.fix=[`The ${v("--filter")} (or ${v("-f")}) flag command argument expects you`,`provide a ${yt.bold("paths")} key name as the starting point. Filtering begins with`,"a Shopify output directory name, for example:","",`${b("$")} ${b(`syncify --filter ${v("sections/file.liquid")}`)}`,`${b("$")} ${b(`syncify --filter ${v("snippets/*")}`)}`,`${b("$")} ${b(`syncify --filter ${v("templates/*.json")}`)}`,`${b("$")} ${b(`syncify --filter ${v("!assets/some-file.ext")}`)}`,"",`Syncify will automatically resolve files from within your defined ${F(r.base)} directory`,`based on the starting point ${F("paths")} name. You can pass glob star matches following the`,`starting point or ignores (${v("!")}) as long the reference can match.`]),e==="pattern"?(s.push(`Invalid ${v("--filter")} pattern provided. You cannot pass starting point`),t[0]==="*"?s.push(`glob (${v("*")}) stars as filters, Syncify does not support this.`):t[0]==="/"?s.push(`path (${v("/")}) roots as filters, Syncify does not support this.`):t[0]==="."&&s.push(`dot paths (${v(".")})  as filters, Syncify does not support this.`),s.push(`Use a starting point reference name based on the ${v(r.from)} key property`,`in your ${v(u.file.base)} file.`)):s.push(`Invalid directory provided. The ${v("--filter")} pattern expects the starting point`,"directory path be one of the following:","",...r.dirs,""),Et({message:s,expected:"--filter <dir>",fix:r.fix});}function bl(e,t,s){if((t[0]==="*"||t[0]==="/"||t[0]===".")&&Ji("pattern",t),t[0]==="!"){s.test(t.slice(1))||Ji("dir",t);return}s.test(t)||Ji("dir",t);let r=t.slice(0,t.indexOf("/"));S(u.filters[r])||(u.filters[r]=[]),u.filters[r].push(pathe.join(e,t));}async function Sl(e){if(!d("filter",e))return;let t=u.mode.upload?u.dirs.output:u.dirs.input,s=e.filter.replace(/\s+/g," ").trim(),r=u.mode.upload?new RegExp(`^(${wr.join("|")})`):new RegExp(`^(${At.join("|")})`);if(s.indexOf(",")>-1){let n=s.split(",").filter(Boolean).map(i=>i.trim());for(let i of n)bl(t,i,r);}else bl(t,s,r);f.out(u.filters);}function $l(e){let{terser:t,mode:s}=u;if(oe(e.terser)){if(s.terse===!1&&e.terser===!1)return;s.terse===!1&&e.terser===!0&&(s.terse=!0);}let r=Be("terser configuration");if(typeof e.terser=="object")for(let n in e.terser){if(e.terser[n]===!1||j(e.terser[n])){u.mode.terse===!0&&(u.terse[n]=!0);continue}if(n==="script"&&u.processor.esbuild.installed===!1&&(I(e.terser[n])&&J(e.terser[n])===!1||oe(e.terser[n])&&e.terser[n]===!0)&&ce("esbuild is not installed",fo),oe(e.terser[n]))u.terser[n]=e.terser[n];else if(I(t[n])){if(J(t[n]))continue;for(let i in e.terser[n]){if(i==="exclude"){J(e.terser[n][i])||(t[n][i]=ze(e.terser[n][i]));continue}d(i,t[n])||bt(`terser.${n}`,i),i==="mangleProps"?!j(e.terser[n][i])&&!Bt(t[n][i])&&k({option:`terser.${n}`,name:i,provided:`${typeof e.terser[n][i]} (${e.terser[n][i]})`,expects:"Regex | string | undefined"}):!j(e.terser[n][i])&&typeof t[n][i]!=typeof e.terser[n][i]&&k({option:`terser.${n}`,name:i,provided:typeof e.terser[n][i],expects:typeof t[n][i]}),i==="collapseWhitespace"?t.markup.collapseWhitespace=e.terser[n][i]:t[n][i]=e.terser[n][i];}}else r("unkown option provided",n);}}function vl(e){if(!d("pages",e.views))return;let{pages:t}=e.views;if(!I(t)&&!j(t)&&k({option:"views",name:"pages",provided:typeof t,expects:"{}"}),J(t))return;let s=u.config.views.pages;for(let r in t)if(d(r,s)||bt("pages",r),r==="importLanguage")L(t[r])?t[r]==="markdown"||t[r]==="html"?u.page[r]=t[r]:fe("views.pages",r,t[r],"markdown | html"):k({option:"views.pages",name:r,provided:t[r],expects:"markdown | html"});else if(r==="author"){if(j(t[r]))continue;L(t[r])?u.page[r]=t[r]:k({option:"views.pages",name:r,provided:t[r],expects:"string"});}else if(r==="suffixDir"||r==="safeSync"){if(j(t[r]))continue;oe(t[r])?u.page[r]=t[r]:k({option:"views.pages",name:r,provided:t[r],expects:"object"});}else if(r==="global"){if(j(t[r]))continue;if(S(t[r])){if(t[r].length>0){u.page[r]=new RegExp(`${t[r].join("|")}`);continue}}else k({option:"views.pages",name:r,provided:t[r],expects:"string | string[]"});}}async function Tl(e,t){f.clear(),await sl(e.cwd),await od(e),u.version="0.3.0-beta",u.restart=!1,u.cli=e,u.mode=ul(e),u.cwd=e.cwd,u.env.cli=e.cli,u.env.prod=e.prod,u.env.dev=e.dev&&!e.prod,u.logger.silent=e.silent,u.terminal.wrap=Math.round(u.terminal.cols-u.terminal.cols/3),process.env.SYNCIFY_ENV=u.env.dev?"dev":"prod",process.env.SYNCIFY_WATCH=String(u.mode.watch);let{config:s,cwd:r}=u,n=await Promise.all([rd(e.watch||e.upload,r),nl(e),id(r),Gi(u.dirs.output),il(),ml(e,s),hl(s),Sl(e),sd(s),ll(s),al(s),vl(s),ol(s),xl(s),Fl(s),Cl(s),$l(s),gl(s),nd(s),El(s)]).catch(i=>{console.log(i);});return f.start(u),n}function rd(e,t){e&&(u.watch=new chokidar.FSWatcher({persistent:!0,ignoreInitial:!0,usePolling:!0,interval:75,binaryInterval:100,ignored:["**/*.map"],ignorePermissionErrors:!0}),u.watch=Object.defineProperties(u.watch,{has:{value(s,r=t){return u.watch._watched.get(r).items.has(s)}},paths:{get(){return at(u.watch.values())}},watching:{get(){return u.watch._watched}}}));}function sd(e){for(let t in e.processors)u.processor[t].config=S(e.processors[t])?e.processors[t]:U(u.processor[t].config,e.processors[t]);}function nd(e){if(d("plugins",e)&&S(e.plugins))for(let t of e.plugins)d("onInit",t)&&t.onInit.call({...u},e),d("onChange",t)&&u.plugins.onChange.push([t.name,t.onChange]),d("onTransform",t)&&u.plugins.onTransform.push([t.name,t.onTransform]),u.mode.watch&&(d("onWatch",t)&&u.plugins.onWatch.push([t.name,t.onWatch]),d("onReload",t)&&u.plugins.onReload.push([t.name,t.onReload])),u.mode.build&&d("onBuild",t)&&u.plugins.onBuild.push([t.name,t.onBuild]);}async function id(e){u.dirs.cache=pathe.join(e,"node_modules/.syncify");let t=pathe.join(u.dirs.cache,"build.map");if(!await fsExtra.pathExists(t))return qi(u.dirs.cache);if(u.cache=await fsExtra.readJSON(t),u.cache.version!==u.version&&u.version==="0.3.0-beta"&&await fsExtra.pathExists(u.dirs.cache))return await fsExtra.remove(u.dirs.cache),qi(u.dirs.cache)}async function od(e){let t=await rl(e.cwd);t!==null?u.config=t:d("syncify",u.pkg)?u.config=u.pkg.syncify:ju(e.cwd);}var eS={get dev(){return process.env.SYNCIFY_ENV==="dev"},get prod(){return process.env.SYNCIFY_ENV==="prod"},get watch(){return process.env.SYNCIFY_WATCH==="true"},get options(){return u.config}};async function hr(e,t,s){if(process.stdin.on("data",Ja),d("_",e)&&(e._=e._.slice(1)),e.help)return console.info(Ya);await Tl(e),process.on("SIGINT",Wu),process.on("rejectionHandled",zu),u.mode.hot&&await Va();try{if(u.mode.build)return Ia(s);if(u.mode.watch)return Wa(s);if(u.mode.upload)return ba(s);if(u.mode.download)return Sa(s);if(u.mode.export)return console.log("TODO")}catch(r){console.log(r),f.throws(r);}}var iS=e=>e;function ud(e,t){if(L(e)){if(/watch|build|download|upload/.test(e))return s=>hr({cli:!1,[e]:!0},t,s)}else if(I(e)){if(!X(t))throw new Error("You cannot provide options when running instance");return {watch:s=>hr({cli:!1,watch:!0},t,s),build:s=>hr({cli:!1,build:!0},t,s),download:s=>hr({cli:!1,download:!0},t,s),upload:s=>hr({cli:!1,upload:!0},t,s)}}}var oS=ud;
+`;
+function findUp(name, startDir, stopDir = pathe.parse(startDir).root) {
+  let dir = startDir;
+  while (dir !== stopDir) {
+    const file = pathe.join(dir, name);
+    if (fsExtra.existsSync(file))
+      return file;
+    if (pathe.extname(file) !== ".json") {
+      const path2 = file + ".json";
+      if (fsExtra.existsSync(path2))
+        return path2;
+    }
+    dir = pathe.dirname(dir);
+  }
+  return null;
+}
+function getTSConfigFromFile(cwd, filename) {
+  return pathe.isAbsolute(filename) ? fsExtra.existsSync(filename) ? filename : null : findUp(filename, cwd);
+}
+function getTSConfigFromExtends(cwd, name) {
+  if (pathe.isAbsolute(name))
+    return fsExtra.existsSync(name) ? name : null;
+  if (name.startsWith("."))
+    return findUp(name, cwd);
+  return __require.resolve(name, { paths: [cwd] });
+}
+function getTSConfig(dir = process.cwd(), name = "tsconfig.json", isExtends = false) {
+  dir = pathe.resolve(dir);
+  const id = isExtends ? getTSConfigFromExtends(dir, name) : getTSConfigFromFile(dir, name);
+  if (!id)
+    return null;
+  const data = jsonc(fsExtra.readFileSync(id, "utf-8"));
+  const configDir = pathe.dirname(id);
+  if (has("baseURL", data.compilerOptions)) {
+    data.compilerOptions.baseUrl = pathe.join(configDir, data.compilerOptions.baseUrl);
+  }
+  const extendsFiles = [];
+  if (data.extends) {
+    const extendsList = isArray(data.extends) ? data.extends : [data.extends];
+    const extendsData = {};
+    for (const name2 of extendsList) {
+      const parentConfig = getTSConfig(configDir, name2, true);
+      if (parentConfig) {
+        assign(extendsData, {
+          ...parentConfig?.data,
+          compilerOptions: {
+            ...extendsData.compilerOptions,
+            ...parentConfig?.data?.compilerOptions
+          }
+        });
+        extendsFiles.push(...parentConfig.files);
+      }
+    }
+    assign(data, {
+      ...extendsData,
+      ...data,
+      compilerOptions: {
+        ...extendsData.compilerOptions,
+        ...data.compilerOptions
+      }
+    });
+  }
+  delete data.extends;
+  return {
+    path: id,
+    data,
+    files: [...extendsFiles, id]
+  };
+}
+function loadTSConfig(dir, name) {
+  return getTSConfig(dir, name);
+}
+function defaultGetOutputFile(path2, format) {
+  return path2.replace(REGEX_EXTJS, `.bundled_${uuid()}.${format === "esm" ? "mjs" : "cjs"}`);
+}
+function isCommonJSorESM(inputFile) {
+  if (typeof jest === "undefined")
+    return "cjs";
+  const ext = pathe.extname(inputFile);
+  if (ext === ".js") {
+    return $.pkg.type === "module" ? "esm" : "cjs";
+  } else if (ext === ".ts") {
+    return "esm";
+  } else if (ext === ".mjs") {
+    return "esm";
+  }
+  return "cjs";
+}
+function tsconfigPathsToRegExp(paths2) {
+  return keys(paths2 || {}).map((key) => new RegExp(`^${key.replace(/\*/, ".*")}$`));
+}
+function match(id, patterns) {
+  if (!patterns)
+    return false;
+  return patterns.some((p) => {
+    if (isRegex(p))
+      return p.test(id);
+    return id === p || id.startsWith(p + "/");
+  });
+}
+function externalPlugin({
+  external: external2,
+  notExternal
+} = {}) {
+  return {
+    name: "bundle-require:external",
+    setup({ onResolve }) {
+      onResolve({ filter: /.*/ }, async (args) => {
+        if (args.path.charCodeAt(0) === 46 || pathe.isAbsolute(args.path))
+          return;
+        if (match(args.path, external2))
+          return { external: true };
+        if (match(args.path, notExternal))
+          return;
+        return { external: true };
+      });
+    }
+  };
+}
+function injectFileScopePlugin() {
+  return {
+    name: "bundle-require:inject-file-scope",
+    setup(ctx) {
+      ctx.initialOptions.define = {
+        ...ctx.initialOptions.define,
+        __dirname: "__injected_dirname__",
+        __filename: "__injected_filename__",
+        "import.meta.url": "__injected_import_meta_url__"
+      };
+      ctx.onLoad({ filter: REGEX_EXTJS }, async (args) => {
+        const contents = await fsExtra.readFile(args.path, "utf-8");
+        const injectLines = [
+          `const __injected_filename__ = ${JSON.stringify(args.path)};`,
+          `const __injected_dirname__ = ${JSON.stringify(pathe.dirname(args.path))};`,
+          `const __injected_import_meta_url__ = ${JSON.stringify(url.pathToFileURL(args.path).href)};`
+        ];
+        return {
+          contents: glue(injectLines) + contents,
+          loader: inferLoader(pathe.extname(args.path))
+        };
+      });
+    }
+  };
+}
+async function bundleRequire(options) {
+  if (!REGEX_EXTJS.test(options.filepath)) {
+    throw new Error(`${options.filepath} is not a valid JS file`);
+  }
+  const preserveTemporaryFile = options.preserveTemporaryFile ?? !!process.env.BUNDLE_REQUIRE_PRESERVE;
+  const cwd = options.cwd;
+  const format = options.format ?? isCommonJSorESM(options.filepath);
+  const tsc = loadTSConfig(cwd, options.tsconfig);
+  const resolvePaths = tsconfigPathsToRegExp(tsc?.data.compilerOptions?.paths || {});
+  async function extractResult(result) {
+    if (!result.outputFiles) {
+      throw new Error("[bundle-require] no output files");
+    }
+    const { text } = result.outputFiles[0];
+    const getOutputFile = options.getOutputFile || defaultGetOutputFile;
+    const outfile = getOutputFile(options.filepath, format);
+    await fsExtra.writeFile(outfile, text, "utf8");
+    let mod;
+    try {
+      mod = await (options.require || dynamicImport)(format === "esm" ? url.pathToFileURL(outfile).href : outfile, { format });
+    } finally {
+      if (!preserveTemporaryFile)
+        await fsExtra.unlink(outfile);
+    }
+    return {
+      mod,
+      dependencies: result.metafile ? keys(result.metafile.inputs) : []
+    };
+  }
+  const ctx = await esbuild$1.build({
+    ...options.esbuildOptions,
+    entryPoints: [options.filepath],
+    absWorkingDir: cwd,
+    outfile: "out.js",
+    format,
+    write: false,
+    platform: "node",
+    sourcemap: "inline",
+    bundle: true,
+    metafile: true,
+    plugins: [
+      ...options.esbuildOptions?.plugins || [],
+      externalPlugin({
+        external: options.external,
+        notExternal: resolvePaths
+      }),
+      injectFileScopePlugin()
+    ]
+  });
+  const extract = await extractResult(ctx);
+  return extract;
+}
 
-exports.a = f;
-exports.b = iS;
-exports.c = oS;
-exports.d = eS;
-exports.e = hr;
+// lib/options/files.ts
+async function configFile(cwd) {
+  let path2 = null;
+  for (const file of [
+    "syncify.config.js",
+    "syncify.config.mjs",
+    "syncify.config.cjs",
+    "syncify.config.ts",
+    "syncify.config.json"
+  ]) {
+    path2 = pathe.join(cwd, file);
+    const exists = await fsExtra.pathExists(path2);
+    if (exists)
+      break;
+    path2 = null;
+  }
+  if (path2 === null)
+    return null;
+  try {
+    if (pathe.extname(path2) === ".json") {
+      $.file.path = path2;
+      $.file.relative = pathe.relative(cwd, path2);
+      $.file.base = pathe.basename(path2);
+      const json = await fsExtra.readFile(path2);
+      return jsonc(json.toString());
+    } else {
+      $.file.path = path2;
+      $.file.relative = pathe.relative(cwd, path2);
+      $.file.base = pathe.basename(path2);
+      const config = await bundleRequire({
+        cwd,
+        filepath: path2
+      });
+      return config.mod.syncify || config.mod.default || config.mod;
+    }
+  } catch (e2) {
+    console.log(e2);
+    const jsonconfig = pathe.join(cwd, "syncify.config.json");
+    const hasFile = await fsExtra.pathExists(jsonconfig);
+    if (hasFile)
+      return fsExtra.readJson(jsonconfig);
+    return null;
+  }
+}
+async function getPackageJson(cwd) {
+  const uri = pathe.join(cwd, "package.json");
+  const has2 = await fsExtra.pathExists(uri);
+  if (!has2)
+    throw new Error('Missing "package.json" file');
+  try {
+    $.pkg = await fsExtra.readJson(uri);
+  } catch (e2) {
+    throw new Error(e2);
+  }
+}
+async function setCacheDirs(path2, options = { purge: false }) {
+  await fsExtra.remove(path2);
+  $.cache = {
+    uri: pathe.join(path2, "build.map"),
+    version: $.version,
+    themeVersion: $.pkg.version,
+    errors: {
+      uri: pathe.join(path2, "errors"),
+      files: []
+    },
+    maps: {},
+    pages: {},
+    metafields: {},
+    sourcemaps: {
+      script: null,
+      style: null
+    }
+  };
+  const hasBase = await fsExtra.pathExists(path2);
+  if (!hasBase) {
+    try {
+      await fsExtra.mkdir(path2);
+    } catch (e2) {
+      throw new Error(e2);
+    }
+  }
+  for (const dir of [
+    "caches",
+    "sourcemaps",
+    "sourcemaps/style",
+    "sourcemaps/script"
+  ]) {
+    const uri = pathe.join(path2, dir, "/");
+    if (dir === "sourcemaps/script") {
+      $.cache.sourcemaps.script = uri;
+    } else if (dir === "sourcemaps/style") {
+      $.cache.sourcemaps.style = uri;
+    }
+    const has2 = await fsExtra.pathExists(uri);
+    if (!has2) {
+      try {
+        await fsExtra.mkdir(uri);
+      } catch (e2) {
+        throw new Error(e2);
+      }
+    } else {
+      if (options.purge)
+        await fsExtra.emptyDir(uri);
+    }
+  }
+  await update3();
+}
+async function setThemeDirs(basePath2) {
+  const hasBase = await fsExtra.pathExists(basePath2);
+  if (hasBase) {
+    if ($.mode.clean) {
+      try {
+        await fsExtra.emptyDir(basePath2);
+      } catch (e2) {
+        console.error(e2);
+      }
+    }
+  } else {
+    try {
+      await fsExtra.mkdir(basePath2);
+    } catch (e2) {
+      throw new Error(e2);
+    }
+  }
+  for (const dir of THEME_DIRS) {
+    const uri = pathe.join(basePath2, dir);
+    const has2 = await fsExtra.pathExists(uri);
+    const name = dir.startsWith("templates/") ? dir.slice(10) : dir;
+    if (!has2) {
+      try {
+        await fsExtra.mkdir(uri);
+        $.stats[name] = 0;
+      } catch (e2) {
+        throw new Error(e2);
+      }
+    } else {
+      $.stats[name] = fsExtra.readdirSync(uri).length;
+    }
+  }
+}
+function setBaseDirs(cli) {
+  const { config, cwd, mode, dirs } = $;
+  const base = basePath(cwd);
+  for (const [dir, def] of BASE_DIRS) {
+    let path2;
+    if (dir === "import") {
+      if (mode.import) {
+        if (has("output", cli)) {
+          $.dirs[dir] = base(cli.output);
+        } else {
+          $.dirs[dir] = base(config.import);
+        }
+      } else {
+        $.dirs[dir] = base(config.import);
+      }
+      continue;
+    } else if (dir === "export") {
+      if (mode.export) {
+        if (has("output", cli)) {
+          $.dirs[dir] = base(cli.output);
+        } else {
+          $.dirs[dir] = base(config.export);
+        }
+      } else {
+        $.dirs[dir] = base(config.export);
+      }
+      continue;
+    } else if (has(dir, cli) && cli[dir] === def) {
+      if (config[dir] === def) {
+        $.dirs[dir] = base(cli[dir]);
+        continue;
+      } else {
+        path2 = config[dir];
+      }
+    } else if (isString(cli[dir])) {
+      path2 = cli[dir];
+    } else {
+      path2 = config[dir];
+    }
+    if (isArray(path2)) {
+      const roots = uniq(path2.map(base));
+      dirs[dir] = roots.length === 1 ? roots[0] : roots;
+    } else if (isString(path2)) {
+      dirs[dir] = base(path2);
+    } else {
+      typeError({
+        option: "config",
+        name: dir,
+        provided: path2,
+        expects: "string"
+      });
+    }
+  }
+  $.watch.add($.file.path);
+}
+async function setImportDirs() {
+  const { dirs, sync: sync4, mode } = $;
+  if (!mode.import)
+    return;
+  const hasBase = await fsExtra.pathExists(dirs.import);
+  if (!hasBase) {
+    try {
+      await fsExtra.mkdir(dirs.import);
+    } catch (e2) {
+      throw new Error(e2);
+    }
+  }
+  for (const theme in sync4.themes) {
+    const { store, target } = sync4.themes[theme];
+    const dir = pathe.join(dirs.import, store);
+    const has2 = await fsExtra.pathExists(dir);
+    if (has2) {
+      if (mode.clean) {
+        try {
+          await fsExtra.emptyDir(dir);
+        } catch (e2) {
+          console.error(e2);
+        }
+      }
+    } else {
+      try {
+        await fsExtra.mkdir(dir);
+      } catch (e2) {
+        throw new Error(e2);
+      }
+    }
+    await setThemeDirs(pathe.join(dir, target));
+  }
+}
+function setJsonOptions(config) {
+  if (!has("json", config.processors))
+    return;
+  const { json } = config.processors;
+  if (isNil(json))
+    return;
+  if (isObject(json) && isEmpty(json))
+    return;
+  if (!isObject(json)) {
+    typeError({
+      option: "processors",
+      name: "json",
+      expects: "{}",
+      provided: typeof json
+    });
+  }
+  for (const option in json) {
+    if (option === "indent") {
+      if (isNumber(json[option])) {
+        $.processor.json[option] = json[option];
+        continue;
+      } else {
+        typeError({
+          option: "json",
+          name: option,
+          provided: json[option],
+          expects: "number"
+        });
+      }
+    }
+    if (option === "useTab") {
+      if (isBoolean(json[option])) {
+        $.processor.json[option] = json[option];
+        continue;
+      } else {
+        typeError({
+          option: "json",
+          name: option,
+          provided: json[option],
+          expects: "boolean"
+        });
+      }
+    }
+    if (option === "exclude") {
+      const exclude = isString(json[option]) ? [json[option]] : json[option];
+      if (isArray(exclude)) {
+        $.processor.json[option] = anymatch3__default.default(exclude);
+        continue;
+      } else {
+        typeError({
+          option: "json",
+          name: option,
+          provided: exclude[option],
+          expects: "string | string[]"
+        });
+      }
+    }
+  }
+}
+
+// lib/options/modes.ts
+function setModes(cli) {
+  const resource2 = anyTrue(cli.pages, cli.metafields, cli.redirects);
+  const transform3 = anyTrue(cli.style, cli.script, cli.image, cli.svg);
+  const watch2 = anyTrue(resource2, cli.upload, cli.import) ? false : cli.watch;
+  const modes = assign($.mode, {
+    watch: watch2,
+    hot: allTrue(cli.watch, cli.hot),
+    interactive: cli.interactive,
+    redirects: cli.redirects,
+    metafields: cli.metafields,
+    pages: cli.pages,
+    pull: cli.pull,
+    force: cli.force,
+    views: cli.views,
+    script: transform3 ? cli.script : false,
+    style: transform3 ? cli.style : false,
+    image: transform3 ? cli.image : false,
+    svg: transform3 ? cli.svg : false,
+    terse: anyTrue(cli.terse, cli.prod),
+    clean: anyTrue(resource2, transform3, cli.upload) ? false : allTrue(cli.export, cli.build) || cli.clean,
+    build: anyTrue(cli.watch, cli.import) ? false : cli.build,
+    upload: anyTrue(transform3, watch2) ? false : cli.upload,
+    export: cli.export,
+    import: anyTrue(resource2, transform3, cli.upload, cli.watch, cli.build) ? false : cli.import
+  });
+  validateCommands(modes);
+  if (modes.build) {
+    const build4 = allFalse(
+      modes.script,
+      modes.style,
+      modes.svg,
+      modes.pages,
+      modes.metafields,
+      modes.image
+    );
+    if (build4) {
+      modes.script = true;
+      modes.style = true;
+      modes.svg = true;
+      modes.image = true;
+      modes.views = true;
+    }
+  }
+  return modes;
+}
+function validateCommands(modes) {
+  if (values(modes).every((cmd) => cmd === false)) {
+    invalidCommand({
+      expected: "--<cmd>",
+      message: [
+        "Execution is unclear, you have not provided Syncify a operation mode to run."
+      ],
+      fix: [
+        "Syncify requires that you provide an operation. In most cases, this",
+        "error occurs when you have forgotten to pass the mode, for example:",
+        "",
+        `${white("$")} ${white(`syncify ${$.argv} ${blue("--watch")}`)}`,
+        `${white("$")} ${white(`syncify ${$.argv} ${blue("--build")}`)}`,
+        `${white("$")} ${white(`syncify ${$.argv} ${blue("--upload")}`)}`,
+        "",
+        `Run ${blue("syncify --help")} for more information, or pass an execution`,
+        `operation mode as per the ${blue("expected")} value and ensure to replace ${blue("--<cmd>")}`,
+        "with one the examples provided or a supported mode."
+      ]
+    });
+  }
+  if (modes.export) {
+    const props = keys3(modes);
+    props.push(
+      "filter",
+      // -f
+      "delete",
+      // -d
+      "spawn",
+      // -s
+      "resource"
+      // -r
+    );
+    for (const mode of props) {
+      if (mode === "build" || mode === "clean" || mode === "export")
+        continue;
+      if (modes[mode]) {
+        const invalid2 = props.filter((cmd) => cmd !== "build" && cmd !== "clean" && cmd !== "export");
+        invalid2.push(
+          "f\\b",
+          // --filter
+          "u\\b",
+          // --upload
+          "w\\b",
+          // --watch
+          "s\\b",
+          // --spawn
+          "d\\b",
+          // --delete
+          "r\\b"
+          // --resource
+        );
+        const valid = invalid2.map((cmd) => {
+          if (cmd === "filter" || cmd === "f" || cmd === "resource" || cmd === "-r") {
+            return `--?${cmd}.*?(?=(--?${invalid2.join("|--?")}))`;
+          } else {
+            return `--?${cmd}`;
+          }
+        }).join("|");
+        const pexp = new RegExp(`(--?${invalid2.join("|--?")})`, "g");
+        const eexp = new RegExp(`(${valid})`, "g");
+        return invalidCommand({
+          message: [
+            `Bad command ${LPR}argv${RPR} sequence passed with ${blue("export")} mode.`,
+            "Theme exports are performed in isolation. You command includes",
+            "execution modes that cannot be run when exporting theme/s"
+          ],
+          provided: $.argv.replace(pexp, red("$1")).replace(/(--export)/, blue("$1")),
+          expected: $.argv.replace(eexp, "").replace(/(--export)/, blue("$1")),
+          fix: [
+            `Removed the flags marked ${red("red")} as shown in provided aboved.`
+          ]
+        });
+      }
+    }
+  }
+}
+
+// lib/options/snippets.ts
+function setSnippetOptions(config) {
+  if (!has("snippets", config.views))
+    return;
+  const { snippets } = config.views;
+  if (isNil(snippets))
+    return;
+  if (isObject(snippets) && isEmpty(snippets))
+    return;
+  if (!isObject(snippets)) {
+    typeError({
+      option: "views",
+      name: "snippets",
+      expects: "{}",
+      provided: typeof snippets
+    });
+  }
+  for (const option in $.snippet) {
+    if (option === "prefixDir") {
+      if (isBoolean(snippets[option])) {
+        $.snippet[option] = snippets[option];
+        continue;
+      } else {
+        typeError({
+          option: "views.snippets",
+          name: option,
+          provided: snippets[option],
+          expects: "boolean"
+        });
+      }
+    }
+    if (option === "separator") {
+      if (isString(snippets[option])) {
+        if (/[.@:_-]/.test(snippets[option])) {
+          $.section[option] = snippets[option];
+          continue;
+        } else {
+          invalidError("snippets", option, snippets[option], "@ | _ | : | - | .");
+        }
+      } else {
+        typeError({
+          option: "views.snippets",
+          name: option,
+          provided: snippets[option],
+          expects: "string"
+        });
+      }
+    }
+    if (option === "global") {
+      const globals = isString(snippets[option]) ? [snippets[option]] : snippets[option];
+      if (isArray(globals)) {
+        if (globals.length > 0) {
+          $.snippet[option] = new RegExp(`${globals.join("|")}`);
+          continue;
+        }
+      } else {
+        typeError({
+          option: "views.snippets",
+          name: option,
+          provided: snippets[option],
+          expects: "string | string[]"
+        });
+      }
+    }
+  }
+}
+
+// lib/options/sections.ts
+function setSectionOptions(config) {
+  if (!has("sections", config.views))
+    return;
+  const { sections } = config.views;
+  if (isNil(config.views.sections))
+    return;
+  if (isObject(sections) && isEmpty(sections))
+    return;
+  if (!isObject(sections)) {
+    typeError({
+      option: "views",
+      name: "sections",
+      expects: "{}",
+      provided: typeof sections
+    });
+  }
+  for (const option in $.section) {
+    if (option === "prefixDir") {
+      if (isBoolean(sections[option])) {
+        $.section[option] = sections[option];
+        continue;
+      } else {
+        typeError({
+          option: "views.sections",
+          name: option,
+          provided: sections[option],
+          expects: "boolean"
+        });
+      }
+    }
+    if (option === "separator") {
+      if (isString(sections[option])) {
+        if (/[@:_-]/.test(sections[option])) {
+          $.section[option] = sections[option];
+          continue;
+        } else {
+          invalidError("view.sections", option, sections[option], "@ | _ | : | -");
+        }
+      } else {
+        typeError({
+          option: "views.sections",
+          name: option,
+          provided: sections[option],
+          expects: "string"
+        });
+      }
+    }
+    if (option === "global") {
+      const globals = isString(sections[option]) ? [sections[option]] : sections[option];
+      if (isArray(globals)) {
+        if (globals.length > 0) {
+          $.section[option] = new RegExp(`${globals.join("|")}`);
+          continue;
+        }
+      } else {
+        typeError({
+          option: "views.sections",
+          name: option,
+          provided: sections[option],
+          expects: "string | string[]"
+        });
+      }
+    }
+  }
+}
+function authURL(domain, env2, type2) {
+  let api_token = domain + "_api_token";
+  if (!has(api_token, env2))
+    api_token = api_token.toUpperCase();
+  if (has(api_token, env2)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      headers: { "X-Shopify-Access-Token": env2[api_token] }
+    };
+  }
+  let api_key = domain + "_api_key";
+  let api_secret = domain + "_api_secret";
+  if (!has(api_key, env2))
+    api_key = api_key.toUpperCase();
+  if (!has(api_secret, env2))
+    api_secret = api_secret.toUpperCase();
+  if (has(api_key, env2) && has(api_secret, env2)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      auth: {
+        username: env2[api_key],
+        password: env2[api_secret]
+      }
+    };
+  }
+  if (type2 === 1 /* DOTENV */) {
+    throwError(`Invalid or missing ${cyan(domain + ".myshopify.com")} credentials`, [
+      `Your shop credentials in the ${cyan.bold(".env")} file could`,
+      "not be read correctly or are missing."
+    ]);
+  } else if (type2 === 2 /* VARENV */) {
+    throwError(`Missing credentials for: ${cyan(domain + ".myshopify.com")}`, `
+    You need to provide shop credentials within a ${cyan.bold(".env")} file.
+    Please check you project setup and ensure you have correctly provided authorization.`);
+  }
+}
+function getResolvedPaths(filePath, hook2) {
+  const { cwd } = $;
+  const match2 = isFunction(hook2) ? [] : false;
+  const warn3 = warnOption("Path Resolver");
+  const path2 = normalPath($.dirs.input);
+  if (isArray(filePath)) {
+    const paths2 = [];
+    for (const item of filePath) {
+      const uri = path2(item);
+      const resolved = glob7__default.default.sync(uri, {
+        cwd,
+        absolute: true
+      });
+      if (match2) {
+        const test2 = hook2(uri);
+        if (isString(test2)) {
+          match2.push(test2);
+        } else if (isArray(test2)) {
+          match2.push(...test2);
+        }
+      }
+      if (resolved.length === 0) {
+        warn3("No files can be resolved in", item);
+      } else {
+        paths2.push(...resolved);
+      }
+    }
+    return match2 === false ? paths2 : { paths: paths2, match: anymatch3__default.default(match2) };
+  }
+  if (isString(filePath)) {
+    const uri = path2(filePath);
+    const paths2 = glob7__default.default.sync(uri, { cwd });
+    if (paths2.length === 0) {
+      warn3("No files can be resolved in", filePath);
+    }
+    if (match2) {
+      const test2 = hook2(uri);
+      if (isString(test2)) {
+        match2.push(test2);
+      } else if (isArray(test2)) {
+        match2.push(...test2);
+      }
+    }
+    return match2 === false ? paths2 : { paths: paths2, match: anymatch3__default.default(match2) };
+  }
+  typeError({
+    option: "uri",
+    name: "uri/path",
+    provided: filePath,
+    expects: "string | string[]"
+  });
+}
+function getTransform(transforms, opts) {
+  if (!has("assertSnippet", opts))
+    opts.assertSnippet = true;
+  if (isString(transforms)) {
+    const { paths: paths2, match: match2 } = getResolvedPaths(transforms, (watch2) => {
+      if (opts.addWatch)
+        $.watch.add(watch2);
+      return globPath(watch2);
+    });
+    if (paths2) {
+      if (opts.flatten) {
+        return paths2.map((input) => opts.assertSnippet ? {
+          input,
+          rename: pathe.basename(input),
+          snippet: false
+        } : {
+          input,
+          rename: pathe.basename(input)
+        });
+      } else {
+        return opts.assertSnippet ? {
+          input: paths2,
+          rename: "[name].[ext]",
+          snippet: false,
+          match: match2
+        } : {
+          input: paths2,
+          rename: "[name].[ext]",
+          match: match2
+        };
+      }
+    }
+  } else if (isArray(transforms)) {
+    if (transforms.every(isString)) {
+      const { paths: paths2, match: match2 } = getResolvedPaths(transforms, (watch2) => {
+        if (opts.addWatch)
+          $.watch.add(watch2);
+        return globPath(watch2);
+      });
+      if (opts.flatten) {
+        return paths2.map((input) => opts.assertSnippet ? {
+          input,
+          rename: pathe.basename(input),
+          snippet: false
+        } : {
+          input,
+          rename: pathe.basename(input)
+        });
+      } else {
+        return opts.assertSnippet ? {
+          input: paths2,
+          rename: "[name].[ext]",
+          snippet: false,
+          match: match2
+        } : {
+          input: paths2,
+          rename: "[name].[ext]",
+          match: match2
+        };
+      }
+    } else if (transforms.every(isObject)) {
+      return transforms.map((option) => {
+        if (!has("input", option)) {
+          invalidError("tranform", "input", option, "{ input: string | string[] }");
+        }
+        const { paths: paths2, match: match2 } = getResolvedPaths(option.input, (watch2) => {
+          if (opts.addWatch)
+            $.watch.add(watch2);
+          return globPath(watch2);
+        });
+        option.match = match2;
+        option.input = paths2;
+        if (opts.assertSnippet && !has("snippet", option))
+          option.snippet = false;
+        if (!has("rename", option)) {
+          option.rename = option.snippet ? "[name].liquid" : "[name].[ext]";
+        }
+        return option;
+      });
+    }
+  } else if (isObject(transforms)) {
+    const config = [];
+    if (has("input", transforms)) {
+      const record = mergerino_min_default(transforms);
+      const { paths: paths2, match: match2 } = getResolvedPaths(record.input, (watch2) => {
+        if (opts.addWatch)
+          $.watch.add(watch2);
+        return globPath(watch2);
+      });
+      if (opts.assertSnippet && !has("snippet", record)) {
+        record.snippet = false;
+      }
+      if (!has("rename", record)) {
+        record.rename = record.snippet ? "[name].liquid" : "[name].[ext]";
+      }
+      if (opts.flatten) {
+        for (const input of paths2) {
+          config.push(assign(record, { input }));
+        }
+      } else {
+        record.input = paths2;
+        record.match = match2;
+        config.push(record);
+      }
+    } else {
+      for (const prop2 in transforms) {
+        const record = { snippet: prop2.startsWith("snippets/") };
+        const asset = prop2.startsWith("assets/");
+        const option = transforms[prop2];
+        const rename = asset || record.snippet;
+        if (isString(option)) {
+          if (rename) {
+            record.rename = asset ? prop2.slice(7) : prop2.slice(9);
+          }
+          const { paths: paths2, match: match2 } = getResolvedPaths(option, (watch2) => {
+            if (opts.addWatch)
+              $.watch.add(watch2);
+            return globPath(watch2);
+          });
+          if (paths2) {
+            if (opts.flatten) {
+              for (const input of paths2)
+                config.push(assign({}, record, { input }));
+            } else {
+              config.push(assign({}, record, { input: paths2, match: match2 }));
+            }
+          }
+        } else if (isObject(option)) {
+          if (!has("input", option)) {
+            invalidError("tranform", prop2, option, "{ input: string | string[] }");
+          }
+          const { paths: paths2, match: match2 } = getResolvedPaths(option.input, (watch2) => {
+            if (opts.addWatch)
+              $.watch.add(watch2);
+            return globPath(watch2);
+          });
+          if (paths2) {
+            const merge = rename ? assign({}, option, record, { rename: asset ? prop2.slice(7) : prop2.slice(9) }) : assign({}, record, option);
+            if (opts.flatten) {
+              for (const input of paths2) {
+                config.push(assign({}, merge, { input }));
+              }
+            } else {
+              config.push(assign(merge, { input: paths2, match: match2 }));
+            }
+          }
+        } else if (isArray(option)) {
+          if (option.every(isString)) {
+            const { paths: paths2, match: match2 } = getResolvedPaths(option, (watch2) => {
+              if (opts.addWatch)
+                $.watch.add(watch2);
+              return globPath(watch2);
+            });
+            if (hasRenameNamespace(prop2))
+              record.rename = pathe.basename(prop2);
+            if (paths2) {
+              if (opts.flatten) {
+                for (const input of paths2) {
+                  config.push(assign({}, record, { input }));
+                }
+              } else {
+                config.push(assign({}, record, { input: paths2, match: match2 }));
+              }
+            }
+          } else {
+            typeError({
+              option: "transform",
+              name: prop2,
+              provided: option,
+              expects: "string[]"
+            });
+          }
+        }
+      }
+    }
+    return config;
+  }
+}
+function getModules(pkg, name) {
+  if (has("devDependencies", pkg) && has(name, pkg.devDependencies)) {
+    if (has(name, pkg.devDependencies))
+      return true;
+  }
+  if (has("dependencies", pkg)) {
+    if (has(name, pkg.dependencies))
+      return true;
+  }
+  if (has("peerDependencies", pkg)) {
+    if (has(name, pkg.peerDependencies))
+      return true;
+  }
+  if (has("optionalDependencies", pkg)) {
+    if (has(name, pkg.peerDependencies))
+      return true;
+  }
+  return false;
+}
+async function getConfigFilePath(filename) {
+  for (const ext of CONFIG_FILE_EXT) {
+    const filepath = `${filename}.${ext}`;
+    const fileExists = await fsExtra.pathExists(filepath);
+    if (fileExists)
+      return filepath;
+  }
+  return null;
+}
+async function readConfigFile(filename) {
+  try {
+    const path2 = await getConfigFilePath(filename);
+    if (path2 !== null) {
+      const config = await bundleRequire({
+        cwd: $.cwd,
+        filepath: path2
+      });
+      return {
+        path: path2,
+        config: config.mod.syncify || config.mod.default || config.mod
+      };
+    }
+    return null;
+  } catch (e2) {
+    return null;
+  }
+}
+function hasRenameNamespace(rename) {
+  return /\[(?:file|dir|ext)\]/.test(rename);
+}
+function renameFile2(src, rename) {
+  let name = rename;
+  const dir = lastPath(src);
+  const ext = pathe.extname(src);
+  const file = pathe.basename(src, ext);
+  if (isUndefined(rename))
+    return { dir, ext, file, name: file };
+  if (/(\[dir\])/.test(name))
+    name = name.replace("[dir]", dir);
+  if (/(\[file\])/.test(name))
+    name = name.replace("[file]", file);
+  if (/(\.?\[ext\])/.test(name))
+    name = name.replace(/\.?\[ext\]/, ext);
+  return {
+    ext,
+    file,
+    dir,
+    name: rename.replace(rename, name)
+  };
+}
+
+// lib/options/stores.ts
+function setStores(cli, config) {
+  const storeRequired = anyTrue(
+    $.mode.metafields,
+    $.mode.pages,
+    $.mode.redirects
+  );
+  const themeRequired = anyTrue(
+    $.mode.watch,
+    $.mode.upload,
+    $.mode.import
+  );
+  if (cli._.length === 0) {
+    if (storeRequired) {
+      invalidCommand({
+        message: [
+          "You have not provided store to target, which is required",
+          "when running in a resource mode that syncs to a remote source"
+        ],
+        expected: "syncify <store>",
+        fix: [
+          "Provide the store target name as the first command argument",
+          "followed by themes target/s and other flags."
+        ]
+      });
+    }
+    return;
+  }
+  const stores = cli._[0].split(",");
+  const file = dotenv__default.default.config({ path: pathe.join($.cwd, ".env") });
+  const array = isArray(config.stores) ? config.stores : [config.stores];
+  const items = array.filter(({ domain }) => includes(domain, stores));
+  const queue2 = items.length > 1;
+  for (const store of items) {
+    const domain = `${store.domain}.myshopify.com`.toLowerCase();
+    const client2 = file.error ? authURL(store.domain, process.env, 2) : authURL(store.domain, file.parsed, 1);
+    const sidx = $.sync.stores.push({
+      store: store.domain,
+      domain,
+      client: client2,
+      queue: queue2
+    }) - 1;
+    if ($.mode.metafields || $.mode.pages)
+      return;
+    const themes = has("theme", cli) ? cli.theme.split(",") : has(store.domain, cli) ? cli[store.domain].split(",") : keys(store.themes);
+    for (const target of themes) {
+      if (!has(target, store.themes)) {
+        invalidTarget(
+          {
+            type: "theme",
+            expected: keys(store.themes).join(","),
+            provided: target,
+            message: [
+              `Unknown theme target (${blue(target)}) provided to ${blue(store.domain)} store`,
+              `Your ${blue($.file.base)} file contains no such theme using this name.`
+            ],
+            fix: [
+              `Provide an ${blue("expected")} theme target or update/add an existing target.`,
+              `You have ${blue(`${themes.length}`)} theme targets defined for ${blue(store.domain)}:`,
+              "",
+              `${DSH} ${themes.join(`
+${DSH} `)}`,
+              ""
+            ]
+          }
+        );
+      }
+      $.sync.themes.push({
+        target,
+        sidx,
+        store: domain,
+        id: store.themes[target],
+        url: `/themes/${store.themes[target]}/assets.json`
+      });
+    }
+  }
+  if (storeRequired) {
+    if ($.sync.stores.length === 0) {
+      return invalidCommand(
+        {
+          expected: "syncify <store>",
+          message: [
+            "You have not provided store to target, which is required",
+            "when running in a resource mode that syncs to a remote source"
+          ],
+          fix: [
+            "Provide the store target name as the first command argument followed by themes",
+            "target/s and other flags. Based on your current configuration:",
+            "",
+            `${DSH} ${white("$")} syncify ${array.join(`
+${DSH} ${white("$")} syncify `)}`,
+            ""
+          ]
+        }
+      );
+    }
+  }
+  if ($.sync.themes.length === 0) {
+    if (themeRequired) {
+      return invalidCommand(
+        {
+          expected: "-t <theme>",
+          message: [
+            "You have not provided a theme to target, which is required",
+            "when running this resource mode."
+          ],
+          fix: [
+            `Provide a theme name to target following a ${blue("-t")} or ${blue("--theme")} flag.`,
+            "Theme targets should be passed as the 2nd argument, the 1st argument should be store name/s."
+          ]
+        }
+      );
+    }
+  }
+  if ($.sync.stores.length === 0) {
+    throwError(
+      "Unknown, missing or invalid store/theme targets",
+      "Check your store config"
+    );
+  }
+  if ($.sync.stores.length === 1 && $.sync.themes.length === 1) {
+    $.env.sync = 1;
+  } else if ($.sync.stores.length > 1 || $.sync.themes.length > 1) {
+    $.env.sync = 2;
+  }
+}
+async function setPaths(config) {
+  const path2 = normalPath($.dirs.input);
+  const warn3 = warnOption("path resolution");
+  for (const key of PATH_KEYS) {
+    let uri;
+    if (key === "customers") {
+      uri = has(key, config.paths) ? isArray(config.paths[key]) ? config.paths[key].map(path2) : [path2(config.paths[key])] : [path2("templates/customers")];
+    } else if (key === "metaobject") {
+      uri = has(key, config.paths) ? isArray(config.paths[key]) ? config.paths[key].map(path2) : [path2(config.paths[key])] : [path2("templates/metaobject")];
+    } else if (has(key, config.paths)) {
+      uri = isArray(config.paths[key]) ? config.paths[key].map(path2) : [path2(config.paths[key])];
+      if (key === "snippets") {
+        for (const p of uri)
+          $.snippet.baseDir.add(lastPath(pathe.dirname(p)));
+      } else if (key === "sections") {
+        for (const p of uri)
+          $.section.baseDir.add(lastPath(pathe.dirname(p)));
+      } else if (key === "assets") {
+        uri.push(pathe.join($.dirs.output, "assets/*"));
+      }
+    } else if (key === "redirects" && has(key, config.paths)) {
+      uri = [pathe.join($.cwd, config.paths[key])];
+    } else {
+      uri = [path2(key)];
+    }
+    for (const p of uri) {
+      if (key !== "metafields" && key !== "redirects") {
+        const paths2 = await glob7__default.default(p, { cwd: $.cwd });
+        if (paths2.length === 0) {
+          if (key === "assets" && p === pathe.join($.dirs.output, "assets/*"))
+            continue;
+          warn3("No files could be resolved in", pathe.relative($.cwd, p));
+        } else {
+          if ($.paths[key].input === null) {
+            $.paths[key].input = new Set(paths2);
+          } else {
+            for (const entry of paths2) {
+              $.paths[key].input.add(entry);
+            }
+          }
+          $.watch.add(p);
+        }
+      }
+      $.paths[key].match = anymatch3__default.default(uri);
+    }
+  }
+}
+function parseVersionNumber(version) {
+  const match2 = version.match(/^(\d{1,2})\.(\d{1,2})\.(\d{1,2})$/);
+  if (!match2) {
+    throw new Error("Unable to parse: " + version);
+  }
+  return {
+    patch: parseInt(match2[3], 10),
+    minor: parseInt(match2[2], 10),
+    major: parseInt(match2[1], 10)
+  };
+}
+async function setVersion(cli) {
+  const { pkg, vc, dirs, cache } = $;
+  if ($.cache.themeVersion !== pkg.number) {
+    vc.update = parseVersionNumber(pkg.version);
+    vc.update.number = pkg.version;
+    vc.update.dir = pathe.join($.dirs.export, `v${vc.major}`);
+    vc.update.zip = pathe.join(vc.update.dir, `${vc.number}.zip`);
+    const { patch, minor, major } = parseVersionNumber(cache.themeVersion);
+    vc.number = cache.themeVersion;
+    vc.patch = patch;
+    vc.minor = minor;
+    vc.major = major;
+    vc.dir = pathe.join(dirs.export, `v${vc.major}`);
+    vc.zip = pathe.join(vc.dir, `${vc.number}.zip`);
+  } else {
+    const { patch, minor, major } = parseVersionNumber(pkg.version);
+    vc.number = pkg.version;
+    vc.patch = patch;
+    vc.minor = minor;
+    vc.major = major;
+    vc.dir = pathe.join(dirs.export, `v${vc.major}`);
+    vc.zip = pathe.join(vc.dir, `${vc.number}.zip`);
+  }
+  if (cli.bump !== null) {
+    vc.update = assign({}, vc);
+    if (cli.bump === "patch") {
+      vc.update.patch = vc.patch + 1;
+      vc.update.bump = "patch";
+    } else if (cli.bump === "minor") {
+      vc.update.minor = vc.minor + 1;
+      vc.update.bump = "minor";
+    } else if (cli.bump === "major") {
+      vc.update.major = vc.major + 1;
+      vc.update.bump = "major";
+      vc.update.dir = pathe.join(dirs.export, `v${vc.update.major}`);
+    }
+    vc.update.number = `${vc.update.major}.${vc.update.minor}.${vc.update.patch}`;
+    vc.update.zip = pathe.join(vc.update.dir, `${vc.update.number}.zip`);
+  }
+}
+function spawned(name, command, callback) {
+  const child = spawn3__default.default(command.cmd, command.args, { stdio: "pipe" });
+  child.stdio[0].on("data", callback);
+  child.stdio[1].on("data", callback);
+  child.stdio[2].on("data", callback);
+  command.pid = child.pid;
+  $.spawn.streams.set(name, child);
+}
+
+// lib/options/spawn.ts
+function setSpawns(config) {
+  const { mode, spawn: spawn4 } = $;
+  if (!has("spawn", config) || isNil(config.spawn))
+    return;
+  if (!isObject(config.spawn)) {
+    typeError({
+      option: "config",
+      name: "spawn",
+      provided: config.spawn,
+      expects: "{ build: {}, watch: {} }"
+    });
+  }
+  let run2 = null;
+  if (mode.build && has("build", config.spawn))
+    run2 = "build";
+  if (mode.watch && has("watch", config.spawn))
+    run2 = "watch";
+  if (isNil(mode) || isNil(config.spawn[run2]))
+    return;
+  if (!isObject(config.spawn[run2])) {
+    typeError({
+      option: "spawn",
+      name: run2,
+      provided: config.spawn[run2],
+      expects: "{ build: {}, watch: {} }"
+    });
+  }
+  const props = keys(config.spawn[run2]);
+  if (props.length === 0)
+    return;
+  for (const name in config.spawn[run2]) {
+    const command = config.spawn[run2][name];
+    if (isString(command)) {
+      $.spawn.commands[name] = {
+        cmd: "",
+        args: [],
+        pid: NaN
+      };
+      const cmd = command.trimStart().indexOf(" ") > -1 ? command.trimStart().split(" ") : [command];
+      $.spawn.commands[name].cmd = cmd.shift();
+      $.spawn.commands[name].args = cmd;
+      spawned(name, $.spawn.commands[name], loggers_exports.spawn(name));
+    } else if (isArray(command)) {
+      const cmd = command.shift();
+      $.spawn.commands[name] = create(null);
+      $.spawn.commands[name].cmd = cmd;
+      $.spawn.commands[name].args = command;
+      $.spawn.commands[name].pid = NaN;
+      spawned(name, $.spawn.commands[name], loggers_exports.spawn(name));
+    } else {
+      typeError({
+        option: "spawn",
+        name: run2,
+        provided: config.spawn[run2],
+        expects: "string | string[]"
+      });
+    }
+  }
+  kill(() => {
+    queue.pause();
+    queue.clear();
+    loggers_exports.nwl("");
+    spawn4.streams.forEach((child, name) => {
+      loggers_exports.out(`- ${gray(`pid: #${child.pid} (${name}) process exited`)}`);
+      treeKill__default.default(child.pid);
+    });
+    loggers_exports.nwl("");
+    spawn4.streams.clear();
+    process.exit(0);
+  });
+}
+async function setScriptOptions(config) {
+  if (!has("script", config.transforms))
+    return;
+  if (config.transforms.script === false)
+    return;
+  const warn3 = warnOption("script transform option");
+  const { esbuild: esbuild4 } = $.processor;
+  const { script: script2 } = config.transforms;
+  esbuild4.installed = getModules($.pkg, "esbuild");
+  if (esbuild4.installed) {
+    const loaded = esbuildModule();
+    if (!loaded) {
+      throwError(
+        "failed to import ESBuild",
+        "Ensure you have installed esbuild"
+      );
+    }
+    const esbuildConfigFile = await readConfigFile("esbuild.config");
+    if (esbuildConfigFile !== null) {
+      esbuild4.file = esbuildConfigFile.path;
+      esbuild4.config = mergerino_min_default(esbuild4.config, esbuildConfigFile.config);
+    }
+  } else {
+    missingDependency("esbuild");
+  }
+  if (has("entryPoints", esbuild4.config)) {
+    warn3("processor option is not allowed and was omitted", "entryPoints");
+    delete esbuild4.config.entryPoints;
+  }
+  const transforms = getTransform(script2, {
+    addWatch: false,
+    flatten: true
+  });
+  const esbuildOptions = omit([
+    "input",
+    "watch",
+    "rename",
+    "snippet"
+  ]);
+  if (!has("absWorkingDir", esbuild4.config)) {
+    esbuild4.config.absWorkingDir = $.cwd;
+  }
+  for (const transform3 of transforms) {
+    const { snippet: snippet3 } = transform3;
+    const keyDir = snippet3 ? "snippets" : "assets";
+    const { name } = renameFile2(transform3.input, transform3.rename);
+    let rename;
+    if (!name.endsWith(".js") && !name.endsWith(".mjs")) {
+      rename = name + ".js";
+    } else if (name.endsWith(".cjs")) {
+      invalidError("rename", "file extension", name, ".js | .mjs");
+    } else {
+      rename = name;
+    }
+    if (snippet3 && !/\.liquid$/.test(rename))
+      rename = rename + ".liquid";
+    const scriptBundle = {
+      uuid: uuid(),
+      snippet: snippet3,
+      input: transform3.input,
+      output: pathe.join($.dirs.output, keyDir, rename),
+      key: pathe.join(keyDir, rename),
+      namespace: transform3.snippet ? "snippets" : "assets",
+      size: NaN,
+      watch: null,
+      watchCustom: null,
+      esbuild: null
+    };
+    esbuild4.config.outfile = scriptBundle.output;
+    if ($.mode.watch) {
+      $.watch.unwatch(scriptBundle.output);
+    }
+    if (has("esbuild", transform3)) {
+      if (isBoolean(transform3.esbuild) || isNil(transform3.esbuild)) {
+        if (isEmpty(esbuildOptions)) {
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config);
+        } else {
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config, esbuildOptions);
+        }
+      } else if (typeof transform3.esbuild === "object") {
+        for (const prop2 in [
+          "entryPoints",
+          "outdir",
+          "watch",
+          "absWorkingDir",
+          "watch",
+          "write",
+          "logLevel",
+          "incremental"
+        ]) {
+          if (prop2 === "entryPoints" && has(prop2, transform3.esbuild)) {
+            warn3('Option is not allowed, use Syncify "input" instead', prop2);
+          } else if (prop2 === "outdir" && has(prop2, transform3.esbuild)) {
+            warn3("Option is not allowed, Syncify will handle output", prop2);
+          } else if (prop2 === "watch" && has(prop2, transform3.esbuild)) {
+            warn3("Option is not allowed, declare watch using Syncify", prop2);
+          } else if (has(prop2, transform3.esbuild)) {
+            warn3("Option is not allowed and will be ignored", prop2);
+          }
+        }
+        if (has("plugins", transform3.esbuild) && has("plugins", esbuild4.config)) {
+          transform3.esbuild.plugins.unshift(...esbuild4.config.plugins);
+        }
+        if (isEmpty(esbuildOptions)) {
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config, transform3.esbuild);
+        } else {
+          scriptBundle.esbuild = mergerino_min_default(esbuild4.config, transform3.esbuild, esbuildOptions);
+        }
+      } else {
+        typeError({
+          option: "script",
+          name: "esbuild",
+          provided: typeof transform3.esbuild,
+          expects: "boolean | null | {}"
+        });
+      }
+    } else {
+      if (isEmpty(esbuildOptions)) {
+        scriptBundle.esbuild = esbuild4.config;
+      } else {
+        scriptBundle.esbuild = mergerino_min_default(esbuild4.config, esbuildOptions);
+      }
+    }
+    scriptBundle.esbuild.entryPoints = [scriptBundle.input];
+    if ($.mode.watch) {
+      if (!has("watch", transform3)) {
+        scriptBundle.watch = /* @__PURE__ */ new Set();
+      } else {
+        if (!isArray(transform3.watch)) {
+          typeError({
+            option: "script",
+            name: "watch",
+            provided: transform3.watch,
+            expects: "string[]"
+          });
+        }
+        const watchers = getResolvedPaths(transform3.watch);
+        scriptBundle.watchCustom = anymatch3__default.default(watchers);
+        scriptBundle.watch = new Set(watchers);
+      }
+    } else {
+      scriptBundle.watch = /* @__PURE__ */ new Set();
+    }
+    try {
+      await esbuildBundle(scriptBundle);
+    } catch (e2) {
+      throw new Error(e2);
+    }
+    if ($.mode.terse) {
+      scriptBundle.esbuild = mergerino_min_default(scriptBundle.esbuild, $.terser.script, {
+        exclude: void 0
+      });
+    }
+    $.script.push(scriptBundle);
+  }
+  esbuild4.loaded = true;
+}
+async function setStyleConfig(config) {
+  if (!has("style", config.transforms))
+    return;
+  const { postcss: postcss4, sass: sass4 } = $.processor;
+  const warn3 = warnOption("style transform option");
+  sass4.installed = getModules($.pkg, "sass");
+  if (sass4.installed) {
+    const loaded = await load("sass");
+    if (!loaded) {
+      throwError(
+        "Unable to dynamically import SASS",
+        "Ensure you have installed sass"
+      );
+    }
+  }
+  postcss4.installed = getModules($.pkg, "postcss");
+  if (postcss4.installed) {
+    const loaded = await load("postcss");
+    if (!loaded) {
+      throwError(
+        "Unable to dynamically import PostCSS",
+        "Ensure you have installed postcss"
+      );
+    }
+    const pcss = await readConfigFile("postcss.config");
+    if (pcss !== null) {
+      postcss4.file = pcss.path;
+      postcss4.config = pcss.config;
+    }
+  }
+  const styles2 = getTransform(config.transforms.style, {
+    addWatch: false,
+    flatten: true
+  });
+  const path2 = normalPath(config.input);
+  for (const style2 of styles2) {
+    const compile8 = {
+      uuid: uuid(),
+      input: style2.input,
+      watch: null,
+      postcss: false,
+      sass: false
+    };
+    if (has("postcss", style2)) {
+      if (!postcss4.installed) {
+        missingDependency("postcss");
+      }
+      if (isArray(style2.postcss)) {
+        compile8.postcss = style2.postcss;
+      } else {
+        const override = isObject(style2.postcss);
+        if ((isBoolean(style2.postcss) || override) && !isNil(style2.postcss)) {
+          if (style2.postcss !== false) {
+            if (!postcss4.installed)
+              missingDependency("postcss");
+            compile8.postcss = override ? mergerino_min_default(postcss4.config, style2.postcss) : true;
+          }
+        } else {
+          typeError({
+            option: "style",
+            name: "postcss",
+            provided: compile8.postcss,
+            expects: "boolean | {}"
+          });
+        }
+      }
+    }
+    if (has("sass", style2) && style2.sass !== false && sass4.installed === true) {
+      const override = isObject(style2.sass);
+      if ((isBoolean(style2.sass) || override) && !isNil(style2.sass)) {
+        if (!sass4.installed) {
+          missingDependency("sass");
+        }
+        if (!override) {
+          defineProperty(compile8, "sass", {
+            get() {
+              return style2.sass;
+            }
+          });
+        } else {
+          compile8.sass = mergerino_min_default(sass4.config, style2.sass);
+          for (const option in style2.sass) {
+            if (option === "sourcemap" || option === "warnings") {
+              if (isBoolean(style2.sass[option])) {
+                compile8.sass[option] = style2.sass[option];
+              } else {
+                typeError({
+                  option: "sass",
+                  name: option,
+                  provided: style2.sass[option],
+                  expects: "boolean"
+                });
+              }
+            } else if (option === "style") {
+              if (!isString(style2.sass[option])) {
+                typeError({
+                  option: "sass",
+                  name: option,
+                  provided: style2.sass[option],
+                  expects: "string"
+                });
+              }
+              if (style2.sass[option] === "expanded" || style2.sass[option] === "compressed") {
+                compile8.sass[option] = style2.sass[option];
+              } else {
+                invalidError("sass", option, style2.sass[option], "expanded | compressed");
+              }
+            } else if (option === "includePaths") {
+              if (isArray(style2.sass[option])) {
+                compile8.sass[option] = uniq(style2.sass[option]).map((p) => pathe.join($.cwd, p));
+              } else {
+                typeError({
+                  option: "sass",
+                  name: option,
+                  provided: style2.sass[option],
+                  expects: "string[]"
+                });
+              }
+            }
+          }
+        }
+      } else {
+        typeError({
+          option: "style",
+          name: "sass",
+          provided: style2.sass,
+          expects: "boolean | {}"
+        });
+      }
+      if (!style2.snippet && !/\.s[ac]ss/.test(pathe.extname(compile8.input))) {
+        warn3("Input is not a sass file", compile8.input);
+      }
+    }
+    let rename = renameFile2(style2.rename);
+    if (has("rename", style2) && !isNil(style2)) {
+      if (!isString(style2.rename)) {
+        typeError({
+          option: "styles",
+          name: "rename",
+          provided: style2.rename,
+          expects: "string"
+        });
+      }
+      rename = renameFile2(compile8.input, style2.rename);
+      if (!/[a-zA-Z0-9_.-]+/.test(rename.name)) {
+        typeError({
+          option: "sass",
+          name: "rename",
+          provided: rename,
+          expects: "Characters: [a-zA-Z0-9_.-]"
+        });
+      }
+      if (rename.name.endsWith(".css")) {
+        compile8.rename = rename.name;
+      } else {
+        if (rename.name.endsWith(".scss")) {
+          rename.name = rename.name.replace(".scss", ".css");
+        } else if (rename.name.endsWith(".sass")) {
+          rename.name = rename.name.replace(".sass", ".css");
+        } else if (!rename.name.endsWith(".liquid")) {
+          rename.name = rename.name + ".css";
+        }
+      }
+    }
+    const watch2 = [];
+    if ($.mode.watch && has("watch", style2)) {
+      if (!isArray(style2.watch)) {
+        typeError({
+          option: "styles",
+          name: "watch",
+          provided: style2.watch,
+          expects: "string[]"
+        });
+      }
+      for (const uri of style2.watch) {
+        const globs = await glob7__default.default(pathe.join($.cwd, path2(uri)));
+        if (globs.length === 0 && uri[0] !== "!") {
+          warn3("Cannot resolve watch glob/path uri", uri);
+        }
+        for (const p of globs) {
+          if (fsExtra.existsSync(p)) {
+            watch2.push(p);
+          } else {
+            warn3("No file exists in path", p);
+          }
+        }
+      }
+      watch2.push(compile8.input);
+      watch2.forEach((p) => $.watch.add(p));
+      compile8.watch = anymatch3__default.default(watch2);
+    } else {
+      compile8.watch = anymatch3__default.default([compile8.input]);
+      $.watch.add(compile8.input);
+    }
+    if (typeof compile8.sass === "object") {
+      compile8.sass.include.unshift($.cwd, pathe.join($.cwd, rename.dir));
+      if (hasPath("sass.include", style2)) {
+        compile8.sass.include = style2.sass.include.map((p) => pathe.join($.cwd, p));
+      }
+    }
+    if (has("snippet", style2)) {
+      if (!isBoolean(style2.snippet)) {
+        typeError(
+          {
+            option: "styles",
+            name: "snippet",
+            provided: style2.snippet,
+            expects: "boolean"
+          }
+        );
+      }
+      compile8.snippet = style2.snippet;
+    }
+    if (compile8.snippet) {
+      if (!has("rename", compile8)) {
+        compile8.rename = rename.name;
+      }
+      if (!rename.name.endsWith(".liquid") || !compile8.rename.endsWith(".liquid")) {
+        compile8.rename = rename.name + ".liquid";
+      }
+      $.paths.transforms.set(compile8.input, 8 /* Style */);
+      if ($.mode.watch) {
+        $.watch.unwatch(pathe.join($.cwd, config.output, "snippets", compile8.rename));
+      }
+    } else {
+      compile8.rename = rename.name;
+      if ($.mode.watch) {
+        $.watch.unwatch(pathe.join($.cwd, config.output, "assets", rename.name));
+      }
+    }
+    $.style.push(compile8);
+  }
+}
+async function setSvgOptions(config) {
+  if (!has("svg", config.transforms))
+    return;
+  const { sprite, svgo } = $.processor;
+  const warn3 = warnOption("svg transform");
+  svgo.installed = getModules($.pkg, "svgo");
+  if (svgo.installed) {
+    const loaded = await load2("svgo");
+    if (!loaded)
+      throwError("Unable to dynamically import SVGO", "Ensure you have installed svgo");
+  }
+  sprite.installed = getModules($.pkg, "svg-sprite");
+  if (sprite.installed) {
+    const loaded = await load2("svg-sprite");
+    if (!loaded)
+      throwError("Unable to dynamically import SVG Sprite", "Ensure you have installed svg-sprite");
+  }
+  if (!sprite.installed && !svgo.installed) {
+    missingDependency(["svgo", "svg-sprite"]);
+  }
+  const svgs = getTransform(config.transforms.svg, {
+    addWatch: true,
+    flatten: false
+  });
+  for (const svg2 of svgs) {
+    const files = svg2.input.filter((path2) => {
+      if (pathe.extname(path2) !== ".svg") {
+        warn3("Excluded file which is not an SVG type", pathe.relative($.cwd, path2));
+        return false;
+      } else {
+        return true;
+      }
+    });
+    if (files.length === 0) {
+      warn3("No SVG file paths were resolved");
+      continue;
+    }
+    const o2 = {
+      uuid: uuid(),
+      input: new Set(files),
+      match: svg2.match,
+      format: null,
+      rename: svg2.rename,
+      snippet: svg2.snippet
+    };
+    if (has("svgo", svg2) && has("sprite", svg2)) {
+      invalidError("transform", "svg", "svgo AND sprite", "svgo OR sprite");
+    }
+    if (!has("format", svg2)) {
+      if (has("svgo", svg2)) {
+        if (!svgo.installed)
+          missingDependency("svgo");
+        o2.format = "file";
+        o2.svgo = isObject(svg2.svgo) ? mergerino_min_default(svgo.config, svg2.svgo) : true;
+      } else if (has("sprite", svg2)) {
+        if (!sprite.installed)
+          missingDependency("svg-sprite");
+        o2.format = "sprite";
+        o2.sprite = isObject(svg2.sprite) ? mergerino_min_default(sprite.config, svg2.sprite) : true;
+      } else {
+        if (svgo.installed && sprite.installed) {
+          missingOption(
+            "transform.svg",
+            "format",
+            "sprite | file",
+            [
+              `SVG transforms require you to define ${cyan("format")} when both SVGO and SVG Sprite`,
+              "processors are installed. Syncify needs to knows how is should handle the input and",
+              "which processor to use for the transform."
+            ]
+          );
+        } else if (svgo.installed && !sprite.installed) {
+          o2.format = "file";
+          o2.svgo = true;
+        } else if (sprite.installed && !svgo.installed) {
+          o2.format = "sprite";
+          o2.sprite = true;
+        } else {
+          unknownError(
+            "transform > svg",
+            "Cannot resolve processor, try defining a format."
+          );
+        }
+      }
+    } else {
+      if (svg2.format === "file" || svg2.format === "sprite") {
+        o2.format = svg2.format;
+        if (svg2.format === "file") {
+          o2.svgo = true;
+          if (!svgo.installed)
+            missingDependency("svgo");
+        } else {
+          o2.sprite = true;
+          if (!sprite.installed)
+            missingDependency("svg-sprite");
+        }
+      } else {
+        invalidError(
+          "transform > svg",
+          "format",
+          svg2.format,
+          '"sprite" | "file"'
+        );
+      }
+    }
+    $.svg.push(o2);
+  }
+}
+async function setHotReloads(config) {
+  if ($.mode.watch !== true)
+    return;
+  if ($.mode.hot === false && config.hot === false)
+    return;
+  if ($.mode.hot === false && config.hot === true)
+    $.mode.hot = true;
+  const warn3 = warnOption("HOT Reloads");
+  if ($.env.sync > 1) {
+    warn3("HOT Reloads can only be used on 1 store");
+    return;
+  } else if ($.sync.themes.length > 1) {
+    warn3("HOT Reloads can only be used on 1 theme");
+    return;
+  }
+  if (allFalse(
+    isObject(config.hot),
+    isBoolean(config.hot),
+    isNil(config.hot)
+  )) {
+    typeError({
+      option: "config",
+      name: "hot",
+      provided: config.hot,
+      expects: "boolean | {}"
+    });
+  }
+  const { hot: hot2 } = $;
+  if (isObject(config.hot) && isEmpty(config.hot) === false) {
+    for (const prop2 in config.hot) {
+      if (!has(prop2, $.hot))
+        unknownError(`hot.${prop2}`, config.hot[prop2]);
+      if (prop2 === "label") {
+        if (config.hot[prop2] === "visible" || config.hot[prop2] === "hidden") {
+          hot2[prop2] = config.hot[prop2];
+        } else {
+          invalidError("hot", prop2, config.hot[prop2], "visible | hidden");
+        }
+      } else if (prop2 === "strategy") {
+        if (config.hot[prop2] === "hydrate" || config.hot[prop2] === "replace") {
+          hot2[prop2] = config.hot[prop2];
+        } else {
+          invalidError("hot", prop2, config.hot[prop2], "hydrate | replace");
+        }
+      } else if (prop2 === "method") {
+        if (config.hot[prop2] === "hot" || config.hot[prop2] === "refresh") {
+          hot2[prop2] = config.hot[prop2];
+        } else {
+          invalidError("hot", prop2, config.hot[prop2], "hot | refresh");
+        }
+      } else if (prop2 === "scroll") {
+        if (config.hot[prop2] === "preserved" || config.hot[prop2] === "top") {
+          hot2[prop2] = config.hot[prop2];
+        } else {
+          invalidError("hot", prop2, config.hot[prop2], "preserved | top");
+        }
+      } else if (typeof hot2[prop2] === typeof config.hot[prop2]) {
+        hot2[prop2] = config.hot[prop2];
+      } else {
+        typeError({
+          option: "hot",
+          name: prop2,
+          provided: config.hot[prop2],
+          expects: typeof hot2[prop2]
+        });
+      }
+    }
+  }
+  hot2.snippet = pathe.join($.cwd, "node_modules", "@syncify/cli", "hot.js.liquid");
+  hot2.output = pathe.join($.dirs.output, "snippets", "hot.js.liquid");
+  for (const layout of hot2.layouts) {
+    hot2.alive[pathe.join($.dirs.output, "layout", layout)] = false;
+  }
+  hot2.renderer = "{% render 'hot.js'" + [
+    "",
+    `server: ${hot2.server}`,
+    `socket: ${hot2.socket}`,
+    `strategy: "${hot2.strategy}"`,
+    `scroll: "${hot2.scroll}"`,
+    `label: "${hot2.label}"`,
+    `history: "${hot2.history}`,
+    `method: "${hot2.method}"`
+  ].join(", ") + " %}";
+  $.wss = socket();
+}
+function throwCommandError(type2, cmd) {
+  const pattern = [];
+  const ref = {};
+  if ($.mode.upload) {
+    ref.base = "output";
+    ref.from = "output";
+    ref.dirs = THEME_DIRS.map((dir) => `${white("-")} ${blue(dir)}`);
+    ref.fix = [
+      `The ${blue("--filter")} (or ${blue("-f")}) flag command argument expects you`,
+      "provide a theme output directory as the starting point. Filtering begins with",
+      "a Shopify output directory name, for example:",
+      "",
+      `${white("$")} ${white(`syncify --filter ${blue("sections/file.liquid")}`)}`,
+      `${white("$")} ${white(`syncify --filter ${blue("snippets/*")}`)}`,
+      `${white("$")} ${white(`syncify --filter ${blue("templates/*.json")}`)}`,
+      `${white("$")} ${white(`syncify --filter ${blue("!assets/some-file.ext")}`)}`,
+      "",
+      `Syncify will automatically resolve files from within your defined ${bold(ref.base)} directory`,
+      "based on the starting point directory name. You can pass glob star matches following the",
+      `directory namespace or starting point ignores (${blue("!")}) as long the directory can match.`
+    ];
+  } else {
+    ref.base = "input";
+    ref.from = "paths";
+    ref.dirs = PATH_KEYS.map((dir) => `${white("-")} ${blue(dir)}`);
+    ref.fix = [
+      `The ${blue("--filter")} (or ${blue("-f")}) flag command argument expects you`,
+      `provide a ${yellow.bold("paths")} key name as the starting point. Filtering begins with`,
+      "a Shopify output directory name, for example:",
+      "",
+      `${white("$")} ${white(`syncify --filter ${blue("sections/file.liquid")}`)}`,
+      `${white("$")} ${white(`syncify --filter ${blue("snippets/*")}`)}`,
+      `${white("$")} ${white(`syncify --filter ${blue("templates/*.json")}`)}`,
+      `${white("$")} ${white(`syncify --filter ${blue("!assets/some-file.ext")}`)}`,
+      "",
+      `Syncify will automatically resolve files from within your defined ${bold(ref.base)} directory`,
+      `based on the starting point ${bold("paths")} name. You can pass glob star matches following the`,
+      `starting point or ignores (${blue("!")}) as long the reference can match.`
+    ];
+  }
+  if (type2 === "pattern") {
+    pattern.push(`Invalid ${blue("--filter")} pattern provided. You cannot pass starting point`);
+    if (cmd[0] === "*") {
+      pattern.push(`glob (${blue("*")}) stars as filters, Syncify does not support this.`);
+    } else if (cmd[0] === "/") {
+      pattern.push(`path (${blue("/")}) roots as filters, Syncify does not support this.`);
+    } else if (cmd[0] === ".") {
+      pattern.push(`dot paths (${blue(".")})  as filters, Syncify does not support this.`);
+    }
+    pattern.push(
+      `Use a starting point reference name based on the ${blue(ref.from)} key property`,
+      `in your ${blue($.file.base)} file.`
+    );
+  } else {
+    pattern.push(
+      `Invalid directory provided. The ${blue("--filter")} pattern expects the starting point`,
+      "directory path be one of the following:",
+      "",
+      ...ref.dirs,
+      ""
+    );
+  }
+  invalidCommand({
+    message: pattern,
+    expected: "--filter <dir>",
+    fix: ref.fix
+  });
+}
+function parseFilter(base, input, regexp) {
+  if (input[0] === "*" || input[0] === "/" || input[0] === ".") {
+    throwCommandError("pattern", input);
+  }
+  if (input[0] === "!") {
+    if (!regexp.test(input.slice(1)))
+      throwCommandError("dir", input);
+    return;
+  }
+  if (!regexp.test(input))
+    throwCommandError("dir", input);
+  const path2 = input.slice(0, input.indexOf("/"));
+  if (!isArray($.filters[path2]))
+    $.filters[path2] = [];
+  $.filters[path2].push(pathe.join(base, input));
+}
+async function setFilters(cli) {
+  if (!has("filter", cli))
+    return;
+  const base = $.mode.upload ? $.dirs.output : $.dirs.input;
+  const filter2 = cli.filter.replace(/\s+/g, " ").trim();
+  const regexp = $.mode.upload ? new RegExp(`^(${THEME_DIRS.join("|")})`) : new RegExp(`^(${PATH_KEYS.join("|")})`);
+  if (filter2.indexOf(",") > -1) {
+    const multiple = filter2.split(",").filter(Boolean).map((entry) => entry.trim());
+    for (const input of multiple) {
+      parseFilter(base, input, regexp);
+    }
+  } else {
+    parseFilter(base, filter2, regexp);
+  }
+  loggers_exports.out($.filters);
+}
+
+// lib/options/terser.ts
+function setMinifyOptions(config) {
+  const { terser: terser2, mode } = $;
+  if (isBoolean(config.terser)) {
+    if (mode.terse === false && config.terser === false)
+      return;
+    if (mode.terse === false && config.terser === true)
+      mode.terse = true;
+  }
+  const warn3 = warnOption("terser configuration");
+  if (typeof config.terser === "object") {
+    for (const key in config.terser) {
+      if (config.terser[key] === false || isNil(config.terser[key])) {
+        if ($.mode.terse === true)
+          $.terse[key] = true;
+        continue;
+      }
+      if (key === "script") {
+        if ($.processor.esbuild.installed === false && (isObject(config.terser[key]) && isEmpty(config.terser[key]) === false || isBoolean(config.terser[key]) && config.terser[key] === true)) {
+          throwError("esbuild is not installed", ESBUILD_NOT_INSTALLED);
+        }
+      }
+      if (isBoolean(config.terser[key])) {
+        $.terser[key] = config.terser[key];
+      } else if (isObject(terser2[key])) {
+        if (isEmpty(terser2[key]))
+          continue;
+        for (const opt in config.terser[key]) {
+          if (opt === "exclude") {
+            if (!isEmpty(config.terser[key][opt])) {
+              terser2[key][opt] = getResolvedPaths(config.terser[key][opt]);
+            }
+            continue;
+          }
+          if (!has(opt, terser2[key]))
+            unknownError(`terser.${key}`, opt);
+          if (opt === "mangleProps") {
+            if (!isNil(config.terser[key][opt]) && !isRegex(terser2[key][opt])) {
+              typeError({
+                option: `terser.${key}`,
+                name: opt,
+                provided: `${typeof config.terser[key][opt]} (${config.terser[key][opt]})`,
+                expects: "Regex | string | undefined"
+              });
+            }
+          } else {
+            if (!isNil(config.terser[key][opt]) && typeof terser2[key][opt] !== typeof config.terser[key][opt]) {
+              typeError({
+                option: `terser.${key}`,
+                name: opt,
+                provided: typeof config.terser[key][opt],
+                expects: typeof terser2[key][opt]
+              });
+            }
+          }
+          if (opt === "collapseWhitespace") {
+            terser2.markup.collapseWhitespace = config.terser[key][opt];
+          } else {
+            terser2[key][opt] = config.terser[key][opt];
+          }
+        }
+      } else {
+        warn3("unkown option provided", key);
+      }
+    }
+  }
+}
+
+// lib/options/pages.ts
+function setPageOptions(config) {
+  if (!has("pages", config.views))
+    return;
+  const { pages: pages2 } = config.views;
+  if (!isObject(pages2) && !isNil(pages2)) {
+    typeError({
+      option: "views",
+      name: "pages",
+      provided: typeof pages2,
+      expects: "{}"
+    });
+  }
+  if (isEmpty(pages2))
+    return;
+  const defaults2 = $.config.views.pages;
+  for (const option in pages2) {
+    if (!has(option, defaults2))
+      unknownError("pages", option);
+    if (option === "importLanguage") {
+      if (isString(pages2[option])) {
+        if (pages2[option] === "markdown" || pages2[option] === "html") {
+          $.page[option] = pages2[option];
+        } else {
+          invalidError("views.pages", option, pages2[option], "markdown | html");
+        }
+      } else {
+        typeError({
+          option: "views.pages",
+          name: option,
+          provided: pages2[option],
+          expects: "markdown | html"
+        });
+      }
+    } else if (option === "author") {
+      if (isNil(pages2[option]))
+        continue;
+      if (isString(pages2[option])) {
+        $.page[option] = pages2[option];
+      } else {
+        typeError({
+          option: "views.pages",
+          name: option,
+          provided: pages2[option],
+          expects: "string"
+        });
+      }
+    } else if (option === "suffixDir" || option === "safeSync") {
+      if (isNil(pages2[option]))
+        continue;
+      if (isBoolean(pages2[option])) {
+        $.page[option] = pages2[option];
+      } else {
+        typeError({
+          option: "views.pages",
+          name: option,
+          provided: pages2[option],
+          expects: "object"
+        });
+      }
+    } else if (option === "global") {
+      if (isNil(pages2[option]))
+        continue;
+      if (isArray(pages2[option])) {
+        if (pages2[option].length > 0) {
+          $.page[option] = new RegExp(`${pages2[option].join("|")}`);
+          continue;
+        }
+      } else {
+        typeError({
+          option: "views.pages",
+          name: option,
+          provided: pages2[option],
+          expects: "string | string[]"
+        });
+      }
+    }
+  }
+}
+
+// lib/options/define.ts
+async function define(cli, _options) {
+  loggers_exports.runtime($);
+  await getPackageJson(cli.cwd);
+  await getConfig(cli);
+  $.restart = false;
+  $.cli = cli;
+  $.mode = setModes(cli);
+  $.cwd = cli.cwd;
+  $.env.cli = cli.cli;
+  $.env.prod = cli.prod;
+  $.env.dev = cli.dev && !cli.prod;
+  $.logger.silent = cli.silent;
+  $.terminal.wrap = Math.round($.terminal.cols - $.terminal.cols / 3);
+  process.env.SYNCIFY_ENV = $.env.dev ? "dev" : "prod";
+  process.env.SYNCIFY_WATCH = String($.mode.watch);
+  const { config, cwd } = $;
+  const promise = await Promise.all([
+    setChokidar(cli.watch || cli.upload, cwd),
+    setBaseDirs(cli),
+    setCaches(cwd),
+    setVersion(cli),
+    setThemeDirs($.dirs.output),
+    setImportDirs(),
+    setStores(cli, config),
+    setPaths(config),
+    setFilters(cli),
+    setProcessors(config),
+    setSectionOptions(config),
+    setSnippetOptions(config),
+    setPageOptions(config),
+    setJsonOptions(config),
+    setScriptOptions(config),
+    setStyleConfig(config),
+    setSvgOptions(config),
+    setMinifyOptions(config),
+    setSpawns(config),
+    setPlugins(config),
+    setHotReloads(config)
+  ]).catch((e2) => {
+    console.log(e2);
+  });
+  loggers_exports.spinner.stop();
+  loggers_exports.start($);
+  return promise;
+}
+function setChokidar(watch2, cwd) {
+  if (!watch2)
+    return;
+  $.watch = new chokidar.FSWatcher({
+    persistent: true,
+    ignoreInitial: true,
+    usePolling: true,
+    interval: 75,
+    binaryInterval: 100,
+    ignored: ["**/*.map"],
+    ignorePermissionErrors: true
+  });
+  $.watch = Object.defineProperties($.watch, {
+    has: {
+      value(path2, dir = cwd) {
+        return $.watch._watched.get(dir).items.has(path2);
+      }
+    },
+    paths: {
+      get() {
+        return toArray($.watch.values());
+      }
+    },
+    watching: {
+      get() {
+        return $.watch._watched;
+      }
+    }
+  });
+}
+function setProcessors(config) {
+  for (const prop2 in config.processors) {
+    $.processor[prop2].config = isArray(config.processors[prop2]) ? config.processors[prop2] : assign($.processor[prop2].config, config.processors[prop2]);
+  }
+}
+function setPlugins(config) {
+  if (!has("plugins", config))
+    return;
+  if (!isArray(config.plugins))
+    return;
+  for (const plugin of config.plugins) {
+    if (has("onInit", plugin))
+      plugin.onInit.call({ ...$ }, config);
+    if (has("onChange", plugin)) {
+      $.plugins.onChange.push([
+        plugin.name,
+        plugin.onChange
+      ]);
+    }
+    if (has("onTransform", plugin)) {
+      $.plugins.onTransform.push([
+        plugin.name,
+        plugin.onTransform
+      ]);
+    }
+    if ($.mode.watch) {
+      if (has("onWatch", plugin)) {
+        $.plugins.onWatch.push([
+          plugin.name,
+          plugin.onWatch
+        ]);
+      }
+      if (has("onReload", plugin)) {
+        $.plugins.onReload.push([
+          plugin.name,
+          plugin.onReload
+        ]);
+      }
+    }
+    if ($.mode.build) {
+      if (has("onBuild", plugin)) {
+        $.plugins.onBuild.push([
+          plugin.name,
+          plugin.onBuild
+        ]);
+      }
+    }
+  }
+}
+async function setCaches(cwd) {
+  $.dirs.cache = pathe.join(cwd, "node_modules/.syncify");
+  const uri = pathe.join($.dirs.cache, "build.map");
+  const exists = await fsExtra.pathExists(uri);
+  if (!exists)
+    return setCacheDirs($.dirs.cache);
+  $.cache = await fsExtra.readJSON(uri);
+  if (!has("themeVersion", $.cache)) {
+    $.cache.themeVersion = $.pkg.version;
+  }
+  if ($.cache.version !== $.version && $.version === "0.3.0-beta") {
+    if (await fsExtra.pathExists($.dirs.cache)) {
+      await fsExtra.remove($.dirs.cache);
+      return setCacheDirs($.dirs.cache);
+    }
+  }
+}
+async function getConfig(cli) {
+  const cfg = await configFile(cli.cwd);
+  if (cfg !== null) {
+    $.config = cfg;
+  } else if (has("syncify", $.pkg)) {
+    $.config = $.pkg.syncify;
+  } else {
+    missingConfig(cli.cwd);
+  }
+}
+
+// lib/index.ts
+var env = {
+  get dev() {
+    return process.env.SYNCIFY_ENV === "dev";
+  },
+  get prod() {
+    return process.env.SYNCIFY_ENV === "prod";
+  },
+  get watch() {
+    return process.env.SYNCIFY_WATCH === "true";
+  },
+  get options() {
+    return $.config;
+  }
+};
+async function run(options, config, callback) {
+  process.stdin.on("data", stdin);
+  if (has("_", options))
+    options._ = options._.slice(1);
+  if (options.help)
+    return console.info(help);
+  await define(options);
+  process.on("SIGINT", signal);
+  if ($.mode.hot)
+    await server();
+  try {
+    if ($.mode.build && $.mode.export === false) {
+      return build2(callback);
+    } else if ($.mode.watch) {
+      return watch(callback);
+    } else if ($.mode.upload) {
+      return upload3(callback);
+    } else if ($.mode.import) {
+      return importing(callback);
+    } else if ($.mode.export) {
+      return exporting(callback);
+    } else if ($.mode.interactive) {
+      return console.log("TODO: --interactive is not yet supported");
+    } else if ($.mode.metafields) {
+      return console.log("TODO: --metafields is not yet supported");
+    }
+  } catch (e2) {
+    console.log(e2);
+    loggers_exports.throws(e2);
+  }
+}
+
+// lib/api.ts
+var defineConfig = (config) => config;
+function api(resource2, options) {
+  if (isString(resource2)) {
+    if (/watch|build|download|upload/.test(resource2)) {
+      return (cb) => run({
+        cli: false,
+        [resource2]: true
+      }, options, cb);
+    }
+  } else if (isObject(resource2)) {
+    if (!isUndefined(options)) {
+      throw new Error("You cannot provide options when running instance");
+    }
+    return {
+      watch: (cb) => run({
+        cli: false,
+        watch: true
+      }, options, cb),
+      build: (cb) => run({
+        cli: false,
+        build: true
+      }, options, cb),
+      download: (cb) => run({
+        cli: false,
+        download: true
+      }, options, cb),
+      upload: (cb) => run({
+        cli: false,
+        upload: true
+      }, options, cb)
+    };
+  }
+}
+var api_default = api;
+
+exports.api_default = api_default;
+exports.defineConfig = defineConfig;
+exports.env = env;
+exports.loggers_exports = loggers_exports;
+exports.run = run;

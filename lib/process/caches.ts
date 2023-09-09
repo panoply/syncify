@@ -3,8 +3,8 @@
 import { writeJson, writeJsonSync } from 'fs-extra';
 import { has } from 'rambdax';
 import { Requests } from 'types';
-import { $ } from '~state';
-import { isObject } from '~utils/native';
+import { $ } from 'syncify:state';
+import { isObject } from 'syncify:utils/native';
 
 export enum Cached {
   /**
