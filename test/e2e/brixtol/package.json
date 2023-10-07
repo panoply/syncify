@@ -30,7 +30,7 @@
     "@syncify/cli": "link:../../..",
     "autoprefixer": "^10.4.13",
     "esbuild": "^0.17.3",
-    "postcss": "^8.4.21",
+    "postcss": "^8.4.31",
     "sass": "^1.57.1",
     "svg-sprite": "^2.0.2"
   },
