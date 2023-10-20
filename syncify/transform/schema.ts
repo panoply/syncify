@@ -22,7 +22,7 @@ import { File, Type } from 'syncify:file';
 import { $ } from 'syncify:state';
 import { hasProp, plural, has, isArray, isObject, glue, checksum } from 'syncify:utils';
 import { bold } from 'syncify:colors';
-import { minifySchema } from 'lib/terser/liquid';
+import { minifySchema } from '../terser/liquid';
 
 export function HasSchemaTag (content: string) {
 

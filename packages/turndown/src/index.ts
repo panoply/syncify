@@ -240,6 +240,8 @@ function tables (turndownService: TurndownService) {
 
 }
 
+export { default as Turndown } from 'turndown';
+
 export function gfm (turndownService: TurndownService) {
 
   turndownService.use([

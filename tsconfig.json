@@ -154,9 +154,6 @@
       "syncify:plugins/*": [
         "syncify/plugins/*"
       ],
-      "syncify:forks/*": [
-        "./syncify/forks/*"
-      ],
       "syncify:hot/*": [
         "./syncify/hot/*"
       ],

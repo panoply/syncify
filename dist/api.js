@@ -28,7 +28,7 @@ var cbor = require('cbor');
 var writeFileAtomic = require('write-file-atomic');
 var matter = require('gray-matter');
 var markdown = require('markdown-it');
-var Turndown = require('turndown');
+var turndown = require('@syncify/turndown');
 var enquirer = require('enquirer');
 var AdmZip = require('adm-zip');
 var dotenv = require('dotenv');
@@ -56,7 +56,6 @@ var cbor__default = /*#__PURE__*/_interopDefault(cbor);
 var writeFileAtomic__default = /*#__PURE__*/_interopDefault(writeFileAtomic);
 var matter__default = /*#__PURE__*/_interopDefault(matter);
 var markdown__default = /*#__PURE__*/_interopDefault(markdown);
-var Turndown__default = /*#__PURE__*/_interopDefault(Turndown);
 var AdmZip__default = /*#__PURE__*/_interopDefault(AdmZip);
 var dotenv__default = /*#__PURE__*/_interopDefault(dotenv);
 var http__default = /*#__PURE__*/_interopDefault(http);
@@ -4572,10 +4571,10 @@ var require_dist = __commonJS({
   }
 });
 
-// lib/api.ts
+// syncify/api.ts
 init_cjs_shims();
 
-// lib/utils/utils.ts
+// syncify/utils/utils.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/strip-json-comments@5.0.1/node_modules/strip-json-comments/index.js
@@ -4667,7 +4666,7 @@ function stripJsonComments(jsonString, { whitespace = true, trailingCommas = fal
   return result + buffer + (isInsideComment ? strip2(jsonString.slice(offset)) : jsonString.slice(offset));
 }
 
-// lib/utils/native.ts
+// syncify/utils/native.ts
 init_cjs_shims();
 var {
   error,
@@ -4689,7 +4688,7 @@ var toBuffer = Buffer.from;
 var { abs } = Math;
 var { toString } = Object.prototype;
 
-// lib/const.ts
+// syncify/const.ts
 init_cjs_shims();
 var CACHE_REFS = [
   "build",
@@ -4799,10 +4798,10 @@ var SHOPIFY_REQUEST_ERRORS = {
   503: "The server is currently unavailable. Check the Shopify status page for reported service outages. See https://www.shopifystatus.com"
 };
 
-// lib/ansi/symbol.ts
+// syncify/ansi/symbol.ts
 init_cjs_shims();
 
-// lib/ansi/colors.ts
+// syncify/ansi/colors.ts
 init_cjs_shims();
 var import_ansis = __toESM(require_ansis());
 var clear2 = "\x1B[H\x1B[2J";
@@ -4858,7 +4857,7 @@ var {
   neonMagenta
 } = import_ansis.default;
 
-// lib/ansi/symbol.ts
+// syncify/ansi/symbol.ts
 var Tree = object({
   /**
    * Tree Line Top
@@ -5052,7 +5051,7 @@ var RSB = `${gray.open}]${gray.close}`;
 var LAN = `${gray.open}<${gray.close}`;
 var RAN = `${gray.open}>${gray.close}`;
 
-// lib/utils/utils.ts
+// syncify/utils/utils.ts
 function has(prop, object2) {
   return prop in object2;
 }
@@ -5263,7 +5262,7 @@ function isBuffer(param) {
   return Buffer.isBuffer(param);
 }
 
-// lib/index.ts
+// syncify/index.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/rambdax@10.0.0/node_modules/rambdax/src/allFalse.js
@@ -5647,10 +5646,10 @@ function last(listOrString) {
   return listOrString[listOrString.length - 1];
 }
 
-// lib/modes/upload.ts
+// syncify/modes/upload.ts
 init_cjs_shims();
 
-// lib/requests/client.ts
+// syncify/requests/client.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/p-map@6.0.0/node_modules/p-map/index.js
@@ -5780,7 +5779,7 @@ async function pMap(iterable, mapper, {
 }
 var pMapSkip = Symbol("skip");
 
-// lib/requests/queue.ts
+// syncify/requests/queue.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/p-queue@7.4.1/node_modules/p-queue/dist/index.js
@@ -6277,7 +6276,7 @@ function requeue(status) {
   return false;
 }
 
-// lib/utils/timer.ts
+// syncify/utils/timer.ts
 init_cjs_shims();
 var timer = new class Timer {
   /**
@@ -6399,7 +6398,7 @@ var timer = new class Timer {
   }
 }();
 
-// lib/model/$.ts
+// syncify/model/$.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/mergerino@0.4.0/node_modules/mergerino/dist/mergerino.min.js
@@ -6426,7 +6425,7 @@ var o = (o2, ...r) => {
 };
 var mergerino_min_default = o;
 
-// lib/cli/size.ts
+// syncify/cli/size.ts
 init_cjs_shims();
 function exec(command, args, shell) {
   return child_process.execFileSync(command, args, {
@@ -6493,7 +6492,7 @@ function size() {
   return create2(80, 24);
 }
 
-// lib/model/terser.ts
+// syncify/model/terser.ts
 init_cjs_shims();
 var terser = () => ({
   json: {
@@ -6566,7 +6565,7 @@ var terser = () => ({
   }
 });
 
-// lib/model/defaults.ts
+// syncify/model/defaults.ts
 init_cjs_shims();
 var defaults = () => ({
   input: "source",
@@ -6651,7 +6650,7 @@ var defaults = () => ({
   }
 });
 
-// lib/model/processor.ts
+// syncify/model/processor.ts
 init_cjs_shims();
 var processor = () => ({
   json: {
@@ -6748,7 +6747,7 @@ var processor = () => ({
   }
 });
 
-// lib/model/plugins.ts
+// syncify/model/plugins.ts
 init_cjs_shims();
 var plugins = () => ({
   onBuild: [],
@@ -6758,7 +6757,7 @@ var plugins = () => ({
   onWatch: []
 });
 
-// lib/model/$.ts
+// syncify/model/$.ts
 function paths() {
   const state = object();
   for (const path2 of PATH_KEYS) {
@@ -7321,10 +7320,10 @@ var $ = new class Bundle {
   }
 }();
 
-// lib/requests/assets.ts
+// syncify/requests/assets.ts
 init_cjs_shims();
 
-// lib/model/file.ts
+// syncify/model/file.ts
 init_cjs_shims();
 var File = class {
   constructor({ base, dir, ext, name, root }) {
@@ -7500,16 +7499,16 @@ var File = class {
   size;
 };
 
-// lib/log/loggers.ts
+// syncify/log/loggers.ts
 init_cjs_shims();
 
-// lib/cli/intercept.ts
+// syncify/cli/intercept.ts
 init_cjs_shims();
 
-// lib/cli/interpolate.ts
+// syncify/cli/interpolate.ts
 init_cjs_shims();
 
-// lib/ansi/ansi.ts
+// syncify/ansi/ansi.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/wrap-ansi@8.1.0/node_modules/wrap-ansi/index.js
@@ -7967,7 +7966,7 @@ function cleanStack(stack, { pretty = false, basePath: basePath2, pathFilter } =
   }).join("\n");
 }
 
-// lib/ansi/ansi.ts
+// syncify/ansi/ansi.ts
 function Prefix(name, ...suffix) {
   const spacer = name.length > 9 ? "  " : " ".repeat(11 - name.length);
   const joiner = suffix.length > 0 ? suffix.length === 1 ? ARR + "  " + suffix[0] : suffix.length === 2 ? ARR + "  " + suffix[0] + " " + ARR + " " + suffix[1] : ARR + "  " + suffix[0] + " " + ARR + " " + suffix[1] + " " + Append(suffix[2]) : "";
@@ -8542,7 +8541,7 @@ function Create(options) {
   return new Message(options);
 }
 
-// lib/cli/interpolate.ts
+// syncify/cli/interpolate.ts
 function Format(input, { type: type2 = "info" } = {}) {
   const message = Create({ type: type2 });
   const lines = isArray(input) ? input : input.split("\n");
@@ -8609,7 +8608,7 @@ function Multiline(input, { type: type2 = "info", color = white } = {}) {
   return Create({ type: type2 }).Newline(line2).Wrap(input, color).toLine();
 }
 
-// lib/cli/spinner.ts
+// syncify/cli/spinner.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/log-update@5.0.1/node_modules/log-update/index.js
@@ -8957,7 +8956,7 @@ var logUpdate = createLogUpdate(process3__default.default.stdout);
 var log_update_default = logUpdate;
 createLogUpdate(process3__default.default.stderr);
 
-// lib/cli/spinner.ts
+// syncify/cli/spinner.ts
 function Spinner2() {
   let interval;
   let active = false;
@@ -9076,7 +9075,7 @@ function Spinner2() {
   return spinner2;
 }
 
-// lib/log/errors.ts
+// syncify/log/errors.ts
 var errors_exports = {};
 __export(errors_exports, {
   esbuild: () => esbuild,
@@ -9091,7 +9090,7 @@ __export(errors_exports, {
 });
 init_cjs_shims();
 
-// lib/ansi/codeframe.ts
+// syncify/ansi/codeframe.ts
 init_cjs_shims();
 function highlight(string) {
   return redBright(string.replace(/('[{}_\w\s.-]*?'|"[\w\s.-]*?")/g, orange("$1")).replace(/({{2}-?[a-zA-Z0-9_\-.'"[\]]+-?}{2})/g, teal("$1")).replace(/((?:www|http:|https:)+[^\s]+[\w])/g, underline("$1")).replace(/(\/)(.*?)(\/)/g, teal("$1") + neonCyan("$2") + teal("$3")).replace(/(\\)(\W)/g, gray("$1") + neonCyan("$2")).replace(/(:)(?= )/g, gray("$1")).replace(/(?<=Filename\s)([\w._-]+)(?=\salready)/, neonCyan.bold("$1")));
@@ -9235,7 +9234,7 @@ function Shopify(input, source) {
   };
 }
 
-// lib/log/errors.ts
+// syncify/log/errors.ts
 function spawn(data) {
   const newlines = data.split("\n").reduce((acc, line2) => {
     const ansi = detect(line2);
@@ -9566,7 +9565,7 @@ function postcss(file, e2) {
   );
 }
 
-// lib/cli/progress.ts
+// syncify/cli/progress.ts
 init_cjs_shims();
 var import_ansis2 = __toESM(require_ansis());
 function progress(total, opts = {}) {
@@ -9622,10 +9621,10 @@ function progress(total, opts = {}) {
   };
 }
 
-// lib/log/runtime.ts
+// syncify/log/runtime.ts
 init_cjs_shims();
 
-// lib/log/throws.ts
+// syncify/log/throws.ts
 init_cjs_shims();
 var warnings = {};
 function warnOption(group2) {
@@ -9773,7 +9772,7 @@ function unknownError(option, value) {
   process.exit(0);
 }
 
-// lib/log/runtime.ts
+// syncify/log/runtime.ts
 var runtime = function($2) {
   clear3();
   if ($2.log.config.silent)
@@ -9971,7 +9970,7 @@ function getThemeURLS(text, themes2, url) {
   }
 }
 
-// lib/log/loggers.ts
+// syncify/log/loggers.ts
 var spinner = Spinner2();
 function hline(options) {
   log(
@@ -10588,7 +10587,7 @@ function version(vc, type2) {
   );
 }
 
-// lib/requests/assets.ts
+// syncify/requests/assets.ts
 async function find(asset, theme2) {
   const request2 = mergerino_min_default($.sync.stores[theme2.sidx].client, {
     method: "get",
@@ -10773,7 +10772,7 @@ async function sync(theme2, file, config) {
   return promise;
 }
 
-// lib/requests/metafields.ts
+// syncify/requests/metafields.ts
 init_cjs_shims();
 async function find2(store, field) {
   if (is(arguments.length, 1))
@@ -10844,7 +10843,7 @@ async function sync2(store, field) {
   });
 }
 
-// lib/requests/client.ts
+// syncify/requests/client.ts
 function client({ stores, themes: themes2 }) {
   return {
     assets: async (method, file, content) => {
@@ -10889,13 +10888,13 @@ function client({ stores, themes: themes2 }) {
   };
 }
 
-// lib/process/files.ts
+// syncify/process/files.ts
 init_cjs_shims();
 
-// lib/process/context.ts
+// syncify/process/context.ts
 init_cjs_shims();
 
-// lib/utils/paths.ts
+// syncify/utils/paths.ts
 init_cjs_shims();
 function globPath(path2) {
   return isArray(path2) ? path2.filter((uri) => /\*/.test(uri)) : /\*/.test(path2) ? path2 : null;
@@ -10974,7 +10973,7 @@ var basePath = (cwd) => (path2) => {
   }
 };
 
-// lib/process/context.ts
+// syncify/process/context.ts
 function svg(file) {
   const config = $.svg.filter((context) => {
     if (context.input.has(file.input))
@@ -11065,7 +11064,7 @@ function snippet(file) {
   return file;
 }
 
-// lib/process/files.ts
+// syncify/process/files.ts
 function getFileKind(ext) {
   switch (ext) {
     case ".liquid":
@@ -11318,7 +11317,7 @@ var outputFile = (output) => (path2) => {
   }
 };
 
-// lib/plugins/hooks.ts
+// syncify/plugins/hooks.ts
 init_cjs_shims();
 async function onAsset(file, input, update2, request2) {
   if (isUndefined(update2) || update2 === false) {
@@ -11332,7 +11331,7 @@ async function onAsset(file, input, update2, request2) {
   }
 }
 
-// lib/hot/inject.ts
+// syncify/hot/inject.ts
 init_cjs_shims();
 var EXP = /{%-?\s*render\s+['"]hot\.js['"]/;
 async function injectSnippet() {
@@ -11410,7 +11409,7 @@ async function injectRender(path2) {
   }
 }
 
-// lib/modes/upload.ts
+// syncify/modes/upload.ts
 function getModel(size2) {
   if (size2 === 0) {
     throwError("Empty output directory", [
@@ -11582,10 +11581,10 @@ async function upload3(cb) {
   process.exit(0);
 }
 
-// lib/modes/build.ts
+// syncify/modes/build.ts
 init_cjs_shims();
 
-// lib/transform/asset.ts
+// syncify/transform/asset.ts
 init_cjs_shims();
 function passthrough(file, sync4) {
   const { type: type2, relative: relative15, kind, key, output } = file;
@@ -11644,10 +11643,10 @@ async function compile(file, sync4, cb) {
   return null;
 }
 
-// lib/transform/liquid.ts
+// syncify/transform/liquid.ts
 init_cjs_shims();
 
-// lib/transform/schema.ts
+// syncify/transform/schema.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/parse-json@7.1.0/node_modules/parse-json/index.js
@@ -11757,7 +11756,7 @@ function parseJson(string, reviver, filename) {
   }
 }
 
-// lib/log/warnings.ts
+// syncify/log/warnings.ts
 init_cjs_shims();
 function getStack(processor2, uri) {
   if (has(uri, $.warnings)) {
@@ -11857,7 +11856,7 @@ function postcss2(file, data) {
   }
 }
 
-// lib/terser/liquid.ts
+// syncify/terser/liquid.ts
 init_cjs_shims();
 function minifySchema(schema3) {
   if ($.terser.liquid.minifySchema === false) {
@@ -11870,7 +11869,7 @@ function minifySchema(schema3) {
   return JSON.stringify(schema3, null, 0);
 }
 
-// lib/transform/schema.ts
+// syncify/transform/schema.ts
 async function ExtractSchema(file) {
   const read2 = await fsExtra.readFile(file.input);
   const content = read2.toString();
@@ -12148,7 +12147,7 @@ async function compile2(file, sync4, cb) {
   }
 }
 
-// lib/transform/liquid.ts
+// syncify/transform/liquid.ts
 var LiquidLineComments = /{%-?\s*#[\s\S]+?%}/g;
 var LiquidBlockComments = /{%-?\s*comment\s*-?%}[\s\S]+?{%-?\s*endcomment\s*-?%}/g;
 var LiquidTag = /{%-?\s*liquid[\s\S]+?%}/g;
@@ -12261,7 +12260,7 @@ async function compile3(file, cb) {
   return edit(input);
 }
 
-// lib/transform/json.ts
+// syncify/transform/json.ts
 init_cjs_shims();
 function parse2(file, data) {
   try {
@@ -12377,7 +12376,7 @@ async function compile4(file, cb) {
   }
 }
 
-// lib/transform/script.ts
+// syncify/transform/script.ts
 init_cjs_shims();
 var esbuild3 = null;
 function esbuildModule() {
@@ -12566,7 +12565,7 @@ async function compile5(file, sync4, hooks2) {
     nwl();
 }
 
-// lib/transform/style.ts
+// syncify/transform/style.ts
 init_cjs_shims();
 var postcss3 = null;
 var sass3 = null;
@@ -12765,7 +12764,7 @@ async function compile6(file, cb) {
   }
 }
 
-// lib/transform/svg.ts
+// syncify/transform/svg.ts
 init_cjs_shims();
 var Svgo = null;
 var SVGSprite = null;
@@ -12950,7 +12949,7 @@ async function compile7(file, request2, cb) {
   }
 }
 
-// lib/process/cache.ts
+// syncify/process/cache.ts
 init_cjs_shims();
 var cq = new dist_default();
 function decode(uri) {
@@ -13052,7 +13051,7 @@ function setPageCache(domain, data) {
   return $.cache.pages[store][data.id];
 }
 
-// lib/modes/build.ts
+// syncify/modes/build.ts
 function getModel2() {
   const report = object({
     stats: object({
@@ -13253,196 +13252,13 @@ async function build(cb) {
   }
 }
 
-// lib/modes/watch.ts
+// syncify/modes/watch.ts
 init_cjs_shims();
 
-// lib/transform/pages.ts
+// syncify/transform/pages.ts
 init_cjs_shims();
 
-// lib/forks/gfm.ts
-init_cjs_shims();
-function taskListItems(turndownService) {
-  turndownService.addRule("taskListItems", {
-    filter: function(node) {
-      return node.type === "checkbox" && node.parentNode.nodeName === "LI";
-    },
-    replacement: function(_content, node) {
-      return (node.checked ? "[x]" : "[ ]") + " ";
-    }
-  });
-}
-function highlightedCodeBlock(turndownService) {
-  const highlight2 = /highlight-(?:text|source)-([a-z0-9]+)/;
-  turndownService.addRule("highlightedCodeBlock", {
-    filter: function(node) {
-      const firstChild = node.firstChild;
-      return node.nodeName === "DIV" && highlight2.test(node.className) && firstChild && firstChild.nodeName === "PRE";
-    },
-    replacement: function(_content, node, options) {
-      const className = node.className || "";
-      const language = (className.match(highlight2) || [null, ""])[1];
-      return "\n\n" + options.fence + language + "\n" + node.firstChild.textContent + "\n" + options.fence + "\n\n";
-    }
-  });
-}
-function strikethrough(turndownService) {
-  turndownService.addRule("strikethrough", {
-    filter: ["del", "s", "strike"],
-    replacement: function(content) {
-      return "~" + content + "~";
-    }
-  });
-}
-function tables(turndownService) {
-  const { indexOf, every } = Array.prototype;
-  function isHeadingRow(tr) {
-    const parentNode = tr.parentNode;
-    return parentNode.nodeName === "THEAD" || parentNode.firstChild === tr && (parentNode.nodeName === "TABLE" || isFirstTbody(parentNode)) && every.call(tr.childNodes, function(n) {
-      return n.nodeName === "TH";
-    });
-  }
-  function isFirstTbody(element) {
-    const previousSibling = element.previousSibling;
-    return element.nodeName === "TBODY" && (!previousSibling || previousSibling.nodeName === "THEAD" && /^\s*$/i.test(previousSibling.textContent));
-  }
-  function cell(content, node = null, index = null) {
-    if (index === null)
-      index = indexOf.call(node.parentNode.childNodes, node);
-    let prefix = " ";
-    if (index === 0)
-      prefix = "| ";
-    let filteredContent = content.trim().replace(/\n\r/g, "<br>").replace(/\n/g, "<br>");
-    filteredContent = filteredContent.replace(/\|+/g, "\\|");
-    while (filteredContent.length < 3)
-      filteredContent += " ";
-    if (node)
-      filteredContent = handleColSpan(filteredContent, node, " ");
-    return prefix + filteredContent + " |";
-  }
-  function nodeContainsTable(node) {
-    if (!node.childNodes)
-      return false;
-    for (let i = 0; i < node.childNodes.length; i++) {
-      const child = node.childNodes[i];
-      if (child.nodeName === "TABLE")
-        return true;
-      if (nodeContainsTable(child))
-        return true;
-    }
-    return false;
-  }
-  function tableShouldBeSkipped(tableNode) {
-    if (!tableNode)
-      return true;
-    if (!tableNode.rows)
-      return true;
-    if (tableNode.rows.length === 1 && tableNode.rows[0].childNodes.length <= 1)
-      return true;
-    if (nodeContainsTable(tableNode))
-      return true;
-    return false;
-  }
-  function nodeParentTable(node) {
-    let parent = node.parentNode;
-    while (parent.nodeName !== "TABLE") {
-      parent = parent.parentNode;
-      if (!parent)
-        return null;
-    }
-    return parent;
-  }
-  function handleColSpan(content, node, emptyChar) {
-    const colspan = Number(node.getAttribute("colspan")) || 1;
-    for (let i = 1; i < colspan; i++)
-      content += " | " + emptyChar.repeat(3);
-    return content;
-  }
-  function tableColCount(node) {
-    let maxColCount = 0;
-    for (let i = 0; i < node.rows.length; i++) {
-      const row = node.rows[i];
-      const colCount = row.childNodes.length;
-      if (colCount > maxColCount)
-        maxColCount = colCount;
-    }
-    return maxColCount;
-  }
-  turndownService.keep(function(node) {
-    return node.nodeName === "TABLE";
-  });
-  turndownService.addRule("tableCell", {
-    filter: ["th", "td"],
-    replacement: function(content, node) {
-      if (tableShouldBeSkipped(nodeParentTable(node)))
-        return content;
-      return cell(content, node);
-    }
-  });
-  turndownService.addRule("tableRow", {
-    filter: "tr",
-    replacement: function(content, node) {
-      const parentTable = nodeParentTable(node);
-      if (tableShouldBeSkipped(parentTable))
-        return content;
-      let borderCells = "";
-      const alignMap = { left: ":--", right: "--:", center: ":-:" };
-      if (isHeadingRow(node)) {
-        const colCount = tableColCount(parentTable);
-        for (let i = 0; i < colCount; i++) {
-          const childNode = colCount >= node.childNodes.length ? null : node.childNodes[i];
-          let border = "---";
-          const align = childNode ? (childNode.getAttribute("align") || "").toLowerCase() : "";
-          if (align)
-            border = alignMap[align] || border;
-          if (childNode) {
-            borderCells += cell(border, node.childNodes[i]);
-          } else {
-            borderCells += cell(border, null, i);
-          }
-        }
-      }
-      return "\n" + content + (borderCells ? "\n" + borderCells : "");
-    }
-  });
-  turndownService.addRule("tableSection", {
-    filter: ["thead", "tbody", "tfoot"],
-    replacement: function(content) {
-      return content;
-    }
-  });
-  turndownService.addRule("table", {
-    // Only convert tables with a heading row.
-    // Tables with no heading row are kept using `keep` (see below).
-    filter: function(node) {
-      return node.nodeName === "TABLE";
-    },
-    replacement: function(content, node) {
-      if (tableShouldBeSkipped(node))
-        return content;
-      content = content.replace(/\n+/g, "\n");
-      let secondLine = content.trim().split("\n");
-      if (secondLine.length >= 2)
-        secondLine = secondLine[1];
-      const secondLineIsDivider = secondLine.indexOf("| ---") === 0;
-      const columnCount = tableColCount(node);
-      let emptyHeader = "";
-      if (columnCount && !secondLineIsDivider) {
-        emptyHeader = "|" + "     |".repeat(columnCount) + "\n|" + " --- |".repeat(columnCount);
-      }
-      return "\n\n" + emptyHeader + content + "\n\n";
-    }
-  });
-}
-function gfm(turndownService) {
-  turndownService.use([
-    highlightedCodeBlock,
-    strikethrough,
-    tables,
-    taskListItems
-  ]);
-}
-
-// lib/process/metafields.ts
+// syncify/process/metafields.ts
 init_cjs_shims();
 function checkMetafieldType(type2) {
   return type2 === "boolean" || type2 === "color" || type2 === "date" || type2 === "date_time" || type2 === "dimension" || type2 === "json" || type2 === "money" || type2 === "multi_line_text_field" || type2 === "number_decimal" || type2 === "number_integer" || type2 === "rating" || type2 === "rich_text_field" || type2 === "single_line_text_field" || type2 === "url" || type2 === "volume" || type2 === "weight";
@@ -13504,7 +13320,7 @@ function getPageMetafields(file, metafields) {
   return true;
 }
 
-// lib/requests/pages.ts
+// syncify/requests/pages.ts
 init_cjs_shims();
 async function list(store) {
   return axios3__default.default.get("pages.json", store.client).then(({ data }) => {
@@ -13581,10 +13397,10 @@ async function sync3(store, file, page) {
   return promise;
 }
 
-// lib/transform/pages.ts
+// syncify/transform/pages.ts
 function toMarkdown(content) {
-  const td = new Turndown__default.default($.page.import);
-  td.use(gfm);
+  const td = new turndown.Turndown($.page.import);
+  td.use(turndown.gfm);
   return td.turndown(content);
 }
 async function promptAction(store) {
@@ -13900,7 +13716,7 @@ async function compile8(file, _cb) {
   await saveCache("pages");
 }
 
-// lib/modes/watch.ts
+// syncify/modes/watch.ts
 function watch(callback) {
   const request2 = client($.sync);
   const parse5 = parseFile($.paths, $.dirs.output);
@@ -13986,10 +13802,10 @@ function watch(callback) {
   }
 }
 
-// lib/modes/themes.ts
+// syncify/modes/themes.ts
 init_cjs_shims();
 
-// lib/requests/themes.ts
+// syncify/requests/themes.ts
 init_cjs_shims();
 async function list2(store) {
   return axios3__default.default.get("themes.json", store.client).then(({ data }) => {
@@ -14189,7 +14005,7 @@ async function themes() {
   }
 }
 
-// lib/modes/import.ts
+// syncify/modes/import.ts
 init_cjs_shims();
 async function getModel3() {
   const sync4 = /* @__PURE__ */ new Map();
@@ -14337,10 +14153,10 @@ async function importing(cb) {
   }
 }
 
-// lib/modes/export.ts
+// syncify/modes/export.ts
 init_cjs_shims();
 
-// lib/process/validate.ts
+// syncify/process/validate.ts
 init_cjs_shims();
 async function hasTemplateMismatch(cwd) {
   const files = await glob6.glob("templates/*", { cwd, absolute: true });
@@ -14446,10 +14262,10 @@ function isEmptyOutputDir(stats) {
   }
 }
 
-// lib/options/files.ts
+// syncify/options/files.ts
 init_cjs_shims();
 
-// lib/requests/require.ts
+// syncify/requests/require.ts
 init_cjs_shims();
 function findUp(name, startDir, stopDir = pathe.parse(startDir).root) {
   let dir = startDir;
@@ -14647,7 +14463,7 @@ async function bundleRequire(options) {
   return extract2;
 }
 
-// lib/options/files.ts
+// syncify/options/files.ts
 async function configFile(cwd) {
   let path2 = null;
   for (const file of [
@@ -14748,7 +14564,7 @@ async function getEnvFile(cwd) {
   }
 }
 
-// lib/modes/export.ts
+// syncify/modes/export.ts
 async function exporting(cb) {
   let { themeVersion } = $.cache.build;
   timer.start("export");
@@ -14845,7 +14661,7 @@ async function exporting(cb) {
   }
 }
 
-// lib/modes/publish.ts
+// syncify/modes/publish.ts
 init_cjs_shims();
 async function publish(cb) {
   await exporting(cb);
@@ -14937,10 +14753,10 @@ async function publish(cb) {
   ]);
 }
 
-// lib/hot/server.ts
+// syncify/hot/server.ts
 init_cjs_shims();
 
-// lib/cli/exit.ts
+// syncify/cli/exit.ts
 init_cjs_shims();
 var trigger = false;
 var register = false;
@@ -14969,7 +14785,7 @@ function kill(callback) {
   return () => hooks.delete(callback);
 }
 
-// lib/hot/server.ts
+// syncify/hot/server.ts
 var HOTError = {
   enable: true,
   output: []
@@ -15135,7 +14951,7 @@ function socket() {
   };
 }
 
-// lib/log/stdin.ts
+// syncify/log/stdin.ts
 init_cjs_shims();
 function stdin(data) {
   const input = data.toString().trim().toLowerCase();
@@ -15184,7 +15000,7 @@ function stdin(data) {
   }
 }
 
-// lib/log/help.ts
+// syncify/log/help.ts
 init_cjs_shims();
 var import_scrollable_cli = __toESM(require_dist());
 function help(cli) {
@@ -15405,10 +15221,10 @@ function help(cli) {
   });
 }
 
-// lib/options/define.ts
+// syncify/options/define.ts
 init_cjs_shims();
 
-// lib/options/dirs.ts
+// syncify/options/dirs.ts
 init_cjs_shims();
 async function setCacheDirs() {
   const { dirs } = $;
@@ -15571,7 +15387,7 @@ async function createDirs(path2) {
   }
 }
 
-// lib/options/json.ts
+// syncify/options/json.ts
 init_cjs_shims();
 function setJsonOptions() {
   if (!has("processors", $.config))
@@ -15643,7 +15459,7 @@ function setJsonOptions() {
   }
 }
 
-// lib/options/modes.ts
+// syncify/options/modes.ts
 init_cjs_shims();
 function setModes(cli) {
   const resource2 = anyTrue(cli.pages, cli.metafields, cli.redirects);
@@ -15800,7 +15616,7 @@ function validateCommands(modes, cli) {
   }
 }
 
-// lib/options/snippets.ts
+// syncify/options/snippets.ts
 init_cjs_shims();
 function setSnippetOptions() {
   if (!has("snippets", $.config.views))
@@ -15873,7 +15689,7 @@ function setSnippetOptions() {
   }
 }
 
-// lib/options/sections.ts
+// syncify/options/sections.ts
 init_cjs_shims();
 async function setSectionOptions() {
   if (!has("sections", $.config.views))
@@ -16073,10 +15889,10 @@ async function setSchemaJson() {
   }
 }
 
-// lib/options/stores.ts
+// syncify/options/stores.ts
 init_cjs_shims();
 
-// lib/utils/options.ts
+// syncify/utils/options.ts
 init_cjs_shims();
 function getStoresFromEnv() {
   const stores = [];
@@ -16445,7 +16261,7 @@ function renameFile2(src, rename) {
   };
 }
 
-// lib/options/stores.ts
+// syncify/options/stores.ts
 function setStores(cli) {
   const storeRequired = anyTrue(
     $.mode.metafields,
@@ -16598,7 +16414,7 @@ ${DSH} ${white("$")} syncify `)}`,
   }
 }
 
-// lib/options/paths.ts
+// syncify/options/paths.ts
 init_cjs_shims();
 async function setPaths() {
   const path2 = normalPath($.dirs.input);
@@ -16651,7 +16467,7 @@ async function setPaths() {
   }
 }
 
-// lib/options/version.ts
+// syncify/options/version.ts
 init_cjs_shims();
 function parseVersionNumber(version2) {
   const match2 = version2.match(/^(\d{1,2})\.(\d{1,2})\.(\d{1,2})$/);
@@ -16710,10 +16526,10 @@ function setVersion(cli) {
   }
 }
 
-// lib/options/spawn.ts
+// syncify/options/spawn.ts
 init_cjs_shims();
 
-// lib/cli/spawn.ts
+// syncify/cli/spawn.ts
 init_cjs_shims();
 function spawned(name, command, callback) {
   const child = crossSpawn.spawn(command.cmd, command.args, { stdio: "pipe" });
@@ -16730,7 +16546,7 @@ function spawned(name, command, callback) {
   })();
 }
 
-// lib/options/spawn.ts
+// syncify/options/spawn.ts
 function setSpawns() {
   const { mode, spawn: spawn4, config } = $;
   if (!has("spawn", config) || isNil(config.spawn))
@@ -16806,7 +16622,7 @@ function setSpawns() {
   });
 }
 
-// lib/options/script.ts
+// syncify/options/script.ts
 init_cjs_shims();
 async function setScriptOptions() {
   if (!has("script", $.config.transform))
@@ -17008,7 +16824,7 @@ async function setScriptOptions() {
   esbuild4.loaded = true;
 }
 
-// lib/options/style.ts
+// syncify/options/style.ts
 init_cjs_shims();
 async function setStyleConfig() {
   if (!has("style", $.config.transform))
@@ -17303,7 +17119,7 @@ async function setStyleConfig() {
   }
 }
 
-// lib/options/svg.ts
+// syncify/options/svg.ts
 init_cjs_shims();
 async function setSvgOptions() {
   if (!has("svg", $.config.transform))
@@ -17434,7 +17250,7 @@ async function setSvgOptions() {
   }
 }
 
-// lib/options/hot.ts
+// syncify/options/hot.ts
 init_cjs_shims();
 async function setHotReloads() {
   if ($.mode.watch !== true) {
@@ -17561,7 +17377,7 @@ async function setHotReloads() {
   $.wss = socket();
 }
 
-// lib/options/filters.ts
+// syncify/options/filters.ts
 init_cjs_shims();
 function throwCommandError(type2, cmd) {
   const pattern = [];
@@ -17663,7 +17479,7 @@ function setFilters(cli) {
   }
 }
 
-// lib/options/terser.ts
+// syncify/options/terser.ts
 init_cjs_shims();
 function setTerserOptions() {
   const { terser: terser2, mode } = $;
@@ -17732,7 +17548,7 @@ function setTerserOptions() {
   }
 }
 
-// lib/options/pages.ts
+// syncify/options/pages.ts
 init_cjs_shims();
 function setPageOptions() {
   if (!hasProp($.config.views)("pages"))
@@ -17818,7 +17634,7 @@ function setPageOptions() {
   }
 }
 
-// lib/options/publish.ts
+// syncify/options/publish.ts
 init_cjs_shims();
 async function setPublishConfig() {
   if (isObject($.config.publish) && isEmpty($.config.publish) === false) {
@@ -17903,7 +17719,7 @@ async function setPublishConfig() {
   }
 }
 
-// lib/options/define.ts
+// syncify/options/define.ts
 async function define(cli, options) {
   timer.start("runtime");
   runtime($);
@@ -18092,7 +17908,7 @@ async function getConfig(cli) {
   }
 }
 
-// lib/index.ts
+// syncify/index.ts
 async function run(options, config, callback) {
   if (has2("_", options))
     options._ = options._.slice(1);
@@ -18128,7 +17944,7 @@ async function run(options, config, callback) {
   }
 }
 
-// lib/api.ts
+// syncify/api.ts
 var defineConfig = (config) => config;
 function api(resource2, options) {
   if (isString(resource2)) {

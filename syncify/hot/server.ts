@@ -12,7 +12,7 @@ import { bold, gray, redBright, neonCyan, pink } from 'syncify:colors';
 import { $ } from 'syncify:state';
 import { injectSnippet, injectRender } from './inject';
 import * as log from 'syncify:log';
-import * as tree from 'lib/ansi/ansi';
+import * as tree from 'syncify:ansi';
 
 export const HOTError: {
   /**

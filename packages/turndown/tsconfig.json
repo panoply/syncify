@@ -1,0 +1,9 @@
+{
+  "extends": "@syncify/tsconfig/node",
+  "include": [
+    "src/index.ts"
+  ],
+  "compilerOptions": {
+    "incremental": false
+  }
+}

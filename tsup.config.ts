@@ -42,10 +42,10 @@ const noExternal = [
   'strip-json-comments',
   'wrap-ansi',
   'scrollable-cli'
-
 ];
 
 const external = [
+  '@syncify/turndown',
   'anymatch',
   'adm-zip',
   'axios',
@@ -69,7 +69,6 @@ const external = [
   'ngrok',
   'prompts',
   'serve-static',
-  'turndown',
   'ws',
 
   // BUILD DEPS
@@ -108,9 +107,9 @@ const define = {
 
 export default defineConfig({
   entry: [
-    'lib/cli.ts',
-    'lib/api.ts',
-    'lib/index.ts'
+    'syncify/cli.ts',
+    'syncify/api.ts',
+    'syncify/index.ts'
   ],
   outDir: 'dist',
   clean: [

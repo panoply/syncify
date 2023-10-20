@@ -17,12 +17,14 @@
   "tsup": {
     "entry": [
       "src/index.ts"
-    ]
+    ],
+    "dts": true
   },
   "dependencies": {
     "turndown": "^7.1.2"
   },
   "devDependencies": {
+    "@syncify/tsconfig": "workspace:^",
     "@types/turndown": "^5.0.3"
   }
 }
