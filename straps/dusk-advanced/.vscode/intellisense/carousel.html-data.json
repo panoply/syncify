@@ -1,0 +1,228 @@
+{
+  "version": 1.1,
+  "globalAttributes": [
+    {
+      "name": "data-carousel-axis-value",
+      "description": "Choose scroll axis between x and y. Remember to stack your slides horizontally or vertically using CSS to match this option.",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#axis"
+        }
+      ],
+      "values": [
+        {
+          "name": "x"
+        },
+        {
+          "name": "y"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-align-value",
+      "description": "Align the slides relative to the carousel viewport. Use one of the predefined alignments `start`, `center` or `end`. Alternatively, provide a number between `0` - `1` to align the slides, where `0.5` equals `50%`. Defaults to `center`",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#align"
+        }
+      ],
+      "values": [
+        {
+          "name": "start"
+        },
+        {
+          "name": "center"
+        },
+        {
+          "name": "end"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-drag-free-value",
+      "description": "Enables momentum scrolling. The speed and duration of the continued scrolling is proportional to how vigorous the drag gesture is. Defaults to `true`",
+      "valueSet": "boolean",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#dragfree"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-draggable-value",
+      "description": "Enables for scrolling the carousel with mouse and touch interactions. Set this to `false` to disable drag events or pass a custom callback to add your own drag logic.",
+      "valueSet": "boolean",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#watchdrag"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-loop-value",
+      "description": "Enables infinite looping. Automatically falls back to false if slide content isn't enough to loop. Embla will apply translateX or translateY to the slides that need to change position in order to create the loop effect. Defaults to `true`",
+      "valueSet": "boolean",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#loop"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-skip-snaps-value",
+      "description": "Allow the carousel to skip scroll snaps if it's dragged vigorously. Note that this option will be ignored if the dragFree option is set to true. Defaults to `true`",
+      "valueSet": "boolean",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#skipsnaps"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-slides-to-scroll-value",
+      "description": "Group slides together. Drag interactions, dot navigation, and previous/next buttons are mapped to group slides into the given number, which has to be an integer. Set it to `auto` if you want Embla to group slides automatically.",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#slidestoscroll"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-contain-scroll-value",
+      "description": "Clear leading and trailing empty space that causes excessive scrolling. Use `trimSnaps` to only use snap points that trigger scrolling or `keepSnaps` to keep them.\n\n> **Note**: When this is active, it will override alignments applied by the align option for enough slides at the start and the end of the carousel, in order to cover the leading and trailing space.",
+      "references": [
+        {
+          "name": "Embla Docs",
+          "url": "https://www.embla-carousel.com/api/options/#containscroll"
+        }
+      ],
+      "values": [
+        {
+          "name": "trimSnaps"
+        },
+        {
+          "name": "keepSnaps"
+        },
+        {
+          "name": "false"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-start-index-value",
+      "description": "Set the initial scroll snap to the given number. First snap index starts at 0. Please note that this is not necessarily equal to the number of slides when used together with the slidesToScroll option. Defaults to `0`",
+      "references": [
+        {
+          "name": "Embla Carousel",
+          "url": "https://www.embla-carousel.com/api/options/#startindex"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-duration-value",
+      "description": "Set scroll duration when triggered by any of the API methods. Higher numbers enables slower scrolling. Drag interactions are not affected because duration is then determined by the drag force.`\n\n> **Note:** Duration is **not** in milliseconds because Embla uses an attraction physics simulation when scrolling instead of easings. Only values between 20-60 are recommended.",
+      "references": [
+        {
+          "name": "Embla Carousel",
+          "url": "https://www.embla-carousel.com/api/options/#duration"
+        }
+      ]
+    },
+    {
+      "name": "data-carousel-screens-value",
+      "description": "The breakpoints at which the carousel logic should be invoked and applied.",
+      "valueSet": "breakpoint"
+    },
+    {
+      "name": "data-carousel-autoplay-value",
+      "description": "When provided, carousel will autoplay. Provide the delay (interval)  between transitions in milliseconds here.",
+      "valueSet": "number"
+    },
+    {
+      "name": "data-carousel-xxs-value",
+      "description": "Number of slides to render in XXS",
+      "valueSet": "number"
+    },
+    {
+      "name": "data-carousel-xs-value",
+      "description": "Number of slides to render in XS",
+      "valueSet": "number"
+    },
+    {
+      "name": "data-carousel-sm-value",
+      "description": "Number of slides to render in SM",
+      "valueSet": "number"
+    },
+    {
+      "name": "data-carousel-md-value",
+      "description": "Number of slides to render in MD",
+      "valueSet": "number"
+    },
+    {
+      "name": "data-carousel-lg-value",
+      "description": "Number of slides to render in LG",
+      "valueSet": "number"
+    },
+    {
+      "name": "data-carousel-xl-value",
+      "description": "Number of slides to render in XL",
+      "valueSet": "number"
+    },
+    {
+      "name": "data-carousel-xxl-value",
+      "description": "Number of slides to render in XXL",
+      "valueSet": "number"
+    }
+  ],
+  "valueSets": [
+    {
+      "name": "boolean",
+      "values": [
+        {
+          "name": "true",
+          "description": "Enabled"
+        },
+        {
+          "name": "false",
+          "description": "Disabled"
+        }
+      ]
+    },
+    {
+      "name": "breakpoint",
+      "values": [
+        {
+          "name": "xs",
+          "description": "Visible until the `xs` viewport screen width. Screens widths between `0px` and `576px`"
+        },
+        {
+          "name": "sm",
+          "description": "Visible until the `sm` viewport screen width. Screens widths between `576px` and `768px`"
+        },
+        {
+          "name": "md",
+          "description": "Visible until the `md` viewport screen width. Screens widths between `768px` and `992px`"
+        },
+        {
+          "name": "lg",
+          "description": "Visible until the `lg` viewport screen width.  Screens widths between `992px` and `1200px`"
+        },
+        {
+          "name": "xl",
+          "description": "Visible until the `xl` viewport screen width. Screens widths between `1200px` and `1400px`"
+        },
+        {
+          "name": "xxl",
+          "description": "Visible until the `xl` viewport screen width. Screens widths above `1400px`"
+        }
+      ]
+    }
+  ]
+}

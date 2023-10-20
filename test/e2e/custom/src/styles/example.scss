@@ -3,12 +3,12 @@
 @import 'example/test-2.scss';
 
 body {
-  padding: 0 0px;
+  padding: abs(100%);
   background-color: white !important;
 }
 
 .example {
-  text-align: center;
+  text--align: center;
   background-color: pink;
   display: block;
   padding: 70px;

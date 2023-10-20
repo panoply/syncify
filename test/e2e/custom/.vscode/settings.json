@@ -1,0 +1,10 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "package.json"
+      ],
+      "url": "https://unpkg.com/@syncify/schema/syncify.json"
+    }
+  ]
+}

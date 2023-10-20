@@ -1,0 +1,9 @@
+{
+  "extends": "@syncify/tsconfig/browser",
+  "typeAcquisition": {
+    "enable": true
+  },
+  "include": [
+    "src/index.ts"
+  ]
+}

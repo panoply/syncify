@@ -1,7 +1,6 @@
 {
   "explorer.fileNesting.enabled": false,
   "npm.packageManager": "pnpm",
-  "eslint.packageManager": "pnpm",
   "files.associations": {
     "*.scss.liquid": "scss",
     "*.css.liquid": "css",
@@ -17,7 +16,6 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     "tests": true,
-    // "test": true
     "**/node_modules": true,
     // "**/node_modules/.syncify": false
     //"**/example": true
@@ -34,22 +32,15 @@
     },
     {
       "fileMatch": [
-        "package.json",
-        "syncify.package.json"
+        "**/package.json"
       ],
-      "url": "/schema/syncify.package.json"
+      "url": "./.vscode/schema/syncify.json"
     },
     {
       "fileMatch": [
         "syncify.env.json"
       ],
       "url": "/schema/syncify.env.json"
-    },
-    {
-      "fileMatch": [
-        "syncify.config.json"
-      ],
-      "url": "/schema/syncify.config.json"
     }
   ],
   "highlight.regexes": {

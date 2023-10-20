@@ -13,6 +13,7 @@ test/e2e/custom/dist
 dump.rdb
 docs/
 tests/
+**/dist
 
 lib-cov
 *.seed

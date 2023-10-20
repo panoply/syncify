@@ -7,3 +7,5 @@ d()
 ClipboardController.targets.pop()
 
 Application.start();
+
+console.log('snippets')

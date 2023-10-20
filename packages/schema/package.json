@@ -1,0 +1,23 @@
+{
+  "name": "@syncify/schema",
+  "version": "0.1.7",
+  "private": false,
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "description": "JSON Store for Syncify Shared Schema",
+  "author": {
+    "name": "Νίκος Σαβίδης",
+    "email": "n.savvidis@gmx.com"
+  },
+  "main": ".",
+  "engines": {
+    "pnpm": ">=4",
+    "node": ">=12"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panoply/syncify/packages/schema"
+  },
+  "bugs": {
+    "url": "https://github.com/panoply/syncify/issues"
+  }
+}

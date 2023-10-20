@@ -1,32 +1,62 @@
 import { defineConfig } from 'tsup';
-import { build } from 'esbuild';
+import { join } from 'path';
+import { writeFileSync, readFileSync, copyFileSync } from 'fs';
 import * as pkg from '../package.json';
+
+const cwd = process.cwd();
+const packages = join(cwd, 'packages');
+
+function importSchema () {
+
+  const liquifySchema = join(cwd, 'node_modules', '@liquify/schema');
+  const syncifySchema = join(packages, 'schema');
+
+  const sections = readFileSync(join(liquifySchema, 'syncify/shared-schema.json'));
+  const env = readFileSync(join(liquifySchema, 'syncify/env.json'));
+  const pkgjson = readFileSync(join(liquifySchema, 'syncify/package-json.json'));
+
+  const config = readFileSync(join(liquifySchema, 'syncify.json'));
+  writeFileSync(join(syncifySchema, 'syncify.json'), pkgjson);
+  writeFileSync(join(syncifySchema, 'config.json'), config);
+  writeFileSync(join(syncifySchema, 'sections.json'), sections);
+  writeFileSync(join(syncifySchema, 'env.json'), env);
+
+  copyFileSync(join(packages, 'hot', 'hot.js.liquid'), join(cwd, 'hot.js.liquid'));
+
+}
+
+importSchema();
 
 const json = JSON.stringify;
 
 const noExternal = [
   'ansis',
   'clean-stack',
-  'open-editor',
+  'lines-and-columns',
   'mergerino',
   'log-update',
   'p-queue',
   'p-map',
+  'parse-json',
   'rambdax',
   'strip-json-comments',
-  'tiny-spinner',
-  'wrap-ansi'
+  'wrap-ansi',
+  'scrollable-cli'
+
 ];
 
 const external = [
   'anymatch',
-  'archiver',
+  'adm-zip',
   'axios',
+  'cbor',
+  'write-file-atomic',
   'pathe',
   'chokidar',
   'cross-spawn',
   'dotenv',
   'fast-glob',
+  'figlet',
   'finalhandler',
   'fs-extra',
   'gray-matter',
@@ -36,10 +66,10 @@ const external = [
   'mime-types',
   'minimist',
   'node-notifier',
+  'ngrok',
   'prompts',
   'serve-static',
   'turndown',
-  'turndown-plugin-gfm',
   'ws',
 
   // BUILD DEPS
@@ -60,54 +90,46 @@ const external = [
   'svgo'
 ];
 
-export default defineConfig(options => ([
-  {
-    entry: [
-      'lib/cli.ts',
-      'lib/api.ts',
-      'lib/index.ts'
-    ],
-    outDir: 'dist',
-    clean: [
-      'dist'
-    ],
-    splitting: true,
-    treeshake: true,
-    noExternal,
-    external,
-    cjsInterop: true,
-    define: {
+const define = {
 
-      // SYNCIFY VERSION
+  // SYNCIFY VERSION
 
-      VERSION: `"${pkg.version}"`,
+  VERSION: `"${pkg.version}"`,
 
-      // CHARACTER SUGAR INJECTIONS
+  // CHARACTER SUGAR INJECTIONS
 
-      NIL: json(''),
-      NWL: json('\n'),
-      NLR: json('\n\n'),
-      WSP: json(' ')
+  NIL: json(''),
+  NWL: json('\n'),
+  NLR: json('\n\n'),
+  WSP: json(' '),
+  WSR: json('  ')
 
-    },
-    esbuildOptions (options) {
-      options.chunkNames = 'cjs';
-      options.treeShaking = true;
-      options.ignoreAnnotations = true;
-    },
-    async onSuccess () {
+};
 
-      await build({
-        entryPoints: [ 'lib/hot/snippet.ts' ],
-        bundle: true,
-        minify: true,
-        format: 'iife',
-        banner: { js: '<script>' },
-        footer: { js: '</script>' },
-        treeShaking: true,
-        outfile: 'hot.js.liquid'
-      });
-
-    }
+export default defineConfig({
+  entry: [
+    'lib/cli.ts',
+    'lib/api.ts',
+    'lib/index.ts'
+  ],
+  outDir: 'dist',
+  clean: [
+    'dist'
+  ],
+  splitting: false,
+  treeshake: true,
+  cjsInterop: true,
+  format: [
+    'cjs',
+    'esm'
+  ],
+  shims: true,
+  noExternal,
+  external,
+  define,
+  esbuildOptions (options) {
+    options.mainFields = [ 'module', 'main' ];
+    options.chunkNames = 'syncify';
+    options.treeShaking = true;
   }
-]));
+});

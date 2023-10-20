@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "exclude": [
+    "node_modules/**/*",
+    "dist"
+  ],
+  "typeAcquisition": {
+    "enable": true,
+    "include": [
+      "node"
+    ]
+  },
+  "compilerOptions": {
+    "incremental": true,
+    "target": "ESNext",
+    "removeComments": true,
+    "lib": [
+      "ESNext",
+      "es2020",
+      "DOM"
+    ],
+    "module": "CommonJS",
+    "declaration": false,
+    "preserveSymlinks": true,
+    "allowSyntheticDefaultImports": true,
+    "keyofStringsOnly": true,
+    "esModuleInterop": true,
+    "ignoreDeprecations": "5.0",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "noImplicitThis": false,
+    "skipDefaultLibCheck": true,
+    "noStrictGenericChecks": true,
+    "noEmit": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "baseUrl": "."
+  }
+}

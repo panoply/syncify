@@ -1,0 +1,42 @@
+{
+  "exclude": [
+    "node_modules/**",
+    "export",
+    "import",
+    "theme"
+  ],
+  "include": [
+    "source/scripts/**/*"
+  ],
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable"
+    ],
+    "module": "ESNext",
+    "allowUnreachableCode": true,
+    "allowSyntheticDefaultImports": true,
+    "checkJs": true,
+    "allowJs": true,
+    "declaration": false,
+    "resolveJsonModule": true,
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "typings/*": [
+        "source/scripts/typings/*.d.ts"
+      ],
+      "application/*": [
+        "source/scripts/application/*.ts"
+      ],
+      "components/*": [
+        "source/scripts/components/*.ts"
+      ],
+      "modules/*": [
+        "source/scripts/modules/*.ts"
+      ]
+    }
+  }
+}

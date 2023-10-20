@@ -1,14 +1,14 @@
 import { PartialDeep } from 'type-fest';
 import { Config } from './config';
-import { Asset } from './bundle/requests';
-import { File } from './bundle/file';
+import { Resource } from './$/requests';
+import { File } from './$/file';
 
 type Download = (
   this: {
     /**
      * The Shopify asset resource response
      */
-    asset: Asset
+    asset: Resource.Asset
     /**
      * The destination directory of the asset
      */
@@ -71,6 +71,21 @@ type Watch = (
   object
 )
 
+type Export = (
+  this: File,
+  /**
+   * The file contents as Buffer.
+   *
+   * > Convert to a string using `content.toString()`
+   */
+  content: Buffer
+) => (
+  string |
+  Buffer |
+  void |
+  object
+)
+
 type Build = (
   this: File,
   /**
@@ -88,13 +103,21 @@ type Build = (
 
 export declare interface Resources {
   /**
-   * Download
+   * Import
    *
    * Invoked for every asset that is downloaded from
    * store theme. Use the `this` scope to access file
    * information.
    */
-  download(callback: Download): void
+  import(callback: Download): void
+  /**
+   * Export
+   *
+   * Invoked for every asset that is downloaded from
+   * store theme. Use the `this` scope to access file
+   * information.
+   */
+  export(callback: Export): void
    /**
    * Upload
    *
@@ -156,7 +179,7 @@ export namespace utils {
  *
  * @example
  *
- * import syncify from '@liquify/syncify'
+ * import syncify from '@syncify/cli'
  *
  * // USING CURRY
  *
@@ -187,7 +210,10 @@ export namespace utils {
  * sync.build(function(content) {})
  *
  * // Invoke download mode
- * sync.download(function(content) {})
+ * sync.import(function(content) {})
+ *
+ * // Invoke export mode
+ * sync.export(function(content) {})
  *
  * // Invoke upload mode
  * sync.upload(function(content) {})
@@ -195,19 +221,18 @@ export namespace utils {
  * // ADDITIONAL METHODS
  *
  * syncify.clean()
- * syncify.vsc()
  * syncify.metafields()
  * syncify.pages()
  */
 export interface Syncify {
   /**
-   * Download
+   * Import
    *
    * Invoked for every asset that is downloaded from
    * store theme. Use the `this` scope to access file
    * information.
    */
-  (resource: 'download', options?: PartialDeep<Config>): (callback: Download) => void
+  (resource: 'import', options?: PartialDeep<Config>): (callback: Download) => void
    /**
    * Upload
    *
@@ -233,22 +258,42 @@ export interface Syncify {
    */
   (resource: 'build', options?: PartialDeep<Config>): (callback: Build) => void
   /**
+   * Export
+   *
+   * Invoked after theme export has completed.
+   * Use the `this` scope to access file information.
+   */
+  (resource: 'export', options?: PartialDeep<Config>): (callback: Build) => void
+  /**
    * Usage via instance
    *
    * **NOT YET AVAILABLE**
    */
   (options?: PartialDeep<Config>): Resources
   /**
+   * Bundle resources
+   *
+   * **NOT YET AVAILABLE**
+   */
+  bundle: {
+    style(options?: any): Promise<any>;
+    script(options?: any): Promise<any>;
+    svg(options?: any): Promise<any>;
+    json(options?: any): Promise<any>;
+    image(options?: any): Promise<any>;
+    pages(options?: any): Promise<any>;
+  };
+  /**
    * Theme resource
    *
    * **NOT YET AVAILABLE**
    */
   themes: {
-    push(file: string, options?: any): Promise<any>;
-    pull(file: string, options?: any): Promise<any>;
-    merge(file: string, options?: any): Promise<any>;
-    delete(file: string, options?: any): Promise<any>;
-    query(file: string, options?: any): Promise<any>
+    push(file: string | string[], options?: any): Promise<any>;
+    pull(file: string | string[], options?: any): Promise<any>;
+    merge(file: string | string[], options?: any): Promise<any>;
+    delete(file: string | string[], options?: any): Promise<any>;
+    query(file: string | string[], options?: any): Promise<any>
   };
   /**
    * Assets resource
@@ -256,23 +301,23 @@ export interface Syncify {
    * **NOT YET AVAILABLE**
    */
   assets: {
-    push(file: string, options?: any): Promise<any>;
-    pull(file: string, options?: any): Promise<any>;
-    merge(file: string, options?: any): Promise<any>;
-    delete(file: string, options?: any): Promise<any>;
-    query(file: string, options?: any): Promise<any>
+    push(file: string | string[], options?: any): Promise<any>;
+    pull(file: string | string[], options?: any): Promise<any>;
+    merge(file: string | string[], options?: any): Promise<any>;
+    delete(file: string | string[], options?: any): Promise<any>;
+    query(file: string | string[], options?: any): Promise<any>
   };
   /**
-   * Files resource
+   * Files API resource
    *
    * **NOT YET AVAILABLE**
    */
   files: {
-    push(file: string, options?: any): Promise<any>;
-    pull(file: string, options?: any): Promise<any>;
-    merge(file: string, options?: any): Promise<any>;
-    delete(file: string, options?: any): Promise<any>;
-    query(file: string, options?: any): Promise<any>
+    push(file: string | string[], options?: any): Promise<any>;
+    pull(file: string | string[], options?: any): Promise<any>;
+    merge(file: string | string[], options?: any): Promise<any>;
+    delete(file: string | string[], options?: any): Promise<any>;
+    query(file: string | string[], options?: any): Promise<any>
   };
   /**
    * Metafields resource
@@ -280,11 +325,11 @@ export interface Syncify {
    * **NOT YET AVAILABLE**
    */
   metafields: {
-    push(file: string, options?: any): Promise<any>;
-    pull(file: string, options?: any): Promise<any>;
-    merge(file: string, options?: any): Promise<any>;
-    delete(file: string, options?: any): Promise<any>;
-    query(file: string, options?: any): Promise<any>
+    push(file: string | string[], options?: any): Promise<any>;
+    pull(file: string | string[], options?: any): Promise<any>;
+    merge(file: string | string[], options?: any): Promise<any>;
+    delete(file: string | string[], options?: any): Promise<any>;
+    query(file: string | string[], options?: any): Promise<any>
   };
   /**
    * Pages resource
@@ -309,11 +354,11 @@ export interface Syncify {
    *
    * **NOT YET AVAILABLE**
    */
-  clean(): Promise<void>
+  clean(): Promise<void>;
   /**
-   * VS Code Schema Store generation
+   * Clean the output directory
    *
    * **NOT YET AVAILABLE**
    */
-  vsc(): Promise<void>
+  spawn(options: any): Promise<void>
 }

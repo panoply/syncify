@@ -3,31 +3,21 @@ BEFORE
 {% schema %}
   {
     "name": "tester",
-    "class": "example",
+    "class": "examples",
     "tag": "section",
-    "use": [
-      "header",
-      "footer"
-    ],
     "settings": [
       {
-        "ref": "header.logo_position"
-      },
-      {
-        "ref": "footer.color_scheme"
+       "$ref": "images.dropdown"
       }
     ],
     "blocks": [
       {
-        "name": "Sample",
-        "type": "sample",
+        "name": "example",
+        "type": "example",
         "settings": [
           {
-            "ref": "footer.link_list.heading"
-          },
-          {
-            "ref": "footer.brand_information.show_social"
-          },
+           "$ref": "forms.input"
+          }
         ]
       }
     ]

@@ -7,12 +7,12 @@ import b from './globs/b'
 import { d } from './globs/d'
 import { e } from './globs/e'
 
-console.log('HOT RELOAD 1');
+console.log('HOT RELOAD');
 
 b()
 d()
 e()
-// ss
+// ssss
 bar();
 foo();
 baz();

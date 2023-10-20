@@ -1,5 +1,5 @@
 import type { LiteralUnion } from 'type-fest';
-import { Config } from './config';
+import type { Config } from './config';
 
 export type Group = LiteralUnion<
   | 'Syncify'

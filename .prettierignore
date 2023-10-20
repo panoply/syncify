@@ -9,3 +9,4 @@ demos/**
 *.mjs
 *.cjs
 /tsconfig.json
+packages/schema/*

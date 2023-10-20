@@ -27,9 +27,13 @@ declare global {
    */
   const NWL: string;
   /**
-   * Single Whitespace e.g: `' '`
+   * Whitespace Character e.g: `' '`
    */
   const WSP: string;
+  /**
+   * Whitespace Repeats x2  e.g: `'  '`
+   */
+  const WSR: string;
   /**
    * Jest Global
    */

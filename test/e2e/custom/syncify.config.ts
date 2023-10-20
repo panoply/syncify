@@ -1,5 +1,4 @@
 import { defineConfig } from '@syncify/cli';
-
 // COMMENTED OUT OPTIONS ARE NOT YET AVAILABLE
 // BUT WILL BE MADE POSSIBLE IN FUTURE VERSIONS
 // ALL CONFIG OPTIONS ARE TYPED AND WELL ANNOTATED
@@ -8,9 +7,13 @@ export default defineConfig({
 
   clean: true,
   input: 'src',
+  config: 'scripts',
   output: 'theme',
   hot: {
     strategy: 'replace',
+  },
+  log: {
+    clear: true
   },
   paths: {
 
@@ -20,7 +23,10 @@ export default defineConfig({
     pages: 'pages/*',
     assets: [
       'assets/images/*',
-      'scripts/vendor/**/*.js'
+      // 'scripts/vendor/**/*.js'
+    ],
+    schema: [
+      'views/schema/*.schema'
     ],
     config: 'data/settings/*',
     locales: 'data/translations/*',
@@ -67,7 +73,7 @@ export default defineConfig({
 
     sections: {
       prefixDir: true,
-      separator: '_',
+      separator: '-',
       global: [
         '_',
         'layout',
@@ -79,7 +85,7 @@ export default defineConfig({
 
     snippets: {
       prefixDir: true,
-      separator: '_',
+      separator: '-',
       global: [
         '_',
         'example',
@@ -90,13 +96,23 @@ export default defineConfig({
 
     pages: {
       safeSync: true,
-      importLanguage: 'markdown'
+      importLanguage: 'markdown',
+
     }
   },
   spawn: {
-
+    build: {
+     // rollup: 'rollup -c scripts/rollup.config.js',
+      //tailwind: 'pnpm tailwindcss -i ./src/assets/styles/base.css -o ./src/assets/styles/tailwind.css --watch',
+    },
+    watch: {
+      //tailwind: 'tailwindcss -i ./src/styles/tailwind/base.css -o ./src/styles/tailwind/tailwind.css --watch',
+      // rollup:  'rollup -c scripts/rollup.config.js -w --bundleConfigAsCjs',
+      // webpack: 'webpack --watch --color --config scripts/webpack.config.js',
+      // esbuild: 'esbuild src/scripts/ts/index.ts --outfile=theme/assets/esbuild-bundle.js --bundle --watch --color=true'
+    }
   },
-  transforms: {
+  transform: {
 
     script: {
 
@@ -119,6 +135,7 @@ export default defineConfig({
       }
     },
 
+
     style: {
       // DAWN CSS
       'assets/[file]': {
@@ -138,7 +155,16 @@ export default defineConfig({
         input: 'styles/snippet.scss',
         postcss: true,
         sass: true,
-      }
+      },
+        // EXAMPLE: GENERATING A SNIPPET
+        'assets/tailwind-[file]': {
+          input: 'styles/tailwind/base.css',
+          postcss:[
+            require('autoprefixer'),
+            require('tailwindcss')
+          ],
+          sass: false,
+        }
     },
 
     svg: {
@@ -172,7 +198,9 @@ export default defineConfig({
       style: 'compressed',
       include: ['node_modules/'],
     },
-    postcss: []
+    postcss: [
+      require('autoprefixer')
+    ]
   },
   terser: {
     json: {
@@ -191,7 +219,7 @@ export default defineConfig({
       minifySyntax: true,
       minifyWhitespace: true,
       mangleQuoted: true,
-      exclude: []
+      exclude: [],
     },
     liquid: {
       removeComments: true,

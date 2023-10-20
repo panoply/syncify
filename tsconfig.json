@@ -8,7 +8,7 @@
     "docs"
   ],
   "include": [
-    "lib/**/*.ts",
+    "syncify/**/*.ts",
     "types/*.d.ts",
     "types/internal/cli.d.ts",
     "types/internal/internal.d.ts"
@@ -43,7 +43,7 @@
     "noEmit": true,
     "noEmitOnError": true,
     "noUnusedLocals": true,
-    "rootDir": "lib",
+    "rootDir": "syncify",
     "baseUrl": ".",
     "paths": {
       /*
@@ -59,68 +59,113 @@
       /* FILES
       /* -------------------------------------------- */
       "syncify:state": [
-        "./lib/model/$.ts"
+        "./syncify/model/$.ts"
+      ],
+      "syncify:file": [
+        "./syncify/model/file.ts"
       ],
       "syncify:const": [
-        "./lib/const.ts"
+        "./syncify/const.ts"
       ],
       "syncify:native": [
-        "./lib/utils/native.ts"
+        "./syncify/utils/native.ts"
       ],
       "syncify:timer": [
-        "./lib/utils/timer.ts"
-      ],
-      "syncify:chars": [
-        "./lib/utils/chars.ts"
+        "./syncify/utils/timer.ts"
       ],
       "syncify:utils": [
-        "./lib/utils/utils.ts"
+        "./syncify/utils/utils.ts"
       ],
-      "syncify:ansi": [
-        "./lib/cli/ansi.ts"
+      "syncify:interpolate": [
+        "syncify/cli/interpolate.ts"
       ],
       "syncify:log": [
-        "./lib/log/index.ts",
+        "./syncify/log/loggers.ts",
+      ],
+      "syncify:errors": [
+        "./syncify/log/errors.ts",
+      ],
+      /*
+      /* ANSI
+      /* -------------------------------------------- */
+      "syncify:ansi": [
+        "syncify/ansi/ansi.ts"
+      ],
+      "syncify:colors": [
+        "./syncify/ansi/colors.ts"
+      ],
+      "syncify:codeframe": [
+        "syncify/ansi/codeframe.ts"
+      ],
+      "syncify:symbol": [
+        "syncify/ansi/symbol.ts"
+      ],
+      /*
+      /* TRANSFORMS
+      /* -------------------------------------------- */
+      "syncify:asset": [
+        "./syncify/transform/asset.ts"
+      ],
+      "syncify:json": [
+        "./syncify/transform/json.ts"
+      ],
+      "syncify:liquid": [
+        "./syncify/transform/liquid.ts"
+      ],
+      "syncify:pages": [
+        "./syncify/transform/pages.ts.ts"
+      ],
+      "syncify:schema": [
+        "./syncify/transform/schema.ts",
+      ],
+      "syncify:script": [
+        "./syncify/transform/script.ts",
+      ],
+      "syncify:style": [
+        "./syncify/transform/style.ts",
+      ],
+      "syncify:svg": [
+        "./syncify/transform/svg.ts",
       ],
       /*
       /* DIRECTORIES
       /* -------------------------------------------- */
       "syncify:process/*": [
-        "./lib/process/*"
+        "./syncify/process/*"
       ],
       "syncify:cli/*": [
-        "./lib/cli/*"
+        "./syncify/cli/*"
       ],
       "syncify:options/*": [
-        "./lib/options/*"
+        "./syncify/options/*"
       ],
       "syncify:transform/*": [
-        "./lib/transform/*"
+        "./syncify/transform/*"
       ],
       "syncify:modes/*": [
-        "./lib/modes/*"
+        "./syncify/modes/*"
       ],
       "syncify:resource/*": [
-        "./lib/resource/*"
+        "./syncify/resource/*"
       ],
       "syncify:requests/*": [
-        "./lib/requests/*"
+        "./syncify/requests/*"
       ],
       "syncify:plugins/*": [
-        "lib/plugins/*"
+        "syncify/plugins/*"
       ],
       "syncify:forks/*": [
-        "./lib/forks/*"
+        "./syncify/forks/*"
       ],
       "syncify:hot/*": [
-        "./lib/hot/*"
+        "./syncify/hot/*"
       ],
       "syncify:log/*": [
-        "./lib/log/*.ts",
-        "!./src/log/index.ts"
+        "./syncify/log/*.ts",
+        "!./syncify/log/index.ts"
       ],
       "syncify:utils/*": [
-        "./lib/utils/*",
+        "./syncify/utils/*",
       ]
     }
   }

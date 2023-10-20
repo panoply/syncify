@@ -36,10 +36,6 @@ export interface Commands {
    */
   cwd?: string;
   /**
-   * The `package.json` url path, this is written post-command parse
-   */
-  pkg?: string;
-  /**
    * The post-parse temp storage reference to stores
    */
   store?: string | string[];
@@ -57,6 +53,21 @@ export interface Commands {
    * ```
    */
   config?: string;
+  /**
+   * Doctor Command
+   *
+   * Tests the current setup and prints some basic information.
+   *
+   */
+  doctor?: boolean;
+  /**
+   * Reset Cache
+   *
+   * Purges cache run with the `--build` command
+   *
+   * @default false
+   */
+  cache?: boolean;
   /**
    *  Run in production mode
    *
@@ -171,6 +182,34 @@ export interface Commands {
    * ```
    */
   export?: boolean;
+  /**
+   * Run in watch mode (chokidar). This requires a store target be passed.
+   *
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify store_1 -p
+   * $ syncify store_1 --publish
+   * ```
+   */
+  publish?: boolean;
+  /**
+   * Run in watch mode (chokidar). This requires a store target be passed.
+   *
+   * ---
+   *
+   * Example:
+   *
+   * ```bash
+   * $ syncify store_1 -r
+   * $ syncify store_1 --release patch
+   * $ syncify store_1 --release minor
+   * $ syncify store_1 --release major
+   * ```
+   */
+  release?: string;
   /**
    * Triggers a resource mode
    *
@@ -293,7 +332,7 @@ export interface Commands {
    * $ syncify --help
    * ```
    */
-  help?: boolean;
+  help?: string;
   /**
    * Hides logs from being printed (shows errors though)
    *

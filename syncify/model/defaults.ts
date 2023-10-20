@@ -1,0 +1,95 @@
+import type { Config } from 'types';
+
+/**
+ * Default Configuration
+ *
+ * This model is merged with the users config file settings and options.
+ * This is reflective of the `syncify.config.js` or `syncify.json` file.
+ *
+ * **Notes:**
+ *
+ * This model will assert defaults to be merged with the `$`, `transform` and `terser` models.
+ * The defined settings will hold reference to the user defined options, the model is immutable.
+ */
+export const defaults = (): Config => ({
+  input: 'source',
+  output: 'theme',
+  import: 'import',
+  export: 'export',
+  config: '.',
+  hot: false,
+  stores: null,
+  publish: {
+    bindVersion: false,
+    publishRole: 'unpublished',
+    themeLimit: 3,
+    tunnelPort: 80
+  },
+  spawn: {
+    build: null,
+    watch: null
+  },
+  log: {
+    clear: true,
+    silent: false,
+    stats: true,
+    warnings: true
+  },
+  paths: {
+    assets: 'assets/*',
+    config: 'config/*.json',
+    layout: 'layout/*.liquid',
+    locales: 'locales/*.json',
+    snippets: 'snippets/*.liquid',
+    metafields: 'metafields/**/*.json',
+    metaobject: 'templates/customers/*.json',
+    redirects: 'redirects.yaml',
+    schema: 'schema/*.json',
+    sections: [
+      'sections/**/*.json',
+      'sections/**/*.liquid'
+    ],
+    pages: [
+      'pages/*.html',
+      'pages/*.md'
+    ],
+    templates: [
+      'templates/customers/*.liquid',
+      'templates/customers/*.json'
+    ],
+    customers: [
+      'templates/customers/*.liquid',
+      'templates/customers/*.json'
+    ]
+  },
+  views: {
+    sections: {
+      prefixDir: false,
+      separator: '-',
+      global: []
+    },
+    snippets: {
+      prefixDir: false,
+      separator: '-',
+      global: []
+    },
+    pages: {
+      author: '',
+      safeSync: true,
+      importLanguage: 'html',
+      suffixDir: false,
+      global: []
+    }
+  },
+  transform: {
+    svg: null,
+    style: null,
+    script: null
+  },
+  terser: {
+    json: false,
+    markup: false,
+    liquid: false,
+    script: false
+  }
+});

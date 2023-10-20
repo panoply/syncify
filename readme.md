@@ -16,6 +16,7 @@ A lightening fast, extensible and superior alternative Shopify CLI (Theme Develo
 - Watch, upload, import and export to multiple storefronts and themes.
 - Intelligent path mapping resolutions that support custom directory structures.
 - HOT Reloading of assets, section, snippets, templates and layouts.
+- Shared section schema support with IntelliSense support in [VSCode Liquid](https://github.com/panoply/vscode-liquid).
 - Clear, concise, informative and beautiful TUI/CLI logging.
 - An elegant global directory based metafields sync approach using JSON files.
 - Supports spawned processing with existing build tools.
@@ -24,9 +25,9 @@ A lightening fast, extensible and superior alternative Shopify CLI (Theme Develo
 
 ### Why?
 
-I have been working on the Shopify platform for several years and nothing the Shopify team have produced has increased my productivity. Despite the advancements Shopify has made in recent years I still find their developer tooling to be missing the mark and a clear disconnect is apparent. The Shopify CLI is cool and all but for me the approach to theme development it fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
+I have been working on the Shopify platform for several years and nothing the Shopify team have produced has increased my productivity. Despite the advancements Shopify has made in recent years I still find their developer tooling to be missing the mark and a clear disconnect is apparent. The Shopify CLI is cool and all but for me the approach to theme development fails to achieve fluidity. Syncify is how I believe theme creation, development and maintenance should be done.
 
-Syncify provides you with essential stack tooling for producing lean, performant and refined themes. It's fast, flexible, extensible, scalable but most importantly, it's an un-restrictive workflow.
+This tool provides you with essential stack tooling for producing lean, performant and refined themes. It's fast, flexible, extensible, scalable but most importantly, it's an un-restrictive workflow.
 
 # Installation
 
@@ -56,7 +57,11 @@ yarn add @syncify/cli --dev
 
 # Setup
 
-After installing you will need to configure a connection to your shopify store. Syncify requires you provide either an Admin API Access Token (recommended) or API Key and Secret as credentials.
+After installing you will need to configure a connection to your shopify store and provide an ngrok auth token. Syncify requires you provide either an Admin API Access Token (recommended) or API Key and Secret as credentials. The ngrok auth token is optional, but required if you plan to publish themes to stores.
+
+### Shopify Authorization
+
+Syncify requires Admin API access to your store/s.
 
 <details>
 <summary>
@@ -110,9 +115,25 @@ You need to provide Syncify read and write access to a couple of admin endpoints
 </p>
 </details>
 
+### Ngrok Authorization
+
+If you are planning to deploy themes using Syncify, you will need to provide an [ngrok](http://ngrok.com) auth token. This is simple, easy and **free** to acquire. Follow the below steps:
+
+1. Create a `.env` file in your project root
+2. Sign-up to [ngrok](https://dashboard.ngrok.com/signup)
+3. You have an auth token
+
+Provide the ngrok auth token within your `.env` file as follows:
+
+```bash
+NGROK_AUTH_TOKEN = 'abcdefghijklmnopqrstuvwz'
+```
+
 # Credentials
 
-Shop credentials can be stored within a `.env` or `.env.syncify.json` file. You can also provide credentials at runtime using `process.env` variables. The preferred approach is to store this information within a `.env` file.
+Shop credentials and your ngrok authorization can be stored within a `.env` file. You can also provide credentials at runtime using `process.env` variables. The preferred approach is to store this information within a `.env` file.
+
+> Syncify also supports `.env.syncify` or `.env.syncify.json` environment files.
 
 ### Using a `.env` file
 
@@ -120,15 +141,15 @@ When using a `.env` file, you can provide shop credentials in either uppercase o
 
 Using an **API Access Token**
 
-```env
-YOUR-SHOP-NAME_API_TOKEN = 'shpat_abcdefghijklmnopqrstuvwz'
+```bash
+FOO_API_TOKEN = 'shpat_abcdefghijklmnopqrstuvwz' # FOO > foo.myshopify.com
 ```
 
 Using an **API key** and **API Secret**
 
-```env
-YOUR-SHOP-NAME_API_KEY = 'abcdefghijklmnopqrstuvwz'
-YOUR-SHOP-NAME_API_SECRET = 'abcdefghijklmnopqrstuvwz'
+```bash
+FOO-BAR_API_KEY = 'abcdefghijklmnopqrstuvwz'    # FOO-BAR > foo-bar.myshopify.com
+FOO-BAR_API_SECRET = 'abcdefghijklmnopqrstuvwz' # FOO-BAR > foo-bar.myshopify.com
 ```
 
 ### Using `process.env` variables
@@ -139,20 +160,99 @@ Using an **API Access Token**
 
 ```js
 // Using an API Access Token
-process.env['YOUR-SHOP-NAME_API_TOKEN'] = 'shpat_abcdefghijklmnopqrstuvwz';
+process.env['FOO_API_TOKEN'] = 'shpat_abcdefghijklmnopqrstuvwz';
 ```
 
 Using an **API key** and **API Secret**
 
 ```js
 // Using an API Key and API Secret
-process.env['YOUR-SHOP-NAME_API_KEY'] = 'abcdefghijklmnopqrstuvwz';
-process.env['YOUR-SHOP-NAME_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
+process.env['FOO-BAR_API_KEY'] = 'abcdefghijklmnopqrstuvwz';
+process.env['FOO-BAR_API_SECRET'] = 'abcdefghijklmnopqrstuvwz';
 ```
+
+Defining **ngrok**
+
+```js
+// Using an API Key and API Secret
+process.env['NGROK_AUTH_TOKEN'] = 'abcdefghijklmnopqrstuvwz';
+```
+
+<!--
+### Testing Scopes
+
+Once you've configured credentials, it's a good idea to **test** your connection to ensure that Syncify has got access to your store/s and you've provided the correct scopes. Open up your terminal and run the following command:
+
+```bash
+$ pnpm syncify doctor
+```
+
+The `syncify doctor` command instructs Syncify to tests your credentials, scopes and general setup. If Syncify has encountered an error or it cannot access certain store resources you will be informed. -->
+
+# Stores
+
+Once you've configured credentials, you will need to provide store references. Stores references are provided within your projects `package.json` file on the `syncify > stores` key property. Syncify exposes a helpful command which you can use to automatically setup stores and themes.
+
+Open up your terminal and run the following command:
+
+```bash
+$ pnpm syncify themes
+```
+
+You will be prompted
+
+```jsonc
+{
+  "syncify": {
+    "stores": {
+      "domain": "shop-1", // equivalent of shop-1.myshopify.com
+      "themes": {
+        "dev": 123456789,
+        "prod": 123456789,
+        "test": 123456789
+      }
+    }
+  }
+}
+```
+
+###
+
+The option accepts an **object** or **array** type. Each item will hold reference to your shopify store/s and their theme/s. For each store you define, you will provide the **shop** name, theme **target** name and **id**. The `themes` object uses a **key** > **value** structure, where the **key** represent a theme name (target) and the value a theme id.
+
+The information you provide to this option can be used via the CLI when targeting and executing operations. Please refer to the [commands](#commands) portion of this readme for more information on CLI usage.
+
+> **Note**
+>
+> The theme target name does need to match that defined in your online store and can be anything you like.
+
+### Config File
+
+Below is an example of how a store reference can be defined. In the example, we have only provided a store domain `shop-1.myshopify.com` and 3 themes to connect and interface with. You can provide reference to multiple stores by passing an array list using the same structure.
+
+<!-- prettier-ignore -->
+```ts
+import { defineConfig } from '@syncify/cli';
+
+export default defineConfig({
+  stores: {
+    domain: 'shop-1', // equivalent of shop-1.myshopify.com
+    themes: {
+      dev:  123456789,
+      prod: 123456789,
+      test: 123456789
+    }
+  }
+});
+```
+
+# Stores
+
+Once you've configured credentials, you will need to provide store references. Syncify requires that you provide stores references within your projects `package.json` file.
 
 # Configuration
 
-Syncify supports `syncify.config.ts` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on the `syncify` property.
+Syncify supports `syncify.config.ts` and `package.json` configurations. Depending on your preference, either option suffices and no restrictions are imposed. If you are defining options within your projects `package.json` file you can assign options on the `syncify.config` property.
 
 ### Supported Files
 
@@ -167,7 +267,7 @@ Syncify supports the following configuration file types. The recommended approac
 
 ### Default Options
 
-Below are the **default** configurations. Options commented out within [transforms](#transform), [processors](#processors) and [terser](#terser) require peer dependencies to be installed for usage.
+Below are the **default** configurations. Options commented out within [transform](#transform), [processors](#processors) and [terser](#terser) require peer dependencies to be installed for usage.
 
 <!-- prettier-ignore -->
 ```ts
@@ -180,31 +280,6 @@ export default defineConfig({
   import: 'import',
   config: '.',
   clean: true,
-  stores: [
-    {
-      domain: '',
-      themes: {}
-    }
-  ],
-  hot: {
-    label: 'visible',
-    history: true,
-    method: 'hot',
-    inject: true,
-    strategy: 'hydrate',
-    scroll: 'preserved',
-    server: 3000,
-    socket: 8089,
-    layouts: [
-      'theme.liquid'
-    ],
-  },
-  logger: {
-    clear: true,
-    silent: false,
-    stats: true,
-    warnings: true
-  },
   paths: {
     redirects: 'redirects.yaml',
     assets: 'assets/**/*',
@@ -231,6 +306,25 @@ export default defineConfig({
       'templates/*.liquid'
     ],
   },
+  hot: {
+    label: 'visible',
+    history: true,
+    method: 'hot',
+    inject: true,
+    strategy: 'hydrate',
+    scroll: 'preserved',
+    server: 3000,
+    socket: 8089,
+    layouts: [
+      'theme.liquid'
+    ],
+  },
+  log: {
+    clear: true,
+    silent: false,
+    stats: true,
+    warnings: true
+  },
   spawn: {
     build: {},
     watch: {},
@@ -256,7 +350,7 @@ export default defineConfig({
       global: []
     }
   },
-  transforms: {
+  transform: {
     script: {},
     style: {},
     svg: {},
@@ -406,36 +500,6 @@ export default defineConfig({
 
   </tbody>
 </table>
-
-# Stores (Required)
-
-The `stores` option is required and will be used to perform sync operations. The option accepts an **object** or **array** type. Each item will hold reference to your shopify store/s and their theme/s. For each store you define, you will provide the **shop** name, theme **target** name and **id**. The `themes` object uses a **key** > **value** structure, where the **key** represent a theme name (target) and the value a theme id.
-
-The information you provide to this option can be used via the CLI when targeting and executing operations. Please refer to the [commands](#commands) portion of this readme for more information on CLI usage.
-
-> **Note**
->
-> The theme target name does need to match that defined in your online store and can be anything you like.
-
-### Config File
-
-Below is an example of how a store reference can be defined. In the example, we have only provided a store domain `shop-1.myshopify.com` and 3 themes to connect and interface with. You can provide reference to multiple stores by passing an array list using the same structure.
-
-<!-- prettier-ignore -->
-```ts
-import { defineConfig } from '@syncify/cli';
-
-export default defineConfig({
-  stores: {
-    domain: 'shop-1', // equivalent of shop-1.myshopify.com
-    themes: {
-      dev:  123456789,
-      prod: 123456789,
-      test: 123456789
-    }
-  }
-});
-```
 
 ### CLI Usage
 
@@ -729,9 +793,175 @@ An array list of glob path patterns to `.json` **metaobject** template files. Th
 </p>
 </details>
 
-# Shared Sections
+# Shared Section Schema
 
-Syncify provides an elegant and simple solution for shared sections. This is an experimental feature and aims to provide developers an easy way to re-use section contents between section files containing schema.
+Syncify provides an elegant and simple solution for shared section schema. Shared section schema provides developers an easy way to re-use section contents between section files containing schema.
+
+> Use the [VSCode Liquid](https://github.com/panoply/vscode-liquid) extension and take advantage of the Syncify Shared Section Schema approach with IntelliSense capabilities.
+
+### How it works?
+
+Shared Section Schemas
+
+### Structures
+
+There are several different structures you can use for defining shared schemas.
+
+##### Setting Singleton
+
+```json
+{
+  "example": {
+    "$description": "An optional internal description used by VSCode Liquid",
+    "type": "textarea",
+    "id": "items",
+    "label": "items",
+    "default": "Item 1\nItem 2\nItem 3\netc etc",
+    "info": "Separate each item to render on newline"
+  }
+}
+```
+
+##### Settings Spread
+
+Below is an example of a shared schema settings spread. The approach accepts an array list of settings and when referenced in sections will spread the output.
+
+```jsonc
+// source/schema/test.json
+{
+  "example": [
+    {
+      "type": "text",
+      "id": "foo",
+      "label": "Example 1"
+    },
+    {
+      "type": "text",
+      "id": "bar",
+      "label": "Example 2"
+    }
+  ]
+}
+```
+
+<details>
+<summary>
+<strong>Reference Example</strong>
+</summary>
+<p>
+
+Referencing the above shared schema in your section `{% schema %}` tag
+
+```liquid
+{% schema %}
+{
+  "settings": [
+    {
+      "$ref": "test.example"
+    }
+  ]
+}
+{% endschema %}
+```
+
+</details>
+
+<details>
+<summary>
+<strong>Output Example</strong>
+</summary>
+<p>
+
+The generated output will inject and spread the schemas you've defined.
+
+```liquid
+{% schema %}
+{
+  "settings": [
+    {
+      "type": "text",
+      "id": "foo",
+      "label": "Example 1"
+    },
+    {
+      "type": "text",
+      "id": "bar",
+      "label": "Example 2"
+    }
+  ]
+}
+{% endschema %}
+```
+
+</p>
+</details>
+
+##### Settings Collection
+
+```json
+{
+  "example": {
+    "$description": "An optional internal description used by VSCode Liquid",
+    "settings": [
+      {
+        "type": "text",
+        "id": "foo",
+        "label": "Example",
+        "default": "Hello World",
+        "info": "Lorem ipsum dolor sit amet"
+      }
+    ]
+  }
+}
+```
+
+##### Block Singleton
+
+```json
+{
+  "block_singleton": {
+    "$description": "An optional internal description used by VSCode Liquid",
+    "name": "",
+    "type": "",
+    "settings": []
+  }
+}
+```
+
+##### Block Collection
+
+```json
+{
+  "example": [
+    {
+      "$description": "An optional internal description used by VSCode Liquid",
+      "name": "foo",
+      "type": "bar",
+      "settings": [
+        {
+          "type": "article",
+          "id": "something",
+          "label": "Something"
+        }
+      ]
+    },
+    {
+      "$description": "An optional internal description used by VSCode Liquid",
+      "name": "bar",
+      "type": "baz",
+      "settings": [
+        {
+          "type": "text",
+          "id": "foo",
+          "label": "Example",
+          "default": "Hello World",
+          "info": "Lorem ipsum dolor sit amet"
+        }
+      ]
+    }
+  ]
+}
+```
 
 # HOT
 
@@ -1138,7 +1368,7 @@ Syncify supports built-in and partial processing for the following file types:
 - `.sass`
 - `.svg`
 
-## Scripts
+## Script
 
 Syncify exposes a `script` transform option which supports TypeScript (`.ts` and `.tsx`) and/or JavaScript (`.js` and `.jsx`) bundling using [ESBuild](https://esbuild.github.io/). Script transforms use a pre-defined set of processing configurations and will produce lean JavaScript bundles designed to work seamlessly in development mode or when leveraging HOT reloads. Syncify will also apply refinements to distribution bundles focused on performance when generating production builds for your Shopify theme.
 
@@ -1163,9 +1393,9 @@ The `script` options accepts several different structures and it is up to you ho
 import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
-  transforms: {
+  transform: {
     script: [
-       {
+      {
         input: [],
         format: 'esm',
         target: 'es2016',
@@ -1189,7 +1419,7 @@ You may prefer to use rename (entry point) structures instead. When we are using
 import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
-  transforms: {
+  transform: {
     script: {
 
       // Producing 2 inline snippet <script> bundles
@@ -1260,7 +1490,7 @@ In the below example we are generating multiple stylesheets and compiling both S
 import { defineConfig } from '@syncify/cli'
 
 export default defineConfig({
-  transforms: {
+  transform: {
     style: {
       'assets/stylesheet.min.css': {
         input: 'styles/stylesheet.scss',
@@ -1608,7 +1838,7 @@ export default defineConfig({
     tailwind: {},   // applied to style transforms
     svgo: {},       // applied to svg transforms
     sprite: {},     // applied to svg transforms
-    sharp: {},      // applied to img transforms
+    sharp: {},      // applied to image transforms
   }
 })
 ```

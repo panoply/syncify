@@ -23,20 +23,19 @@
       {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
     </title>
 
-    {% if page_description %}
+        {% if page_description %}
       <meta name="description" content="{{ page_description | escape }}">
-    {% endif %}
-
     {% render 'meta-tags' %}
+
+        {% endif %}
 
     <script src="{{ 'constants.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
-    {%- if settings.animations_reveal_on_scroll -%}
+        {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
-    {{ content_for_header }}
 
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
@@ -266,7 +265,10 @@
     <link href="{{ 'example.min.css' | asset_url }}" rel="stylesheet">
 
     <script src="{{ 'bundle.min.js' |  asset_url }}"></script>
+      {{ content_for_header }}
+
   </head>
+
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
@@ -280,11 +282,12 @@
     {%  render 'test-1' %}
     {%  render 'test-2' %}
     {%  render 'test-3' %}
-
+    {%  render 'foo-snippet.js' %}
 
     <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
       {{ content_for_layout }}
     </main>
+
 
 
     {% sections 'footer-group' %}

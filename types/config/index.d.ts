@@ -1,19 +1,64 @@
 /* eslint-disable no-unused-vars */
 
+import type { Merge, PackageJson } from 'type-fest';
 import type { Sections, Snippets } from './views';
 import type { HOTConfig } from '../bundle/hot';
 import type { ScriptTerse, JSONTerse, MarkupTerse, LiquidTerse } from './terser';
-import type { PluginHooks } from '../bundle/plugin';
-import type { JSONConfig } from '../transforms/json';
-import type { SharpConfig } from '../transforms/image';
-import type { PagesConfig } from '../transforms/pages';
-import type { ScriptTransformer, ESBuildConfig } from '../transforms/script';
-import type { StyleTransformer, SASSConfig, PostCSSConfig } from '../transforms/style';
-import type { SVGTransformer, SVGOConfig, SVGSpriteConfig } from '../transforms/svg';
+import type { PluginHooks } from '../$/plugin';
+import type { JSONConfig } from '../transform/json';
+import type { SharpConfig } from '../transform/image';
+import type { PagesConfig } from '../transform/pages';
+import type { ScriptTransformer, ESBuildConfig } from '../transform/script';
+import type { StyleTransformer, SASSConfig, PostCSSConfig } from '../transform/style';
+import type { SVGTransformer, SVGOConfig, SVGSpriteConfig } from '../transform/svg';
 
 /* -------------------------------------------- */
 /* PROCESSORS                                   */
 /* -------------------------------------------- */
+
+export interface Publishing {
+  /**
+   * The port address to publish on - In most cases, you can leave
+   * this to the default, unless port `80` is occupied, in such
+   * situation, use a different port.
+   *
+   * @default 80
+   */
+  tunnelPort?: number;
+  /**
+   * Set the publishment role to use - This defaults to `unpublished`
+   * which means theme publishes will not be made pushed live.
+   *
+   * `main`
+   *
+   * The theme is published. Customers see it when they visit the online store.
+   *
+   * `unpublished`
+   *
+   * The theme is unpublished. Customers can't see it.
+   *
+   * `development`
+   *
+   * The theme is used for development. The theme can't be published, and is temporary.
+   *
+   * @default 'unpublished'
+   */
+  publishRole?: 'main' | 'unpublished' | 'development';
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * Bind theme version with the `settings_schema.json` version.
+   *
+   * @default false
+   */
+  bindVersion?: boolean;
+  /**
+   * Limit the amount of new theme publishments.
+   *
+   * @default 3
+   */
+  themeLimit?: number;
+}
 
 /**
  * Processor Default Configurations
@@ -418,6 +463,12 @@ export interface Paths<T = string | string[]> {
    */
   locales?: T
   /**
+   * An array list of shared section schema `.json` files
+   *
+   * @default 'source/schema'
+   */
+  schema?: T
+  /**
    * **NOT YET AVAILABLE**
    *
    * > **This option will be available in later versions**
@@ -456,9 +507,22 @@ export interface Paths<T = string | string[]> {
  */
 export interface Config<T = Stores> extends Directories {
   /**
-   * Define your Shopify store/s and thier theme/s
+   * **Use `package.json` file for store and theme references**
+   *
+   * Define Shopify stores and themes within your projects `package.json` file.
+   * In your `package.json` provide store/s and themes as per the example below:
+   *
+   * ```jsonc
+   * {
+   *   "syncify": {
+   *     "stores": {} // define your themes in package.json
+   *   }
+   * }
+   * ```
+   *
+   * @deprecated
    */
-  stores: T | Stores | Stores[];
+  stores?: T | Stores | Stores[];
   /**
    * Define customize input structures - Paths resolve to `input`
    */
@@ -478,9 +542,17 @@ export interface Config<T = Stores> extends Directories {
    */
   hot?: boolean | HOTConfig;
   /**
+   * Console log options
+   */
+  log?: Logger;
+  /**
    * Syncify Plugins
    */
-  plugins?: PluginHooks[]
+  plugins?: PluginHooks[];
+  /**
+   * Provide publish configuration
+   */
+  publish?: Publishing;
   /**
    * Spawn child process
    */
@@ -520,20 +592,20 @@ export interface Config<T = Stores> extends Directories {
    */
   views?: Views;
   /**
-   * Console log options
+   * **Transform**
+   *
+   * The asset transform pipeline configurations
    */
-  logger?: Logger;
+  transform?: Transforms;
   /**
+   * **Processors**
+   *
    * Configurations for the `transform` processors. Define options
-   * for the transformers to inherit. You can override these on a
-   * per-transform basis. Optionally, you can use the default presets
-   * which syncify has pre-configured for optimal output.
+   * for a transform to inherit. You can override these on a per-transform basis.
+   * Optionally, you can use the default presets which syncify has pre-configured
+   * for optimal output.
    */
   processors?: Processors;
-  /**
-   * Transform pipeline configurations
-   */
-  transforms?: Transforms;
   /**
    * Terse options (minification)
    *
@@ -548,3 +620,20 @@ export interface Config<T = Stores> extends Directories {
    */
   minify?: undefined;
 }
+
+/* -------------------------------------------- */
+/* PACKAGE JSON                                 */
+/* -------------------------------------------- */
+
+export type PKG = Merge<PackageJson, {
+  syncify: {
+    /**
+     * Store Configurations
+     */
+    stores: Stores | Stores[];
+    /**
+     * Optional Config
+     */
+    config?: Omit<Config, 'stores'>
+  }
+}>
