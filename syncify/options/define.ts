@@ -8,7 +8,7 @@ import { setJsonOptions } from './json';
 import { setModes } from './modes';
 import { setSnippetOptions } from './snippets';
 import { setSectionOptions } from './sections';
-import { setStores } from './stores';
+import { setSync } from './sync';
 import { setPaths } from './paths';
 import { setVersion } from './version';
 import { setSpawns } from './spawn';
@@ -21,9 +21,9 @@ import { setTerserOptions } from './terser';
 import { setPageOptions } from './pages';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
-import { isArray, has, isObject, isEmpty } from 'syncify:utils';
+import { isArray, has, isObject, isEmpty, hasProp } from 'syncify:utils';
 import { toArray } from 'syncify:native';
-import { cacheDone, setCache } from '../process/cache';
+import { cacheDone, getCache } from '../process/cache';
 import { setPublishConfig } from './publish';
 import { $ } from 'syncify:state';
 import { timer } from 'syncify:timer';
@@ -55,10 +55,9 @@ export async function define (cli: Commands, options?: Config) {
   await getEnvFile(cli.cwd);
   await getPackageJson(cli.cwd);
   await getConfig(cli);
-  await setCache(cli);
+  await getCache(cli);
 
-  setLogOptions();
-  setInternals(cli);
+  setMisc(cli);
   setModes(cli);
 
   process.env.SYNCIFY_ENV = $.env.dev ? 'dev' : 'prod';
@@ -70,8 +69,9 @@ export async function define (cli: Commands, options?: Config) {
 
   log.runtime.modes($);
 
+  await setSync(cli);
+
   setChokidar(cli.watch || cli.upload);
-  setStores(cli);
   setProcessors();
   setPublishConfig();
   setSpawns();
@@ -127,7 +127,12 @@ export async function define (cli: Commands, options?: Config) {
 
 };
 
-function setInternals (cli: Commands) {
+/**
+ * Set Misc
+ *
+ * Applies various assignments to the `$` modal
+ */
+function setMisc (cli: Commands) {
 
   $.restart = false;
   $.cli = cli;
@@ -137,30 +142,12 @@ function setInternals (cli: Commands) {
   $.env.dev = cli.dev && !cli.prod;
   $.terminal.wrap = Math.round($.terminal.cols - ($.terminal.cols / 3));
 
-}
+  const prop = hasProp($.config.log);
 
-/**
- * Set Log Options
- *
- * Configures the Syncify log options
- */
-function setLogOptions () {
-
-  if (has('silent', $.config.log)) {
-    $.log.config.silent = $.config.log.silent;
-  }
-
-  if (has('clear', $.config.log)) {
-    $.log.config.clear = $.config.log.clear;
-  }
-
-  if (has('stats', $.config.log)) {
-    $.log.config.stats = $.config.log.stats;
-  }
-
-  if (has('warnings', $.config.log)) {
-    $.log.config.warnings = $.config.log.warnings;
-  }
+  if (prop('silent')) $.log.config.silent = $.config.log.silent;
+  if (prop('clear')) $.log.config.clear = $.config.log.clear;
+  if (prop('stats')) $.log.config.stats = $.config.log.stats;
+  if (prop('warnings')) $.log.config.warnings = $.config.log.warnings;
 
 }
 

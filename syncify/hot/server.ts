@@ -7,7 +7,7 @@ import { pathExists, readFile, writeFile } from 'fs-extra';
 import { join, basename, relative } from 'pathe';
 import { Server } from 'ws';
 import { kill } from 'syncify:cli/exit';
-import { ARR, COL, Tree, TLD } from 'syncify:symbol';
+import { ARR, COL, Tree } from 'syncify:symbol';
 import { bold, gray, redBright, neonCyan, pink } from 'syncify:colors';
 import { $ } from 'syncify:state';
 import { injectSnippet, injectRender } from './inject';
@@ -30,13 +30,13 @@ export const HOTError: {
 
 async function injection () {
 
-  log.update(tree.Line(gray(` ${TLD} validating snippet injection`)));
+  log.update(tree.Line(gray('validating snippet injection')));
 
   const snippet = await injectSnippet();
 
   if (snippet) {
 
-    log.update(tree.Line(gray(` ${TLD} validating layouts`)));
+    log.update(tree.Line(gray('validating layouts')));
 
     for (const layout in $.hot.alive) {
 
@@ -44,7 +44,7 @@ async function injection () {
 
       if (!exists) {
 
-        log.update(tree.Line(gray(` ${TLD} layout has not yet been bundled, building now...`)));
+        log.update(tree.Line(gray('layout has not yet been bundled, building now...')));
 
         const files = glob.sync($.config.paths.layout, {
           cwd: $.dirs.input,
@@ -58,7 +58,7 @@ async function injection () {
           }
         }
 
-        log.update(tree.Line(gray(` ${TLD} layout was bundled from source, injecting hot snippet`)));
+        log.update(tree.Line(gray('layout was bundled from source, injecting hot snippet')));
 
       }
 
@@ -118,7 +118,7 @@ export async function server () {
   }
 
   log.out(tree.Line(bold(`${$.hot.method === 'hot' ? 'HOT Reload' : 'LIVE Reload'}${COL}`)));
-  log.update(tree.Line(` ${TLD} configuring HOT Reload`));
+  log.update(tree.Line('configuring HOT Reload'));
 
   await injection();
 
@@ -173,11 +173,11 @@ export async function server () {
   const port = `${gray('PORT')}  ${ARR} ${pink(`${$.hot.server}`)}`;
   const sock = `${gray('PORT')}  ${ARR} ${pink(`${$.hot.socket}`)}`;
 
-  log.update(tree.Line(` ${TLD} ${neonCyan('server')}  ${ARR}  ${port}`));
-  log.out(tree.Line(` ${TLD} ${neonCyan('socket')}  ${ARR}  ${sock}`));
+  log.update(tree.Line(`${neonCyan('server')}  ${ARR}  ${port}`));
+  log.out(tree.Line(`${neonCyan('socket')}  ${ARR}  ${sock}`));
 
   for (const p in $.hot.alive) {
-    log.out(tree.Line(` ${TLD} ${neonCyan('layout')}  ${ARR}  ${gray(relative($.cwd, p))}`));
+    log.out(tree.Line(`${neonCyan('layout')}  ${ARR}  ${gray(relative($.cwd, p))}`));
   }
 
   log.nwl();

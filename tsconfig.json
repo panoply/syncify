@@ -136,6 +136,9 @@
       "syncify:cli/*": [
         "./syncify/cli/*"
       ],
+      "syncify:prompts/*": [
+        "./syncify/prompts/*"
+      ],
       "syncify:options/*": [
         "./syncify/options/*"
       ],

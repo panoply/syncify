@@ -31,7 +31,7 @@ export function setPageOptions () {
     // checks against the default model.
     if (!has(option as keyof PagesConfig)) unknownError('pages', option);
 
-    if (option === 'importLanguage') {
+    if (option === 'language') {
 
       if (isString(pages[option])) {
         if (pages[option] === 'markdown' || pages[option] === 'html') {

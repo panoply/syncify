@@ -346,6 +346,24 @@ importers:
   plugins/icons: {}
 
   straps/dusk:
+    devDependencies:
+      '@syncify/cli':
+        specifier: workspace:0.3.0-beta
+        version: link:../..
+      '@syncify/stylelint-config':
+        specifier: workspace:^
+        version: link:../../packages/configs/stylelint-config
+      esbuild:
+        specifier: ^0.19.5
+        version: 0.19.5
+      sass:
+        specifier: ^1.69.4
+        version: 1.69.4
+      svgo:
+        specifier: ^3.0.2
+        version: 3.0.2
+
+  straps/dusk-advanced:
     dependencies:
       '@hotwired/stimulus':
         specifier: ^3.2.2
@@ -387,6 +405,9 @@ importers:
       esbuild:
         specifier: ^0.19.5
         version: 0.19.5
+      postcss:
+        specifier: ^8.4.31
+        version: 8.4.31
       svg-sprite:
         specifier: ^2.0.2
         version: 2.0.2
@@ -1747,6 +1768,7 @@ packages:
   /ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
+    requiresBuild: true
 
   /ansi-regex@6.0.1:
     resolution: {integrity: sha512-n5M855fKb2SsfMIiFFoVrABHJC8QtHwVx+mHWP3QcEqBHYienj5dHSgjbxtC0WEZXYt4wcD6zrQElDPhFuZgfA==}
@@ -2585,6 +2607,7 @@ packages:
   /color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
+    requiresBuild: true
     dependencies:
       color-name: 1.1.4
 

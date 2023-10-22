@@ -353,6 +353,17 @@ export const $ = new class Bundle {
   });
 
   /**
+   * The available stores as per configuration in `package.json` file
+   *
+   * @default
+   * {
+   *   themes: [],
+   *   stores: []
+   * }
+   */
+  public stores: Type.Stores[] = [];
+
+  /**
    * The sync clients. Multiple stores and themes can run concurrently.
    *
    * @default
@@ -465,7 +476,7 @@ export const $ = new class Bundle {
     author: '',
     global: null,
     suffixDir: false,
-    importLanguage: 'html',
+    language: 'html',
     export: object<Type.Markdown.Export>({
       quotes: '“”‘’',
       html: true,

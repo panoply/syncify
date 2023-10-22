@@ -4,10 +4,11 @@ import { join, relative, basename, extname } from 'pathe';
 import { pathExists, readFile, readJson, writeFile } from 'fs-extra';
 import stripJsonComments from 'strip-json-comments';
 import { bundleRequire } from 'syncify:requests/require';
-import { jsonc } from 'syncify:utils';
+import { isArray, isEmpty, isObject, jsonc } from 'syncify:utils';
 import { throws } from 'syncify:log/errors';
 import { $ } from 'syncify:state';
-import { missingEnv } from 'syncify:log/throws';
+import { missingEnv, missingStores } from 'syncify:log/throws';
+import { hasPath } from 'rambdax';
 
 /**
  * Config Files
@@ -125,9 +126,9 @@ export async function getTSConfig (cwd: string): Promise<Tsconfig> {
 /**
  * Set Package.json File
  *
- * Resolves `package.json` file. This is triggered
- * at runtime, the module requires the existence of
- * a `package.json` file.
+ * Resolves `package.json` file. This is triggered at runtime, the
+ * module requires the existence of a `package.json` file. This
+ * function will also assign `$.stores[]` reference.
  */
 export async function getPackageJson (cwd: string) {
 
@@ -138,7 +139,19 @@ export async function getPackageJson (cwd: string) {
   if (!has) throw new Error('Missing "package.json" file');
 
   try {
+
     $.pkg = await readJson(uri);
+
+    if (hasPath('syncify.stores', $.pkg)) {
+      if (isArray($.pkg.syncify.stores)) {
+        $.stores = $.pkg.syncify.stores;
+      } else if (isObject($.pkg.syncify.stores) && isEmpty($.pkg.syncify.stores) === false) {
+        $.stores = [ $.pkg.syncify.stores ];
+      }
+    } else {
+      missingStores(cwd);
+    }
+
   } catch (e) {
     throw new Error(e);
   }

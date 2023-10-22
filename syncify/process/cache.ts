@@ -63,7 +63,7 @@ function save (uri: string, data: any) {
  * Called during the runtime define and is responsible
  * for setting up the cache references.
  */
-export async function setCache (cli: Commands) {
+export async function getCache (cli: Commands) {
 
   $.cache.uri = create(null);
 

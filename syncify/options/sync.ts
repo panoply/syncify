@@ -1,21 +1,22 @@
 import type { Commands, Stores } from 'types';
-import { anyTrue, hasPath, includes } from 'rambdax';
+import { anyTrue, includes } from 'rambdax';
 import { DSH } from 'syncify:symbol';
 import { blue, white } from 'syncify:colors';
-import { throwError, invalidCommand, invalidTarget, missingEnv } from 'syncify:log/throws';
+import { throwError, invalidCommand, invalidTarget } from 'syncify:log/throws';
 import { authURL, getStoresFromEnv } from 'syncify:utils/options';
 import { keys } from 'syncify:native';
-import { isArray, has, isEmpty } from 'syncify:utils';
+import { has } from 'syncify:utils';
 import { $ } from 'syncify:state';
+import { Connect, Target } from 'syncify:cli/prompts';
 
 /**
- * Resolve Stores
+ * Set Sync
  *
  * Resolves Shopify stores and themes from the `package.json`
  * and `.env` file locations relative to the current
  * working directory.
  */
-export function setStores (cli: Commands) {
+export async function setSync (cli: Commands) {
 
   /**
    * Modes which require store arguments
@@ -38,28 +39,12 @@ export function setStores (cli: Commands) {
     $.mode.import
   );
 
-  let array: Stores[] = [];
   let stores: string[];
   let items: Stores[] = [];
   let queue: boolean = false;
 
-  if (hasPath('syncify.stores', $.pkg)) {
-
-    if (isArray($.pkg.syncify.stores)) {
-      array = $.pkg.syncify.stores;
-    } else if (isEmpty($.pkg.syncify.stores) === false) {
-      array = [ $.pkg.syncify.stores ];
-    }
-
-  } else if ($.config.stores !== null) {
-
-    array = isArray($.config.stores) ? $.config.stores : [ $.config.stores ];
-
-  }
-
   if (cli._.length === 0) {
-
-    if (storeRequired && array.length > 1) {
+    if (storeRequired) {
       invalidCommand({
         expected: 'syncify <store>',
         message: [
@@ -74,23 +59,14 @@ export function setStores (cli: Commands) {
     }
   }
 
-  if ($.mode.themes) {
+  if ($.mode.themes && $.stores.length > 0) {
 
-    if (array.length > 0) {
-      items = getStoresFromEnv();
-    }
-
-    if (array.length === 0 && items.length === 0) missingEnv($.cwd);
+    items = getStoresFromEnv();
 
   } else {
 
-    if (cli._.length === 0) {
-      stores = array.map(({ domain }) => domain);
-    } else {
-      stores = cli._[0].split(',');
-    }
-
-    items = array.filter(({ domain }) => includes(domain, stores));
+    stores = cli._.length === 0 ? $.stores.map(({ domain }) => domain) : cli._[0].split(',');
+    items = $.stores.filter(({ domain }) => includes(domain, stores));
     queue = items.length > 1;
 
   }
@@ -104,12 +80,7 @@ export function setStores (cli: Commands) {
     const client = authURL(store.domain);
 
     // Set store endpoints
-    const sidx = $.sync.stores.push({
-      store: store.domain,
-      domain,
-      client,
-      queue
-    }) - 1;
+    const sidx = $.sync.stores.push({ store: store.domain, domain, client, queue }) - 1;
 
     // skip if mode is themes
     if ($.mode.themes) continue;
@@ -118,12 +89,19 @@ export function setStores (cli: Commands) {
     // we do not need context of themes if such modes were initialized by cli
     if ($.mode.metafields || $.mode.pages) return;
 
-    // Lets parse the theme target names
-    const themes: string[] = has('theme', cli)
-      ? (cli.theme as any).split(',')
-      : has(store.domain, cli)
-        ? cli[store.domain].split(',')
-        : keys(store.themes);
+    let themes: string[] = [];
+
+    if (has('theme', cli)) {
+      themes = (cli.theme as any).split(',');
+    } else if (has(store.domain, cli)) {
+      themes = cli[store.domain].split(',');
+    } else if (has('themes', store)) {
+      themes = keys(store.themes);
+    }
+
+    if (themes.length === 0) {
+      await Connect($.sync.stores[sidx]);
+    }
 
     for (const target of themes) {
 
@@ -166,7 +144,6 @@ export function setStores (cli: Commands) {
 
   if (storeRequired) {
     if ($.sync.stores.length === 0) {
-
       return invalidCommand(
         {
           expected: 'syncify <store>',
@@ -178,18 +155,16 @@ export function setStores (cli: Commands) {
             'Provide the store target name as the first command argument followed by themes',
             'target/s and other flags. Based on your current configuration:',
             NLR,
-            `${DSH} ${white('$')} syncify ${array.join(`\n${DSH} ${white('$')} syncify `)}`,
+            `${DSH} ${white('$')} syncify ${$.stores.join(`\n${DSH} ${white('$')} syncify `)}`,
             NLR
           ]
         }
       );
-
     }
   }
 
   if ($.sync.themes.length === 0) {
     if (themeRequired) {
-
       return invalidCommand(
         {
           expected: '-t <theme>',

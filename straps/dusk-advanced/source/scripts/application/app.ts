@@ -4,6 +4,7 @@ import * as track from 'application/tracking';
 
 export function App ({ targets, screens, controllers }) {
 
+  console.log('bundle')
   /**
    * SPX: Called to establish SPX connection
    */
@@ -12,6 +13,7 @@ export function App ({ targets, screens, controllers }) {
     lazySizes.init();
     stimulus.connect(controllers, screens);
     Shopify.designMode || spx.disconnect();
+
 
   });
 

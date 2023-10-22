@@ -43,7 +43,7 @@ export interface BasePromptOptions {
   /**
    * Function to format the final submitted value before it's returned.
    */
-  result?(value: string): string | Promise<string>
+  result?(this: { map:(params: any) => string }, value: string | string[]): any;
   /**
    * If `true` it will not ask that prompt.
    */

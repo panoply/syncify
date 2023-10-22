@@ -347,6 +347,9 @@ export interface Logger {
 /* STORES                                       */
 /* -------------------------------------------- */
 
+/**
+ * Stores Configuration
+ */
 export interface Stores {
   /**
    * The store myshopify domain, eg: `store.myshopify.com`

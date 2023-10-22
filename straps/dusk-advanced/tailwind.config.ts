@@ -2,7 +2,7 @@ import { Config } from 'tailwindcss';
 
 export default <Config>{
   content: [
-    './{assets,config,layout,locales,sections,snippets,src,templates}/**/*.{js,ts,jsx,tsx,vue,svelte,liquid,json}'
+    './source/**/*'
   ],
   theme: {
     extend: {

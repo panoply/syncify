@@ -12,6 +12,9 @@ export default defineConfig({
     templates: 'views/templates/*.json',
     metaobject: 'views/templates/metaobject/**/*'
   },
+  hot: {
+    strategy: 'replace'
+  },
   views: {
     sections: {
       prefixDir: true,
@@ -21,7 +24,7 @@ export default defineConfig({
       ]
     },
     pages: {
-      importLanguage: 'markdown'
+      language: 'markdown'
     }
   },
   transform: {
@@ -32,7 +35,7 @@ export default defineConfig({
     style: {
       'assets/stylesheet': {
         input: 'styles/base.css',
-        tailwind: true
+        postcss: true
       }
     },
     svg: {

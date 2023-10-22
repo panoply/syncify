@@ -1,0 +1,45 @@
+{
+  "name": "dusk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "sy -w --hot",
+    "build": "sy -b"
+  },
+  "license": "MIT",
+  "stylelint": {
+    "extends": "@syncify/stylelint-config"
+  },
+  "syncify": {
+    "stores": {
+      "domain": "syncify",
+      "themes": {
+        "dusk": 137200533745
+      }
+    },
+    "config": {
+      "transform": {
+        "style": {
+          "assets/style": {
+            "input": "assets/style.scss",
+            "sass": {
+              "style": "expanded"
+            }
+          }
+        },
+        "svg": {
+          "snippets/icon.[file]": "assets/icons/*"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@syncify/cli": "workspace:0.3.0-beta",
+    "@syncify/stylelint-config": "workspace:^",
+    "esbuild": "^0.19.5",
+    "sass": "^1.69.4",
+    "svgo": "^3.0.2"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/pnpm-lock.yaml": true
+  },
+  "json.schemas": [
+    {
+      "url": "https://unpkg.com/@syncify/schema/syncify.json",
+      "fileMatch": [
+        "package.json"
+      ],
+    }
+  ],
+  "[css]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  },
+  "[liquid]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "sissel.shopify-liquid"
+  }
+}

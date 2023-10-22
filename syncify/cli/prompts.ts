@@ -1,11 +1,15 @@
-import type { ArrayPromptOptions, Choice } from 'types/internal';
-import { TLD, Tree } from 'syncify:symbol';
-import * as c from 'syncify:colors';
+import type { Resource, Store } from 'types';
+import type { ArrayPromptOptions, Choice, BooleanPromptOptions } from 'types/internal';
+import { TLD, Tree, ARR } from 'syncify:symbol';
 import * as u from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { prompt } from 'enquirer';
+import { list } from 'syncify:requests/themes';
+import { isArray, ws } from 'syncify:utils';
+import { values } from 'syncify:native';
+import * as c from 'syncify:colors';
 
-const theme = {
+export const theme = {
   prefix: c.lightGray('│ '),
   styles: {
     primary: c.neonGreen,
@@ -31,10 +35,133 @@ const theme = {
     }
   },
   pointer (choice: Choice, index: number) {
-    const prefix = this.state.index === index ? Tree.stub : Tree.line;
-    return index === 0 ? Tree.after + prefix : prefix;
+    const prefix = this.state.index === index ? Tree.stub.trimEnd() + WSP : Tree.trim + WSP;
+    return index === 0 ? (Tree.trim + NWL + prefix) : prefix;
   }
 };
+
+export async function Connect (store: Store) {
+
+  let separator: number = 0;
+
+  const style = { ...theme };
+  const items = await list(store);
+  const themes = items.filter(({ role }) => role !== 'demo');
+  const space = ws(themes, 'name');
+  const choices = themes.map<Choice>((value) => {
+    if (value.name.length > separator) separator = value.name.length;
+    return {
+      name: value.name,
+      message: value.name,
+      hint: `${space(value.name)} ${TLD} ${c.gray(value.role)}`,
+      value
+    };
+  });
+
+  const { targets } = await prompt< { targets: Resource.Theme[] }>(<ArrayPromptOptions>{
+    name: 'targets',
+    type: 'select',
+    multiple: true,
+    message: 'Select Themes',
+    hint: 'Press spacebar to select',
+    theme: style,
+    choices,
+    result (names: string[]) {
+      return values(this.map(names));
+    },
+    format (value: string | string[]) {
+      if (isArray(value) && value.length > 0) {
+        return c.neonCyan(`${value.join(c.whiteBright(', '))}`);
+      }
+    }
+  });
+
+  const config = { domain: store.store.toLowerCase(), themes: {} };
+  const fields: any[] = [];
+
+  for (const theme of targets) {
+    config.themes['${' + theme.name + '}'] = theme.id;
+    fields.push({
+      name: theme.name,
+      message: theme.name,
+      validate (value: string, _: any, field: { name: string }) {
+
+        if (field && field.name === theme.name) {
+          if (/[A-Z]/.test(value)) {
+            return NWL + c.reset.redBright('  Target name must be lowercase');
+          } else if (/[0-9]/.test(value)) {
+            return NWL + c.reset.redBright('  Target name cannot contain numbers');
+          } else if (/[ ]/.test(value)) {
+            return NWL + c.reset.redBright('  Target name cannot contain spaces');
+          } else if (/-/.test(value)) {
+            return NWL + c.reset.redBright('  Target name cannot contain dashes');
+          }
+        }
+
+        return true;
+      }
+    });
+  }
+
+  style.styles.primary = c.neonCyan.italic;
+  style.styles.typing = c.neonGreen;
+  const template = JSON.stringify(config, null, 2);
+  const snippet = await prompt<{
+    stores: {
+      values: {
+        [name: string]: string
+      };
+      result: string;
+    }
+  }>(<any>{
+    name: 'stores',
+    type: 'snippet',
+    required: targets.map(({ name }) => name),
+    message: 'Theme Targets',
+    newline: NWL,
+    theme: style,
+    fields,
+    template,
+    format () {
+
+      if (this.state.submitted === true) {
+        if (this.state.completed !== 100) {
+          return c.neonGreen(`${this.state.completed}% completed`);
+        }
+      }
+
+      return ` ${ARR}  ${c.orange(`${this.state.completed}% completed`)}`;
+    }
+  });
+
+  const json = { syncify: JSON.parse(snippet.stores.result) };
+
+  const save = await prompt(<BooleanPromptOptions>{
+    name: 'save',
+    type: 'confirm',
+    message: 'Save Settings',
+    theme: style,
+    initial: true,
+    newline: NWL,
+    format () {
+      return /^[ty1]/i.test(this.input) ? 'Yes' : 'No';
+    },
+    footer: Tree.line + [
+      NIL,
+      c.gray('The following store and theme references will be saved'),
+      c.gray('to your package.json file on the syncify key property.'),
+      NIL,
+      JSON.stringify(json.syncify, null, 2)
+      .split(NWL)
+      .join(NWL + Tree.line),
+      NIL
+    ].join(NWL + Tree.line)
+
+  });
+
+  console.log(save);
+
+}
 
 /* -------------------------------------------- */
 /* PROMPTS                                      */
@@ -72,37 +199,37 @@ export async function Stores <T> (type: 'select' | 'multiselect'): Promise<T> {
 /**
  * Theme Targets
  */
-export async function Target <T> (domain: string): Promise<T> {
+export async function Target (domain: string): Promise<{ target: string }> {
 
   return prompt(<ArrayPromptOptions>{
     type: 'select',
-    name: 'resource',
+    name: 'target',
     message: 'Theme Resources',
     theme,
     choices: [
       {
         name: 'Connect',
-        hint: `Connect themes from ${domain}`,
+        hint: `     Connect themes from ${domain}`,
         value: 'connect'
       },
       {
         name: 'List',
-        hint: `List all themes from ${domain}`,
+        hint: `        List all themes from ${domain}`,
         value: 'list'
       },
       {
         name: 'Publish',
-        hint: `Publish theme on ${domain}`,
+        hint: `     Publish theme on ${domain}`,
         value: 'publish'
       },
       {
         name: 'Unpublish',
-        hint: `Unpublish theme on ${domain}`,
+        hint: `   Unpublish theme on ${domain}`,
         value: 'unpublish'
       },
       {
         name: 'Delete',
-        hint: `Delete theme on ${domain}`,
+        hint: `      Delete theme on ${domain}`,
         value: 'delete'
       }
     ]

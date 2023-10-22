@@ -18,7 +18,7 @@ import anymatch from 'anymatch';
 import merge from 'mergerino';
 import { pathExists } from 'fs-extra';
 import { CONFIG_FILE_EXT } from 'syncify:const';
-import { typeError, invalidError, warnOption, throwError } from 'syncify:log/throws';
+import { typeError, invalidError, warnOption, throwError, missingEnv } from 'syncify:log/throws';
 import { bundleRequire } from 'syncify:requests/require';
 import { lastPath, normalPath, globPath } from 'syncify:utils/paths';
 import { assign } from 'syncify:native';
@@ -68,7 +68,9 @@ export function getStoresFromEnv () {
 
   }
 
-  return stores;
+  if (stores.length > 0) return stores;
+
+  missingEnv($.cwd);
 
 }
 

@@ -1,6 +1,6 @@
 import { Tester } from 'anymatch';
 import { Merge } from 'type-fest';
-import { PageMetafield } from '../internal/requests';
+import { PageMetafield } from '../$/requests';
 
 /**
  * **Markdown > HTML**
@@ -117,7 +117,7 @@ export interface PagesConfig {
    *
    * @default 'html'
    */
-  importLanguage?: 'markdown' | 'html',
+  language?: 'markdown' | 'html',
   /**
    * Whether or not to use safe sync. When enabled, Syncify
    * will check remote sources before publishing. If local

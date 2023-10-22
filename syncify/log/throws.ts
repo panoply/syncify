@@ -172,6 +172,7 @@ export function invalidCommand ({
     .NL
     .Line('How to fix?', gray.bold)
     .Wrap(fix, gray)
+    .NL
     .End($.log.group)
     .BR
     .toString()
@@ -436,6 +437,44 @@ export function invalidError ({
     .End($.log.group)
     .BR
     .toString(red)
+  );
+
+  process.exit(0);
+
+};
+
+/**
+ * Missing Stores
+ *
+ * Throws when store references are missing within the `package.json` file.
+ */
+export function missingStores (cwd: string) {
+
+  error(
+    Create({ type: 'error' })
+    .Line(`${'MISSING REFERENCE'}`, bold)
+    .NL
+    .Line(`You have not provided any ${bold('stores')} within your ${cyan('package.json')} file.`)
+    .NL
+    .Line('How to fix?', white.bold)
+    .Line(`You need to provide ${cyan('stores')} via ${cyan('syncify')} key`, gray)
+    .Line('passing both your store name and a key > value list of theme targets.', gray)
+    .NL
+    .Line('{', gray)
+    .Line('  "syncify": {'.replace(/"/g, white('"')), gray)
+    .Line('    "stores": {'.replace(/"/g, white('"')), gray)
+    .Line(`      "domain": "${redBright('your-store')}"`.replace(/"/g, white('"')), gray)
+    .Line('      "themes": {}'.replace(/"/g, white('"')), gray)
+    .Line('    }', gray)
+    .Line('  }', gray)
+    .Line('}', gray)
+    .NL
+    .Line(`Replace the ${white('your-store')} with the name of your .myshopify domain.`, gray)
+    .Line('Syncify will prompt you and provide a list of theme targets to select from.', gray)
+    .NL
+    .End($.log.group)
+    .BR
+    .toString()
   );
 
   process.exit(0);
