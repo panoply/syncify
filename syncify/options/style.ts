@@ -62,7 +62,9 @@ export async function setStyleConfig () {
       ]);
     }
 
-    const pcss = await readConfigFile<PostCSSProcess>('postcss.config');
+    const pcss = await readConfigFile<PostCSSProcess>('postcss.config', {
+      tsconfig: null
+    });
 
     if (pcss !== null) {
       postcss.file = pcss.path;
@@ -127,6 +129,10 @@ export async function setStyleConfig () {
           );
         }
       }
+    } else {
+
+      bundle.postcss = postcss.installed;
+
     }
 
     if ((has('sass') && style.sass !== false) && sass.installed === true) {

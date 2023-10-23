@@ -145,26 +145,6 @@ export declare interface Resources {
 }
 
 /**
- * Syncify Utilities
- *
- * A couple  of utilities which are helpful when working
- * with external build tools or using Syncify within a script.
- */
-export namespace utils {
-
-  /**
-   * Conditional check of the current environment.
-   */
-  export function env(env: 'dev' | 'prod'): boolean
-
-  /**
-   * Condition check of the current running resource.
-   */
-  export function resource(resource: 'watch' | 'upload' | 'download'): boolean
-
-}
-
-/**
  * **Syncify**
  *
  * The function returns a function with parameter

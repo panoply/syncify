@@ -228,7 +228,8 @@ async function postcssProcess (file: File<StyleBundle>, css: string, map: any) {
 
     if ($.mode.watch) timer.start();
 
-    const plugins = u.isBoolean(file.data.postcss) ? $.processor.postcss.config : file.data.postcss;
+    const cfg = u.isBoolean(file.data.postcss) ? $.processor.postcss.config : file.data.postcss;
+    const plugins = u.isArray(cfg) ? cfg : cfg.plugins;
     const result = await postcss(plugins).process(css, {
       from: data.rename,
       to: data.rename,
@@ -249,7 +250,7 @@ async function postcssProcess (file: File<StyleBundle>, css: string, map: any) {
       }
     }
 
-    return result.toString();
+    return result.css.toString();
 
   } catch (e) {
 
@@ -310,8 +311,11 @@ export async function compile (file: File<StyleBundle>, cb: Syncify): Promise<st
       const post = await postcssProcess(file, out.css, out.map);
 
       if (post === null) return null;
+
       if (file.data.snippet) {
         return output(createSnippet(post, file.data.attrs));
+      } else {
+        return output(post);
       }
     }
 

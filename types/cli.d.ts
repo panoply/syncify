@@ -25,6 +25,12 @@ export interface Commands {
    * @default true
    */
   cli?: boolean;
+  /**
+   * Whether or not to run the syncify setup process
+   *
+   * @default false
+   */
+  setup?: boolean;
  /**
    * Whether or not syncify interactive command prompt
    *

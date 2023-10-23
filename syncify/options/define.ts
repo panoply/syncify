@@ -52,13 +52,15 @@ export async function define (cli: Commands, options?: Config) {
 
   log.runtime($);
 
-  await getEnvFile(cli.cwd);
+  await getEnvFile(cli);
   await getPackageJson(cli.cwd);
   await getConfig(cli);
   await getCache(cli);
 
   setMisc(cli);
   setModes(cli);
+
+  if ($.mode.setup) return;
 
   process.env.SYNCIFY_ENV = $.env.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String($.mode.watch);
@@ -302,7 +304,9 @@ async function getConfig (cli: Commands) {
 
       } else if (!has('stores', $.pkg.syncify)) {
 
-        missingConfig(cli.cwd);
+        if (cli.setup === false) {
+          missingConfig(cli.cwd);
+        }
 
       }
     }

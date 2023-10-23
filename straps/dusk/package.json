@@ -1,12 +1,12 @@
 {
   "name": "dusk",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
   "private": true,
   "scripts": {
     "dev": "sy -w --hot",
-    "build": "sy -b"
+    "build": "sy -b",
+    "zip": ""
   },
   "license": "MIT",
   "stylelint": {
@@ -21,16 +21,16 @@
     },
     "config": {
       "transform": {
+        "svg": {
+          "snippets/icon.[file]": "assets/icons/*.svg"
+        },
         "style": {
-          "assets/style": {
+          "assets/style.css": {
             "input": "assets/style.scss",
             "sass": {
               "style": "expanded"
             }
           }
-        },
-        "svg": {
-          "snippets/icon.[file]": "assets/icons/*"
         }
       }
     }

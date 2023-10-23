@@ -1,12 +1,12 @@
 import type { Resource, Store } from 'types';
-import type { ArrayPromptOptions, Choice, BooleanPromptOptions } from 'types/internal';
-import { TLD, Tree, ARR } from 'syncify:symbol';
+import type { ArrayPromptOptions, Choice, BooleanPromptOptions, StringPromptOptions } from 'types/internal';
+import { TLD, Tree, ARR, COL } from 'syncify:symbol';
 import * as u from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { prompt } from 'enquirer';
 import { list } from 'syncify:requests/themes';
 import { isArray, ws } from 'syncify:utils';
-import { values } from 'syncify:native';
+import { log, values } from 'syncify:native';
 import * as c from 'syncify:colors';
 
 export const theme = {
@@ -40,6 +40,10 @@ export const theme = {
   }
 };
 
+export async function Create () {
+
+}
+
 export async function Connect (store: Store) {
 
   let separator: number = 0;
@@ -57,6 +61,18 @@ export async function Connect (store: Store) {
       value
     };
   });
+
+  choices.push(
+    {
+      role: 'separator',
+      message: c.lightGray('─'.repeat(separator))
+    },
+    {
+      name: 'create',
+      message: 'Create Theme',
+      value: 'create'
+    }
+  );
 
   const { targets } = await prompt< { targets: Resource.Theme[] }>(<ArrayPromptOptions>{
     name: 'targets',

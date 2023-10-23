@@ -1,6 +1,6 @@
 import type { BundleRequire, BundleResolve } from 'types/internal';
 import { pathToFileURL } from 'node:url';
-import { readFile, unlink, writeFile, existsSync, readFileSync } from 'fs-extra';
+import { readFile, unlink, existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import { isAbsolute, dirname, extname, join, parse, resolve } from 'pathe';
 import { build, BuildResult, Plugin } from 'esbuild';
 import { has } from 'rambdax';
@@ -60,7 +60,7 @@ export type Loaded = {
   files: string[]
 }
 
-function getTSConfig (dir = process.cwd(), name = 'tsconfig.json', isExtends = false): Loaded | null {
+function getTSConfig (dir = $.cwd, name = 'tsconfig.json', isExtends = false): Loaded | null {
 
   dir = resolve(dir);
 
@@ -167,7 +167,7 @@ function isCommonJSorESM (inputFile: string): 'esm' | 'cjs' {
 
 function tsconfigPathsToRegExp (paths: Record<string, any>) {
 
-  return keys(paths || {}).map((key) => new RegExp(`^${key.replace(/\*/, '.*')}$`));
+  return paths === null ? null : keys(paths || {}).map((key) => new RegExp(`^${key.replace(/\*/, '.*')}$`));
 
 };
 
@@ -253,9 +253,9 @@ export async function bundleRequire<T = any> (options: BundleRequire): BundleRes
   }
 
   const preserveTemporaryFile = options.preserveTemporaryFile ?? !!process.env.BUNDLE_REQUIRE_PRESERVE;
-  const cwd = options.cwd;
+  const cwd = options.cwd || $.cwd;
   const format = options.format ?? isCommonJSorESM(options.filepath);
-  const tsc = loadTSConfig(cwd, options.tsconfig);
+  const tsc = options.tsconfig === null ? null : loadTSConfig(cwd, options.tsconfig);
   const resolvePaths = tsconfigPathsToRegExp(tsc?.data.compilerOptions?.paths || {});
 
   async function extractResult (result: BuildResult) {
@@ -266,20 +266,16 @@ export async function bundleRequire<T = any> (options: BundleRequire): BundleRes
 
     const { text } = result.outputFiles[0];
     const getOutputFile = options.getOutputFile || defaultGetOutputFile;
-    const outfile = getOutputFile(options.filepath, format);
+    const outfile = join($.dirs.cache, getOutputFile(options.filepath, format));
 
-    await writeFile(outfile, text, 'utf8');
+    writeFileSync(outfile, text, 'utf8');
 
     let mod: any;
+    const req = options.require || dynamicImport;
 
     try {
 
-      mod = await (
-        options.require ||
-        dynamicImport
-      )(format === 'esm'
-        ? pathToFileURL(outfile).href
-        : outfile, { format });
+      mod = await req(format === 'esm' ? pathToFileURL(outfile).href : outfile, { format });
 
     } finally {
 

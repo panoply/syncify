@@ -2,7 +2,7 @@
 
 import type { Merge, PackageJson } from 'type-fest';
 import type { Sections, Snippets } from './views';
-import type { HOTConfig } from '../bundle/hot';
+import type { HOTConfig } from '../$/hot';
 import type { ScriptTerse, JSONTerse, MarkupTerse, LiquidTerse } from './terser';
 import type { PluginHooks } from '../$/plugin';
 import type { JSONConfig } from '../transform/json';

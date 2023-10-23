@@ -20,7 +20,6 @@ import { fileSize, isUndefined, has, object, plural, isEmpty } from 'syncify:uti
 import { timer } from 'syncify:timer';
 import { $ } from 'syncify:state';
 import { saveCache } from 'syncify:process/cache';
-import { CHK } from 'syncify:symbol';
 import { Append, Create, CreateClosure, Prefix } from 'syncify:ansi';
 
 import * as c from 'syncify:colors';

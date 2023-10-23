@@ -64,8 +64,6 @@ export async function setHotReloads () {
     });
   }
 
-  const { hot } = $;
-
   if (isObject($.config.hot) && isEmpty($.config.hot) === false) {
 
     const has = hasProp($.hot);
@@ -79,7 +77,7 @@ export async function setHotReloads () {
       if (prop === 'label') {
 
         if ($.config.hot[prop] === 'visible' || $.config.hot[prop] === 'hidden') {
-          hot[prop] = $.config.hot[prop];
+          $.hot[prop] = $.config.hot[prop];
         } else {
           invalidError({
             option: 'hot',
@@ -92,7 +90,7 @@ export async function setHotReloads () {
       } else if (prop === 'strategy') {
 
         if ($.config.hot[prop] === 'hydrate' || $.config.hot[prop] === 'replace') {
-          hot[prop] = $.config.hot[prop];
+          $.hot[prop] = $.config.hot[prop];
         } else {
           invalidError({
             option: 'hot',
@@ -105,7 +103,7 @@ export async function setHotReloads () {
       } else if (prop === 'method') {
 
         if ($.config.hot[prop] === 'hot' || $.config.hot[prop] === 'refresh') {
-          hot[prop] = $.config.hot[prop];
+          $.hot[prop] = $.config.hot[prop];
         } else {
           invalidError({
             option: 'hot',
@@ -118,7 +116,7 @@ export async function setHotReloads () {
       } else if (prop === 'scroll') {
 
         if ($.config.hot[prop] === 'preserved' || $.config.hot[prop] === 'top') {
-          hot[prop] = $.config.hot[prop];
+          $.hot[prop] = $.config.hot[prop];
         } else {
           invalidError({
             option: 'hot',
@@ -129,9 +127,9 @@ export async function setHotReloads () {
 
         }
 
-      } else if (typeof hot[prop] === typeof $.config.hot[prop]) {
+      } else if (typeof $.hot[prop] === typeof $.config.hot[prop]) {
 
-        hot[prop] = $.config.hot[prop];
+        $.hot[prop] = $.config.hot[prop];
 
       } else {
 
@@ -139,7 +137,7 @@ export async function setHotReloads () {
           option: 'hot',
           name: prop,
           provided: $.config.hot[prop],
-          expects: typeof hot[prop]
+          expects: typeof $.hot[prop]
         });
 
       }
@@ -147,27 +145,27 @@ export async function setHotReloads () {
     }
   }
 
-  hot.snippet = join($.cwd, 'node_modules', '@syncify/cli', 'hot.js.liquid');
-  hot.output = join($.dirs.output, 'snippets', 'hot.js.liquid');
+  $.hot.snippet = join($.cwd, 'node_modules', '@syncify/cli', 'hot.js.liquid');
+  $.hot.output = join($.dirs.output, 'snippets', 'hot.js.liquid');
 
   const base = join($.dirs.output, 'layout');
 
-  for (const layout of hot.layouts) {
+  for (const layout of $.hot.layouts) {
     const path = join(base, layout);
-    hot.alive[path] = false;
+    $.hot.alive[path] = false;
     if (!$.cache.build.hotSnippet.includes(base)) $.cache.build.hotSnippet.push(base);
   }
 
-  hot.renderer = '{% render \'hot.js\'' + [
+  $.hot.renderer = '{% render \'hot.js\'' + [
 
     ''
-    , `server: ${hot.server}`
-    , `socket: ${hot.socket}`
-    , `strategy: "${hot.strategy}"`
-    , `scroll: "${hot.scroll}"`
-    , `label: "${hot.label}"`
-    , `history: "${hot.history}`
-    , `method: "${hot.method}"`
+    , `server: ${$.hot.server}`
+    , `socket: ${$.hot.socket}`
+    , `strategy: "${$.hot.strategy}"`
+    , `scroll: "${$.hot.scroll}"`
+    , `label: "${$.hot.label}"`
+    , `history: "${$.hot.history}`
+    , `method: "${$.hot.method}"`
 
   ].join(', ') + ' %}';
 

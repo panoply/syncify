@@ -40,27 +40,18 @@ export const defaults = (): Config => ({
     config: 'config/*.json',
     layout: 'layout/*.liquid',
     locales: 'locales/*.json',
-    snippets: 'snippets/*.liquid',
     metafields: 'metafields/**/*.json',
-    metaobject: 'templates/customers/*.json',
     redirects: 'redirects.yaml',
     schema: 'schema/*.json',
+    snippets: 'snippets/**/*.liquid',
+    metaobject: 'templates/metaobject/*',
     sections: [
       'sections/**/*.json',
       'sections/**/*.liquid'
     ],
-    pages: [
-      'pages/*.html',
-      'pages/*.md'
-    ],
-    templates: [
-      'templates/customers/*.liquid',
-      'templates/customers/*.json'
-    ],
-    customers: [
-      'templates/customers/*.liquid',
-      'templates/customers/*.json'
-    ]
+    pages: 'pages/*',
+    templates: 'templates/*',
+    customers: 'templates/customers/*'
   },
   views: {
     sections: {
@@ -76,7 +67,7 @@ export const defaults = (): Config => ({
     pages: {
       author: '',
       safeSync: true,
-      importLanguage: 'html',
+      language: 'html',
       suffixDir: false,
       global: []
     }

@@ -18,6 +18,7 @@ import { help } from 'syncify:log/help';
 import * as log from 'syncify:log';
 import { define } from './options/define';
 import { isString } from 'syncify:utils';
+import { setup } from 'syncify:modes/setup';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -34,6 +35,9 @@ export * from './api';
 export const env = {
   get dev () {
     return process.env.SYNCIFY_ENV === 'dev';
+  },
+  get terse () {
+    return $.cli.terse;
   },
   get prod () {
     return process.env.SYNCIFY_ENV === 'prod';
@@ -77,6 +81,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   /* THEMES                                       */
   /* -------------------------------------------- */
 
+  if ($.mode.setup) return setup();
   if ($.mode.themes) return themes();
 
   /* -------------------------------------------- */

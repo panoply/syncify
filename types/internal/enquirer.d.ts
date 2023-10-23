@@ -64,7 +64,7 @@ export interface Choice {
   /**
    * The unique key to identify a choice
    */
-  name: string;
+  name?: string;
   /**
    * The message to display in the terminal. `name` is used when this is undefined.
    */
@@ -102,6 +102,7 @@ export interface Choice {
    */
   indicator?: (string | ((state: any, choice: Choice)=> string))
 }
+
 
 export interface AutocompletePromptOptions extends BasePromptOptions {
 

@@ -22,6 +22,9 @@ export function setModes (cli: Commands) {
 
   $.mode = assign<Modes, Modes>($.mode, {
     watch,
+    dev: !cli.prod,
+    prod: cli.prod,
+    setup: cli.setup,
     hot: allTrue(cli.watch, cli.hot),
     interactive: cli.interactive,
     redirects: cli.redirects,

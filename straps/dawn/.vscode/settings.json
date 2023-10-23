@@ -1,0 +1,19 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    // "**/node_modules": true,
+    "**/pnpm-lock.yaml": true
+  },
+  "json.schemas": [
+    {
+      "url": "https://unpkg.com/@syncify/schema@0.2.2/syncify.json",
+      "fileMatch": [
+        "package.json"
+      ],
+    }
+  ],
+  "[liquid]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "sissel.shopify-liquid"
+  }
+}

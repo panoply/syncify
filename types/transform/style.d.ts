@@ -228,7 +228,7 @@ export type StyleTransformer = (
  *
  * PostCSS Processor Configuration
  */
-export type PostCSSProcesser = GetProcessorConfigs<PostCSSConfig[]>;
+export type PostCSSProcesser = GetProcessorConfigs<{ plugins: PostCSSConfig[] }>;
 
 /**
  * **INTERNAL USE**

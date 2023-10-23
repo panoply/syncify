@@ -56,9 +56,9 @@
     "build": "tsup --minify",
     "syncify": "dist/cli.js"
   },
-  "prettier": "@sissel/prettier-config",
+  "prettier": "@syncify/prettier-config",
   "eslintConfig": {
-    "extends": "@sissel/eslint-config",
+    "extends": "@syncify/eslint-config",
     "ignorePatterns": [
       "docs",
       "dist",
@@ -110,7 +110,7 @@
     "ws": "^8.14.2"
   },
   "devDependencies": {
-    "@liquify/schema": "^0.8.4",
+    "@liquify/schema": "^0.8.9",
     "@syncify/eslint-config": "workspace:^",
     "@syncify/prettier-config": "workspace:^",
     "@syncify/turndown": "workspace:^",
@@ -126,7 +126,7 @@
     "ava": "^5.3.1",
     "clean-stack": "^5.2.0",
     "esbuild": "^0.19.5",
-    "eslint": "^8.51.0",
+    "eslint": "^8.52.0",
     "log-update": "^5.0.1",
     "mergerino": "^0.4.0",
     "p-map": "^6.0.0",

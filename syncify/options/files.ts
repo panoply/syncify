@@ -1,4 +1,4 @@
-import type { Config, ENV, Tsconfig } from 'types';
+import type { Commands, Config, ENV, Tsconfig } from 'types';
 import dotenv from 'dotenv';
 import { join, relative, basename, extname } from 'pathe';
 import { pathExists, readFile, readJson, writeFile } from 'fs-extra';
@@ -205,9 +205,9 @@ export async function setPkgVersion (current: string, increment: string) {
  * `.env.syncify.json` file. This file can optionally
  * include credential information.
  */
-export async function getEnvFile (cwd: string): Promise<ENV.RCFile> {
+export async function getEnvFile (cli: Commands): Promise<ENV.RCFile> {
 
-  let path = join(cwd, '.env');
+  let path = join(cli.cwd, '.env');
 
   if (await pathExists(path)) {
 
@@ -223,7 +223,7 @@ export async function getEnvFile (cwd: string): Promise<ENV.RCFile> {
 
   } else {
 
-    path = join(cwd, 'syncify.env');
+    path = join(cli.cwd, 'syncify.env');
 
     if (await pathExists(path)) {
 
@@ -239,7 +239,9 @@ export async function getEnvFile (cwd: string): Promise<ENV.RCFile> {
 
     } else {
 
-      missingEnv(cwd);
+      if (cli.setup === false) {
+        missingEnv(cli.cwd);
+      }
 
     }
 

@@ -6,13 +6,13 @@
   },
   "json.schemas": [
     {
-      "url": "https://unpkg.com/@syncify/schema/syncify.json",
+      "url": "https://unpkg.com/@syncify/schema@0.2.0/syncify.json",
       "fileMatch": [
         "package.json"
       ],
     }
   ],
-  "[css]": {
+  "[scss]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "stylelint.vscode-stylelint"
   },

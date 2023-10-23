@@ -281,9 +281,12 @@ export const $ = new class Bundle {
   public mode: Type.Modes = object<Type.Modes>({
     build: false,
     interactive: false,
+    dev: true,
+    prod: false,
     watch: false,
     clean: false,
     cache: false,
+    setup: false,
     upload: false,
     import: false,
     metafields: false,

@@ -10,7 +10,7 @@ import type {
   StyleTransformer
 } from 'types';
 
-import type { Input, Transform } from 'types/internal';
+import type { BundleRequire, Input, Transform } from 'types/internal';
 import type { AxiosRequestConfig } from 'axios';
 import { basename, extname } from 'pathe';
 import glob from 'fast-glob';
@@ -597,10 +597,13 @@ export async function getConfigFilePath (filename: string): Promise<string> {
 /**
  * Read Config File
  *
- * Load the syncify config file for node projects.
+ * Loads config files for for node projects.
  * Supports loading config as es module or common js module,
  */
-export async function readConfigFile <T> (filename: string): Promise<{ config: T; path: string; }> {
+export async function readConfigFile <T> (filename: string, options?: Partial<BundleRequire>): Promise<{
+  config: T;
+  path: string;
+}> {
 
   try {
 
@@ -610,7 +613,8 @@ export async function readConfigFile <T> (filename: string): Promise<{ config: T
 
       const config = await bundleRequire({
         cwd: $.cwd,
-        filepath: path
+        filepath: path,
+        ...(options || {})
       });
 
       return {

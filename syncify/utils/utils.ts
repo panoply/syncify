@@ -3,6 +3,7 @@
 import { EventEmitter } from 'node:events';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
+import { writeFile, readFile } from 'fs-extra';
 import zlib from 'node:zlib';
 import strip from 'strip-json-comments';
 import { assign, create, toBuffer, toString } from './native';
@@ -274,6 +275,21 @@ export async function dynamicImport (id: string, { format }: { format: string })
 };
 
 /**
+ * Small helper for determining how an external dependency should
+ * be resolved, returning an import resolver.
+ *
+ * @param name The import pkg or path
+ */
+export function getImport <T> (name: string): T {
+
+  if (isFunction(require)) return require(name);
+
+  // @ts-expect-error
+  return createRequire(import.meta.url)(name);
+
+}
+
+/**
  * Infer JavaScript loader (used for esbuild related logic)
  *
  * @param ext The JS file extension, e.g: `.mjs`, `.js` etc
@@ -448,21 +464,6 @@ export function addSuffix (number: number): string {
     ? 'st'
     : (a === 2 && b !== 12) ? 'nd' : (a === 3 && b !== 13) ? 'rd' : 'th'
   );
-
-}
-
-/**
- * Small helper for determining how an external dependency should
- * be resolved, returning an import resolver.
- *
- * @param name The import pkg or path
- */
-export function getImport <T> (name: string): T {
-
-  if (isFunction(globalThis.require)) return globalThis.require(name);
-
-  // @ts-expect-error
-  return createRequire(import.meta.url)(name);
 
 }
 

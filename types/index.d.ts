@@ -36,6 +36,39 @@ export type * from './transform/style';
 export type * from './transform/svg';
 
 /**
+ * **Environment**
+ *
+ * Exposes the execution environment
+ *
+ * ---
+ *
+ * @example
+ *
+* import { env } from '@syncify/cli';
+*
+* console.log(env.dev) // true unless prod
+*
+*/
+export declare const env: {
+  /**
+   * Whether or not Syncify is running in developer mode, e.g: `--dev`
+   */
+  dev: boolean;
+  /**
+   * Whether or not Syncify is running in production mode, e.g: `--prod`
+   */
+  prod: boolean;
+  /**
+   * Whether or not Syncify is running in watch mode, e.g: `-w, --watch`
+   */
+  watch: boolean;
+  /**
+   * Whether or not Syncify is running in terse mode, e.g: `--terse`
+   */
+  terse: boolean;
+};
+
+/**
  * **State Bundle**
  *
  * Exposes the the execution bundle `$` model.

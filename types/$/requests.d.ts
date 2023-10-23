@@ -116,7 +116,29 @@ export interface PageMetafield {
   description?: string;
 }
 
+export type AccessScopes = LiteralUnion<
+  | 'read_files'
+  | 'write_files'
+  | 'write_online_store_pages'
+  | 'read_online_store_pages'
+  | 'write_content'
+  | 'read_content'
+  | 'write_themes'
+  | 'read_themes'
+, string>
+
 export namespace Resource {
+
+  /* -------------------------------------------- */
+  /* ACCESS SCOPES                                */
+  /* -------------------------------------------- */
+
+  export interface Access {
+    /**
+     * The Access Scope handle
+     */
+    handle: 'write_files'
+  }
 
   /* -------------------------------------------- */
   /* ASSET                                        */
@@ -658,6 +680,13 @@ export namespace DELETE {
 }
 
 interface RequestUrls {
+  access: {
+    GET: 'oauth/access_scopes.json',
+    LIST: never;
+    POST: never;
+    PUT: never;
+    DELETE: never;
+  }
   asset: {
     GET: `themes/${number}/assets.json`;
     LIST: `themes/${number}/assets.json`;
@@ -682,6 +711,13 @@ interface RequestUrls {
 }
 
 interface RequestData {
+  access: {
+    GET: never;
+    LIST: never;
+    PUT: never;
+    DELETE: never;
+    POST: never;
+  };
   page: {
     GET: never;
     LIST: never;
@@ -706,6 +742,13 @@ interface RequestData {
 }
 
 interface RequestParams {
+  access: {
+    GET: never;
+    LIST: never;
+    PUT: never;
+    DELETE: never;
+    POST: never;
+  };
   page: {
     GET: GET.PageParams
     LIST: LIST.PageParams;
@@ -732,6 +775,14 @@ interface RequestParams {
 export type RequestMethods = 'GET' | 'LIST' | 'PUT' | 'POST' | 'DELETE'
 
 export namespace Requests {
+
+  export type Access<M extends 'GET'> = AxiosRequestConfig<{
+    url?: LiteralUnion<RequestUrls['access'][M], string>;
+    method?: Lowercase<M>;
+    responseType?: 'json',
+    data?: RequestData['access'][M]
+    params?: RequestParams['access'][M]
+  }>
 
   export type Asset<M extends RequestMethods> = AxiosRequestConfig<{
     url?: LiteralUnion<RequestUrls['asset'][M], string>;
@@ -760,6 +811,16 @@ export namespace Requests {
 }
 
 export namespace Responses {
+
+  /* -------------------------------------------- */
+  /* ACCESS SCOPES                                */
+  /* -------------------------------------------- */
+
+  export type Access<T extends RequestMethods> = AxiosResponse<T extends 'GET' ? {
+    access_scopes: Resource.Access[]
+  } : {
+    asset: Resource.Asset
+  }, Requests.Asset<T>>
 
   /* -------------------------------------------- */
   /* ASSETS                                       */

@@ -207,38 +207,6 @@ export function parseFile (paths: PathBundle, output: string) {
         }
       }
 
-    } else if (paths.assets.match(path)) {
-
-      if ($.spawn.invoked) return define(Namespace.Assets, Type.Spawn);
-
-      switch (file.ext) {
-        case '.json':
-          return define(Namespace.Assets, Type.Asset, Kind.JSON);
-        case '.svg':
-          return define(Namespace.Assets, Type.Asset, Kind.SVG);
-        case '.css':
-          return define(Namespace.Assets, Type.Asset, Kind.CSS);
-        case '.ico':
-        case '.jpg':
-        case '.png':
-        case '.gif':
-        case '.webp':
-        case '.pjpg':
-          return define(Namespace.Assets, Type.Asset, Kind.Image);
-        case '.mov':
-        case '.mp4':
-        case '.webm':
-        case '.ogg':
-          return define(Namespace.Assets, Type.Asset, Kind.Video);
-        case '.pdf':
-          return define(Namespace.Assets, Type.Asset, Kind.PDF);
-        case '.eot':
-        case '.ttf':
-        case '.woff':
-        case '.woff2':
-          return define(Namespace.Assets, Type.Asset, Kind.Font);
-      }
-
     } else if (file.ext === '.schema' && paths.schema.match(path)) {
 
       return schema(fn, define(Namespace.Schema, Type.Schema, Kind.JSON));
@@ -287,6 +255,40 @@ export function parseFile (paths: PathBundle, output: string) {
         return define(Namespace.Pages, Type.Page, Kind.Markdown);
       case '.html':
         return define(Namespace.Pages, Type.Page, Kind.HTML);
+    }
+
+    if (paths.assets.match(path)) {
+
+      if ($.spawn.invoked) return define(Namespace.Assets, Type.Spawn);
+
+      switch (file.ext) {
+        case '.json':
+          return define(Namespace.Assets, Type.Asset, Kind.JSON);
+        case '.svg':
+          return define(Namespace.Assets, Type.Asset, Kind.SVG);
+        case '.css':
+          return define(Namespace.Assets, Type.Asset, Kind.CSS);
+        case '.ico':
+        case '.jpg':
+        case '.png':
+        case '.gif':
+        case '.webp':
+        case '.pjpg':
+          return define(Namespace.Assets, Type.Asset, Kind.Image);
+        case '.mov':
+        case '.mp4':
+        case '.webm':
+        case '.ogg':
+          return define(Namespace.Assets, Type.Asset, Kind.Video);
+        case '.pdf':
+          return define(Namespace.Assets, Type.Asset, Kind.PDF);
+        case '.eot':
+        case '.ttf':
+        case '.woff':
+        case '.woff2':
+          return define(Namespace.Assets, Type.Asset, Kind.Font);
+      }
+
     }
 
     return undefined;

@@ -349,6 +349,18 @@ export interface Modes {
    */
   interactive: boolean;
   /**
+   * Executed in dev mode, `--dev`
+   */
+  dev: boolean;
+ /**
+   * Executed in dev mode, `--prod`
+   */
+  prod: boolean;
+ /**
+   * Executed setup, `--setup`
+   */
+  setup: boolean;
+  /**
    * Execute a build, alias: `-b`
    */
   build: boolean;

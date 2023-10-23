@@ -48,6 +48,7 @@ run(mm(argv.slice(1), {
 
     /* MODES -------------------------------------- */
 
+    setup: false,
     import: false,
     export: false,
     build: false,
@@ -91,7 +92,6 @@ run(mm(argv.slice(1), {
 
     /* TODO --------------------------------------- */
 
-    setup: false,
     strap: false
   },
   boolean: [
@@ -106,6 +106,7 @@ run(mm(argv.slice(1), {
     'hot',
     'terse',
     'interactive',
+    'setup',
 
     /* ENV ---------------------------------------- */
 
