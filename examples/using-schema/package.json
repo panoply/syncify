@@ -1,0 +1,36 @@
+{
+  "name": "@syncify/using-schema",
+  "version": "0.1.0",
+  "description": "Syncify example usage with shared schema",
+  "private": true,
+  "license": "MIT",
+  "syncify": {
+    "stores": {
+      "domain": "syncify",
+      "themes": {
+        "dusk": 137200533745
+      }
+    },
+    "config": {
+      "paths": {
+        "config": "source/data/config/*.json",
+        "locales": "source/data/locales/*.json",
+        "layout": "source/theme.liquid"
+      },
+      "transform": {
+        "style": {
+          "assets/stylesheet": "source/assets/*.css"
+        },
+        "svg": {
+          "snippets/icon.[file]": {
+            "input": "source/assets/*.svg",
+            "format": "file"
+          }
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@syncify/cli": "workspace:0.3.0-beta"
+  }
+}

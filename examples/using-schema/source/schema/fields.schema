@@ -1,0 +1,377 @@
+{
+  "textarea": [
+    {
+      "type": "header",
+      "content": "Textarea Input",
+      "info": "Renders a Textarea container"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "info": "Defines the label of the textarea"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "info": "Describes an expected value for the textarea"
+    },
+    {
+      "type": "checkbox",
+      "id": "require",
+      "label": "Require",
+      "default": true,
+      "info": "Whether or input is required"
+    },
+    {
+      "type": "checkbox",
+      "id": "required",
+      "info": "The form requires this input to be filled",
+      "label": "Required"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Control layout and alignment of the grid system."
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Height",
+      "info": "The height of the textarea input",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "default": 25
+    },
+    {
+      "type": "header",
+      "content": "Gutter",
+      "info": "Control gutter spacing"
+    },
+    {
+      "type": "range",
+      "id": "mt",
+      "label": "Top",
+      "info": "The margin to apply from top",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mb",
+      "label": "Bottom",
+      "info": "The margin to apply from bottom",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "email": [
+    {
+      "type": "header",
+      "content": "E-mail Address",
+      "info": "An E-mail address input field to render in the form."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "info": "The placeholder (label) value",
+      "default": "Email Address"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "info": "Defines the name of the input field",
+      "default": "email"
+    },
+    {
+      "type": "checkbox",
+      "id": "autocomplete",
+      "label": "Autocomplete",
+      "default": false,
+      "info": "Whether or not to allow autocompletion"
+    },
+    {
+      "type": "checkbox",
+      "id": "required",
+      "label": "Required",
+      "default": true,
+      "info": "Whether or not the value is required"
+    },
+    {
+      "type": "checkbox",
+      "id": "multiple",
+      "label": "Multiple",
+      "default": false,
+      "info": "Whether to allow multiple emails be defined"
+    },
+    {
+      "type": "header",
+      "content": "Gutter",
+      "info": "Control gutter spacing"
+    },
+    {
+      "type": "range",
+      "id": "mt",
+      "label": "Top",
+      "info": "The margin to apply from top",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mb",
+      "label": "Bottom",
+      "info": "The margin to apply from bottom",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Control layout and alignment of the grid system"
+    },
+    {
+      "type": "range",
+      "id": "xl",
+      "label": "Desktop Columns",
+      "info": "The amount of columns in desktop",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "Tablet Columns",
+      "info": "The amount of columns in tablet",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "xs",
+      "label": "Mobile Columns",
+      "info": "The amount of columns in mobile",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    }
+  ],
+  "telephone": [
+    {
+      "type": "header",
+      "content": "Phone Number Field",
+      "info": "A telephone number input field to render in the form."
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "info": "Defines the name of the telephone field",
+      "default": "telephone"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "info": "Describes an expected value of the input"
+    },
+    {
+      "type": "checkbox",
+      "id": "autocomplete",
+      "label": "Autocomplete",
+      "default": false,
+      "info": "Whether or not to allow autocompletion"
+    },
+    {
+      "type": "checkbox",
+      "id": "code",
+      "label": "Country Code",
+      "default": false,
+      "info": "Whether or not to provide a country calling code"
+    },
+    {
+      "type": "checkbox",
+      "id": "require",
+      "label": "Require",
+      "default": false,
+      "info": "Whether or not the value is required"
+    },
+    {
+      "type": "header",
+      "content": "Gutter",
+      "info": "Control gutter spacing"
+    },
+    {
+      "type": "range",
+      "id": "mt",
+      "label": "Top",
+      "info": "The margin to apply from top",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mb",
+      "label": "Bottom",
+      "info": "The margin to apply from bottom",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Control layout and alignment of the grid system"
+    },
+    {
+      "type": "range",
+      "id": "xl",
+      "label": "Desktop Columns",
+      "info": "The amount of columns in desktop",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "Tablet Columns",
+      "info": "The amount of columns in tablet",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "xs",
+      "label": "Mobile Columns",
+      "info": "The amount of columns in mobile",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    }
+  ],
+  "number": [
+    {
+      "type": "header",
+      "content": "Number Input",
+      "info": "Renders a Numeric input field"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "info": "Defines the name of the number field"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "info": "The placeholder to render"
+    },
+    {
+      "type": "checkbox",
+      "id": "required",
+      "info": "The form requires this input to be filled",
+      "label": "Required"
+    },
+    {
+      "type": "header",
+      "content": "Gutter",
+      "info": "Control gutter spacing"
+    },
+    {
+      "type": "range",
+      "id": "mt",
+      "label": "Top",
+      "info": "The margin to apply from top",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mb",
+      "label": "Bottom",
+      "info": "The margin to apply from bottom",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "checkbox": [
+    {
+      "type": "header",
+      "content": "Checkbox Input",
+      "info": "Renders a traditional Checkout input field"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "info": "The Label to render atop of the input (optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "required",
+      "info": "The form requires this input to be filled",
+      "label": "Required"
+    },
+    {
+      "type": "checkbox",
+      "id": "validate",
+      "info": "Whether or not this input should be validated",
+      "label": "Validate"
+    },
+    {
+      "type": "header",
+      "content": "Gutter",
+      "info": "Control gutter spacing"
+    },
+    {
+      "type": "range",
+      "id": "mt",
+      "label": "Top",
+      "info": "The margin to apply from top",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mb",
+      "label": "Bottom",
+      "info": "The margin to apply from bottom",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    }
+  ]
+}

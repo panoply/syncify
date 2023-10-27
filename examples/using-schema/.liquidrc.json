@@ -1,0 +1,31 @@
+{
+  "engine": "shopify",
+  "files": {
+    "settings": "source/config/settings_schema.json",
+    "locales": "source/locales/en.default.json",
+    "schema": [
+      "source/schema/*.schema"
+    ],
+    "sections": [
+      "theme/sections/*.liquid"
+    ],
+    "snippets": [
+      "theme/snippets/*.liquid"
+    ]
+  },
+  "format": {
+    "ignore": [],
+    "liquid": {
+      "commentIndent": true,
+      "forceFilter": 3,
+      "forceArgument": 3,
+      "dedentTagList": [
+        "schema"
+      ]
+    },
+    "markup": {
+      "forceIndent": true,
+      "forceAttribute": 2
+    }
+  }
+}
