@@ -2,8 +2,6 @@
 
 Example usage of shared schema files in Syncify. Shared Schema allow you to isolate and re-use section schema in your themes. Shared Schema files use a `.schema` file extension and can be referenced (imported) into `{% schema %}` tags using a `$ref` key and `<file>.<prop>` reference.
 
-> It is highly recommended that you use the [VSCode Liquid](https://github.com/panoply/vscode-liquid) extension and take advantage of intelliSense capabilities for Shared Schema.
-
 <pre><code><strong>PASSWORD</strong>  →   <code>access</code>
 <strong>PREVIEW</strong>   →   <a href="https://syncify.myshopify.com?preview_theme_id=137588637937">https://syncify.myshopify.com?preview_theme_id=137588637937</a>
 </code></pre>
@@ -24,6 +22,9 @@ You can use this example as a starting point to your next project. Open up your 
 ```bash
 $ pnpx @syncify/strap --strap examples/using-schema
 ```
+
+> **Note**
+> It is highly recommended that you use the [VSCode Liquid](https://github.com/panoply/vscode-liquid) extension and take advantage of intelliSense capabilities for Shared Schema.
 
 # Overview
 
