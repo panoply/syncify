@@ -33,6 +33,12 @@
         "sass": true,
         "rename": "[file].min.[ext]"
       }
-    ]
+    ],
+    "svg": {
+      "snippets/icon.[file]": {
+        "input": "source/assets/icons/*.svg",
+        "format": "file"
+      }
+    }
   }
 }

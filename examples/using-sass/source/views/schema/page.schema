@@ -4,8 +4,15 @@
       "type": "text",
       "label": "Title",
       "id": "title",
-      "default": "Syncify",
+      "default": "Using Sass",
       "info": "An example section schema setting"
+    },
+    {
+      "type": "textarea",
+      "label": "Description",
+      "id": "description",
+      "info": "Description of this example",
+      "default": "This Syncify example is using SASS Transforms."
     },
     {
       "type": "text",

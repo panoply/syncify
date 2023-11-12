@@ -14,7 +14,9 @@
     ]
   },
   "format": {
-    "ignore": [],
+    "ignore": [
+      "theme/**/*"
+    ],
     "liquid": {
       "commentIndent": true,
       "forceFilter": 3,

@@ -17,6 +17,7 @@
       {{ settings.body_font | font_face }}
     </style>
 
+    {{ 'bootstrap.min.css' | asset_url | stylesheet_tag }}
     {{ 'stylesheet.min.css' | asset_url | stylesheet_tag }}
 
     {{ content_for_header }}
@@ -25,8 +26,12 @@
 
   <body>
 
-    {% render 'navbar' %}
-    {{ content_for_layout }}
+    <div class="container-fluid">
 
+      {% render 'navbar' %}
+
+      {{ content_for_layout }}
+
+    </div>
   </body>
 </html>

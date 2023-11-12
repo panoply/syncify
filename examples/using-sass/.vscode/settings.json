@@ -12,6 +12,15 @@
     "**/node_modules": true,
     "**/pnpm-lock.yaml": true
   },
+  "html-css-class-completion.includeGlobPattern": "theme/**/*.{css,liquid}",
+  "html-css-class-completion.CSSLanguages": [
+    "css"
+  ],
+  "html-css-class-completion.HTMLLanguages": [
+    "liquid",
+    "html",
+    "markdown"
+  ],
   "[liquid]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "sissel.shopify-liquid"

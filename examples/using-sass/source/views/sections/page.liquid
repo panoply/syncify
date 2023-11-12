@@ -1,17 +1,14 @@
-<div class="contain">
-
-  <a
-    href="{{ section.settings.url }}"
-    target="_blank"
-    class="logo">
-    {% render 'icon.logo' %}
-  </a>
-
-  <p class="text">
-    {{ section.settings.title }}
-  </p>
-
+<div class="row align-items-center justify-content-center border-top border-light-subtle">
+  <div class="col-auto text-center py-5 h-100">
+    <h4>
+      {{ section.settings.title }}
+    </h4>
+    <p>
+      {{ section.settings.description }}
+    </p>
+  </div>
 </div>
+
 
 {% schema %}
 {
