@@ -1,0 +1,26 @@
+<div class="flex items-center justify-center h-vh flex-col">
+
+  <a
+    href="{{ section.settings.url }}"
+    target="_blank"
+    class="logo">
+    {% render 'icon.logo' %}
+  </a>
+
+  <p class="font-mono uppercase pt-2 tracking-logo text-logo text-gray-300 font-semibold">
+    {{ section.settings.title }}
+  </p>
+
+</div>
+
+
+{% schema %}
+{
+  "name": "page",
+  "settings": [
+    {
+      "$ref": "page.example"
+    }
+  ]
+}
+{% endschema %}

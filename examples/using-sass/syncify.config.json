@@ -1,0 +1,38 @@
+{
+  "paths": {
+    "config": "data/config/*.json",
+    "locales": "data/locales/*.json",
+    "layout": "views/*.liquid",
+    "snippets": "views/snippets/**/*.liquid",
+    "schema": "views/schema/*.schema",
+    "sections": "views/sections/**/*.liquid",
+    "customers": "views/templates/liquid/customers/*.liquid",
+    "templates": [
+      "views/templates/json/*.json",
+      "views/templates/liquid/*.liquid"
+    ]
+  },
+  "transform": {
+    "script": {
+      "input": "source/assets/scripts/bundle.js",
+      "format": "iife",
+      "rename": "bundle.min.js"
+    },
+    "style": [
+      {
+        "input": "source/assets/styles/bootstrap.scss",
+        "rename": "bootstrap.min.[ext]",
+        "sass": {
+          "include": [
+            "node_modules/bootstrap"
+          ]
+        }
+      },
+      {
+        "input": "source/assets/styles/stylesheet.scss",
+        "sass": true,
+        "rename": "[file].min.[ext]"
+      }
+    ]
+  }
+}

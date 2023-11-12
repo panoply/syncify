@@ -1,0 +1,18 @@
+{
+  "example": [
+    {
+      "type": "text",
+      "label": "Title",
+      "id": "title",
+      "default": "Syncify",
+      "info": "An example section schema setting"
+    },
+    {
+      "type": "text",
+      "id": "url",
+      "label": "URL",
+      "default": "https://github.com/panoply/syncify",
+      "info": "The Github repository URL"
+    }
+  ]
+}

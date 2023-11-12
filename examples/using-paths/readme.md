@@ -2,6 +2,10 @@
 
 Example usage of custom directory architecture in Syncify. Using the `paths` configuration option, you can create custom structures according to your preference or project requirements.
 
+<pre><code><strong>PASSWORD</strong>  →   <code>access</code>
+<strong>PREVIEW</strong>   →   <a href="https://syncify.myshopify.com?preview_theme_id=137588605169">https://syncify.myshopify.com?preview_theme_id=137588605169</a>
+</code></pre>
+
 ### Showcasing
 
 - Preset VSCode Workspace

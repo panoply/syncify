@@ -1,0 +1,29 @@
+{
+  "name": "@syncify/using-tailwind",
+  "version": "0.1.0",
+  "description": "Syncify example usage with Tailwind",
+  "private": true,
+  "scripts": {
+    "dev": "sy -w",
+    "build": "sy -b",
+    "publish": ""
+  },
+  "license": "MIT",
+  "stylelint": {
+    "extends": "@syncify/stylelint-config"
+  },
+  "syncify": {
+    "stores": {
+      "domain": "syncify",
+      "themes": {
+        "dusk": 137200533745
+      }
+    }
+  },
+  "devDependencies": {
+    "@syncify/cli": "workspace:0.3.0-beta",
+    "@syncify/stylelint-config": "workspace:^",
+    "autoprefixer": "^10.4.16",
+    "tailwindcss": "^3.3.3"
+  }
+}

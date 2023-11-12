@@ -4,6 +4,10 @@ Example usage of shared schema files in Syncify. Shared Schema allow you to isol
 
 > It is highly recommended that you use the [VSCode Liquid](https://github.com/panoply/vscode-liquid) extension and take advantage of intelliSense capabilities for Shared Schema.
 
+<pre><code><strong>PASSWORD</strong>  →   <code>access</code>
+<strong>PREVIEW</strong>   →   <a href="https://syncify.myshopify.com?preview_theme_id=137588637937">https://syncify.myshopify.com?preview_theme_id=137588637937</a>
+</code></pre>
+
 ### Showcasing
 
 This example defines config within the projects `package.json` file. You can also define configuration within a `syncify.config.ts` file. The example showcases the below additional capabilities.
