@@ -468,7 +468,7 @@ declare global {
       const xhr = new XMLHttpRequest();
 
       xhr.responseType = type;
-      xhr.open('GET', uri);
+      xhr.open('GET', uri, true);
       xhr.setRequestHeader('X-Syncify-Hot-Request', 'true');
       xhr.onload = () => resolve(xhr.response);
       xhr.onerror = () => reject(xhr.statusText);
