@@ -7,7 +7,7 @@ import type { FSWatcher } from 'chokidar';
 import type { AxiosRequestConfig } from 'axios';
 import type { Config as TailwindProcessor } from 'tailwindcss';
 import type { ESBuildProcesser } from '../transform/script';
-import type { SASSProcesser, PostCSSProcesser } from '../transform/style';
+import type { SASSProcesser, PostCSSProcesser, TailwindCSSProcesser } from '../transform/style';
 import type { SVGOProcesser, SVGSpriteProcesser } from '../transform/svg';
 import type { JSONBundle } from '../transform/json';
 import type { SchemaBlocks, SchemaSettings } from '../internal/schema';
@@ -353,13 +353,17 @@ export interface Modes {
    */
   dev: boolean;
  /**
-   * Executed in dev mode, `--prod`
+   * Executed in prod mode, `--prod`
    */
   prod: boolean;
  /**
    * Executed setup, `--setup`
    */
   setup: boolean;
+  /**
+   * Executed in strap mode, `--strap`
+   */
+  strap: boolean;
   /**
    * Execute a build, alias: `-b`
    */
@@ -946,9 +950,7 @@ export interface LogBundle {
  * The file uri input path - The `Map` will hold
  * process identifier and a `Set` of stack messages.
  */
-interface Warnings {
-  [uri: string]: Map<string, Set<string>>
-}
+type Warnings = Map<string, Map<string, Set<string>>>
 
 /* -------------------------------------------- */
 /* PROCESSORS                                   */
@@ -976,7 +978,7 @@ export interface ProcessorsBundle {
   /**
    * [TailwindCSS](https://tailwindcss.com/) Pre-Processor
    */
-  tailwind?: TailwindProcessor;
+  tailwind?: TailwindCSSProcesser;
   /**
    * [Sharp](https://sharp.pixelplumbing.com) Pre-Processor
    */

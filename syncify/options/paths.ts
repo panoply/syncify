@@ -1,10 +1,10 @@
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
-import { dirname, join, relative } from 'pathe';
+import { dirname, join } from 'pathe';
 import { PATH_KEYS } from 'syncify:const';
 import { isArray, hasProp } from 'syncify:utils';
 import { lastPath, normalPath } from 'syncify:utils/paths';
-import { warnOption } from 'syncify:log/throws';
+// import { warnOption } from 'syncify:log/throws';
 import { $ } from 'syncify:state';
 
 /**
@@ -19,7 +19,7 @@ export async function setPaths () {
 
   // Path normalize,
   const path = normalPath($.dirs.input);
-  const warn = warnOption('Path Resolution');
+  // const warn = warnOption('Path Resolution');
   const has = hasProp($.config.paths);
 
   // iterate over the defined path mappings
@@ -33,7 +33,7 @@ export async function setPaths () {
         ? isArray($.config.paths[key])
           ? ($.config.paths[key] as string[]).map(path)
           : [ path($.config.paths[key]) ]
-        : [ path('templates/customers') ];
+        : [ path('templates/customers/*') ];
 
     } else if (key === 'metaobject') {
 
@@ -41,7 +41,15 @@ export async function setPaths () {
         ? isArray($.config.paths[key])
           ? ($.config.paths[key] as string[]).map(path)
           : [ path($.config.paths[key]) ]
-        : [ path('templates/metaobject') ];
+        : [ path('templates/metaobject/*') ];
+
+    } else if (key === 'schema') {
+
+      uri = has(key)
+        ? isArray($.config.paths[key])
+          ? ($.config.paths[key] as string[]).map(path)
+          : [ path($.config.paths[key]) ]
+        : [ path('schema/*') ];
 
     } else if (has(key)) {
 
@@ -87,7 +95,7 @@ export async function setPaths () {
 
           if (key === 'assets' && p === join($.dirs.output, 'assets/*')) continue;
 
-          warn('No files could be resolved in', relative($.cwd, p));
+          // warn('No files could be resolved in', relative($.cwd, p));
 
         } else {
 
@@ -112,6 +120,7 @@ export async function setPaths () {
       }
 
       $.paths[key].match = anymatch(uri);
+
     }
 
   }

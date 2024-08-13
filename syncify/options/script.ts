@@ -1,14 +1,12 @@
-import type { ESBuildConfig, ScriptBundle, ScriptTransform } from 'types';
+import type { ESBuildConfig, ESBuildOptions, ScriptBundle, ScriptTransform } from 'types';
 import { join } from 'pathe';
 import anymatch from 'anymatch';
-import merge from 'mergerino';
 import { omit } from 'rambdax';
 import { Namespace, Type } from 'syncify:file';
-import { getModules, readConfigFile, getResolvedPaths, getTransform, renameFile } from 'syncify:utils/options';
-import { esbuildModule, esbuildBundle } from 'syncify:transform/script';
-import { warnOption, missingDependency, invalidError, typeError, throwError } from 'syncify:log/throws';
+import { getResolvedPaths, getTransform, renameFile } from 'syncify:utils/options';
+import { esbuildBundle } from 'syncify:transform/script';
+import { warnOption, invalidError, typeError, errorRuntime } from 'syncify:log/throws';
 import * as u from 'syncify:utils';
-
 import { $ } from 'syncify:state';
 
 /**
@@ -24,53 +22,14 @@ export async function setScriptOptions () {
 
   const warn = warnOption('Script Transform');
 
-  const { esbuild } = $.processor;
-  const { script } = $.config.transform;
-
-  esbuild.installed = getModules($.pkg, 'esbuild');
-
-  if (esbuild.installed) {
-
-    const loaded = esbuildModule();
-
-    if (!loaded) {
-      throwError('failed to import ESBuild', [
-        'Ensure you have installed esbuild in your project'
-      ]);
-    }
-
-    /** External `esbuild.config.js` file  */
-    const esbuildConfigFile = await readConfigFile<ESBuildConfig>('esbuild.config');
-
-    if (esbuildConfigFile !== null) {
-      esbuild.file = esbuildConfigFile.path;
-      esbuild.config = merge(esbuild.config, esbuildConfigFile.config);
-    }
-
-  } else {
-
-    missingDependency('esbuild');
-
-  }
-
   // Lets ensure that no excluded esbuild options were provided
   // on the processor configuration object
-  if (u.has('entryPoints', esbuild.config)) {
+  if (u.has('entryPoints', $.processor.esbuild)) {
     warn('processor option is not allowed and was omitted', 'entryPoints');
-    delete esbuild.config.entryPoints;
+    delete $.processor.esbuild.entryPoints;
   }
 
-  // Provide tsconfig raw options
-  //
-  // const tsconfig = await getTSConfig($.cwd);
-  //
-  // defineProperty(esbuild, 'tsconfig', {
-  //   get () {
-  //     return tsconfig;
-  //   }
-  // });
-
-  const transforms = getTransform<ScriptTransform[]>(script, {
+  const transforms = getTransform<ScriptTransform[]>($.config.transform.script, {
     addWatch: false,
     flatten: true
   });
@@ -89,8 +48,8 @@ export async function setScriptOptions () {
     'snippet'
   ]);
 
-  if (!u.has('absWorkingDir', esbuild.config)) {
-    esbuild.config.absWorkingDir = $.cwd;
+  if (!u.has('absWorkingDir', $.processor.esbuild)) {
+    $.processor.esbuild.absWorkingDir = $.cwd;
   }
 
   for (const script of transforms) {
@@ -196,7 +155,7 @@ export async function setScriptOptions () {
     bundle.watchCustom = null;
     bundle.esbuild = null;
 
-    esbuild.config.outfile = bundle.output;
+    $.processor.esbuild.outfile = bundle.output;
 
     if ($.mode.watch) $.watch.unwatch(bundle.output);
 
@@ -204,9 +163,9 @@ export async function setScriptOptions () {
       if (u.isBoolean(script.esbuild) || u.isNil(script.esbuild)) {
 
         if (u.isEmpty(esbuildOptions)) {
-          bundle.esbuild = merge(esbuild.config);
+          bundle.esbuild = $.processor.esbuild as ESBuildOptions;
         } else {
-          bundle.esbuild = merge(esbuild.config, esbuildOptions);
+          bundle.esbuild = u.merge($.processor.esbuild, esbuildOptions);
         }
 
       } else if (u.isObject(script.esbuild)) {
@@ -234,14 +193,14 @@ export async function setScriptOptions () {
           }
         }
 
-        if (esProp('plugins') && u.has('plugins', esbuild.config)) {
-          script.esbuild.plugins.unshift(...esbuild.config.plugins);
+        if (esProp('plugins') && u.has('plugins', $.processor.esbuild)) {
+          script.esbuild.plugins.unshift(...$.processor.esbuild.plugins);
         }
 
         if (u.isEmpty(esbuildOptions)) {
-          bundle.esbuild = merge(esbuild.config, script.esbuild);
+          bundle.esbuild = u.merge<any>($.processor.esbuild, script.esbuild);
         } else {
-          bundle.esbuild = merge(esbuild.config, script.esbuild, esbuildOptions);
+          bundle.esbuild = u.merge($.processor.esbuild, script.esbuild, esbuildOptions);
         }
 
       } else {
@@ -255,9 +214,9 @@ export async function setScriptOptions () {
 
     } else {
       if (u.isEmpty(esbuildOptions)) {
-        bundle.esbuild = esbuild.config as ESBuildConfig;
+        bundle.esbuild = $.processor.esbuild as ESBuildConfig;
       } else {
-        bundle.esbuild = merge(esbuild.config, esbuildOptions);
+        bundle.esbuild = u.merge($.processor.esbuild, esbuildOptions);
       }
     }
 
@@ -298,19 +257,32 @@ export async function setScriptOptions () {
 
     } catch (e) {
 
-      // TODO - HANDLE RUNTIME ERRORS
-      throw new Error(e);
+      errorRuntime(e, {
+        message: [
+          'Syncify has failed to initialize due to a script prebuild error.',
+          'Script transforms execute runtime builds but the compile process did not complete.',
+          'This is typically due to invalid JavaScript syntax but may also be caused due to invalid',
+          'transform options being passed.'
+        ],
+        solution: [
+          'You will need to correct the error encountered. Alternatively you can skip Syncify',
+          'from applying the transform by excluding the file. '
+        ],
+        entries: {
+          processor: 'ESBuild'
+        }
+      });
 
     }
 
     if ($.mode.terse) {
-      bundle.esbuild = merge<any>(bundle.esbuild, $.terser.script, { exclude: undefined });
+      bundle.esbuild = u.merge<any>(bundle.esbuild, $.terser.script, {
+        exclude: undefined
+      });
     }
 
     $.script.push(bundle);
 
   }
-
-  esbuild.loaded = true;
 
 }

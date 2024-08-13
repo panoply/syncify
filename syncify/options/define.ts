@@ -1,5 +1,4 @@
 import type { Commands, Config } from 'types';
-import merge from 'mergerino';
 import { FSWatcher } from 'chokidar';
 import { missingConfig } from 'syncify:log/throws';
 import { configFile, getEnvFile, getPackageJson } from './files';
@@ -21,7 +20,7 @@ import { setTerserOptions } from './terser';
 import { setPageOptions } from './pages';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
-import { isArray, has, isObject, isEmpty, hasProp } from 'syncify:utils';
+import { isArray, has, isObject, isEmpty, hasProp, merge } from 'syncify:utils';
 import { toArray } from 'syncify:native';
 import { cacheDone, getCache } from '../process/cache';
 import { setPublishConfig } from './publish';
@@ -35,7 +34,7 @@ import { timer } from 'syncify:timer';
  */
 export async function configs (cli: Commands) {
 
-  await getPackageJson(cli.cwd);
+  await getPackageJson(cli);
   await getConfig(cli);
 
 }
@@ -53,14 +52,14 @@ export async function define (cli: Commands, options?: Config) {
   log.runtime($);
 
   await getEnvFile(cli);
-  await getPackageJson(cli.cwd);
+  await getPackageJson(cli);
   await getConfig(cli);
   await getCache(cli);
 
   setMisc(cli);
   setModes(cli);
 
-  if ($.mode.setup) return;
+  if ($.mode.setup || $.mode.strap) return;
 
   process.env.SYNCIFY_ENV = $.env.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String($.mode.watch);
@@ -102,12 +101,16 @@ export async function define (cli: Commands, options?: Config) {
 
   if (!$.mode.build) log.runtime.stores($);
 
+  await setSectionOptions();
+  await setScriptOptions();
+  await setSvgOptions();
+  await setStyleConfig();
+
+  setTerserOptions();
+
   const promise = await Promise.all(
     [
-      setSectionOptions(),
-      setScriptOptions(),
-      setStyleConfig(),
-      setSvgOptions(),
+
       setHotReloads(),
       cacheDone()
     ]
@@ -118,8 +121,6 @@ export async function define (cli: Commands, options?: Config) {
     });
 
   });
-
-  setTerserOptions();
 
   log.runtime.warnings($);
 
@@ -185,7 +186,7 @@ export function setChokidar (watch: boolean) {
     },
     paths: {
       get () {
-        return toArray($.watch.values());
+        return toArray(this._closers.keys());
       }
     },
     watching: {
@@ -213,7 +214,11 @@ function setProcessors () {
       if (isArray($.config.processors[prop])) {
         $.processor[prop].config = $.config.processors[prop];
       } else if (isObject($.config.processors[prop])) {
-        $.processor[prop].config = merge($.processor[prop].config, $.config.processors[prop]);
+        if (prop === 'esbuild') {
+          $.processor[prop] = merge($.processor[prop], $.config.processors[prop] as any);
+        } else {
+          $.processor[prop].config = merge($.processor[prop].config, $.config.processors[prop]);
+        }
       }
 
     }
@@ -304,7 +309,7 @@ async function getConfig (cli: Commands) {
 
       } else if (!has('stores', $.pkg.syncify)) {
 
-        if (cli.setup === false) {
+        if (cli.setup === false && cli.strap === null) {
           missingConfig(cli.cwd);
         }
 

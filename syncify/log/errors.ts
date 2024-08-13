@@ -349,7 +349,7 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
  */
 export function throws (e: any, entries: { [name: string]: string | number }) {
 
-  const context:{ stack: string | false; entries: { [name: string]: string | number; }; } = {
+  const context: { stack: string | false; entries: { [name: string]: string | number; }; } = {
     stack: false,
     entries: {
       ...entries
@@ -366,15 +366,26 @@ export function throws (e: any, entries: { [name: string]: string | number }) {
   if (has('code', e)) context.entries.code = e.code;
   if (has('name', e)) context.entries.name = e.name;
 
-  error(
-    glue(
-      Format(message, { type: 'error' }),
-      Context(context)
-    )
-  );
+  if (context.stack === false) {
 
-  if (context.stack === false) process.exit(0);
+    error(
+      glue(
+        Format(message, { type: 'error' }),
+        Context(context)
+      )
+    );
 
+    process.exit(0);
+
+  } else {
+
+    $.errors.add(
+      glue(
+        Format(message, { type: 'error' }),
+        Context(context)
+      )
+    );
+  }
 }
 
 /**

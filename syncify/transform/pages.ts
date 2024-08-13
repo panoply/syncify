@@ -5,7 +5,7 @@ import { readFile, writeFile } from 'fs-extra';
 import matter, { stringify } from 'gray-matter';
 import prompts from 'prompts';
 import markdown from 'markdown-it';
-import { Turndown, gfm } from '@syncify/turndown';
+import { Turndown, GithubFlavor } from '@syncify/turndown';
 import { File, Kind } from 'syncify:file';
 import { getPageMetafields } from 'syncify:process/metafields';
 import { lastPath } from 'syncify:utils/paths';
@@ -65,11 +65,9 @@ enum PromptActions {
  */
 export function toMarkdown (content: string) {
 
-  const td = new Turndown($.page.import);
-
-  td.use(gfm);
-
-  return td.turndown(content);
+  return new Turndown($.page.import)
+  .use(GithubFlavor)
+  .turndown(content);
 
 }
 
@@ -484,7 +482,7 @@ export async function compile (file: File, _cb: Syncify) {
 
         let convert: string = remote.body_html;
 
-        if ($.page.importLanguage === 'markdown') {
+        if ($.page.language === 'markdown') {
           const markdown = toMarkdown(convert);
           log.transform(`${file.name}.html ${ARR} ${file.base}`);
           convert = stringify('\n' + markdown, frontmatter.data);

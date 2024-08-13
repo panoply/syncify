@@ -3,7 +3,7 @@ import { join, dirname, resolve } from 'pathe';
 import { COL } from 'syncify:symbol';
 import { yellowBright } from 'syncify:colors';
 import { throwError } from 'syncify:log/throws';
-import { isArray } from './utils';
+import { isArray } from 'syncify:utils';
 
 /**
  * Generate File Path
@@ -47,7 +47,6 @@ export function globPath <T extends string | string[]> (path: T): T {
  * the path does not not contain forward slashes it
  * returns the passed string.
  *
- * @see https://regex101.com/r/lrnhEe/1
  * @example
  *
  * // File name is excluded
@@ -61,7 +60,7 @@ export function lastPath (path: string | string[]) {
   if (isArray(path)) return path.map(lastPath);
   if (path.indexOf('/') === -1) return path;
 
-  const dir = dirname(path);
+  const dir = path.endsWith('/') ? dirname(path.slice(0, -1)) : dirname(path);
   const ender = dir.lastIndexOf('/') + 1;
 
   return dir.slice(ender);
@@ -102,15 +101,21 @@ export function parentPath (path: string | string[]) {
  * who accepts a string or array of strings. Paths will include
  * the directory `input` folder name.
  *
+ * When passing a `cwd` then input path will check `startsWith`
+ * this is used in transform paths to ensure correct resolution
+ *
  * @example
  *
  * // basic usage
  * normalPath('input')('/some/path') => 'input/some/path'
  *
+ * // handles input repeats
+ * normalPath('input')('/some/path/input') => 'input/some/path'
+ *
  * // handles ignores
  * normalPath('input')('!ignore') => '!input/ignore'
  */
-export function normalPath (input: string) {
+export function normalPath (input: string, cwd = null) {
 
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
 
@@ -134,7 +139,12 @@ export function normalPath (input: string) {
       );
     }
 
-    return (ignore ? '!' : '') + join(input, path);
+    if (cwd !== null) {
+      const exists = join(cwd, path);
+      return (ignore ? '!' : '') + (exists.startsWith(input) ? exists : join(input, path));
+    } else {
+      return (ignore ? '!' : '') + join(input, path);
+    }
 
   };
 };

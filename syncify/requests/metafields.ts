@@ -1,7 +1,7 @@
+import { Config, Store, Requests } from 'types';
 import { allFalse, has } from 'rambdax';
 import axios, { AxiosError } from 'axios';
 import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
-import { Config, Store, Requests } from 'types';
 import { join } from 'pathe';
 import prompts from 'prompts';
 import { assign } from 'syncify:utils/native';
@@ -19,7 +19,7 @@ import { $, Bundle } from 'syncify:state';
  */
 function write (config: Config) {
 
-  const base = join($.cwd, config.metafields);
+  const base = join($.cwd, config.paths.metafields);
   const { indent } = $.json;
 
   return async (field: { dir: string; key: string; data: object; name: string; }) => {
@@ -173,7 +173,7 @@ export async function list <T extends { metafields: Requests.Metafield[] }> (sto
     if (requeue(e.response.status)) {
       queue.add(() => list(store));
     } else {
-      return error(store.store, e.response);
+      return error.request(store.store, e.response);
     }
 
   });
@@ -196,12 +196,12 @@ export async function get <T extends { metafields: Requests.Metafield[] }> (stor
 
   }).catch((e: AxiosError) => {
 
-    if (!store.queue) return error(store.store, e.response);
+    if (!store.queue) return error.request(store.store, e.response);
 
     if (requeue(e.response.status)) {
       queue.add(() => get(store, id));
     } else {
-      return error(store.store, e.response);
+      return error.request(store.store, e.response);
     }
 
   });
@@ -223,12 +223,12 @@ export async function remove <T extends { metafields: Requests.IMetafield[] }> (
 
   }).catch((e: AxiosError) => {
 
-    if (!store.queue) return error(store.store, e.response);
+    if (!store.queue) return error.request(store.store, e.response);
 
     if (requeue(e.response.status)) {
       queue.add(() => remove(store, id));
     } else {
-      return error(store.store, e.response);
+      return error.request(store.store, e.response);
     }
 
   });
@@ -243,7 +243,7 @@ export async function remove <T extends { metafields: Requests.IMetafield[] }> (
  */
 export async function find <T extends Requests.IMetafield> (store: Store, field?: Requests.IMetafield) {
 
-  if (is(arguments.length, 1)) return (_field: Requests.IMetafield) => find(store, _field);
+  if (arguments.length === 1) return (_field: Requests.IMetafield) => find(store, _field);
 
   if (allFalse(has('namespace', field), has('key', field))) {
     log.invalid('invalid fields');
@@ -273,7 +273,7 @@ export async function find <T extends Requests.IMetafield> (store: Store, field?
  */
 export async function create <T extends Requests.Metafield> (store: Store, metafield?: T) {
 
-  if (is(arguments.length, 1)) return (_metafield: Requests.Metafield) => create(store, _metafield);
+  if (arguments.length === 1) return (_metafield: Requests.Metafield) => create(store, _metafield);
 
   metafield.type = 'json';
   metafield.namespace = 'email';
@@ -289,13 +289,13 @@ export async function create <T extends Requests.Metafield> (store: Store, metaf
   }).catch(e => {
 
     console.log(e);
-    if (!store.queue) return error(metafield.namespace, e.response);
+    if (!store.queue) return error.request(metafield.namespace, e.response);
 
     if (requeue(e.response.status)) {
       queue.add(() => create(store, metafield));
       return undefined;
     } else {
-      return error(store.store, e.response);
+      return error.request(store.store, e.response);
     }
 
   });
@@ -319,12 +319,12 @@ export async function update <T extends Requests.Metafield> (store: Store, id?: 
 
   }).catch(e => {
 
-    if (!store.queue) return error(metafield.namespace, e.response);
+    if (!store.queue) return error.request(metafield.namespace, e.response);
 
     if (requeue(e.response.status)) {
       queue.add(() => update(store, id, metafield));
     } else {
-      return error(store.store, e.response);
+      return error.request(store.store, e.response);
     }
 
   });
@@ -347,12 +347,12 @@ export async function sync (store: Store, field?: Requests.Metafield) {
 
   return update(store, data.id, assign(field, { id: data.id, type: 'json' })).catch(e => {
 
-    if (!store.queue) return error(field.namespace, e.response);
+    if (!store.queue) return error.request(field.namespace, e.response);
 
     if (requeue(e.response.status)) {
       queue.add(() => sync(store, field));
     } else {
-      return error(store.store, e.response);
+      return error.request(store.store, e.response);
     }
   });
 

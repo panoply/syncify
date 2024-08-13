@@ -130,10 +130,10 @@ export async function getTSConfig (cwd: string): Promise<Tsconfig> {
  * module requires the existence of a `package.json` file. This
  * function will also assign `$.stores[]` reference.
  */
-export async function getPackageJson (cwd: string) {
+export async function getPackageJson (cli: Commands) {
 
   // Save path reference of package
-  const uri = join(cwd, 'package.json');
+  const uri = join(cli.cwd, 'package.json');
   const has = await pathExists(uri);
 
   if (!has) throw new Error('Missing "package.json" file');
@@ -143,13 +143,19 @@ export async function getPackageJson (cwd: string) {
     $.pkg = await readJson(uri);
 
     if (hasPath('syncify.stores', $.pkg)) {
+
       if (isArray($.pkg.syncify.stores)) {
         $.stores = $.pkg.syncify.stores;
       } else if (isObject($.pkg.syncify.stores) && isEmpty($.pkg.syncify.stores) === false) {
         $.stores = [ $.pkg.syncify.stores ];
       }
+
     } else {
-      missingStores(cwd);
+
+      if (cli.strap === null) {
+        missingStores(cli.cwd);
+      }
+
     }
 
   } catch (e) {
@@ -181,7 +187,7 @@ export async function setPkgVersion (current: string, increment: string) {
     if (num === current) {
 
       await writeFile(uri, `${str.slice(0, sqo)}${increment}${str.slice(eqo)}`);
-      await getPackageJson($.cwd);
+      await getPackageJson($.cli);
 
       return true;
 
@@ -239,7 +245,7 @@ export async function getEnvFile (cli: Commands): Promise<ENV.RCFile> {
 
     } else {
 
-      if (cli.setup === false) {
+      if (cli.setup === false && cli.strap === null) {
         missingEnv(cli.cwd);
       }
 

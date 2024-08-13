@@ -7,7 +7,7 @@ import { authURL, getStoresFromEnv } from 'syncify:utils/options';
 import { keys } from 'syncify:native';
 import { has } from 'syncify:utils';
 import { $ } from 'syncify:state';
-import { Connect, Target } from 'syncify:cli/prompts';
+import { Connect } from 'syncify:cli/prompts';
 
 /**
  * Set Sync
@@ -129,7 +129,7 @@ export async function setSync (cli: Commands) {
 
       }
 
-      // Let populate the model with theme
+      // Lets populate the model with theme
       $.sync.themes.push({
         target,
         sidx,

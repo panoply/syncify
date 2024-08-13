@@ -30,3 +30,8 @@ tsup.config.ts
 
 readme.md
 changelog.md
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

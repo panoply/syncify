@@ -19,6 +19,7 @@ import * as log from 'syncify:log';
 import { define } from './options/define';
 import { isString } from 'syncify:utils';
 import { setup } from 'syncify:modes/setup';
+import { strap } from 'syncify:modes/strap';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -82,6 +83,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   /* -------------------------------------------- */
 
   if ($.mode.setup) return setup();
+  if ($.mode.strap) return strap();
   if ($.mode.themes) return themes();
 
   /* -------------------------------------------- */

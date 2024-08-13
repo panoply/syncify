@@ -101,7 +101,7 @@ export function renameFile ({ name, dir, ext, namespace }: File, rename: string)
 }
 
 /**
- * Path setter for in-process file handling. Returns a an object with important
+ * Path setter for in-process file handling. Returns an object with important
  * information about the current file being processed.
  *
  * @param file The parsed file context information
@@ -158,7 +158,7 @@ export function setImportFile (parsedFile: Partial<File>, output: string) {
 
   const file = <File>parsedFile;
 
-  return <T extends unknown>(key: string, namespace: Namespace): File<T> => {
+  return (key: string, namespace: Namespace): File => {
 
     return assign({}, file, {
       uuid: uuid(),
@@ -171,6 +171,13 @@ export function setImportFile (parsedFile: Partial<File>, output: string) {
 
   };
 }
+
+export function parseFileQuick <T> (path: string): File<T> {
+
+  return <File<T>> parseFile($.paths, $.dirs.output)(path);
+
+}
+
 /**
  * Parses the filename and returns a workable object that we will pass
  * into requests and transforms. The function returns file context
@@ -196,7 +203,7 @@ export function parseFile (paths: PathBundle, output: string) {
       } else if (paths.layout.match(path)) {
         return define(Namespace.Layout, Type.Layout, Kind.Liquid);
       } else if (paths.templates.match(path)) {
-        return define(Namespace.Layout, Type.Template, Kind.Liquid);
+        return define(Namespace.Templates, Type.Template, Kind.Liquid);
       } else if (paths.customers.match(path)) {
         return define(Namespace.Customers, Type.Template, Kind.Liquid);
       } else if (paths.metaobject.match(path)) {

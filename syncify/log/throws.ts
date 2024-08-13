@@ -547,6 +547,52 @@ export function missingEnv (cwd: string) {
  *
  * Throws an error when an unknown config option  was provided.
  */
+export function errorRuntime (e: any, options: {
+  message: string | string[];
+  solution: string | string[]
+  entries: {
+    [name: string]: string | number;
+  }
+}) {
+
+  const message: string = e instanceof Error
+    ? has('message', e)
+      ? e.message
+      : e.toString()
+    : e;
+
+  if (has('code', e)) options.entries.code = e.code;
+  if (has('name', e)) options.entries.name = e.name;
+
+  error(
+    Create({ type: 'error' })
+    .Line('ERROR', bold)
+    .NL
+    .Wrap(options.message, redBright)
+    .NL
+    .Wrap(message, redBright.bold)
+    .NL
+    .Line('How to fix?', gray.bold)
+    .Wrap(options.solution, gray)
+    .NL
+    .Context({
+      entries: options.entries
+    })
+    .NL
+    .End($.log.group)
+    .BR
+    .toString()
+  );
+
+  process.exit(0);
+
+};
+
+/**
+ * Unknown Option
+ *
+ * Throws an error when an unknown config option  was provided.
+ */
 export function throwError (message: string | string, solution: string[]) {
 
   error(

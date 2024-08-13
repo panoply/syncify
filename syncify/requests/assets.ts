@@ -8,7 +8,7 @@ import { pMapSkip } from 'p-map';
 import { Type } from 'syncify:file';
 import { queue, axios } from 'syncify:requests/queue';
 import { timer } from 'syncify:timer';
-import { event } from 'syncify:utils';
+import { event } from 'syncify:native';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';

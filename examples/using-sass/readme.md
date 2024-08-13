@@ -1,6 +1,6 @@
 # Syncify using SASS
 
-Example usage of SASS Transforms with Syncify. This repository showcases how developers can process `.scss` files using Syncify **style** transforms. This example also applies some customizations and take advantage of additional features that Syncify offers.
+Example usage of SASS Transforms with Syncify. This repository showcases how developers can process `.scss` files using Syncify **style** transforms. This example also applies some customizations and takes advantage of additional features that Syncify offers.
 
 <pre><code><strong>PASSWORD</strong>  →   <code>access</code>
 <strong>PREVIEW</strong>   →   <a href="https://syncify.myshopify.com?preview_theme_id=137588506865">https://syncify.myshopify.com?preview_theme_id=137588506865</a>

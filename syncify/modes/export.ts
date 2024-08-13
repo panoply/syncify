@@ -8,7 +8,7 @@ import { build } from './build';
 import { timer } from 'syncify:timer';
 import { THEME_DIRS } from 'syncify:const';
 import { toBuffer } from 'syncify:native';
-import { byteSize, getSizeStr } from 'syncify:utils';
+import { byteSize, stringSize } from 'syncify:sizes';
 import { hasTemplateMismatch, isEmptyOutputDir, Mismatch } from 'syncify:process/validate';
 import { setPkgVersion } from 'syncify:options/files';
 import { saveCache } from 'syncify:process/cache';
@@ -97,7 +97,7 @@ export async function exporting (cb?: Syncify): Promise<void> {
     if (!(await pathExists($.vc.update.dir))) await mkdir($.vc.update.dir);
 
     log.version($.vc, 'bump');
-    log.zipped(getSizeStr(size), relative($.cwd, $.vc.update.zip));
+    log.zipped(stringSize(size), relative($.cwd, $.vc.update.zip));
 
     try {
 
@@ -123,7 +123,7 @@ export async function exporting (cb?: Syncify): Promise<void> {
       log.version($.vc, 'overwrite');
     }
 
-    log.zipped(getSizeStr(size), relative($.cwd, $.vc.zip));
+    log.zipped(stringSize(size), relative($.cwd, $.vc.zip));
 
     try {
 

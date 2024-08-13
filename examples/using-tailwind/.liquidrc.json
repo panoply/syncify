@@ -25,7 +25,8 @@
     },
     "markup": {
       "forceIndent": true,
-      "forceAttribute": 2
+      "forceAttribute": 2,
+      "ignoreJS": true
     }
   }
 }

@@ -3,7 +3,7 @@ import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Tsconfig } from 'tsconfig-type';
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
-import type { GetProcessorConfigs, RenamePaths } from '../shared';
+import type { GetProcessorConfigFile, GetProcessorConfigs, RenamePaths } from '../shared';
 
 type TargetBrowser = (
   | 'chrome'
@@ -277,7 +277,7 @@ export type ScriptTransformer = (
  *
  * Processor Configuration
  */
-export type ESBuildProcesser = Merge<GetProcessorConfigs<ESBuildOptions>, {
+export type ESBuildProcesser = Merge<ESBuildOptions, {
   /**
    * Despite the name, this getter represents both
    * `tsconfig.json` or `jsconfig.json` files.

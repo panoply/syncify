@@ -1,4 +1,3 @@
-import type { ClientParam, Syncify } from 'types';
 import type {
   BlockSingleton,
   BlockSpread,
@@ -10,6 +9,7 @@ import type {
   SettingsSpread,
   SharedSchema
 } from 'types/internal';
+import type { ClientParam, Syncify } from 'types';
 import pMap from 'p-map';
 import { readFile } from 'fs-extra';
 import parseJSON, { JSONError } from 'parse-json';
@@ -23,6 +23,7 @@ import { $ } from 'syncify:state';
 import { hasProp, plural, has, isArray, isObject, glue, checksum } from 'syncify:utils';
 import { bold } from 'syncify:colors';
 import { minifySchema } from '../terser/liquid';
+import { ARR } from 'syncify:symbol';
 
 export function HasSchemaTag (content: string) {
 
@@ -57,7 +58,7 @@ export function HasSchemaTag (content: string) {
  * [
  *  before, // Content up until end of opening {% schema %} tag
  *  schema, // The parsed JSON schema within, if null no schema exists
- *  after?,  // Content from and after the opening {% endschem %} tag
+ *  after?,  // Content from and after the opening {% endschema %} tag
  * ]
  *
  */
@@ -106,7 +107,7 @@ export async function ExtractSchema (file: File): Promise<[
     log.error(file.relative, {
       notify: {
         title: 'JSON Error',
-        message: `Error when parsing ${file.base}`
+        message: `Error when parsing ${file.base} in ExtractSchema`
       }
     });
 
@@ -155,11 +156,13 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
           settings.push(...(shared.schema[prop] as SettingsSpread));
 
         } else if (isObject(shared.schema[prop])) {
+
           if (has('settings', shared.schema[prop])) {
 
             // Settings Group Shared Schema
             //
             settings.push(...(shared.schema[prop] as SettingsGroup).settings);
+
           } else {
 
             // Settings Singleton
@@ -169,26 +172,39 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
         }
 
       } else {
+
         if ($.mode.build) {
+
           warn.schema(file, {
             shared: shared.uri,
             $ref: schema[i].$ref,
-            message: 'unknown schema key',
-            schema: 'settings'
+            schema: 'settings',
+            message: [
+              `An unknown Shared Schema reference key of ${bold(schema[i].$ref)} was provided.`,
+              `There is no such key ${bold(prop)} within the shared schema.`
+            ]
           });
+
         } else {
           log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
         }
       }
 
     } else {
+
       if ($.mode.build) {
+
         warn.schema(file, {
           shared: prop,
           $ref: schema[i].$ref,
-          message: 'unknown schema',
-          schema: 'settings'
+          schema: 'settings',
+          message: [
+            `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
+            `to ${bold('settings')} within section file ${bold(file.base)}. There is no known shared`,
+            'schema file using that name.'
+          ]
         });
+
       } else {
         log.warn(`unknown $ref ${bold(schema[i].$ref)} `, file.base);
       }
@@ -242,25 +258,38 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
         } else {
 
           if ($.mode.build) {
+
             warn.schema(file, {
-              shared: shared.uri,
+              shared: prop,
               $ref: schema[i].$ref,
-              message: 'unknown schema key',
-              schema: 'blocks'
+              schema: 'blocks',
+              message: [
+                `An unknown Shared Schema key reference of ${bold(schema[i].$ref)} was provided`,
+                `to the ${bold('blocks')} within section file ${bold(file.base)}. The shared schema`,
+                `file exists, but the key ${bold(prop)} does not.`
+              ]
             });
+
           } else {
             log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
           }
 
         }
       } else {
+
         if ($.mode.build) {
+
           warn.schema(file, {
-            shared: key,
+            shared: prop,
             $ref: schema[i].$ref,
-            message: 'unknown schema',
-            schema: 'settings'
+            schema: 'blocks',
+            message: [
+              `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
+              `to ${bold('blocks')} within section file ${bold(file.base)}. There is no known shared`,
+              'schema file using that name.'
+            ]
           });
+
         } else {
           log.warn(`unknown $ref ${bold(schema[i].$ref)} `, file.base);
         }
@@ -313,12 +342,18 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
               } else {
                 if ($.mode.build) {
+
                   warn.schema(file, {
-                    shared: shared.uri,
-                    $ref: setting.$ref,
-                    message: 'unknown schema key',
-                    schema: 'blocks'
+                    shared: prop,
+                    $ref: schema[i].$ref,
+                    schema: `blocks ${ARR} settings`,
+                    message: [
+                      `An unknown Shared Schema key reference of ${bold(schema[i].$ref)} was provided`,
+                      `to the ${bold('blocks')} schema id ${bold(setting.id)} within section file`,
+                      `${bold(file.base)}. The shared schema file exists, but the key ${bold(prop)} does not.`
+                    ]
                   });
+
                 } else {
                   log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
                 }
@@ -326,12 +361,19 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
             } else {
               if ($.mode.build) {
+
                 warn.schema(file, {
                   shared: prop,
-                  $ref: setting.$ref,
-                  message: 'unknown schema',
-                  schema: 'blocks'
+                  $ref: schema[i].$ref,
+                  schema: `blocks ${ARR} settings`,
+                  message: [
+                    `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
+                    `to ${bold('blocks')} schema id ${bold(setting.id)} within section file ${bold(file.base)}.`,
+                    'There is no known shared schema file using that name.'
+                  ]
+
                 });
+
               } else {
                 log.warn(`unknown $ref ${bold(setting.$ref)} `, file.base);
               }
@@ -367,7 +409,7 @@ async function ParseSharedSchema (file: File) {
   try {
 
     const read = await readFile(file.input);
-    const hash = checksum(file.input);
+    const hash = checksum(read);
 
     if (
       has(file.input, $.cache.schema) &&

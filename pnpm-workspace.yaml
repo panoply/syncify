@@ -1,9 +1,5 @@
 packages:
   - "."
-  - "packages/configs/tsconfig"
-  - "packages/configs/prettier-config"
-  - "packages/configs/eslint-config"
-  - "packages/configs/stylelint-config"
-  - "packages/turndown"
-  - "packages/schema"
-  - "packages/hot"
+  - "packages/configs/*"
+  - "packages/*"
+  - "examples/*"

@@ -3,12 +3,13 @@ import type { Warning } from 'postcss';
 import type { SourceSpan } from 'sass';
 import type { Message } from 'esbuild';
 import { log, warn } from 'syncify:native';
-import { glue, glueString, isNumber, plural, sanitize, has } from 'syncify:utils';
+import { glue, glueString, isNumber, plural, sanitize, has, isUndefined } from 'syncify:utils';
 import { Sample } from 'syncify:interpolate';
 import * as c from 'syncify:colors';
 import { Create, LineYellow, Prefix, Suffix, Context } from 'syncify:ansi';
 import { $ } from 'syncify:state';
 import { Tree } from 'syncify:symbol';
+import { LiteralUnion } from 'type-fest';
 
 /**
  * Get Stack
@@ -18,33 +19,40 @@ import { Tree } from 'syncify:symbol';
  */
 function getStack (processor: string, uri: string) {
 
-  if (has(uri, $.warnings)) {
+  if ($.warnings.has(uri)) {
 
-    if ($.warnings[uri].has(processor)) return $.warnings[uri].get(processor);
+    const file = $.warnings.get(uri);
 
-    return $.warnings[uri].set(processor, new Set()).get(processor);
+    if (file.has(processor)) {
+      return file.get(processor);
+    }
+
+    return file.set(processor, new Set()).get(processor);
 
   }
 
-  $.warnings[uri] = new Map([ [ processor, new Set() ] ]);
-
-  return $.warnings[uri].get(processor);
+  return $.warnings
+  .set(uri, new Map([ [ processor, new Set() ] ]))
+  .get(uri)
+  .get(processor);
 
 }
 
 export function schema (file: File, options: {
   shared: string,
-  schema: 'settings' | 'blocks'
-  message: string,
+  schema: LiteralUnion<'settings' | 'blocks', string>
+  message: string | string[],
   $ref: string
 }) {
 
-  const stack = getStack('schema', file.input);
+  const stack = getStack('Shared Schema', file.input);
   const output = Create({ type: 'warning' })
   .NL
   .Wrap(options.message, c.yellowBright)
+  .NL
   .Context({
     stack: false,
+    type: 'warning',
     entries: {
       reference: options.$ref,
       schema: options.schema,
@@ -69,6 +77,8 @@ export const sass = (file: File) => (message: string, options: {
   const output = Create({ type: 'warning' }).NL.Wrap(message, c.yellowBright);
 
   if (has('span', options)) {
+
+    if(isUndefined(options.span)) return;
 
     const { span } = options;
     const code = has('context', span) ? span.context : span.text;

@@ -1,27 +1,30 @@
-import type PostCSS from 'postcss';
 import type SASS from 'sass';
-import type { Syncify, SASSConfig, StyleBundle } from 'types';
+import type { Config as TailwindConfig } from 'tailwindcss';
+import type { Syncify, SASSConfig, StyleBundle, ClientParam } from 'types';
 import { basename, join, relative } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
 import { timer } from 'syncify:timer';
+import { byteSize, sizeDiff } from 'syncify:sizes';
 import * as u from 'syncify:utils';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import * as warn from 'syncify:log/warnings';
 import { File, Kind } from 'syncify:file';
-import { $ } from 'syncify:state';
 import { bold } from 'syncify:colors';
-import merge from 'mergerino';
-
-/**
- * PostCSS Module
- */
-export let postcss: typeof PostCSS = null;
+import postcss, { PluginCreator } from 'postcss';
+import { toBuffer } from 'syncify:utils/native';
+import { $ } from 'syncify:state';
+import { parseFileQuick } from 'syncify:process/files';
 
 /**
  * SASS Dart module
  */
 export let sass: typeof SASS = null;
+
+/**
+ * TailwindCSS module
+ */
+export let tailwind: PluginCreator<Partial<TailwindConfig>> = null;
 
 /**
  * Load PostCSS / SASS
@@ -30,17 +33,16 @@ export let sass: typeof SASS = null;
  * lettings `sass` or `postcss`. This allows users to optionally
  * include modules in the build.
  */
-export async function load (id: 'postcss' | 'sass') {
-
-  if (id === 'postcss') {
-    const pcss = await import('postcss');
-    postcss = pcss.default;
-    return u.isNil(postcss) === false;
-  }
+export async function load (id: 'tailwind' | 'sass') {
 
   if (id === 'sass') {
     sass = require('sass');
     return u.isNil(sass) === false;
+  }
+
+  if (id === 'tailwind') {
+    tailwind = require('tailwindcss');
+    return u.isNil(tailwind) === false;
   }
 
 };
@@ -49,7 +51,7 @@ export async function load (id: 'postcss' | 'sass') {
 /* TRANSFORMS                                   */
 /* -------------------------------------------- */
 
-function write (file: File<StyleBundle>, cb: Syncify) {
+function write (file: File<StyleBundle>, sync: ClientParam<StyleBundle>, cb: Syncify) {
 
   const scope = u.isFunction(cb) ? { ...file } : false;
 
@@ -61,7 +63,7 @@ function write (file: File<StyleBundle>, cb: Syncify) {
 
     if (scope !== false) {
 
-      const update = cb.apply({ ...file }, Buffer.from(data));
+      const update = cb.apply({ ...file }, toBuffer(data));
 
       if (u.isUndefined(update) || update === false) {
         content = data;
@@ -72,32 +74,44 @@ function write (file: File<StyleBundle>, cb: Syncify) {
       content = data;
     }
 
+    $.cache.checksum[file.input] = u.checksum(content);
+
     writeFile(file.output, content).catch(
       error.write('Error writing stylesheet to output', {
         input: file.relative,
         output: relative($.cwd, file.output)
       })
-    ); ;
+    );
 
-    const size = u.fileSize(data, file.size);
+    const size = sizeDiff(data, file.size);
 
     if (size.isSmaller) {
-      if (file.kind === Kind.SCSS || file.kind === Kind.SASS) {
-        log.transform(file.kind, bold('CSS'), size.before);
+      if (file.kind === Kind.SCSS || file.kind === Kind.SASS || file.kind === Kind.Tailwind) {
+        log.transform(file.kind, bold('CSS'), size.before, timer.stop(file.uuid));
       } else {
         log.transform('CSS', size.before, `gzip ${size.gzip}`);
       }
     } else {
-      log.minified('CSS', size.before, size.after, size.saved);
+      if (file.kind === Kind.Tailwind) {
+        log.minified(Kind.Tailwind, size.before, size.after, size.saved);
+      } else {
+        log.minified('CSS', size.before, size.after, size.saved);
+      }
     }
 
     if ($.mode.hot) {
-
       $.wss.stylesheet(file.uuid, basename(file.key));
-
     }
 
-    return content;
+    if (file.kind !== Kind.Tailwind) {
+      log.syncing(file.key);
+    }
+
+    if (sync === null) {
+      return content;
+    } else {
+      await sync('put', file, content);
+    }
 
   };
 };
@@ -106,10 +120,14 @@ async function sassProcess (file: File) {
 
   const { data } = file;
 
-  if (u.isBoolean(data.sass) && data.sass === false) return readStyleFile(file);
+  if ((u.isBoolean(data.sass) && data.sass === false)) {
+    return readStyleFile(file);
+  }
+
+  if (u.isUndefined(data)) return readStyleFile(file);
 
   const options: SASSConfig = u.isObject(data.sass)
-    ? merge($.processor.sass.config, data.sass)
+    ? u.merge($.processor.sass.config, data.sass)
     : $.processor.sass.config;
 
   if (file.ext === '.scss' || file.ext === '.sass') {
@@ -147,7 +165,7 @@ async function sassProcess (file: File) {
 
       log.process('SASS Dart', timer.stop());
 
-      file.size = u.byteSize(css);
+      file.size = byteSize(css);
 
       return {
         css,
@@ -181,12 +199,59 @@ async function sassProcess (file: File) {
 
 };
 
-async function readStyleFile (file: File<StyleBundle>) {
+export async function tailwindParse (file: File, queue: [File, string][]) {
+
+  for (const map in $.processor.tailwind.map) {
+    if ($.processor.tailwind.map[map].has(file.input)) {
+
+      const item = parseFileQuick($.style[map].input);
+
+      if (u.isUndefined(item)) continue;
+
+      timer.start(item.uuid);
+
+      item.kind = Kind.Tailwind;
+
+      const style = await tailwindProcess(item);
+
+      if (u.isString(style)) queue.push([ item, style ]);
+
+    }
+  }
+
+  return queue;
+}
+
+/**
+ * Tailwind Processor
+ *
+ * An isolated tailwind transform used in `content[]` triggers
+ * from views.
+ */
+export async function tailwindProcess (file: File<StyleBundle>) {
+
+  if ($.mode.hot) timer.start(file.uuid);
+
+  const output = write(file, null, null);
+  const read = await readStyleFile(file);
+  const post = await postcssProcess(file, read.css, read.map);
+
+  if (post === null) return null;
+
+  if (file.data.snippet) {
+    return output(createSnippet(post, file.data.attrs));
+  } else {
+    return output(post);
+  }
+
+}
+
+export async function readStyleFile (file: File<StyleBundle>) {
 
   try {
 
     const css = await readFile(file.input);
-    file.size = u.byteSize(css);
+    file.size = byteSize(css);
 
     return {
       css: css.toString(),
@@ -220,16 +285,18 @@ async function readStyleFile (file: File<StyleBundle>) {
  *
  * Runs postcss on compiled SASS or CSS styles
  */
-async function postcssProcess (file: File<StyleBundle>, css: string, map: any) {
+export async function postcssProcess (file: File<StyleBundle>, css: string, map: any) {
 
   const { data } = file;
+  const isTWCSS = u.isBoolean(data.tailwind) === false;
+  const plugins: postcss.AcceptedPlugin[] = isTWCSS && data.tailwind
+    ? [ tailwind(data.tailwind) as postcss.AcceptedPlugin ].concat(data.postcss)
+    : data.postcss;
 
   try {
 
-    if ($.mode.watch) timer.start();
+    if ($.mode.watch && file.kind !== Kind.Tailwind) timer.start();
 
-    const cfg = u.isBoolean(file.data.postcss) ? $.processor.postcss.config : file.data.postcss;
-    const plugins = u.isArray(cfg) ? cfg : cfg.plugins;
     const result = await postcss(plugins).process(css, {
       from: data.rename,
       to: data.rename,
@@ -240,7 +307,9 @@ async function postcssProcess (file: File<StyleBundle>, css: string, map: any) {
       } : null
     });
 
-    if ($.mode.watch) log.process('PostCSS', timer.stop());
+    if ($.mode.watch && file.kind !== Kind.Tailwind) {
+      log.process('PostCSS', timer.stop());
+    }
 
     const issues = result.warnings();
 
@@ -289,12 +358,12 @@ export function createSnippet (string: string, attrs: string[]) {
 /**
  * SASS and PostCSS Compiler
  */
-export async function compile (file: File<StyleBundle>, cb: Syncify): Promise<string> {
+export async function compile <T extends StyleBundle> (file: File<StyleBundle>, sync: ClientParam<T>, cb: Syncify) {
 
   if ($.mode.watch) timer.start();
   if ($.mode.hot) timer.start(file.uuid);
 
-  const output = write(file, cb);
+  const output = write(file, sync, cb);
 
   try {
 
@@ -328,4 +397,4 @@ export async function compile (file: File<StyleBundle>, cb: Syncify): Promise<st
     return null;
   }
 
-};
+}

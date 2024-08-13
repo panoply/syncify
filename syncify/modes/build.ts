@@ -2,12 +2,10 @@
 import type { Syncify } from 'types';
 import type { Merge } from 'type-fest';
 import type { BuildReport, BuildModeReport } from 'types/internal';
-import { setInterval } from 'node:timers';
 import anymatch from 'anymatch';
 import glob from 'fast-glob';
 import pMap from 'p-map';
 import { compile as assets } from 'syncify:asset';
-import { compile as schema } from 'syncify:schema';
 import { compile as liquid } from 'syncify:liquid';
 import { compile as json } from 'syncify:json';
 import { compile as script } from 'syncify:script';
@@ -16,14 +14,16 @@ import { compile as svg } from 'syncify:svg';
 import { File, Type } from 'syncify:file';
 import { parseFile } from 'syncify:process/files';
 import { toArray } from 'syncify:native';
-import { fileSize, isUndefined, has, object, plural, isEmpty } from 'syncify:utils';
+import { sizeDiff } from 'syncify:sizes';
+import { isUndefined, has, object, plural, isEmpty } from 'syncify:utils';
 import { timer } from 'syncify:timer';
 import { $ } from 'syncify:state';
 import { saveCache } from 'syncify:process/cache';
-import { Append, Create, CreateClosure, Prefix } from 'syncify:ansi';
+import { Append, Create, Prefix } from 'syncify:ansi';
 
 import * as c from 'syncify:colors';
 import * as log from 'syncify:log';
+import { COL, HSH } from 'syncify:symbol';
 
 type Groups = (
   | 'styles'
@@ -98,38 +98,6 @@ function getModel (): Merge<{ [K in Groups]: BuildReport; }, {
 }
 
 /**
- * Logger
- *
- * Keeps the **duration** ticker running and prints
- * the log update to terminal.
- */
-function logger (message: CreateClosure) {
-
-  let timeout: NodeJS.Timeout = null;
-
-  function update () {
-
-    log.update(
-      message
-      .toRaw()
-      .join(NIL)
-    );
-
-  }
-
-  return {
-    begin (ms: number) {
-      if (timeout === null) timeout = setInterval(update, ms);
-    },
-    clear () {
-      clearInterval(timeout);
-      timeout = null;
-    }
-  };
-
-};
-
-/**
  * Build Function
  *
  * Triggers a compile of the project. Build mode will filter
@@ -142,10 +110,11 @@ export async function build (cb?: Syncify) {
 
   if (!$.mode.export) {
     log.task('Build');
+    log.nwl();
   }
 
+  const errors = Create({ type: 'error' });
   const message = Create().Newline();
-  const interval = logger(message);
   const SVG: Set<string> = new Set();
   const report = getModel();
   const hasFilter = isEmpty($.filters) === false;
@@ -154,8 +123,6 @@ export async function build (cb?: Syncify) {
   const globs = await glob('**', { absolute: true, cwd: $.dirs.input });
   const cache = $.cache.paths;
 
-  interval.begin(100);
-
   for (const path of globs.filter(match)) {
 
     const file = parse(path);
@@ -163,7 +130,6 @@ export async function build (cb?: Syncify) {
     if (isUndefined(file)) continue;
 
     switch (file.type) {
-      //   case Type.Schema: report.schema.files.push(file); break;
       case Type.Style: report.styles.files.push(file); break;
       case Type.Script: report.scripts.files.push(file); break;
       case Type.Section: report.sections.files.push(file); break;
@@ -245,13 +211,15 @@ export async function build (cb?: Syncify) {
             output: file.key,
             error: null,
             time: timer.stop(file.uuid),
-            size: fileSize(value, file.size)
+            size: sizeDiff(value, file.size)
           }
         );
 
       } catch (e) {
 
         report.stats.errors += 1;
+
+        errors.Line(e.message);
 
         return object(
           {
@@ -279,7 +247,7 @@ export async function build (cb?: Syncify) {
     const record = report[group];
 
     record.size = record.files.length;
-    record.report = await pMap(record.files, handle(record, fn), { stopOnError: false });
+    record.report = await pMap(record.files, handle(record, fn), { stopOnError: true });
     record.time = timer.stop(group);
 
     const files = record.report.length;
@@ -289,7 +257,6 @@ export async function build (cb?: Syncify) {
 
   }
 
-  // await bundle('schema', schema);
   await bundle('svgs', svg);
   await bundle('layouts', liquid);
   await bundle('templates', liquid);
@@ -302,30 +269,69 @@ export async function build (cb?: Syncify) {
   await bundle('scripts', script);
   await saveCache();
 
-  timer.pause('build');
-
-  interval.clear();
-
   if ($.mode.export === false && $.mode.publish === false) {
 
-    log.update(
+    message
+    .NL
+    .Dash('Completed', c.gray)
+    .NL
+    .Line(Prefix('version', `${$.vc.number}`))
+    .Line(Prefix('processed', `${c.bold(`${report.stats.total}`)} files`))
+    .Line(Prefix('bundled', `${c.bold(`${report.stats.bundled}`)} files`))
+    .Line(Prefix('skipped', `${c.bold(`${report.stats.skipped}`)} files`))
+    .Line(Prefix('duration', timer.now('build')))
+    .Line(Prefix('warnings', c.bold(`${$.warnings.size}`)))
+    .Line(Prefix('errors', c.bold(`${report.stats.errors}`)));
+
+    if ($.warnings.size > 0) {
+
       message
-      .Remove(0)
       .NL
-      .Dash('Completed', c.gray)
-      .NL
-      .Line(Prefix('version', `${$.vc.number}`))
-      .Line(Prefix('processed', `${c.bold(`${report.stats.total}`)} files`))
-      .Line(Prefix('bundled', `${c.bold(`${report.stats.bundled}`)} files`))
-      .Line(Prefix('skipped', `${c.bold(`${report.stats.skipped}`)} files`))
-      .Line(Prefix('duration', timer.now('build')))
-      // .Line(Prefix('warnings', c.bold(`${$.warnings.size}`)))
-      .Line(Prefix('errors', c.bold(`${report.stats.errors}`)))
-      .NL
-      .End($.log.group)
-      .BR
-      .toString(c.whiteBright)
-    );
+      .Dash('Warnings', c.gray)
+      .Newline();
+
+      let group: string;
+      let count: number = 0;
+
+      for (const err of $.warnings.keys()) {
+        for (const [ processor, warnings ] of $.warnings.get(err)) {
+
+          if (group !== processor) {
+            count = 1;
+            group = processor;
+          } else {
+            count = count + 1;
+            message.Ruler();
+          }
+
+          message
+          .Warn(`${c.bold('WARNING')} ${HSH}${c.bold(`${count}`)}`, c.yellowBright)
+          .Newline('yellow')
+          .Warn(group, c.yellowBright);
+
+          for (const warn of warnings) {
+
+            message.Insert(warn);
+
+          }
+        }
+      }
+
+      log.out(
+        message.NL
+        .End($.log.group)
+        .BR
+        .toString(c.whiteBright)
+      );
+    } else {
+
+      log.out(
+        message.NL
+        .End($.log.group)
+        .BR
+        .toString(c.whiteBright)
+      );
+    }
 
     process.exit(0);
 

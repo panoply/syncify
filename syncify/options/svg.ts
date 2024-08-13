@@ -2,10 +2,8 @@ import type { SVGBundle, SVGSprite, SVGFile, SVGTransform } from 'types';
 import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import { extname, relative } from 'pathe';
-import merge from 'mergerino';
 import { cyan } from 'syncify:colors';
-import { load } from 'syncify:svg';
-import { getTransform, getModules } from 'syncify:utils/options';
+import { getTransform } from 'syncify:utils/options';
 import { $ } from 'syncify:state';
 import * as u from 'syncify:utils';
 import * as e from 'syncify:log/throws';
@@ -20,41 +18,7 @@ export async function setSvgOptions () {
   if (!u.has('svg', $.config.transform)) return;
   if (!$.config.transform.svg || u.isEmpty($.config.transform.svg)) return;
 
-  const { sprite, svgo } = $.processor;
   const warn = e.warnOption('SVG Transform');
-
-  svgo.installed = getModules($.pkg, 'svgo');
-
-  // Load SVGO module
-  if (svgo.installed) {
-    const loaded = await load('svgo');
-    if (!loaded) {
-      e.throwError('Unable to dynamically import SVGO', [
-        'Ensure you have installed svgo'
-      ]);
-    }
-  }
-
-  sprite.installed = getModules($.pkg, 'svg-sprite');
-
-  // Load SVG Sprite module
-  if (sprite.installed) {
-
-    const loaded = await load('svg-sprite');
-
-    if (!loaded) {
-      e.throwError('Unable to dynamically import SVG Sprite', [
-        'Ensure you have installed svg-sprite'
-      ]);
-    }
-  }
-
-  if (sprite.installed === false && svgo.installed === false) {
-    e.missingDependency([
-      'svgo',
-      'svg-sprite'
-    ]);
-  }
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
@@ -103,53 +67,28 @@ export async function setSvgOptions () {
 
       if (has('svgo')) {
 
-        if (!svgo.installed) e.missingDependency('svgo');
-
         bundle.format = 'file';
-        bundle.svgo = u.isObject(svg.svgo) ? merge(svgo.config, svg.svgo) : true;
+        bundle.svgo = u.isObject(svg.svgo) ? u.merge($.processor.svgo, svg.svgo) : true;
 
       } else if (has('sprite')) {
 
-        if (!sprite.installed) e.missingDependency('svg-sprite');
-
         bundle.format = 'sprite';
-        bundle.sprite = u.isObject(svg.sprite) ? merge(sprite.config, svg.sprite) : true;
+        bundle.sprite = u.isObject(svg.sprite) ? u.merge($.processor.sprite, svg.sprite) : true;
 
       } else {
 
-        if (svgo.installed && sprite.installed) {
+        e.missingOption(
+          {
+            option: 'transform.svg',
+            key: 'format',
+            expects: 'sprite | file',
+            reason: [
+              `SVG transforms require you to define ${cyan('format')} Syncify needs to knows how`,
+              'it should handle the input and which processor to use for the transform.'
+            ]
+          }
+        );
 
-          e.missingOption(
-            {
-              option: 'transform.svg',
-              key: 'format',
-              expects: 'sprite | file',
-              reason: [
-                `SVG transforms require you to define ${cyan('format')} when both SVGO and SVG Sprite`,
-                'processors are installed. Syncify needs to knows how is should handle the input and',
-                'which processor to use for the transform.'
-              ]
-            }
-          );
-
-        } else if (svgo.installed && !sprite.installed) {
-
-          bundle.format = 'file';
-          bundle.svgo = true;
-
-        } else if (sprite.installed && !svgo.installed) {
-
-          bundle.format = 'sprite';
-          bundle.sprite = true;
-
-        } else {
-
-          e.unknownError(
-            'transform > svg',
-            'Cannot resolve processor, try defining a format.'
-          );
-
-        }
       }
 
     } else {
@@ -159,16 +98,9 @@ export async function setSvgOptions () {
         bundle.format = svg.format;
 
         if (svg.format === 'file') {
-
           bundle.svgo = true;
-
-          if (!svgo.installed) e.missingDependency('svgo');
-
         } else {
-
           bundle.sprite = true;
-
-          if (!sprite.installed) e.missingDependency('svg-sprite');
         }
 
       } else {

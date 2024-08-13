@@ -25,6 +25,7 @@ export function setModes (cli: Commands) {
     dev: !cli.prod,
     prod: cli.prod,
     setup: cli.setup,
+    strap: cli.strap !== null,
     hot: allTrue(cli.watch, cli.hot),
     interactive: cli.interactive,
     redirects: cli.redirects,

@@ -61,7 +61,7 @@ export async function setSectionOptions () {
     }
 
     // Validate the prefix separator option, in Shopify sections
-    // We cannot use dot prefixes, we ensure only accepts values are defined.
+    // We cannot use dot prefixes, we ensure only accepted values are defined.
     if (option === 'separator') {
       if (isString(sections[option])) {
 
@@ -181,7 +181,7 @@ export async function setSharedSchema () {
 
       log.error(relative($.cwd, uri), {
         notify: {
-          title: 'JSON Error',
+          title: 'JSON Error (setSharedSchema)',
           message: `Error when parsing ${basename(uri)}`
         }
       });
@@ -221,6 +221,8 @@ export async function setSchemaJson () {
     const open = data.search(/{%-?\s*schema/);
 
     if (open < 0) continue;
+
+    // TODO: Ensure schema blocks within comments are ignored
 
     const begin = data.indexOf('%}', open + 2) + 2;
     const start = data.slice(begin);

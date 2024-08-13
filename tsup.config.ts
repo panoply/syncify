@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 import { join } from 'path';
 import { writeFileSync, readFileSync, copyFileSync } from 'fs';
-import * as pkg from '../package.json';
+import * as pkg from './package.json';
 
 const cwd = process.cwd();
 const packages = join(cwd, 'packages');
@@ -30,63 +30,69 @@ importSchema();
 const json = JSON.stringify;
 
 const noExternal = [
+
   'ansis',
+  'anymatch',
   'clean-stack',
-  'lines-and-columns',
-  'mergerino',
   'log-update',
-  'p-queue',
+  'mergerino',
+  'minimist',
   'p-map',
+  'p-queue',
   'parse-json',
   'rambdax',
   'strip-json-comments',
+  'tree-kill',
   'wrap-ansi',
-  'scrollable-cli'
+  'write-file-atomic'
+
 ];
 
 const external = [
+  // Syncify Specific
   '@syncify/turndown',
-  'anymatch',
+
+  // Third parties
   'adm-zip',
   'axios',
   'cbor',
-  'write-file-atomic',
-  'pathe',
   'chokidar',
+  'clean-css',
   'cross-spawn',
   'dotenv',
+  'enquirer',
+  'esbuild',
   'fast-glob',
   'figlet',
   'finalhandler',
   'fs-extra',
   'gray-matter',
   'html-minifier-terser',
-  'lz-string',
   'markdown-it',
-  'mime-types',
-  'minimist',
-  'node-notifier',
   'ngrok',
+  'node-notifier',
+  'pathe',
+  'postcss',
   'prompts',
+  'scrollable-cli',
   'serve-static',
+  'svg-sprite',
+  'svgo',
   'ws',
 
   // BUILD DEPS
   'ava',
   'eslint',
   'prettier',
-  'tsup',
-  'typefest',
   'tsconfig-type',
+  'tsup',
+  'type-fest',
   'typescript',
 
   // PEER DEPS
-  'esbuild',
-  'postcss',
   'sass',
   'sharp',
-  'svgstore',
-  'svgo'
+  'tailwindcss'
 ];
 
 const define = {
@@ -116,7 +122,7 @@ export default defineConfig({
     'dist'
   ],
   splitting: false,
-  treeshake: true,
+  treeshake: false,
   cjsInterop: true,
   format: [
     'cjs',
@@ -129,6 +135,5 @@ export default defineConfig({
   esbuildOptions (options) {
     options.mainFields = [ 'module', 'main' ];
     options.chunkNames = 'syncify';
-    options.treeShaking = true;
   }
 });

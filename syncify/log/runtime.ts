@@ -8,7 +8,7 @@ import { warnings } from 'syncify:log/throws';
 import { ARR, COL, DSH, TLD } from 'syncify:symbol';
 import { gray, bold, white, neonCyan, pink, yellowBright, lightGray, cyan } from 'syncify:colors';
 import { clear } from 'syncify:log';
-import { Create, CreateClosure, NextLine, Break } from 'syncify:ansi';
+import { Create, CreateClosure, Break } from 'syncify:ansi';
 import { timer } from 'syncify:timer';
 
 interface Runtime {

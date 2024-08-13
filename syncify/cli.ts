@@ -82,17 +82,17 @@ run(mm(argv.slice(1), {
     force: false,
     cache: false,
 
+    /* STRAPS ------------------------------------ */
+    strap: null,
+
     /* VERSIONING -------------------------------- */
 
     bump: null,
 
     /* HELP --------------------------------------- */
 
-    help: null,
+    help: null
 
-    /* TODO --------------------------------------- */
-
-    strap: false
   },
   boolean: [
 
@@ -190,6 +190,6 @@ run(mm(argv.slice(1), {
     /* TODO --------------------------------------- */
 
     'strap'
-    // --strap silk | --strap dawn
+    // --strap silk | --strap dawn | --strap dusk
   ]
 })).catch(console.error);

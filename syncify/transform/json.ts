@@ -4,24 +4,14 @@ import { readFile, writeFile } from 'fs-extra';
 import parseJSON, { JSONError } from 'parse-json';
 import { File, Type } from 'syncify:file';
 import { timer } from 'syncify:timer';
+import { byteSize, byteConvert, sizeDiff } from 'syncify:sizes';
+import { find } from 'syncify:requests/assets';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
-import {
-  isBuffer,
-  isArray,
-  isObject,
-  isUndefined,
-  isString,
-  isFunction,
-  byteSize,
-  byteConvert,
-  fileSize,
-  sanitize,
-  isEmpty
-} from 'syncify:utils';
-
-import { find } from 'syncify:requests/assets';
+import * as u from 'syncify:utils';
 import { $ } from 'syncify:state';
+import { queue } from 'syncify:requests/client';
+import { tailwindParse } from 'syncify:style';
 
 /**
  * Parse JSON
@@ -96,10 +86,10 @@ export async function jsonCompile (file: File, data: string, space = 0) {
   }
 
   if (space === 0) {
-    const size = fileSize(minified, file.size);
+    const size = sizeDiff(minified, file.size);
     log.minified('JSON', size.before, size.after, size.saved);
   } else {
-    log.transform(file.namespace, byteConvert(file.size));
+    log.transform('JSON', file.namespace, byteConvert(file.size), timer.now());
   }
 
   if (file.type === Type.Metafield) return minified;
@@ -121,7 +111,7 @@ export async function jsonCompile (file: File, data: string, space = 0) {
  * cb that one can optionally execute
  * from within scripts.
  */
-export async function compile (file: File, cb: Syncify): Promise<string> {
+export async function compile (file: File, sync: any, cb: Syncify): Promise<string> {
 
   if ($.mode.watch) timer.start();
 
@@ -131,7 +121,7 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
     })
   );
 
-  if (isBuffer(json)) {
+  if (u.isBuffer(json)) {
 
     const read = json.toString();
 
@@ -161,7 +151,7 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
 
     if (data === null) return null;
 
-    if (isEmpty(data)) {
+    if (u.isEmpty(data)) {
       log.skipped(file, 'empty file');
       return null;
     }
@@ -186,21 +176,46 @@ export async function compile (file: File, cb: Syncify): Promise<string> {
       }
     }
 
-    if (!isFunction(cb)) return jsonCompile(file, data, space);
+    let content: string;
 
-    const update = cb.apply({ ...file }, data);
+    if (u.isFunction(cb)) {
 
-    if (isUndefined(update)) {
-      return jsonCompile(file, data, space);
-    } else if (isArray(update) || isObject(update)) {
-      return jsonCompile(file, sanitize(update), space);
-    } else if (isString(update)) {
-      return jsonCompile(file, parse(file, update), space);
-    } else if (isBuffer(update)) {
-      return jsonCompile(file, parse(file, update.toString()), space);
+      const update = cb.apply({ ...file }, data);
+
+      if (u.isUndefined(update)) {
+        content = await jsonCompile(file, data, space);
+      } else if (u.isArray(update) || u.isObject(update)) {
+        content = await jsonCompile(file, u.sanitize(update), space);
+      } else if (u.isString(update)) {
+        content = await jsonCompile(file, parse(file, update), space);
+      } else if (u.isBuffer(update)) {
+        content = await jsonCompile(file, parse(file, update.toString()), space);
+      }
+    } else {
+
+      content = await jsonCompile(file, data, space);
     }
 
-    await jsonCompile(file, data, space);
+    $.cache.checksum[file.input] = u.checksum(content);
+
+    if ($.processor.tailwind.map !== null && file.type !== Type.Style) {
+
+      const request = await tailwindParse(file, [ [ file, content ] ]);
+
+      for (const req of request) {
+        await sync('put', req[0], req[1]);
+        log.syncing(req[0].key);
+      }
+
+    } else {
+
+      log.syncing(file.key);
+      await sync('put', file, content);
+    }
+
+    if ($.mode.hot) {
+      await queue.onIdle().then(() => $.wss.replace());
+    }
 
   }
 };

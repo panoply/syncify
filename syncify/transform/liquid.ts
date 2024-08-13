@@ -1,15 +1,18 @@
-import type { Syncify } from 'types';
+import type { ClientParam, Syncify } from 'types';
 import { minify } from 'html-minifier-terser';
+import { relative } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
-import { isNil, isType } from 'rambdax';
 import { File, Type } from 'syncify:file';
+import { queue } from 'syncify:requests/client';
 import { hasSnippet, inject, removeRender } from 'syncify:hot/inject';
-import { byteConvert, byteSize, fileSize } from 'syncify:utils';
+import { byteConvert, byteSize, sizeDiff } from 'syncify:sizes';
 import { timer } from 'syncify:timer';
 import * as log from 'syncify:log';
-// import * as error from 'syncify:errors';
-import { $ } from 'syncify:state';
+import * as error from 'syncify:errors';
 import { CreateSection } from 'syncify:schema';
+import { checksum, isBuffer, isFunction, isString, isUndefined, isNil, toUpcase } from 'syncify:utils';
+import { tailwindParse } from 'syncify:style';
+import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -153,9 +156,18 @@ const transform = (file: File) => async (data: string) => {
   }
 
   if (!$.mode.terse) {
-    await writeFile(file.output, data);
-    log.transform(`${file.namespace} → ${byteConvert(file.size)}`);
+
+    writeFile(file.output, data).catch(
+      error.write('Error writing liquid file to output', {
+        input: file.relative,
+        output: relative($.cwd, file.output)
+      })
+    );
+
+    log.transform(file.kind, toUpcase(file.namespace), byteConvert(file.size), timer.now());
+
     return data;
+
   }
 
   let htmlmin: string;
@@ -190,15 +202,22 @@ const transform = (file: File) => async (data: string) => {
   log.process('HTML Terser', timer.now());
 
   if (isNil(htmlmin)) {
-    await writeFile(file.output, data);
+
+    writeFile(file.output, data).catch(
+      error.write('Error writing liquid file to output', {
+        input: file.relative,
+        output: relative($.cwd, file.output)
+      })
+    );
+
     return data;
   }
 
   const postmin = removeDashes(htmlmin).replace(/^\s+/gm, NIL);
 
-  await writeFile(file.output, postmin);
+  writeFile(file.output, postmin);
 
-  const size = fileSize(data, file.size);
+  const size = sizeDiff(data, file.size);
 
   if (size.isSmaller) {
     log.transform(`${file.namespace} ${size.before} → gzip ${size.gzip}`);
@@ -216,7 +235,7 @@ const transform = (file: File) => async (data: string) => {
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export async function compile (file: File, cb: Syncify) {
+export async function compile (file: File, sync: ClientParam<File>, cb: Syncify) {
 
   if ($.mode.watch) timer.start();
 
@@ -233,36 +252,58 @@ export async function compile (file: File, cb: Syncify) {
   }
 
   if (file.type === Type.Section) {
-
     const section = await CreateSection(file);
-    if (section === null) return;
-
+    if (section === null) return null;
     input = section;
-
   }
 
   file.size = byteSize(input);
 
   const edit = transform(file);
 
-  if (!isType('Function', cb)) return edit(input);
+  let content: string;
 
-  const update = cb.apply({ ...file }, input);
+  if (isFunction(cb)) {
 
-  if (isType('Undefined', update) || update === false) {
+    const update = cb.apply({ ...file }, input);
 
-    return edit(input);
+    if (isUndefined(update) || update === false) {
+      content = await edit(input);
+    } else if (isString(update)) {
+      content = await edit(update);
+    } else if (isBuffer(update)) {
+      content = await edit(update.toString());
+    }
 
-  } else if (isType('String', update)) {
+  } else {
+    content = await edit(input);
+  }
 
-    return edit(update);
+  $.cache.checksum[file.input] = checksum(content);
 
-  } else if (Buffer.isBuffer(update)) {
+  if ($.processor.tailwind.map !== null && file.type !== Type.Style) {
 
-    return edit(update.toString());
+    const request = await tailwindParse(file, [ [ file, content ] ]);
+
+    for (const req of request) {
+      await sync('put', req[0], req[1]);
+      log.syncing(req[0].key);
+    }
+
+  } else {
+
+    log.syncing(file.key);
+
+    await sync('put', file, content);
 
   }
 
-  return edit(input);
+  if ($.mode.hot) {
+    if (file.type === Type.Section) {
+      $.wss.section(file.name);
+    } else {
+      await queue.onIdle().then(() => $.wss.replace());
+    }
+  }
 
 };

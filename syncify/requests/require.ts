@@ -19,11 +19,8 @@ function findUp (name: string, startDir: string, stopDir = parse(startDir).root)
 
     if (existsSync(file)) return file;
     if (extname(file) !== '.json') {
-
       const path = file + '.json';
-
       if (existsSync(path)) return path;
-
     }
 
     dir = dirname(dir);
@@ -35,6 +32,8 @@ function findUp (name: string, startDir: string, stopDir = parse(startDir).root)
 };
 
 function getTSConfigFromFile (cwd: string, filename: string) {
+
+  if (!existsSync(join(cwd, filename))) return null;
 
   return isAbsolute(filename)
     ? existsSync(filename) ? filename : null
@@ -60,7 +59,7 @@ export type Loaded = {
   files: string[]
 }
 
-function getTSConfig (dir = $.cwd, name = 'tsconfig.json', isExtends = false): Loaded | null {
+function getTSConfig (dir = process.cwd(), name = 'tsconfig.json', isExtends = false): Loaded | null {
 
   dir = resolve(dir);
 
@@ -69,6 +68,7 @@ function getTSConfig (dir = $.cwd, name = 'tsconfig.json', isExtends = false): L
     : getTSConfigFromFile(dir, name);
 
   if (!id) return null;
+
 
   const data: {
     extends?: string | string[]

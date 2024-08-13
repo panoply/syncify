@@ -1,17 +1,97 @@
 /* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable n/handle-callback-err */
-import { EventEmitter } from 'node:events';
-import { createRequire } from 'node:module';
+
 import { createHash } from 'node:crypto';
-import { writeFile, readFile } from 'fs-extra';
-import zlib from 'node:zlib';
+import { createRequire } from 'node:module';
 import strip from 'strip-json-comments';
-import { assign, create, toBuffer, toString } from './native';
-import { UNITS } from 'syncify:const';
 import { COL, DSH } from 'syncify:symbol';
-import { bold } from 'syncify:colors';
+import type { MultipleTopLevelPatch } from 'types/internal';
+import { assign, create } from 'syncify:native';
+
+/* -------------------------------------------- */
+/* UTILITIES                                    */
+/* -------------------------------------------- */
 
 /**
+ * **merge**
+ *
+ * An immutable merge util for state management. You can pass multiple patches
+ * in a single merge call, array arguments will be flattened before processing.
+ * Since falsy patches are ignored.
+ */
+export function merge <S extends object> (source: S, ...patches: Array<MultipleTopLevelPatch<S>>): S {
+
+  const arr = isArray(source);
+
+  return (function apply (isArr, copy: any, patch: any) {
+
+    const type = typeof patch;
+
+    if (patch && type === 'object') {
+
+      if (isArray(patch)) {
+        for (const p of patch) copy = apply(isArr, copy, p);
+      } else {
+        for (const k in patch) {
+          const val = patch[k];
+          if (isFunction(val)) {
+            copy[k] = val(copy[k], merge);
+          } else if (val === undefined) {
+            if (isArr) {
+              copy.splice(k, 1);
+            } else {
+              delete copy[k];
+            }
+          } else if (val === null || isObject(val) === false || isArray(val)) {
+            copy[k] = val;
+          } else if (typeof copy[k] === 'object') {
+            copy[k] = val === copy[k] ? val : merge(copy[k], val);
+          } else {
+            copy[k] = apply(false, {}, val);
+          }
+        }
+      }
+    } else if (type === 'function') {
+      copy = patch(copy, merge);
+    }
+
+    return copy;
+
+  })(arr, arr ? source.slice() : assign({}, source), patches);
+};
+
+/**
+ * **hasPath**
+ *
+ * Whether the provided object `path` exists in deeply nested object.
+ *
+ * @param prop The object property to check
+ * @param object The object
+ */
+export function hasPath (path: string, param: object) {
+
+  if (isNil(param)) return false;
+  if (isObject(param) === false) return false;
+
+  let object = param;
+  let counter = 0;
+
+  const props = path.split('.');
+
+  while (counter < props.length) {
+    if (isNil(object)) return false;
+    if (object[props[counter]] === null) return false;
+    object = object[props[counter]];
+    counter++;
+  }
+
+  return object !== undefined;
+
+}
+
+/**
+ * **has**
+ *
  * Whether property is in object
  *
  * @param prop The object property to check
@@ -19,12 +99,14 @@ import { bold } from 'syncify:colors';
  */
 export function has <T extends object> (prop: keyof T | string, object: T): boolean {
 
-  return prop in object;
+  return isObject(object) ? prop in object : false;
 
 }
 
 /**
- * Whether property is in object
+ * **hasProp**
+ *
+ * Whether property is in object, returning an object to be used as curry
  *
  * @param prop The object property to check
  * @param object The object
@@ -35,60 +117,16 @@ export function hasProp <T extends object> (object: T): (prop: keyof T) => boole
 
 }
 
-export function getChunk (array: any[], perChunk: number = 2) {
-
-  return array.reduce((acc, item, index) => {
-
-    const ci = Math.floor(index / perChunk); // chunk index
-
-    if (!acc[ci]) acc[ci] = []; // start a new chunk
-    acc[ci].push(item);
-    return acc;
-
-  }, []);
-
-}
-
 /**
- * Event emitter instance
- */
-export const event = new EventEmitter();
-
-export function ws (array: any[] | object, prop: string = null) {
-
-  let size: number = 0;
-
-  if (isArray(array)) {
-    for (const item of array) {
-      if (prop) {
-        if (item[prop].length > size) size = item[prop].length;
-      } else {
-        if (item.length > size) size = item.length;
-      }
-    }
-  } else {
-    for (const item in array) if (item.length > size) size = item.length;
-  }
-
-  size = size + 1;
-
-  return function curried (string: string | number) {
-    const n = isString(string) ? size - string.length : size - string;
-    return n < 1 ? WSP : WSP.repeat(n);
-  };
-
-}
-
-/**
+ * **object**
+ *
  * Create a null prototype object
  *
  * @param input The object to assign (optional)
  */
 export function object <T = any> (input?: T): T {
 
-  return input
-    ? assign(create(null), input)
-    : create(null);
+  return input ? assign(create(null), input) : create(null);
 
 }
 
@@ -111,34 +149,6 @@ export function detect (string: string, { onlyFirst = false } = {}) {
 }
 
 /**
- * Join a string together with a single space character
- *
- * @param input The string input to join
- */
-export function glueString (...input: string[]) {
-
-  return input.join(WSP);
-
-}
-
-/**
- * Join an array or ...spread together
- *
- * @param input The string input to join (defaults to `''` NIL)
- */
-export function glue (...input: [ string[] ] | string[]) {
-
-  return isArray(input[0]) ? input[0].join(NIL) : input.join(NIL);
-
-}
-
-export function checksum (input: string | Buffer) {
-
-  return createHash('md5').update(input).digest('hex');
-
-}
-
-/**
  * JSONC
  *
  * Strip JSON Comments
@@ -150,9 +160,12 @@ export function jsonc <T> (data: string): T {
   if (strip(data).trim() === NIL) return <T>{};
 
   try {
-    return JSON.parse(strip(data).trim());
-  } catch (e) {
-    throw new Error(e);
+
+    return new Function(`return ${strip(data).trim()}`)()
+
+  } catch {
+
+    return <T>{}
   }
 }
 
@@ -194,60 +207,6 @@ export function fileKind (ext: string) {
     case 'mp3':
     case 'wav': return 'audio';
   }
-
-};
-
-/**
-
- * Converts string input to a handle
- *
- * @param string The string to convert
- * @example 'foo:bar_baz 10' => 'foo-bar-baz-10'
- */
-export function handleize (string: string) {
-
-  return string
-  .toLowerCase()
-  .replace(/[^a-z0-9_:]+/g, '-')
-  .replace(/-$/, '')
-  .replace(/^-/, '');
-
-}
-
-/**
- * Adds an `s` to the end of a word if length is more than 1
- *
- * @param word The word to pluralize
- * @param size The length to determine, if `undefined` will measure `word`
- * @param zero Whether a length of `0` should be plural (defaults to `false`)
- */
-export function plural (word: string, size: number, zero = false) {
-
-  if (size >= 2) {
-    return word[word.length - 1] !== 's' ? `${word}s` : word;
-  } else {
-    return word[word.length - 1] !== 's' ? word : word.slice(0, -1);
-  }
-
-}
-
-/**
- * Sanatizes the log message passed. Converts a `Buffer`, `number`, `object`,
- * `boolean` or an `array` type to a readable string.
- *
- * @param message Input string to sanitize
- * @example
- * sanitize(true) => 'true'
- * sanitize({ x: 1 }) => '{"x":1}'
- * sanitize(1000) => '1000'
- */
-export function sanitize (message: number | boolean | string | Buffer | object | any[]): string {
-
-  if (isBuffer(message)) return message.toString();
-  if (isObject(message) || isArray(message)) return JSON.stringify(message);
-  if (isBoolean(message) || isNumber(message)) return `${message}`;
-
-  return isString(message) ? message : String(message);
 
 };
 
@@ -303,86 +262,6 @@ export function inferLoader <T> (ext: string): T {
 }
 
 /**
- * Capitlalize the first letter of a string.
- *
- * @param value The word to upcase
- * @example 'title' => 'Title'
- */
-export function toUpcase <T extends string> (value: T) {
-
-  return value.charAt(0).toUpperCase() + value.slice(1);
-
-};
-
-/**
- * Helper which runs `byteConvert` and `byteSize` to return readable
- * size string.
- *
- * @param value Either number of bytes of string input
- */
-export function getSizeStr (value: string | number) {
-
-  return typeof value === 'number'
-    ? byteConvert(value)
-    : byteConvert(byteSize(value));
-}
-
-/**
- * Returns the byte size of a string value. Use the `getSizeStr()` utility
- * to return a readable string.
- *
- * @param string The string to determine
- */
-export function byteSize (string: string | Buffer): number {
-
-  return isString(string)
-    ? toBuffer(string).toString().length
-    : string.toString().length;
-
-};
-
-/**
- * Converts byte size to killobyte, megabyte, gigabyte or terrabyte
- *
- * @param bytes The bytes number to convert
- * @example 1000 => '1kb'
- */
-export function byteConvert (bytes: number): string {
-
-  if (bytes === 0) return '0b';
-
-  const size = parseInt(`${Math.floor(Math.log(bytes) / Math.log(1024))}`, 10);
-
-  return size === 0
-    ? `${bold(String(bytes))}${(UNITS[size])}`
-    : `${bold((bytes / 1024 ** size).toFixed(1))}${(UNITS[size])}`;
-};
-
-/**
- * Returns an object containing size analysis of a string.
- * Requires a `beforeSize` value be provided to perform diff analysis
- *
- * @param content The content to measure
- * @param beforeSize The size to compare
- */
-export function fileSize (content: string | Buffer, beforeSize: number) {
-
-  const size = byteSize(content);
-  const gzip = byteConvert(zlib.gzipSync(content).length);
-  const before = byteConvert(beforeSize);
-  const after = byteConvert(size);
-  const saved = byteConvert(beforeSize - size);
-
-  return {
-    isSmaller: (size > beforeSize || (size === beforeSize)),
-    gzip,
-    before,
-    after,
-    saved
-  };
-};
-
-/**
  * Converts milisecond time to a readable string
  *
  * @param ms The miliseconds to convert
@@ -401,7 +280,7 @@ export function convertTimer (ms: number) {
  * will write ANSI colors
  *
  * @example
- * '01:59:20'
+ * getTime() // 01:59:20
  */
 export function getTime () {
 
@@ -422,7 +301,7 @@ export function getTime () {
  * will write ANSI colors
  *
  * @example
- * '01-01-2022 01:59:20'
+ * getDateTime() // 01-01-2022 01:59:20
  */
 export function getDateTime () {
 
@@ -446,50 +325,21 @@ export function getDateTime () {
 };
 
 /**
- * Append an `st`, `nd`, `rd` or `th` to the end of a number
+ * **getChunk**
  *
- * @param i The number to suffix
- * @example
- * 1 => '1st'
- * 2 => '2nd'
- * 3 => '3rd'
- * 4 => '4th'
+ * Chunked arrays
  */
-export function addSuffix (number: number): string {
+export function getChunk (array: any[], perChunk: number = 2) {
 
-  const a = number % 10;
-  const b = number % 100;
+  return array.reduce((acc, item, index) => {
 
-  return number + ((a === 1 && b !== 11)
-    ? 'st'
-    : (a === 2 && b !== 12) ? 'nd' : (a === 3 && b !== 13) ? 'rd' : 'th'
-  );
+    const ci = Math.floor(index / perChunk); // chunk index
 
-}
+    if (!acc[ci]) acc[ci] = []; // start a new chunk
+    acc[ci].push(item);
+    return acc;
 
-export function kebabCase (string: string) {
-
-  if (typeof string === 'string' && string.length > 0) {
-
-    return string
-    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
-    .join('-')
-    .toLowerCase();
-
-  }
-
-  return string;
-}
-
-/**
- * Generate a random UUID
- *
- * @example
- * uuid() => 'x1s2n5'
- */
-export function uuid (): string {
-
-  return Math.random().toString(36).slice(2);
+  }, []);
 
 }
 
@@ -539,12 +389,208 @@ export function debouncePromise<T extends unknown[]> (
 }
 
 /* -------------------------------------------- */
+/* STRING                                       */
+/* -------------------------------------------- */
+
+/**
+ * **sanatize**
+ *
+ * Sanatizes the log message passed. Converts a `Buffer`, `number`, `object`,
+ * `boolean` or an `array` type to a readable string.
+ *
+ * @example
+ *
+* sanitize(true) => 'true'
+* sanitize({ x: 1 }) => '{"x":1}'
+* sanitize(1000) => '1000'
+*/
+export function sanitize (message: number | boolean | string | Buffer | object | any[]): string {
+
+  if (isBuffer(message)) return message.toString();
+  if (isObject(message) || isArray(message)) return JSON.stringify(message);
+  if (isBoolean(message) || isNumber(message)) return `${message}`;
+
+  return isString(message) ? message : String(message);
+
+};
+
+/**
+ * **handleize**
+ *
+ * Converts string input to a handle
+ *
+ * @param string The string to convert
+ * @example 'foo:bar_baz 10' => 'foo-bar-baz-10'
+ */
+export function checksum (input: string | Buffer) {
+
+  return createHash('md5').update(input).digest('hex');
+
+}
+
+/**
+ * **handleize**
+ *
+ * Converts string input to a handle
+ *
+ * @param string The string to convert
+ * @example 'foo:bar_baz 10' => 'foo-bar-baz-10'
+ */
+export function handleize (string: string) {
+
+  return string
+  .toLowerCase()
+  .replace(/[^a-z0-9_:]+/g, '-')
+  .replace(/-$/, '')
+  .replace(/^-/, '');
+
+}
+
+/**
+ * **plural**
+ *
+ * Adds an `s` to the end of a word if length is more than 1
+ *
+ * @param word The word to pluralize
+ * @param size The length to determine, if `undefined` will measure `word`
+ */
+export function plural (word: string, size: number) {
+
+  if (size >= 2) return word[word.length - 1] !== 's' ? `${word}s` : word;
+
+  return word[word.length - 1] !== 's' ? word : word.slice(0, -1);
+
+}
+
+/**
+ * **toUpcase**
+ *
+ * Capitlalize the first letter of a string.
+ *
+ * @example
+ *
+ * toUpcase('title') // Title
+ */
+export function toUpcase <T extends string> (value: T) {
+
+  return value.charAt(0).toUpperCase() + value.slice(1);
+
+};
+
+/**
+ * **addSuffix**
+ *
+ * Append an `st`, `nd`, `rd` or `th` to the end of a number
+ *
+ * @example
+ *
+ * addSuffix(1) // 1st
+ * addSuffix(2) // 2nd
+ * addSuffix(3) // 3rd
+ * addSuffix(4) // 4th
+ */
+export function addSuffix (number: number): string {
+
+  const a = number % 10;
+  const b = number % 100;
+
+  return number + ((a === 1 && b !== 11)
+    ? 'st'
+    : (a === 2 && b !== 12) ? 'nd' : (a === 3 && b !== 13) ? 'rd' : 'th'
+  );
+
+}
+
+/**
+ * **glueString**
+ *
+ * Join a string together with a single space character.
+ * Accepts spread of string only.
+ *
+ * @example
+ *
+ * glueString('foo', 'bar', 'bar') // foo bar baz
+ */
+export function glueString (...input: string[]) {
+
+  return input.join(' ');
+
+}
+
+/**
+ * **glue**
+ *
+ * Join `string[]` or `...string[]` (spread) together
+ *
+ * @example
+ *
+ * glue('foo', 'bar', 'bar')   // foobarbaz
+ * glue(['foo', 'bar', 'baz']) // foobarbaz
+ */
+export function glue (...input: [ string[] ] | string[]) {
+
+  return isArray(input[0]) ? input[0].join('') : input.join('');
+
+}
+
+/**
+ * **ws**
+ *
+ * Equalised Spacing
+ */
+export function ws (array: any[] | object, prop: string = null) {
+
+  let size: number = 0;
+
+  if (isArray(array)) {
+    for (const item of array) {
+      if (prop) {
+        if (item[prop].length > size) size = item[prop].length;
+      } else {
+        if (item.length > size) size = item.length;
+      }
+    }
+  } else {
+    for (const item in array) if (item.length > size) size = item.length;
+  }
+
+  size = size + 1;
+
+  return function curried (string: string | number) {
+    const n = isString(string) ? size - string.length : size - string;
+    return n < 1 ? WSP : WSP.repeat(n);
+  };
+
+}
+
+/**
+ * Generate a random UUID
+ *
+ * @example
+ *
+ * uuid() => 'x1s2n5'
+ */
+export function uuid (): string {
+
+  return Math.random().toString(36).slice(2);
+
+}
+
+/* -------------------------------------------- */
 /* TYPE AND VALUE CHECKS                        */
 /* -------------------------------------------- */
 
 /**
+ * **isNil**
+ *
  * Check whether value is `undefined` or `null`
- */
+ *
+ * @example
+ *
+* isNil(undefined) // true
+* isNil(null)      // true
+* isNil(-1)        // false
+*/
 export function isNil (input: any) {
 
   return input === undefined || input === null;
@@ -552,8 +598,15 @@ export function isNil (input: any) {
 }
 
 /**
- * Check whether value is even number
- */
+* **isEven**
+*
+* Check whether value is even number
+*
+* @example
+*
+* isEven(50) // true
+* isEven(99) // false
+*/
 export function isEven (number: number) {
 
   return number % 2 === 0;
@@ -561,8 +614,14 @@ export function isEven (number: number) {
 }
 
 /**
- * Check whether a Buffer or String is empty
- */
+* **isEmptyString**
+*
+* Check whether a Buffer or String is empty
+*
+* @example
+*
+* isEmptyString('  ') // true
+*/
 export function isEmptyString (input: Buffer | string) {
 
   if (isBuffer(input)) return input.toString().trim().length === 0;
@@ -572,8 +631,16 @@ export function isEmptyString (input: Buffer | string) {
 }
 
 /**
- * Check whether a object or array is empty
- */
+* **isEmpty**
+*
+* Check whether a object or array is empty.
+*
+* @example
+*
+* isEmpty([])  // true
+* isEmpty({})  // true
+* isEmpty([1]) // false
+*/
 export function isEmpty (input: any) {
 
   if (isObject(input)) {
@@ -589,80 +656,114 @@ export function isEmpty (input: any) {
 }
 
 /**
- * Check if param is an array type
- */
+* **isArray**
+*
+* Check if param is an array type
+*
+* @example
+*
+* isArray([]) // true
+* isArray({}) // false
+*/
 export function isArray <T extends any[]> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Array';
+  return Array.isArray(param);
 
 }
 
 /**
- * Check if param is an object type
- */
+* **isObject**
+*
+* Check if param is an object type
+*
+* @example
+*
+* isObject({}) // true
+* isObject([]) // false
+*/
 export function isObject <T extends object> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Object';
+  return typeof param === 'object';
 
 }
 
 /**
- * Check if param is a string type
- */
+* **isString**
+*
+* Check if param is a string type
+*
+* @example
+*
+* isString('') // true
+* isString(``) // true
+* isString([]) // false
+*/
 export function isString <T extends string> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'String';
+  return typeof param === 'string';
 
 }
 
 /**
- * Check if param is a date type
- */
+* **isDate**
+*
+* Check if param is a date type
+*/
 export function isDate <T extends Date> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Date';
+  return Object.prototype.toString.call(param).slice(8, -1) === 'Date';
 
 }
 
 /**
- * Check if param is an regular expression type
- */
+* **isRegex**
+*
+* Check if param is an regular expression type
+*/
 export function isRegex <T extends RegExp> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'RegExp';
+  return Object.prototype.toString.call(param).slice(8, -1) === 'RegExp';
 
 }
 
 /**
- * Check if param is a function type
- */
+* **isFunction**
+*
+* Check if param is a function type
+*/
 export function isFunction <T extends Function> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Function';
+  return typeof param === 'function';
 
 }
 
 /**
- * Check if param is a boolean type
- */
+* **isBoolean**
+*
+* Check if param is a boolean type
+*/
 export function isBoolean <T extends boolean> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Boolean';
+  return typeof param === 'boolean';
 
 }
 
 /**
- * Check if param is a number type
- */
+* **isNumber**
+*
+* Check if param is a number type
+*/
 export function isNumber <T extends number> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Number';
+  return typeof param === 'number';
 
 }
 
 /**
- * Check if param is a number type
- */
+* **isNaN**
+*
+* Check if param is `NaN`
+*/
 export function isNaN <T extends number> (param: any): param is T {
 
   return Number.isNaN(param);
@@ -670,25 +771,32 @@ export function isNaN <T extends number> (param: any): param is T {
 }
 
 /**
- * Check if param is null type
- */
+* **isNull**
+*
+* Check if param is null type
+*/
 export function isNull <T extends null> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Null';
+  return Object.prototype.toString.call(param).slice(8, -1) === 'Null';
 
 }
 
 /**
- * Check if param is a undefined type
- */
+* **isUndefined**
+*
+* Check if param is a undefined type
+*/
 export function isUndefined <T extends undefined> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'Undefined';
+  return typeof param === 'undefined';
+
 }
 
 /**
- * Check if param is Asynchronous type
- */
+* **isAsync**
+*
+* Check if param is Asynchronous type
+*/
 export function isAsync<T extends Promise<unknown>> (param: any): param is T {
 
   return toString.call(param).slice(8, -1) === 'AsyncFunction';
@@ -696,8 +804,10 @@ export function isAsync<T extends Promise<unknown>> (param: any): param is T {
 }
 
 /**
- * Check if param is Buffer type
- */
+* **isBuffer**
+*
+* Check if param is Buffer type
+*/
 export function isBuffer<T extends Buffer> (param: any): param is T {
 
   return Buffer.isBuffer(param);

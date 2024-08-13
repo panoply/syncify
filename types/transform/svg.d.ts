@@ -4,7 +4,7 @@ import type { LiteralUnion, Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
 import type { Config as SVGOConfig } from 'svgo';
 import type { Config as SVGSpriteConfig } from 'svg-sprite';
-import type { GetProcessorConfigs, RenamePaths } from '../shared';
+import type { RenamePaths } from '../shared';
 
 /* -------------------------------------------- */
 /* PROCESSOR CONFIGS                            */
@@ -150,14 +150,14 @@ export type SVGTransformer = (
  *
  * Processor Configuration
  */
-export type SVGOProcesser = GetProcessorConfigs<SVGOConfig>
+export type SVGOProcesser = SVGOConfig
 
 /**
  * **INTERNAL USE**
  *
  * Processor Configuration
  */
-export type SVGSpriteProcesser = GetProcessorConfigs<SVGSpriteConfig>
+export type SVGSpriteProcesser = SVGSpriteConfig
 
 /**
  * **INTERNAL USE**

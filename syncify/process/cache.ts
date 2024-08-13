@@ -89,9 +89,8 @@ export async function getCache (cli: Commands) {
 
   if (!has('hotSnippet', $.cache.build)) $.cache.build.hotSnippet = [];
 
-  if (cli.cache) {
-    return clearCache();
-  }
+  if (cli.cache) return clearCache();
+
 }
 
 export function clearCache (id: keyof Cache.Model = null) {

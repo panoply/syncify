@@ -275,22 +275,26 @@ declare global {
       right: '0',
       margin: '0 auto',
       display: 'flex',
-      color: '#f7f7f7',
-      zIndex: '99999',
-      fontFamily: 'system-ui,sans-serif',
+      color: '#fff',
+      zIndex: '2147483647',
+      fontFamily: 'system-ui, sans-serif',
+      fontWeight: '500',
       textAlign: 'center',
+      textTransform: 'uppercase',
       justifyContent: 'space-around',
       alignItems: 'center',
-      fontSize: '11px'
+      fontSize: '9px',
+      // @ts-expect-error
+      '-webkit-font-smoothing': 'antialiased'
     };
 
     const childStyle: Partial<CSSStyleDeclaration> = {
-      padding: '5px 20px',
+      padding: '5px 10px',
       backgroundColor: '#232326',
       border: '0.8px solid transparent',
-      borderRadius: '5px',
-      borderTopLeftRadius: '0',
-      borderTopRightRadius: '0',
+      borderRadius: '0',
+      borderTopLeftRadius: '5px',
+      borderTopRightRadius: '5px',
       borderBottomLeftRadius: '0',
       borderBottomRightRadius: '0',
       borderBottom: '0'

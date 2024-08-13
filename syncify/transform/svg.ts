@@ -1,54 +1,20 @@
 import type { SVGBundle, Syncify, SVGSpriteConfig, SVGOConfig, ClientParam } from 'types';
-import type { SVGSpriter, SVGSpriterConstructor } from 'svg-sprite';
-import type SVGO from 'svgo';
+import type { SVGSpriter } from 'svg-sprite';
+import Svgo from 'svgo';
+import SVGSprite from 'svg-sprite';
 import { join, relative } from 'pathe';
 import { readFile, writeFile } from 'fs-extra';
-import { isNil } from 'rambdax';
 import { toArray, assign } from 'syncify:utils/native';
 import { Kind, File, Namespace } from 'syncify:file';
 import { renameFile } from 'syncify:process/files';
-import { byteSize, fileSize, plural } from 'syncify:utils/utils';
+import { sizeDiff, byteSize } from 'syncify:sizes';
+import { plural } from 'syncify:utils/utils';
 import { timer } from 'syncify:timer';
 import * as c from 'syncify:colors';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';
 import pMap from 'p-map';
-
-/* -------------------------------------------- */
-/* DYNAMIC IMPORTS                              */
-/* -------------------------------------------- */
-
-/**
- * SVGO Module
- */
-export let Svgo: typeof SVGO = null;
-
-/**
- * SVG Sprite Module
- */
-export let SVGSprite: SVGSpriterConstructor = null;
-
-/**
- * Load SVG Sprite / SVGO
- *
- * Dynamically imports SVG Sprite and SVGO. Assigns the modules to
- * lettings `sprite` and/or `svgo`. This allows users to optionally
- * include modules in the build.
- */
-export async function load (id: 'svg-sprite' | 'svgo') {
-
-  if (id === 'svg-sprite') {
-    SVGSprite = (await import('svg-sprite')).default;
-    return isNil(SVGSprite) === false;
-  }
-
-  if (id === 'svgo') {
-    Svgo = (await import('svgo')).default;
-    return isNil(Svgo) === false;
-  }
-
-};
 
 /* -------------------------------------------- */
 /* TRANSFORMS                                   */
@@ -117,7 +83,7 @@ export function compileSprite (
       file.output = join($.dirs.output, file.key);
     }
 
-    const options = (config.sprite === true ? $.processor.sprite.config : config.sprite) as SVGSpriteConfig;
+    const options = (config.sprite === true ? $.processor.sprite : config.sprite) as SVGSpriteConfig;
     const sprite = new SVGSprite(options);
     const items = await pMap(toArray(config.input), getFile).catch(
       error.write('Error reading an SVG file', {
@@ -158,7 +124,7 @@ export function compileSprite (
         })
       );
 
-      const size = fileSize(content, file.size);
+      const size = sizeDiff(content, file.size);
 
       if (size.isSmaller) {
         log.transform(`${file.kind} ${size.before}`, `gzip ${size.gzip}`);
@@ -262,7 +228,7 @@ export function compileInline (
 
     file.size = byteSize(patch);
 
-    let svg: SVGO.Output;
+    let svg: Svgo.Output;
 
     try {
 
@@ -291,7 +257,7 @@ export function compileInline (
 
     const { data } = svg;
 
-    const size = fileSize(data, file.size);
+    const size = sizeDiff(data, file.size);
 
     if (size.isSmaller) {
       log.transform(`${file.kind} ${size.before} → gzip ${size.gzip}`);

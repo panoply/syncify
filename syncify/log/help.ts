@@ -1,9 +1,6 @@
 import type { Commands } from 'types';
-import { stdin, stdout } from 'node:process';
-import { emitKeypressEvents } from 'node:readline';
-import scroll from 'scrollable-cli';
 import { COL, ARR } from 'syncify:symbol';
-import { gray, bold, neonRouge, lightGray, whiteBright, clear } from 'syncify:colors';
+import { gray, bold, lightGray, whiteBright, clear } from 'syncify:colors';
 import { log } from 'syncify:native';
 
 export function help (cli: Commands) {
@@ -11,7 +8,6 @@ export function help (cli: Commands) {
   log(clear);
 
   const DSH = lightGray('-'.repeat(80));
-  const HZR = NWL + lightGray('─'.repeat(80)) + NWL;
 
   const usage = `
     ${bold('SYNCIFY CLI  ' + ARR + whiteBright('  v' + VERSION))}
@@ -32,30 +28,7 @@ export function help (cli: Commands) {
 
   if (cli.help === null) {
 
-    const name = require('figlet').textSync('  syncify', {
-      font: 'Slant',
-      whitespaceBreak: true
-    });
-
-    return log(
-      neonRouge.bold.bgBlack(name) + NLR,
-      usage
-    );
-
-  } else {
-
-    const title = WSP.repeat(10) + 'syncify';
-    const name = require('figlet').textSync(title, {
-      font: 'Slant',
-      whitespaceBreak: true
-    });
-
-    log(
-      neonRouge.bold.bgBlack(name) + NWL,
-      HZR,
-      gray(`Scroll up ${neonRouge('▲')} and ${neonRouge('▼')} down using the arrow keys.`),
-      HZR
-    );
+    return log(usage);
 
   }
 
@@ -226,28 +199,6 @@ export function help (cli: Commands) {
 
   `;
 
-  emitKeypressEvents(process.stdin);
-
-  const help = scroll()
-  .setContent(cli.help === 'examples' ? examples : commands)
-  .setStart({ x: 0, y: 11 })
-  .setSize({ width: 100, height: 30 })
-  .setWrapOptions({ trim: false, hard: false, wordWrap: false })
-  .print();
-
-  log(
-    HZR,
-    gray(`Type ${neonRouge.bold('Q')} or press ${neonRouge.bold('esc')} key to quit and exit this screen`),
-    HZR
-  );
-
-  stdout.cursorTo(0, 40);
-  stdin.setRawMode(true);
-  stdin.on('keypress', (_, key) => {
-    if (key.name === 'up') help.scroll(-2).print();
-    if (key.name === 'down') help.scroll(2).print();
-    if (key.name === 'q') process.exit();
-    if (key.name === 'escape') process.exit();
-  });
+  log(cli.help === 'examples' ? examples : commands);
 
 }

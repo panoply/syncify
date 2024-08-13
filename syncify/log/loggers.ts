@@ -273,12 +273,9 @@ export function unhook () {
  */
 export function hook (name: string) {
 
-  if ($.warnings.current !== name) $.warnings.current = name;
-
-  if (!u.has(name, $.warnings.process)) {
-    $.warnings.current = name;
-    $.warnings.process[name] = new Set();
-  }
+  const warning = $.warnings.has(name)
+    ? $.warnings.get(name)
+    : $.warnings.set(name, new Map()).get(name);
 
   $.log.listen = intercept((stream, data) => {
 
@@ -287,8 +284,6 @@ export function hook (name: string) {
       process[stream].write(data);
 
     } else {
-
-      $.warnings.count += 1;
 
       const text = data.split(NWL);
 

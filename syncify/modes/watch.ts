@@ -1,5 +1,5 @@
-import type { Syncify } from 'types';
-import { client, queue } from 'syncify:requests/client';
+import type { ChokidorEvents, Syncify } from 'types';
+import { client } from 'syncify:requests/client';
 import { compile as liquid } from 'syncify:transform/liquid';
 import { compile as styles } from 'syncify:transform/style';
 import { compile as script } from 'syncify:transform/script';
@@ -8,7 +8,7 @@ import { compile as json } from 'syncify:transform/json';
 import { compile as pages } from 'syncify:transform/pages';
 import { compile as svgs } from 'syncify:transform/svg';
 import { compile as schema } from 'syncify:transform/schema';
-import { isUndefined, isNil } from 'syncify:utils';
+import { isUndefined } from 'syncify:utils';
 import { File, Type, Kind } from 'syncify:file';
 import { parseFile } from 'syncify:process/files';
 import * as log from 'syncify:log';
@@ -26,7 +26,9 @@ export function watch (callback: Syncify) {
 
   if ($.mode.hot) $.wss.connected();
 
-  $.watch.on('all', function (event, path) {
+  $.watch.on('all', onchange);
+
+  function onchange (event: ChokidorEvents, path: string) {
 
     const file = parse(path);
 
@@ -52,13 +54,11 @@ export function watch (callback: Syncify) {
       }
     }
 
-  });
+  };
 
   async function handler (file: File) {
 
     try {
-
-      let value: Buffer | string | void | { title: any; body_html: any; } = null;
 
       /* -------------------------------------------- */
       /* DISPATCH REQUEST IN TRANSFORM                */
@@ -88,60 +88,39 @@ export function watch (callback: Syncify) {
 
         case Type.Style:
 
-          value = await styles(file, callback);
+          return styles(file, request.assets, callback);
 
-          break;
         case Type.Layout:
         case Type.Snippet:
 
-          value = await liquid(file, callback);
+          return liquid(file, request.assets, callback);
 
-          break;
         case Type.Section:
 
           if (file.kind === Kind.JSON) {
-            value = await json(file, callback);
+            return json(file, request.assets, callback);
           } else {
-            value = await liquid(file, callback);
+            return liquid(file, request.assets, callback);
           }
 
-          break;
-
+        case Type.Metaobject:
         case Type.Template:
 
           if (file.kind === Kind.JSON) {
-            value = await json(file, callback);
+            return json(file, request.assets, callback);
           } else {
-            value = await liquid(file, callback);
+            return liquid(file, request.assets, callback);
           }
 
-          break;
         case Type.Config:
         case Type.Locale:
 
-          value = await json(file, callback);
+          return json(file, request.assets, callback);
 
-          break;
         case Type.Metafield:
 
-          value = await json(file, callback);
-          return request.metafields({ value, namespace: file.namespace, key: file.key });
+          return json(file, request.metafields, callback);
 
-      }
-
-      if (!isNil(value)) {
-
-        log.syncing(file.key);
-
-        await request.assets('put', file, value);
-
-        if ($.mode.hot) {
-          if (file.type === Type.Section) {
-            $.wss.section(file.name);
-          } else if (file.type !== Type.Style) {
-            await queue.onIdle().then(() => $.wss.replace());
-          }
-        }
       }
 
     } catch (e) {

@@ -3,9 +3,10 @@ import type { AxiosError } from 'axios';
 import { allFalse, has, hasPath } from 'rambdax';
 import { queue, requeue } from 'syncify:requests/queue';
 import axios from 'axios';
-import { event, getSizeStr } from 'syncify:utils';
+import { stringSize } from 'syncify:sizes';
 import { timer } from 'syncify:timer';
 import { setPageCache } from 'syncify:process/cache';
+import { event } from 'syncify:native';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';
@@ -184,7 +185,7 @@ export async function sync <T extends Resource.Page> (store: Store, file: File, 
       event.emit('upload', 'uploaded', page, {
         key: file.key,
         namespace: file.namespace,
-        fileSize: getSizeStr(page.body_html)
+        fileSize: stringSize(page.body_html)
       });
 
     }

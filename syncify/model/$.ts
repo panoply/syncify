@@ -147,7 +147,7 @@ export const $ = new class Bundle {
    * @default
    * {}
    */
-  public warnings: Type.Warnings = object<Type.Warnings>();
+  public warnings: Type.Warnings = new Map();
 
   /**
    * Theme Publishing
@@ -283,6 +283,7 @@ export const $ = new class Bundle {
     interactive: false,
     dev: true,
     prod: false,
+    strap: false,
     watch: false,
     clean: false,
     cache: false,

@@ -108,14 +108,10 @@ export async function setup () {
     }
   });
 
-  const client = {
+  const scopes = await access.get({
     baseURL: `https://${domain}.myshopify.com/admin`,
-    headers: {
-      'X-Shopify-Access-Token': token.trim()
-    }
-  };
-
-  const scopes = await access.get(client);
+    headers: { 'X-Shopify-Access-Token': token.trim() }
+  });
 
   if (isBoolean(scopes)) {
 
@@ -157,7 +153,7 @@ export async function setup () {
       .NL
       .Wrap(
         'Syncify requires read and write access to all the above resources.',
-        'Provide access to all scopes in red above and try again.',
+        'Provide access to all scopes listed in red (above) and try again.',
         c.red
       )
       .NL

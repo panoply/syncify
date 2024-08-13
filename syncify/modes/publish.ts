@@ -107,6 +107,7 @@ export async function publish (cb?: Syncify) {
     // await processing(id, store);
 
     log.spinner.stop('done');
+
     log.write(`${bold('published')} ${ARR} ${store.domain}`, {
       prefix: 'status',
       color: neonGreen,

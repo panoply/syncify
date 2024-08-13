@@ -12,11 +12,12 @@ export const processor = (): ProcessorsBundle => ({
     crlf: false,
     exclude: null
   },
-  postcss: {
+  tailwind: {
     installed: false,
     loaded: false,
     file: false,
-    config: []
+    map: null,
+    config: null
   },
   sass: {
     installed: false,
@@ -31,23 +32,18 @@ export const processor = (): ProcessorsBundle => ({
     }
   },
   esbuild: {
-    installed: false,
-    loaded: false,
-    file: false,
-    config: {
-      bundle: true,
-      format: 'esm',
-      globalName: undefined,
-      target: 'es2016',
-      metafile: true,
-      external: [],
-      platform: 'browser',
-      splitting: false,
-      sourcemap: 'linked',
-      write: false,
-      logLevel: 'silent',
-      plugins: []
-    }
+    bundle: true,
+    format: 'esm',
+    globalName: undefined,
+    target: 'es2016',
+    metafile: true,
+    external: [],
+    platform: 'browser',
+    splitting: false,
+    sourcemap: 'linked',
+    write: false,
+    logLevel: 'silent',
+    plugins: []
   },
   sharp: {
     installed: false,
@@ -56,46 +52,39 @@ export const processor = (): ProcessorsBundle => ({
     file: false,
     config: {}
   },
-  sprite: {
-    installed: false,
-    loaded: false,
+  postcss: {
     file: false,
-    config: {
-      mode: {
-        inline: true,
-        symbol: {
-          example: false
-        }
-      },
-      shape: {
-        transform: [ 'svgo' ],
-        id: {
-          generator: 'svg-%s'
-        }
-      },
-      svg: {
-        xmlDeclaration: false,
-        doctypeDeclaration: false,
-        dimensionAttributes: false,
-        namespaceClassnames: false,
-        namespaceIDs: false
+    config: []
+  },
+  sprite: {
+    mode: {
+      inline: true,
+      symbol: {
+        example: false
       }
+    },
+    shape: {
+      transform: [ 'svgo' ],
+      id: {
+        generator: 'svg-%s'
+      }
+    },
+    svg: {
+      xmlDeclaration: false,
+      doctypeDeclaration: false,
+      dimensionAttributes: false,
+      namespaceClassnames: false,
+      namespaceIDs: false
     }
   },
   svgo: {
-    installed: false,
-    loaded: false,
-    file: false,
-    config: {
-      multipass: true,
-      datauri: 'enc',
-      js2svg: {
-        indent: 2,
-        pretty: true
-      },
-      plugins: [
-        'preset-default'
-      ]
-    }
+    multipass: true,
+    js2svg: {
+      indent: 2,
+      pretty: true
+    },
+    plugins: [
+      'preset-default'
+    ]
   }
 });

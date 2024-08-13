@@ -7,11 +7,10 @@ import { importFile } from 'syncify:process/files';
 import { Progress } from 'syncify:cli/progress';
 import { queue } from 'syncify:requests/queue';
 import { timer } from 'syncify:utils/timer';
-import { assign } from 'syncify:native';
-import { addSuffix, event, glue } from 'syncify:utils';
+import { assign, event } from 'syncify:native';
+import { addSuffix, glue } from 'syncify:utils';
 import { Create, Prefix } from 'syncify:ansi';
 import { ARR } from 'syncify:symbol';
-
 import * as request from 'syncify:requests/assets';
 import * as c from 'syncify:colors';
 import * as log from 'syncify:log';

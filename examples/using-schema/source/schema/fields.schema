@@ -351,7 +351,7 @@
     {
       "type": "header",
       "content": "Gutter",
-      "info": "Control gutter spacing"
+      "info": "Control gutter spacings"
     },
     {
       "type": "range",

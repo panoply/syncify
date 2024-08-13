@@ -510,9 +510,11 @@ export interface Paths<T = string | string[]> {
  */
 export interface Config<T = Stores> extends Directories {
   /**
-   * **Use `package.json` file for store and theme references**
+   * **THIS OPTION IS DEPRECATED**
    *
-   * Define Shopify stores and themes within your projects `package.json` file.
+   * >  **Use `package.json` file for store and theme references**
+   *
+   * > Define Shopify stores and themes within your projects `package.json` file.
    * In your `package.json` provide store/s and themes as per the example below:
    *
    * ```jsonc

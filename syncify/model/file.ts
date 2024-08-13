@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import type { ParsedPath } from 'node:path';
-import { assign } from 'syncify:native';
 import type { FileKeys, FileResources } from 'types';
 
 /* -------------------------------------------- */
@@ -62,6 +61,7 @@ export const enum Kind {
   TypeScript = 'TypeScript',
   JSX = 'JSX',
   TSX = 'TSX',
+  Tailwind = 'Tailwind',
   Font = 'Font',
   SVG = 'SVG',
   Sprite = 'Sprite',
@@ -92,6 +92,16 @@ export class File<T = any> {
    * @default undefined // getter when required
    */
   readonly data: T = undefined;
+
+  /**
+   * Hash reference of the file contents, used for diffing comparison, couples with
+   * the caching datasets.
+   *
+   * @example
+   *
+   * 'aa11bb22cc33dd44ee55ff66gg77'
+   */
+  public hash: string;
 
   /**
    * A unique UUID reference for this file - This option can change

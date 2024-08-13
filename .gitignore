@@ -133,3 +133,8 @@ lib/utils/paths.ts
 lib/utils/require.ts
 lib/utils/timer.ts
 lib/utils/utils.ts
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

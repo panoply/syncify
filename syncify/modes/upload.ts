@@ -6,7 +6,9 @@ import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
 import { outputFile } from 'syncify:process/files';
 import { delay } from 'rambdax';
-import { event, byteSize, getSizeStr, isFunction, toUpcase, glue } from 'syncify:utils';
+import { event } from 'syncify:native';
+import { byteSize, stringSize } from 'syncify:sizes';
+import { isFunction, toUpcase, glue } from 'syncify:utils';
 import { AxiosResponse } from 'axios';
 import { onAsset } from 'syncify:plugins/hooks';
 import { hasSnippet, removeRender } from 'syncify:hot/inject';
@@ -232,7 +234,7 @@ export async function upload (cb?: Syncify): Promise<void> {
     .NL
     .Line(Prefix('Elapsed', c.whiteBright.bold(timer.now('upload'))), c.gray)
     .Line(Prefix('Duration', c.whiteBright(timer.stop(file.uuid))), c.gray)
-    .Line(Prefix('Size', c.whiteBright(getSizeStr(file.size))), c.gray)
+    .Line(Prefix('Size', c.whiteBright(stringSize(file.size))), c.gray)
     .Newline();
 
     if (item.status === Events.Success) {

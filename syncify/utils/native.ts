@@ -1,5 +1,11 @@
 import { Console } from 'node:console';
 import { stdout, stderr } from 'node:process';
+import { EventEmitter } from 'node:events';
+
+/**
+ * Event emitter instance
+ */
+export const event = new EventEmitter();
 
 /**
  * Native Console Log

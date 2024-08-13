@@ -81,6 +81,21 @@ export type GetProcessorConfigs<T> = {
 }
 
 /**
+ * Processor Configuration
+ */
+export type GetProcessorConfigFile<T> = {
+  /**
+   * Whether or not a config file exists for the processor,
+   * When one exists the URI path location to the file will
+   * be applied as the value.
+   */
+  file: boolean | string;
+  /**
+   * Configuration of the processor, Initialized with defaults
+   */
+  config: T;
+}
+/**
  * Picked `package.json` fields
  */
 export interface Package {

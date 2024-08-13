@@ -1,34 +1,25 @@
 /* eslint-disable no-unused-vars */
 
-import type { LiteralUnion, Merge } from 'type-fest';
+import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
-import type { Config as TailwindConfig } from 'tailwindcss';
-import type { Plugin as PostCSSPlugin, Transformer, TransformCallback } from 'postcss';
-import type { GetProcessorConfigs, RenamePaths } from '../shared';
+import type { Config as TailwindCSSConfig } from 'tailwindcss';
+import type { Plugin as PostCSSPlugin, Transformer, TransformCallback, AcceptedPlugin } from 'postcss';
+import type { GetProcessorConfigFile, GetProcessorConfigs, RenamePaths } from '../shared';
 
 /* -------------------------------------------- */
 /* PROCESSOR CONFIGS                            */
 /* -------------------------------------------- */
 
 export type PostCSSConfig = (
+  | AcceptedPlugin
   | PostCSSPlugin
   | Transformer
   | TransformCallback
+  | any
 );
 
-export interface TailwindCSSConfig {
-  important: TailwindConfig['important'];
-  prefix: TailwindConfig['PrefixConfig'];
-  separator: TailwindConfig['SeparatorConfig'];
-  safelist: TailwindConfig['SafelistConfig'];
-  blocklist: TailwindConfig['BlocklistConfig'];
-  presets: TailwindConfig['presets'];
-  future: TailwindConfig['future'];
-  experimental: TailwindConfig['experimental'];
-  darkMode: TailwindConfig['darkMode'];
-  theme: TailwindConfig['theme'];
-  corePlugins: TailwindConfig['corePlugins'];
-  plugins: TailwindConfig['plugins'];
+export interface TailwindConfig extends TailwindCSSConfig {
+  config: string[]
 }
 
 export interface SASSConfig {
@@ -143,7 +134,6 @@ export interface StyleTransform<T = string | string[]> {
    */
   attrs?: string[][];
   /**
-   * **NOT YET AVAILABLE**
    *
    * [TailwindCSS](https://tailwindcss.com/) Override
    *
@@ -156,7 +146,7 @@ export interface StyleTransform<T = string | string[]> {
    *
    * @default true // if tailwind is not installed this is false
    */
-  tailwind?: boolean | TailwindCSSConfig;
+  tailwind?: boolean | Partial<TailwindConfig>;
   /**
    * [PostCSS](https://postcss.org/) Override
    *
@@ -228,14 +218,21 @@ export type StyleTransformer = (
  *
  * PostCSS Processor Configuration
  */
-export type PostCSSProcesser = GetProcessorConfigs<{ plugins: PostCSSConfig[] }>;
+export type PostCSSProcesser = GetProcessorConfigFile<PostCSSConfig[]>;
 
 /**
  * **INTERNAL USE**
  *
  * Tailwind Processor Configuration
  */
-export type TailwindCSSProcesser = GetProcessorConfigs<TailwindCSSConfig>
+export type TailwindCSSProcesser = Merge<GetProcessorConfigs<TailwindConfig>, {
+  /**
+   * Bundle References
+   *
+   * Holds the index of each style bundle that uses tailwind.
+   */
+  map: { [bundle: number]: Set<string> }
+}>
 
 /**
  * **INTERNAL USE**
@@ -266,4 +263,12 @@ export type StyleBundle = Merge<StyleTransform, {
    * Anymatch function
    */
   watch: Tester;
+  /**
+   * PostCSS
+   */
+  postcss: PostCSSConfig[];
+  /**
+   * Tailwind
+   */
+  tailwind: Partial<TailwindConfig>;
 }>;

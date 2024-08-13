@@ -15,14 +15,13 @@ import type { AxiosRequestConfig } from 'axios';
 import { basename, extname } from 'pathe';
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
-import merge from 'mergerino';
 import { pathExists } from 'fs-extra';
 import { CONFIG_FILE_EXT } from 'syncify:const';
 import { typeError, invalidError, warnOption, throwError, missingEnv } from 'syncify:log/throws';
 import { bundleRequire } from 'syncify:requests/require';
-import { lastPath, normalPath, globPath } from 'syncify:utils/paths';
+import { lastPath, normalPath, globPath } from 'syncify:paths';
 import { assign } from 'syncify:native';
-import { isArray, isObject, isString, isUndefined, isFunction, has } from 'syncify:utils';
+import { isArray, isObject, isString, isUndefined, isFunction, has, merge } from 'syncify:utils';
 import { cyan } from 'syncify:colors';
 import { $ } from 'syncify:state';
 
@@ -138,7 +137,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
   const { cwd } = $;
   const match = isFunction(hook) ? [] : false;
   const warn = warnOption('Path Resolver');
-  const path = normalPath($.dirs.input); // Path normalizer
+  const path = normalPath($.dirs.input, $.cwd); // Path normalizer
 
   if (isArray(filePath)) {
 
@@ -382,7 +381,7 @@ export function getTransform <
         });
 
         option.match = match;
-        option.input = paths;
+        option.input = paths[0];
 
         // apply snippet default is not defined
         if (opts.assertSnippet && !has('snippet', option)) option.snippet = false;

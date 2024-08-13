@@ -32,14 +32,12 @@
     "declaration": false,
     "preserveSymlinks": true,
     "allowSyntheticDefaultImports": true,
-    "keyofStringsOnly": true,
     "esModuleInterop": true,
     "ignoreDeprecations": "5.0",
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "noImplicitThis": false,
     "skipDefaultLibCheck": true,
-    "noStrictGenericChecks": true,
     "noEmit": true,
     "noEmitOnError": true,
     "noUnusedLocals": true,
@@ -66,12 +64,6 @@
       ],
       "syncify:const": [
         "./syncify/const.ts"
-      ],
-      "syncify:native": [
-        "./syncify/utils/native.ts"
-      ],
-      "syncify:timer": [
-        "./syncify/utils/timer.ts"
       ],
       "syncify:utils": [
         "./syncify/utils/utils.ts"
@@ -164,9 +156,33 @@
         "./syncify/log/*.ts",
         "!./syncify/log/index.ts"
       ],
+      /*
+      /* UTILITIES
+      /* -------------------------------------------- */
       "syncify:utils/*": [
         "./syncify/utils/*",
-      ]
+      ],
+      "syncify:timer": [
+        "./syncify/utils/timer.ts"
+      ],
+      "syncify:paths": [
+        "./syncify/utils/paths.ts",
+      ],
+      "syncify:object": [
+        "./syncify/utils/object.ts",
+      ],
+      "syncify:string": [
+        "./syncify/utils/string.ts",
+      ],
+      "syncify:sizes": [
+        "./syncify/utils/sizes.ts",
+      ],
+      "syncify:typeof": [
+        "./syncify/utils/typeof.ts",
+      ],
+      "syncify:native": [
+        "./syncify/utils/native.ts"
+      ],
     }
   }
 }

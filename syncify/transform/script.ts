@@ -1,45 +1,17 @@
 import type { Syncify, ClientParam, ScriptBundle } from 'types';
 import { writeFile } from 'fs-extra';
-import ESBuild, { Metafile } from 'esbuild';
+import esbuild, { Metafile } from 'esbuild';
 import { basename, join, relative } from 'pathe';
-import { isNil, isType } from 'rambdax';
+import { isType } from 'rambdax';
 import { File } from 'syncify:file';
 import { timer } from 'syncify:timer';
 import { bold } from 'syncify:colors';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import * as warn from 'syncify:log/warnings';
-import { pNext, getImport, getSizeStr, byteSize, fileSize, isBuffer, has } from 'syncify:utils';
+import { stringSize, byteSize, sizeDiff } from 'syncify:sizes';
+import { pNext, isBuffer, has } from 'syncify:utils';
 import { $ } from 'syncify:state';
-
-/**
- * ESBuild Instance
- */
-export let esbuild: typeof ESBuild = null;
-
-/* -------------------------------------------- */
-/* FUNCTIONS                                    */
-/* -------------------------------------------- */
-
-/**
- * Load ESBuild
- *
- * Dynamically imports ESBuild and assigns the module to
- * letting `esbuild`. This allows users to optionally include
- * modules in the build.
- */
-export function esbuildModule (): boolean {
-
-  esbuild = getImport('esbuild');
-
-  if (isNil(esbuild)) {
-    esbuild = null;
-    return false;
-  }
-
-  return true;
-
-};
 
 /**
  * ESBuild Metafile
@@ -48,7 +20,7 @@ export function esbuildModule (): boolean {
  */
 export async function esbuildBundle (config: ScriptBundle): Promise<void> {
 
-  if ($.processor.esbuild.loaded) config.watch.clear();
+  config.watch.clear();
 
   const result = await esbuild.build(config.esbuild);
 
@@ -83,7 +55,7 @@ async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) 
 
   }
 
-  if (mode.watch && $.processor.esbuild.loaded) {
+  if (mode.watch) {
 
     // Ensure that watched files of importes are aligned.
     // We execute this check in the next event loop to ensure
@@ -207,18 +179,18 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
             if (isNaN(config.size)) {
 
               log.transform(file.kind, `${bold(format.toUpperCase())} bundle`);
-              log.minified(getSizeStr(text));
+              log.minified(stringSize(text));
 
             } else {
 
-              const { before, after, saved } = fileSize(text, config.size);
-              log.transform(`${bold(format.toUpperCase())} bundle → ${bold(getSizeStr(text))}`);
+              const { before, after, saved } = sizeDiff(text, config.size);
+              log.transform(`${bold(format.toUpperCase())} bundle → ${bold(stringSize(text))}`);
               log.minified(null, before, after, saved);
 
             }
 
           } else {
-            log.transform(`${bold(format.toUpperCase())} bundle → ${bold(getSizeStr(text))}`);
+            log.transform(`${bold(format.toUpperCase())} bundle → ${bold(stringSize(text))}`);
           }
 
           let content: string;

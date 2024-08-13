@@ -1,0 +1,66 @@
+{
+  "name": "@syncify/dawn",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Syncify Strap (Dawn) with the most elementary presets.",
+  "license": "MIT",
+  "syncify": {
+    "stores": {
+      "domain": "syncify",
+      "themes": {
+        "dev": 136656060657
+      }
+    },
+    "config": {
+      "paths": {
+        "assets": "assets/**/*",
+        "config": "config/*.json",
+        "locales": "locales/*.json",
+        "layout": "layout/*.liquid",
+        "snippets": "snippets/**/*.liquid",
+        "schema": "schema/*.json",
+        "sections": "sections/**/*.liquid",
+        "templates": "templates/*",
+        "customers": "customers/*",
+        "metaobject": "metaobject/*",
+        "metafields": "metafields/**/*.json",
+        "pages": "pages/**/*",
+        "redirects": "redirects.yaml"
+      },
+      "views": {
+        "sections": {
+          "prefixDir": false,
+          "separator": "-",
+          "global": []
+        },
+        "snippets": {
+          "prefixDir": false,
+          "separator": "-",
+          "global": []
+        },
+        "pages": {
+          "importLanguage": "markdown",
+          "suffixDir": false,
+          "author": "",
+          "global": []
+        }
+      },
+      "transform": {
+        "script": {
+          "assets/[file]": "assets/*.js"
+        },
+        "style": {
+          "assets/[file]": "assets/*.css"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@syncify/cli": "workspace:0.3.0-beta",
+    "autoprefixer": "^10.4.16",
+    "cssnano": "^6.0.1",
+    "esbuild": "^0.19.5",
+    "postcss": "^8.4.31",
+    "svg-sprite": "^2.0.2"
+  }
+}

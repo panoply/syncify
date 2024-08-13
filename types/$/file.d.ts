@@ -282,4 +282,5 @@ interface File<T = any> {
    * @default undefined // getter when required
    */
   get data(): T
+
 }
