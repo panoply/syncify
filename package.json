@@ -59,7 +59,12 @@
   "prettier": "@syncify/prettier-config",
   "eslintConfig": {
     "extends": "@syncify/eslint-config",
-    "ignorePatterns": ["docs", "dist", "**/theme", "test/e2e/theme"],
+    "ignorePatterns": [
+      "docs",
+      "dist",
+      "**/theme",
+      "test/e2e/theme"
+    ],
     "rules": {
       "object-curly-newline": "off",
       "no-import-assign": "off",
@@ -79,6 +84,7 @@
     }
   },
   "dependencies": {
+    "@syncify/turndown": "^0.2.0",
     "adm-zip": "^0.5.15",
     "axios": "^1.7.3",
     "cbor": "^9.0.2",
@@ -109,7 +115,6 @@
     "@liquify/schema": "^0.9.5",
     "@syncify/eslint-config": "workspace:^",
     "@syncify/prettier-config": "workspace:^",
-    "@syncify/turndown": "workspace:^",
     "@types/finalhandler": "^1.2.3",
     "@types/fs-extra": "^11.0.4",
     "@types/mime-types": "^2.1.4",

@@ -93,9 +93,6 @@ importers:
       '@syncify/prettier-config':
         specifier: workspace:^
         version: link:packages/configs/prettier-config
-      '@syncify/turndown':
-        specifier: workspace:^
-        version: link:packages/turndown
       '@types/finalhandler':
         specifier: ^1.2.3
         version: 1.2.3
