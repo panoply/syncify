@@ -303,6 +303,8 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
         if (prop !== 'settings') block[prop] = schema[i][prop];
       }
 
+      if (block.type === '@app') continue
+
       block.settings = [];
 
       if (has('settings', schema[i])) {
