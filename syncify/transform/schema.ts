@@ -303,42 +303,62 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
         if (prop !== 'settings') block[prop] = schema[i][prop];
       }
 
-      if (block.type === '@app') continue
+      // Only add settings array if it's not an @app block
+      if (block.type !== '@app') {
 
-      block.settings = [];
+        block.settings = [];
 
-      if (has('settings', schema[i])) {
+        if (has('settings', schema[i])) {
 
-        for (const setting of schema[i].settings) {
+          for (const setting of schema[i].settings) {
 
-          if (has('$ref', setting)) {
+            if (has('$ref', setting)) {
 
-            const [ key, prop ] = setting.$ref.split('.');
+              const [key, prop] = setting.$ref.split('.');
 
-            if ($.section.shared.has(key)) {
+              if ($.section.shared.has(key)) {
 
-              const shared = $.section.shared.get(key);
+                const shared = $.section.shared.get(key);
 
-              if (has(prop, shared.schema)) {
+                if (has(prop, shared.schema)) {
 
-                if (isArray(shared.schema[prop])) {
+                  if (isArray(shared.schema[prop])) {
 
-                  // Settings Spread Shared Schema
-                  //
-                  block.settings.push(...(shared.schema[prop] as SettingsSpread));
-
-                } else if (isObject(shared.schema[prop])) {
-
-                  if (has('settings', shared.schema[prop])) {
-
-                    // Settings Group Shared Schema
+                    // Settings Spread Shared Schema
                     //
-                    block.settings.push(...(shared.schema[prop] as SettingsGroup).settings);
+                    block.settings.push(...(shared.schema[prop] as SettingsSpread));
+
+                  } else if (isObject(shared.schema[prop])) {
+
+                    if (has('settings', shared.schema[prop])) {
+
+                      // Settings Group Shared Schema
+                      //
+                      block.settings.push(...(shared.schema[prop] as SettingsGroup).settings);
+                    } else {
+
+                      // Settings Singleton
+                      //
+                      block.settings.push(shared.schema[prop] as SettingsSingleton);
+                    }
+                  }
+
+                } else {
+                  if ($.mode.build) {
+
+                    warn.schema(file, {
+                      shared: prop,
+                      $ref: schema[i].$ref,
+                      schema: `blocks ${ARR} settings`,
+                      message: [
+                        `An unknown Shared Schema key reference of ${bold(schema[i].$ref)} was provided`,
+                        `to the ${bold('blocks')} schema id ${bold(setting.id)} within section file`,
+                        `${bold(file.base)}. The shared schema file exists, but the key ${bold(prop)} does not.`
+                      ]
+                    });
+
                   } else {
-
-                    // Settings Singleton
-                    //
-                    block.settings.push(shared.schema[prop] as SettingsSingleton);
+                    log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
                   }
                 }
 
@@ -350,45 +370,27 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
                     $ref: schema[i].$ref,
                     schema: `blocks ${ARR} settings`,
                     message: [
-                      `An unknown Shared Schema key reference of ${bold(schema[i].$ref)} was provided`,
-                      `to the ${bold('blocks')} schema id ${bold(setting.id)} within section file`,
-                      `${bold(file.base)}. The shared schema file exists, but the key ${bold(prop)} does not.`
+                      `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
+                      `to ${bold('blocks')} schema id ${bold(setting.id)} within section file ${bold(file.base)}.`,
+                      'There is no known shared schema file using that name.'
                     ]
+
                   });
 
                 } else {
-                  log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
+                  log.warn(`unknown $ref ${bold(setting.$ref)} `, file.base);
                 }
               }
 
             } else {
-              if ($.mode.build) {
 
-                warn.schema(file, {
-                  shared: prop,
-                  $ref: schema[i].$ref,
-                  schema: `blocks ${ARR} settings`,
-                  message: [
-                    `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
-                    `to ${bold('blocks')} schema id ${bold(setting.id)} within section file ${bold(file.base)}.`,
-                    'There is no known shared schema file using that name.'
-                  ]
+              block.settings.push(setting);
 
-                });
-
-              } else {
-                log.warn(`unknown $ref ${bold(setting.$ref)} `, file.base);
-              }
             }
-
-          } else {
-
-            block.settings.push(setting);
 
           }
 
         }
-
       }
 
       blocks.push(block);
