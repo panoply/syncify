@@ -1,0 +1,126 @@
+{
+  "github": {
+    "title": "Github",
+    "url": "https://github.com/panoply/syncify",
+    "target": "_blank"
+  },
+  "npm": {
+    "title": "NPM",
+    "url": "https://www.npmjs.com/package/syncify",
+    "target": "_blank"
+  },
+  "discord": {
+    "title": "Discord",
+    "url": "https://discord.gg/shopify-developers-597504637167468564",
+    "target": "_blank"
+  },
+  "menu": [
+    {
+      "title": "Introduction",
+      "links": [
+        {
+          "title": "What is Syncify?",
+          "url": "/what-is-syncify/"
+        },
+        {
+          "title": "Getting Help",
+          "url": "/getting-help/"
+        },
+        {
+          "title": "Examples",
+          "url": "/examples/"
+        },
+        {
+          "title": "Boycott Shopify CLI",
+          "url": "/examples/"
+        }
+      ]
+    },
+    {
+      "title": "Setup",
+      "links": [
+        {
+          "title": "Installation",
+          "url": "/setup/installation/"
+        },
+        {
+          "title": "Authorization",
+          "url": "/setup/authorization/"
+        },
+        {
+          "title": "Credentials",
+          "url": "/setup/credentials/"
+        },
+        {
+          "title": "Store References",
+          "url": "/setup/store-references/"
+        }
+      ]
+    },
+    {
+      "title": "Usage",
+      "links": [
+        {
+          "title": "Syncify CLI",
+          "url": "/usage/syncify-cli/"
+        },
+        {
+          "title": "Config File",
+          "url": "/usage/config-file/"
+        }
+      ]
+    },
+    {
+      "title": "Features",
+      "links": [
+        {
+          "title": "Shared Schema",
+          "url": "/features/shared-schema/"
+        },
+        {
+          "title": "HOT Reloading",
+          "url": "/features/hot-reloading/"
+        }
+      ]
+    },
+    {
+      "title": "Options",
+      "links": [
+        {
+          "title": "Input",
+          "url": "/configuration/input/"
+        },
+        {
+          "title": "Output",
+          "url": "/configuration/output/"
+        }
+      ]
+    },
+    {
+      "title": "CLI Commands",
+      "links": [
+        {
+          "title": "Modes",
+          "url": "/cli-commands/modes/"
+        }
+      ]
+    },
+    {
+      "title": "Integrate",
+      "links": [
+        {
+          "title": "CI Solution",
+          "url": "/integrate/ci-solution/"
+        },
+        {
+          "title": "Github",
+          "url": "/integrate/git/"
+        },
+        {
+          "title": "VSCode",
+          "url": "/integrate/vscode/"
+        }
+      ]
+    }
+  ]
+}

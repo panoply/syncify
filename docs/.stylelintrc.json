@@ -1,0 +1,36 @@
+{
+  "plugins": ["stylelint-scss"],
+  "extends": ["stylelint-config-rational-order"],
+  "rules": {
+    "indentation": 2,
+    "block-no-empty": null,
+    "color-no-invalid-hex": true,
+    "comment-empty-line-before": [
+      "always",
+      {
+        "ignore": ["stylelint-commands", "after-comment"]
+      }
+    ],
+    "declaration-colon-space-after": "always",
+    "max-empty-lines": 2,
+    "block-opening-brace-newline-after": "always-multi-line",
+    "rule-empty-line-before": [
+      "always",
+      {
+        "except": ["first-nested"],
+        "ignore": ["after-comment"]
+      }
+    ],
+    "unit-whitelist": [
+      "px",
+      "rem",
+      "%",
+      "s",
+      "vh",
+      "vw",
+      "cm",
+      "em",
+      "deg"
+    ]
+  }
+}

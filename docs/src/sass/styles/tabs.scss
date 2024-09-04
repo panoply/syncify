@@ -1,0 +1,46 @@
+.tabs {
+  nav > button {
+    color: $black;
+    font-weight: 500;
+    font-size: 0.895rem;
+    font-family: Roboto, sans-serif !important;
+    text-transform: uppercase;
+    background-color: transparent;
+    border: 0;
+    border-bottom: 1px solid $cyan;
+    cursor: pointer;
+
+
+    &:hover,
+    &:active,
+    &:focus {
+      color: $black;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &[aria-selected="true"] {
+      color: $black;
+      background-color: $blue;
+    }
+
+    &[aria-selected="false"] {
+      color: $white;
+    }
+  }
+
+  .panel,
+  .panel > ul {
+    position: relative;
+
+    > li {
+      list-style-type: inherit;
+    }
+  }
+}
+
+[role="tabpanel"][aria-hidden="true"] {
+  display: none;
+}

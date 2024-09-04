@@ -1,0 +1,45 @@
+/* -------------------------------------------- */
+/* PRESET                                       */
+/* -------------------------------------------- */
+
+@import '../../node_modules/@brixtol/bootstrap/variables';
+
+/* -------------------------------------------- */
+/* VARIABLES                                    */
+/* -------------------------------------------- */
+
+@import 'variables';
+
+/* -------------------------------------------- */
+/* BOOTSTRAP                                    */
+/* -------------------------------------------- */
+
+@import '../../node_modules/@brixtol/bootstrap/variation';
+@import '../../node_modules/@brixtol/bootstrap/sass/components/drawer';
+
+/* -------------------------------------------- */
+/* PAPYRUS                                      */
+/* -------------------------------------------- */
+
+@import '../../node_modules/papyrus/index';
+@import '../../node_modules/papyrus/theme/languages/bash';
+@import '../../node_modules/papyrus/theme/languages/html';
+@import '../../node_modules/papyrus/theme/languages/liquid';
+@import '../../node_modules/papyrus/theme/languages/javascript';
+@import '../../node_modules/papyrus/theme/languages/typescript';
+@import '../../node_modules/papyrus/theme/languages/xml';
+@import '../../node_modules/papyrus/theme/languages/css';
+@import '../../node_modules/papyrus/theme/languages/scss';
+@import '../../node_modules/papyrus/theme/languages/json';
+@import '../../node_modules/papyrus/theme/languages/treeview';
+
+/* -------------------------------------------- */
+/* COMPONENTS                                   */
+/* -------------------------------------------- */
+
+@import 'styles/svg';
+@import 'styles/overwrites';
+@import 'styles/navbar';
+@import 'styles/sidebar';
+@import 'styles/landing';
+@import 'styles/tabs';

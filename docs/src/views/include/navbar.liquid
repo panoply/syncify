@@ -1,0 +1,29 @@
+<header
+  id="navbar"
+  class="container-fluid navbar d-unset d-sm-none">
+  <nav class="row jc-between ai-center px-2">
+
+    <button
+      type="button"
+      class="col-auto btn navbar-drawer ml-2 d-flex d-sm-none p-0"
+      spx@click="drawer.toggle">
+      {% svg 'menu', 'icon-menu' %}
+    </button>
+
+    <a
+      href="/"
+      class="col-auto tc-sm"
+      title="Home Page"
+      spx-target="body">
+      {% svg 'logo', 'logo' %}
+    </a>
+
+    <a
+      class="col-auto d-none"
+      href="{{ navigation.github.url }}"
+      title="Syncify Github"
+      target="_blank">
+      {% svg 'github', 'icon-github' %}
+    </a>
+  </nav>
+</header>

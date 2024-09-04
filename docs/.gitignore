@@ -1,0 +1,6 @@
+# FILES
+.env
+
+# DIRECTORIES
+node_modules
+theme

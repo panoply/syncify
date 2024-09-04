@@ -1,0 +1,25 @@
+{
+  "[liquid]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "sissel.shopify-liquid"
+  },
+  "highlight.regexes": {
+    "(?<=:{3,4}\\s)(grid|rule|note)": {
+      "decorations": [
+        {
+          "color": "#81D4FA",
+          "fontWeight": "900"
+        }
+      ]
+    },
+    "(?<=:{3,4}[a-z ]+)([colsxmd0-9-]+)": {
+      "regexFlags": "g",
+      "decorations": [
+        {
+          "color": "#91EBC2",
+          "isWholeLine": true
+        }
+      ]
+    }
+  },
+}

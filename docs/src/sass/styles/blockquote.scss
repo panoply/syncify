@@ -1,0 +1,50 @@
+blockquote {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  padding: 10px;
+  padding-left: 75px !important;
+  background-image: url(icon-info($gray-500));
+  background-repeat: no-repeat no-repeat;
+  background-position: 25px center;
+  background-size: 2.5%;
+  background-color: $code-bg;
+  border: 0.01rem #363d49 solid;
+  border-radius: 0.5rem;
+  position: relative;
+
+  @include media-breakpoint-down(sm) {
+    background-image: none;
+    padding: 15px !important;
+
+    > p {
+      font-size: $font-size-sm !important;
+    }
+  }
+
+  &.note {
+    background-image: url(icon-info($gray-600));
+    background-repeat: no-repeat no-repeat;
+    background-position: 25px center;
+    background-size: 2.5%;
+    padding: 15px;
+    padding-right: 20px;
+    padding-left: 65px;
+
+    > p {
+      margin-left: 65px;
+      width: 100% !important;
+    }
+  }
+
+  > p {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: 0;
+    width: 100% !important;
+    color: #b8b5b5;
+    font-size: $font-size-md;
+    font-weight: 100;
+    font-family: $font-family-base;
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}

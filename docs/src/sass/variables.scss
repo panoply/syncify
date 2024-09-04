@@ -1,0 +1,330 @@
+:root {
+  --papyrus-font-size: 0.875em;
+  --papyrus-code-padding-y: 0.9em;
+  --papyrus-code-padding-x: 0.8em;
+  --papyrus-code-border-radius: 0.4em !important;
+  --papyrus-line-number-width: 3.4rem;
+  //--papyrus-code-bg: #181b21;
+  // --papyrus-line-fence-color: transparent;
+}
+
+/* -------------------------------------------- */
+/* VARIABLE PREFIX                              */
+/* -------------------------------------------- */
+
+$variable-prefix: null;
+$enable-font-smoothing: true;
+
+/* -------------------------------------------- */
+/* EDITABLE OPTIONS                             */
+/* -------------------------------------------- */
+
+$enable-rfs: true;
+
+/* -------------------------------------------- */
+/* PALETTE                                      */
+/* -------------------------------------------- */
+
+$white: rgb(240, 240, 240);
+$black: #1c1e21;
+$blue: #6eb2d3;
+$indigo: #6610f2;
+$purple: #a77afe;
+$pink: #e45589;
+$salmon: #ff8ab0;
+$red: #dc3545;
+$orange: #ef8c39;
+$yellow: #ffe77a;
+$green: #9ee34f;
+$teal: #20c997;
+$cyan: #7ef0ff;
+$sea: #8bd3fd;
+
+/* -------------------------------------------- */
+/* GRAYS                                        */
+/* -------------------------------------------- */
+
+$gray-100: #ffffff;
+$gray-200: #f9f9f9; // FONT COLOUR
+$gray-300: #f2f0f1;
+$gray-400: #c4c8cc;
+$gray-500: #a4a6a8;
+$gray-600: #57647f;
+$gray-700: #212529;
+$gray-800: #282a36; // CODE BACKGROUND
+$gray-900: #181b20;
+
+/* -------------------------------------------- */
+/* BACKGROUND COLORS                            */
+/* -------------------------------------------- */
+
+$background-colors: (
+  'ivory': $gray-300,
+  'black': $black,
+  'gray': $gray-100,
+  'cyan': $cyan,
+  'ebony': $gray-800,
+  'code': #1c2028,
+  'white': $white
+);
+
+/* -------------------------------------------- */
+/* BORDER COLORS                                */
+/* -------------------------------------------- */
+
+// $border-color: $gray-400;
+
+/* -------------------------------------------- */
+/* FONT COLORS                                  */
+/* -------------------------------------------- */
+
+$font-colors: (
+  'black': $black,
+  'white': $gray-200,
+  'gray': $gray-500,
+  'dark-gray': $gray-600,
+  'red': $red,
+  'yellow': $yellow,
+  'cyan': $cyan,
+  'green': $green,
+  'blue': $blue,
+  'purple': $purple,
+  'pink': $pink
+);
+
+/* -------------------------------------------- */
+/* SPACING                                      */
+/* -------------------------------------------- */
+
+$spacer: 1rem;
+
+/* -------------------------------------------- */
+/* GRID                                         */
+/* -------------------------------------------- */
+
+$grid-columns: 12;
+$grid-gutter-width: 1.5rem;
+$grid-row-columns: 6;
+
+/* -------------------------------------------- */
+/* GRID > BREAKPOINTS                           */
+/* -------------------------------------------- */
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1140px,
+  xxl: 1260px
+);
+
+/* -------------------------------------------- */
+/* GRID > MAX-WIDTHS                            */
+/* -------------------------------------------- */
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1000px,
+  xxl: 1320px
+);
+
+/* -------------------------------------------- */
+/* LAYOUT                                       */
+/* -------------------------------------------- */
+
+$sidebar-width: 280px;
+$session-width: 380px;
+
+/* -------------------------------------------- */
+/* BODY                                         */
+/* -------------------------------------------- */
+
+$body-bg: #16181c; // $black; //#282a36; // $gray-100;
+$body-color: $white; //$gray-900;
+$code-bg: #20242c;
+$code-inline-bg: $code-bg;
+$link-color: $gray-400;
+
+$letter-spacing-base: inherit;
+$letter-spacing-heading: inherit;
+
+$font-weight-normal: 200;
+$font-weight-lighter: 200;
+$font-weight-light: 100;
+$font-weight-bold: 500;
+$font-weight-bolder: bolder;
+
+/* -------------------------------------------- */
+/* BORDER                                       */
+/* -------------------------------------------- */
+
+$border-width: 0.01rem;
+$border-color: #2d333a; // $gray-600; //$gray-400;
+$accordion-border-color: $border-color; //$gray-400;
+$accordion-border-width: $border-width;
+
+/* -------------------------------------------- */
+/* FONT FAMILY                                  */
+/* -------------------------------------------- */
+
+// stylelint-disable
+
+$font-family-base:
+  Proxima Nova,
+  system-ui,
+  -apple-system,
+  Segoe UI,
+  Roboto,
+  Ubuntu,
+  Cantarell,
+  Noto Sans,
+  sans-serif,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  Helvetica,
+  Arial,
+  sans-serif,
+  'Apple Color Emoji',
+  'Segoe UI Emoji',
+  'Segoe UI Symbol';
+
+$font-family-heading: 'JetBrains Mono', monospace;
+$font-family-other: 'JetBrains Mono', monospace;
+$font-family-code: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono',
+  monospace;
+
+// stylelint-enable
+
+/* -------------------------------------------- */
+/* FONT SIZES                                   */
+/* -------------------------------------------- */
+
+$font-size-base: 1.05rem;
+
+$font-size-xs: $font-size-base * 0.595;
+$font-size-sm: $font-size-base * 0.825;
+$font-size-md: $font-size-base * 0.945;
+$font-size-lg: $font-size-base * 1.25;
+$font-size-xl: $font-size-base * 1.75;
+
+// stylelint-enable
+
+/* -------------------------------------------- */
+/* FONT HEADINGS                                */
+/* -------------------------------------------- */
+
+$line-height-base: 1.4;
+$line-height-sm: 1.25;
+$line-height-lg: 2;
+$line-height-xl: 2.4;
+
+$headings-letter-spacing: $headings-letter-spacing;
+$headings-font-family: $font-family-other;
+$headings-margin-bottom: $spacer-3;
+$headings-font-style: null;
+$headings-font-weight: 900;
+$headings-line-height: 1.2;
+$headings-color: null;
+$headings-uppercase: true;
+
+$h1-font-size: $font-size-base * 1.4;
+$h2-font-size: $font-size-base * 1.3;
+$h3-font-size: $font-size-base * 1.1;
+$h4-font-size: $font-size-base * 1;
+$h5-font-size: $font-size-base * 1;
+$h6-font-size: $font-size-base;
+
+$hr-color: $border-color;
+$hr-margin-y: $spacer;
+$hr-border-width: $border-width;
+$hr-border-color: null; // Allows for inherited colors
+$hr-opacity: 1;
+
+/* -------------------------------------------- */
+/* PARAGRAPH                                    */
+/* -------------------------------------------- */
+
+$input-bg: rgb(18, 20, 24);
+$input-disabled-bg: $gray-100;
+$input-disabled-border-color: $gray-200;
+$input-color: $body-color;
+$input-border-color: $gray-400;
+
+$tooltip-bg: #000;
+$tooltip-font-family: $font-family-base;
+$tooltip-font-style: normal;
+$tooltip-font-size: $font-size-xs;
+$tooltip-font-color: $white;
+$tooltip-padding-y: 0.3rem;
+$tooltip-padding-x: 0.6rem;
+$tooltip-arrow-size: 5px;
+$tooltip-radius: 0;
+$tooltip-border-width: 0.03rem;
+$tooltip-animation: true;
+$tooltip-use-outline: false;
+
+/* -------------------------------------------- */
+/* FORM RANGE                                   */
+/* -------------------------------------------- */
+
+$form-range-track-width: 100%;
+$form-range-track-height: 0.05rem;
+$form-range-track-cursor: pointer;
+$form-range-track-bg: #363d49;
+$form-range-track-border-radius: 0;
+$form-range-track-box-shadow: $box-shadow-inset;
+$form-range-thumb-size: 0.8rem;
+$form-range-thumb-width: 0.9rem;
+$form-range-thumb-height: 0.9rem;
+$form-range-thumb-bg: $code-bg-color;
+$form-range-thumb-border: 0;
+$form-range-thumb-border-radius: 50%;
+$form-range-thumb-focus-box-shadow: transparent;
+$form-range-thumb-focus-box-shadow-width: 0;
+$form-range-thumb-active-bg: $pink;
+$form-range-thumb-disabled-bg: $gray-500;
+
+/* stylelint-disable scss/dollar-variable-colon-space-after */
+
+/* -------------------------------------------- */
+/* BASE STYLES                                  */
+/* -------------------------------------------- */
+
+// FONT FAMILY
+$papyrus-font-family: consolas, monaco, 'Andale Mono', 'Ubuntu Mono',
+  monospace;
+$papyrus-font-size: 0.895rem;
+$papyrus-line-height: 1.7;
+$papyrus-scrollbar-width: 0;
+$papyrus-code-bg: $body-bg;
+
+// EDITOR SIZING
+// $papyrus-height: auto;
+//$papyrus-width: 100%;
+
+// SELECTION
+$papyrus-selection-bg: 255, 255, 255;
+$papyrus-selection-alpha: 0.3;
+
+.language-ts {
+  .token {
+    &.constant {
+      color: #81d4fa;
+    }
+
+    &.this {
+      color: #ffab40;
+    }
+
+    &.keyword + .property {
+      color: #87abb3;
+    }
+
+    &.class-name {
+      color: #81d4fa !important;
+    }
+  }
+}

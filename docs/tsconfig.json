@@ -1,0 +1,28 @@
+{
+  "exclude": [
+    "node_modules/**",
+    "public"
+  ],
+  "include": [
+    "src/app/**/*.ts"
+  ],
+  "compilerOptions": {
+    "target": "ES6",
+    "ignoreDeprecations": "5.0",
+    "lib": [
+      "es2020",
+      "dom",
+      "dom.iterable"
+    ],
+    "module": "ES6",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "baseUrl": ".",
+    "paths": {
+      "types": [
+        "./scripts/eleventy.d.ts"
+      ]
+    }
+  }
+}

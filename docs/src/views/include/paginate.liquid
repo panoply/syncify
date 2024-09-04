@@ -1,0 +1,70 @@
+<section class="pt-4 px-3">
+  {% for item in navigation.menu %}
+
+    {% assign menu_index = forloop.index %}
+    {% assign menu_last = forloop.last %}
+
+    {% for link in item.links %}
+
+      {% liquid
+        #
+        # SKIP LINKS
+        #
+        unless link.url == page.url
+          continue
+        endunless
+        #
+        # PREV AND NEXT LINKS
+        #
+        if link.url == page.url
+          #
+          # PREV LINK
+          #
+          if forloop.first
+            assign prev_index = menu_index | minus: 2
+            assign prev = navigation.menu[prev_index].links | last
+          else
+            assign prev_link = forloop.index0 | minus: 1
+            assign prev = item.links[prev_link]
+          endif
+          #
+          # NEXT LINK
+          #
+          if menu_last and forloop.last
+            assign next = navigation.menu[0].links | first
+          elsif forloop.last
+            assign next = navigation.menu[menu_index].links | first
+          else
+            assign next_index = forloop.index0 | plus: 1
+            assign next = item.links[next_index]
+          endif
+        endif
+      %}
+
+      <div class="row jc-between mt-5 mb-3 navigators">
+
+        {% unless menu_index == 1 and forloop.index == 1 %}
+          <a
+            href="{{ prev.url | url }}"
+            class="col-auto btn prev"
+            spx-scroll="0">
+            {% svg 'chevron-left', 'icon icon-left mr-2' %}
+            {{ prev.title }}
+          </a>
+        {% endunless %}
+
+        <a
+          class="col-auto btn next ml-auto"
+          href="{{ next.url | url }}"
+          spx-scroll="0">
+          {{ next.title }}
+          {% svg 'chevron-right', 'icon icon-right ml-2' %}
+        </a>
+
+      </div>
+
+      {% break %}
+
+    {% endfor %}
+  {% endfor %}
+</section>

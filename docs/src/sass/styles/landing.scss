@@ -1,0 +1,232 @@
+.hidden {
+  overflow: hidden;
+}
+
+.hero {
+  h5 {
+    @include media-breakpoint-down(md) {
+      font-size: $font-size-md;
+    }
+  }
+
+  @keyframes move {
+    0% {
+      opacity: 0;
+      left: -200%;
+    }
+    10% {
+      opacity: 1;
+    }
+
+    70% {
+      opacity: 0;
+    }
+    100% {
+      left: 200%;
+    }
+  }
+
+  @keyframes move-right {
+    0% {
+      opacity: 0;
+      right: -20%;
+    }
+
+    10% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
+    100% {
+      right: 150%;
+    }
+  }
+
+  &-github {
+    a {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+
+      @include media-breakpoint-down(md) {
+        top: 20px;
+        right: 20px;
+      }
+
+      > .icon {
+        width: 30px;
+        height: 30px;
+        fill: $white;
+
+        @include media-breakpoint-down(md) {
+          width: 20px;
+          height: 20px;
+        }
+
+        &:hover {
+          fill: $blue;
+        }
+      }
+    }
+  }
+
+  .line {
+    width: 100%;
+    height: 2px;
+    background-color: transparent;
+    position: relative;
+
+    @include media-breakpoint-down(md) {
+      height: 1px;
+    }
+
+    &::before,
+    &::after {
+      position: absolute;
+      overflow: hidden;
+      top: 31px;
+      left: -100%;
+      transform: translatey(-50%);
+      content: '';
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        to right,
+        rgba($white, 0) 0%,
+        $blue 60%,
+        $blue 100%
+      );
+      opacity: 1;
+      z-index: 100;
+      animation-fill-mode: forwards;
+      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+
+      @include media-breakpoint-down(md) {
+        top: 18px;
+        width: 80%;
+        transform: translatey(-80%);
+      }
+    }
+
+    &::before {
+      animation: move 3s;
+    }
+
+    &:nth-child(1)::after,
+    &:nth-child(1)::before {
+      opacity: 0;
+    }
+
+    &::after {
+      animation: move 3s infinite;
+    }
+
+    &:nth-child(1)::after {
+      opacity: 0;
+      animation-delay: 3s;
+    }
+  }
+
+  &-logo {
+    color: #282a36;
+    z-index: 101;
+
+    &:hover {
+      transition: color 200ms ease-in-out 50ms;
+      color: $white;
+    }
+
+    a {
+      color: #282a36;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    > svg {
+      width: 200px;
+      height: 80px;
+
+      @include media-breakpoint-down(md) {
+        width: 175px;
+        height: 50px;
+      }
+
+      &:hover {
+        fill: $cyan;
+      }
+    }
+  }
+
+  &-caption {
+    font-size: 17px;
+    text-transform: uppercase;
+
+    @include media-breakpoint-down(md) {
+      font-size: 15px;
+      font-weight: $font-weight-normal;
+    }
+  }
+}
+
+.version {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  padding-right: 3px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.goto-link {
+  font-family: $font-family-heading;
+  font-size: 0.745rem;
+  text-transform: uppercase;
+  color: $link-color;
+  border: $border-width $border-color solid;
+  border-radius: 5px;
+  padding: 10px 0;
+  text-align: center;
+  background-color: $code-bg;
+
+  &:hover {
+    color: $white;
+    background-color: $code-bg;
+  }
+}
+
+.find {
+  input {
+    width: 100%;
+    height: 45px;
+    color: $white;
+    font-weight: 900;
+    font-size: 16px;
+    line-height: 45px;
+    background-color: #ffffff31;
+    border: none;
+    border-radius: 3px;
+
+    &::placeholder {
+      padding-left: 5px;
+      color: #ffffffad;
+      font-weight: 400;
+      font-size: 11px;
+    }
+
+    &:focus {
+      outline: #fff;
+    }
+  }
+
+  &-spinner {
+    width: 2rem;
+    height: 2rem;
+    color: rgba($color: $white, $alpha: 30%);
+    border-width: 0.24em;
+  }
+}

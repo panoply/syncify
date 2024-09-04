@@ -1,0 +1,54 @@
+<main
+  id="main"
+  class="container-fluid">
+  <div class="row vh-100 d-flex ai-center jc-center px-sm-5 hidden">
+    <div class="hero d-grid ai-center col-11 col-xl-6 m-auto">
+      <div class="hero-github">
+        <a href="https://github.com/panoply/spx">
+          {% svg 'github', 'icon icon-github' %}
+        </a>
+      </div>
+
+      <div class="d-flex flex-col as-center jc-center">
+
+        <div class="line"></div>
+
+        <a
+          spx-target="body"
+          href="/what-is-syncify/"
+          class="hero-logo d-block m-auto mb-3">
+          {% svg 'logo' %}
+        </a>
+
+      </div>
+
+      <div class="d-flex flex-column m-auto tc fw-lighter pb-2">
+        <span class="ff-base d-block uncase mt-1 hero-caption d-none d-sm-block">
+          {{ content }}
+        </span>
+      </div>
+
+      <div class="row my-4 jc-center ai-center">
+        <a
+          spx-target="body"
+          href="/what-is-syncify/"
+          class="col-5 col-md-2 goto-link tc">
+          Documentation
+        </a>
+        <span class="col-12 col-md-auto fs-xs fc-gray ff-heading tc px-3 my-3 my-sm-0">OR</span>
+        <a
+          spx-target="body"
+          href="/tutorial/"
+          class="col-5 col-md-2 goto-link">
+          Tutorial
+        </a>
+      </div>
+
+    </div>
+    <div class="version upper fc-dark-gray ff-head">
+      {{ pkg.version | prepend: 'version ' }}
+    </div>
+
+  </div>
+
+</main>

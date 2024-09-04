@@ -1,0 +1,71 @@
+{
+  "name": "syncify-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Syncify documentation website",
+  "author": {
+    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
+    "url": "https://github.com/panoply"
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "rm -rf public && concurrently \"pnpm run 11ty:watch\" \"pnpm run sass:watch\" \"pnpm tsup:watch\"",
+    "stage": "netlify dev -c \"eleventy --watch --serve --watch\" --targetPort 8080",
+    "build": "rm -rf public && pnpm run 11ty:build && pnpm run sass:build && pnpm run postcss && pnpm run tsup:build",
+    "postcss": "postcss public/style.css -r --no-map",
+    "release": "netlify build && netlify deploy",
+    "11ty:watch": "eleventy --config=.eleventy.cjs --serve --watch --quiet",
+    "11ty:build": "ENV=prod eleventy --config=.eleventy.cjs ",
+    "tsup:watch": "tsup --watch",
+    "tsup:build": "tsup --minify --env.NODE_ENV production",
+    "search:json": "tsup --env.NODE_ENV search",
+    "sass:build": "sass ./src/sass/stylesheet.scss public/style.css --no-source-map",
+    "sass:watch": "sass ./src/sass/stylesheet.scss public/style.css --poll --watch"
+  },
+  "browserslist": [
+    "defaults",
+    "Chrome >= 78",
+    "Firefox >= 78",
+    "Safari >= 10",
+    "Edge >= 18",
+    "IE >= 11",
+    "Opera >= 73",
+    "ChromeAndroid >= 75",
+    "ios_saf >= 9",
+    "Android >= 4",
+    "not dead"
+  ],
+  "stylelint": {
+    "extends": "@syncify/stylelint-config"
+  },
+  "eslintConfig": {
+    "extends": "@syncify/eslint-config"
+  },
+  "prettier": "@syncify/prettier-config",
+  "dependencies": {
+    "fuse.js": "^7.0.0",
+    "qvp": "^0.3.2",
+    "relapse": "^0.9.0"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1",
+    "@brixtol/bootstrap": "^1.7.5",
+    "@fullhuman/postcss-purgecss": "^6.0.0",
+    "@sissel/stylelint-config": "^1.2.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "cssnano": "^7.0.5",
+    "e11ty": "^0.0.4",
+    "gray-matter": "^4.0.3",
+    "markdown-it-anchor": "^9.0.1",
+    "markdown-it-attrs": "^4.2.0",
+    "markdown-it-container": "^4.0.0",
+    "marked": "^14.0.0",
+    "netlify-cli": "^17.34.2",
+    "papyrus": "^0.6.7",
+    "postcss": "^8.4.41",
+    "postcss-cli": "^11.0.0",
+    "sass": "^1.77.8",
+    "tsup": "^8.2.4"
+  }
+}
