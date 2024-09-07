@@ -15,6 +15,9 @@ tests/
 packages/**/dist
 straps/dusk-advanced/theme
 
+# DOCS
+docs/public
+
 lib-cov
 *.seed
 *.log
