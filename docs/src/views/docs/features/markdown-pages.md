@@ -1,56 +1,36 @@
 ---
 title: 'Pages'
 layout: base
-permalink: '/usage/pages/index.html'
-prev:
-  label: 'Targeting'
-  uri: '/cli/targeting'
-next:
-  label: 'Resources'
-  uri: '/cli/filtering'
-navs:
-  - 'Config File'
+permalink: '/features/markdown-pages/index.html'
+anchors:
+  - 'Markdown Pages'
   - 'Supported Files'
   - 'Default Options'
 ---
 
-# Pages
+# Markdown Pages
 
-Syncify supports page sync and employs an intuitive approach to working with static pages for stores. The [paths](#paths) **pages** option is where you can provide path file references to be synced. Pages in Syncify can be either `.html` (markup) or `.md` (markdown) files and cannot contain Liquid syntax (Shopify does not support Liquid in pages only static markup). Syncify also support frontmatter in page files, this allows you to pass in additional data when syncing to store/s.
+Syncify supports page sync and employs an intuitive approach to working with static pages for stores. The [paths](#paths) **pages** option is where you can provide path file references to be synced. Pages in Syncify can be either `.html` (markup) or `.md` (markdown) files.
 
-### Options
-
-The `pages` setting available in the `views` option of your `syncify.config.ts` file allows you to configure page processing and transforms. In Syncify, frontmatter can be used to configure per-page control.
-
-<!--prettier-ignore-->
-```js
-import { defaultConfig } from '@syncify/cli'
-
-export default defineConfig({
-  paths: {
-    pages: 'pages/*.{md,html}' // Set the location of page files
-  },
-  views: {
-    pages: {
-      suffixDir: false,  // When true, directory name will be used for template_suffix
-      safeSync: true,    // Ensure local and remote versions are aligned
-      author: '',        // Fallback author name
-      global: [],        // List of directories to exclude from applying template_suffix
-      language: 'html'   // Set the import language when remote sources sync to local ones
-    }
-  }
-})
-```
-
-### Remote and Local sources
-
-By default, syncify will perform **safe** synchronization. The `safeSync` option instructs syncify to pull down remote versions before uploading local ones in watch and upload modes. This operation ensures that you do not overwrite page content in situations where changes have been applied in your store since the last sync was performed on your local machine. Syncify will prompt you when misalignment is detected and allow you to pull in the remote versions.
-
-### Markdown Support
+> Pages cannot contain Liquid syntax (Shopify does not support Liquid in pages only static markup). Adding Liquid to page content will result in an error.
 
 Pages can be written in markdown, Syncify will transform `.md` page files into valid HTML markup when syncing. Markdown pages are parsed and transformed using the the powerful [markdown-it](https://github.com/markdown-it/markdown-it) and support Github flavored markdown syntax. In addition to Markdown → HTML generation, Syncify can also perform reversed conversion (HTML → Markdown). Using the `importLanguage` option, any time a remote to local alignment is carried out, files will be written in markdown.
 
-### Frontmatter Support
+---
+
+# Remote and Local sources
+
+By default, syncify will perform **safe** synchronization. The `safeSync` option instructs syncify to pull down remote versions before uploading local ones in watch and upload modes. This operation ensures that you do not overwrite page content in situations where changes have been applied in your store since the last sync was performed on your local machine. Syncify will prompt you when misalignment is detected and allow you to pull in the remote versions.
+
+---
+
+# Markdown Support
+
+Pages can be written in markdown, Syncify will transform `.md` page files into valid HTML markup when syncing. Markdown pages are parsed and transformed using the the powerful [markdown-it](https://github.com/markdown-it/markdown-it) and support Github flavored markdown syntax. In addition to Markdown → HTML generation, Syncify can also perform reversed conversion (HTML → Markdown). Using the `importLanguage` option, any time a remote to local alignment is carried out, files will be written in markdown.
+
+---
+
+# Frontmatter Support
 
 You can pass frontmatter data in page files. Page frontmatter can be used to control per-page publishing settings and allows for additional request payloads to be passed. Syncify supports a modest schema structure for page frontmatter.
 

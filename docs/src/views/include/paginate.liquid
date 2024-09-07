@@ -1,12 +1,12 @@
-<section class="pt-4 px-3">
-  {% for item in navigation.menu %}
+<section class="pt-4 pb-5 px-3">
+  {%- for item in navigation.menu -%}
 
-    {% assign menu_index = forloop.index %}
-    {% assign menu_last = forloop.last %}
+    {%- assign menu_index = forloop.index -%}
+    {%- assign menu_last = forloop.last -%}
 
-    {% for link in item.links %}
+    {%- for link in item.links -%}
 
-      {% liquid
+      {%- liquid
         #
         # SKIP LINKS
         #
@@ -39,32 +39,32 @@
             assign next = item.links[next_index]
           endif
         endif
-      %}
+      -%}
 
       <div class="row jc-between mt-5 mb-3 navigators">
 
-        {% unless menu_index == 1 and forloop.index == 1 %}
+        {%- unless menu_index == 1 and forloop.index == 1 -%}
           <a
             href="{{ prev.url | url }}"
             class="col-auto btn prev"
             spx-scroll="0">
-            {% svg 'chevron-left', 'icon icon-left mr-2' %}
-            {{ prev.title }}
+            {%- svg 'chevron-left', 'icon icon-left mr-2' -%}
+            {{- prev.title -}}
           </a>
-        {% endunless %}
+        {%- endunless -%}
 
         <a
           class="col-auto btn next ml-auto"
           href="{{ next.url | url }}"
           spx-scroll="0">
-          {{ next.title }}
-          {% svg 'chevron-right', 'icon icon-right ml-2' %}
+          {{- next.title -}}
+          {%- svg 'chevron-right', 'icon icon-right ml-2' -%}
         </a>
 
       </div>
 
-      {% break %}
+      {%- break -%}
 
-    {% endfor %}
-  {% endfor %}
+    {%- endfor -%}
+  {%- endfor -%}
 </section>

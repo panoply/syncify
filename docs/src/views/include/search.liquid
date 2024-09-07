@@ -1,16 +1,22 @@
 <div
-  class="navbar-search d-none d-md-unset"
+  class="search d-none d-md-flex"
   spx-component="search"
-  spx-search:source="{{ '/spx.json' | url }}">
+  spx-search:source="{{ '/syncify.json' | url }}">
 
   <input
     type="search"
+    name="search"
     class="fm-input"
     placeholder="Search"
     spx@input="search.onInput"
     spx@click="search.onFocus"
     spx-node="search.input">
-
+  <div class="keys">
+    <div class="row jc-center ac-center">
+      <kbd class="col-auto">⌘</kbd>
+      <kbd class="col-auto letters">K</kbd>
+    </div>
+  </div>
   <ul
     class="search-list d-none"
     spx-node="search.list">

@@ -1,28 +1,20 @@
 ---
 title: 'Transforms'
-layout: base
-permalink: '/usage/transforms/index.html'
-prev:
-  label: 'Targeting'
-  uri: '/cli/targeting'
-next:
-  label: 'Resources'
-  uri: '/cli/filtering'
-navs:
-  - 'Config File'
+layout: base.liquid
+permalink: '/usage/using-transforms/index.html'
+anchors:
+  - 'Using Transforms'
   - 'Supported Files'
   - 'Default Options'
 ---
 
-# Transforms
+# Using Transforms
 
 In Syncify, asset files can be transformed before being written to the defined `output` directory and uploaded to your Shopify store. The `transform` option provides users with control of the "asset pipeline" and Syncify exposes configuration wrappers for handling files together with modern developer tooling.
 
-#### Motivation
-
 ---
 
-### Script
+# Script
 
 Syncify exposes a `script` transform option which supports TypeScript (`.ts` and `.tsx`) and/or JavaScript (`.js` and `.jsx`) bundling using [ESBuild](https://esbuild.github.io/). Script transforms use a pre-defined set of processing configurations and will produce lean JavaScript bundles designed to work seamlessly in development mode or when leveraging HOT reloads. Syncify will also apply refinements to distribution bundles focused on performance when generating production builds for your Shopify theme.
 

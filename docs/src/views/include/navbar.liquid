@@ -1,29 +1,70 @@
 <header
   id="navbar"
-  class="container-fluid navbar d-unset d-sm-none">
-  <nav class="row jc-between ai-center px-2">
+  class="navbar bb">
+  <div class="container-fluid w-100">
+    <nav class="row ai-center px-2">
+      <button
+        type="button"
+        class="col-auto btn navbar-drawer ml-2 d-flex d-sm-none p-0"
+        spx@click="drawer.toggle">
+        {%- svg 'menu', 'icon-menu' -%}
+      </button>
+      <a
+        href="/"
+        class="col-auto tc-sm ml-offset"
+        title="Home Page"
+        spx-target="body">
+        {%- svg 'logo-text', 'navbar-logo' -%}
+      </a>
+      <span class="col-auto pl-0 fs-xs fc-white ff-heading upper mt-2 ">
+        <small class="navbar-version">version</small>
+        {{- pkg.version -}}
+      </span>
 
-    <button
-      type="button"
-      class="col-auto btn navbar-drawer ml-2 d-flex d-sm-none p-0"
-      spx@click="drawer.toggle">
-      {% svg 'menu', 'icon-menu' %}
-    </button>
+      <div class="col-auto tr pl-5  mr-auto">
+        <ul class="list-pipe mb-0 navbar-menu">
+          <li>
+            <a
+              href="/documentation"
+              class="active">Docs</a>
+          </li>
+          <li>
+            <a href="/documentation">CLI</a>
+          </li>
+          <li class="pr-4">
+            <a href="/documentation">CONFIG</a>
+          </li>
 
-    <a
-      href="/"
-      class="col-auto tc-sm"
-      title="Home Page"
-      spx-target="body">
-      {% svg 'logo', 'logo' %}
-    </a>
-
-    <a
-      class="col-auto d-none"
-      href="{{ navigation.github.url }}"
-      title="Syncify Github"
-      target="_blank">
-      {% svg 'github', 'icon-github' %}
-    </a>
-  </nav>
+        </ul>
+      </div>
+      <div class="col-auto pl-3  ml-auto ">
+        <div class="row">
+          <a
+            target="_blank"
+            href="{{ navigation.github.url }}"
+            title="{{ navigation.github.title }}"
+            class="col-auto">
+            {%- svg 'github', 'icon icon-github-text' -%}
+          </a>
+          <a
+            target="_blank"
+            href="{{ navigation.npm.url }}"
+            title="{{ navigation.npm.title }}"
+            class="col-auto">
+            {%- svg 'npm', 'icon icon-npm' -%}
+          </a>
+          <a
+            target="_blank"
+            href="{{ navigation.discord.url }}"
+            title="{{ navigation.discord.title }}"
+            class="col-auto">
+            {%- svg 'discord', 'icon icon-discord' -%}
+          </a>
+        </div>
+      </div>
+      <div class="col-auto">
+        {%- include 'include/search' -%}
+      </div>
+    </nav>
+  </div>
 </header>

@@ -44,16 +44,16 @@
           "url": "/setup/installation/"
         },
         {
-          "title": "Authorization",
-          "url": "/setup/authorization/"
+          "title": "Authentication",
+          "url": "/setup/authentication/"
         },
         {
-          "title": "Credentials",
-          "url": "/setup/credentials/"
+          "title": "References",
+          "url": "/setup/references/"
         },
         {
-          "title": "Store References",
-          "url": "/setup/store-references/"
+          "title": "Checklist",
+          "url": "/setup/checklist/"
         }
       ]
     },
@@ -65,21 +65,76 @@
           "url": "/usage/syncify-cli/"
         },
         {
-          "title": "Config File",
-          "url": "/usage/config-file/"
-        }
-      ]
-    },
-    {
-      "title": "Features",
-      "links": [
+          "title": "Config Files",
+          "url": "/usage/config-files/"
+        },
         {
-          "title": "Shared Schema",
-          "url": "/features/shared-schema/"
+          "title": "Modes",
+          "url": "/usage/syncify-cli/"
+        },
+        {
+          "title": "Directory Structures",
+          "url": "/usage/directory-structures/"
+        },
+        {
+          "title": "Renaming Files",
+          "url": "/usage/renaming-files/"
+        },
+        {
+          "title": "Transforms",
+          "url": "/usage/using-transforms/"
         },
         {
           "title": "HOT Reloading",
-          "url": "/features/hot-reloading/"
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Shared Schema",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Markdown Pages",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Metafields",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Frontmatter",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Terse Output",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Remote Bindings",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Multistore Support",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Version Control",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Publishing Themes",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Redirects",
+          "url": "/usage/using-transforms/"
+        },
+        {
+          "title": "Strap Generator",
+          "url": "/usage/syncify-cli/"
+        },
+        {
+          "title": "Troubleshoot",
+          "url": "/usage/using-transforms/"
         }
       ]
     },

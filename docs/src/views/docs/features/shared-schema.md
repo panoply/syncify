@@ -10,9 +10,9 @@ anchors:
 
 # Shared Schema
 
-Syncify provides an elegant and simple solution for Shared Section Schema. Shared Schemas are a superset implementation that provides developers a refined way to reuse schema `settings` and `blocks` across multiple sections. Syncify supports this capability using an isolation → injection approach wherein schema structures written in external JSON files can be injected into section `{% schema %}` tags.
+Syncify offers an elegant and straightforward solution for Shared Section Schema. Shared Schemas are a superset implementation that provides developers with a refined method to reuse schema `settings` and `blocks` across multiple sections. Syncify supports this capability using an isolation → injection approach, where schema structures written in external JSON files can be injected into section `{liquid} {% schema %}` tags.
 
-The internal structure of shared schema files use a simple `key` → `value` (object) pattern that is similar to how we define `presets` in section schema. Importing shared schemas into `{% schema %}` tags is made possible using a reference `$ref` key and injection value expression that allows for cherry picking different structures within schema files.
+The internal structure of shared schema files uses a simple **key** → **value** (object) pattern, similar to how we define `presets` in section schemas. Importing shared schemas into `{liquid} {% schema %}` tags is made possible using a reference `$ref` key and an injection value expression, allowing for the selective inclusion of different structures within schema files.
 
 #### Motivation
 
@@ -25,7 +25,6 @@ In theme development, we often need to reuse schema across multiple sections. Ho
 Shared Schema usage begins with the `schema` configuration `paths` option. The `schema` paths option is where Syncify will resolve shared schema JSON files. By default, Syncify assumes your shared schema files exist within a directory named `schema` relative to the `input` base directory, see below:
 
 :::: grid row
-
 ::: grid col
 
 ```js
@@ -38,6 +37,7 @@ export default defineConfig({
     schema: 'schema/*.{schema,json}'
   }
 });
+
 ```
 
 :::

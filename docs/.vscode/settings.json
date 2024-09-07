@@ -3,6 +3,26 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "sissel.shopify-liquid"
   },
+  "liquid.format.rules": {
+    "liquid": {
+      "delimiterTrims": "always"
+    }
+  },
+  "stylelint.validate": [
+    "scss",
+    "sass",
+    "less",
+    "postcss"
+  ],
+  "spx.files": [
+    "./docs/src/app/**/*.ts"
+  ],
+  "somesass.loadPaths": [
+    "./docs/src/sass/**/*.scss",
+    "!./docs/node_modules/@brixtol/bootstrap/_variables.scss"
+  ],
+  "stylelint.packageManager": "pnpm",
+  "stylelint.enable": false,
   "highlight.regexes": {
     "(?<=:{3,4}\\s)(grid|rule|note)": {
       "decorations": [

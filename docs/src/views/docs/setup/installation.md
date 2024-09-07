@@ -2,7 +2,7 @@
 title: 'Installation'
 layout: base.liquid
 permalink: '/setup/installation/index.html'
-navs:
+anchors:
   - 'Installation'
   - 'Schema Stores'
   - 'VSCode Usage'
@@ -58,10 +58,17 @@ $ bun add @syncify/cli --dev
 Syncify provides JSON Schema Store references for usage in JSON files that contain a `$schema` property or within text editors like [VSCode](https://code.visualstudio.com/) which support external schema store association. The JSON Schema store is helpful for users who prefer `.json` configurations or are setting config options within their `package.json` file via the `syncify` config key.
 
 ```bash
-https://unpkg.com/@syncify/schema/env.json        # Usage within env.syncify.json
-https://unpkg.com/@syncify/schema/pkg.json        # Usage within package.json
-https://unpkg.com/@syncify/schema/config.json     # Usage within syncify.config.json
-https://unpkg.com/@syncify/schema/sections.json   # Usage within *.schema files
+# Usage within env.syncify.json
+https://unpkg.com/@syncify/schema/env.json
+
+# Usage within package.json
+https://unpkg.com/@syncify/schema/pkg.json
+
+# Usage within syncify.config.json
+https://unpkg.com/@syncify/schema/config.json
+
+# Usage within *.schema files
+https://unpkg.com/@syncify/schema/sections.json
 ```
 
 ### VSCode Usage

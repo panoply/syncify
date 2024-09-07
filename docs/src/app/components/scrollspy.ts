@@ -36,11 +36,10 @@ export class ScrollSpy extends spx.Component<typeof ScrollSpy.define> {
    */
   onmount () {
 
-    console.log('onmount');
 
     if (this.dom.hasHrefNode) {
 
-      this.dom.hrefNode.classList.add('fc-blue');
+      this.dom.hrefNode.classList.add('fc-green');
 
       for (const a of this.dom.hrefNodes) {
 
@@ -48,8 +47,8 @@ export class ScrollSpy extends spx.Component<typeof ScrollSpy.define> {
 
         a.onclick = () => {
           setTimeout(() => {
-            this.dom.hrefNodes.forEach(j => j.classList.remove('fc-blue'));
-            a.classList.add('fc-blue');
+            this.dom.hrefNodes.forEach(j => j.classList.remove('fc-green'));
+            a.classList.add('fc-green');
           }, 300);
         };
 
@@ -84,8 +83,8 @@ export class ScrollSpy extends spx.Component<typeof ScrollSpy.define> {
 
       if (next < window.screenY && this.dom.hrefNodes[i]) {
 
-        this.dom.hrefNodes.forEach(j => j.classList.remove('fc-blue'));
-        this.dom.hrefNodes[i].classList.add('fc-blue');
+        this.dom.hrefNodes.forEach(j => j.classList.remove('fc-green'));
+        this.dom.hrefNodes[i].classList.add('fc-green');
 
       }
     });

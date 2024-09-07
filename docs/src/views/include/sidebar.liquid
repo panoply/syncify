@@ -1,28 +1,11 @@
-<div class="sidebar-header">
-  <div class="row jc-between ai-center w-100">
-    <a
-      href="/"
-      class="col-auto tc-sm"
-      spx-target="body">
-      {% svg 'logo', 'icon-logo' %}
-    </a>
-    <a
-      class="col-auto tr pr-0"
-      href="{{ navigation.github.url }}"
-      data-tooltip="right"
-      aria-label="{{ navigation.github.title }}"
-      target="_blank">
-      {% svg 'github', 'icon-github' %}
-    </a>
-  </div>
-</div>
 <nav
   id="menu"
-  class="sidebar-menu mt-0 mb-2 br-0 bt-0"
+  class="sidebar-menu mt-4 mb-2 sticky"
   spx-component="sidebar">
-  {% for parent in navigation.menu %}
 
-    {%
+  {%- for parent in navigation.menu -%}
+
+    {%-
       liquid
       #
       # PARENT NAVIGATION GROUP
@@ -32,39 +15,39 @@
       if mapped_groups contains page.url
         assign parent_expand = true
       endif
-    %}
+    -%}
 
-    {% if parent.url %}
+    {%- if parent.url -%}
       <a
         spx-scroll="0"
         href="{{ parent.url | url }}"
-        {% if parent_expand %}
+        {%- if parent_expand -%}
           aria-expanded="true"
           class="menu-link active"
-        {% else %}
+        {%- else -%}
           class="menu-link"
-        {% endif %}>
-        {{ parent.title }}
+        {%- endif -%}>
+        {{- parent.title -}}
       </a>
-    {% else %}
+    {%- else -%}
       <button
         type="button"
-        {% if parent_expand %}
+        {%- if parent_expand -%}
           aria-expanded="true"
           class="menu-link active"
-        {% else %}
+        {%- else -%}
           class="menu-link"
-        {% endif %}>
-        {{ parent.title }}
+        {%- endif -%}>
+        {{- parent.title -}}
       </button>
-    {% endif %}
+    {%- endif -%}
     <ul
       class="list rel my-0"
-      {% unless parent_expand %}
+      {%- unless parent_expand -%}
         hidden="true"
-      {% endunless %}>
-      {% for child in parent.links %}
-        {%
+      {%- endunless -%}>
+      {%- for child in parent.links -%}
+        {%-
           liquid
           #
           # CHILD NAVIGATION GROUP
@@ -74,60 +57,52 @@
           if mapped_child contains page.url
             assign child_expand = true
           endif
-        %}
-        {% if child.links %}
+        -%}
+        {%- if child.links -%}
           <li data-relapse>
             <button
               type="button"
-              {% if page.url == child.url or child_expand %}
+              {%- if page.url == child.url or child_expand -%}
                 aria-expanded="true"
                 class="menu-link active"
-              {% else %}
+              {%- else -%}
                 class="child-link"
-              {% endif %}>
-              {{ child.title }}
+              {%- endif -%}>
+              {{- child.title -}}
             </button>
             <ul
               class="child-list rel pl-2"
-              {% unless child_expand %}
+              {%- unless child_expand -%}
                 hidden="true"
-              {% endunless %}>
-              {% for child in child.links %}
+              {%- endunless -%}>
+              {%- for child in child.links -%}
                 <li class="pl-1">
                   <a
                     spx-scroll="0"
                     href="{{ child.url | url }}"
-                    {% if page.url == child.url %}
+                    {%- if page.url == child.url -%}
                       class="active"
-                    {% endif %}>
-                    {{ child.title }}
+                    {%- endif -%}>
+                    {{- child.title -}}
                   </a>
                 </li>
-              {% endfor %}
+              {%- endfor -%}
             </ul>
           </li>
-        {% else %}
+        {%- else -%}
           <li>
             <a
               spx-scroll="0"
               href="{{ child.url | url }}"
               aria-disabled="true"
-              {% if page.url == child.url %}
+              {%- if page.url == child.url -%}
                 class="active"
-              {% endif %}>
-              {{ child.title }}
+              {%- endif -%}>
+              {{- child.title -}}
             </a>
           </li>
-        {% endif %}
-      {% endfor %}
+        {%- endif -%}
+      {%- endfor -%}
     </ul>
-  {% endfor %}
+  {%- endfor -%}
 </nav>
-
-<div class="sidebar-footer w-100">
-  <div class="row jc-center">
-    <div class="col-auto fc-dark-gray">
-      {{ pkg.version | prepend: 'syncify version ' }}
-    </div>
-  </div>
-</div>

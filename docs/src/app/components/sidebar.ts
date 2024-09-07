@@ -16,7 +16,7 @@ export class Sidebar extends spx.Component<typeof Sidebar.define> {
 
   onmount () {
 
-   this.relapse ? this.relapse.reinit() :   this.relapse = relapse(this.root);
+    this.relapse ? this.relapse.reinit() : this.relapse = relapse(this.root);
 
   }
 

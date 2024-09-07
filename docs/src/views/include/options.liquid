@@ -1,0 +1,12 @@
+<section class="accordion bx-0 mb-5" spx-component="accordion">
+  {%- for item in options -%}
+    <details>
+      <summary class="accordion-btn fc-white py-3 ff-code ">
+        {{- item.name -}}
+      </summary>
+      <section class="py-3 pb-5">
+        {{- item.description | markdown -}}
+      </section>
+    </details>
+  {%- endfor -%}
+</section>

@@ -85,7 +85,7 @@ function search (config) {
   config.on('eleventy.after', async () => {
     if (page.length > 0) {
       const content = JSON.stringify(page, null, 2);
-      await writeFile('./public/spx.json', content);
+      await writeFile('./public/syncify.json', content);
     }
   });
 
@@ -155,10 +155,20 @@ module.exports = eleventy(function (config) {
 
   const md = markdown(config, {
     highlight: {
-      block: ({ raw, language }) => papyrus.highlight(raw, {
-        language,
-        lineNumbers: language !== 'bash'
-      }),
+      block: ({ raw, language }) => {
+
+        return papyrus.highlight(raw, {
+          language,
+          lineNumbers: (
+            language === 'json' ||
+            language === 'ts' ||
+            language === 'typescript' ||
+            language === 'javascript' ||
+            language === 'js' ||
+            language === 'liquid'
+          )
+        })
+      },
       inline: ({ raw, language }) => papyrus.inline(raw, { language })
     },
     options: {
@@ -178,11 +188,9 @@ module.exports = eleventy(function (config) {
   md.use(attrs);
   md.disable('code');
 
-  config.setLiquidOptions({
-      jsTruthy: true,
-  })
-  config.addLiquidShortcode('schema', () => {})
-  config.addLiquidShortcode('endschema',  () => {})
+  config.addLiquidShortcode('schema', () => '{% schema %}')
+  config.addLiquidShortcode('endschema',  () => '{% endschema %}')
+  config.addFilter('markdown', (value) => md.renderInline(value))
   config.addFilter('anchor', (value) => `#${util.slug(value)}`);
   config.addLiquidShortcode('search', search(config));
   config.addPlugin(sprite, { inputPath: './src/assets/svg', spriteShortCode: 'sprite' });
@@ -206,7 +214,7 @@ module.exports = eleventy(function (config) {
       input: 'src/views',
       output: 'public',
       includes: '',
-      layouts: '',
+      layouts: 'layout',
       data: 'data'
     }
   };

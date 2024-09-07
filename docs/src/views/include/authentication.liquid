@@ -1,0 +1,32 @@
+<div class="row mt-5">
+  {%- for auth in authentication -%}
+    <div class="{{- auth.col }} mb-3">
+      <h4>{{- auth.group -}}</h4>
+      <p class="fs-sm">{{- auth.description -}}</p>
+      <ul>
+        {%- for scope in auth.scopes -%}
+          <li class="mb-3">
+            <code class="fs-sm">{{- scope -}}</code>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endfor -%}
+</div>
+<section
+  class="accordion bx-0 bt-0 mb-5"
+  spx-component="accordion">
+  <details>
+    <summary class="accordion-btn fc-white  bt-0 py-4 ff-head upper">Screencast</summary>
+    <section>
+      <video
+        controls
+        width="100%"
+        style="border: 5px solid #2d333a;border-radius: 10px;">
+        <source
+          src="https://brixtol.cloud/open-source/shopify-token.mp4"
+          type="video/mp4">
+      </video>
+    </section>
+  </details>
+</section>

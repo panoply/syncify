@@ -16,6 +16,7 @@
 
 @import '../../node_modules/@brixtol/bootstrap/variation';
 @import '../../node_modules/@brixtol/bootstrap/sass/components/drawer';
+@import '../../node_modules/@brixtol/bootstrap/sass/components/accordion';
 
 /* -------------------------------------------- */
 /* PAPYRUS                                      */
@@ -27,7 +28,6 @@
 @import '../../node_modules/papyrus/theme/languages/liquid';
 @import '../../node_modules/papyrus/theme/languages/javascript';
 @import '../../node_modules/papyrus/theme/languages/typescript';
-@import '../../node_modules/papyrus/theme/languages/xml';
 @import '../../node_modules/papyrus/theme/languages/css';
 @import '../../node_modules/papyrus/theme/languages/scss';
 @import '../../node_modules/papyrus/theme/languages/json';
@@ -38,8 +38,11 @@
 /* -------------------------------------------- */
 
 @import 'styles/svg';
+@import 'styles/blockquote';
 @import 'styles/overwrites';
+@import 'styles/code';
 @import 'styles/navbar';
+@import 'styles/search';
 @import 'styles/sidebar';
 @import 'styles/landing';
 @import 'styles/tabs';

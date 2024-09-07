@@ -72,70 +72,13 @@
     }
   }
 
-  .line {
-    width: 100%;
-    height: 2px;
-    background-color: transparent;
-    position: relative;
-
-    @include media-breakpoint-down(md) {
-      height: 1px;
-    }
-
-    &::before,
-    &::after {
-      position: absolute;
-      overflow: hidden;
-      top: 31px;
-      left: -100%;
-      transform: translatey(-50%);
-      content: '';
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(
-        to right,
-        rgba($white, 0) 0%,
-        $blue 60%,
-        $blue 100%
-      );
-      opacity: 1;
-      z-index: 100;
-      animation-fill-mode: forwards;
-      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
-
-      @include media-breakpoint-down(md) {
-        top: 18px;
-        width: 80%;
-        transform: translatey(-80%);
-      }
-    }
-
-    &::before {
-      animation: move 3s;
-    }
-
-    &:nth-child(1)::after,
-    &:nth-child(1)::before {
-      opacity: 0;
-    }
-
-    &::after {
-      animation: move 3s infinite;
-    }
-
-    &:nth-child(1)::after {
-      opacity: 0;
-      animation-delay: 3s;
-    }
-  }
-
   &-logo {
-    color: #282a36;
+    color: $white;
     z-index: 101;
 
     &:hover {
       transition: color 200ms ease-in-out 50ms;
-      color: $white;
+      color: $green;
     }
 
     a {
@@ -148,7 +91,7 @@
     }
 
     > svg {
-      width: 200px;
+      width: 300px;
       height: 80px;
 
       @include media-breakpoint-down(md) {

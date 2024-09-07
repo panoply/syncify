@@ -52,6 +52,7 @@
     "@brixtol/bootstrap": "^1.7.5",
     "@fullhuman/postcss-purgecss": "^6.0.0",
     "@sissel/stylelint-config": "^1.2.4",
+    "@syncify/cli": "link:..",
     "autoprefixer": "^10.4.20",
     "concurrently": "^8.2.2",
     "cssnano": "^7.0.5",

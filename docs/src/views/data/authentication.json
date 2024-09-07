@@ -1,0 +1,32 @@
+[
+  {
+    "group": "Themes",
+    "col": "col-11 col-md-6 col-lg-4",
+    "description": "Allows syncify to upload and download themes in your store.",
+    "scopes": ["write_themes", "read_themes"]
+  },
+  {
+    "group": "Files",
+    "col": "col-11 col-md-6 col-lg-4",
+    "description": "Allows syncify to sync conent to store files in your store.",
+    "scopes": ["write_files", "read_files"]
+  },
+  {
+    "group": "Pages",
+    "col": "col-11 col-md-6 col-lg-4",
+    "description": "Allows syncify upload, download and manage pages in your store.",
+    "scopes": ["write_online_store_pages", "read_online_store_pages"]
+  },
+  {
+    "group": "Store",
+    "col": "col-11 col-md-6 col-lg-4",
+    "description": "Allows syncify to sync redirects and additional content in your store.",
+    "scopes": ["write_online_store_content", "read_online_store_content"]
+  },
+  {
+    "group": "Metaobject",
+    "col": "col-11 col-md-6",
+    "description": "Allows syncify to upload, download and manage metaobjects in your store.",
+    "scopes": ["write_metaobject_definitions", "read_metaobject_definitions"]
+  }
+]

@@ -1,0 +1,44 @@
+{
+  "Style": [
+    {
+      "name": "input",
+      "type": "`{js} { input: [] }`",
+      "description": "An input glob pattern of file path/s. Resolution is relative to your defined `input` directory."
+    },
+    {
+      "name": "rename",
+      "type": "`{js} { rename: '[name]' }`",
+      "description": "Rename the stylesheet file/s. The same name as source file will be used when undefined. Accepts [name], [dir] and [ext] namespace replacers."
+    },
+    {
+      "name": "watch",
+      "type": "`{js} { watch: [] }`",
+      "description": "Glob stylesheet paths/files to watch. When changes are applied to matched files, then the defined `input` will be compiled."
+    },
+    {
+      "name": "snippet",
+      "type": "`{js} { snippet: false }`",
+      "description": "Optionally output the CSS as a snippet. This will transform the stylesheet inline, wrap output within `{html} <style> </style>` tags and write it to `snippets`."
+    },
+    {
+      "name": "attrs",
+      "type": "`{js} { attrs: [] }`",
+      "description": "When `snippet` is `true` you can provide an additional list of attributes to be applied to `{html} <style>` tag which code will be output within. This only applies to snippet generation and entries will be ignored if snippet is `false`."
+    },
+    {
+      "name": "postcss",
+      "type": "`{js} { postcss: true }`",
+      "description": "[PostCSS](https://postcss.org/) plugins for this CSS File transform. Will use the options provided to `processor.postcss` but you can optionally override those defaults on a per-transform basis. Any configuration options defined here will be merged with the options defined in `processor.postcss`. You can also skip pre-processing with postcss by passing a boolean `false`."
+    },
+    {
+      "name": "tailwind",
+      "type": "`{js} { tailwind: true }`",
+      "description": "[TailwindCSS](https://tailwindcss.com/) transforms will use the `tailwind.config.js` configuration file in your projects root (or defined `config` path). If you have not provided a tailwind config file, then syncify will use options defined on `processor.tailwind`. You can optionally override configuration on a per-transform basis and any options defined here will be merged with those defined in your `tailwind.config.js` or `processor.tailwind`."
+    },
+    {
+      "name": "sass",
+      "type": "`{js} { sass: true }`",
+      "description": "SASS File transforms will use the options provided to `processor.sass` but you can optionally override those defaults on a per-transform basis. Any configuration options defined here will be merged with the options defined in `processor.sass`. You can also skip SASS transforms by passing a `false` which will inform Syncify to not pass output to SASS. By default, Syncify will forward all input files using `.scss` or `.sass` extension to SASS Dart. If you have PostCSS installed then Syncify will automatically pass SASS files to PostCSS in the post-process."
+    }
+  ]
+}

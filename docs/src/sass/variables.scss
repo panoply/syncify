@@ -25,8 +25,11 @@ $enable-rfs: true;
 /* PALETTE                                      */
 /* -------------------------------------------- */
 
-$white: rgb(240, 240, 240);
-$black: #1c1e21;
+$white: #ffffff;
+$black: #121212;
+$ebony: #2e2e2f;
+$lighter: #505050;
+$gray: #a4a4a4;
 $blue: #6eb2d3;
 $indigo: #6610f2;
 $purple: #a77afe;
@@ -35,44 +38,21 @@ $salmon: #ff8ab0;
 $red: #dc3545;
 $orange: #ef8c39;
 $yellow: #ffe77a;
-$green: #9ee34f;
+$green: #4ebb74;
 $teal: #20c997;
 $cyan: #7ef0ff;
 $sea: #8bd3fd;
-
-/* -------------------------------------------- */
-/* GRAYS                                        */
-/* -------------------------------------------- */
-
-$gray-100: #ffffff;
-$gray-200: #f9f9f9; // FONT COLOUR
-$gray-300: #f2f0f1;
-$gray-400: #c4c8cc;
-$gray-500: #a4a6a8;
-$gray-600: #57647f;
-$gray-700: #212529;
-$gray-800: #282a36; // CODE BACKGROUND
-$gray-900: #181b20;
 
 /* -------------------------------------------- */
 /* BACKGROUND COLORS                            */
 /* -------------------------------------------- */
 
 $background-colors: (
-  'ivory': $gray-300,
   'black': $black,
-  'gray': $gray-100,
-  'cyan': $cyan,
-  'ebony': $gray-800,
-  'code': #1c2028,
+  'gray': $gray,
+  'ebony': $ebony,
   'white': $white
 );
-
-/* -------------------------------------------- */
-/* BORDER COLORS                                */
-/* -------------------------------------------- */
-
-// $border-color: $gray-400;
 
 /* -------------------------------------------- */
 /* FONT COLORS                                  */
@@ -93,45 +73,6 @@ $font-colors: (
 );
 
 /* -------------------------------------------- */
-/* SPACING                                      */
-/* -------------------------------------------- */
-
-$spacer: 1rem;
-
-/* -------------------------------------------- */
-/* GRID                                         */
-/* -------------------------------------------- */
-
-$grid-columns: 12;
-$grid-gutter-width: 1.5rem;
-$grid-row-columns: 6;
-
-/* -------------------------------------------- */
-/* GRID > BREAKPOINTS                           */
-/* -------------------------------------------- */
-
-$grid-breakpoints: (
-  xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1140px,
-  xxl: 1260px
-);
-
-/* -------------------------------------------- */
-/* GRID > MAX-WIDTHS                            */
-/* -------------------------------------------- */
-
-$container-max-widths: (
-  sm: 540px,
-  md: 720px,
-  lg: 960px,
-  xl: 1000px,
-  xxl: 1320px
-);
-
-/* -------------------------------------------- */
 /* LAYOUT                                       */
 /* -------------------------------------------- */
 
@@ -142,11 +83,11 @@ $session-width: 380px;
 /* BODY                                         */
 /* -------------------------------------------- */
 
-$body-bg: #16181c; // $black; //#282a36; // $gray-100;
-$body-color: $white; //$gray-900;
-$code-bg: #20242c;
-$code-inline-bg: $code-bg;
-$link-color: $gray-400;
+$body-bg: $black;
+$code-bg: $body-bg;
+$code-inline-bg: $body-bg;
+$link-color: $white;
+$body-color: $gray;
 
 $letter-spacing-base: inherit;
 $letter-spacing-heading: inherit;
@@ -162,7 +103,7 @@ $font-weight-bolder: bolder;
 /* -------------------------------------------- */
 
 $border-width: 0.01rem;
-$border-color: #2d333a; // $gray-600; //$gray-400;
+$border-color: #373b3e; // $gray-600; //$gray-400;
 $accordion-border-color: $border-color; //$gray-400;
 $accordion-border-width: $border-width;
 
@@ -202,7 +143,7 @@ $font-family-code: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono',
 /* FONT SIZES                                   */
 /* -------------------------------------------- */
 
-$font-size-base: 1.05rem;
+$font-size-base: 1.1rem;
 
 $font-size-xs: $font-size-base * 0.595;
 $font-size-sm: $font-size-base * 0.825;
