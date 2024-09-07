@@ -53,3 +53,5 @@ versions
 .flaskenv*
 !.env.project
 !.env.vault
+# Local Netlify folder
+.netlify
