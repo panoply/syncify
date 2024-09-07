@@ -16,7 +16,10 @@ packages/**/dist
 straps/dusk-advanced/theme
 
 # DOCS
-docs/public
+#########################################
+
+.netlify
+docs/public/*
 
 lib-cov
 *.seed
@@ -45,7 +48,6 @@ nbproject
 example
 package
 theme
-yarn.lock
 versions
 
 
@@ -53,5 +55,3 @@ versions
 .flaskenv*
 !.env.project
 !.env.vault
-# Local Netlify folder
-.netlify
