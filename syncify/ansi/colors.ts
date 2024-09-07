@@ -134,4 +134,4 @@ export const {
   neonRouge,
   neonMagenta
 
-}: AnsisExtend = ansis;
+}: Partial<AnsisExtend> = ansis;

@@ -10,9 +10,9 @@ import { glue, isString, sanitize } from 'syncify:utils';
  * Parses and applies some normalization to response
  * messages by applying colours.
  */
-function highlight (string: string) {
+const highlight = (string: string) =>
 
-  return c.redBright(string
+  c.redBright(string
   .replace(/('[{}_\w\s.-]*?'|"[\w\s.-]*?")/g, c.orange('$1'))
   .replace(/({{2}-?[a-zA-Z0-9_\-.'"[\]]+-?}{2})/g, c.teal('$1'))
   .replace(/((?:www|http:|https:)+[^\s]+[\w])/g, c.underline('$1'))
@@ -21,22 +21,18 @@ function highlight (string: string) {
   .replace(/(:)(?= )/g, c.gray('$1'))
   .replace(/(?<=Filename\s)([\w._-]+)(?=\salready)/, c.neonCyan.bold('$1')));
 
-}
-
 /**
  * Token Highlights
  *
  * Used for code sample, applies minor highights to specific characters.
  */
-function tokens (string: string) {
+const tokens = (string: string) =>
 
-  return string
+  string
   .replace(/({%|{%-}|-%}|%}|{{|{{-|}}|-}}|<\/?|>|:|,)/g, c.neonCyan('$1'))
   .replace(/(['"].*?['"])/g, c.gray('$1'));
 
-}
-
-function extract (text: string) {
+const extract = (text: string) => {
 
   let lines: string = NIL;
 
@@ -55,7 +51,7 @@ function extract (text: string) {
 
   return text;
 
-}
+};
 
 /**
  * TUI Shopify
@@ -79,7 +75,7 @@ function extract (text: string) {
  * │
  * ```
  */
-export function Shopify (input: string | string[], source: string[]): {
+export const Shopify = (input: string | string[], source: string[]): {
   /**
    * Line Number detected within response
    *
@@ -96,7 +92,7 @@ export function Shopify (input: string | string[], source: string[]): {
    * The codeframe output generated
    */
   output: string;
-} {
+} => {
 
   /**
    * The Codeframe entries
@@ -380,4 +376,4 @@ export function Shopify (input: string | string[], source: string[]): {
     output: output.join(NWL) + NWL + frame.join(NWL)
   };
 
-}
+};

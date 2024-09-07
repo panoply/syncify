@@ -11,7 +11,7 @@ import type { SASSProcesser, PostCSSProcesser, TailwindCSSProcesser } from '../t
 import type { SVGOProcesser, SVGSpriteProcesser } from '../transform/svg';
 import type { JSONBundle } from '../transform/json';
 import type { SchemaBlocks, SchemaSettings } from '../internal/schema';
-import type * as Config from '../config/index';
+import type * as Config from '../config';
 
 /* -------------------------------------------- */
 /* STATS                                        */
@@ -254,7 +254,10 @@ export interface Spawn {
  */
 export interface Store<T = any> {
   /**
-  * The store domain name in Upcase (without `myshopify.com`)
+  * The store domain name captilized (without `myshopify.com`)
+  *
+  * @example
+  * 'Webshop' // webshop.myshopify.com
   */
   store: string;
   /**
@@ -556,7 +559,7 @@ export type SharedSection = Map<string, {
  *
  * Sections sub-directory configuration
  */
-export type SectionBundle = Merge<Config.Views['sections'], {
+export type SectionBundle = Merge<Omit<Config.Sections, 'input'>, {
   /**
    * Globals pass-through directories
    */
@@ -615,7 +618,7 @@ export type SectionBundle = Merge<Config.Views['sections'], {
  *
  * Snippets sub-directory configuration
  */
-export type SnippetBundle = Merge<Config.Views['snippets'], {
+export type SnippetBundle = Merge<Omit<Config.Snippets, 'input'>, {
   /**
    * Globals pass-through directories
    */
@@ -641,15 +644,17 @@ export type SnippetBundle = Merge<Config.Views['snippets'], {
  *
  * Anymatched paths
  */
-export type PathsBundle = Merge<Config.Paths<Tester>, {
-  transforms?: Map<string, 7 | 8 | 9>
-}>;
+export type PathsBundle = Merge<Config.Paths<Tester>, { transforms?: Map<string, 7 | 8 | 9> }>;
 
 export type PathsRef = {
   /**
    * Set of all resolved paths;
    */
   input: Set<string>;
+  /**
+   * A copy of the user define paths
+   */
+  config: string;
   /**
    * Anymatch tester of all resolved paths
    */
@@ -963,10 +968,6 @@ type Warnings = Map<string, Map<string, Set<string>>>
  * pre-processors are being used and/or available.
  */
 export interface ProcessorsBundle {
-  /**
-   * JSON processing
-   */
-  json?: JSONBundle;
   /**
    * [PostCSS](https://postcss.org/) Pre-Processor
    */

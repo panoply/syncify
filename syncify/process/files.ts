@@ -83,6 +83,7 @@ export function renameFile ({ name, dir, ext, namespace }: File, rename: string)
   let newName = rename;
 
   if (/\[dir\]/.test(newName)) newName = newName.replace(/\[dir\]/g, dir);
+  if (/\[name\]/.test(newName)) newName = newName.replace(/\[name\]/g, name);
   if (/\[file\]/.test(newName)) newName = newName.replace(/\[file\]/g, name);
   if (/\[ext\]/.test(newName)) newName = newName.replace(/\[ext\]/g, ext);
 
@@ -197,21 +198,33 @@ export function parseFile (paths: PathBundle, output: string) {
     if (file.ext === '.liquid') {
 
       if (paths.sections.match(path)) {
+
         return section(define(Namespace.Sections, Type.Section, Kind.Liquid));
+
       } else if (paths.snippets.match(path)) {
+
         return snippet(define(Namespace.Snippets, Type.Snippet, Kind.Liquid));
+
       } else if (paths.layout.match(path)) {
+
         return define(Namespace.Layout, Type.Layout, Kind.Liquid);
+
       } else if (paths.templates.match(path)) {
+
         return define(Namespace.Templates, Type.Template, Kind.Liquid);
+
       } else if (paths.customers.match(path)) {
+
         return define(Namespace.Customers, Type.Template, Kind.Liquid);
+
       } else if (paths.metaobject.match(path)) {
+
         return define(Namespace.Metaobject, Type.Template, Kind.Liquid);
-      } else if (paths.transforms.has(path)) {
-        if (paths.transforms.get(path) === Type.Style) {
-          return style(define(Namespace.Snippets, Type.Style, Kind.CSS));
-        }
+
+      } else if (paths.transforms.get(path) === Type.Style) {
+
+        return style(define(Namespace.Snippets, Type.Style, Kind.CSS));
+
       }
 
     } else if (file.ext === '.schema' && paths.schema.match(path)) {
@@ -221,21 +234,37 @@ export function parseFile (paths: PathBundle, output: string) {
     } else if (file.ext === '.json') {
 
       if (paths.metafields.match(path)) {
+
         return define(Namespace.Metafields, Type.Metafield, Kind.JSON);
+
       } else if (paths.sections.match(path)) {
+
         return section(define(Namespace.Sections, Type.Section, Kind.JSON));
+
       } else if (paths.templates.match(path)) {
+
         return define(Namespace.Templates, Type.Template, Kind.JSON);
+
       } else if (paths.config.match(path)) {
+
         return define(Namespace.Config, Type.Config, Kind.JSON);
+
       } else if (paths.locales.match(path)) {
+
         return define(Namespace.Locales, Type.Locale, Kind.JSON);
+
       } else if (paths.customers.match(path)) {
+
         return define(Namespace.Customers, Type.Template, Kind.JSON);
+
       } else if (paths.metaobject.match(path)) {
+
         return define(Namespace.Metaobject, Type.Template, Kind.JSON);
+
       } else if (paths.schema.match(path)) {
+
         return schema(fn, define(Namespace.Schema, Type.Schema, Kind.JSON));
+
       }
 
     }

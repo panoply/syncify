@@ -1,14 +1,12 @@
-import type { Request, Store, File, Methods, Sync, Requests } from 'types';
+import type { Store, File, Methods, Sync, Requests } from 'types';
 import pMap from 'p-map';
 import { mapParallelAsync } from 'rambdax';
-import { Type } from 'syncify:process/files';
 import { queue } from '../requests/queue';
 import { timer } from 'syncify:timer';
 import { isUndefined } from 'syncify:utils';
 import { assign } from 'syncify:native';
 import { $ } from 'syncify:state';
 import * as asset from 'syncify:requests/assets';
-import * as pages from 'syncify:requests/pages';
 import * as metafields from 'syncify:requests/metafields';
 
 // import merge from 'mergerino';
@@ -39,7 +37,7 @@ export function client ({ stores, themes }: Sync) {
        * either `GET` or `DELETE` but when `content` is passed
        * the request will be either `POST` or `PUT`
        */
-      const payload: Partial<Request> = isUndefined(content) ? {
+      const payload = isUndefined(content) ? {
         method,
         params: {
           'asset[key]': file.key
@@ -82,6 +80,7 @@ export function client ({ stores, themes }: Sync) {
 
     },
 
+    // @ts-expect-error
     metafields: (content?: Requests.Metafield) => {
 
       return queue.add(function () {

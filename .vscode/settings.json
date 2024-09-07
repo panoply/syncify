@@ -1,13 +1,19 @@
 {
-  "explorer.fileNesting.enabled": false,
-  "npm.packageManager": "pnpm",
-  "files.associations": {
-    "*.scss.liquid": "scss",
-    "*.css.liquid": "css",
-    "*i18n.js.liquid": "javascript",
-    "*shop.js.liquid": "javascript",
-    "*config.js.liquid": "javascript"
+  "stylelint.validate": [
+    "scss",
+    "sass",
+    "less",
+    "postcss"
+  ],
+  "spx.files": [
+    "./docs/src/app/**/*.ts"
+  ],
+  "stylelint.enable": false,
+  "[liquid]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "sissel.shopify-liquid"
   },
+  "npm.packageManager": "pnpm",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -49,6 +55,14 @@
       "decorations": [
         {
           "color": "#ffbafc"
+        }
+      ]
+    },
+    "(?<=:{3,4}\\s)(grid|example|tabs|css|scss|html|note)": {
+      "decorations": [
+        {
+          "color": "#81D4FA",
+          "fontWeight": "900"
         }
       ]
     },
@@ -125,20 +139,12 @@
     "imgmin",
     "linkify",
     "obfucss",
+    "Odestry",
     "pnpx",
     "purgecss",
     "Spriter",
     "syver",
-    "tailwindcss"
-  ],
-  "[liquid]": {
-    "editor.formatOnSave": true
-  },
-  "liquid.config.method": "workspace",
-  "liquid.format.rules": {
-    "liquid": {
-      "indentAttribute": true,
-      "forceArgument": 3
-    }
-  }
+    "tailwindcss",
+    "twoslash"
+  ]
 }

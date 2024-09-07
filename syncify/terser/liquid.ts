@@ -12,7 +12,7 @@ import { SchemaSectionTag } from 'types/internal';
  */
 export function removeComments (content: string) {
 
-  if ($.terser.liquid.removeComments === false) return content;
+  if ($.liquid.terse.markup.removeComments === false) return content;
 
   let output: string = content;
 
@@ -31,11 +31,11 @@ export function removeComments (content: string) {
  */
 export function minifySchema (schema: SchemaSectionTag) {
 
-  if ($.terser.liquid.minifySchema === false) {
-    if ($.processor.json.useTab) {
-      return JSON.stringify(schema, null, '\t'.repeat($.processor.json.indent));
+  if ($.liquid.terse.liquid.minifySchema === false) {
+    if ($.json.useTab) {
+      return JSON.stringify(schema, null, '\t'.repeat($.json.indent));
     } else {
-      return JSON.stringify(schema, null, $.processor.json.indent);
+      return JSON.stringify(schema, null, $.json.indent);
     }
   }
 
@@ -52,7 +52,7 @@ export function minifySchema (schema: SchemaSectionTag) {
  */
 export function removeDashes (content: string) {
 
-  if (!$.terser.liquid.stripDashes) return content;
+  if (!$.liquid.terse.liquid.stripTrims) return content;
 
   return content;
 

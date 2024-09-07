@@ -77,7 +77,12 @@ export const enum Kind {
 
 export class File<T = any> {
 
-  constructor ({ base, dir, ext, name, root }: ParsedPath) {
+  constructor ({
+    base,
+    dir,
+    ext,
+    name,
+    root }: ParsedPath) {
     this.base = base;
     this.dir = dir;
     this.ext = ext;
@@ -253,7 +258,7 @@ export class File<T = any> {
   public output: string;
   /**
    * The file size in bytes before any augmentation is applied. This
-   * value will assigned post-context, typically in a transform.
+   * value will be assigned post-context, typically in a transform.
    *
    * @example
    *

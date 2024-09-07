@@ -1,4 +1,4 @@
-import type { Config } from './config';
+import type { SyncifyConfig } from './config';
 import type { Syncify as syncify } from './api';
 import type { Bundle } from '../syncify/model/$';
 
@@ -12,8 +12,7 @@ export type * from './shared';
 /* CONFIG ------------------------------------- */
 
 export type * from './config';
-export type * from './config/views';
-export type * from './config/terser';
+export type * from './transform/liquid';
 
 /* STATE -------------------------------------- */
 
@@ -31,6 +30,7 @@ export type * from './$/hot';
 export type * from './transform/pages';
 export type * from './transform/image';
 export type * from './transform/json';
+export type * from './transform/liquid';
 export type * from './transform/script';
 export type * from './transform/style';
 export type * from './transform/svg';
@@ -109,5 +109,6 @@ export declare const $: Bundle;
  * });
  *
  */
-export declare function defineConfig<T>(config: Config<T>): void;
+export declare function defineConfig(config: SyncifyConfig): void;
+
 export default syncify;

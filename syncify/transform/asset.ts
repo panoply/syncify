@@ -23,7 +23,7 @@ function passthrough (file: File, sync: ClientParam<AssetRequest>) {
 
   const { type, relative, kind, key, output } = file;
 
-  return async function (data: string) {
+  return async (data: string) => {
 
     if (type !== Type.Spawn) {
 

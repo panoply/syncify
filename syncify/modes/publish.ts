@@ -1,18 +1,15 @@
 import type { Syncify } from 'types';
-import http from 'node:http';
-import statics from 'serve-static';
-import handler from 'finalhandler';
 import ngrok from 'ngrok';
+import uWS from 'uWebSockets.js';
 import { delay } from 'rambdax';
 import { timer } from 'syncify:timer';
 import * as log from 'syncify:log';
 import { exporting } from 'syncify:modes/export';
 import { ARR, COL } from 'syncify:symbol';
-import { bold, gray, line, magentaBright, neonCyan, neonGreen, orange, whiteBright } from 'syncify:colors';
-import * as request from 'syncify:requests/themes';
+import { bold, gray, magentaBright, neonCyan, neonGreen } from 'syncify:colors';
 import { $ } from 'syncify:state';
 import prompts from 'prompts';
-import { processing } from 'syncify:requests/themes';
+import { existsSync, readFileSync } from 'fs-extra';
 
 export async function publish (cb?: Syncify) {
 
@@ -22,44 +19,61 @@ export async function publish (cb?: Syncify) {
 
   log.title('Publishing');
 
-  const versions = statics($.vc.dir);
-  const server = http.createServer((req, res) => versions(req, res, handler(req, res)));
+  const app = uWS.App().get('/*', (response, request) => {
 
-  const onerror = (e: { code: 'EADDRINUSE' }) => {
-    if (e.code === 'EADDRINUSE') {
-      log.error('EADDRINUSE');
-      return null;
+    response.writeHeader('Access-Control-Allow-Origin', '*');
+    response.writeHeader('Cache-Control', 'public, max-age=0');
+
+    const uri = $.vc.dir + request.getUrl();
+
+    existsSync(uri)
+      ? response.end(readFileSync(uri))
+      : response.endWithoutBody();
+
+  }).listen($.publish.tunnelPort, (token) => {
+    if (!token) {
+      console.log('Failed to listen to port ' + $.publish.tunnelPort);
     }
-  };
+  });
 
-  const onconnect = () => {
-    server.removeListener('error', onerror);
-    server.removeListener('connect', onconnect);
-  };
+  // const versions = statics($.vc.dir);
+  // const server = http.createServer((req, res) => versions(req, res, handler(req, res)));
 
-  server.on('error', onerror);
-  server.on('connect', onconnect);
-  server.listen($.publish.tunnelPort);
+  // const onerror = (e: { code: 'EADDRINUSE' }) => {
+  //   if (e.code === 'EADDRINUSE') {
+  //     log.error('EADDRINUSE');
+  //     return null;
+  //   }
+  // };
+
+  // const onconnect = () => {
+  //   server.removeListener('error', onerror);
+  //   server.removeListener('connect', onconnect);
+  // };
+
+  // server.on('error', onerror);
+  // server.on('connect', onconnect);
+  // server.listen($.publish.tunnelPort);
 
   await delay(500);
 
   timer.start('ngrok');
 
-  const url = await ngrok.connect({
-    addr: $.publish.tunnelPort,
-    onStatusChange (status) {
-      if (status === 'closed') {
-        log.write('disconnect', { prefix: 'ngrok' });
-      } else {
-        log.write(`${bold('connected')} PORT${COL}${$.publish.tunnelPort}`, {
-          prefix: 'ngrok',
-          suffix: timer.stop('ngrok')
-        });
-      }
-    }
-  });
+  // const url = await ngrok.connect({
+  //   addr: $.publish.tunnelPort,
+  //   onStatusChange (status) {
+  //     if (status === 'closed') {
+  //       log.write('disconnect', { prefix: 'ngrok' });
+  //     } else {
+  //       log.write(`${bold('connected')} PORT${COL}${$.publish.tunnelPort}`, {
+  //         prefix: 'ngrok',
+  //         suffix: timer.stop('ngrok')
+  //       });
+  //     }
+  //   }
+  // });
 
-  const src = `${url}/${$.vc.number}.zip`;
+  const src = `${$.vc.number}.zip`;
 
   log.write(gray(src), { prefix: 'server' });
 
@@ -116,9 +130,9 @@ export async function publish (cb?: Syncify) {
 
   }
 
-  server.close();
+  app.close();
 
-  await ngrok.disconnect();
+  //  await ngrok.disconnect();
 
   log.nwl();
   log.group();

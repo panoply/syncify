@@ -50,7 +50,7 @@ const ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
  */
 function removeComments (content: string) {
 
-  return $.terser.liquid.removeComments ? content
+  return $.liquid.terse.markup.removeComments ? content
   .replace(LiquidBlockComments, NIL)
   .replace(LiquidLineComments, NIL) : content;
 
@@ -76,7 +76,7 @@ function minifyLiquidTag (content: string) {
  */
 function minifySchema (file: File, content: string) {
 
-  if (!$.terser.liquid.minifySchema) return removeComments(content);
+  if (!$.liquid.terse.liquid.minifySchema) return removeComments(content);
 
   const open = content.search(/{%-?\s*schema/);
 
@@ -110,7 +110,7 @@ function minifySchema (file: File, content: string) {
  */
 function removeDashes (content: string) {
 
-  if (!$.terser.liquid.stripDashes) return content;
+  if (!$.liquid.terse.liquid.stripTrims) return content;
 
   return content;
 
@@ -126,7 +126,7 @@ async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await minify(content, $.terser.markup);
+    const htmlmin = await minify(content, $.liquid.terse.markup);
 
     return htmlmin;
 

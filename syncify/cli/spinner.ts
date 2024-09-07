@@ -3,7 +3,7 @@
 import type { Merge } from 'type-fest';
 import type { Ansis } from 'ansis';
 import update from 'log-update';
-import { assign, defineProperty, log } from 'syncify:native';
+import { assign, defineProperty } from 'syncify:native';
 import { glueString, has, isFunction, isObject, isString, object } from 'syncify:utils';
 import { bold, neonGreen, pink } from 'syncify:colors';
 import { Prefix, Break } from 'syncify:ansi';

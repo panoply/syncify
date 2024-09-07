@@ -2,7 +2,7 @@ import type { Resource, Store } from 'types';
 import type { Choice, ArrayPromptOptions, BooleanPromptOptions } from 'types/internal';
 import { list } from 'syncify:requests/themes';
 import { theme as themeing } from 'syncify:cli/prompts';
-import { isArray, ws } from 'syncify:utils';
+import { isArray, merge, ws } from 'syncify:utils';
 import { prompt } from 'enquirer';
 import { values } from 'syncify:native';
 import { ARR, TLD, Tree } from 'syncify:symbol';
@@ -12,13 +12,15 @@ export async function Connect (store: Store) {
 
   let separator: number = 0;
 
-  const theme = { ...themeing };
+  const theme = merge(themeing);
   const items = await list(store);
   const themes = items.filter(({ role }) => role !== 'demo');
   const space = ws(themes, 'name');
   const choices = themes.map<Choice>((value) => {
 
-    if (value.name.length > separator) separator = value.name.length;
+    if (value.name.length > separator) {
+      separator = value.name.length;
+    }
 
     return {
       name: value.name,
@@ -29,7 +31,9 @@ export async function Connect (store: Store) {
 
   });
 
-  const { targets } = await prompt< { targets: Resource.Theme[] }>(<ArrayPromptOptions>{
+  const { targets } = await prompt<{
+    targets: Resource.Theme[]
+  }>(<ArrayPromptOptions>{
     name: 'targets',
     type: 'select',
     multiple: true,
@@ -51,7 +55,9 @@ export async function Connect (store: Store) {
   const fields: any[] = [];
 
   for (const theme of targets) {
+
     config.themes['${' + theme.name + '}'] = theme.id;
+
     fields.push({
       name: theme.name,
       message: theme.name,
@@ -76,7 +82,9 @@ export async function Connect (store: Store) {
 
   theme.styles.primary = c.neonCyan.italic;
   theme.styles.typing = c.neonGreen;
+
   const template = JSON.stringify(config, null, 2);
+
   const snippet = await prompt<{
     stores: {
       values: {

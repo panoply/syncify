@@ -15,15 +15,15 @@ import { File, Type } from 'syncify:file';
 import { parseFile } from 'syncify:process/files';
 import { toArray } from 'syncify:native';
 import { sizeDiff } from 'syncify:sizes';
-import { isUndefined, has, object, plural, isEmpty } from 'syncify:utils';
+import { isUndefined, has, plural, isEmpty } from 'syncify:utils';
 import { timer } from 'syncify:timer';
 import { $ } from 'syncify:state';
 import { saveCache } from 'syncify:process/cache';
 import { Append, Create, Prefix } from 'syncify:ansi';
-
 import * as c from 'syncify:colors';
 import * as log from 'syncify:log';
-import { COL, HSH } from 'syncify:symbol';
+import { HSH } from 'syncify:symbol';
+import { BUILD_GROUPS } from 'syncify:const';
 
 type Groups = (
   | 'styles'
@@ -42,59 +42,40 @@ type Groups = (
   | 'assets'
 )
 
-function getModel (): Merge<{ [K in Groups]: BuildReport; }, {
+type Report = Merge<Partial<Record<Groups, BuildReport>>, {
   stats: {
     total: number;
     errors: number;
     skipped: number;
     bundled: number;
   }
-}> {
+}>
 
-  const report: Merge<{ [K in Groups]: BuildReport; }, {
+function getModel (): Report {
+
+  const report: Report = {
     stats: {
-      total: number;
-      errors: number;
-      skipped: number;
-      bundled: number;
-    }
-  }> = object({
-    stats: object({
       total: 0,
       errors: 0,
       skipped: 0,
       bundled: 0
-    })
-  });
+    }
+  };
 
-  for (const group of [
-    'styles',
-    'scripts',
-    'svgs',
-    'sections',
-    'layouts',
-    'metaobject',
-    'templates',
-    'snippets',
-    'locales',
-    'configs',
-    'schema',
-    'pages',
-    'metafields',
-    'assets'
-  ] as Array<Groups>) {
+  for (const group of BUILD_GROUPS as Array<Groups>) {
 
-    report[group] = object({
+    report[group] = {
       group,
       time: NIL,
       size: 0,
       files: [],
       report: null
-    });
+    };
 
   }
 
   return report;
+
 }
 
 /**
@@ -109,13 +90,14 @@ export async function build (cb?: Syncify) {
   timer.start('build');
 
   if (!$.mode.export) {
+    log.nwl();
     log.task('Build');
     log.nwl();
   }
 
+  const SVG: Set<string> = new Set();
   const errors = Create({ type: 'error' });
   const message = Create().Newline();
-  const SVG: Set<string> = new Set();
   const report = getModel();
   const hasFilter = isEmpty($.filters) === false;
   const parse = parseFile($.paths, $.dirs.output);
@@ -130,17 +112,28 @@ export async function build (cb?: Syncify) {
     if (isUndefined(file)) continue;
 
     switch (file.type) {
-      case Type.Style: report.styles.files.push(file); break;
-      case Type.Script: report.scripts.files.push(file); break;
-      case Type.Section: report.sections.files.push(file); break;
-      case Type.Layout: report.layouts.files.push(file); break;
-      case Type.Snippet: report.snippets.files.push(file); break;
-      case Type.Locale: report.locales.files.push(file); break;
-      case Type.Config: report.configs.files.push(file); break;
-      case Type.Template: report.templates.files.push(file); break;
-      case Type.Page: report.pages.files.push(file); break;
-      case Type.Asset: report.assets.files.push(file); break;
-      case Type.Metafield: report.metafields.files.push(file); break;
+      case Type.Style:
+        report.styles.files.push(file); break;
+      case Type.Script:
+        report.scripts.files.push(file); break;
+      case Type.Section:
+        report.sections.files.push(file); break;
+      case Type.Layout:
+        report.layouts.files.push(file); break;
+      case Type.Snippet:
+        report.snippets.files.push(file); break;
+      case Type.Locale:
+        report.locales.files.push(file); break;
+      case Type.Config:
+        report.configs.files.push(file); break;
+      case Type.Template:
+        report.templates.files.push(file); break;
+      case Type.Page:
+        report.pages.files.push(file); break;
+      case Type.Asset:
+        report.assets.files.push(file); break;
+      case Type.Metafield:
+        report.metafields.files.push(file); break;
       case Type.Svg:
 
         for (const { uuid, format, input } of file.data) {
@@ -164,8 +157,6 @@ export async function build (cb?: Syncify) {
   }
 
   /**
-   * Compile Handler
-   *
    * Used by the `pMap` caller to build files
    */
   function handle (record: BuildReport, transform: Function) {
@@ -183,37 +174,33 @@ export async function build (cb?: Syncify) {
         cache[file.output] = file.input;
 
         const value = file.ext === '.json'
-          ? await json(file, cb)
+          ? await json(file, cb as any)
           : await transform(file, cb);
 
         if (value === null || isNaN(file.size)) {
 
           report.stats.skipped += 1;
 
-          return object(
-            {
-              name: file.base,
-              input: file.relative,
-              time: timer.stop(file.uuid),
-              output: file.key,
-              error: 'Skipped File'
-            }
-          );
+          return {
+            name: file.base,
+            input: file.relative,
+            time: timer.stop(file.uuid),
+            output: file.key,
+            error: 'Skipped File'
+          };
 
         }
 
         report.stats.bundled += 1;
 
-        return object(
-          {
-            name: file.base,
-            input: file.relative,
-            output: file.key,
-            error: null,
-            time: timer.stop(file.uuid),
-            size: sizeDiff(value, file.size)
-          }
-        );
+        return {
+          name: file.base,
+          input: file.relative,
+          output: file.key,
+          error: null,
+          time: timer.stop(file.uuid),
+          size: sizeDiff(value, file.size)
+        };
 
       } catch (e) {
 
@@ -221,15 +208,14 @@ export async function build (cb?: Syncify) {
 
         errors.Line(e.message);
 
-        return object(
-          {
-            name: file.base,
-            input: file.relative,
-            output: file.key,
-            time: timer.stop(file.uuid),
-            error: e.message
-          }
-        );
+        return {
+          name: file.base,
+          input: file.relative,
+          output: file.key,
+          time: timer.stop(file.uuid),
+          error: e.message
+        };
+
       }
 
     };
@@ -238,9 +224,7 @@ export async function build (cb?: Syncify) {
 
   async function bundle (group: Groups, fn: Function) {
 
-    const filter = hasFilter && has(group, $.filters)
-      ? $.filters[group]
-      : null;
+    const filter = hasFilter && has(group, $.filters) ? $.filters[group] : null;
 
     if (filter && filter.includes(group) === false) return 0;
 
@@ -252,8 +236,9 @@ export async function build (cb?: Syncify) {
 
     const files = record.report.length;
     const count = c.bold(files < 10 ? ` ${files}` : `${files}`);
+    const space = files === 1 ? WSR : WSP;
 
-    message.Line(Prefix(group, `${count} ${plural('file', files)} ${Append(record.time)}`));
+    message.Line(Prefix(group, `${count} ${plural('file', files)}${space}${Append(record.time)}`));
 
   }
 
@@ -323,6 +308,7 @@ export async function build (cb?: Syncify) {
         .BR
         .toString(c.whiteBright)
       );
+
     } else {
 
       log.out(
@@ -331,6 +317,7 @@ export async function build (cb?: Syncify) {
         .BR
         .toString(c.whiteBright)
       );
+
     }
 
     process.exit(0);

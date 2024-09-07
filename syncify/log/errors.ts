@@ -214,11 +214,7 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
   store?: boolean;
 }): T {
 
-  const defaults = object({
-    log: true,
-    store: false
-  });
-
+  const defaults = { log: true, store: false };
   const config: RequestError = assign(defaults, options);
 
   if (config.store === true) config.data = object();
@@ -345,7 +341,6 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
  * Generic Throws
  *
  * Used for any type of error
- *
  */
 export function throws (e: any, entries: { [name: string]: string | number }) {
 

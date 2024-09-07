@@ -113,7 +113,9 @@ export function has <T extends object> (prop: keyof T | string, object: T): bool
  */
 export function hasProp <T extends object> (object: T): (prop: keyof T) => boolean {
 
-  return (prop) => prop in object;
+  const isObj = isObject(object);
+
+  return (prop) => isObj ? prop in object : false;
 
 }
 
@@ -133,7 +135,7 @@ export function object <T = any> (input?: T): T {
 /**
  * Detect ANSI Codes
  *
- * Returns the regex expression
+ * Returns the regex expression or `false`
  *
  * @param string The string to detect ANSI occurances
  * @param option Whether or not to apply `g` flag
@@ -161,11 +163,11 @@ export function jsonc <T> (data: string): T {
 
   try {
 
-    return new Function(`return ${strip(data).trim()}`)()
+    return new Function(`return ${strip(data).trim()}`)();
 
   } catch {
 
-    return <T>{}
+    return <T>{};
   }
 }
 
@@ -297,8 +299,7 @@ export function getTime () {
 };
 
 /**
- * Return the current time/date - This is console specific and
- * will write ANSI colors
+ * Return the current time/date - This is console specific
  *
  * @example
  * getDateTime() // 01-01-2022 01:59:20
@@ -393,9 +394,9 @@ export function debouncePromise<T extends unknown[]> (
 /* -------------------------------------------- */
 
 /**
- * **sanatize**
+ * **sanitize**
  *
- * Sanatizes the log message passed. Converts a `Buffer`, `number`, `object`,
+ * Sanitizes the log message passed. Converts a `Buffer`, `number`, `object`,
  * `boolean` or an `array` type to a readable string.
  *
  * @example
@@ -415,12 +416,11 @@ export function sanitize (message: number | boolean | string | Buffer | object |
 };
 
 /**
- * **handleize**
+ * **checksum**
  *
- * Converts string input to a handle
+ * Creates an MD5 hash from input.
  *
- * @param string The string to convert
- * @example 'foo:bar_baz 10' => 'foo-bar-baz-10'
+ * @param input The data input to digest
  */
 export function checksum (input: string | Buffer) {
 
@@ -456,7 +456,7 @@ export function handleize (string: string) {
  */
 export function plural (word: string, size: number) {
 
-  if (size >= 2) return word[word.length - 1] !== 's' ? `${word}s` : word;
+  if (size >= 2 || size === 0) return word[word.length - 1] !== 's' ? `${word}s` : word;
 
   return word[word.length - 1] !== 's' ? word : word.slice(0, -1);
 
@@ -620,7 +620,7 @@ export function isEven (number: number) {
 *
 * @example
 *
-* isEmptyString('  ') // true
+* isEmptyString(' ') // true
 */
 export function isEmptyString (input: Buffer | string) {
 

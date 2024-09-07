@@ -1,6 +1,6 @@
 # Syncify using Schema
 
-Example usage of shared schema files in Syncify. Shared Schema allow you to isolate and re-use section schema in your themes. Shared Schema files use a `.schema` file extension and can be referenced (imported) into `{% schema %}` tags using a `$ref` key and `<file>.<prop>` reference.
+Example usage of the Syncify shared schema modularity feature. Shared Schema allows you to isolate and re-use section schema in your themes with external files, identified by a `.schema` extension, can be integrated `{% schema %}` tags. Shared schema, uses `$ref` key followed by a `<file>.<prop>` notation to reference specific schema you wish to import.
 
 <pre><code><strong>PASSWORD</strong>  →   <code>access</code>
 <strong>PREVIEW</strong>   →   <a href="https://syncify.myshopify.com?preview_theme_id=137588637937">https://syncify.myshopify.com?preview_theme_id=137588637937</a>

@@ -21,7 +21,7 @@ export async function setup () {
     token: string;
     ngrok: string;
     version: string;
-    scopes: { [K in AccessScopes]: boolean }
+    scopes: Record<AccessScopes, boolean>
   } = {
     store: null,
     domain: null,
@@ -120,7 +120,7 @@ export async function setup () {
       .NL
       .Wrap(
         `Connection failed on ${c.cyan(`${domain}.myshopify.com`)}. Please check the API Access Token`,
-        'is correct and you have set the correct scopes, then try again.',
+        'is correct and you have set the right access scopes, then try again.',
         c.red
       )
       .NL
@@ -131,10 +131,15 @@ export async function setup () {
 
   }
 
-  for (const { handle } of scopes.access_scopes) {
-    if (handle in model.scopes) {
-      model.scopes[handle] = true;
-      message.Line(`${CHK} ${handle}`);
+  if (scopes.access_scopes.length > 0) {
+
+    message.Newline();
+
+    for (const { handle } of scopes.access_scopes) {
+      if (handle in model.scopes) {
+        model.scopes[handle] = true;
+        message.Line(`${CHK} ${handle}`);
+      }
     }
   }
 

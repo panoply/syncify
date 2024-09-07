@@ -1,7 +1,9 @@
 import anymatch from 'anymatch';
-import { typeError } from 'syncify:log/throws';
+import { typeError, warnOption } from 'syncify:log/throws';
 import { isArray, isBoolean, isNumber, isObject, isString, has, isEmpty, isNil } from 'syncify:utils';
 import { $ } from 'syncify:state';
+import { getResolvedPaths } from 'syncify:utils/options';
+import { ARR } from 'syncify:symbol';
 
 /**
  * JSON Options
@@ -11,13 +13,11 @@ import { $ } from 'syncify:state';
  */
 export function setJsonOptions () {
 
-  if (!has('processors', $.config)) return;
-  if (!has('json', $.config.processors)) return;
+  if (!has('transform', $.config) || !has('json', $.config.transform)) return;
 
-  const { json } = $.config.processors;
+  const { json } = $.config.transform;
 
   if (isNil(json)) return;
-  if (isObject(json) && isEmpty(json)) return;
 
   // Ensure the section option is an object
   if (!isObject(json)) {
@@ -31,14 +31,21 @@ export function setJsonOptions () {
     );
   }
 
+  if (isEmpty(json)) return;
+
+  const warn = warnOption('liquid configuration');
+
   // Iterate over all the properties in sections option
   for (const option in json) {
 
     // Validate theindent number
     if (option === 'indent') {
       if (isNumber(json[option])) {
-        $.processor.json[option] = json[option];
+
+        $.json[option] = json[option];
+
         continue;
+
       } else {
         typeError(
           {
@@ -51,10 +58,30 @@ export function setJsonOptions () {
       }
     }
 
+    // Validate theindent number
+    if (option === 'comments') {
+      if (isBoolean(json[option])) {
+
+        $.json[option] = json[option];
+
+        continue;
+
+      } else {
+        typeError(
+          {
+            option: 'json',
+            name: option,
+            provided: json[option],
+            expects: 'boolean'
+          }
+        );
+      }
+    }
+
     // Validate the useTabs options, when true we indent with tabs
     if (option === 'useTab') {
       if (isBoolean(json[option])) {
-        $.processor.json[option] = json[option];
+        $.json[option] = json[option];
         continue;
       } else {
         typeError(
@@ -75,7 +102,7 @@ export function setJsonOptions () {
       const exclude = isString(json[option]) ? [ json[option] ] : json[option];
 
       if (isArray(exclude)) {
-        $.processor.json[option] = anymatch(exclude as string[]);
+        $.json[option] = anymatch(getResolvedPaths<string[]>(json[option]));
         continue;
       } else {
         typeError(
@@ -86,6 +113,50 @@ export function setJsonOptions () {
             expects: 'string | string[]'
           }
         );
+      }
+    }
+
+    if (option === 'terse' && $.mode.terse === true) {
+
+      if (isEmpty(json.terse)) {
+
+        $.json.terse.enabled = false;
+
+        warn('Terse option is empty, minification will not apply');
+
+      } else if (isBoolean(json.terse) && json.terse === true) {
+
+        $.json.terse.enabled = true;
+
+      } else if (isObject(json.terse)) {
+
+        $.json.terse.enabled = true;
+
+        for (const p in json.terse) {
+
+          if (p !== 'exclude' && has(p, $.json.terse)) {
+
+            if (isBoolean(json.terse[option])) {
+              $.json.terse[p] = json.terse[p];
+              continue;
+            } else {
+              typeError(
+                {
+                  option: `json ${ARR} terse`,
+                  name: p,
+                  provided: json.terse[p],
+                  expects: 'boolean'
+                }
+              );
+            }
+
+          } else if (p === 'exclude') {
+
+            $.json.terse.exclude = anymatch(getResolvedPaths<string[]>(json.terse[option]));
+
+          }
+        }
+
       }
     }
 

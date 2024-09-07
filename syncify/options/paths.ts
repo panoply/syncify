@@ -1,11 +1,37 @@
+import type { Paths, PathsInput } from 'types';
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
 import { dirname, join } from 'pathe';
 import { PATH_KEYS } from 'syncify:const';
-import { isArray, hasProp } from 'syncify:utils';
+import { isArray, has, isObject } from 'syncify:utils';
 import { lastPath, normalPath } from 'syncify:utils/paths';
 // import { warnOption } from 'syncify:log/throws';
 import { $ } from 'syncify:state';
+
+const getPaths = (paths: Paths) => {
+
+  const path = normalPath($.dirs.input);
+
+  return (key: string, fallback: string): string[] => {
+
+    const files = $.config.paths[key];
+
+    if (!has('paths', $.config)) return [ path(fallback) ];
+
+    if (isArray<string[]>(files)) {
+      return files.map(path);
+    }
+
+    if (isObject<PathsInput>(files) && files.input) {
+
+      return isArray(files.input) ? files.input.map(path) : [ path(files.input) ];
+
+    }
+
+    return [ path(files) ];
+
+  };
+};
 
 /**
  * Get Paths
@@ -17,112 +43,65 @@ import { $ } from 'syncify:state';
  */
 export async function setPaths () {
 
-  // Path normalize,
   const path = normalPath($.dirs.input);
-  // const warn = warnOption('Path Resolution');
-  const has = hasProp($.config.paths);
 
-  // iterate over the defined path mappings
+  const getPaths = (key: string, fallback: string): string[] => {
+
+    const files = $.config.paths[key];
+
+    if (!files) {
+      return [ path(fallback) ];
+    }
+
+    if (isArray<string[]>(files)) {
+      return files.map(path);
+    }
+
+    if (isObject<PathsInput>(files) && files.input) {
+
+      return isArray(files.input) ? files.input.map(path) : [ path(files.input) ];
+
+    }
+
+    return [ path(files) ];
+
+  };
+
+  // Loop through each path type
   for (const key of PATH_KEYS) {
 
-    let uri: string[];
+    let paths: string[] = [];
 
-    if (key === 'customers') {
-
-      uri = has(key)
-        ? isArray($.config.paths[key])
-          ? ($.config.paths[key] as string[]).map(path)
-          : [ path($.config.paths[key]) ]
-        : [ path('templates/customers/*') ];
-
-    } else if (key === 'metaobject') {
-
-      uri = has(key)
-        ? isArray($.config.paths[key])
-          ? ($.config.paths[key] as string[]).map(path)
-          : [ path($.config.paths[key]) ]
-        : [ path('templates/metaobject/*') ];
-
-    } else if (key === 'schema') {
-
-      uri = has(key)
-        ? isArray($.config.paths[key])
-          ? ($.config.paths[key] as string[]).map(path)
-          : [ path($.config.paths[key]) ]
-        : [ path('schema/*') ];
-
-    } else if (has(key)) {
-
-      uri = isArray($.config.paths[key])
-        ? ($.config.paths[key] as string[]).map(path)
-        : [ path($.config.paths[key]) ];
-
-      if (key === 'snippets') {
-
-        for (const p of uri) {
-          $.snippet.baseDir.add(lastPath(dirname(p)));
-        }
-
-      } else if (key === 'sections') {
-
-        for (const p of uri) {
-          $.section.baseDir.add(lastPath(dirname(p)));
-        }
-
-      } else if (key === 'assets') {
-
-        uri.push(join($.dirs.output, 'assets/*'));
-
-      }
-
-    } else if (key === 'redirects' && has(key)) {
-
-      uri = [ join($.cwd, $.config.paths[key]) ];
-
-    } else {
-
-      uri = [ path(key) ];
-
+    switch (key) {
+      case 'customers':
+        paths = getPaths(key, 'templates/customers/*'); break;
+      case 'metaobject':
+        paths = getPaths(key, 'templates/metaobject/*'); break;
+      case 'schema':
+        paths = getPaths(key, 'schema/*'); break;
+      default:
+        if ($.config.paths[key]) paths = getPaths(key, '');
     }
 
-    for (const p of uri) {
+    // Special handling for certain keys
+    if (key === 'snippets' || key === 'sections') {
+      paths.forEach(p => $[key].baseDir.add(lastPath(dirname(p))));
+    } else if (key === 'assets') {
+      paths.push(join($.dirs.output, 'assets/*'));
+    }
 
+    // Process each path
+    for (const p of paths) {
       if (key !== 'metafields' && key !== 'redirects') {
-
-        const paths = await glob(p, { cwd: $.cwd });
-
-        if (paths.length === 0) {
-
-          if (key === 'assets' && p === join($.dirs.output, 'assets/*')) continue;
-
-          // warn('No files could be resolved in', relative($.cwd, p));
-
-        } else {
-
-          // We will create the set if null
-          // otherwise we iterate and populate the set.
-          //
-          if ($.paths[key].input === null) {
-            $.paths[key].input = new Set(paths);
-          } else {
-            for (const entry of paths) {
-              $.paths[key].input.add(entry);
-            }
-          }
-
-          // TODO
-          // IMPROVE THIS LOGIC
-          //
+        const foundPaths = await glob(p, { cwd: $.cwd });
+        if (foundPaths.length) {
+          foundPaths.forEach(entry => $.paths[key].input.add(entry));
           $.watch.add(p);
-
+        } else if (key !== 'assets' || p !== join($.dirs.output, 'assets/*')) {
+          // Optionally log or handle the case where no files are found
         }
-
       }
-
-      $.paths[key].match = anymatch(uri);
-
+      $.paths[key].match = anymatch(paths);
     }
-
   }
-
 }

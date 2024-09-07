@@ -11,7 +11,7 @@
     "syncify/**/*.ts",
     "types/*.d.ts",
     "types/internal/cli.d.ts",
-    "types/internal/internal.d.ts"
+    "types/internal/internal.d.ts",
   ],
   "typeAcquisition": {
     "enable": true,

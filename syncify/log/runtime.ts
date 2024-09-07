@@ -377,9 +377,7 @@ runtime.warnings = function getRuntimeWarnings ($: Bundle) {
 
   if (amount === 0) return;
 
-  const message = Create({
-    type: 'warning'
-  }).Line(`${amount} ${plural('Warning', amount)}`, bold);
+  const message = Create({ type: 'warning' }).Line(`${amount} ${plural('Warning', amount)}`, bold);
 
   for (const key of props) {
 

@@ -51,11 +51,11 @@ export async function load (id: 'tailwind' | 'sass') {
 /* TRANSFORMS                                   */
 /* -------------------------------------------- */
 
-function write (file: File<StyleBundle>, sync: ClientParam<StyleBundle>, cb: Syncify) {
+function write <T extends StyleBundle> (file: File<T>, sync: ClientParam<T>, hook: Syncify) {
 
-  const scope = u.isFunction(cb) ? { ...file } : false;
+  const scope = u.isFunction(hook) ? { ...file } : false;
 
-  return async function (data: string) {
+  return async (data: string) => {
 
     if (u.isNil(data)) return null;
 
@@ -63,7 +63,7 @@ function write (file: File<StyleBundle>, sync: ClientParam<StyleBundle>, cb: Syn
 
     if (scope !== false) {
 
-      const update = cb.apply({ ...file }, toBuffer(data));
+      const update = hook.apply({ ...file }, toBuffer(data));
 
       if (u.isUndefined(update) || update === false) {
         content = data;
@@ -76,12 +76,10 @@ function write (file: File<StyleBundle>, sync: ClientParam<StyleBundle>, cb: Syn
 
     $.cache.checksum[file.input] = u.checksum(content);
 
-    writeFile(file.output, content).catch(
-      error.write('Error writing stylesheet to output', {
-        input: file.relative,
-        output: relative($.cwd, file.output)
-      })
-    );
+    writeFile(file.output, content).catch(error.write('Error writing stylesheet to output', {
+      input: file.relative,
+      output: relative($.cwd, file.output)
+    }));
 
     const size = sizeDiff(data, file.size);
 
@@ -107,44 +105,38 @@ function write (file: File<StyleBundle>, sync: ClientParam<StyleBundle>, cb: Syn
       log.syncing(file.key);
     }
 
-    if (sync === null) {
-      return content;
-    } else {
-      await sync('put', file, content);
-    }
+    if (sync === null) return content;
+
+    await sync('put', file, content);
 
   };
 };
 
 async function sassProcess (file: File) {
 
-  const { data } = file;
-
-  if ((u.isBoolean(data.sass) && data.sass === false)) {
+  if (u.isUndefined(file.data) || (u.isBoolean(file.data.sass) && file.data.sass === false)) {
     return readStyleFile(file);
   }
 
-  if (u.isUndefined(data)) return readStyleFile(file);
-
-  const options: SASSConfig = u.isObject(data.sass)
-    ? u.merge($.processor.sass.config, data.sass)
+  const options: SASSConfig = u.isObject(file.data.sass)
+    ? u.merge($.processor.sass.config, file.data.sass)
     : $.processor.sass.config;
 
   if (file.ext === '.scss' || file.ext === '.sass') {
 
-    if ($.mode.watch) timer.start();
+    $.mode.watch && timer.start();
 
     try {
 
-      const { css, sourceMap } = sass.compile(data.input, {
+      const { css, sourceMap } = sass.compile(file.data.input, {
         loadPaths: options.include,
-        sourceMapIncludeSources: data.postcss,
+        sourceMapIncludeSources: file.data.postcss,
         sourceMap: options.sourcemap,
         style: options.style,
         alertColor: false,
         alertAscii: false,
         quietDeps: options.quietDeps,
-        charset: data.snippet === false,
+        charset: file.data.snippet === false,
         logger: {
           debug: msg => console.log('DEBUG', msg),
           warn: warn.sass(file)
@@ -202,19 +194,19 @@ async function sassProcess (file: File) {
 export async function tailwindParse (file: File, queue: [File, string][]) {
 
   for (const map in $.processor.tailwind.map) {
+
     if ($.processor.tailwind.map[map].has(file.input)) {
 
-      const item = parseFileQuick($.style[map].input);
+      const item = parseFileQuick<StyleBundle>($.style[map].input);
 
       if (u.isUndefined(item)) continue;
 
       timer.start(item.uuid);
-
       item.kind = Kind.Tailwind;
 
       const style = await tailwindProcess(item);
 
-      if (u.isString(style)) queue.push([ item, style ]);
+      u.isString(style) && queue.push([ item, style ]);
 
     }
   }
@@ -300,11 +292,7 @@ export async function postcssProcess (file: File<StyleBundle>, css: string, map:
     const result = await postcss(plugins).process(css, {
       from: data.rename,
       to: data.rename,
-      map: map ? {
-        prev: map,
-        inline: false,
-        absolute: true
-      } : null
+      map: map ? { prev: map, inline: false, absolute: true } : null
     });
 
     if ($.mode.watch && file.kind !== Kind.Tailwind) {
@@ -367,11 +355,15 @@ export async function compile <T extends StyleBundle> (file: File<StyleBundle>, 
 
   try {
 
+    if (u.isUndefined(file.data) || (
+      u.isBoolean(file.data.sass) &&
+      file.data.sass === false)) return readStyleFile(file);
+
     const out = await sassProcess(file);
 
     if (out === null) return null;
 
-    if (u.isNil(postcss) || (!file.data.postcss && !file.data.snippet)) {
+    if (u.isNil(postcss) || u.isUndefined(file.data) || (!file.data.postcss && !file.data.snippet)) {
       return output(out.css);
     }
 
@@ -388,7 +380,9 @@ export async function compile <T extends StyleBundle> (file: File<StyleBundle>, 
       }
     }
 
-    return file.data.snippet ? output(createSnippet(out.css, file.data.attrs)) : output(out.css);
+    return file.data.snippet
+      ? output(createSnippet(out.css, file.data.attrs))
+      : output(out.css);
 
   } catch (e) {
 

@@ -130,15 +130,15 @@ import { $ } from 'syncify:state';
  */
 export async function setCacheDirs () {
 
-  const { dirs } = $;
+  await createDirs($.dirs.cache);
+  await createDirs($.dirs.sourcemaps.root);
 
-  await createDirs(dirs.cache);
-  await createDirs(dirs.sourcemaps.root);
-
-  return Promise.all([
-    createDirs(dirs.sourcemaps.scripts),
-    createDirs(dirs.sourcemaps.styles)
-  ]);
+  return Promise.all(
+    [
+      createDirs($.dirs.sourcemaps.scripts),
+      createDirs($.dirs.sourcemaps.styles)
+    ]
+  );
 
 };
 
@@ -152,16 +152,14 @@ export async function setThemeDirs (basePath?: string) {
 
   if (!basePath) basePath = $.dirs.output;
 
-  const hasBase = await pathExists(basePath);
-
-  if (hasBase) {
+  if (await pathExists(basePath)) {
 
     if ($.mode.clean) {
 
       try {
         await emptyDir(basePath);
       } catch (e) {
-        console.error(e);
+        throw new Error(e);
       }
 
     }
@@ -179,10 +177,9 @@ export async function setThemeDirs (basePath?: string) {
   for (const dir of THEME_DIRS) {
 
     const uri = join(basePath, dir);
-    const has = await pathExists(uri);
     const name = dir.startsWith('templates/') ? dir.slice(10) : dir;
 
-    if (!has) {
+    if (!(await pathExists(uri))) {
 
       try {
 
@@ -209,16 +206,14 @@ export async function setThemeDirs (basePath?: string) {
 /**
  * Set Base Directories
  *
- * Generates the base directory paths. The function
- * also normalizes paths to ensure the mapping is correct.
+ * Generates the base directory paths. The function also normalizes paths to
+ * ensure the mapping is correct.
  */
-export function setBaseDirs (cli: Commands) {
+export async function setBaseDirs (cli: Commands) {
 
   const base = basePath($.cwd);
 
   for (const [ dir, def ] of BASE_DIRS) {
-
-    let path: string | string[];
 
     if (dir === 'cache') {
 
@@ -232,50 +227,25 @@ export function setBaseDirs (cli: Commands) {
 
     } if (dir === 'import') {
 
-      if ($.mode.import) {
-        if (has('output', cli)) {
-          $.dirs[dir] = base(cli.output);
-        } else {
-          $.dirs[dir] = base($.config.import);
-        }
-      } else {
-        $.dirs[dir] = base($.config.import);
-      }
+      $.dirs[dir] = base($.mode.import && has('output', cli) ? cli.output : $.config.import);
 
       continue;
 
     } else if (dir === 'export') {
 
-      if ($.mode.export) {
-        if (has('output', cli)) {
-          $.dirs[dir] = base(cli.output);
-        } else {
-          $.dirs[dir] = base($.config.export);
-        }
-      } else {
-        $.dirs[dir] = base($.config.export);
-      }
+      $.dirs[dir] = base($.mode.export && has('output', cli) ? cli.output : $.config.export);
 
       continue;
 
-    } else if (has(dir, cli) && cli[dir] === def) {
+    } else if (has(dir, cli) && cli[dir] === def && $.config[dir] === def) {
 
-      if ($.config[dir] === def) {
-        $.dirs[dir] = base(cli[dir]);
-        continue;
-      } else {
-        path = $.config[dir];
-      }
+      $.dirs[dir] = base(cli[dir]);
 
-    } else if (isString(cli[dir])) {
-
-      path = cli[dir];
-
-    } else {
-
-      path = $.config[dir];
+      continue;
 
     }
+
+    const path = isString(cli[dir]) ? cli[dir] : $.config[dir];
 
     if (isString(path)) {
 
@@ -310,9 +280,7 @@ export async function setImportDirs () {
 
   if (!mode.import) return;
 
-  const hasBase = await pathExists(dirs.import);
-
-  if (!hasBase) {
+  if (!(await pathExists(dirs.import))) {
     try {
       await mkdir(dirs.import);
     } catch (e) {
@@ -323,16 +291,14 @@ export async function setImportDirs () {
   for (const theme in sync.themes) {
 
     const { store, target } = sync.themes[theme];
-
     const dir = join(dirs.import, store);
-    const has = await pathExists(dir);
 
-    if (has) {
+    if (await pathExists(dir)) {
       if (mode.clean) {
         try {
           await emptyDir(dir);
         } catch (e) {
-          console.error(e);
+          throw new Error(e);
         }
       }
     } else {
@@ -361,9 +327,7 @@ export async function createDirs (path: string | string[]) {
 
     for (const uri of path) {
 
-      const has = await pathExists(uri);
-
-      if (!has) {
+      if (!(await pathExists(uri))) {
         try {
           await mkdir(uri);
         } catch (e) {
@@ -374,13 +338,15 @@ export async function createDirs (path: string | string[]) {
 
   } else {
 
-    const has = await pathExists(path);
-
-    if (!has) {
+    if (!(await pathExists(path))) {
       try {
+
         await mkdir(path);
+
       } catch (e) {
+
         throw new Error(e);
+
       }
     }
   }

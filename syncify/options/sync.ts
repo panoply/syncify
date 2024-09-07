@@ -43,20 +43,18 @@ export async function setSync (cli: Commands) {
   let items: Stores[] = [];
   let queue: boolean = false;
 
-  if (cli._.length === 0) {
-    if (storeRequired) {
-      invalidCommand({
-        expected: 'syncify <store>',
-        message: [
-          'You have not provided store to target, which is required',
-          'when running in a resource mode that syncs to a remote source'
-        ],
-        fix: [
-          'Provide the store target name as the first command argument',
-          'followed by themes target/s and other flags.'
-        ]
-      });
-    }
+  if (storeRequired && cli._.length === 0 && $.mode.themes === false) {
+    invalidCommand({
+      expected: 'syncify <store>',
+      message: [
+        'You have not provided a store to target, which is required',
+        'when running in a resource mode that syncs to a remote source'
+      ],
+      fix: [
+        'Provide the store target name as the first command argument',
+        'followed by theme target/s and other flags.'
+      ]
+    });
   }
 
   if ($.mode.themes && $.stores.length > 0) {
@@ -100,32 +98,31 @@ export async function setSync (cli: Commands) {
     }
 
     if (themes.length === 0) {
+
       await Connect($.sync.stores[sidx]);
+
     }
 
     for (const target of themes) {
 
       if (!has(target, store.themes)) {
 
-        invalidTarget(
-          {
-            type: 'theme',
-            expected: keys(store.themes).join(','),
-            provided: target,
-            message: [
-              `Unknown theme target (${blue(target)}) provided to ${blue(store.domain)} store`,
-              `Your ${blue($.file.base)} file contains no such theme using this name.`
-            ],
-            fix: [
-              `Provide an ${blue('expected')} theme target or update/add an existing target.`,
-              `You have ${blue(`${themes.length}`)} theme targets defined for ${blue(store.domain)}:`,
-              NLR,
-              `${DSH} ${themes.join(`\n${DSH} `)}`,
-              NLR
-            ]
-
-          }
-        );
+        invalidTarget({
+          type: 'theme',
+          expected: keys(store.themes).join(','),
+          provided: target,
+          message: [
+            `Unknown theme target (${blue(target)}) provided to ${blue(store.domain)} store`,
+            `Your ${blue($.file.base)} file contains no such theme using this name.`
+          ],
+          fix: [
+            `Provide an ${blue('expected')} theme target or update/add an existing target.`,
+            `You have ${blue(`${themes.length}`)} theme targets defined for ${blue(store.domain)}:`,
+            NLR,
+            `${DSH} ${themes.join(`\n${DSH} `)}`,
+            NLR
+          ]
+        });
 
       }
 
@@ -142,54 +139,47 @@ export async function setSync (cli: Commands) {
 
   }
 
-  if (storeRequired) {
-    if ($.sync.stores.length === 0) {
-      return invalidCommand(
-        {
-          expected: 'syncify <store>',
-          message: [
-            'You have not provided store to target, which is required',
-            'when running in a resource mode that syncs to a remote source'
-          ],
-          fix: [
-            'Provide the store target name as the first command argument followed by themes',
-            'target/s and other flags. Based on your current configuration:',
-            NLR,
-            `${DSH} ${white('$')} syncify ${$.stores.join(`\n${DSH} ${white('$')} syncify `)}`,
-            NLR
-          ]
-        }
-      );
-    }
+  if (storeRequired && $.sync.stores.length === 0) {
+    invalidCommand({
+      expected: 'syncify <store>',
+      message: [
+        'You have not provided store to target, which is required',
+        'when running in a resource mode that syncs to a remote source'
+      ],
+      fix: [
+        'Provide the store target name as the first command argument followed by themes',
+        'target/s and other flags. Based on your current configuration:',
+        NLR,
+        `${DSH} ${white('$')} syncify ${$.stores.join(`\n${DSH} ${white('$')} syncify `)}`,
+        NLR
+      ]
+    });
   }
 
-  if ($.sync.themes.length === 0) {
-    if (themeRequired) {
-      return invalidCommand(
-        {
-          expected: '-t <theme>',
-          message: [
-            'You have not provided a theme to target, which is required',
-            'when running this resource mode.'
-          ],
-          fix: [
-            `Provide a theme name to target following a ${blue('-t')} or ${blue('--theme')} flag.`,
-            'Theme targets should be passed as the 2nd argument, the 1st argument should be store name/s.'
-          ]
-        }
-      );
-    }
+  if (themeRequired && $.sync.themes.length === 0) {
+    invalidCommand(
+      {
+        expected: '-t <theme>',
+        message: [
+          'You have not provided a theme to target, which is required',
+          'when running this resource mode.'
+        ],
+        fix: [
+          `Provide a theme name to target following a ${blue('-t')} or ${blue('--theme')} flag.`,
+          'Theme targets should be passed as the 2nd argument, the 1st argument should be store name/s.'
+        ]
+      }
+    );
   }
 
   if ($.sync.stores.length === 0) {
+
     throwError('Unknown, missing or invalid store/theme targets', [
       'Check your store config'
     ]);
+
   }
 
-  if ($.sync.stores.length === 1 && $.sync.themes.length === 1) {
-    $.env.sync = 1;
-  } else if ($.sync.stores.length > 1 || $.sync.themes.length > 1) {
-    $.env.sync = 2;
-  }
+  $.env.sync = $.sync.stores.length === 1 && $.sync.themes.length === 1 ? 1 : 2;
+
 };

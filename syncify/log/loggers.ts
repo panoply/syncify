@@ -2,7 +2,7 @@ import type { File, Store, Theme, VC } from 'types';
 import type { MinifiedParams } from 'types/internal';
 import { cursorTo, clearScreenDown } from 'node:readline';
 import { inspect } from 'node:util';
-import { stdout } from 'node:process';
+import { stdout, stderr } from 'node:process';
 import notifier from 'node-notifier';
 import { intercept } from 'syncify:cli/intercept';
 import { queue } from 'syncify:requests/queue';
@@ -36,7 +36,7 @@ export { runtime } from 'syncify:log/runtime';
  *
  * Console Log with inspect
  */
-export function console (...message: any) {
+export const console = (...message: any) => {
 
   n.log(
     inspect(
@@ -48,7 +48,7 @@ export function console (...message: any) {
     )
   );
 
-}
+};
 
 /* -------------------------------------------- */
 /* LOGGERS                                      */
@@ -92,7 +92,7 @@ export const spinner = Spinner();
  * ├────────────────────────────────────────────────
  * │
  */
-export function hline (options?: { width?: number, newlines?: boolean }) {
+export const hline = (options?: { width?: number, newlines?: boolean }) => {
 
   n.log(
     x.Ruler(
@@ -101,7 +101,7 @@ export function hline (options?: { width?: number, newlines?: boolean }) {
     )
   );
 
-}
+};
 
 /**
  * Log Write
@@ -113,7 +113,7 @@ export function hline (options?: { width?: number, newlines?: boolean }) {
  * '│ lorem ipsum'             // Settings omitted
  * '│ lorem ipsum ~ 10ms'      // Settings with prefix
  */
-export function write (message: string, {
+export const write = (message: string, {
   color,
   type = null,
   prefix = null,
@@ -146,7 +146,7 @@ export function write (message: string, {
    */
   suffix?: string;
 
-} = {}) {
+} = {}) => {
 
   if (type === 'error') {
     if (prefix === null) {
@@ -223,13 +223,13 @@ export function write (message: string, {
     }
   }
 
-}
+};
 
-export function message (message: string) {
+export const message = (message: string) => {
 
-  return n.log(x.Line(message));
+  n.log(x.Line(message));
 
-}
+};
 
 /**
  * TUI Newline
@@ -240,7 +240,8 @@ export function message (message: string) {
  *
  * `│`
  */
-export function nwl (entry?: string | 'red' | 'yellow' | undefined) {
+export const nwl = (entry?: string | 'red' | 'yellow' | undefined) => {
+
   if (entry === NIL) {
     n.log(NWL);
   } else if (entry === 'red') {
@@ -250,7 +251,8 @@ export function nwl (entry?: string | 'red' | 'yellow' | undefined) {
   } else {
     n.log(Tree.line);
   }
-}
+
+};
 
 /**
  * Unhook
@@ -258,12 +260,12 @@ export function nwl (entry?: string | 'red' | 'yellow' | undefined) {
  * Removes log listener and prints intercepted messages.
  * Captured logs can be printed based on `stdin` input.
  */
-export function unhook () {
+export const unhook = () => {
 
   $.log.listen();
   $.log.listen = null;
 
-}
+};
 
 /**
  * Hook
@@ -271,7 +273,7 @@ export function unhook () {
  * Listens on `stdout` and Intercepts logs messages.
  * Maintains a reference of warning/stdout invoked by different processes.
  */
-export function hook (name: string) {
+export const hook = (name: string) => {
 
   const warning = $.warnings.has(name)
     ? $.warnings.get(name)
@@ -281,14 +283,17 @@ export function hook (name: string) {
 
     if (data.charCodeAt(0) === 9474) {
 
-      process[stream].write(data);
+      stream === 'stderr'
+        ? stderr.write(data)
+        : stdout.write(data);
 
     } else {
 
       const text = data.split(NWL);
 
       while (text.length !== 0) {
-        $.warnings.process[name].add(
+
+        warning.get(name).add(
           c.yellowBright(
             text
             .shift()
@@ -300,7 +305,7 @@ export function hook (name: string) {
 
   });
 
-}
+};
 
 /* -------------------------------------------- */
 /* CLEAR                                        */
@@ -312,17 +317,19 @@ export function hook (name: string) {
  * Clears the console messages. Optionally pass a `boolean` value of `true`
  * to override the syncify `log.config` option.
  */
-export function clear (force = false) {
+export const clear = (force = false) => {
 
   if (force === false && $.log.config.clear === false) return;
 
   const count = stdout.rows - 2;
 
   n.log(count > 0 ? NWL.repeat(count) : NIL);
+
   cursorTo(stdout, 0, 0);
+
   clearScreenDown(stdout);
 
-}
+};
 
 /* -------------------------------------------- */
 /* GROUP                                        */
@@ -337,7 +344,7 @@ export function clear (force = false) {
  * │
  * └─ Name ~ 01:59:20
  */
-export function group (name?: string | boolean) {
+export const group = (name?: string | boolean) => {
 
   if ($.log.config.silent || $.env.tree === false) return;
 
@@ -350,7 +357,7 @@ export function group (name?: string | boolean) {
     n.log(NWL + x.Top($.log.group)); // Open new group
   }
 
-}
+};
 
 /**
  * New Group
@@ -361,7 +368,7 @@ export function group (name?: string | boolean) {
 * │
 * └─ Name ~ 01:59:20
 */
-export function task (name?: string) {
+export const task = (name?: string) => {
 
   if ($.log.config.silent || $.env.tree === false) return;
 
@@ -384,7 +391,7 @@ export function task (name?: string) {
 
   }
 
-}
+};
 
 /* -------------------------------------------- */
 /* PROCESS                                      */
@@ -402,7 +409,7 @@ export function task (name?: string) {
  * '│ process → ESBuild ‣ message ~ 500ms'   // Passing a message and time
  *
  */
-export function process (label: string, ...message: [ string, string? ]) {
+export const process = (label: string, ...message: [ string, string? ]) => {
 
   if ($.mode.export || $.mode.build || $.log.config.silent) return;
 
@@ -441,14 +448,14 @@ export function process (label: string, ...message: [ string, string? ]) {
     );
   }
 
-}
+};
 
 /**
  * Log Changed - `neonCyan`
  *
  * @example '│ changed → source/dir/file.ext'
  */
-export function changed (file: File) {
+export const changed = (file: File) => {
 
   if ($.log.config.silent === true || $.mode.watch === false) return;
 
@@ -488,12 +495,15 @@ export function changed (file: File) {
   n.log(
     x.NextLine(
       c.neonCyan(
-        x.Prefix('changed', u.glueString(file.relative, x.Append(`${change} change${change > 1 ? 's' : NIL}`)))
+        x.Prefix('changed', u.glueString(
+          file.relative,
+          x.Append(`${change} change${change > 1 ? 's' : NIL}`)
+        ))
       )
     )
   );
 
-}
+};
 
 /**
  * Log Minified - `whiteBright`
@@ -503,7 +513,7 @@ export function changed (file: File) {
  * '│ minified → CSS → 200kb ⥂ 120kb ~ saved 80kb'  // Passing kind
  * '│ minified → 200kb ⥂ 120kb ~ saved 80kb'        // Omitting kind
  */
-export function minified (...p: MinifiedParams) {
+export const minified = (...p: MinifiedParams) => {
 
   if ($.mode.export || $.mode.build || $.log.config.silent) return;
 
@@ -563,7 +573,7 @@ export function minified (...p: MinifiedParams) {
     );
   }
 
-}
+};
 
 /**
  * Log Syncing - `magentaBright`
@@ -572,18 +582,18 @@ export function minified (...p: MinifiedParams) {
  *
  * '│ syncing → dir/file.ext'
  */
-export function syncing (path: string, { hot = false } = {}) {
+export const syncing = (path: string, { hot = false } = {}) => {
 
   if ($.mode.export || $.mode.build || $.log.config.silent) return;
 
-  if ($.warnings[path]) {
+  if ($.warnings.has(path)) {
     n.log(
       x.LineYellow(
         c.yellowBright(
           x.Prefix(
             'warning',
             u.glueString(
-              u.sanitize($.warnings[path].size),
+              u.sanitize($.warnings.get(path).size),
               u.plural('warning', $.warnings[path].size),
               x.Suffix.warning
             )
@@ -611,7 +621,7 @@ export function syncing (path: string, { hot = false } = {}) {
       )
     );
   }
-}
+};
 
 /**
  * Log Prompt - `blueBright`
@@ -634,7 +644,7 @@ export function syncing (path: string, { hot = false } = {}) {
  *
  * '┌─ Name ~ 01:59:20'
  */
-export function prompt (message: string, notify?: notifier.Notification) {
+export const prompt = (message: string, notify?: notifier.Notification) => {
 
   // close previous group
 
@@ -649,11 +659,9 @@ export function prompt (message: string, notify?: notifier.Notification) {
 
   if (u.isObject(notify)) notifier.notify(notify).notify();
 
-  return () => n.log(
-    x.Top($.log.group)
-  );
+  return () => n.log(x.Top($.log.group));
 
-}
+};
 
 /**
  * Log Resource - `neonGreen`
@@ -665,7 +673,7 @@ export function prompt (message: string, notify?: notifier.Notification) {
  *
  * '│ uploaded → page → store.myshopify.com ~ 500ms'
  */
-export function resource (type: string, store: Store) {
+export const resource = (type: string, store: Store) => {
 
   if ($.mode.watch) {
 
@@ -727,7 +735,7 @@ export function resource (type: string, store: Store) {
 
   }
 
-}
+};
 
 /**
  * Log Uploaded - `neonGreen`
@@ -736,7 +744,7 @@ export function resource (type: string, store: Store) {
  *
  * '│ uploaded → theme → store.myshopify.com ~ 500ms'
  */
-export function upload (theme: Theme) {
+export const upload = (theme: Theme) => {
 
   if ($.log.config.silent) return;
 
@@ -781,7 +789,7 @@ export function upload (theme: Theme) {
     );
 
   }
-}
+};
 
 /**
  * Log Invalid - `red`
@@ -794,7 +802,7 @@ export function upload (theme: Theme) {
  *
  * '│ invalid → dir/file.ext'
  */
-export function invalid (path: string, message?: string | string[]) {
+export const invalid = (path: string, message?: string | string[]) => {
 
   n.log(
     x.LineRed(
@@ -826,7 +834,7 @@ export function invalid (path: string, message?: string | string[]) {
     );
   }
 
-}
+};
 
 /**
  * Log Error - `red`
@@ -839,7 +847,7 @@ export function invalid (path: string, message?: string | string[]) {
  * error → dir/file.ext
  * error → dir/file.ext ~ suffix
 */
-export function error (input: string, { suffix = null, notify = null }: {
+export const error = (input: string, { suffix = null, notify = null }: {
   /**
    * Suffix text - optional and will apply an append when passed
    *
@@ -852,7 +860,7 @@ export function error (input: string, { suffix = null, notify = null }: {
    * @default null
    */
   notify?: notifier.Notification
-} = {}) {
+} = {}) => {
 
   n.error(
     x.LineRed(
@@ -865,7 +873,7 @@ export function error (input: string, { suffix = null, notify = null }: {
   if (notify !== null) {
     notifier.notify(notify).notify();
   }
-}
+};
 
 /**
  * Spawn Logging
@@ -874,7 +882,7 @@ export function error (input: string, { suffix = null, notify = null }: {
  * informs about invoked spawned processes, which is not ideal
  * but suffices (for now).
  */
-export function spawn (name: string) {
+export const spawn = (name: string) => {
 
   return function (...input: string[]) {
 
@@ -907,14 +915,14 @@ export function spawn (name: string) {
 
   };
 
-}
+};
 
 /**
  * Log Warning `yellowBright`
  *
  * @example '│ warning → message ~ suffix
  */
-export function warn (message: string, suffix?: string) {
+export const warn = (message: string, suffix?: string) => {
 
   if (suffix) {
     n.log(
@@ -933,14 +941,14 @@ export function warn (message: string, suffix?: string) {
       )
     );
   }
-}
+};
 
 /**
  * Log Retrying - `orange`
  *
  * @example '│ retrying → dir/file.ext → theme ~ store.myshopify.com'
  */
-export function retrying (file: string, theme: Theme) {
+export const retrying = (file: string, theme: Theme) => {
 
   n.log(
     x.Line(
@@ -950,7 +958,7 @@ export function retrying (file: string, theme: Theme) {
     )
   );
 
-}
+};
 
 /**
  * Log Deleted - `blueBright`
@@ -959,7 +967,7 @@ export function retrying (file: string, theme: Theme) {
  *
  * '│ deleted → dir/filename.ext → theme ~ store.myshopify.com'
  */
-export function deleted (file: string, theme: Theme) {
+export const deleted = (file: string, theme: Theme) => {
 
   n.log(
     x.Line(
@@ -968,7 +976,7 @@ export function deleted (file: string, theme: Theme) {
       )
     )
   );
-}
+};
 
 /* -------------------------------------------- */
 /* TRANSFORM                                    */
@@ -1008,7 +1016,7 @@ export function deleted (file: string, theme: Theme) {
  * │ transform → message → result ~ suffix
  * ```
  */
-export function transform (label: string, ...suffix: [ string?, string?, string? ]) {
+export const transform = (label: string, ...suffix: [ string?, string?, string? ]) => {
 
   if ($.mode.build) return;
 
@@ -1051,7 +1059,7 @@ export function transform (label: string, ...suffix: [ string?, string?, string?
     );
 
   }
-}
+};
 
 /* -------------------------------------------- */
 /* ZIPPED                                       */
@@ -1064,7 +1072,7 @@ export function transform (label: string, ...suffix: [ string?, string?, string?
  *
  * '│ zipped → ZIP 1.5mb ~ source/dir/file.ext'
  */
-export function zipped (size: string, path: string) {
+export const zipped = (size: string, path: string) => {
 
   n.log(
     x.Line(
@@ -1081,7 +1089,7 @@ export function zipped (size: string, path: string) {
     )
   );
 
-}
+};
 
 /**
  * Log Skipped - `gray`
@@ -1090,7 +1098,7 @@ export function zipped (size: string, path: string) {
  *
  * '│ skipped → dir/file.ext'
  */
-export function skipped (file: File | string, reason: string) {
+export const skipped = (file: File | string, reason: string) => {
 
   if ($.mode.export || $.mode.build) return;
 
@@ -1108,7 +1116,7 @@ export function skipped (file: File | string, reason: string) {
     )
   );
 
-}
+};
 
 /**
  * Log Ignored - `yellowBright`
@@ -1117,7 +1125,7 @@ export function skipped (file: File | string, reason: string) {
  *
  * '│ ignored → dir/file.ext'
  */
-export function ignored (path: string) {
+export const ignored = (path: string) => {
 
   n.log(
     x.Line(
@@ -1130,7 +1138,7 @@ export function ignored (path: string) {
     )
   );
 
-}
+};
 
 /**
  * Log Title
@@ -1141,7 +1149,7 @@ export function ignored (path: string) {
  * '│ Title'
  * '│'
  */
-export function title (label: string) {
+export const title = (label: string) => {
 
   n.log(
     x.Break(
@@ -1149,7 +1157,7 @@ export function title (label: string) {
     )
   );
 
-}
+};
 
 /**
  * Log HOT Reload - `neonRouge`
@@ -1160,7 +1168,7 @@ export function title (label: string) {
  *
  * '│ reloaded → HOT RELOAD ~ 500ms'
  */
-export function hot (id?: string) {
+export const hot = (id?: string) => {
 
   n.log(
     x.Line(
@@ -1175,7 +1183,7 @@ export function hot (id?: string) {
       )
     )
   );
-}
+};
 
 /**
  * Log Exported - `whiteBright`
@@ -1184,7 +1192,7 @@ export function hot (id?: string) {
  *
 * '│ exported → script ⥂ snippet'
 */
-export function exported (from: string, to: string) {
+export const exported = (from: string, to: string) => {
 
   if ($.mode.build) return;
 
@@ -1212,7 +1220,7 @@ export function exported (from: string, to: string) {
  *
  * '│ reloaded → dir/file.ext ~ 500ms'
  */
-export function reloaded (path: string, time: string) {
+export const reloaded = (path: string, time: string) => {
 
   n.log(
     x.Line(
@@ -1235,7 +1243,7 @@ export function reloaded (path: string, time: string) {
  *
  * @example '│ warning → message ~ append text
  */
-export function version (vc: VC, type: string) {
+export const version = (vc: VC, type: string) => {
 
   n.log(
     x.Line(
@@ -1253,4 +1261,4 @@ export function version (vc: VC, type: string) {
     )
   );
 
-}
+};

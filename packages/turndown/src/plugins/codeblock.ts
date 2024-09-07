@@ -6,19 +6,15 @@ export function highlightedCodeBlock (turndownService: TurndownService) {
 
   turndownService.addRule('codeblock', {
 
-    filter (node) {
+    filter: node => <boolean>(
+      node.nodeName === 'DIV' &&
+      highlight.test(node.className) &&
+      node.firstChild &&
+      node.firstChild.nodeName === 'PRE'
+    ),
+    replacement: (_content, node, options) => {
 
-      return <boolean>(
-        node.nodeName === 'DIV' &&
-        highlight.test(node.className) &&
-        node.firstChild &&
-        node.firstChild.nodeName === 'PRE'
-      );
-
-    },
-    replacement (_content, node, options) {
-
-      const className = (node as TurndownService.Node).className || '';
+      const className = (node as Element).className || '';
       const language = (className.match(highlight) || [ null, '' ])[1];
 
       return (

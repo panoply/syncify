@@ -305,7 +305,7 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
       if (block.type === '@app') {
         blocks.push(block);
-        continue
+        continue;
       }
 
       block.settings = [];

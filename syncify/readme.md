@@ -32,9 +32,10 @@ The [`tsconfig.json`](/tsconfig.json) sets various path reference for local impo
 
 # Directories
 
-- [CLI](#cli)
-- [Forks](#forks)
-- [Log](#log)
+- [ansi](#ansi)
+- [cli](#cli)
+- [hot](#hot)
+- [log](#log)
 - [Model](#model)
 - [Modes](#modes)
 - [Options](#options)
@@ -45,17 +46,21 @@ The [`tsconfig.json`](/tsconfig.json) sets various path reference for local impo
 - [Transform](#transform)
 - [Utils](#utils)
 
-# [CLI](/cli)
+# [ansi](/ansi)
 
-The CLI directory contains normalization logic for command line operations and various utilities or helper modules pertaining to CLI execution. The TUI (Terminal User Interface) designed for Syncify is unique and little chaotic. The `ansi.ts` file is where you will find the terminal colors, characters and symbols. Files existing in the [log](#) directory will digest and re-export the exposed exports within `ansi.ts`. The `progress.ts`, `size.ts` and other files within CLI are self explanatory and documented.
+The `ansi` directory contains terminal related logic, specifically colors, symbols terminal and logic for logging. The **core** TUI (Terminal User Interface) aesthetic for Syncify is _typically_ composed using a chaining utility which will construct a tree-like log. You'll find most of the underlying references for terminal styling within this directory.
 
-# Forks
+# [cli](/cli)
 
-The forks directory is where hard-forked modules reside. Hard-forks are carbon copies of Open Source projects that Syncify uses but requires additional handling to be applied.
+The CLI directory contains normalization logic for command line operations and various utilities or helper modules pertaining to CLI execution. This directory and containing files differ from those found within [ansi](#ansi) in the sense that the `cli` directory is how trigger cli operations, whereas `ansi` is composition related.
 
-# Log
+# [hot](/hot)
 
-The Log directory contains all console logging related logic. All logger are made available using function export methods. Depending on the execution mode, different logging and loggers are used and this is what gives Syncify its beautiful TUI.
+TODO
+
+# [log](/hot)
+
+The Log directory contains all console logging related logic. All loggers are made available using function export methods. Depending on the execution mode, different logging and loggers are used and this is what gives Syncify its beautiful TUI.
 
 ```js
 import { log } from 'syncify:log';

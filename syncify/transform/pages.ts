@@ -9,7 +9,7 @@ import { Turndown, GithubFlavor } from '@syncify/turndown';
 import { File, Kind } from 'syncify:file';
 import { getPageMetafields } from 'syncify:process/metafields';
 import { lastPath } from 'syncify:utils/paths';
-import { isArray, isBoolean, isObject, isRegex, isUndefined, handleize, toUpcase, has } from 'syncify:utils';
+import { isArray, isBoolean, isObject, isRegex, isUndefined, handleize, toUpcase, has, merge } from 'syncify:utils';
 import { timer } from 'syncify:timer';
 import { getPageCache, saveCache, setPageCache } from 'syncify:process/cache';
 import * as c from 'syncify:colors';
@@ -254,13 +254,9 @@ async function promptOverwrite (remote: Resource.Page): Promise<{
  */
 function getPayloadFromFrontmatter (file: File, data: PageFrontmatter): Requests.Page {
 
-  const payload: Resource.Page = {};
-
-  if (has('title', data)) {
-    payload.title = `${data.title}`;
-  } else {
-    payload.title = toUpcase(file.name.replace(/[._-]/g, ' '));
-  }
+  const payload: Resource.Page = {
+    title: has('title', data) ? data.title : toUpcase(file.name.replace(/[._-]/g, ' '))
+  };
 
   if (has('handle', data)) {
 
@@ -383,7 +379,7 @@ export async function compile (file: File, _cb: Syncify) {
   }
 
   const frontmatter = matter(read) as { data: PageFrontmatter; content: string; };
-  const { data, content } = { ...frontmatter };
+  const { data, content } = merge(frontmatter);
   const payload = getPayloadFromFrontmatter(file, data);
 
   if (isArray(payload.metafields) && !getPageMetafields(file, payload.metafields)) {
@@ -407,7 +403,7 @@ export async function compile (file: File, _cb: Syncify) {
 
     log.invalid(file.relative, [
       `Multiple pages returned when matching on handle ${c.blue.bold(payload.handle)}`,
-      'Syncify is unsure of to handle this request and has cancelled the sync. Please',
+      'Syncify is unsure on how to handle this request and has cancelled the sync. Please',
       'check the provided handle in your webshop.'
     ]);
 
@@ -466,7 +462,7 @@ export async function compile (file: File, _cb: Syncify) {
 
   }
 
-  if ($.page.safeSync && isObject(remote)) {
+  if (isObject(remote)) {
 
     const online = new Date(remote.updated_at).getTime();
     const local = new Date(cached.updated_at).getTime();

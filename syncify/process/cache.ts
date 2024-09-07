@@ -175,7 +175,7 @@ export function getSettingsCache (domain: string, themeId: number) {
  * Returns a page resource from the cache, when no page cache exits
  * for the provided parameters, the record is created and cache file
  * updates (via queue). Optionally pass in a page id to return a specific
- * page reference , if no page exists for that id an empty object is returned.
+ * page reference, if no page exists for that id an empty object is returned.
  */
 export function getPageCache (domain: string, pageId: number = NaN) {
 

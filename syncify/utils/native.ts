@@ -10,12 +10,7 @@ export const event = new EventEmitter();
 /**
  * Native Console Log
  */
-export const {
-  error,
-  log,
-  warn,
-  clear
-} = new Console(stdout, stderr);
+export const { error, log, warn, clear } = new Console(stdout, stderr);
 
 /**
  * Native Object methods

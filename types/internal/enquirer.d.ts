@@ -103,7 +103,6 @@ export interface Choice {
   indicator?: (string | ((state: any, choice: Choice)=> string))
 }
 
-
 export interface AutocompletePromptOptions extends BasePromptOptions {
 
 }

@@ -1,6 +1,7 @@
 import { typeError, invalidError } from 'syncify:log/throws';
-import { isObject, isString, isArray, isBoolean, has, isEmpty, isNil } from 'syncify:utils';
+import { isObject, isString, isArray, isBoolean, has, isEmpty } from 'syncify:utils';
 import { $ } from 'syncify:state';
+import { Snippets } from 'types';
 
 /**
  * Snippet Options
@@ -9,17 +10,17 @@ import { $ } from 'syncify:state';
  */
 export function setSnippetOptions () {
 
-  if (!has('snippets', $.config.views)) return;
+  if (!isObject($.config.paths.snippets)) return;
 
-  const { snippets } = $.config.views;
+  const { snippets } = $.config.paths as { snippets: Snippets };
 
-  if (isNil(snippets)) return;
-  if (isObject(snippets) && isEmpty(snippets)) return;
+  if (has('input', snippets)) return;
+  if (isEmpty(snippets.input)) return;
 
   // Ensure the section option is an object
   if (!isObject(snippets)) {
     typeError({
-      option: 'views',
+      option: 'paths',
       name: 'snippets',
       expects: '{}',
       provided: typeof snippets
@@ -28,6 +29,8 @@ export function setSnippetOptions () {
 
   // Iterate over all the properties in sections option
   for (const option in $.snippet) {
+
+    if (option === 'input') continue;
 
     // Validate the boolean type values of the option
     if (option === 'prefixDir') {

@@ -15,6 +15,10 @@ declare global {
        */
       connected: boolean;
       /**
+       * A set of web components registered in the DOM.
+       */
+      webcomponents: Map<string, string>;
+      /**
        * List of errors encountered
        */
       errors?: Array<{
@@ -116,12 +120,11 @@ declare global {
 
   if (!document) return;
 
-  console.log(opts);
-
   window.syncify = window.syncify || {
     ready: false,
     connected: true,
-    errors: []
+    errors: [],
+    webcomponents: new Map()
   };
 
   /* -------------------------------------------- */
@@ -133,6 +136,12 @@ declare global {
    */
   const node = document.createElement('div');
 
+  // const zap = m.trust('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>');
+
+  // const setting = m.trust('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>');
+
+  // const refresh = m.trust('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>');
+
   /**
    * Set label `id="syncify-hot-label-status"`
    */
@@ -143,8 +152,11 @@ declare global {
   /* -------------------------------------------- */
 
   function websocket () {
+
     const socket = new WebSocket(`ws://localhost:${opts.socket}/ws`);
+
     ws(socket);
+
   }
 
   websocket();
@@ -158,7 +170,7 @@ declare global {
   const morphs = {
     onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
       if (fromEl.id === 'syncify-hot-label-status') return false;
-      if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
+      if (fromEl.tagName === 'SCRIPT' && fromEl.hasAttribute('src')) return false;
       if (fromEl.isEqualNode(toEl)) return false;
       return true;
     }
@@ -247,6 +259,87 @@ declare global {
 
   })({});
 
+  const webcomponents = function () {
+
+    const methods = {
+      customElementDefine: customElements.define,
+      customElementsGet: customElements.get,
+      querySelector: Document.prototype.querySelector,
+      querySelectorAll: Document.prototype.querySelectorAll,
+      getElementsByTagName: Document.prototype.getElementsByTagName,
+      matches: Element.prototype.matches,
+      closest: Element.prototype.closest
+    };
+
+    const uuid = (length = 10, current?: string) => {
+      current = current || '';
+      return length
+        ? uuid(--length, 'abcdefghiklmnopqrstuvwxyz'.charAt(Math.floor(Math.random() * 60)) + current)
+        : current;
+    };
+
+    function replaceSelector (selector: string) {
+      return window.syncify.webcomponents.has(selector) ? window.syncify.webcomponents.get(selector) : selector;
+    }
+
+    // Patch querySelector
+    Document.prototype.querySelector = function (selector: string) {
+      return methods.querySelector.call(this, replaceSelector(selector));
+    };
+
+    // Patch querySelectorAll
+    Document.prototype.querySelectorAll = function (selector: string) {
+      return methods.querySelectorAll.call(this, replaceSelector(selector));
+    };
+
+    // Patch querySelectorAll
+    Document.prototype.getElementsByName = function (selector: string) {
+      return methods.getElementsByTagName.call(this, replaceSelector(selector));
+    };
+
+    // Patch matches
+    Element.prototype.matches = function (selector: string) {
+      return methods.matches.call(this, replaceSelector(selector));
+    };
+
+    // Patch matches
+    Element.prototype.closest = function (selector: string) {
+      return methods.closest.call(this, replaceSelector(selector));
+    };
+
+    customElements.get = function (name: string): CustomElementConstructor {
+      return methods.customElementsGet.call(customElements, replaceSelector(name));
+    };
+
+    customElements.define = function (name: string, constructor: CustomElementConstructor, options?: any) {
+
+      if (window.syncify.webcomponents.has(name)) {
+
+        const newName = `${name}-${uuid()}`;
+        const oldName = window.syncify.webcomponents.get(name);
+
+        methods.customElementDefine.call(customElements, newName, constructor, options);
+
+        document.body.querySelectorAll(oldName).forEach(oldElement => {
+          console.info(`Syncify: Web Component '${name}' was refined to ${newName} (refresh to reset)`);
+          const newElement = document.createElement(newName);
+          newElement.innerHTML = oldElement.innerHTML;
+          oldElement.replaceWith(newElement);
+        });
+
+        window.syncify.webcomponents.set(name, newName);
+
+      } else {
+
+        console.info(`Syncify: Web component '${name}' will be monkey patched during HOT Mode.`);
+        methods.customElementDefine.call(customElements, name, constructor, options);
+        window.syncify.webcomponents.set(name, name);
+
+      }
+    };
+
+  };
+
   /* -------------------------------------------- */
   /* HISTORY SNAPSHOTS                            */
   /* -------------------------------------------- */
@@ -278,18 +371,16 @@ declare global {
       color: '#fff',
       zIndex: '2147483647',
       fontFamily: 'system-ui, sans-serif',
-      fontWeight: '500',
+      fontWeight: '300',
       textAlign: 'center',
       textTransform: 'uppercase',
       justifyContent: 'space-around',
       alignItems: 'center',
-      fontSize: '9px',
-      // @ts-expect-error
-      '-webkit-font-smoothing': 'antialiased'
+      fontSize: '8px'
     };
 
     const childStyle: Partial<CSSStyleDeclaration> = {
-      padding: '5px 10px',
+      padding: '5px 12px',
       backgroundColor: '#232326',
       border: '0.8px solid transparent',
       borderRadius: '0',
@@ -300,7 +391,12 @@ declare global {
       borderBottom: '0'
     };
 
-    const child = { view: () => m('div', { style: childStyle }, state) };
+    const child = {
+      view: () => m('div', {
+        style: childStyle
+      },
+      state)
+    };
 
     /**
      * Parent Style
@@ -328,9 +424,12 @@ declare global {
         return node;
       },
       event: (label?: string) => {
+
         if (label !== undefined) state = label;
+
         m.redraw();
         return state;
+
       },
       render: (dom: HTMLElement) => {
 
@@ -364,7 +463,7 @@ declare global {
         }
 
         timeout = setTimeout(() => {
-          label.event('Waiting for changes...');
+          label.event('HOT');
           timeout = null;
         }, 5000);
 
@@ -427,9 +526,7 @@ declare global {
    */
   function scripts (dom: Document | HTMLHeadElement, uri?: string) {
 
-    dom.querySelectorAll('script').forEach((node) => {
-
-      if (!node.hasAttribute('src')) return;
+    dom.querySelectorAll('script[src]').forEach((node) => {
 
       const href = node.getAttribute('src');
 
@@ -439,7 +536,9 @@ declare global {
       script.setAttribute('src', server + params(href));
 
       for (const attr of Array.from(node.attributes)) {
-        if (attr.nodeName !== 'src') script.setAttribute(attr.nodeName, attr.nodeValue);
+        if (attr.nodeName !== 'src') {
+          script.setAttribute(attr.nodeName, attr.nodeValue);
+        }
       }
 
       node.replaceWith(script);
@@ -488,7 +587,16 @@ declare global {
 
     socket.addEventListener('close', () => {
       socket = null;
+      window.syncify.connected = false;
+      label.event('Syncify Disconnected');
       setTimeout(websocket, 5000);
+    });
+
+    socket.addEventListener('open', () => {
+      if (!window.syncify.connected) {
+        window.syncify.connected = true;
+        label.event('Syncify Connected');
+      }
     });
 
     // status('Syncify Live (connected)');
@@ -496,7 +604,16 @@ declare global {
     socket.addEventListener('message', function ({
       data
     }: {
-      data: LiteralUnion<'connected' | 'disconnect' | 'reload' | 'replace' | 'script' | 'style', string>
+      data: LiteralUnion<
+        | 'connected'
+        | 'disconnect'
+        | 'reload'
+        | 'replace'
+        | 'script'
+        | 'style'
+        | 'section',
+        string
+      >
     }) {
 
       if (data === 'connected') {
@@ -565,11 +682,7 @@ declare global {
 
         timer.start();
 
-        const [
-          type,
-          id,
-          uuid
-        ] = data.split(',');
+        const [ type, id, uuid ] = data.split(',');
 
         if (type === 'section') {
 
@@ -580,15 +693,12 @@ declare global {
             return;
           }
 
-          if (nodes.length > 1) {
-            label.event(`Reloading ${nodes.length} Sections: ${id}`);
-          } else {
-            label.event(`Reloading Section: ${id}`);
-          }
-
           const uri = `${location.pathname}?sections=${id}`;
+          nodes.length > 1
+            ? label.event(`Reloading ${nodes.length} Sections: ${id}`)
+            : label.event(`Reloading Section: ${id}`);
 
-          return req(uri, 'json').then((value: { [prop: string]: string }) => {
+          return req(uri, 'json').then((value: Record<string, string>) => {
 
             if (nodes === null) return;
 
@@ -597,7 +707,7 @@ declare global {
               const options = {
                 childrenOnly: true,
                 onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
-                  if (fromEl.tagName === 'SCRIPT' || fromEl.tagName === 'STYLE') return false;
+                  if (fromEl.tagName === 'SCRIPT') return true;
                   if (fromEl.isEqualNode(toEl)) return false;
                   return true;
                 }
@@ -611,6 +721,7 @@ declare global {
                 const { firstElementChild } = parser.parseFromString(value[uri], 'text/html').body;
                 node.replaceWith(firstElementChild);
               });
+
             }
 
             label.event(`Reloaded in ${timer.stop()}`);
@@ -678,13 +789,17 @@ declare global {
   /* RENDER VNODE                                 */
   /* -------------------------------------------- */
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('readystatechange', () => {
+    if (document.readyState === 'interactive') {
+      webcomponents();
+      console.warn('Syncify: Web Component occurances will trigger monkey patches in HOT Mode.');
+    }
+  });
 
+  document.addEventListener('DOMContentLoaded', () => {
     sections.load(document.body);
     label.render(document.body);
-
     window.syncify.ready = true;
-
   });
 
 }({

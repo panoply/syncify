@@ -1,4 +1,4 @@
-import type { ESBuildConfig, ESBuildOptions, ScriptBundle, ScriptTransform } from 'types';
+import type { ScriptBundle, ScriptTransform } from 'types';
 import { join } from 'pathe';
 import anymatch from 'anymatch';
 import { omit } from 'rambdax';
@@ -49,7 +49,9 @@ export async function setScriptOptions () {
   ]);
 
   if (!u.has('absWorkingDir', $.processor.esbuild)) {
+
     $.processor.esbuild.absWorkingDir = $.cwd;
+
   }
 
   for (const script of transforms) {
@@ -66,7 +68,7 @@ export async function setScriptOptions () {
 
     let rename: string;
 
-    if (name.endsWith('.js') === false && name.endsWith('.mjs') === false) {
+    if (!name.endsWith('.js') && !name.endsWith('.mjs')) {
 
       rename = name + '.js';
 
@@ -78,18 +80,15 @@ export async function setScriptOptions () {
         value: name,
         expects: '.js | .mjs',
         reason: [
-          'You cannot use cjs extensions in web environments'
+          'You cannot use cjs extensions in Shopify themes.',
+          'The .cjs extension is for Node, themes are a web environment. '
         ]
       });
 
     } else {
-      rename = name;
-    }
 
-    if (
-      script.snippet === true &&
-      rename.endsWith('.liquid') === false) {
-      rename = rename + '.liquid';
+      rename = name;
+
     }
 
     /**
@@ -100,6 +99,9 @@ export async function setScriptOptions () {
 
     if (script.snippet) {
 
+      if (!rename.endsWith('.liquid')) rename = rename + '.liquid';
+
+      bundle.attrs = [];
       bundle.snippet = true;
       bundle.namespace = Namespace.Snippets;
       bundle.type = Type.Snippet;
@@ -118,27 +120,30 @@ export async function setScriptOptions () {
 
               typeError(
                 {
-                  option: 'style',
+                  option: 'transform.script',
                   name: `attrs[${i}]`,
                   provided: attr,
                   expects: 'string[]'
                 }
               );
+
             }
           }
+
         } else {
 
           typeError(
             {
-              option: 'style',
+              option: 'transform.script',
               name: 'attrs',
               provided: script.attrs,
-              expects: '[ string[] ]'
+              expects: '[ [ name: string, value: string ] ]'
             }
           );
         }
       }
     } else {
+      bundle.attrs = [];
       bundle.snippet = false;
       bundle.namespace = Namespace.Assets;
       bundle.type = Type.Script;
@@ -149,7 +154,6 @@ export async function setScriptOptions () {
     bundle.input = script.input as string;
     bundle.output = join($.dirs.output, keyDir, rename);
     bundle.key = join(keyDir, rename);
-    bundle.attrs = [];
     bundle.size = NaN;
     bundle.watch = null;
     bundle.watchCustom = null;
@@ -162,11 +166,9 @@ export async function setScriptOptions () {
     if (has('esbuild')) {
       if (u.isBoolean(script.esbuild) || u.isNil(script.esbuild)) {
 
-        if (u.isEmpty(esbuildOptions)) {
-          bundle.esbuild = $.processor.esbuild as ESBuildOptions;
-        } else {
-          bundle.esbuild = u.merge($.processor.esbuild, esbuildOptions);
-        }
+        bundle.esbuild = u.isEmpty(esbuildOptions)
+          ? u.merge<any>($.processor.esbuild)
+          : u.merge($.processor.esbuild, esbuildOptions);
 
       } else if (u.isObject(script.esbuild)) {
 
@@ -185,9 +187,9 @@ export async function setScriptOptions () {
           if (prop === 'entryPoints' && esProp(prop)) {
             warn('Option is not allowed, use Syncify "input" instead', prop);
           } else if (prop === 'outdir' && esProp(prop)) {
-            warn('Option is not allowed, Syncify will handle output', prop);
+            warn('Option is not allowed, Syncify will handle output location', prop);
           } else if (prop === 'watch' && esProp(prop)) {
-            warn('Option is not allowed, declare watch using Syncify', prop);
+            warn('Option is not allowed, declare watch paths using Syncify', prop);
           } else if (esProp(prop)) {
             warn('Option is not allowed and will be ignored', prop);
           }
@@ -197,11 +199,9 @@ export async function setScriptOptions () {
           script.esbuild.plugins.unshift(...$.processor.esbuild.plugins);
         }
 
-        if (u.isEmpty(esbuildOptions)) {
-          bundle.esbuild = u.merge<any>($.processor.esbuild, script.esbuild);
-        } else {
-          bundle.esbuild = u.merge($.processor.esbuild, script.esbuild, esbuildOptions);
-        }
+        bundle.esbuild = u.isEmpty(esbuildOptions)
+          ? u.merge<any>($.processor.esbuild, script.esbuild)
+          : u.merge($.processor.esbuild, script.esbuild, esbuildOptions);
 
       } else {
         typeError({
@@ -213,14 +213,14 @@ export async function setScriptOptions () {
       }
 
     } else {
-      if (u.isEmpty(esbuildOptions)) {
-        bundle.esbuild = $.processor.esbuild as ESBuildConfig;
-      } else {
-        bundle.esbuild = u.merge($.processor.esbuild, esbuildOptions);
-      }
+
+      bundle.esbuild = u.isEmpty(esbuildOptions)
+        ? u.merge<any>($.processor.esbuild)
+        : u.merge($.processor.esbuild, esbuildOptions);
+
     }
 
-    bundle.esbuild.entryPoints = [ bundle.input as string ];
+    bundle.esbuild.entryPoints = [ bundle.input ];
 
     if ($.mode.watch) {
 
@@ -259,14 +259,14 @@ export async function setScriptOptions () {
 
       errorRuntime(e, {
         message: [
-          'Syncify has failed to initialize due to a script prebuild error.',
+          'Syncify has failed to initialize due to a script transform prebuild error.',
           'Script transforms execute runtime builds but the compile process did not complete.',
           'This is typically due to invalid JavaScript syntax but may also be caused due to invalid',
           'transform options being passed.'
         ],
         solution: [
           'You will need to correct the error encountered. Alternatively you can skip Syncify',
-          'from applying the transform by excluding the file. '
+          'from applying the transform by excluding the file.'
         ],
         entries: {
           processor: 'ESBuild'
@@ -276,9 +276,7 @@ export async function setScriptOptions () {
     }
 
     if ($.mode.terse) {
-      bundle.esbuild = u.merge<any>(bundle.esbuild, $.terser.script, {
-        exclude: undefined
-      });
+      bundle.esbuild = u.merge<any>(bundle.esbuild, { exclude: undefined });
     }
 
     $.script.push(bundle);

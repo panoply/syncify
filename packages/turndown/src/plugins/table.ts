@@ -14,13 +14,10 @@ export function tables (turndownService: TurndownService) {
     if (tr.parentNode === null) return false;
     if (tr.parentNode.nodeName === 'THEAD') return true;
 
-    return (tr.parentNode.firstChild === tr && (
-      tr.parentNode.nodeName === 'TABLE' ||
-      isFirstTbody(tr.parentNode)
-    ) && every.call(
-      tr.childNodes,
-      (n: TurndownService.Node) => n.nodeName === 'TH'
-    ));
+    return (
+      (tr.parentNode.firstChild === tr) &&
+      (tr.parentNode.nodeName === 'TABLE' || isFirstTbody(tr.parentNode as unknown as HTMLElement)) &&
+      (every.call(tr.childNodes, (n: TurndownService.Node) => n.nodeName === 'TH')));
 
   }
 
@@ -30,7 +27,9 @@ export function tables (turndownService: TurndownService) {
   function isFirstTbody (node: TurndownService.Node) {
 
     if (node.nodeName === 'TBODY') {
+
       if (node.previousSibling === null) return true;
+
       if (node.previousSibling.nodeName === 'THEAD' && node.previousSibling.textContent !== null) {
         return /^\s*$/i.test(node.previousSibling.textContent);
       }
@@ -71,7 +70,7 @@ export function tables (turndownService: TurndownService) {
     for (let i = 0; i < node.childNodes.length; i++) {
       const child = node.childNodes[i];
       if (child.nodeName === 'TABLE') return true;
-      if (nodeContainsTable(child)) return true;
+      if (nodeContainsTable(child as unknown as HTMLElement)) return true;
     }
 
     return false;

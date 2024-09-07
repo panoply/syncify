@@ -75,7 +75,7 @@ export interface Commands {
    */
   cache?: boolean;
   /**
-   *  Run in production mode
+   * Run in production mode
    *
    * ---
    *

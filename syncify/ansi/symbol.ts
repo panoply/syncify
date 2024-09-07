@@ -1,10 +1,9 @@
 import { gray, neonGreen, redBright, lightGray, red, yellow } from 'syncify:colors';
-import { object } from 'syncify:utils';
 
 /**
  * Tree Characters
  */
-export const Tree = object({
+export const Tree = {
   /**
    * Tree Line Top
    *
@@ -124,7 +123,7 @@ export const Tree = object({
    *
    * Symbols used for next level lines
    */
-  indent: object({
+  indent: {
     /**
      * Tree Indent Line Top
      *
@@ -173,8 +172,8 @@ export const Tree = object({
      * ```
      */
     base: `${lightGray.open}│  └─${lightGray.close} `
-  })
-});
+  }
+};
 
 /* -------------------------------------------- */
 /* CHARACTER HELPERS                            */

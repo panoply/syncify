@@ -17,8 +17,37 @@ export const defaults = (): Config => ({
   import: 'import',
   export: 'export',
   config: '.',
-  hot: false,
-  stores: null,
+  paths: {
+    assets: 'assets/*',
+    config: 'config/*.json',
+    layout: 'layout/*.liquid',
+    locales: 'locales/*.json',
+    metafields: 'metafields/**/*.json',
+    redirects: 'redirects.yaml',
+    schema: 'schema/*.{schema,json}',
+    templates: 'templates/*',
+    customers: 'templates/customers/*',
+    metaobject: 'templates/metaobject/*',
+    pages: 'pages/*',
+    snippets: 'snippets/**/*.liquid',
+    sections: 'sections/**/*.{liquid,json}'
+  },
+  transform: {
+    svg: null,
+    style: null,
+    script: null,
+    json: {
+      indent: 2,
+      useTab: false,
+      crlf: false,
+      comments: true,
+      exclude: [],
+      terse: false
+    },
+    liquid: {
+      terse: false
+    }
+  },
   publish: {
     bindVersion: false,
     publishRole: 'unpublished',
@@ -29,55 +58,11 @@ export const defaults = (): Config => ({
     build: null,
     watch: null
   },
+  hot: false,
   log: {
     clear: true,
     silent: false,
     stats: true,
     warnings: true
-  },
-  paths: {
-    assets: 'assets/*',
-    config: 'config/*.json',
-    layout: 'layout/*.liquid',
-    locales: 'locales/*.json',
-    metafields: 'metafields/**/*.json',
-    redirects: 'redirects.yaml',
-    schema: 'schema/*.{schema,json}',
-    snippets: 'snippets/**/*.liquid',
-    metaobject: 'templates/metaobject/*',
-    sections: 'sections/**/*.{liquid,json}',
-    pages: 'pages/*',
-    templates: 'templates/*',
-    customers: 'templates/customers/*'
-  },
-  views: {
-    sections: {
-      prefixDir: false,
-      separator: '-',
-      global: []
-    },
-    snippets: {
-      prefixDir: false,
-      separator: '-',
-      global: []
-    },
-    pages: {
-      author: '',
-      safeSync: true,
-      language: 'html',
-      suffixDir: false,
-      global: []
-    }
-  },
-  transform: {
-    svg: null,
-    style: null,
-    script: null
-  },
-  terser: {
-    json: false,
-    markup: false,
-    liquid: false,
-    script: false
   }
 });

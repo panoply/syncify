@@ -251,14 +251,14 @@ export const Suffix = u.object({
  * │
  * ```
  */
-export function Ruler (width = $.terminal.wrap, newlines = true) {
+export const Ruler = (width = $.terminal.wrap, newlines = true) => {
 
   const line = '├' + '─'.repeat(width - 10);
 
   return newlines
     ? `${c.lightGray.open}${NWL}${line}${NWL}│${c.lightGray.close}`
     : `${c.lightGray.open}${line}${c.lightGray.close}`;
-}
+};
 
 /**
  * Tree Top
@@ -268,9 +268,7 @@ export function Ruler (width = $.terminal.wrap, newlines = true) {
  * ┌─ Label ~ 01:59:20
  * ```
  */
-export function Top (label: string) {
-  return Tree.open + c.reset.gray(`${label} ~ ${u.getTime()}`);
-}
+export const Top = (label: string) => Tree.open + c.reset.gray(`${label} ~ ${u.getTime()}`);
 
 /**
  * Tree Multiline
@@ -283,7 +281,7 @@ export function Top (label: string) {
  * │ lorem ipsum lorem ipsum\n
  * ```
  */
-export function Multiline <T extends { color?: Ansis; line?: string; }> (...input: [ string[], T?] | (string | T)[]) {
+export const Multiline = <T extends { color?: Ansis; line?: string; }> (...input: [ string[], T?] | (string | T)[]) => {
 
   const style: T = u.object(<T>{ color: null, line: Tree.line });
 
@@ -311,7 +309,7 @@ export function Multiline <T extends { color?: Ansis; line?: string; }> (...inpu
 
   return write.slice(0, -1);
 
-}
+};
 
 /**
  * Tree Wrap
@@ -329,7 +327,7 @@ export function Multiline <T extends { color?: Ansis; line?: string; }> (...inpu
  * │ lorem ipsum lorem ipsum
  * ```
  */
-export function Wrap<T extends { color?: Ansis; line?: string; }> (...input: [ string[], T?] | (string | T)[]) {
+export const Wrap = <T extends { color?: Ansis; line?: string; }> (...input: [ string[], T?] | (string | T)[]) => {
 
   const style: T = u.object(<T>{ color: null, line: Tree.line });
 
@@ -357,7 +355,7 @@ export function Wrap<T extends { color?: Ansis; line?: string; }> (...input: [ s
 
   return write.trimEnd();
 
-}
+};
 
 /**
  * Tree Line Break
@@ -368,11 +366,8 @@ export function Wrap<T extends { color?: Ansis; line?: string; }> (...input: [ s
  * │
  * ```
  */
-export function Break (input: string) {
-
-  return Tree.trim + NWL + Tree.line + input + NWL + Tree.trim;
-
-}
+export const Break = (input: string) =>
+  Tree.trim + NWL + Tree.line + input + NWL + Tree.trim;
 
 /**
  * Tree Line Break Red
@@ -383,11 +378,8 @@ export function Break (input: string) {
  * │
  * ```
  */
-export function BreakRed (input: string) {
-
-  return Tree.redTrim + NWL + Tree.red + c.red(input) + NWL + Tree.redTrim;
-
-}
+export const BreakRed = (input: string) =>
+  Tree.redTrim + NWL + Tree.red + c.red(input) + NWL + Tree.redTrim;
 
 /**
  * Tree Line Break
@@ -398,11 +390,9 @@ export function BreakRed (input: string) {
  * │
  * ```
  */
-export function BreakYellow (input: string) {
+export const BreakYellow = (input: string) =>
+  Tree.yellowTrim + NWL + Tree.yellow + c.yellow(input) + NWL + Tree.yellowTrim;
 
-  return Tree.yellowTrim + NWL + Tree.yellow + c.yellow(input) + NWL + Tree.yellowTrim;
-
-}
 /**
  * Tree Line
  *
@@ -410,11 +400,8 @@ export function BreakYellow (input: string) {
  * │ input
  * ```
  */
-export function Line (input: string) {
-
-  return Tree.line + input;
-
-}
+export const Line = (input: string) =>
+  Tree.line + input;
 
 /**
  * Tree Red Line
@@ -423,11 +410,8 @@ export function Line (input: string) {
  * │ input
  * ```
  */
-export function LineRed (input: string) {
-
-  return Tree.red + input;
-
-}
+export const LineRed = (input: string) =>
+  Tree.red + input;
 
 /**
  * Tree Warn Line
@@ -436,11 +420,8 @@ export function LineRed (input: string) {
  * │ input
  * ```
  */
-export function LineYellow (input: string) {
-
-  return Tree.yellow + input;
-
-}
+export const LineYellow = (input: string) =>
+  Tree.yellow + input;
 
 /**
  * Tree Next Line
@@ -450,11 +431,8 @@ export function LineYellow (input: string) {
  * │ input
  * ```
  */
-export function NextLine (input: string) {
-
-  return Tree.trim + NWL + Tree.line + input;
-
-}
+export const NextLine = (input: string) =>
+  Tree.trim + NWL + Tree.line + input;
 
 /**
  * Tree Line Next
@@ -464,11 +442,8 @@ export function NextLine (input: string) {
  * │
  * ```
  */
-export function Next (input: string) {
-
-  return Tree.line + input + NWL + Tree.line;
-
-}
+export const Next = (input: string) =>
+  Tree.line + input + NWL + Tree.line;
 
 /**
  * Tree Dash
@@ -477,11 +452,8 @@ export function Next (input: string) {
  * ├─ input
  * ```
  */
-export function Dash (input: string) {
-
-  return Tree.dash + input;
-
-}
+export const Dash = (input: string) =>
+  Tree.dash + input;
 
 /**
  * Tree End
@@ -490,11 +462,8 @@ export function Dash (input: string) {
  * └─ input\n
  * ```
  */
-export function End (input: string) {
-
-  return Tree.base + c.reset.gray(`${input} ~ ${u.getTime()}`) + NWL;
-
-}
+export const End = (input: string) =>
+  Tree.base + c.reset.gray(`${input} ~ ${u.getTime()}`) + NWL;
 
 /**
  * Tree Indent Line
@@ -503,11 +472,8 @@ export function End (input: string) {
  * │  │  input
  * ```
  */
-export function IndentLine (input: string) {
-
-  return Tree.indent.line + input;
-
-}
+export const IndentLine = (input: string) =>
+  Tree.indent.line + input;
 
 /**
  * Tree Indent Line Dash
@@ -516,21 +482,18 @@ export function IndentLine (input: string) {
  * │  ├─ input
  * ```
  */
-export function IndentDash (input: string) {
-  return Tree.indent.dash + input;
-}
+export const IndentDash = (input: string) =>
+  Tree.indent.dash + input;
 
-/**
- * Tree Indent Line Dash
+/** Tree Indent Line Dash
  *
  * ```bash
  * │  └─ input\n
  * │
  * ```
  */
-export function IndentEnd (input: string) {
-  return Tree.indent.base + input + NWL + Tree.trim;
-}
+export const IndentEnd = (input: string) =>
+  Tree.indent.base + input + NWL + Tree.trim;
 
 /**
  * Error and/or Warning context normalizer.
@@ -633,10 +596,7 @@ class Message {
    */
   private text?: string[];
 
-  constructor (options?: {
-    type?: LiteralUnion<'nil' | 'info' | 'warning' | 'error', string>;
-    text?: string[]
-  }) {
+  constructor (options?: { type?: LiteralUnion<'nil' | 'info' | 'warning' | 'error', string>; text?: string[] }) {
 
     if (u.isObject(options)) {
 

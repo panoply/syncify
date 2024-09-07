@@ -51,11 +51,7 @@ export async function setHotReloads () {
     return;
   }
 
-  if (allFalse(
-    isObject($.config.hot),
-    isBoolean($.config.hot),
-    isNil($.config.hot)
-  )) {
+  if (allFalse(isObject($.config.hot), isBoolean($.config.hot), isNil($.config.hot))) {
     typeError({
       option: 'config',
       name: 'hot',
@@ -151,13 +147,17 @@ export async function setHotReloads () {
   const base = join($.dirs.output, 'layout');
 
   for (const layout of $.hot.layouts) {
+
     const path = join(base, layout);
+
     $.hot.alive[path] = false;
-    if (!$.cache.build.hotSnippet.includes(base)) $.cache.build.hotSnippet.push(base);
+
+    if (!$.cache.build.hotSnippet.includes(base)) {
+      $.cache.build.hotSnippet.push(base);
+    }
   }
 
   $.hot.renderer = '{% render \'hot.js\'' + [
-
     ''
     , `server: ${$.hot.server}`
     , `socket: ${$.hot.socket}`
@@ -169,6 +169,6 @@ export async function setHotReloads () {
 
   ].join(', ') + ' %}';
 
-  $.wss = socket();
+  $.wss = await socket();
 
 }

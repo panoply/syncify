@@ -82,9 +82,9 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   /* THEMES                                       */
   /* -------------------------------------------- */
 
+  if ($.mode.themes) return themes();
   if ($.mode.setup) return setup();
   if ($.mode.strap) return strap();
-  if ($.mode.themes) return themes();
 
   /* -------------------------------------------- */
   /* STDIN                                        */
@@ -101,7 +101,7 @@ export async function run (options: Commands, config?: Config, callback?: Syncif
   // process.on('uncaughtException', exception);
   // process.on('rejectionHandled', rejection);
 
-  if ($.mode.hot) await server();
+  // if ($.mode.hot) await server();
 
   /* -------------------------------------------- */
   /* EXECUTE MODE                                 */

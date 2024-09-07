@@ -64,7 +64,6 @@ const external = [
   'esbuild',
   'fast-glob',
   'figlet',
-  'finalhandler',
   'fs-extra',
   'gray-matter',
   'html-minifier-terser',
@@ -75,10 +74,9 @@ const external = [
   'postcss',
   'prompts',
   'scrollable-cli',
-  'serve-static',
   'svg-sprite',
   'svgo',
-  'ws',
+  'uWebSockets.js',
 
   // BUILD DEPS
   'ava',

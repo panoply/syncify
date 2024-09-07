@@ -9,6 +9,7 @@ import { throws } from 'syncify:log/errors';
 import { $ } from 'syncify:state';
 import { missingEnv, missingStores } from 'syncify:log/throws';
 import { hasPath } from 'rambdax';
+import { SYNCIFY_CONFIG } from 'syncify:const';
 
 /**
  * Config Files
@@ -25,13 +26,7 @@ export async function configFile (cwd: string): Promise<Config> {
 
   let path: string = null;
 
-  for (const file of [
-    'syncify.config.js',
-    'syncify.config.mjs',
-    'syncify.config.cjs',
-    'syncify.config.ts',
-    'syncify.config.json'
-  ]) {
+  for (const file of SYNCIFY_CONFIG) {
 
     path = join(cwd, file);
 
@@ -74,14 +69,13 @@ export async function configFile (cwd: string): Promise<Config> {
 
   } catch (e) {
 
-    console.log(e);
-
     const jsonconfig = join(cwd, 'syncify.config.json');
     const hasFile = await pathExists(jsonconfig);
 
     if (hasFile) return readJson(jsonconfig);
 
     return null;
+
   }
 
 };
@@ -159,7 +153,9 @@ export async function getPackageJson (cli: Commands) {
     }
 
   } catch (e) {
+
     throw new Error(e);
+
   }
 
 };

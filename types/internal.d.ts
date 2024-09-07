@@ -6,3 +6,5 @@ export * from './internal/schema';
 export * from './internal/templates';
 export * from './internal/errors';
 export * from './internal/merge';
+export * from './internal/paths';
+export * from './internal/terser';

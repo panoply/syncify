@@ -3,6 +3,17 @@ import type { Cache, Commands, PathBundle } from 'types';
 export const SHA_256_HASH_LENGTH = 32;
 
 /**
+ * Syncify configuration file types
+ */
+export const SYNCIFY_CONFIG = [
+  'syncify.config.js',
+  'syncify.config.mjs',
+  'syncify.config.cjs',
+  'syncify.config.ts',
+  'syncify.config.json'
+];
+
+/**
  * Syncify `.cache/syncify/{ref}.map` Reference names
  */
 export const CACHE_REFS: Array<Cache.Keys> = [
@@ -53,6 +64,26 @@ export const PATH_KEYS: Array<Exclude<keyof PathBundle, 'transforms'>> = [
   'metafields',
   'pages',
   'redirects'
+];
+
+/**
+ * Theme **build** groups
+ */
+export const BUILD_GROUPS = [
+  'styles',
+  'scripts',
+  'svgs',
+  'sections',
+  'layouts',
+  'metaobject',
+  'templates',
+  'snippets',
+  'locales',
+  'configs',
+  'schema',
+  'pages',
+  'metafields',
+  'assets'
 ];
 
 /**

@@ -1,5 +1,8 @@
 {
-  "extends": "@syncify/tsconfig/node",
+  "extends": "@syncify/tsconfig/browser",
+  "typeAcquisition": {
+    "enable": true
+  },
   "include": [
     "src/*"
   ],

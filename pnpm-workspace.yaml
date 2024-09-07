@@ -1,5 +1,7 @@
 packages:
   - "."
+  - "docs"
   - "packages/configs/*"
   - "packages/*"
   - "examples/*"
+  - "straps/test"

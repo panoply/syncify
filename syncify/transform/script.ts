@@ -1,7 +1,7 @@
 import type { Syncify, ClientParam, ScriptBundle } from 'types';
 import { writeFile } from 'fs-extra';
 import esbuild, { Metafile } from 'esbuild';
-import { basename, join, relative } from 'pathe';
+import { join, relative } from 'pathe';
 import { isType } from 'rambdax';
 import { File } from 'syncify:file';
 import { timer } from 'syncify:timer';
@@ -18,27 +18,25 @@ import { $ } from 'syncify:state';
  *
  * A sub-build process used at runtime to collect all import paths.
  */
-export async function esbuildBundle (config: ScriptBundle): Promise<void> {
+export async function esbuildBundle (bundle: ScriptBundle): Promise<void> {
 
-  config.watch.clear();
+  bundle.watch.clear();
 
-  const result = await esbuild.build(config.esbuild);
+  const result = await esbuild.build(bundle.esbuild);
 
   if ($.mode.terse && $.mode.build) {
-
-    config.size = byteSize(result.outputFiles[0].text);
-
+    bundle.size = byteSize(result.outputFiles[0].text);
   }
 
   if ($.mode.watch) {
-    await getWatchPaths(config, result.metafile.inputs);
+    await getWatchPaths(bundle, result.metafile.inputs);
   } else {
-    if (!config.watch.has(config.input)) config.watch.add(config.input);
-    if (!$.watch.has(config.input)) $.watch.add(config.input);
+    if (!bundle.watch.has(bundle.input)) bundle.watch.add(bundle.input);
+    if (!$.watch.has(bundle.input)) $.watch.add(bundle.input);
   }
 }
 
-async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) {
+async function getWatchPaths (bundle: ScriptBundle, inputs: Metafile['inputs']) {
 
   const store: string[] = [];
   const { cwd, watch, mode } = $;
@@ -49,7 +47,7 @@ async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) 
 
     const path = join(cwd, file);
 
-    if (!config.watch.has(path)) config.watch.add(path);
+    if (!bundle.watch.has(path)) bundle.watch.add(path);
     if (!watch.has(path)) watch.add(path);
     if (mode.watch) store.push(path);
 
@@ -62,13 +60,13 @@ async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) 
     // that it does not impact performance.
     await pNext().then(() => {
 
-      for (const path of config.watch) {
+      for (const path of bundle.watch) {
 
         if (path.indexOf('/node_modules/') > -1) continue;
-        if (config.watchCustom !== null && config.watchCustom(path)) continue;
+        if (bundle.watchCustom !== null && bundle.watchCustom(path)) continue;
 
         if (!has(path.slice(cwd.length + 1), inputs)) {
-          config.watch.delete(path);
+          bundle.watch.delete(path);
           watch.unwatch(path);
         }
 
@@ -131,7 +129,7 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
   const hook = runHook(hooks);
   const trigger = file.data.length;
 
-  for (const config of file.data) {
+  for (const bundle of file.data) {
 
     const {
       key,
@@ -139,14 +137,11 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
       output,
       snippet,
       attrs,
-      esbuild: { format } } = config;
+      esbuild: { format } } = bundle;
 
     try {
 
-      const {
-        metafile,
-        outputFiles,
-        warnings } = await esbuild.build(config.esbuild);
+      const { metafile, outputFiles, warnings } = await esbuild.build(bundle.esbuild);
 
       if (trigger > 1) {
         log.nwl();
@@ -154,7 +149,7 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
       }
 
       if ($.mode.watch) {
-        await getWatchPaths(config, metafile.inputs);
+        await getWatchPaths(bundle, metafile.inputs);
       }
 
       if (warnings.length > 0) warn.esbuild(warnings);
@@ -165,25 +160,23 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
 
           const map = join($.dirs.sourcemaps.scripts, `${file.base}.map`);
 
-          writeFile(map, text).catch(
-            error.write('Error writing JavaScript Source Map to cache', {
-              file: relative($.cwd, map),
-              source: file.relative
-            })
-          );
+          writeFile(map, text).catch(error.write('Error writing JavaScript Source Map to cache', {
+            file: relative($.cwd, map),
+            source: file.relative
+          }));
 
         } else {
 
           if ($.mode.terse) {
 
-            if (isNaN(config.size)) {
+            if (isNaN(bundle.size)) {
 
               log.transform(file.kind, `${bold(format.toUpperCase())} bundle`);
               log.minified(stringSize(text));
 
             } else {
 
-              const { before, after, saved } = sizeDiff(text, config.size);
+              const { before, after, saved } = sizeDiff(text, bundle.size);
               log.transform(`${bold(format.toUpperCase())} bundle → ${bold(stringSize(text))}`);
               log.minified(null, before, after, saved);
 
@@ -221,11 +214,9 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
               if (content === null) continue;
             }
 
-            await writeFile(output, content).catch(
-              error.write('Error writing JavaScript asset', {
-                file: file.relative
-              })
-            );
+            await writeFile(output, content).catch(error.write('Error writing JavaScript asset', {
+              file: file.relative
+            }));
 
           }
 
@@ -233,15 +224,15 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
 
             log.syncing(key, { hot: true });
 
-            $.wss.script(file.uuid, basename(key));
+            $.wss.script(file.uuid, file.base);
 
-            await sync('put', config as any, content);
+            await sync('put', bundle, content);
 
           } else if (!$.mode.build) {
 
             log.syncing(key);
 
-            await sync('put', config as any, content);
+            await sync('put', bundle, content);
 
           }
 

@@ -1,23 +1,25 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
 import type { ChildProcess } from 'node:child_process';
-import * as Type from 'types';
+import type * as Type from 'types';
 import { argv } from 'node:process';
-import merge from 'mergerino';
 import { size } from 'syncify:cli/size';
 import { PATH_KEYS } from 'syncify:const';
-import { terser } from './terser';
 import { defaults } from './defaults';
 import { processor } from './processor';
 import { plugins } from './plugins';
-import { object } from 'syncify:utils';
+import { object, merge } from 'syncify:utils';
 
 function paths (): Type.PathBundle {
 
   const state = object<Type.PathBundle>();
 
   for (const path of PATH_KEYS) {
-    state[path] = object<Type.PathsRef>({ input: null, match: null });
+    state[path] = object<Type.PathsRef>({
+      input: null,
+      match: null,
+      config: null
+    });
   }
 
   state.transforms = new Map();
@@ -43,11 +45,6 @@ export const $ = new class Bundle {
    * Plugins
    */
   private static plugins: Type.Plugins = plugins();
-
-  /**
-   * The terse minification configuration settings
-   */
-  private static terser: Type.TerserConfig = terser();
 
   /**
    * The processors configuration settings
@@ -82,7 +79,7 @@ export const $ = new class Bundle {
   /**
    * Cached reference of the CLI commands passed
    */
-  public cli: Type.Commands = object();
+  public cli: Type.Commands = {};
 
   /**
    * Websockets HOT reloading
@@ -94,21 +91,21 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public stats: Type.Stats = object();
+  public stats: Type.Stats = {};
 
   /**
    * CLI provided filters
    *
    * @default null
    */
-  public filters: Type.Filters = object();
+  public filters: Type.Filters = {};
 
   /**
    * Cache copy of the invoked commands in which syncify was started
    *
    * @default null
    */
-  public commands: Type.Commands = object();
+  public commands: Type.Commands = {};
 
   /**
    * The version defined in the package.json
@@ -152,13 +149,13 @@ export const $ = new class Bundle {
   /**
    * Theme Publishing
    */
-  public publish: Type.PublishBundle = object<Type.PublishBundle>({
+  public publish: Type.PublishBundle = {
     ngrok: null,
     bindVersion: false,
     publishRole: 'unpublished',
     themeLimit: 3,
     tunnelPort: 80
-  });
+  };
 
   /**
    * Version Control
@@ -174,7 +171,7 @@ export const $ = new class Bundle {
    *  update: null
    * }
    */
-  public vc: Type.VC = object<Type.VC>({
+  public vc: Type.VC = {
     dir: null,
     number: null,
     zip: null,
@@ -182,11 +179,11 @@ export const $ = new class Bundle {
     major: 0,
     minor: 0,
     update: null
-  });
+  };
 
   /**
    * Execution options which describe the invocation and operation
-   * instructions which Syncify was initialised.
+   * instructions Syncify was initialised.
    *
    * @default
    * {
@@ -197,7 +194,7 @@ export const $ = new class Bundle {
    *  vars: {}
    * }
    */
-  public env: Type.Env = object<Type.Env>({
+  public env: Type.Env = {
     cli: false,
     tree: false,
     dev: true,
@@ -206,7 +203,7 @@ export const $ = new class Bundle {
     sync: 0,
     file: null,
     vars: {}
-  });
+  };
 
   /**
    * Hot reload mode options - Use the `mode.hot` reference to
@@ -227,7 +224,7 @@ export const $ = new class Bundle {
    *  alive: {}
    * }
    */
-  public hot: Type.HOTBundle = object<Type.HOTBundle>({
+  public hot: Type.HOTBundle = {
     inject: true,
     server: 3000,
     socket: 8089,
@@ -250,13 +247,12 @@ export const $ = new class Bundle {
       , 'history: false'
       , 'method: "hot"'
     ].join(', ') + ' %}'
-
-  });
+  };
 
   /**
    * Log State
    */
-  public log: Type.LogBundle = object<Type.LogBundle>({
+  public log: Type.LogBundle = {
     idle: false,
     group: 'Syncify',
     title: NIL,
@@ -265,20 +261,20 @@ export const $ = new class Bundle {
     thrown: null,
     queue: new Set(),
     changes: object(),
-    config: object<Type.Logger>({
+    config: {
       clear: true,
       silent: false,
       stats: true,
       warnings: true
-    })
-  });
+    }
+  };
 
   /**
    * The operation mode executing
    *
    * @default false // all modes are false by default
    */
-  public mode: Type.Modes = object<Type.Modes>({
+  public mode: Type.Modes = {
     build: false,
     interactive: false,
     dev: true,
@@ -306,7 +302,7 @@ export const $ = new class Bundle {
     release: false,
     publish: false,
     themes: false
-  });
+  };
 
   /**
    * The configuration file name resolution
@@ -320,11 +316,11 @@ export const $ = new class Bundle {
    *  type: null
    * }
    */
-  public file: Type.ConfigFile = object<Type.ConfigFile>({
+  public file: Type.ConfigFile = {
     base: null,
     path: null,
     relative: null
-  });
+  };
 
   /**
    * Files store - Holds a `Set` reference to all files
@@ -334,7 +330,19 @@ export const $ = new class Bundle {
   /**
    * Base directory path references
    */
-  public dirs: Type.Dirs = object<Type.Dirs>();
+  public dirs: Type.Dirs = {
+    cache: null,
+    config: null,
+    export: null,
+    import: null,
+    input: null,
+    output: null,
+    sourcemaps: {
+      root: null,
+      scripts: null,
+      styles: null
+    }
+  };
 
   /**
    * Passed commands that may be of importance in the transform or build processes.
@@ -348,13 +356,13 @@ export const $ = new class Bundle {
    *   output: null
    * }
    */
-  public cmd: Type.CommandBundle = object<Type.CommandBundle>({
+  public cmd: Type.CommandBundle = {
     config: null,
     delete: null,
     filter: null,
     input: null,
     output: null
-  });
+  };
 
   /**
    * The available stores as per configuration in `package.json` file
@@ -404,14 +412,15 @@ export const $ = new class Bundle {
    *   global: null
    * }
    */
-  public section: Type.SectionBundle = object<Type.SectionBundle>({
+  public section: Type.SectionBundle = {
+    global: null,
     prefixDir: false,
     separator: '-',
-    global: null,
+    paths: null,
     baseDir: new Set(),
     schema: null,
     shared: new Map()
-  });
+  };
 
   /**
    * Snippet sub-directory configuration
@@ -426,12 +435,13 @@ export const $ = new class Bundle {
    *   global: null
    * }
    */
-  public snippet: Type.SnippetBundle = object<Type.SnippetBundle>({
+  public snippet: Type.SnippetBundle = {
+    global: null,
+    paths: null,
     prefixDir: false,
     separator: '-',
-    global: null,
     baseDir: new Set()
-  });
+  };
 
   /**
    * Directory structure paths.
@@ -481,7 +491,7 @@ export const $ = new class Bundle {
     global: null,
     suffixDir: false,
     language: 'html',
-    export: object<Type.Markdown.Export>({
+    export: {
       quotes: '“”‘’',
       html: true,
       linkify: false,
@@ -489,8 +499,8 @@ export const $ = new class Bundle {
       xhtmlOut: false,
       breaks: true,
       langPrefix: 'language-'
-    }),
-    import: object<Type.Markdown.Import>({
+    },
+    import: {
       codeBlockStyle: 'fenced',
       emDelimiter: '_',
       fence: '```',
@@ -500,7 +510,7 @@ export const $ = new class Bundle {
       linkStyle: 'inlined',
       strongDelimiter: '**',
       bulletListMarker: '-'
-    })
+    }
   });
 
   /**
@@ -522,39 +532,83 @@ export const $ = new class Bundle {
    */
   public svg: Type.SVGBundle[] = [];
   /**
+   * Liquid Transforms
+   *
+   * @default []
+   */
+  public liquid: Type.LiquidBundle = {
+    terse: {
+      enabled: false,
+      exclude: null,
+      liquid: {
+        minifySchema: true
+      },
+      markup: {
+        // EXPOSED
+        minifyCSS: true,
+        minifyJS: true,
+        collapseWhitespace: true,
+        removeComments: true,
+        //
+        // OVERRIDES
+        caseSensitive: false,
+        collapseBooleanAttributes: false,
+        collapseInlineTagWhitespace: false,
+        conservativeCollapse: false,
+        keepClosingSlash: false,
+        noNewlinesBeforeTagClose: false,
+        preventAttributesEscaping: false,
+        removeEmptyAttributes: false,
+        removeEmptyElements: false,
+        removeOptionalTags: false,
+        removeRedundantAttributes: false,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: false,
+        continueOnParseError: true,
+        trimCustomFragments: false,
+        ignoreCustomFragments: [
+          /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+          /<style[\s\S]*?<\/style>/,
+          /<script[\s\S]*?<\/script>/,
+          /{%[\s\S]*?%}/
+        ]
+
+      }
+    }
+  };
+
+  /**
+   * Liquid Transforms
+   *
+   * @default []
+   */
+  public json: Type.JSONBundle = {
+    crlf: false,
+    cache: null,
+    comments: false,
+    exclude: null,
+    indent: 2,
+    useTab: false,
+    terse: {
+      enabled: false,
+      exclude: null,
+      options: {
+        assets: true,
+        config: true,
+        locales: true,
+        metafields: true,
+        metaobject: true,
+        groups: true,
+        templates: true
+      }
+    }
+  };
+
+  /**
    * Image transforms
    */
   public image: any;
-  /**
-   * Terser Minification Options
-   */
-  public terse: Type.TerserBundle = object<Type.TerserBundle>({
-    /**
-     * Terse JSON Minification
-     *
-     * @default false
-     */
-    json: false,
-    /**
-     * Terse Liquid minification
-     */
-    liquid: false,
-    /**
-     * Terse Markup (HTML) minification
-     */
-    markup: false,
-    /**
-      * **NOTE YET AVAILABLE**
-      *
-      * Terse Style (CSS) Minification
-      */
-    style: false,
-    /**
-      * Terse Script (JS/TS) Minification
-      */
-    script: false
-  });
-
   /**
    * Holds an instance of FSWatcher. Chokidar is leveraged in for watching,
    * and this value exposes the instance and it can be used anywhere in the
@@ -575,14 +629,6 @@ export const $ = new class Bundle {
     * Merged terse minification configuration
     */
   set cache (cache: Type.Cache.Model) { Bundle.cache = cache; }
-  /**
-  * Merged terse minification configuration
-  */
-  get terser () { return Bundle.terser; }
-  /**
-    * Merged terse minification configuration
-    */
-  set terser (options: Type.TerserConfig) { Bundle.terser = merge(Bundle.terser, options); }
   /**
    * Processor Configurations
    */

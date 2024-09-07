@@ -37,7 +37,10 @@ export type Client = (method: Methods, file: File, content?: string) => Promise<
 /**
  * Client Request as parameter
  */
-export type ClientParam<T = any> = (method: Methods, file: File<T>, content?: string) => Promise<void>
+export type ClientParam<T = any> = {
+  (method: Methods, file: T, content?: string): Promise<void>;
+  (method: Methods, file: File<T>, content?: string): Promise<void>;
+}
 
 /**
  * Chokidor Event Names

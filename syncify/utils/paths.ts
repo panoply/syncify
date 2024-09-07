@@ -44,7 +44,7 @@ export function globPath <T extends string | string[]> (path: T): T {
  * Last Path
  *
  * Will return the portion of a URI path. If
- * the path does not not contain forward slashes it
+ *  the path does not not contain forward slashes it
  * returns the passed string.
  *
  * @example
@@ -98,7 +98,7 @@ export function parentPath (path: string | string[]) {
  * Normalize path
  *
  * Resolve CWD to a path definition. Returns a function type
- * who accepts a string or array of strings. Paths will include
+ * that accepts a string or array of strings. Paths will include
  * the directory `input` folder name.
  *
  * When passing a `cwd` then input path will check `startsWith`
@@ -123,9 +123,9 @@ export function normalPath (input: string, cwd = null) {
    * Prepends the provided input to the path and
    * returns a correctly formed uri.
    */
-  return function prepend (path: string | string[]) {
+  return function prepend (path: any) {
 
-    if (isArray(path)) return path.map(prepend);
+    if (Array.isArray(path)) return path.map(prepend);
 
     const ignore = path.charCodeAt(0) === 33;
 
@@ -202,7 +202,7 @@ export const basePath = (cwd: string) => (path: string) => {
   }
 
   // path directory is valid, eg: path
-  // dirs cannot reference sub directorys, eg: path/sub
+  // dirs cannot reference sub directories, eg: path/sub
   if (/^[a-zA-Z0-9_-]+/.test(path)) {
     path = join(cwd, path);
     return last(path).charCodeAt(0) === 47 ? path : path + '/';

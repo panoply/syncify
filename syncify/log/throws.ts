@@ -323,7 +323,7 @@ export function missingOption ({
     Create({ type: 'error' })
     .Line('MISSING OPTION', bold)
     .NL
-    .Wrap(`Missing ${Encase('CB', cyan(option))} config option. The ${cyan(key)} option needs to be defined`)
+    .Wrap(`Missing ${Encase('CB', cyan(option))} config option. The ${cyan(key)} option must be defined`)
     .NL
     .Line(`expected${COL} ${blue(expects.replace(/([|,])/g, gray('$1')))}`)
     .Line(`location${COL} ${gray.underline($.file.base)}`)
@@ -545,7 +545,7 @@ export function missingEnv (cwd: string) {
 /**
  * Unknown Option
  *
- * Throws an error when an unknown config option  was provided.
+ * Throws an error when an unknown config option was provided.
  */
 export function errorRuntime (e: any, options: {
   message: string | string[];
@@ -626,7 +626,9 @@ export function unknownError (option: string, value: any) {
       option.split('.').filter(Boolean).join(gray(' → ')),
       ARR,
       redBright.bold(value)
-    ), { spaced: true });
+    ), {
+      spaced: true
+    });
 
   }
 

@@ -69,7 +69,6 @@ function getTSConfig (dir = process.cwd(), name = 'tsconfig.json', isExtends = f
 
   if (!id) return null;
 
-
   const data: {
     extends?: string | string[]
     [k: string]: any

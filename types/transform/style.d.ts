@@ -2,6 +2,7 @@
 
 import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
+import type { OptionsOutput as CleanCSSOptions } from 'clean-css';
 import type { Config as TailwindCSSConfig } from 'tailwindcss';
 import type { Plugin as PostCSSPlugin, Transformer, TransformCallback, AcceptedPlugin } from 'postcss';
 import type { GetProcessorConfigFile, GetProcessorConfigs, RenamePaths } from '../shared';
@@ -17,6 +18,45 @@ export type PostCSSConfig = (
   | TransformCallback
   | any
 );
+
+/**
+ * Style Minification
+ */
+export interface StyleTerse extends CleanCSSOptions {
+ /**
+  * Whether or not to purge unused CSS class names
+  *
+  * @default false
+  */
+  purgeUnusedCSS?: boolean;
+  /**
+  * Whether or not to obfuscate CSS class names
+  *
+  * @default false
+  */
+  obfuscateClassNames?: boolean;
+  /**
+  * List of class names that should be excluded from
+  * obfuscation and shortnaming.
+  */
+  obfuscateWhitelist?: string[];
+  /**
+  * The alphabet used to generate the new class names.
+  *
+  * > **NOTE**
+  * >
+  * > There is no `d` in the default alphabet to avoid adblock issues.
+  *
+  * @default 'abcefghijklmnopqrstuvwxyz0123456789'
+  */
+  obfuscateAlphabet?: string;
+  /**
+  * Excluded files from terser minification
+  *
+  * @default []
+  */
+  exclude?: string[]
+}
 
 export interface TailwindConfig extends TailwindCSSConfig {
   config: string[]
@@ -182,6 +222,15 @@ export interface StyleTransform<T = string | string[]> {
    * @default true // if sass is not installed this is false
    */
   sass?: boolean | SASSConfig;
+  /**
+   * **NOTE YET AVAILABLE**
+   *
+   * Terse Style (CSS) Minification
+   *
+   * > Uses [clean-css](https://github.com/clean-css/clean-css) minification
+   * > Uses [purge-css](https://github.com/FullHuman/purgecss)
+   */
+  terser?: boolean | SASSConfig;
 }
 
 /* -------------------------------------------- */

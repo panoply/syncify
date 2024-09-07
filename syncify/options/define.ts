@@ -13,19 +13,18 @@ import { setVersion } from './version';
 import { setSpawns } from './spawn';
 import { setScriptOptions } from './script';
 import { setStyleConfig } from './style';
+import { setLiquidOptions } from './liquid';
 import { setSvgOptions } from './svg';
 import { setHotReloads } from './hot';
 import { setFilters } from './filters';
-import { setTerserOptions } from './terser';
-import { setPageOptions } from './pages';
-import * as log from 'syncify:log';
-import * as error from 'syncify:errors';
 import { isArray, has, isObject, isEmpty, hasProp, merge } from 'syncify:utils';
 import { toArray } from 'syncify:native';
 import { cacheDone, getCache } from '../process/cache';
 import { setPublishConfig } from './publish';
-import { $ } from 'syncify:state';
 import { timer } from 'syncify:timer';
+import { $ } from 'syncify:state';
+import * as log from 'syncify:log';
+import * as error from 'syncify:errors';
 
 /**
  * Define Configs
@@ -72,6 +71,8 @@ export async function define (cli: Commands, options?: Config) {
 
   await setSync(cli);
 
+  if ($.mode.themes) return;
+
   setChokidar(cli.watch || cli.upload);
   setProcessors();
   setPublishConfig();
@@ -86,16 +87,14 @@ export async function define (cli: Commands, options?: Config) {
     ]
   ).catch(e => {
 
-    error.throws(e, {
-      details: 'Directory and path generation error'
-    });
+    error.throws(e, { details: 'Directory and path generation error' });
 
   });
 
   if ($.mode.themes) return;
 
-  setPageOptions();
   setJsonOptions();
+  setLiquidOptions();
   setSnippetOptions();
   setPlugins();
 
@@ -106,11 +105,8 @@ export async function define (cli: Commands, options?: Config) {
   await setSvgOptions();
   await setStyleConfig();
 
-  setTerserOptions();
-
   const promise = await Promise.all(
     [
-
       setHotReloads(),
       cacheDone()
     ]
@@ -164,24 +160,21 @@ export function setChokidar (watch: boolean) {
 
   if (!watch) return;
 
-  $.watch = new FSWatcher(
-    {
-      persistent: true,
-      ignoreInitial: true,
-      usePolling: true,
-      interval: 75,
-      binaryInterval: 100,
-      ignored: [ '**/*.map' ],
-      ignorePermissionErrors: true
-    }
-  );
+  // @ts-ignore
+  $.watch = new FSWatcher({
+    persistent: true,
+    ignoreInitial: true,
+    usePolling: true,
+    interval: 75,
+    binaryInterval: 100,
+    ignored: [ '*.map' ],
+    ignorePermissionErrors: true
+  });
 
   $.watch = Object.defineProperties($.watch, {
     has: {
       value (path: string, dir = $.cwd) {
-        return $.watch._watched.has(dir)
-          ? $.watch._watched.get(dir).items.has(path)
-          : false;
+        return $.watch._watched.has(dir) ? $.watch._watched.get(dir).items.has(path) : false;
       }
     },
     paths: {
@@ -209,18 +202,23 @@ function setProcessors () {
 
     for (const prop in $.config.processors) {
 
-      if (isEmpty($.config.processors[prop])) continue;
+      if (isEmpty($.config.processors[prop])) {
+        continue;
+      }
 
       if (isArray($.config.processors[prop])) {
+
         $.processor[prop].config = $.config.processors[prop];
+
       } else if (isObject($.config.processors[prop])) {
+
         if (prop === 'esbuild') {
           $.processor[prop] = merge($.processor[prop], $.config.processors[prop] as any);
         } else {
           $.processor[prop].config = merge($.processor[prop].config, $.config.processors[prop]);
         }
-      }
 
+      }
     }
   }
 
@@ -293,27 +291,22 @@ function setPlugins () {
  */
 async function getConfig (cli: Commands) {
 
-  const cfg = await configFile(cli.cwd);
+  const config = await configFile(cli.cwd);
 
-  if (cfg !== null) {
+  if (config !== null) {
 
-    $.config = cfg;
+    $.config = config;
 
-  } else {
+  } else if (has('syncify', $.pkg)) {
 
-    if (has('syncify', $.pkg)) {
+    if (has('config', $.pkg.syncify)) {
 
-      if (has('config', $.pkg.syncify)) {
+      $.config = $.pkg.syncify.config;
 
-        $.config = $.pkg.syncify.config;
+    } else if (!has('stores', $.pkg.syncify) && cli.setup === false && cli.strap === null) {
 
-      } else if (!has('stores', $.pkg.syncify)) {
+      missingConfig(cli.cwd);
 
-        if (cli.setup === false && cli.strap === null) {
-          missingConfig(cli.cwd);
-        }
-
-      }
     }
   }
 

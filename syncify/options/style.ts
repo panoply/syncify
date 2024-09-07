@@ -17,6 +17,18 @@ import { $ } from 'syncify:state';
 /* TYPES                                        */
 /* -------------------------------------------- */
 
+// @ts-expect-error
+// eslint-disable-next-line no-unused-vars
+const _TERSER = {
+  exclude: [],
+  format: false,
+  inline: false,
+  purgeUnusedCSS: false,
+  obfuscateAlphabet: 'abcefghijklmnopqrstuvwxyz0123456789',
+  obfuscateClassNames: false,
+  obfuscateWhitelist: []
+};
+
 type PostCSSProcess = Processors['postcss']
 type SassDartProcess = Processors['sass']
 

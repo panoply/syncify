@@ -2,14 +2,15 @@
 /* LIVE RELOADS                                 */
 /* -------------------------------------------- */
 
-import type { Server, WebSocket } from 'ws';
-import type { IncomingMessage } from 'http';
+// import type { Server, WebSocket } from 'ws';
+// import type { IncomingMessage } from 'http';
+import { TemplatedApp } from 'uWebSockets.js';
 
 export interface WSS {
   /**
    * The `wss` instance
    */
-  get http(): Server<typeof WebSocket, typeof IncomingMessage>
+  get http(): TemplatedApp; // Server<typeof WebSocket, typeof IncomingMessage>
   /**
    * Hot Socket for `<script>` tags,
    *

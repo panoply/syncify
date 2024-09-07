@@ -1,5 +1,5 @@
 import type { AxiosError, AxiosRequestConfig } from 'axios';
-import type { Request, Theme, File, FileKeys } from 'types';
+import type { Theme, File, FileKeys, Requests } from 'types';
 import axios from 'axios';
 import { queue } from 'syncify:requests/queue';
 import { assign } from 'syncify:utils/native';
@@ -68,7 +68,7 @@ export async function upload (asset: string, config: { theme: Theme, key: FileKe
 
   }).catch((e: AxiosError) => {
 
-    log.failed(config.key);
+    log.error(config.key);
 
     error.request(config.key, e.response);
 
@@ -106,7 +106,7 @@ export async function get <T> (url: string, config: AxiosRequestConfig<Request>)
 
   }).catch((e: AxiosError) => {
 
-    log.failed(url);
+    log.error(url);
     error.request(url, e.response);
 
   });
@@ -122,7 +122,7 @@ let limit: number;
  * REST endpoint. When request rates are exceeded
  * the handler will re-queue them.
  */
-export async function sync (theme: Theme, file: File, config: Request) {
+export async function sync (theme: Theme, file: File, config: Requests.) {
 
   if (queue.isPaused) return;
 
@@ -154,7 +154,7 @@ export async function sync (theme: Theme, file: File, config: Request) {
       log.retrying(file.key, theme);
       queue.add(() => sync(theme, file, config));
     } else {
-      log.failed(file.key);
+      log.error(file.key);
       error.request(file.relative, e.response);
     }
 

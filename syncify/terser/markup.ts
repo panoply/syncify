@@ -13,7 +13,7 @@ export async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await minify(content, $.terser.markup);
+    const htmlmin = await minify(content, $.liquid.terse.markup);
     return htmlmin;
 
   } catch (e) {

@@ -47,24 +47,27 @@ export function getStoresFromEnv () {
 
     } else if (p.endsWith('_api_key')) {
 
-      const d = `${p.slice(0, p.indexOf('_api_key'))}`;
+      const domain = `${p.slice(0, p.indexOf('_api_key'))}`;
 
-      if (!admin.has(d)) {
-        stores.push({ domain: d, themes: {} });
-        admin.add(d);
+      if (!admin.has(domain)) {
+
+        stores.push({ domain, themes: {} });
+        admin.add(domain);
+
       }
 
     } else if (p.endsWith('_api_secret')) {
 
-      const d = `${p.slice(0, p.indexOf('_api_secret'))}`;
+      const domain = `${p.slice(0, p.indexOf('_api_secret'))}`;
 
-      if (!admin.has(d)) {
-        stores.push({ domain: d, themes: {} });
-        admin.add(d);
+      if (!admin.has(domain)) {
+
+        stores.push({ domain, themes: {} });
+        admin.add(domain);
+
       }
 
     }
-
   }
 
   if (stores.length > 0) return stores;
@@ -76,14 +79,15 @@ export function getStoresFromEnv () {
 /**
  * Store Authorization URL
  *
- * Generate the the authorization URL to
- * be used for requests.
+ * Generate the the authorization URL to be used for requests.
  */
 export function authURL (domain: string): AxiosRequestConfig {
 
   let api_token = domain + '_api_token';
 
-  if (!has(api_token, $.env.vars)) api_token = api_token.toUpperCase();
+  if (!has(api_token, $.env.vars)) {
+    api_token = api_token.toUpperCase();
+  }
 
   if (has(api_token, $.env.vars)) {
     return {
@@ -95,9 +99,16 @@ export function authURL (domain: string): AxiosRequestConfig {
   let api_key = domain + '_api_key';
   let api_secret = domain + '_api_secret';
 
-  if (!has(api_key, $.env.vars)) api_key = api_key.toUpperCase();
-  if (!has(api_secret, $.env.vars)) api_secret = api_secret.toUpperCase();
+  if (!has(api_key, $.env.vars)) {
+    api_key = api_key.toUpperCase();
+  }
+
+  if (!has(api_secret, $.env.vars)) {
+    api_secret = api_secret.toUpperCase();
+  }
+
   if (has(api_key, $.env.vars) && has(api_secret, $.env.vars)) {
+
     return {
       baseURL: `https://${domain}.myshopify.com/admin`,
       auth: {
@@ -105,13 +116,17 @@ export function authURL (domain: string): AxiosRequestConfig {
         password: $.env.vars[api_secret]
       }
     };
+
   }
 
-  throwError(`Invalid or missing ${cyan(domain + '.myshopify.com')} credentials`, [
-    `Your shop credentials in the ${cyan.bold(basename($.env.file))} file could`,
-    'not be read correctly or are missing. Please check your environment file and ensure',
-    'you have provided authorization.'
-  ]);
+  throwError(
+    `Invalid or missing ${cyan(domain + '.myshopify.com')} credentials`,
+    [
+      `Your shop credentials in the ${cyan.bold(basename($.env.file))} file could`,
+      'not be read correctly or are missing. Please check your environment file and ensure',
+      'you have provided valid authorization.'
+    ]
+  );
 
 };
 
@@ -151,7 +166,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
         absolute: true
       });
 
-      if (match) {
+      if (match !== false) {
         const test = hook(uri);
         if (isString(test)) {
           match.push(test);
@@ -184,7 +199,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
       warn('No files can be resolved in', filePath);
     }
 
-    if (match) {
+    if (match !== false) {
       const test = hook(uri);
       if (isString(test)) {
         match.push(test);
@@ -428,7 +443,7 @@ export function getTransform <
       if (opts.flatten) {
 
         for (const input of paths) {
-          config.push(assign(record as T, { input }));
+          config.push(assign({}, record as T, { input }));
         }
 
       } else {
@@ -474,7 +489,7 @@ export function getTransform <
           if (!has('input', option)) {
 
             invalidError({
-              option: 'tranform',
+              option: 'transform',
               name: prop,
               value: option,
               expects: '{ input: string | string[] }'
@@ -487,7 +502,7 @@ export function getTransform <
             return globPath(watch);
           });
 
-          if (paths) {
+          if (paths.length > 0) {
 
             const merge = rename
               ? assign({}, option, record as T, { rename: asset ? prop.slice(7) : prop.slice(9) })
@@ -639,7 +654,7 @@ export async function readConfigFile <T> (filename: string, options?: Partial<Bu
  */
 export function hasRenameNamespace (rename: string) {
 
-  return /\[(?:file|dir|ext)\]/.test(rename);
+  return /\[(?:file|name|dir|ext)\]/.test(rename);
 
 }
 
@@ -665,6 +680,7 @@ export function renameFile (src: string, rename?: string) {
   if (isUndefined(rename)) return { dir, ext, file, name: file };
 
   if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);
+  if (/(\[name\])/.test(name)) name = name.replace('[name]', file);
   if (/(\[file\])/.test(name)) name = name.replace('[file]', file);
   if (/(\.?\[ext\])/.test(name)) name = name.replace(/\.?\[ext\]/, ext);
 

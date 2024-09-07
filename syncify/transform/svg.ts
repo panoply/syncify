@@ -39,7 +39,9 @@ function getSprite (sprite: SVGSpriter): Promise<string> {
   return new Promise(function (resolve, reject) {
 
     sprite.compile((error, svg) => {
+
       if (error) return reject(error);
+
       for (const m in svg) {
         for (const p in svg[m]) {
           resolve(svg[m][p].contents.toString());
@@ -146,7 +148,7 @@ export function compileSprite (
 /**
  * Has Liquid
  *
- * Quickly validates SVGs for occurances of Liquid synxtax.
+ * Quickly validates SVGs for occurances of Liquid syntax.
  * SVGO cannot digest such occurances, so we will skip tokens
  * which contain Liquid code.
  *

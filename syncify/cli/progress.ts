@@ -122,16 +122,8 @@ export function progress (total: number, opts: ProgressOptions = {}): Progress {
   /* PRIVATES                                     */
   /* -------------------------------------------- */
 
-  function align (output: string) {
-
-    return Tree.line + output + WSP.repeat(Math.max(0, options.barSize - output.length));
-
-  }
-
-  function bar (length: number, empty: boolean = false) {
-
-    return (empty ? '▱' : '▰').repeat(length);
-  }
+  const align = (output: string) => Tree.line + output + WSP.repeat(Math.max(0, options.barSize - output.length));
+  const bar = (length: number, empty: boolean = false) => (empty ? '▱' : '▰').repeat(length);
 
   /* -------------------------------------------- */
   /* PUBLIC                                       */
@@ -140,16 +132,16 @@ export function progress (total: number, opts: ProgressOptions = {}): Progress {
   /**
    * Stop progress
    */
-  function stop (): void {
+  const stop = (): void => {
 
     if (options.clearOnComplete) console.clear();
 
-  }
+  };
 
   /**
    * Increment the progress
    */
-  function increment (incrementBy: number = 1) {
+  const increment = (incrementBy: number = 1) => {
 
     const filled = percent + incrementBy;
 
@@ -157,23 +149,23 @@ export function progress (total: number, opts: ProgressOptions = {}): Progress {
 
     if (percent === total) stop();
 
-  }
+  };
 
   /**
    * Decrement the progress
    */
-  function decrement (decrementBy: number = 1) {
+  const decrement = (decrementBy: number = 1) => {
 
     const filled = percent - decrementBy;
 
     percent = Math.max(filled, 0);
 
-  }
+  };
 
   /**
    * Render the progress bar - Returns a string.
    */
-  function render (percentColor?: Ansis): string {
+  const render = (percentColor?: Ansis): string => {
 
     const progress = Math.round((percent / total) * options.barSize);
     const filled = bar(progress);
@@ -187,7 +179,7 @@ export function progress (total: number, opts: ProgressOptions = {}): Progress {
 
     return align(output);
 
-  }
+  };
 
   return {
     stop,

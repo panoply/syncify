@@ -4,6 +4,7 @@ import { defineProperty } from 'syncify:native';
 import { isRegex, isUndefined } from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { lastPath, parentPath } from 'syncify:utils/paths';
+import { Type } from 'syncify:file';
 
 /**
  * Script Context
@@ -40,14 +41,15 @@ export function style (file: File<StyleBundle>) {
 
   const config = $.style.find(x => x.watch(file.input));
 
-  if (isUndefined(config)) return file;
+  if (isUndefined(config)) {
+
+    file.type = Type.Asset;
+    return file;
+
+  }
 
   // Assign the bundle configuration to a "data" getter
-  defineProperty(file, 'data', {
-    get () {
-      return config;
-    }
-  });
+  defineProperty(file, 'data', { get () { return config; } });
 
   if (config.snippet) {
     file.namespace = 'snippets';
@@ -92,10 +94,6 @@ export function script (file: File<ScriptBundle[]>) {
 
 };
 
-/**
- * Augment the file configuration to accept
- * metafield types.
- */
 export function schema (fn: (path: string) => File, file: File) {
 
   // Assign the bundle configuration to a "data" getter
@@ -105,10 +103,6 @@ export function schema (fn: (path: string) => File, file: File) {
 
 };
 
-/**
- * Augment the file configuration to accept
- * metafield types.
- */
 export function section (file: File) {
 
   if ($.section.prefixDir) {
@@ -132,10 +126,6 @@ export function section (file: File) {
 
 };
 
-/**
- * Augment the file configuration to accept
- * metafield types.
- */
 export function snippet (file: File) {
 
   if ($.snippet.prefixDir) {

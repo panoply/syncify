@@ -1,5 +1,5 @@
 import type { Commands } from 'types';
-import { has, object } from 'syncify:utils';
+import { hasProp, object } from 'syncify:utils';
 import { join } from 'pathe';
 import { $ } from 'syncify:state';
 
@@ -24,11 +24,13 @@ function parseVersionNumber (version: string) {
  */
 export function setVersion (cli: Commands) {
 
-  if (!has('syncifyVersion', $.cache.build)) {
+  const has = hasProp($.cache.build);
+
+  if (!has('syncifyVersion')) {
     $.cache.build.syncifyVersion = $.version;
   }
 
-  if (!has('themeVersion', $.cache.build)) {
+  if (!has('themeVersion')) {
     $.cache.build.themeVersion = $.pkg.version;
   }
 
@@ -39,12 +41,12 @@ export function setVersion (cli: Commands) {
     $.vc.update.dir = join($.dirs.export, `v${$.vc.major}`);
     $.vc.update.zip = join($.vc.update.dir, `${$.vc.number}.zip`);
 
-    const { patch, minor, major } = parseVersionNumber($.cache.build.themeVersion);
+    const v = parseVersionNumber($.cache.build.themeVersion);
 
     $.vc.number = $.cache.build.themeVersion;
-    $.vc.patch = patch;
-    $.vc.minor = minor;
-    $.vc.major = major;
+    $.vc.patch = v.patch;
+    $.vc.minor = v.minor;
+    $.vc.major = v.major;
     $.vc.dir = join($.dirs.export, `v${$.vc.major}`);
     $.vc.zip = join($.vc.dir, `${$.vc.number}.zip`);
 
@@ -52,12 +54,12 @@ export function setVersion (cli: Commands) {
 
   } else {
 
-    const { patch, minor, major } = parseVersionNumber($.pkg.version);
+    const v = parseVersionNumber($.pkg.version);
 
     $.vc.number = $.pkg.version;
-    $.vc.patch = patch;
-    $.vc.minor = minor;
-    $.vc.major = major;
+    $.vc.patch = v.patch;
+    $.vc.minor = v.minor;
+    $.vc.major = v.major;
     $.vc.dir = join($.dirs.export, `v${$.vc.major}`);
     $.vc.zip = join($.vc.dir, `${$.vc.number}.zip`);
 
@@ -68,15 +70,21 @@ export function setVersion (cli: Commands) {
     $.vc.update = object($.vc);
 
     if (cli.release === 'patch') {
+
       $.vc.update.patch = $.vc.patch + 1;
       $.vc.update.bump = 'patch';
+
     } else if (cli.release === 'minor') {
+
       $.vc.update.minor = $.vc.minor + 1;
       $.vc.update.bump = 'minor';
+
     } else if (cli.release === 'major') {
+
       $.vc.update.major = $.vc.major + 1;
       $.vc.update.bump = 'major';
       $.vc.update.dir = join($.dirs.export, `v${$.vc.update.major}`);
+
     }
 
     $.vc.update.number = `${$.vc.update.major}.${$.vc.update.minor}.${$.vc.update.patch}`;

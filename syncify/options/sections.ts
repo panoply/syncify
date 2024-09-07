@@ -4,12 +4,13 @@ import { readFile } from 'fs-extra';
 import { File } from 'syncify:file';
 import parseJSON, { JSONError } from 'parse-json';
 import { typeError, invalidError, throwError, warnOption } from 'syncify:log/throws';
-import { isObject, isString, isArray, isBoolean, checksum, has, hasProp, isEmpty, isNil } from 'syncify:utils';
+import { isObject, isString, isArray, isBoolean, checksum, has, hasProp, isEmpty } from 'syncify:utils';
 import * as error from 'syncify:errors';
 import * as log from 'syncify:log';
 import { bold } from 'syncify:colors';
 import { $ } from 'syncify:state';
 import { defineProperty } from 'syncify:native';
+import { Sections } from 'types';
 
 /**
  * Section Options
@@ -18,12 +19,12 @@ import { defineProperty } from 'syncify:native';
  */
 export async function setSectionOptions () {
 
-  if (!has('sections', $.config.views)) return;
+  if (!isObject($.config.paths.snippets)) return;
 
-  const { sections } = $.config.views;
+  const { sections } = $.config.paths as { sections: Sections };
 
-  if (isNil($.config.views.sections)) return;
-  if (isObject(sections) && isEmpty(sections)) return;
+  if (has('input', sections)) return;
+  if (isEmpty(sections.input)) return;
 
   // Ensure the section option is an object
   if (!isObject(sections)) {
@@ -39,6 +40,8 @@ export async function setSectionOptions () {
 
   // Iterate over all the properties in sections option
   for (const option in $.section) {
+
+    if (option === 'input') continue;
 
     // Validate the boolean type values of the option
     if (option === 'prefixDir') {
@@ -112,7 +115,7 @@ export async function setSectionOptions () {
 
         typeError(
           {
-            option: 'views.sections',
+            option: 'paths.sections',
             name: option,
             provided: sections[option],
             expects: 'string | string[]'

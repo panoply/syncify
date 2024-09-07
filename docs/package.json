@@ -1,5 +1,5 @@
 {
-  "name": "syncify-website",
+  "name": "@syncify/docs",
   "version": "1.0.0",
   "private": true,
   "description": "Syncify documentation website",
@@ -7,7 +7,7 @@
     "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
     "url": "https://github.com/panoply"
   },
-  "license": "MIT",
+  "license": "CC BY-NC-ND 4.0",
   "scripts": {
     "dev": "rm -rf public && concurrently \"pnpm run 11ty:watch\" \"pnpm run sass:watch\" \"pnpm tsup:watch\"",
     "stage": "netlify dev -c \"eleventy --watch --serve --watch\" --targetPort 8080",

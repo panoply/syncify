@@ -1,7 +1,12 @@
 import type { LiteralUnion } from 'type-fest';
 import type { Config } from './config';
 
-export type Group = LiteralUnion<
+/**
+ * Union Type for strings
+ */
+export type LiteralString<T> = LiteralUnion<T, string>
+
+export type Group = LiteralString<
   | 'Syncify'
   | 'Asset'
   | 'Spawn'
@@ -14,14 +19,13 @@ export type Group = LiteralUnion<
   | 'Config'
   | 'Template'
   | 'Metafield'
-  , string
 >
 
-export type Namespacing = (
+export type Namespacing = LiteralString<
   | '[dir]'
   | '[file]'
   | '[ext]'
-)
+>
 
 /**
  * Namespaced Paths
@@ -38,22 +42,43 @@ export type DirPaths = `${'assets' | 'snippets'}/${string}`
  */
 export type RenamePaths = NamespacePaths;
 
-/**
- * Rename input type
- */
-export type RenameInput = {
-  [filename: string]: string | string[]
-}
+export type SnippetPaths = LiteralString<
+  | '[name]'
+  | '[dir]-[name]'
+  | '[dir]_[name]'
+  | '[dir].[name]'
+  | '[name]-[dir]'
+  | '[name]_[dir]'
+  | '[name].[dir]'
+>;
 
-/**
- * Rename input paths type
- */
-export type RenameInputPaths = { [filename: RenamePaths]: string | string[] }
+export type SectionPaths = LiteralString<
+  | '[name]'
+  | '[dir]-[name]'
+  | '[dir]_[name]'
+  | '[name]-[dir]'
+  | '[name]_[dir]'
+>;
 
-/**
- * Rename config type
- */
-export type RenameConfig<T> = { [filename: RenamePaths]: string | string[] | T}
+export type TemplatePaths = LiteralString<
+  | '[name]'
+  | '[dir].[name]'
+>;
+
+export type CustomerPaths = LiteralString<
+  | '[name]'
+  | '[dir].[name]'
+>;
+
+export type MetaObjectPaths = LiteralString<
+  | '[name]'
+  | '[dir]-[name]'
+  | '[dir]_[name]'
+  | '[dir].[name]'
+  | '[name]-[dir]'
+  | '[name]_[dir]'
+  | '[name].[dir]'
+>;
 
 /**
  * Processor Configuration
@@ -75,7 +100,7 @@ export type GetProcessorConfigs<T> = {
    */
   file: boolean | string;
   /**
-   * Configuration of the processor, Initialized with defaults
+   * Configuration of the processor. Initialized with defaults.
    */
   config: T;
 }
@@ -115,8 +140,17 @@ export namespace ENV {
    * > _Single store_
    */
   export interface RCSecret {
-    domain: string,
-    key: string,
+    /**
+     * Domain name
+     */
+    domain: string;
+    /**
+     * Authorization Key
+     */
+    key: string;
+    /**
+     * Authorization Secret
+     */
     secret: string
   }
 
@@ -147,10 +181,6 @@ export namespace ENV {
   /**
    * Using a `.syncifyrc` file for authorizations
    */
-  export type RCFile =
-    | RCSecret
-    | RCSecret[]
-    | RCToken
-    | RCToken[]
+  export type RCFile = RCSecret | RCSecret[] | RCToken | RCToken[]
 
 }

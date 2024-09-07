@@ -1,6 +1,7 @@
 import { Tester } from 'anymatch';
 import { Merge } from 'type-fest';
 import { PageMetafield } from '../$/requests';
+import { LiteralString } from 'types/shared';
 
 /**
  * **Markdown > HTML**
@@ -21,25 +22,35 @@ export namespace Markdown {
    */
   export interface Export {
     /**
-     * Enable HTML tags in source, defaults to `true`
+     * Enable HTML tags in source
+     *
+     * @default true
      */
     html: boolean;
     /**
      * // Use `/` to close single tags (<br />), defaults to `false`.
      * This is only for full CommonMark compatibility.
+     *
+     * @default false
      */
     xhtmlOut: boolean;
     /**
      * Convert '\n' in paragraphs into `<br>`, defaults to `true`
+     *
+     * @default true
      */
     breaks: boolean;
     /**
      * CSS language prefix for fenced blocks. Can be useful for external
      * highlighters, defaults to `language-`
+     *
+     * @default 'language-'
      */
     langPrefix: string;
     /**
      * Autoconvert URL-like text to links, defaults to `false`
+     *
+     * @default false
      */
     linkify: boolean;
 
@@ -47,6 +58,8 @@ export namespace Markdown {
      * Enable some language-neutral replacement + quotes beautification (defaults to `false`)
      * For the full list of replacements, see;
      * https://github.com/markdown-it/markdown-it/blob/master/lib/rules_core/replacements.js
+     *
+     * @default false
      */
     typographer: boolean;
     /**
@@ -67,43 +80,43 @@ export namespace Markdown {
     /**
      * Heading style for conversion. This defaults to `atx`.
      */
-    headingStyle?: 'setext' | 'atx';
+    headingStyle?: LiteralString<'setext' | 'atx'>;
     /**
      * Horizontal Rules, defaults to `***`
      */
-    hr?: '***' | '---' | '___';
+    hr?: LiteralString<'***' | '---' | '___'>;
     /**
      * Bullet list markers, defaults to `-`
      */
-    bulletListMarker?: '-' | '+' | '*'
+    bulletListMarker?: LiteralString<'-' | '+' | '*'>
     /**
      * Code blocks, defaults to `fenced`
      */
-    codeBlockStyle?: 'indented' | 'fenced';
+    codeBlockStyle?: LiteralString<'indented' | 'fenced'>;
     /**
      * EM Delimiter (ie: Italic), defaults to `_`
      */
-    emDelimiter?: '_' | '*';
+    emDelimiter?: LiteralString<'_' | '*'>;
     /**
      * Code block fence style, defaults to ```
      */
-    fence?: '```' | '~~~' | undefined;
+    fence?: LiteralString<'```' | '~~~' | undefined>;
     /**
      * Strong Delimiter (ie: bold), defaults to `**`
      */
-    strongDelimiter?: '__' | '**' | undefined;
+    strongDelimiter?: LiteralString<'__' | '**' | undefined>;
     /**
      * Link style, defaults to `inlined`
      *
-     * _Don't fuck around with this and leave it as `inlined`_
+     * _Don't fuck around with this, leave it as `inlined`_
      */
-    linkStyle?: 'inlined' | 'referenced' | undefined;
+    linkStyle?: LiteralString<'inlined' | 'referenced' | undefined>;
     /**
      * Link style reference, defaults to `full`
      *
-     * _Don't fuck around with this and leave it as `full`_
+     * _Don't fuck around with this, leave it as `full`_
      */
-    linkReferenceStyle?: 'full' | 'collapsed' | 'shortcut' | undefined;
+    linkReferenceStyle?: LiteralString<'full' | 'collapsed' | 'shortcut' | undefined>;
   }
 }
 
@@ -112,21 +125,11 @@ export namespace Markdown {
  */
 export interface PagesConfig {
   /**
-   * Whether the pulled page content should be written
-   * as HTML or have the HTML converted to Markdown.
+   * Whether the pulled page content should be written as HTML or have the HTML converted to Markdown.
    *
    * @default 'html'
    */
   language?: 'markdown' | 'html',
-  /**
-   * Whether or not to use safe sync. When enabled, Syncify
-   * will check remote sources before publishing. If local
-   * sources have had edits applied, you will be prompted
-   * before an overwrite takes place.
-   *
-   * @default true
-   */
-  safeSync?: boolean;
   /**
    * Fallback author name
    *
@@ -134,31 +137,16 @@ export interface PagesConfig {
    */
   author?: string;
   /**
-   * Whether pages contained in sub-directories should
-   * use their directory name as the `template_suffix`
-   * when publishing to stores
-   *
-   * @default false
+   * Import HTML > Markdown Conversion Options
    */
-  suffixDir?: boolean;
+  export?: Markdown.Import;
   /**
-   * If `suffixDir` is `true` you can provide alist of page sub-directories
-   * or relative files that should pass through without applying the directory
-   * name as a `template_suffix` on the page.
+   * **HTML → Markdown**
    *
-   * _cannot contain glob (`*`) stars_
-   *
-   * @default []
-   *
-   * @example
-   *
-   * // ✓ This is correct
-   * { global: ['some-dir/filename.md' ] }
-   *
-   * // ✗ This is incorrect
-   * { global: ['some-dir/*.md' ] }
+   * Import markup conversion settings
    */
-  global?: string[];
+  import?: Markdown.Import;
+
 }
 
 /* -------------------------------------------- */

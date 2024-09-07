@@ -2,13 +2,13 @@
 
 import type { AxiosError } from 'axios';
 import type { Theme, File, FileKeys, Requests, Responses, RequestMethods } from 'types';
-import merge from 'mergerino';
 import { delay } from 'rambdax';
 import { pMapSkip } from 'p-map';
 import { Type } from 'syncify:file';
 import { queue, axios } from 'syncify:requests/queue';
 import { timer } from 'syncify:timer';
 import { event } from 'syncify:native';
+import { merge } from 'syncify:utils';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';
@@ -62,9 +62,7 @@ export async function find (asset: FileKeys, theme: Theme) {
   const request = merge($.sync.stores[theme.sidx].client, {
     method: 'get',
     url: theme.url,
-    params: {
-      'asset[key]': asset
-    }
+    params: { 'asset[key]': asset }
   });
 
   return axios<Requests.Asset<'GET'>, Responses.Asset<'GET'>>(request)
@@ -112,10 +110,7 @@ export async function upload (asset: string, config: {theme: Theme, key: FileKey
  */
 export async function get <T extends RequestMethods> (theme: Theme, config: Requests.Asset<T>) {
 
-  const request = merge(config, {
-    method: 'get',
-    url: theme.url
-  });
+  const request = merge(config, { method: 'get', url: theme.url });
 
   try {
 
@@ -171,12 +166,10 @@ export async function sync <T extends RequestMethods> (theme: Theme, file: File,
     if (limit >= 32) queue.concurrency--;
     if (limit >= 39) await delay(500);
   } else if (queue.concurrency < 3 && limit < 30) {
-
     queue.concurrency++;
-
   }
 
-  if ($.mode.upload === false && $.mode.import === false) timer.start();
+  $.mode.upload === false && $.mode.import === false && timer.start();
 
   const promise = await axios<Requests.Asset<T>, Responses.Asset<T>>(config).then(({ headers, data }) => {
 
@@ -190,10 +183,7 @@ export async function sync <T extends RequestMethods> (theme: Theme, file: File,
 
       if ($.mode.watch) {
 
-        if (
-          $.mode.hot === true &&
-          file.type !== Type.Script &&
-          file.type !== Type.Style) log.hot();
+        $.mode.hot === true && file.type !== Type.Script && file.type !== Type.Style && log.hot();
 
         log.upload(theme);
 
@@ -226,9 +216,9 @@ export async function sync <T extends RequestMethods> (theme: Theme, file: File,
 
     if (e.response && (e.response.status === 429 || e.response.status === 500)) {
 
-      if (
-        $.mode.upload === false &&
-        $.mode.import === false) log.retrying(file.key, theme);
+      if ($.mode.upload === false && $.mode.import === false) {
+        log.retrying(file.key, theme);
+      }
 
       queue.add(() => sync(theme, file, config));
 

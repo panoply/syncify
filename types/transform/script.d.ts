@@ -54,18 +54,29 @@ type ESBuildAllowedOptions = Pick<ESBuildOptions, (
   | 'footer'
   | 'format'
   | 'globalName'
+  | 'inject'
+  | 'ignoreAnnotations'
   | 'tsconfigRaw'
   | 'tsconfig'
   | 'treeShaking'
   | 'target'
   | 'jsx'
+  | 'keepNames'
   | 'jsxDev'
   | 'jsxFactory'
   | 'jsxFragment'
   | 'jsxImportSource'
   | 'jsxSideEffects'
-  | 'inject'
-  | 'ignoreAnnotations'
+  | 'loader'
+  | 'minify'
+  | 'mangleCache'
+  | 'mangleQuoted'
+  | 'mangleProps'
+  | 'minifyIdentifiers'
+  | 'minifySyntax'
+  | 'minifyWhitespace'
+  | 'mangleQuoted'
+  | 'metafile'
   | 'drop'
   | 'splitting'
   | 'supported'
@@ -74,8 +85,6 @@ type ESBuildAllowedOptions = Pick<ESBuildOptions, (
   | 'sourcemap'
   | 'pure'
   | 'plugins'
-  | 'metafile'
-  | 'loader'
   | 'publicPath'
 )>
 
@@ -167,7 +176,7 @@ interface ScriptSharedConfig {
   snippet?: boolean;
   /**
    * When `snippet` is `true` you can provide an additional list of attributes to
-   * be applied to `<script>` tag which code will be output within. This only applies
+   * be applied to inlined `<script>` tag which code will be output within. This only applies
    * to snippet generation and entries will be ignored if snippet is `false`.
    *
    * **Example Definition**
@@ -215,7 +224,7 @@ interface ScriptSharedConfig {
    * the options defined in `processor.esbuild`.
    *
    * You can also skip pre-processing with esbuild by passing a _boolean_
-   * `false` which will inform Syncify to process scripts with ESBuild.
+   * `false` which will inform Syncify to skip processing scripts with ESBuild.
    *
    * @default true // if esbuild is not installed this is false
    */

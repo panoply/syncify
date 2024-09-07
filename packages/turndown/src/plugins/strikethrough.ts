@@ -1,14 +1,10 @@
 import TurndownService from 'turndown';
 
-export function strikethrough (turndownService: TurndownService) {
+export function strikethrough (turndown: TurndownService) {
 
-  turndownService.addRule('strikethrough', {
-    filter: [ 'del', 's', 'strike' as any ],
-    replacement (content) {
-
-      return '~' + content + '~';
-
-    }
+  turndown.addRule('strikethrough', {
+    filter: [ 's', 'del' ],
+    replacement: content => `~${content}~`
   });
 
 }

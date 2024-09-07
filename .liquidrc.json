@@ -1,0 +1,66 @@
+{
+  "engine": "11ty",
+  "files": {
+    "includes": [
+      "./docs/src/views/include/*.liquid"
+    ],
+    "data": [
+      "./docs/src/views/data/*.json"
+    ]
+  },
+  "format": {
+    "wrap": 125,
+    "crlf": false,
+    "indentSize": 2,
+    "preserveLine": 1,
+    "endNewline": false,
+    "liquid": {
+      "commentIndent": true,
+      "commentNewline": true,
+      "delimiterPlacement": "consistent",
+      "delimiterTrims": "always",
+      "lineBreakSeparator": "before",
+      "indentAttribute": true,
+      "normalizeSpacing": true,
+      "preserveComment": false,
+      "quoteConvert": "single",
+      "forceFilter": 3,
+      "forceArgument": 3
+    },
+    "markup": {
+      "quoteConvert": "double",
+      "lineBreakValue": "preserve",
+      "commentNewline": true,
+      "forceIndent": false,
+      "ignoreJS": false,
+      "forceAttribute": 2,
+      "preserveText": true
+    },
+    "json": {
+      "braceAllman": true,
+      "arrayFormat": "indent",
+      "objectIndent": "indent"
+    },
+    "style": {
+      "correct": true,
+      "commentNewline": true,
+      "commentIndent": true,
+      "noLeadZero": true,
+      "quoteConvert": "single",
+      "classPadding": true
+    },
+    "script": {
+      "correct": true,
+      "arrayFormat": "indent",
+      "objectIndent": "indent",
+      "methodChain": 3,
+      "caseSpace": true,
+      "quoteConvert": "single",
+      "elseNewline": true,
+      "functionNameSpace": true,
+      "functionSpace": true,
+      "commentNewline": true,
+      "noCaseIndent": true
+    }
+  }
+}

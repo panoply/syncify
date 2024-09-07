@@ -95,22 +95,13 @@ export function watch (callback: Syncify) {
 
           return liquid(file, request.assets, callback);
 
-        case Type.Section:
-
-          if (file.kind === Kind.JSON) {
-            return json(file, request.assets, callback);
-          } else {
-            return liquid(file, request.assets, callback);
-          }
-
         case Type.Metaobject:
         case Type.Template:
+        case Type.Section:
 
-          if (file.kind === Kind.JSON) {
-            return json(file, request.assets, callback);
-          } else {
-            return liquid(file, request.assets, callback);
-          }
+          return file.kind === Kind.JSON
+            ? json(file, request.assets, callback)
+            : liquid(file, request.assets, callback);
 
         case Type.Config:
         case Type.Locale:

@@ -6,11 +6,12 @@ import type { ProcessorsBundle } from 'types';
  * This model is the default options for the transform processors.
  */
 export const processor = (): ProcessorsBundle => ({
-  json: {
-    indent: 2,
-    useTab: false,
-    crlf: false,
-    exclude: null
+  sharp: {
+    installed: false,
+    required: false,
+    loaded: false,
+    file: false,
+    config: {}
   },
   tailwind: {
     installed: false,
@@ -32,6 +33,7 @@ export const processor = (): ProcessorsBundle => ({
     }
   },
   esbuild: {
+    tsconfig: undefined,
     bundle: true,
     format: 'esm',
     globalName: undefined,
@@ -44,13 +46,6 @@ export const processor = (): ProcessorsBundle => ({
     write: false,
     logLevel: 'silent',
     plugins: []
-  },
-  sharp: {
-    installed: false,
-    required: false,
-    loaded: false,
-    file: false,
-    config: {}
   },
   postcss: {
     file: false,

@@ -14,8 +14,7 @@ import { LiteralUnion } from 'type-fest';
 /**
  * Get Stack
  *
- * Generates or obtains a warning stack reference from
- * the `$` state model.
+ * Generates or obtains a warning stack reference from the `$` state model.
  */
 function getStack (processor: string, uri: string) {
 
@@ -78,7 +77,7 @@ export const sass = (file: File) => (message: string, options: {
 
   if (has('span', options)) {
 
-    if(isUndefined(options.span)) return;
+    if (isUndefined(options.span)) return;
 
     const { span } = options;
     const code = has('context', span) ? span.context : span.text;

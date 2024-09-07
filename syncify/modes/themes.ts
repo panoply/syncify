@@ -2,7 +2,6 @@
 import type { Resource, Store } from 'types';
 import { list } from 'syncify:requests/themes';
 import { $ } from 'syncify:state';
-import * as log from 'syncify:log';
 import { isArray, ws } from 'syncify:utils';
 import { prompt } from 'enquirer';
 import { values } from 'syncify:native';
@@ -187,7 +186,7 @@ async function listThemes (store: Store) {
 
   const json = { syncify: JSON.parse(snippet.stores.result) };
 
-  const save = await prompt({
+  const save = await prompt(<any>{
     name: 'save',
     type: 'confirm',
     message: 'Save Settings',
