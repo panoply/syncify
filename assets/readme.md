@@ -16,4 +16,4 @@ Use the Syncify shield in repositories and let others know that you leverage the
 
 Use the Syncify SVG logos anywhere you like.
 
-<img src="/assets/avatar.svg">
+![/assets/avatar.svg](https://raw.githubusercontent.com/panoply/syncify/next/assets/badge.svg)
