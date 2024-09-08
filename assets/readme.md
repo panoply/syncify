@@ -22,7 +22,7 @@ Use the Syncify SVG logos anywhere you like.
 
 ### Logo Icon
 
-<img src="https://github.com/panoply/syncify/blob/af844e7231a1ece8a7cb92df462de56c30b8800b/assets/logo-icon.svg" width="25%">
+<img src="https://github.com/panoply/syncify/blob/af844e7231a1ece8a7cb92df462de56c30b8800b/assets/logo-icon.svg" width="20%">
 
 ### Logo Text
 
