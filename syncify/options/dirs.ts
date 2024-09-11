@@ -1,124 +1,12 @@
-import type { Commands } from 'types';
+import type { Commands } from 'types/internal';
 import { mkdir, emptyDir, pathExists, readdirSync } from 'fs-extra';
-import { join } from 'pathe';
+import { join } from 'node:path';
 import { isArray, isString, has } from 'syncify:utils';
 import { basePath } from 'syncify:utils/paths';
 import { THEME_DIRS, BASE_DIRS } from 'syncify:const';
 import { typeError } from 'syncify:log/throws';
 import { create } from 'syncify:native';
 import { $ } from 'syncify:state';
-
-/**
- * Read Cache
- *
- * Populates the cache references and assigns them
- * to the `$.cache` model.
- */
-// export async function getCacheFiles () {
-
-//   // Populate the store specifics records
-//   //
-//   if (dir === 'page' || dir === 'metafield' || dir === 'redirect') {
-
-//     const stores = isArray($.config.stores) ? $.config.stores : [ $.config.stores ];
-
-//     for (const { domain } of stores) {
-
-//       const myshopify = `${domain}.myshopify.com`;
-//       const uri = join(path, myshopify);
-//       const has = await pathExists(uri);
-
-//       $.cache[dir as string] = { [myshopify]: create(null) };
-
-//       if (!has) {
-
-//         try {
-//           await mkdir(uri);
-//         } catch (e) {
-//           throw new Error(e);
-//         }
-
-//       } else {
-
-//         const files = await glob(join(path, '*'));
-
-//         if (files.length > 0) {
-
-//           for (const file of files) {
-
-//             const name = basename(file, extname(file));
-
-//             try {
-
-//               const data = await readJson(file);
-
-//               defineProperty($.cache[dir as string][myshopify], name, {
-//                 get () {
-//                   return data;
-//                 }
-//               });
-
-//             } catch (e) {
-//               throw new Error(e);
-//             }
-//           }
-//         }
-//       }
-//     }
-
-//   } else if (dir === 'style' || dir === 'script') {
-
-//     const files = await glob(join(path, '*'));
-
-//     if (files.length > 0) {
-
-//       for (const file of files) {
-
-//         const name = basename(file, extname(file));
-
-//         try {
-
-//           $.cache[dir as string] = create(null);
-//           $.cache[dir][name] = file;
-
-//         } catch (e) {
-
-//           throw new Error(e);
-//         }
-//       }
-//     }
-
-//   } else {
-
-//     console.log(dir, path);
-//     const files = await glob(join(path, '*.json'));
-
-//     if (files.length > 0) {
-
-//       for (const file of files) {
-
-//         // const name = basename(file, '.json');
-
-//         try {
-
-//           const data = await readJson(file);
-
-//           defineProperty($.cache, dir, {
-//             get () {
-//               return data;
-//             }
-//           });
-
-//         } catch (e) {
-
-//           throw new Error(e);
-//         }
-//       }
-//     }
-
-//   }
-
-// }
 
 /**
  * Set Cache

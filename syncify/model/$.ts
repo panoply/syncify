@@ -1,9 +1,9 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable prefer-const */
-import type { ChildProcess } from 'node:child_process';
 import type * as Type from 'types';
-import { argv } from 'node:process';
-import { size } from 'syncify:cli/size';
+import type { Commands } from 'types/internal';
+import type { ChildProcess } from 'node:child_process';
+import { size } from '@syncify/ansi';
 import { PATH_KEYS } from 'syncify:const';
 import { defaults } from './defaults';
 import { processor } from './processor';
@@ -77,11 +77,6 @@ export const $ = new class Bundle {
   public restart: boolean = false;
 
   /**
-   * Cached reference of the CLI commands passed
-   */
-  public cli: Type.Commands = {};
-
-  /**
    * Websockets HOT reloading
    */
   public wss: Type.WSS = null;
@@ -91,21 +86,7 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public stats: Type.Stats = {};
-
-  /**
-   * CLI provided filters
-   *
-   * @default null
-   */
-  public filters: Type.Filters = {};
-
-  /**
-   * Cache copy of the invoked commands in which syncify was started
-   *
-   * @default null
-   */
-  public commands: Type.Commands = {};
+  public stats: Type.Stats = object();
 
   /**
    * The version defined in the package.json
@@ -119,14 +100,28 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public cwd: string = null;
+  public cwd: string = process.cwd();
+
+  /**
+   * Cache copy of the invoked commands in which syncify was started
+   *
+   * @default null
+   */
+  public cmd: Commands = null;
 
   /**
    * The provided command passed on the CLI.
    *
    * @default null
    */
-  public argv: string = argv.slice(2).join(WSP);
+  public argv: string = null;
+
+  /**
+   * CLI provided filters
+   *
+   * @default null
+   */
+  public filters: Type.Filters = object();
 
   /**
    * Error store, holds reference to errors
@@ -149,13 +144,13 @@ export const $ = new class Bundle {
   /**
    * Theme Publishing
    */
-  public publish: Type.PublishBundle = {
+  public publish: Type.PublishBundle = object({
     ngrok: null,
     bindVersion: false,
     publishRole: 'unpublished',
     themeLimit: 3,
     tunnelPort: 80
-  };
+  });
 
   /**
    * Version Control
@@ -171,7 +166,7 @@ export const $ = new class Bundle {
    *  update: null
    * }
    */
-  public vc: Type.VC = {
+  public vc: Type.VC = object({
     dir: null,
     number: null,
     zip: null,
@@ -179,7 +174,7 @@ export const $ = new class Bundle {
     major: 0,
     minor: 0,
     update: null
-  };
+  });
 
   /**
    * Execution options which describe the invocation and operation
@@ -194,7 +189,7 @@ export const $ = new class Bundle {
    *  vars: {}
    * }
    */
-  public env: Type.Env = {
+  public env: Type.Env = object({
     cli: false,
     tree: false,
     dev: true,
@@ -203,7 +198,7 @@ export const $ = new class Bundle {
     sync: 0,
     file: null,
     vars: {}
-  };
+  });
 
   /**
    * Hot reload mode options - Use the `mode.hot` reference to
@@ -224,7 +219,7 @@ export const $ = new class Bundle {
    *  alive: {}
    * }
    */
-  public hot: Type.HOTBundle = {
+  public hot: Type.HOTBundle = object({
     inject: true,
     server: 3000,
     socket: 8089,
@@ -247,12 +242,12 @@ export const $ = new class Bundle {
       , 'history: false'
       , 'method: "hot"'
     ].join(', ') + ' %}'
-  };
+  });
 
   /**
    * Log State
    */
-  public log: Type.LogBundle = {
+  public log: Type.LogBundle = object({
     idle: false,
     group: 'Syncify',
     title: NIL,
@@ -267,17 +262,17 @@ export const $ = new class Bundle {
       stats: true,
       warnings: true
     }
-  };
+  });
 
   /**
    * The operation mode executing
    *
    * @default false // all modes are false by default
    */
-  public mode: Type.Modes = {
+  public mode: Type.Modes = object({
+    dev: true,
     build: false,
     interactive: false,
-    dev: true,
     prod: false,
     strap: false,
     watch: false,
@@ -292,7 +287,6 @@ export const $ = new class Bundle {
     pages: false,
     pull: false,
     force: false,
-    views: false,
     script: false,
     image: false,
     style: false,
@@ -302,7 +296,7 @@ export const $ = new class Bundle {
     release: false,
     publish: false,
     themes: false
-  };
+  });
 
   /**
    * The configuration file name resolution
@@ -316,11 +310,11 @@ export const $ = new class Bundle {
    *  type: null
    * }
    */
-  public file: Type.ConfigFile = {
+  public file: Type.ConfigFile = object({
     base: null,
     path: null,
     relative: null
-  };
+  });
 
   /**
    * Files store - Holds a `Set` reference to all files
@@ -330,7 +324,7 @@ export const $ = new class Bundle {
   /**
    * Base directory path references
    */
-  public dirs: Type.Dirs = {
+  public dirs: Type.Dirs = object({
     cache: null,
     config: null,
     export: null,
@@ -342,27 +336,7 @@ export const $ = new class Bundle {
       scripts: null,
       styles: null
     }
-  };
-
-  /**
-   * Passed commands that may be of importance in the transform or build processes.
-   *
-   * @default
-   * {
-   *   config: null,
-   *   delete: null,
-   *   filter: null,
-   *   input: null,
-   *   output: null
-   * }
-   */
-  public cmd: Type.CommandBundle = {
-    config: null,
-    delete: null,
-    filter: null,
-    input: null,
-    output: null
-  };
+  });
 
   /**
    * The available stores as per configuration in `package.json` file
@@ -489,7 +463,6 @@ export const $ = new class Bundle {
     safeSync: true,
     author: '',
     global: null,
-    suffixDir: false,
     language: 'html',
     export: {
       quotes: '“”‘’',

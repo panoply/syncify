@@ -1,6 +1,6 @@
 import type { Syncify, Requests, Theme, Resource, File } from 'types';
 import type { AxiosResponse } from 'axios';
-import { join, relative } from 'pathe';
+import { join, relative } from 'node:path';
 import { delay } from 'rambdax';
 import { writeFileSync } from 'fs-extra';
 import { importFile } from 'syncify:process/files';
@@ -9,10 +9,10 @@ import { queue } from 'syncify:requests/queue';
 import { timer } from 'syncify:utils/timer';
 import { assign, event } from 'syncify:native';
 import { addSuffix, glue } from 'syncify:utils';
-import { Create, Prefix } from 'syncify:ansi';
-import { ARR } from 'syncify:symbol';
+import { Create, Prefix } from 'syncify:cli/tree';
+import { ARR } from '@syncify/ansi';
 import * as request from 'syncify:requests/assets';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 import * as log from 'syncify:log';
 
 import { $ } from 'syncify:state';

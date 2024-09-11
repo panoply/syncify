@@ -1,5 +1,5 @@
 import type { HOTBundle } from 'types';
-import { join } from 'pathe';
+import { join } from 'node:path';
 import { allFalse } from 'rambdax';
 import { socket } from 'syncify:hot/server';
 import { isObject, isBoolean, hasProp, isNil, isEmpty } from 'syncify:utils';

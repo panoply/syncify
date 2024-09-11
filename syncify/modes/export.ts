@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import type { Syncify } from 'types';
 import { mkdir, pathExists, statSync } from 'fs-extra';
-import { basename, join, relative } from 'pathe';
+import { basename, join, relative } from 'node:path';
 import { glob } from 'fast-glob';
 import AdmZip from 'adm-zip';
 import { build } from './build';

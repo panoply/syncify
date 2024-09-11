@@ -1,11 +1,11 @@
 import { pathExists, readFile, writeFile } from 'fs-extra';
-import { basename } from 'pathe';
-import { TLD } from 'syncify:symbol';
-import { gray, neonCyan } from 'syncify:colors';
+import { basename } from 'node:path';
+import { TLD } from '@syncify/ansi';
+import { gray, neonCyan } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 import * as request from 'syncify:requests/assets';
 import * as log from 'syncify:log';
-import * as tree from 'syncify:ansi';
+import * as tree from 'syncify:cli/tree';
 import { isString } from 'syncify:utils';
 
 const EXP = /{%-?\s*render\s+['"]hot\.js['"]/;

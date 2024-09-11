@@ -19,10 +19,10 @@ import { isUndefined, has, plural, isEmpty } from 'syncify:utils';
 import { timer } from 'syncify:timer';
 import { $ } from 'syncify:state';
 import { saveCache } from 'syncify:process/cache';
-import { Append, Create, Prefix } from 'syncify:ansi';
-import * as c from 'syncify:colors';
+import { Append, Create, Prefix } from 'syncify:cli/tree';
+import * as c from '@syncify/ansi';
 import * as log from 'syncify:log';
-import { HSH } from 'syncify:symbol';
+import { HSH } from '@syncify/ansi';
 import { BUILD_GROUPS } from 'syncify:const';
 
 type Groups = (

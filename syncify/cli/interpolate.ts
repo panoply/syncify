@@ -1,8 +1,8 @@
 import type { Ansis } from 'ansis';
 import { has, isArray, isString, sanitize, ws } from 'syncify:utils';
-import { Tree, COL, TLD, BAD } from 'syncify:symbol';
-import { gray, cyan, white, magenta, underline, neonCyan, blue, whiteBright, yellowBright, red } from 'syncify:colors';
-import { Create, CreateClosure, Suffix } from 'syncify:ansi';
+import { Tree, COL, TLD, BAD } from '@syncify/ansi';
+import { gray, cyan, white, magenta, underline, neonCyan, blue, whiteBright, yellowBright, red } from '@syncify/ansi';
+import { Create, CreateClosure, Suffix } from 'syncify:cli/tree';
 import { $ } from 'syncify:state';
 import { LiteralUnion } from 'type-fest';
 

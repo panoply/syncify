@@ -1,11 +1,11 @@
 import type { AccessScopes } from 'types';
 import type { Choice, StringPromptOptions } from 'types/internal';
-import { BAD, CHK, COL, Tree } from 'syncify:symbol';
-import { Create } from 'syncify:ansi';
+import { BAD, CHK, COL, Tree } from '@syncify/ansi';
+import { Create } from 'syncify:cli/tree';
 import { assign } from 'syncify:native';
 import { theme as Theme } from 'syncify:cli/prompts';
 import { prompt } from 'enquirer';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 import * as log from 'syncify:log';
 import * as access from 'syncify:requests/access';
 import { isBoolean } from 'syncify:utils';

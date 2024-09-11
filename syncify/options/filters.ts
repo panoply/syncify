@@ -1,7 +1,7 @@
-import type { Commands } from 'types';
-import { join } from 'pathe';
+import type { Commands } from 'types/internal';
+import { join } from 'node:path';
 import { PATH_KEYS, THEME_DIRS } from 'syncify:const';
-import { blue, bold, white, yellow } from 'syncify:colors';
+import { blue, bold, white, yellow } from '@syncify/ansi';
 import { invalidCommand } from 'syncify:log/throws';
 import { isArray, has, object } from 'syncify:utils';
 import { $ } from 'syncify:state';

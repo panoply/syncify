@@ -3,9 +3,9 @@ import { argv } from 'node:process';
 import { isUndefined, isString, glueString } from 'syncify:utils';
 import { error } from 'syncify:native';
 import { REGEX_OR_CHARS } from 'syncify:const';
-import { Tree, COL, TLD, ARR } from 'syncify:symbol';
-import { blue, bold, cyan, gray, red, redBright, white, whiteBright, yellowBright } from 'syncify:colors';
-import { Encase, Create } from 'syncify:ansi';
+import { Tree, COL, TLD, ARR } from '@syncify/ansi';
+import { blue, bold, cyan, gray, red, redBright, white, whiteBright, yellowBright } from '@syncify/ansi';
+import { Encase, Create } from 'syncify:cli/tree';
 import { $ } from 'syncify:state';
 
 /**
@@ -524,7 +524,7 @@ export function missingEnv (cwd: string) {
 
   const message = [
     `Missing ${cyan('.env')} credentials. Syncify could not resolve credentials within the workspace.`,
-    `Check you have ${cyan('.env')} or ${cyan('syncify.env')} file present in the root of your project`
+    `Check you have ${cyan('.env')} file present in the root of your project`
   ];
 
   error(

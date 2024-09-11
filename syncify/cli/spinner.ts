@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 
 import type { Merge } from 'type-fest';
-import type { Ansis } from 'ansis';
+import type { Ansis } from '@syncify/ansi';
 import update from 'log-update';
 import { assign, defineProperty } from 'syncify:native';
 import { glueString, has, isFunction, isObject, isString, object } from 'syncify:utils';
-import { bold, neonGreen, pink } from 'syncify:colors';
-import { Prefix, Break } from 'syncify:ansi';
+import { bold, neonGreen, pink } from '@syncify/ansi';
+import { Prefix, Break } from 'syncify:cli/tree';
 
 type SpinnerStyles = 'brielle' | 'arrows' | 'spinning'
 

@@ -1,6 +1,6 @@
 import type { Commands } from 'types';
-import { COL, ARR } from 'syncify:symbol';
-import { gray, bold, lightGray, whiteBright, clear } from 'syncify:colors';
+import { COL, ARR } from '@syncify/ansi';
+import { gray, bold, lightGray, whiteBright, clear } from '@syncify/ansi';
 import { log } from 'syncify:native';
 
 export function help (cli: Commands) {
@@ -52,7 +52,7 @@ export function help (cli: Commands) {
     $ sy your-store${gray('=')}theme-1,some-theme,test-theme
 
     ${gray('Target 2 stores and 1 theme')}:
-    $ sy ---your-store${gray('=')}theme-1 --another-store${gray('=')}some-theme
+    $ sy --your-store${gray('=')}theme-1 --another-store${gray('=')}some-theme
 
     ${gray('Target 2 stores and 4 theme')}:
     $ sy --your-store${gray('=')}theme-1,theme-2 --another-store${gray('=')}some-theme,test-theme

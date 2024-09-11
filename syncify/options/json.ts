@@ -3,7 +3,7 @@ import { typeError, warnOption } from 'syncify:log/throws';
 import { isArray, isBoolean, isNumber, isObject, isString, has, isEmpty, isNil } from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { getResolvedPaths } from 'syncify:utils/options';
-import { ARR } from 'syncify:symbol';
+import { ARR } from '@syncify/ansi';
 
 /**
  * JSON Options

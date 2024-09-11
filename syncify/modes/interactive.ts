@@ -6,8 +6,8 @@ import * as log from 'syncify:log';
 import { isArray, ws } from 'syncify:utils';
 import { prompt } from 'enquirer';
 import { values } from 'syncify:native';
-import { ARR, TLD, Tree } from 'syncify:symbol';
-import { gray, lightGray, neonCyan, neonGreen, orange, red, reset, whiteBright, yellowBright } from 'syncify:colors';
+import { ARR, TLD, Tree } from '@syncify/ansi';
+import { gray, lightGray, neonCyan, neonGreen, orange, red, reset, whiteBright, yellowBright } from '@syncify/ansi';
 
 interface Choice {
   name?: string

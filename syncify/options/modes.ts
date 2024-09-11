@@ -1,10 +1,9 @@
-import type { Commands, Modes } from 'types';
-import { anyTrue, allFalse, allTrue } from 'rambdax';
-import { LPR, LAN, RAN, RPR } from 'syncify:symbol';
-import { white, blue, red, bold, gray, whiteBright, cyan } from 'syncify:colors';
+import type { Modes } from 'types';
+import type { Commands } from 'types/internal';
+import { LPR, LAN, RAN, RPR, white, blue, red, bold, gray, whiteBright, cyan } from '@syncify/ansi';
 import { invalidCommand } from 'syncify:log/throws';
 import { assign, values, keys } from 'syncify:native';
-import { isString } from 'syncify:utils';
+import { hasProp, isString } from 'syncify:utils';
 import { $ } from 'syncify:state';
 
 /**
@@ -16,44 +15,45 @@ import { $ } from 'syncify:state';
  */
 export function setModes (cli: Commands) {
 
-  const resource = anyTrue(cli.pages, cli.metafields, cli.redirects);
-  const transform = anyTrue(cli.style, cli.script, cli.image, cli.svg);
-  const watch = anyTrue(resource, cli.upload, cli.import) ? false : cli.watch;
+  const prop = hasProp($.config.log);
+
+  if (prop('silent')) $.log.config.silent = $.config.log.silent;
+  if (prop('clear')) $.log.config.clear = $.config.log.clear;
+  if (prop('stats')) $.log.config.stats = $.config.log.stats;
+  if (prop('warnings')) $.log.config.warnings = $.config.log.warnings;
+
+  const resource = cli.pages || cli.metafields || cli.redirects;
+  const transform = cli.style || cli.script || cli.image || cli.svg;
+  const watch = resource || cli.upload || cli.import ? false : cli.watch;
 
   $.mode = assign<Modes, Modes>($.mode, {
     watch,
     dev: !cli.prod,
     prod: cli.prod,
-    setup: cli.setup,
-    strap: cli.strap !== null,
-    hot: allTrue(cli.watch, cli.hot),
+    setup: cli.mode === 'setup',
+    strap: cli.mode === 'strap',
+    themes: cli.mode === 'themes',
+    hot: cli.watch && cli.hot,
     interactive: cli.interactive,
     redirects: cli.redirects,
     metafields: cli.metafields,
     pages: cli.pages,
     pull: cli.pull,
-    cache: allTrue(cli.build, cli.cache),
+    cache: cli.build && cli.cache,
     force: cli.force,
-    views: cli.views,
     script: transform ? cli.script : false,
     style: transform ? cli.style : false,
     image: transform ? cli.image : false,
     svg: transform ? cli.svg : false,
-    terse: anyTrue(cli.terse, cli.prod),
-    clean: anyTrue(resource, transform, cli.upload) ? false : allTrue(cli.export, cli.build) || cli.clean,
-    build: anyTrue(cli.watch, cli.import) ? false : cli.build,
-    upload: anyTrue(transform, watch) ? false : cli.upload,
+    terse: cli.terse || cli.prod,
+    clean: (resource || transform || cli.upload) ? false : (cli.export && cli.build) || cli.clean,
+    build: (cli.watch || cli.import) ? false : cli.build,
+    upload: (transform || watch) ? false : cli.upload,
     export: cli.export,
-    import: anyTrue(resource, transform, cli.upload, cli.watch, cli.build) ? false : cli.import,
+    import: (resource || transform || cli.upload || cli.watch || cli.build) ? false : cli.import,
     publish: cli.publish,
-    release: isString(cli.release),
-    themes: cli._[0] === 'themes'
+    release: isString(cli.release)
   });
-
-  if ($.mode.themes) {
-    cli._ = [];
-    return;
-  }
 
   validateCommands($.mode, cli);
 
@@ -66,13 +66,13 @@ export function setModes (cli: Commands) {
 
   if ($.mode.build) {
 
-    const build = allFalse(
-      $.mode.script,
-      $.mode.style,
-      $.mode.svg,
-      $.mode.pages,
-      $.mode.metafields,
-      $.mode.image
+    const build = (
+      !$.mode.script &&
+      !$.mode.style &&
+      !$.mode.svg &&
+      !$.mode.pages &&
+      !$.mode.metafields &&
+      !$.mode.image
     );
 
     if (build) {
@@ -80,7 +80,6 @@ export function setModes (cli: Commands) {
       $.mode.style = true;
       $.mode.svg = true;
       $.mode.image = true;
-      $.mode.views = true;
     }
   }
 

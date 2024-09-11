@@ -6,17 +6,16 @@ import { stdout, stderr } from 'node:process';
 import notifier from 'node-notifier';
 import { intercept } from 'syncify:cli/intercept';
 import { queue } from 'syncify:requests/queue';
-import { Tree, ARL, ARR, CHV, TLD } from 'syncify:symbol';
+import { Tree, ARL, ARR, CHV, TLD } from '@syncify/ansi';
 import { Multiline } from 'syncify:interpolate';
 import { timer } from 'syncify:timer';
 import { Spinner } from 'syncify:cli/spinner';
 import * as errors from 'syncify:log/errors';
-import * as x from 'syncify:ansi';
-import * as c from 'syncify:colors';
+import * as x from 'syncify:cli/tree';
+import * as c from '@syncify/ansi';
 import * as u from 'syncify:utils';
 import * as n from 'syncify:native';
 import { $ } from 'syncify:state';
-import { Ansis } from 'ansis';
 
 /* -------------------------------------------- */
 /* REXPORT                                      */
@@ -24,8 +23,8 @@ import { Ansis } from 'ansis';
 
 export { log as out } from 'syncify:native';
 export { default as update } from 'log-update';
-export { progress } from 'syncify:cli/progress';
 export { runtime } from 'syncify:log/runtime';
+export { progress } from '@syncify/ansi';
 
 /* -------------------------------------------- */
 /* INTERNAL                                     */
@@ -124,7 +123,7 @@ export const write = (message: string, {
    *
    * @default whiteBright
    */
-  color?: Ansis;
+  color?: c.Ansis;
   /**
    * The type of message - The message `color` will reflect
    * if unspecific, meaning if `type` is `warning` text is yellow,

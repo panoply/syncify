@@ -1,6 +1,6 @@
-import type { Commands, Config, ENV, Tsconfig } from 'types';
+import type { Config, ENV, Tsconfig } from 'types';
 import dotenv from 'dotenv';
-import { join, relative, basename, extname } from 'pathe';
+import { join, relative, basename, extname } from 'node:path';
 import { pathExists, readFile, readJson, writeFile } from 'fs-extra';
 import stripJsonComments from 'strip-json-comments';
 import { bundleRequire } from 'syncify:requests/require';
@@ -22,13 +22,13 @@ import { SYNCIFY_CONFIG } from 'syncify:const';
  * > When `null` is returned, the `package.json` file is
  * assumed to contain configuration requirements.
  */
-export async function configFile (cwd: string): Promise<Config> {
+export async function configFile (): Promise<Config> {
 
   let path: string = null;
 
   for (const file of SYNCIFY_CONFIG) {
 
-    path = join(cwd, file);
+    path = join($.cwd, file);
 
     const exists = await pathExists(path);
 
@@ -45,7 +45,7 @@ export async function configFile (cwd: string): Promise<Config> {
     if (extname(path) === '.json') {
 
       $.file.path = path;
-      $.file.relative = relative(cwd, path);
+      $.file.relative = relative($.cwd, path);
       $.file.base = basename(path);
 
       const json = await readFile(path);
@@ -55,11 +55,11 @@ export async function configFile (cwd: string): Promise<Config> {
     } else {
 
       $.file.path = path;
-      $.file.relative = relative(cwd, path);
+      $.file.relative = relative($.cwd, path);
       $.file.base = basename(path);
 
       const config = await bundleRequire({
-        cwd,
+        cwd: $.cwd,
         filepath: path
       });
 
@@ -69,7 +69,7 @@ export async function configFile (cwd: string): Promise<Config> {
 
   } catch (e) {
 
-    const jsonconfig = join(cwd, 'syncify.config.json');
+    const jsonconfig = join($.cwd, 'syncify.config.json');
     const hasFile = await pathExists(jsonconfig);
 
     if (hasFile) return readJson(jsonconfig);
@@ -87,17 +87,17 @@ export async function configFile (cwd: string): Promise<Config> {
  * with _script_ transforms and esbuild to support different
  * capabilities like path aliases.
  */
-export async function getTSConfig (cwd: string): Promise<Tsconfig> {
+export async function getTSConfig (): Promise<Tsconfig> {
 
   let uri: string;
 
   // Save path reference of package
-  uri = join(cwd, 'tsconfig.json');
+  uri = join($.cwd, 'tsconfig.json');
 
   const tsconfig = await pathExists(uri);
 
   if (!tsconfig) {
-    uri = join(cwd, 'jsconfig.json');
+    uri = join($.cwd, 'jsconfig.json');
     const jsconfig = await pathExists(uri);
     if (!jsconfig) return null;
   }
@@ -124,10 +124,10 @@ export async function getTSConfig (cwd: string): Promise<Tsconfig> {
  * module requires the existence of a `package.json` file. This
  * function will also assign `$.stores[]` reference.
  */
-export async function getPackageJson (cli: Commands) {
+export async function getPackageJson () {
 
   // Save path reference of package
-  const uri = join(cli.cwd, 'package.json');
+  const uri = join($.cwd, 'package.json');
   const has = await pathExists(uri);
 
   if (!has) throw new Error('Missing "package.json" file');
@@ -146,9 +146,7 @@ export async function getPackageJson (cli: Commands) {
 
     } else {
 
-      if (cli.strap === null) {
-        missingStores(cli.cwd);
-      }
+      if (!$.cmd.strap) missingStores($.cwd);
 
     }
 
@@ -183,7 +181,7 @@ export async function setPkgVersion (current: string, increment: string) {
     if (num === current) {
 
       await writeFile(uri, `${str.slice(0, sqo)}${increment}${str.slice(eqo)}`);
-      await getPackageJson($.cli);
+      await getPackageJson();
 
       return true;
 
@@ -207,9 +205,9 @@ export async function setPkgVersion (current: string, increment: string) {
  * `.env.syncify.json` file. This file can optionally
  * include credential information.
  */
-export async function getEnvFile (cli: Commands): Promise<ENV.RCFile> {
+export async function getEnvFile (): Promise<ENV.RCFile> {
 
-  let path = join(cli.cwd, '.env');
+  const path = join($.cwd, '.env');
 
   if (await pathExists(path)) {
 
@@ -225,25 +223,9 @@ export async function getEnvFile (cli: Commands): Promise<ENV.RCFile> {
 
   } else {
 
-    path = join(cli.cwd, 'syncify.env');
+    if ($.cmd.setup === false && !$.cmd.strap) {
 
-    if (await pathExists(path)) {
-
-      const env = dotenv.config({ path });
-
-      if (env.error) {
-        throws(env.error.message, { path });
-        return null;
-      }
-
-      $.env.file = path;
-      $.env.vars = env.parsed;
-
-    } else {
-
-      if (cli.setup === false && cli.strap === null) {
-        missingEnv(cli.cwd);
-      }
+      missingEnv($.cwd);
 
     }
 

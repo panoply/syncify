@@ -1,4 +1,5 @@
-import type { Cache, Commands, PathBundle } from 'types';
+import type { Cache, PathBundle } from 'types';
+import type { Commands } from 'types/internal';
 
 export const SHA_256_HASH_LENGTH = 32;
 
@@ -6,10 +7,10 @@ export const SHA_256_HASH_LENGTH = 32;
  * Syncify configuration file types
  */
 export const SYNCIFY_CONFIG = [
+  'syncify.config.ts',
   'syncify.config.js',
   'syncify.config.mjs',
   'syncify.config.cjs',
-  'syncify.config.ts',
   'syncify.config.json'
 ];
 

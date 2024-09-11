@@ -5,10 +5,9 @@ import { delay } from 'rambdax';
 import { timer } from 'syncify:timer';
 import * as log from 'syncify:log';
 import { exporting } from 'syncify:modes/export';
-import { ARR, COL } from 'syncify:symbol';
-import { bold, gray, magentaBright, neonCyan, neonGreen } from 'syncify:colors';
+import { ARR, COL } from '@syncify/ansi';
+import { bold, gray, magentaBright, neonCyan, neonGreen } from '@syncify/ansi';
 import { $ } from 'syncify:state';
-import prompts from 'prompts';
 import { existsSync, readFileSync } from 'fs-extra';
 
 export async function publish (cb?: Syncify) {

@@ -1,14 +1,14 @@
 import type { Theme } from 'types';
 import type { Bundle } from 'syncify:state';
 import { allFalse, anyTrue, isEmpty } from 'rambdax';
-import { relative } from 'pathe';
+import { relative } from 'node:path';
 import { log, keys, warn } from 'syncify:native';
 import { glueString, plural, ws } from 'syncify:utils';
 import { warnings } from 'syncify:log/throws';
-import { ARR, COL, DSH, TLD } from 'syncify:symbol';
-import { gray, bold, white, neonCyan, pink, yellowBright, lightGray, cyan } from 'syncify:colors';
+import { ARR, COL, DSH, TLD } from '@syncify/ansi';
+import { gray, bold, white, neonCyan, pink, yellowBright, lightGray, cyan } from '@syncify/ansi';
 import { clear } from 'syncify:log';
-import { Create, CreateClosure, Break } from 'syncify:ansi';
+import { Create, CreateClosure, Break } from 'syncify:cli/tree';
 import { timer } from 'syncify:timer';
 
 interface Runtime {

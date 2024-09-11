@@ -10,12 +10,12 @@ import { hasPath } from 'rambdax';
 import { SHOPIFY_REQUEST_ERRORS } from 'syncify:const';
 import { assign, error } from 'syncify:native';
 import { getChunk, glue, detect, sanitize, object, has } from 'syncify:utils';
-import { red, strip, bold, blue, neonMagenta, whiteBright, gray, white } from 'syncify:colors';
-import { BAD, COL, TLD, Tree } from 'syncify:symbol';
+import { red, strip, bold, blue, neonMagenta, whiteBright, gray, white } from '@syncify/ansi';
+import { BAD, COL, TLD, Tree } from '@syncify/ansi';
 import { Context, Format } from 'syncify:interpolate';
 import { update } from 'syncify:log';
-import { Create } from 'syncify:ansi';
-import * as codeframe from 'syncify:codeframe';
+import { Create } from 'syncify:cli/tree';
+import * as codeframe from 'syncify:cli/codeframe';
 
 import { $ } from 'syncify:state';
 

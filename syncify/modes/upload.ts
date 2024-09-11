@@ -1,6 +1,6 @@
 import type { File, Resource, Theme } from 'types';
 import glob from 'fast-glob';
-import { relative } from 'pathe';
+import { relative } from 'node:path';
 import { readFile } from 'fs-extra';
 import { Syncify } from 'types';
 import { client, queue } from '../requests/client';
@@ -16,12 +16,12 @@ import { throwError } from 'syncify:log/throws';
 import { Progress } from 'syncify:cli/progress';
 import { Events } from 'syncify:requests/assets';
 import { timer } from 'syncify:timer';
-import { Prefix, Create, CreateClosure, Line, Break } from 'syncify:ansi';
-import { ARR } from 'syncify:symbol';
+import { Prefix, Create, CreateClosure, Line, Break } from 'syncify:cli/tree';
+import { ARR } from '@syncify/ansi';
 
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 
 import { $ } from 'syncify:state';
 

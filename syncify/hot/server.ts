@@ -5,15 +5,15 @@ import statics from 'serve-static';
 import handler from 'finalhandler';
 import glob from 'fast-glob';
 import { pathExists, readFile, writeFile, readFileSync, existsSync } from 'fs-extra';
-import { join, basename, relative } from 'pathe';
+import { join, basename, relative } from 'node:path';
 // import { Server } from 'ws';
 import { kill } from 'syncify:cli/exit';
-import { ARR, COL, Tree } from 'syncify:symbol';
-import { bold, gray, redBright, neonCyan, pink } from 'syncify:colors';
+import { ARR, COL, Tree } from '@syncify/ansi';
+import { bold, gray, redBright, neonCyan, pink } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 import { injectSnippet, injectRender } from './inject';
 import * as log from 'syncify:log';
-import * as tree from 'syncify:ansi';
+import * as tree from 'syncify:cli/tree';
 
 export const HOTError: {
   /**

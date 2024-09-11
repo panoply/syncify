@@ -1,13 +1,13 @@
 import type { Resource, Store } from 'types';
 import type { ArrayPromptOptions, Choice, BooleanPromptOptions, StringPromptOptions } from 'types/internal';
-import { TLD, Tree, ARR, COL } from 'syncify:symbol';
+import { TLD, Tree, ARR, COL } from '@syncify/ansi';
 import * as u from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { prompt } from 'enquirer';
 import { list } from 'syncify:requests/themes';
 import { isArray, ws } from 'syncify:utils';
 import { log, values } from 'syncify:native';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 
 export const theme = {
   prefix: c.lightGray('│ '),

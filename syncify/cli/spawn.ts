@@ -1,5 +1,5 @@
 import { SpawnCommand } from 'types';
-import { spawn } from 'cross-spawn';
+import { spawn } from 'node:child_process';
 import { $ } from 'syncify:state';
 import { delay } from 'rambdax';
 

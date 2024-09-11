@@ -1,25 +1,20 @@
-import { argv } from 'node:process';
-import { has } from 'rambdax';
-import { Commands, Syncify, Config } from 'types';
-import { exception, rejection, signal } from './cli/emitters';
-import { upload } from './modes/upload';
-import { build } from './modes/build';
-import { watch } from './modes/watch';
-import { themes } from './modes/themes';
-import { importing } from './modes/import';
-import { exporting } from './modes/export';
-import { publish } from './modes/publish';
-import { server } from './hot/server';
+import type { Syncify, Config } from 'types';
+import type { Commands } from 'types/internal';
+import process from 'node:process';
+import { upload } from 'syncify:modes/upload';
+import { build } from 'syncify:modes/build';
+import { watch } from 'syncify:modes/watch';
+import { themes } from 'syncify:modes/themes';
+import { importing } from 'syncify:modes/import';
+import { exporting } from 'syncify:modes/export';
+import { publish } from 'syncify:modes/publish';
 import { stdin } from 'syncify:log/stdin';
-import { $ } from 'syncify:state';
-// import { resource } from 'modes/resource';
-// import { readConfig } from 'config/config';
 import { help } from 'syncify:log/help';
-import * as log from 'syncify:log';
-import { define } from './options/define';
-import { isString } from 'syncify:utils';
+import { define } from 'syncify:options/define';
 import { setup } from 'syncify:modes/setup';
 import { strap } from 'syncify:modes/strap';
+import { $ } from 'syncify:state';
+// import { exception, rejection, signal } from './cli/emitters';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
@@ -38,7 +33,7 @@ export const env = {
     return process.env.SYNCIFY_ENV === 'dev';
   },
   get terse () {
-    return $.cli.terse;
+    return $.cmd.terse;
   },
   get prod () {
     return process.env.SYNCIFY_ENV === 'prod';
@@ -48,35 +43,19 @@ export const env = {
   }
 };
 
-/**
- * Run Syncify
- *
- * Determines how Syncify was initialized.
- * It will dispatch and construct the correct
- * configuration model accordingly.
- */
-export async function run (options: Commands, config?: Config, callback?: Syncify) {
-
-  /* -------------------------------------------- */
-  /* LAUNCH SYNCIFY                               */
-  /* -------------------------------------------- */
-
-  if (has('_', options)) options._ = options._.slice(1);
+export async function run (cmd: Commands, config?: Config, callback?: Syncify) {
 
   /* -------------------------------------------- */
   /* HELP                                         */
   /* -------------------------------------------- */
 
-  if (argv.slice(2).length === 0 ||
-    options.help === 'examples' || (
-    isString(options.help) &&
-    options.help.length === 0)) return help(options);
+  if (cmd.help) return help(cmd);
 
   /* -------------------------------------------- */
   /* DEFINE OPTIONS                               */
   /* -------------------------------------------- */
 
-  await define(options, config);
+  await define(cmd, config);
 
   /* -------------------------------------------- */
   /* THEMES                                       */

@@ -5,10 +5,10 @@ import type { Message } from 'esbuild';
 import { log, warn } from 'syncify:native';
 import { glue, glueString, isNumber, plural, sanitize, has, isUndefined } from 'syncify:utils';
 import { Sample } from 'syncify:interpolate';
-import * as c from 'syncify:colors';
-import { Create, LineYellow, Prefix, Suffix, Context } from 'syncify:ansi';
+import * as c from '@syncify/ansi';
+import { Create, LineYellow, Prefix, Suffix, Context } from 'syncify:cli/tree';
 import { $ } from 'syncify:state';
-import { Tree } from 'syncify:symbol';
+import { Tree } from '@syncify/ansi';
 import { LiteralUnion } from 'type-fest';
 
 /**

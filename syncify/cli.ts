@@ -1,195 +1,179 @@
 import { argv } from 'node:process';
-import mm from 'minimist';
+import { cmd } from 'syncify:cli/args';
 import { run } from '.';
 
-run(mm(argv.slice(1), {
-  alias: {
+run(
+  cmd(argv, {
 
-    /* DIRECTORIES -------------------------------- */
+    /* PATHS -------------------------------------- */
 
-    config: 'c',
-    input: 'i',
-    output: 'o',
+    config: {
+      type: 'string',
+      short: 'c'
+    },
+    input: {
+      type: 'string',
+      short: 'i'
+    },
+    output: {
+      type: 'string',
+      short: 'o'
+    },
+
+    /* TARGETS ------------------------------------ */
+
+    theme: {
+      type: 'string',
+      short: 't'
+    },
+    spawn: {
+      type: 'string',
+      short: 's'
+    },
+    delete: {
+      type: 'string',
+      short: 'd'
+    },
+    filter: {
+      type: 'string',
+      short: 'f'
+    },
+    help: {
+      type: 'boolean',
+      short: 'h',
+      default: false
+    },
+
+    /* VERSION CONTROL ---------------------------- */
+
+    publish: {
+      type: 'boolean',
+      default: false
+    },
+    release: {
+      type: 'string'
+    },
+    bump: {
+      type: 'string'
+    },
+
+    /* HELPERS ------------------------------------ */
+
+    // strap: {
+    //   type: 'string',
+    //   default: null
+
+    // },
+    setup: {
+      type: 'boolean',
+      default: false
+    },
+
+    /* ENVIRONMENTS ------------------------------- */
+
+    dev: {
+      type: 'boolean',
+      default: true
+    },
+    prod: {
+      type: 'boolean',
+      default: false
+    },
 
     /* MODES -------------------------------------- */
 
-    build: 'b',
-    watch: 'w',
-    upload: 'u',
-    publish: 'p',
-
-    /* RESOURCE ----------------------------------- */
-
-    theme: 't',
-    help: 'h',
-    spawn: 's',
-
-    /* OPERATIONS --------------------------------- */
-
-    resource: 'r',
-    filter: 'f',
-    delete: 'd'
-
-  },
-  default: {
-
-    cwd: process.cwd(),
-
-    /* DIRECTORIES -------------------------------- */
-
-    config: '.',
-    input: 'source',
-
-    /* ENV ---------------------------------------- */
-
-    cli: true,
-    dev: true,
-    prod: false,
-
-    /* MODES -------------------------------------- */
-
-    setup: false,
-    import: false,
-    export: false,
-    build: false,
-    watch: false,
-    upload: false,
-    terse: false,
-    hot: false,
-    interactive: false,
-    publish: false,
-    release: false,
+    import: {
+      type: 'boolean',
+      default: false
+    },
+    export: {
+      type: 'boolean',
+      default: false
+    },
+    build: {
+      type: 'boolean',
+      short: 'b',
+      default: false
+    },
+    watch: {
+      type: 'boolean',
+      short: 'w',
+      default: false
+    },
+    upload: {
+      type: 'boolean',
+      short: 'u',
+      default: false
+    },
+    terse: {
+      type: 'boolean',
+      default: false
+    },
+    hot: {
+      type: 'boolean',
+      default: false
+    },
+    interactive: {
+      type: 'boolean',
+      default: false
+    },
 
     /* TRANSFORMS --------------------------------- */
 
-    views: false,
-    script: false,
-    style: false,
-    svg: false,
-    image: false,
+    script: {
+      type: 'boolean',
+      default: false
+    },
+    style: {
+      type: 'boolean',
+      default: false
+    },
+    svg: {
+      type: 'boolean',
+      default: false
+    },
+    image: {
+      type: 'boolean',
+      default: false
+    },
 
     /* RESOURCES ---------------------------------- */
 
-    metafields: false,
-    pages: false,
-    redirects: false,
+    metafields: {
+      type: 'boolean',
+      default: false
+    },
+    pages: {
+      type: 'boolean',
+      default: false
+    },
+    redirects: {
+      type: 'boolean',
+      default: false
+    },
 
     /* OPERATIONS --------------------------------- */
 
-    doctor: false,
-    clean: false,
-    silent: false,
-    force: false,
-    cache: false,
+    doctor: {
+      type: 'boolean',
+      default: false
+    },
+    clean: {
+      type: 'boolean',
+      default: false
+    },
+    silent: {
+      type: 'boolean',
+      default: false
+    },
+    force: {
+      type: 'boolean',
+      default: false
+    },
+    cache: {
+      type: 'boolean',
+      default: false
+    }
 
-    /* STRAPS ------------------------------------ */
-    strap: null,
-
-    /* VERSIONING -------------------------------- */
-
-    bump: null,
-
-    /* HELP --------------------------------------- */
-
-    help: null
-
-  },
-  boolean: [
-
-    /* MODES -------------------------------------- */
-
-    'build',
-    'watch',
-    'upload',
-    'import',
-    'export',
-    'hot',
-    'terse',
-    'interactive',
-    'setup',
-
-    /* ENV ---------------------------------------- */
-
-    'dev',
-    'prod',
-
-    /* RESOURCE ----------------------------------- */
-
-    'metafields',
-    'pages',
-    'redirects',
-
-    /* OPERATIONS --------------------------------- */
-
-    'clean',
-    'silent',
-    'pull',
-    'force',
-    'test',
-    'cache',
-    'doctor',
-
-    /* GENERATORS --------------------------------- */
-
-    'strap',
-
-    /* TRANSFORMS --------------------------------- */
-
-    'views',
-    'script',
-    'style',
-    'svg',
-    'image'
-  ],
-  string: [
-
-    /* DIRECTORIES -------------------------------- */
-
-    'input'
-    , // --input ./path/dir | -i ./path/dir
-    'output'
-    , // --output ./path/dir | -o ./path/dir
-    'config'
-    , // --config ./path/dir | -c ./path/dir
-
-    /* MODES -------------------------------------- */
-
-    'theme'
-    , // --theme foo | -t foo | (comma lists: foo,bar,baz)
-    'spawn'
-    , // --spawn foo | (comma lists: foo,bar,baz)
-    'del'
-    , // --delete file.liquid | --del file.ext | (comma lists: foo,bar,baz)
-    'release'
-    , // --release patch | --release minor | --release major
-
-    /* OPERATIONS --------------------------------- */
-
-    'bump'
-    , // --bump major | --bump minor | --bump patch
-
-    'resource'
-    // --resource
-    // --resource theme | -r theme
-    // --resource metafields | -r metafields
-    ,
-
-    /* FILTERING ---------------------------------- */
-
-    'filter'
-    // --filter snippets | -f sections
-    // --filter templates/theme.liquid
-    // --filter /**/* | -f /**/*
-    ,
-
-    /* HELP --------------------------------------- */
-    'help'
-    // --help examples
-    // -h examples
-    ,
-    /* TODO --------------------------------------- */
-
-    'strap'
-    // --strap silk | --strap dawn | --strap dusk
-  ]
-})).catch(console.error);
+  })
+).catch(console.error);

@@ -1,10 +1,10 @@
-import type { Commands, Config } from 'types';
+import type { Config } from 'types';
+import type { Commands } from 'types/internal';
 import { FSWatcher } from 'chokidar';
 import { missingConfig } from 'syncify:log/throws';
 import { configFile, getEnvFile, getPackageJson } from './files';
-import { setImportDirs, setThemeDirs, setBaseDirs, setCacheDirs } from './dirs';
+import { setImportDirs, setThemeDirs, setCacheDirs } from './dirs';
 import { setJsonOptions } from './json';
-import { setModes } from './modes';
 import { setSnippetOptions } from './snippets';
 import { setSectionOptions } from './sections';
 import { setSync } from './sync';
@@ -17,8 +17,8 @@ import { setLiquidOptions } from './liquid';
 import { setSvgOptions } from './svg';
 import { setHotReloads } from './hot';
 import { setFilters } from './filters';
-import { isArray, has, isObject, isEmpty, hasProp, merge } from 'syncify:utils';
-import { toArray } from 'syncify:native';
+import { isArray, has, isObject, isEmpty, merge } from 'syncify:utils';
+import { defineProperties, toArray } from 'syncify:native';
 import { cacheDone, getCache } from '../process/cache';
 import { setPublishConfig } from './publish';
 import { timer } from 'syncify:timer';
@@ -31,10 +31,10 @@ import * as error from 'syncify:errors';
  *
  * Required config loading
  */
-export async function configs (cli: Commands) {
+export async function configs () {
 
-  await getPackageJson(cli);
-  await getConfig(cli);
+  await getPackageJson();
+  await getConfig();
 
 }
 
@@ -50,20 +50,16 @@ export async function define (cli: Commands, options?: Config) {
 
   log.runtime($);
 
-  await getEnvFile(cli);
-  await getPackageJson(cli);
-  await getConfig(cli);
-  await getCache(cli);
+  await getEnvFile();
+  await getPackageJson();
+  await getConfig();
+  await getCache();
 
-  setMisc(cli);
-  setModes(cli);
-
-  if ($.mode.setup || $.mode.strap) return;
+  if ($.mode.setup || $.mode.strap || $.mode.themes) return;
 
   process.env.SYNCIFY_ENV = $.env.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String($.mode.watch);
 
-  setBaseDirs(cli);
   setVersion(cli);
   setFilters(cli);
 
@@ -73,7 +69,7 @@ export async function define (cli: Commands, options?: Config) {
 
   if ($.mode.themes) return;
 
-  setChokidar(cli.watch || cli.upload);
+  setChokidar();
   setProcessors();
   setPublishConfig();
   setSpawns();
@@ -112,9 +108,7 @@ export async function define (cli: Commands, options?: Config) {
     ]
   ).catch(e => {
 
-    error.throws(e, {
-      details: 'Runtime error'
-    });
+    error.throws(e, { details: 'Runtime error' });
 
   });
 
@@ -127,38 +121,14 @@ export async function define (cli: Commands, options?: Config) {
 };
 
 /**
- * Set Misc
- *
- * Applies various assignments to the `$` modal
- */
-function setMisc (cli: Commands) {
-
-  $.restart = false;
-  $.cli = cli;
-  $.cwd = cli.cwd;
-  $.env.cli = cli.cli;
-  $.env.prod = cli.prod;
-  $.env.dev = cli.dev && !cli.prod;
-  $.terminal.wrap = Math.round($.terminal.cols - ($.terminal.cols / 3));
-
-  const prop = hasProp($.config.log);
-
-  if (prop('silent')) $.log.config.silent = $.config.log.silent;
-  if (prop('clear')) $.log.config.clear = $.config.log.clear;
-  if (prop('stats')) $.log.config.stats = $.config.log.stats;
-  if (prop('warnings')) $.log.config.warnings = $.config.log.warnings;
-
-}
-
-/**
  * Set Chokidar
  *
  * Creates an instance of chodkidar FSWatcher, we will assign watch paths
  * during the initialization process that executes in directly after this.
  */
-export function setChokidar (watch: boolean) {
+export function setChokidar () {
 
-  if (!watch) return;
+  if (!($.cmd.watch || $.cmd.upload)) return;
 
   // @ts-ignore
   $.watch = new FSWatcher({
@@ -171,10 +141,12 @@ export function setChokidar (watch: boolean) {
     ignorePermissionErrors: true
   });
 
-  $.watch = Object.defineProperties($.watch, {
+  $.watch = defineProperties($.watch, {
     has: {
       value (path: string, dir = $.cwd) {
-        return $.watch._watched.has(dir) ? $.watch._watched.get(dir).items.has(path) : false;
+        return $.watch._watched.has(dir)
+          ? $.watch._watched.get(dir).items.has(path)
+          : false;
       }
     },
     paths: {
@@ -289,9 +261,9 @@ function setPlugins () {
  * Resolves the `syncify.config.js` file or configuration
  * property contained in the _package.json_ file.
  */
-async function getConfig (cli: Commands) {
+async function getConfig () {
 
-  const config = await configFile(cli.cwd);
+  const config = await configFile();
 
   if (config !== null) {
 
@@ -303,9 +275,9 @@ async function getConfig (cli: Commands) {
 
       $.config = $.pkg.syncify.config;
 
-    } else if (!has('stores', $.pkg.syncify) && cli.setup === false && cli.strap === null) {
+    } else if (!has('stores', $.pkg.syncify) && $.cmd.setup === false && !$.cmd.strap) {
 
-      missingConfig(cli.cwd);
+      missingConfig($.cwd);
 
     }
   }
