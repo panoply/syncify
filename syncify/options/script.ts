@@ -1,5 +1,5 @@
 import type { ScriptBundle, ScriptTransform } from 'types';
-import { join } from 'pathe';
+import { join } from 'node:path';
 import anymatch from 'anymatch';
 import { omit } from 'rambdax';
 import { Namespace, Type } from 'syncify:file';
@@ -18,6 +18,7 @@ import { $ } from 'syncify:state';
 export async function setScriptOptions () {
 
   if (!u.has('script', $.config.transform)) return;
+
   if (!$.config.transform.script || u.isEmpty($.config.transform.script)) return;
 
   const warn = warnOption('Script Transform');
@@ -41,12 +42,7 @@ export async function setScriptOptions () {
    * for convenience sake, this fuction will retrive only this
    * which are relative to esbuild
    */
-  const esbuildOptions = omit([
-    'input',
-    'watch',
-    'rename',
-    'snippet'
-  ]);
+  const esbuildOptions = omit([ 'input', 'watch', 'rename', 'snippet' ]);
 
   if (!u.has('absWorkingDir', $.processor.esbuild)) {
 

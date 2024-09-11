@@ -1,7 +1,7 @@
 ---
 title: 'HOT'
 layout: base
-permalink: '/configure/hot/index.html'
+permalink: '/options/hot/index.html'
 prev:
   label: 'Targeting'
   uri: '/cli/targeting'

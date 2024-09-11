@@ -1,5 +1,5 @@
 import type { SchemaBlocks, SchemaSectionTag, SchemaSettings, SharedSchema } from 'types/internal';
-import { basename, extname, relative } from 'pathe';
+import { basename, extname, relative } from 'node:path';
 import { readFile } from 'fs-extra';
 import { File } from 'syncify:file';
 import parseJSON, { JSONError } from 'parse-json';
@@ -7,10 +7,9 @@ import { typeError, invalidError, throwError, warnOption } from 'syncify:log/thr
 import { isObject, isString, isArray, isBoolean, checksum, has, hasProp, isEmpty } from 'syncify:utils';
 import * as error from 'syncify:errors';
 import * as log from 'syncify:log';
-import { bold } from 'syncify:colors';
+import { bold } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 import { defineProperty } from 'syncify:native';
-import { Sections } from 'types';
 
 /**
  * Section Options
@@ -19,24 +18,9 @@ import { Sections } from 'types';
  */
 export async function setSectionOptions () {
 
-  if (!isObject($.config.paths.snippets)) return;
+  const { sections } = $.config.paths;
 
-  const { sections } = $.config.paths as { sections: Sections };
-
-  if (has('input', sections)) return;
-  if (isEmpty(sections.input)) return;
-
-  // Ensure the section option is an object
-  if (!isObject(sections)) {
-
-    typeError({
-      option: 'views',
-      name: 'sections',
-      expects: '{}',
-      provided: typeof sections
-    });
-
-  }
+  return;
 
   // Iterate over all the properties in sections option
   for (const option in $.section) {

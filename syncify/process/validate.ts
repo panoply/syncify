@@ -1,13 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { join, parse, relative } from 'pathe';
-import * as c from 'syncify:colors';
+import { join, parse, relative } from 'node:path';
+import * as c from '@syncify/ansi';
 import { $ } from 'syncify:state';
 import { glob } from 'fast-glob';
-import prompts from 'prompts';
 import { throwError } from 'syncify:log/throws';
 import { Stats } from 'types';
 import * as log from 'syncify:log';
-import { DSH } from 'syncify:symbol';
+import { DSH } from '@syncify/ansi';
 
 export const enum Mismatch {
   /**

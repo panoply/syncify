@@ -1,7 +1,6 @@
 import { last } from 'rambdax';
-import { join, dirname, resolve } from 'pathe';
-import { COL } from 'syncify:symbol';
-import { yellowBright } from 'syncify:colors';
+import { join, dirname, resolve } from 'node:path';
+import { COL, yellowBright } from '@syncify/ansi';
 import { throwError } from 'syncify:log/throws';
 import { isArray } from 'syncify:utils';
 
@@ -186,7 +185,7 @@ export const basePath = (cwd: string) => (path: string) => {
     } else {
       throwError(
         `Directory path is invalid at${COL} ${yellowBright(`"${path}"`)}`,
-        [ 'Ensure that path you are resolving is correctly formed' ]
+        [ 'Ensure the path you are resolving is correctly formed' ]
       );
     }
 

@@ -44,8 +44,9 @@
   "prettier": "@syncify/prettier-config",
   "dependencies": {
     "fuse.js": "^7.0.0",
+    "match-sorter": "^6.3.4",
     "qvp": "^0.3.2",
-    "relapse": "^0.9.0"
+    "relapse": "^0.9.1"
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",
@@ -54,19 +55,15 @@
     "@sissel/stylelint-config": "^1.2.4",
     "@syncify/cli": "link:..",
     "autoprefixer": "^10.4.20",
-    "concurrently": "^8.2.2",
-    "cssnano": "^7.0.5",
-    "e11ty": "^0.0.4",
-    "gray-matter": "^4.0.3",
-    "markdown-it-anchor": "^9.0.1",
-    "markdown-it-attrs": "^4.2.0",
+    "concurrently": "^9.0.0",
+    "cssnano": "^7.0.6",
+    "e11ty": "^0.1.1",
     "markdown-it-container": "^4.0.0",
-    "marked": "^14.0.0",
-    "netlify-cli": "^17.34.3",
-    "papyrus": "^0.6.7",
-    "postcss": "^8.4.41",
+    "netlify-cli": "^17.35.0",
+    "papyrus": "^0.6.8",
+    "postcss": "^8.4.45",
     "postcss-cli": "^11.0.0",
-    "sass": "^1.77.8",
+    "sass": "^1.78.0",
     "tsup": "^8.2.4"
   }
 }

@@ -1,6 +1,6 @@
 import type PostCSS from 'postcss';
 import type SASS from 'sass';
-import { join, relative } from 'pathe';
+import { join, relative } from 'node:path';
 import { File, StyleTransform, Syncify, Processors } from 'types';
 import { readFile, writeFile } from 'fs-extra';
 import { isNil } from 'rambdax';

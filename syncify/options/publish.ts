@@ -1,6 +1,6 @@
 import * as u from 'syncify:utils';
 import { typeError, unknownError, invalidError, throwError } from 'syncify:log/throws';
-import { bold, gray, underline, whiteBright } from 'syncify:colors';
+import { bold, gray, underline, whiteBright } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 
 /**

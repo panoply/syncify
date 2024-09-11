@@ -1,7 +1,7 @@
 import type { BundleRequire, BundleResolve } from 'types/internal';
 import { pathToFileURL } from 'node:url';
 import { readFile, unlink, existsSync, readFileSync, writeFileSync } from 'fs-extra';
-import { isAbsolute, dirname, extname, join, parse, resolve } from 'pathe';
+import { isAbsolute, dirname, extname, join, parse, resolve } from 'node:path';
 import { build, BuildResult, Plugin } from 'esbuild';
 import { has } from 'rambdax';
 import { inferLoader, dynamicImport, uuid, isRegex, jsonc, isArray, glue } from 'syncify:utils';
@@ -265,7 +265,8 @@ export async function bundleRequire<T = any> (options: BundleRequire): BundleRes
 
     const { text } = result.outputFiles[0];
     const getOutputFile = options.getOutputFile || defaultGetOutputFile;
-    const outfile = join($.dirs.cache, getOutputFile(options.filepath, format));
+
+    const outfile = getOutputFile(options.filepath, format);
 
     writeFileSync(outfile, text, 'utf8');
 

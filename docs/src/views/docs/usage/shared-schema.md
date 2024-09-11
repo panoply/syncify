@@ -1,7 +1,7 @@
 ---
 title: 'Shared Schema'
 layout: base.liquid
-permalink: '/features/shared-schema/index.html'
+permalink: '/usage/shared-schema/index.html'
 anchors:
   - 'Shared Schema'
   - 'How it works?'

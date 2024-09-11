@@ -2,6 +2,7 @@
 
 import type {
   PKG,
+  SVGTransform,
   SVGTransformer,
   ScriptTransform,
   ScriptTransformer,
@@ -9,10 +10,9 @@ import type {
   StyleTransform,
   StyleTransformer
 } from 'types';
-
 import type { BundleRequire, Input, Transform } from 'types/internal';
 import type { AxiosRequestConfig } from 'axios';
-import { basename, extname } from 'pathe';
+import { basename, extname } from 'node:path';
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
 import { pathExists } from 'fs-extra';
@@ -22,7 +22,7 @@ import { bundleRequire } from 'syncify:requests/require';
 import { lastPath, normalPath, globPath } from 'syncify:paths';
 import { assign } from 'syncify:native';
 import { isArray, isObject, isString, isUndefined, isFunction, has, merge } from 'syncify:utils';
-import { cyan } from 'syncify:colors';
+import { cyan } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 
 /* -------------------------------------------- */
@@ -161,10 +161,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
     for (const item of filePath) {
 
       const uri = path(item);
-      const resolved = glob.sync(uri, {
-        cwd,
-        absolute: true
-      });
+      const resolved = glob.sync(uri, { cwd, absolute: true });
 
       if (match !== false) {
         const test = hook(uri);
@@ -183,10 +180,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
 
     }
 
-    return <T>(
-      match === false
-        ? paths
-        : { paths, match: anymatch(match) });
+    return <T>(match === false ? paths : { paths, match: anymatch(match) });
 
   }
 
@@ -208,9 +202,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
       }
     }
 
-    return <T>(match === false
-      ? paths
-      : { paths, match: anymatch(match) });
+    return <T>(match === false ? paths : { paths, match: anymatch(match) });
 
   }
 

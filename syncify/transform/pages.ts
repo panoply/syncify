@@ -3,7 +3,6 @@ import type { Syncify, Requests, Store, PageFrontmatter, PageMetafield, WatchBun
 import { isEmpty } from 'rambdax';
 import { readFile, writeFile } from 'fs-extra';
 import matter, { stringify } from 'gray-matter';
-import prompts from 'prompts';
 import markdown from 'markdown-it';
 import { Turndown, GithubFlavor } from '@syncify/turndown';
 import { File, Kind } from 'syncify:file';
@@ -12,11 +11,11 @@ import { lastPath } from 'syncify:utils/paths';
 import { isArray, isBoolean, isObject, isRegex, isUndefined, handleize, toUpcase, has, merge } from 'syncify:utils';
 import { timer } from 'syncify:timer';
 import { getPageCache, saveCache, setPageCache } from 'syncify:process/cache';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 import * as pages from 'syncify:requests/pages';
 import * as log from 'syncify:log';
 import { $ } from 'syncify:state';
-import { ARR, CHV, TLD } from 'syncify:symbol';
+import { ARR, CHV, TLD } from '@syncify/ansi';
 
 enum PromptActions {
   /**

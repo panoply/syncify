@@ -1,8 +1,8 @@
 ---
 title: 'HOT Reloading'
 layout: base.liquid
-permalink: '/features/hot-reloading/index.html'
-navs:
+permalink: '/usage/hot-reloading/index.html'
+anchors:
   - 'HOT Reloading'
   - 'Assets'
   - 'Sections'

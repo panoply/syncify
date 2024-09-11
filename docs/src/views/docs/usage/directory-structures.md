@@ -118,7 +118,6 @@ By default, Syncify assumes you are using the above theme architecture and it wi
 Using the default structure is certainly not the preferred approach when leveraging Syncify and you are encouraged to establish an input (theme) structure which suits your project and adheres to your workflow or tastes. Below is a basic example of how we can architect a **customized structure** using the `paths` option.
 
 :::: grid row dir-each
-
 ::: grid col fs-sm
 
 #### Structure
@@ -144,7 +143,6 @@ Using the default structure is certainly not the preferred approach when leverag
 ```
 
 :::
-
 ::: grid col-8
 
 #### Configuration
@@ -174,15 +172,11 @@ export default defineConfig({
 ```
 
 :::
-
 ::::
-
-#
 
 Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration (the tool defaults to this). The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify can digest.
 
 :::: grid row jc-center dir-each
-
 ::: grid col fs-sm
 
 #### Default Structure
@@ -260,136 +254,3 @@ The output structure which syncify generates.
 ::::
 
 There is no distributed difference between the **default** and **customized** structures illustrated above. Both would generate an **output** that Shopify understands, requires and reasons with. Only the **input** source locations differ. The **output** Syncify creates will always be written to a standard Shopify theme structure regardless of how you may decide to organize **input** paths. Custom structures give you creative freedom and does not impose a restrictive workflow you may have become behest to working with Dawn and the Shopify CLI.
-
----
-
-# Paths
-
-The `paths` option allows you to define your theme/projects structure within the defined `input` directory. Syncify does not require you set a development structure required by Shopify and you should begin to decouple from that logic as it is generally flawed and restrictive when building advanced or large scale stores.
-
-Each path key represents a theme directory or resource point. Path options accept either a `string` or `string[]` array list of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns and can point to files contained within sub-directories of infinite depth. All defined references will automatically resolve to the defined `input` directory starting point, so you do not need to include it within your path definitions.
-
-There is no restrictions or limitations imposed on structures other than **input** relativity. Syncify will obtain full resolution and build a valid theme structure that Shopify understands when generating an **output**.
-
-# Config File
-
-By default, Syncify assumes you are using a basic (defaults) structure. This structure is certainly not the preferred format and when leveraging Syncify you are encouraged to establish a structure which suits your project and adheres to your workflow or tastes.
-
-<!-- prettier-ignore -->
-```js
-import { defineConfig } from '@syncify/cli';
-
-export default defineConfig({
-  input: 'source',
-  output: 'theme',
-  paths: {
-    assets: 'assets/**',
-    config: 'config/*.json',
-    locales: 'locales/*.json',
-    layout: 'layout/.liquid',
-    metafields: 'metafields/**/*.json',
-    sections: 'sections/*.liquid',
-    snippets: 'snippets/*.liquid',
-    templates: 'templates/*.liquid',
-    customers: 'templates/customers/*',
-    pages: 'pages/*',
-    redirects: 'redirects.yaml',
-  }
-})
-```
-
-### Custom Structures
-
-Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration (the tool defaults to this). The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify can digest.
-
-<table>
-  <thead>
-    <tr>
-      <th width=330px>Default Structure</th>
-      <th width="330px">Customized Structure</th>
-      <th width="330px">Output Structure</th>
-    </tr>
-  </thead>
-  <tbody>
-<td>
-
-```treeview
-
-
-
-  source/
-  ├── assets/
-  ├── config/
-  ├── layout/
-  ├── locales/
-  ├── pages/
-  ├── files/
-  ├── metafields
-  ├── sections/
-  ├── snippets/
-  └── templates/
-      ├── metaobject/
-      └── customers/
-
-
-
-```
-
-</td>
-<td>
-
-```treeview
-  source/
-  ├── assets/
-  │   ├── files/
-  │   └── icons/
-  ├── data
-  │   ├── config/
-  │   ├── locales/
-  │   └── metafields/
-  ├── styles
-  ├── scripts
-  └── views
-      ├── customers
-      ├── metaobject
-      ├── sections
-      ├── snippets
-      ├── templates
-      └── theme.liquid
-```
-
-</td>
-<td>
-<pre>
-<code>
-      ㅤㅤ
-      ㅤ
-      ㅤ      ㅤ
-      ㅤ      ㅤ
-      ㅤ      ㅤ
-      ㅤ
-  output
-  └─┐
-    ├─ assets
-    ├─ config
-    ├─ locales
-    ├─ layout
-    ├─ sections
-    ├─ snippets
-    └─ template
-       ├─ metaobject
-       └─ customers ㅤ
-       ㅤ
-       ㅤ
-       ㅤ
-       ㅤ
-</code>
-      </pre>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-There is no distributed difference between the **default** and **customized** structures illustrated above. Both would generate an **output** that Shopify understands, requires and reasons with. Only the **input** source locations differ. The **output** Syncify creates will always be written to a standard Shopify theme structure regardless of how you may decide to organize **input** paths. Custom structures give you creative freedom and does not impose a restrictive workflow you may have become behest to working with Dawn and the Shopify CLI.
-
-Welcome to the better approach, you're welcome.

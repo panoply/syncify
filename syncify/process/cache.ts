@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 
-import type { Cache, Commands, Resource } from 'types';
+import type { Cache, Resource } from 'types';
 import { hasPath, isEmpty } from 'rambdax';
-import { join } from 'pathe';
+import { join } from 'node:path';
 import { existsSync, mkdirSync, readFileSync } from 'fs-extra';
 import Queue from 'p-queue';
 import zlib from 'node:zlib';
@@ -63,7 +63,7 @@ function save (uri: string, data: any) {
  * Called during the runtime define and is responsible
  * for setting up the cache references.
  */
-export async function getCache (cli: Commands) {
+export async function getCache () {
 
   $.cache.uri = create(null);
 
@@ -89,7 +89,7 @@ export async function getCache (cli: Commands) {
 
   if (!has('hotSnippet', $.cache.build)) $.cache.build.hotSnippet = [];
 
-  if (cli.cache) return clearCache();
+  if ($.cmd.cache) return clearCache();
 
 }
 

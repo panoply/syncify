@@ -26,16 +26,15 @@
     "lib": [
       "ESNext",
       "es2020",
-      "DOM"
     ],
-    "module": "CommonJS",
+    "module": "ES6",
     "declaration": false,
     "preserveSymlinks": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "ignoreDeprecations": "5.0",
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "noImplicitThis": false,
     "skipDefaultLibCheck": true,
     "noEmit": true,
@@ -81,16 +80,16 @@
       /* ANSI
       /* -------------------------------------------- */
       "syncify:ansi": [
-        "syncify/ansi/ansi.ts"
+        "syncify/cli/tree.ts"
       ],
       "syncify:colors": [
-        "./syncify/ansi/colors.ts"
+        "syncify/cli/colors.ts"
       ],
       "syncify:codeframe": [
-        "syncify/ansi/codeframe.ts"
+        "syncify/cli/codeframe.ts"
       ],
       "syncify:symbol": [
-        "syncify/ansi/symbol.ts"
+        "syncify/cli/symbol.ts"
       ],
       /*
       /* TRANSFORMS

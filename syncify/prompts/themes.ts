@@ -5,8 +5,8 @@ import { theme as themeing } from 'syncify:cli/prompts';
 import { isArray, merge, ws } from 'syncify:utils';
 import { prompt } from 'enquirer';
 import { values } from 'syncify:native';
-import { ARR, TLD, Tree } from 'syncify:symbol';
-import * as c from 'syncify:colors';
+import { ARR, TLD, Tree } from '@syncify/ansi';
+import * as c from '@syncify/ansi';
 
 export async function Connect (store: Store) {
 

@@ -1,11 +1,11 @@
 import type { Syncify, ClientParam, ScriptBundle } from 'types';
 import { writeFile } from 'fs-extra';
 import esbuild, { Metafile } from 'esbuild';
-import { join, relative } from 'pathe';
+import { join, relative } from 'node:path';
 import { isType } from 'rambdax';
 import { File } from 'syncify:file';
 import { timer } from 'syncify:timer';
-import { bold } from 'syncify:colors';
+import { bold } from '@syncify/ansi';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import * as warn from 'syncify:log/warnings';

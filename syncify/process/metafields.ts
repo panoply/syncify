@@ -1,6 +1,6 @@
 import type { PageMetafield, File } from 'types';
 import { has } from 'rambdax';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 import * as log from 'syncify:log';
 
 /**

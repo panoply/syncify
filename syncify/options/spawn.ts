@@ -1,5 +1,5 @@
 import treeKill from 'tree-kill';
-import { gray } from 'syncify:colors';
+import { gray } from '@syncify/ansi';
 import * as log from 'syncify:log';
 import * as u from 'syncify:utils';
 import { typeError } from 'syncify:log/throws';

@@ -1,5 +1,5 @@
 import type { Syncify, Config, ESBuildConfig, ScriptBundle, ScriptTransform, WatchBundle, PluginHooks, File, ClientParam } from 'types';
-import { join, relative } from 'pathe';
+import { join, relative } from 'node:path';
 import anymatch from 'anymatch';
 import merge from 'mergerino';
 import { has, isEmpty, isNil, omit, isType } from 'rambdax';
@@ -9,7 +9,7 @@ import { warnOption, missingDependency, invalidError, typeError, throwError } fr
 import { writeFile } from 'fs-extra';
 import ESBuild, { Metafile } from 'esbuild';
 import { timer } from 'syncify:timer';
-import { bold } from 'syncify:ansi';
+import { bold } from 'syncify:cli/tree';
 import { log, error, warn } from 'syncify:log';
 import { $ } from 'syncify:state';
 

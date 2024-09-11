@@ -2,7 +2,7 @@ import type { SVGBundle, Syncify, SVGSpriteConfig, SVGOConfig, ClientParam } fro
 import type { SVGSpriter } from 'svg-sprite';
 import Svgo from 'svgo';
 import SVGSprite from 'svg-sprite';
-import { join, relative } from 'pathe';
+import { join, relative } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { toArray, assign } from 'syncify:utils/native';
 import { Kind, File, Namespace } from 'syncify:file';
@@ -10,7 +10,7 @@ import { renameFile } from 'syncify:process/files';
 import { sizeDiff, byteSize } from 'syncify:sizes';
 import { plural } from 'syncify:utils/utils';
 import { timer } from 'syncify:timer';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';

@@ -1,8 +1,8 @@
 import type { SVGBundle, SVGSprite, SVGFile, SVGTransform } from 'types';
 import type { Merge } from 'type-fest';
 import type { Tester } from 'anymatch';
-import { extname, relative } from 'pathe';
-import { cyan } from 'syncify:colors';
+import { extname, relative } from 'node:path';
+import { cyan } from '@syncify/ansi';
 import { getTransform } from 'syncify:utils/options';
 import { $ } from 'syncify:state';
 import * as u from 'syncify:utils';

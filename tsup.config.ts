@@ -30,8 +30,9 @@ importSchema();
 const json = JSON.stringify;
 
 const noExternal = [
+  // Syncify Specific
+  '@syncify/ansi',
 
-  'ansis',
   'anymatch',
   'clean-stack',
   'log-update',
@@ -49,6 +50,7 @@ const noExternal = [
 ];
 
 const external = [
+
   // Syncify Specific
   '@syncify/turndown',
 
@@ -58,7 +60,6 @@ const external = [
   'cbor',
   'chokidar',
   'clean-css',
-  'cross-spawn',
   'dotenv',
   'enquirer',
   'esbuild',
@@ -70,9 +71,8 @@ const external = [
   'markdown-it',
   'ngrok',
   'node-notifier',
-  'pathe',
+  'node:path',
   'postcss',
-  'prompts',
   'scrollable-cli',
   'svg-sprite',
   'svgo',

@@ -1,6 +1,6 @@
 import type { Commands } from 'types';
 import { hasProp, object } from 'syncify:utils';
-import { join } from 'pathe';
+import { join } from 'node:path';
 import { $ } from 'syncify:state';
 
 function parseVersionNumber (version: string) {

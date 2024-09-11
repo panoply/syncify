@@ -13,10 +13,10 @@
     }
   },
   "devDependencies": {
-    "@syncify/cli": "workspace:0.3.0-beta",
-    "sass": "^1.69.5"
+    "@syncify/cli": "workspace:0.0.1-rc.1",
+    "sass": "^1.78.0"
   },
   "dependencies": {
-    "bootstrap": "^5.3.2"
+    "bootstrap": "^5.3.3"
   }
 }

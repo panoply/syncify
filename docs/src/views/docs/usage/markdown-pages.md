@@ -1,7 +1,7 @@
 ---
 title: 'Pages'
 layout: base
-permalink: '/features/markdown-pages/index.html'
+permalink: '/usage/markdown-pages/index.html'
 anchors:
   - 'Markdown Pages'
   - 'Supported Files'

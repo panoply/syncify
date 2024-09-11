@@ -1,7 +1,7 @@
 import zlib from 'node:zlib';
 import { toBuffer } from 'syncify:native';
 import { isNumber, isString } from 'syncify:utils';
-import { bold } from 'syncify:colors';
+import { bold } from '@syncify/ansi';
 
 /**
  * Transform Units

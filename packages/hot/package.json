@@ -24,6 +24,6 @@
   "devDependencies": {
     "@syncify/eslint-config": "workspace:^",
     "@syncify/tsconfig": "workspace:^",
-    "esbuild": "^0.23.0"
+    "esbuild": "^0.23.1"
   }
 }

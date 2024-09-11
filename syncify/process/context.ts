@@ -1,5 +1,5 @@
 import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
-import { join, dirname, basename } from 'pathe';
+import { join, dirname, basename } from 'node:path';
 import { defineProperty } from 'syncify:native';
 import { isRegex, isUndefined } from 'syncify:utils';
 import { $ } from 'syncify:state';

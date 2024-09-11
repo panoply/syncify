@@ -21,9 +21,9 @@ import { queue } from 'syncify:requests/queue';
 import { File, Type } from 'syncify:file';
 import { $ } from 'syncify:state';
 import { hasProp, plural, has, isArray, isObject, glue, checksum } from 'syncify:utils';
-import { bold } from 'syncify:colors';
+import { bold } from '@syncify/ansi';
 import { minifySchema } from '../terser/liquid';
-import { ARR } from 'syncify:symbol';
+import { ARR } from '@syncify/ansi';
 
 export function HasSchemaTag (content: string) {
 

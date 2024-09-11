@@ -2,13 +2,12 @@ import { Config, Store, Requests } from 'types';
 import { allFalse, has } from 'rambdax';
 import axios, { AxiosError } from 'axios';
 import { stat, writeJson, mkdir, pathExists } from 'fs-extra';
-import { join } from 'pathe';
-import prompts from 'prompts';
+import { join } from 'node:path';
 import { assign } from 'syncify:utils/native';
 import { queue, requeue } from 'syncify:requests/queue';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
-import * as c from 'syncify:colors';
+import * as c from '@syncify/ansi';
 import { $, Bundle } from 'syncify:state';
 
 /**

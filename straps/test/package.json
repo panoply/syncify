@@ -17,11 +17,11 @@
     }
   },
   "devDependencies": {
-    "@syncify/cli": "^0.3.0-beta",
+    "@syncify/cli": "^0.0.1-rc.1",
     "autoprefixer": "^10.4.20",
-    "cssnano": "^7.0.5",
+    "cssnano": "^7.0.6",
     "esbuild": "^0.23.1",
-    "postcss": "^8.4.41",
+    "postcss": "^8.4.45",
     "svg-sprite": "^2.0.4"
   }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import type { PathBundle } from 'types';
-import { join, parse, relative, basename } from 'pathe';
+import { join, parse, relative, basename } from 'node:path';
 import { schema, script, section, snippet, style, svg } from 'syncify:process/context';
 import { lastPath } from 'syncify:utils/paths';
 import { uuid } from 'syncify:utils';
@@ -92,9 +92,7 @@ export function renameFile ({ name, dir, ext, namespace }: File, rename: string)
 
   // validate the rename extension
   if (!rename.endsWith('.[ext]') || !rename.endsWith(ext)) {
-    return /\.[a-z]+$/.test(rename)
-      ? newName
-      : newName + ext;
+    return /\.[a-z]+$/.test(rename) ? newName : newName + ext;
   }
 
   return newName;

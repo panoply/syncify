@@ -1,12 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const { eleventy, terser, sprite, markdown, util } = require('e11ty');
+const { defineConfig, terser, sprite, markdown, search } = require('e11ty');
 const papyrus = require('papyrus');
 const container = require('markdown-it-container');
-const attrs = require('markdown-it-attrs');
-const anchor = require('markdown-it-anchor');
-const { readFile, writeFile } = require('node:fs/promises');
-const { marked } = require('marked');
-const matter = require('gray-matter');
 
 /**
  * @param {string[]} tokens
@@ -76,100 +71,37 @@ function tabs (tokens, index) {
 }
 
 /**
- * @param {EleventyConfig} config
- */
-function search (config) {
-
-  const page = [];
-
-  config.on('eleventy.after', async () => {
-    if (page.length > 0) {
-      const content = JSON.stringify(page, null, 2);
-      await writeFile('./public/syncify.json', content);
-    }
-  });
-
-  return async function (content) {
-
-    let data;
-    let heading;
-    let anchor;
-
-    const records = new Map();
-    const read = await readFile(this.page.inputPath);
-    const parse = marked.lexer(read.toString());
-    const frontmatter = parse[0].type === 'hr'
-      ? parse.splice(0, 2).map(({ raw }) => raw).join('\n')
-      : null;
-
-    if (frontmatter !== null) {
-
-      data = matter(frontmatter).data;
-
-    }
-
-    parse.forEach(token => {
-
-      if (token.text && token.text.length > 0) {
-        if (token.type === 'heading') {
-
-          if (token.text.toLowerCase().includes('acknowledgements')) return;
-
-          heading = token.text.replace(/[`_*]/g, '');
-          anchor = util.slug(heading);
-
-          if (!records.has(heading)) records.set(heading, { anchor, content: '' });
-
-        } else if (token.type === 'paragraph') {
-
-          if (!/^({{|{%|<[a-z]|:::)/.test(token.text) && heading) {
-            records.get(heading).content = token.text
-              .replace(/[`_*]/g, '')
-              .replace(/\[([a-z].*?)\]\(.*?\)/g, '$1');
-          }
-
-        }
-      }
-
-    });
-
-    for (const [ heading, { anchor, content } ] of records) {
-      page.push({
-        title: data.title,
-        heading,
-        content,
-        url: heading ? `${this.page.url.slice(0, -1)}#${anchor}` : this.page.url
-      });
-    }
-
-  };
-
-}
-
-/**
  * Eleventy Build
  *
  * Generates SPX Documentation
  */
-module.exports = eleventy(function (config) {
+module.exports = defineConfig(function (config) {
 
   const md = markdown(config, {
     highlight: {
-      block: ({ raw, language }) => {
-
-        return papyrus.highlight(raw, {
-          language,
-          lineNumbers: (
-            language === 'json' ||
-            language === 'ts' ||
-            language === 'typescript' ||
-            language === 'javascript' ||
-            language === 'js' ||
-            language === 'liquid'
-          )
-        })
-      },
-      inline: ({ raw, language }) => papyrus.inline(raw, { language })
+      block: ({
+        raw,
+        language
+      }) =>  papyrus.highlight(raw, {
+        language,
+        lineNumbers: (
+          language === 'json' ||
+          language === 'ts' ||
+          language === 'typescript' ||
+          language === 'javascript' ||
+          language === 'js' ||
+          language === 'liquid'
+        )
+      }),
+      inline: ({
+        raw,
+        language
+      }) => papyrus.inline(raw, { language })
+    },
+    anchors: {
+      attrs: [
+        [ 'spx-node', 'scrollspy.anchor' ]
+      ]
     },
     options: {
       html: true,
@@ -179,25 +111,15 @@ module.exports = eleventy(function (config) {
     }
   });
 
-  md.use(anchor, {
-    slugify: util.slug,
-    callback: token => token.attrs.push([ 'spx-node', 'scrollspy.anchor' ])
-  });
 
   md.use(container, 'tabs', { render: tabs });
-  md.use(attrs);
-  md.disable('code');
 
-  config.addLiquidShortcode('schema', () => '{% schema %}')
-  config.addLiquidShortcode('endschema',  () => '{% endschema %}')
-  config.addFilter('markdown', (value) => md.renderInline(value))
-  config.addFilter('anchor', (value) => `#${util.slug(value)}`);
-  config.addLiquidShortcode('search', search(config));
-  config.addPlugin(sprite, { inputPath: './src/assets/svg', spriteShortCode: 'sprite' });
+  config.addLiquidShortcode('schema', () => '{% schema %}');
+  config.addLiquidShortcode('endschema',  () => '{% endschema %}');
+  config.addPlugin(search, { minify: true })
+  config.addPlugin(sprite, { inputPath: './src/assets/svg' });
   config.addPlugin(terser);
-  config.addPassthroughCopy({
-    'src/assets/fonts/': 'assets/fonts'
-  });
+  config.addPassthroughCopy({ 'src/assets/fonts/': 'assets/fonts' });
 
   return {
     htmlTemplateEngine: 'liquid',
@@ -213,7 +135,7 @@ module.exports = eleventy(function (config) {
     dir: {
       input: 'src/views',
       output: 'public',
-      includes: '',
+      includes: 'include',
       layouts: 'layout',
       data: 'data'
     }

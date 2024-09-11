@@ -1,6 +1,6 @@
 import type { ClientParam, Syncify } from 'types';
 import { minify } from 'html-minifier-terser';
-import { relative } from 'pathe';
+import { relative } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { File, Type } from 'syncify:file';
 import { queue } from 'syncify:requests/client';

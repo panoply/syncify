@@ -4,8 +4,8 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+var __esm = (fn2, res) => function __init() {
+  return fn2 && (res = (0, fn2[__getOwnPropNames(fn2)[0]])(fn2 = 0)), res;
 };
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -32,111 +32,12 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// node_modules/.pnpm/tsup@8.2.4_jiti@1.21.6_postcss@8.4.41_typescript@5.5.4_yaml@2.5.0/node_modules/tsup/assets/cjs_shims.js
+// node_modules/.pnpm/tsup@8.2.4_jiti@1.21.6_postcss@8.4.45_typescript@5.5.4_yaml@2.5.1/node_modules/tsup/assets/cjs_shims.js
 var getImportMetaUrl, importMetaUrl;
 var init_cjs_shims = __esm({
-  "node_modules/.pnpm/tsup@8.2.4_jiti@1.21.6_postcss@8.4.41_typescript@5.5.4_yaml@2.5.0/node_modules/tsup/assets/cjs_shims.js"() {
+  "node_modules/.pnpm/tsup@8.2.4_jiti@1.21.6_postcss@8.4.45_typescript@5.5.4_yaml@2.5.1/node_modules/tsup/assets/cjs_shims.js"() {
     getImportMetaUrl = () => typeof document === "undefined" ? new URL(`file:${__filename}`).href : document.currentScript && document.currentScript.src || new URL("main.js", document.baseURI).href;
     importMetaUrl = /* @__PURE__ */ getImportMetaUrl();
-  }
-});
-
-// node_modules/.pnpm/ansis@3.3.2/node_modules/ansis/index.js
-var require_ansis = __commonJS({
-  "node_modules/.pnpm/ansis@3.3.2/node_modules/ansis/index.js"(exports2, module2) {
-    "use strict";
-    init_cjs_shims();
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var { round: e, floor: t, max: n } = Math;
-    var r = (e2) => {
-      let [, t2] = /([a-f\d]{3,6})/i.exec(e2) || [], n2 = t2 ? t2.length : 0;
-      if (3 === n2) t2 = t2[0] + t2[0] + t2[1] + t2[1] + t2[2] + t2[2];
-      else if (6 !== n2) return [0, 0, 0];
-      let r2 = parseInt(t2, 16);
-      return [r2 >> 16 & 255, r2 >> 8 & 255, 255 & r2];
-    };
-    var i = (t2, n2, r2) => t2 === n2 && n2 === r2 ? t2 < 8 ? 16 : t2 > 248 ? 231 : e((t2 - 8) / 247 * 24) + 232 : 16 + 36 * e(t2 / 51) + 6 * e(n2 / 51) + e(r2 / 51);
-    var o = (r2) => {
-      let i2, o2, l2, s2, c2, u2;
-      return r2 < 8 ? 30 + r2 : r2 < 16 ? r2 - 8 + 90 : (r2 >= 232 ? i2 = o2 = l2 = (10 * (r2 - 232) + 8) / 255 : (u2 = (r2 -= 16) % 36, i2 = t(r2 / 36) / 5, o2 = t(u2 / 6) / 5, l2 = u2 % 6 / 5), s2 = 2 * n(i2, o2, l2), 0 === s2 ? 30 : (c2 = 30 + (e(l2) << 2 | e(o2) << 1 | e(i2)), 2 === s2 ? c2 + 60 : c2));
-    };
-    var l = (e2, t2, n2) => o(i(e2, t2, n2));
-    var s = ((e2) => {
-      const t2 = (e3) => !!c2.find((t3) => e3.test(t3)), n2 = globalThis, r2 = n2.Deno, i2 = null != r2, o2 = n2.process || r2 || {}, l2 = o2.stdout, s2 = "win32" === (i2 ? r2.build.os : o2.platform), c2 = o2.argv || o2.args || [];
-      let u2 = o2.env || {}, a2 = -1;
-      if (i2) try {
-        u2 = u2.toObject();
-      } catch (e3) {
-        a2 = 0;
-      }
-      const p2 = "FORCE_COLOR", g2 = u2[p2], f2 = parseInt(g2), d2 = "false" === g2 ? 0 : isNaN(f2) ? 3 : f2, b2 = "NO_COLOR" in u2 || 0 === d2 || t2(/^-{1,2}(no-color|color=(false|never))$/), _2 = p2 in u2 && d2 || t2(/^-{1,2}color=?(true|always)?$/), O2 = (u2.NEXT_RUNTIME || "").indexOf("edge") > -1 || "PM2_HOME" in u2 && "pm_id" in u2 || (i2 ? r2.isatty(1) : l2 && "isTTY" in l2);
-      return b2 ? 0 : (a2 < 0 && (a2 = ((e3, t3, n3) => {
-        const { TERM: r3, COLORTERM: i3 } = e3;
-        return "TF_BUILD" in e3 ? 1 : "TEAMCITY_VERSION" in e3 ? 2 : "CI" in e3 ? ["GITHUB_ACTIONS", "GITEA_ACTIONS"].some((t4) => t4 in e3) ? 3 : 1 : !t3 || /-mono|dumb/i.test(r3) ? 0 : n3 || "truecolor" === i3 || "24bit" === i3 || "xterm-kitty" === r3 ? 3 : /-256(colou?r)?$/i.test(r3) ? 2 : /^screen|^tmux|^xterm|^vt[1-5][0-9]([0-9])?|^ansi|color|cygwin|linux|mintty|rxvt/i.test(r3) ? 1 : 3;
-      })(u2, O2, s2)), _2 && 0 === a2 ? 3 : a2);
-    })();
-    var c = s > 0;
-    var u = { open: "", close: "" };
-    var a = c ? (e2, t2) => ({ open: `\x1B[${e2}m`, close: `\x1B[${t2}m` }) : () => u;
-    var p = 39;
-    var g = 49;
-    var f = (e2) => (t2, n2, r2) => e2(i(t2, n2, r2));
-    var d = (e2) => (t2) => {
-      let [n2, i2, o2] = r(t2);
-      return e2(n2, i2, o2);
-    };
-    var b = (e2) => a(`38;5;${e2}`, p);
-    var _ = (e2) => a(`48;5;${e2}`, g);
-    var O = (e2, t2, n2) => a(`38;2;${e2};${t2};${n2}`, p);
-    var y = (e2, t2, n2) => a(`48;2;${e2};${t2};${n2}`, g);
-    1 === s ? (b = (e2) => a(o(e2), p), _ = (e2) => a(o(e2) + 10, g), O = (e2, t2, n2) => a(l(e2, t2, n2), p), y = (e2, t2, n2) => a(l(e2, t2, n2) + 10, g)) : 2 === s && (O = f(b), y = f(_));
-    var m;
-    var x;
-    var h = { ansi256: b, bgAnsi256: _, fg: b, bg: _, rgb: O, bgRgb: y, hex: d(O), bgHex: d(y), visible: u, reset: a(0, 0), inverse: a(7, 27), hidden: a(8, 28), bold: a(1, 22), dim: a(2, 22), italic: a(3, 23), underline: a(4, 24), strikethrough: a(9, 29), strike: a(9, 29), grey: a(90, p), gray: a(90, p), bgGrey: a(100, g), bgGray: a(100, g) };
-    var T = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"];
-    var $2 = "Bright";
-    var I = 30;
-    for (m of T) x = "bg" + m[0].toUpperCase() + m.slice(1), h[m] = a(I, p), h[m + $2] = a(I + 60, p), h[x] = a(I + 10, g), h[x + $2] = a(I + 70, g), I++;
-    var { defineProperty: R, defineProperties: v, setPrototypeOf: C } = Object;
-    var E = /[][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
-    var w = /(\r?\n)/g;
-    var M = {};
-    var N = ({ _p: e2 }, { open: t2, close: n2 }) => {
-      const r2 = (e3, ...t3) => {
-        if (!e3) return "";
-        let n3 = r2._p, { _a: i3, _b: o3 } = n3, l2 = null != e3.raw ? String.raw(e3, ...t3) : "" + e3;
-        if (l2.includes("\x1B")) for (; null != n3; ) {
-          let e4 = n3.close, t4 = e4.length;
-          if (t4) {
-            let r3, i4 = 0, o4 = "";
-            for (; ~(r3 = l2.indexOf(e4, i4)); ) o4 += l2.slice(i4, r3) + n3.open, i4 = r3 + t4;
-            i4 && (l2 = o4 + l2.slice(i4));
-          }
-          n3 = n3._p;
-        }
-        return l2.includes("\n") && (l2 = l2.replace(w, o3 + "$1" + i3)), i3 + l2 + o3;
-      };
-      let i2 = t2, o2 = n2;
-      return null != e2 && (i2 = e2._a + t2, o2 = n2 + e2._b), C(r2, P), r2._p = { open: t2, close: n2, _a: i2, _b: o2, _p: e2 }, r2.open = i2, r2.close = o2, r2;
-    };
-    var A = function() {
-      const e2 = (e3) => "" + e3;
-      return e2.isSupported = () => c, e2.strip = (e3) => e3.replace(E, ""), e2.extend = (t2) => {
-        for (let e3 in t2) {
-          let n2 = t2[e3], i2 = typeof n2, o2 = "string" === i2 ? O(...r(n2)) : n2;
-          M[e3] = "function" === i2 ? { get() {
-            return (...e4) => N(this, n2(...e4));
-          } } : { get() {
-            let t3 = N(this, o2);
-            return R(this, e3, { value: t3 }), t3;
-          } };
-        }
-        P = v({}, M), C(e2, P);
-      }, e2.extend(h), e2;
-    };
-    var P;
-    var S = new A();
-    module2.exports = S, module2.exports.Ansis = A;
   }
 });
 
@@ -153,16 +54,16 @@ var require_eventemitter3 = __commonJS({
       Events2.prototype = /* @__PURE__ */ Object.create(null);
       if (!new Events2().__proto__) prefix = false;
     }
-    function EE(fn, context, once) {
-      this.fn = fn;
+    function EE(fn2, context, once) {
+      this.fn = fn2;
       this.context = context;
       this.once = once || false;
     }
-    function addListener(emitter, event2, fn, context, once) {
-      if (typeof fn !== "function") {
+    function addListener(emitter, event2, fn2, context, once) {
+      if (typeof fn2 !== "function") {
         throw new TypeError("The listener must be a function");
       }
-      var listener = new EE(fn, context || emitter, once), evt = prefix ? prefix + event2 : event2;
+      var listener = new EE(fn2, context || emitter, once), evt = prefix ? prefix + event2 : event2;
       if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
       else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
       else emitter._events[evt] = [emitter._events[evt], listener];
@@ -253,27 +154,27 @@ var require_eventemitter3 = __commonJS({
       }
       return true;
     };
-    EventEmitter3.prototype.on = function on(event2, fn, context) {
-      return addListener(this, event2, fn, context, false);
+    EventEmitter3.prototype.on = function on2(event2, fn2, context) {
+      return addListener(this, event2, fn2, context, false);
     };
-    EventEmitter3.prototype.once = function once(event2, fn, context) {
-      return addListener(this, event2, fn, context, true);
+    EventEmitter3.prototype.once = function once(event2, fn2, context) {
+      return addListener(this, event2, fn2, context, true);
     };
-    EventEmitter3.prototype.removeListener = function removeListener(event2, fn, context, once) {
+    EventEmitter3.prototype.removeListener = function removeListener(event2, fn2, context, once) {
       var evt = prefix ? prefix + event2 : event2;
       if (!this._events[evt]) return this;
-      if (!fn) {
+      if (!fn2) {
         clearEvent(this, evt);
         return this;
       }
       var listeners = this._events[evt];
       if (listeners.fn) {
-        if (listeners.fn === fn && (!once || listeners.once) && (!context || listeners.context === context)) {
+        if (listeners.fn === fn2 && (!once || listeners.once) && (!context || listeners.context === context)) {
           clearEvent(this, evt);
         }
       } else {
         for (var i = 0, events = [], length = listeners.length; i < length; i++) {
-          if (listeners[i].fn !== fn || once && !listeners[i].once || context && listeners[i].context !== context) {
+          if (listeners[i].fn !== fn2 || once && !listeners[i].once || context && listeners[i].context !== context) {
             events.push(listeners[i]);
           }
         }
@@ -917,7 +818,7 @@ var require_parse = __commonJS({
       try {
         new RegExp(value);
       } catch (ex) {
-        return args.map((v) => utils.escapeRegex(v)).join("..");
+        return args.map((v2) => utils.escapeRegex(v2)).join("..");
       }
       return value;
     };
@@ -1315,8 +1216,8 @@ var require_parse = __commonJS({
             brace.value = brace.output = "\\{";
             value = output = "\\}";
             state.output = out;
-            for (const t of toks) {
-              state.output += t.output || t.value;
+            for (const t2 of toks) {
+              state.output += t2.output || t2.value;
             }
           }
           push({ type: "brace", value, output });
@@ -1630,7 +1531,7 @@ var require_parse = __commonJS({
         if (opts2.noglobstar === true) return star;
         return `(${capture}(?:(?!${START_ANCHOR}${opts2.dot ? DOTS_SLASH : DOT_LITERAL}).)*?)`;
       };
-      const create5 = (str) => {
+      const create4 = (str) => {
         switch (str) {
           case "*":
             return `${nodot}${ONE_CHAR}${star}`;
@@ -1651,14 +1552,14 @@ var require_parse = __commonJS({
           default: {
             const match2 = /^(.*?)\.(\w+)$/.exec(str);
             if (!match2) return;
-            const source2 = create5(match2[1]);
+            const source2 = create4(match2[1]);
             if (!source2) return;
             return source2 + DOT_LITERAL + match2[2];
           }
         }
       };
       const output = utils.removePrefix(input, state);
-      let source = create5(output);
+      let source = create4(output);
       if (source && opts.strictSlashes !== true) {
         source += `${SLASH_LITERAL}?`;
       }
@@ -2112,13 +2013,13 @@ var require_lib = __commonJS({
   }
 });
 
-// node_modules/.pnpm/picocolors@1.0.1/node_modules/picocolors/picocolors.js
+// node_modules/.pnpm/picocolors@1.1.0/node_modules/picocolors/picocolors.js
 var require_picocolors = __commonJS({
-  "node_modules/.pnpm/picocolors@1.0.1/node_modules/picocolors/picocolors.js"(exports2, module2) {
+  "node_modules/.pnpm/picocolors@1.1.0/node_modules/picocolors/picocolors.js"(exports2, module2) {
     init_cjs_shims();
-    var argv4 = process.argv || [];
-    var env2 = process.env;
-    var isColorSupported = !("NO_COLOR" in env2 || argv4.includes("--no-color")) && ("FORCE_COLOR" in env2 || argv4.includes("--color") || process.platform === "win32" || require != null && require("tty").isatty(1) && env2.TERM !== "dumb" || "CI" in env2);
+    var argv2 = process.argv || [];
+    var env = process.env;
+    var isColorSupported = !("NO_COLOR" in env || argv2.includes("--no-color")) && ("FORCE_COLOR" in env || argv2.includes("--color") || process.platform === "win32" || require != null && require("tty").isatty(1) && env.TERM !== "dumb" || "CI" in env);
     var formatter = (open, close, replace = open) => (input) => {
       let string = "" + input;
       let index = string.indexOf(close, open.length);
@@ -2162,7 +2063,23 @@ var require_picocolors = __commonJS({
         bgBlue: init("\x1B[44m", "\x1B[49m"),
         bgMagenta: init("\x1B[45m", "\x1B[49m"),
         bgCyan: init("\x1B[46m", "\x1B[49m"),
-        bgWhite: init("\x1B[47m", "\x1B[49m")
+        bgWhite: init("\x1B[47m", "\x1B[49m"),
+        blackBright: init("\x1B[90m", "\x1B[39m"),
+        redBright: init("\x1B[91m", "\x1B[39m"),
+        greenBright: init("\x1B[92m", "\x1B[39m"),
+        yellowBright: init("\x1B[93m", "\x1B[39m"),
+        blueBright: init("\x1B[94m", "\x1B[39m"),
+        magentaBright: init("\x1B[95m", "\x1B[39m"),
+        cyanBright: init("\x1B[96m", "\x1B[39m"),
+        whiteBright: init("\x1B[97m", "\x1B[39m"),
+        bgBlackBright: init("\x1B[100m", "\x1B[49m"),
+        bgRedBright: init("\x1B[101m", "\x1B[49m"),
+        bgGreenBright: init("\x1B[102m", "\x1B[49m"),
+        bgYellowBright: init("\x1B[103m", "\x1B[49m"),
+        bgBlueBright: init("\x1B[104m", "\x1B[49m"),
+        bgMagentaBright: init("\x1B[105m", "\x1B[49m"),
+        bgCyanBright: init("\x1B[106m", "\x1B[49m"),
+        bgWhiteBright: init("\x1B[107m", "\x1B[49m")
       };
     };
     module2.exports = createColors();
@@ -2394,23 +2311,23 @@ var require_conversions = __commonJS({
     var channels;
     var labels;
     var model;
-    convert.rgb.hsl = function(rgb2) {
-      var r = rgb2[0] / 255;
-      var g = rgb2[1] / 255;
-      var b = rgb2[2] / 255;
-      var min = Math.min(r, g, b);
-      var max = Math.max(r, g, b);
+    convert.rgb.hsl = function(rgb) {
+      var r = rgb[0] / 255;
+      var g = rgb[1] / 255;
+      var b2 = rgb[2] / 255;
+      var min = Math.min(r, g, b2);
+      var max = Math.max(r, g, b2);
       var delta = max - min;
       var h;
-      var s;
+      var s2;
       var l;
       if (max === min) {
         h = 0;
       } else if (r === max) {
-        h = (g - b) / delta;
+        h = (g - b2) / delta;
       } else if (g === max) {
-        h = 2 + (b - r) / delta;
-      } else if (b === max) {
+        h = 2 + (b2 - r) / delta;
+      } else if (b2 === max) {
         h = 4 + (r - g) / delta;
       }
       h = Math.min(h * 60, 360);
@@ -2419,40 +2336,40 @@ var require_conversions = __commonJS({
       }
       l = (min + max) / 2;
       if (max === min) {
-        s = 0;
+        s2 = 0;
       } else if (l <= 0.5) {
-        s = delta / (max + min);
+        s2 = delta / (max + min);
       } else {
-        s = delta / (2 - max - min);
+        s2 = delta / (2 - max - min);
       }
-      return [h, s * 100, l * 100];
+      return [h, s2 * 100, l * 100];
     };
-    convert.rgb.hsv = function(rgb2) {
+    convert.rgb.hsv = function(rgb) {
       var rdif;
       var gdif;
       var bdif;
       var h;
-      var s;
-      var r = rgb2[0] / 255;
-      var g = rgb2[1] / 255;
-      var b = rgb2[2] / 255;
-      var v = Math.max(r, g, b);
-      var diff = v - Math.min(r, g, b);
+      var s2;
+      var r = rgb[0] / 255;
+      var g = rgb[1] / 255;
+      var b2 = rgb[2] / 255;
+      var v2 = Math.max(r, g, b2);
+      var diff = v2 - Math.min(r, g, b2);
       var diffc = function(c) {
-        return (v - c) / 6 / diff + 1 / 2;
+        return (v2 - c) / 6 / diff + 1 / 2;
       };
       if (diff === 0) {
-        h = s = 0;
+        h = s2 = 0;
       } else {
-        s = diff / v;
+        s2 = diff / v2;
         rdif = diffc(r);
         gdif = diffc(g);
-        bdif = diffc(b);
-        if (r === v) {
+        bdif = diffc(b2);
+        if (r === v2) {
           h = bdif - gdif;
-        } else if (g === v) {
+        } else if (g === v2) {
           h = 1 / 3 + rdif - bdif;
-        } else if (b === v) {
+        } else if (b2 === v2) {
           h = 2 / 3 + gdif - rdif;
         }
         if (h < 0) {
@@ -2463,38 +2380,38 @@ var require_conversions = __commonJS({
       }
       return [
         h * 360,
-        s * 100,
-        v * 100
+        s2 * 100,
+        v2 * 100
       ];
     };
-    convert.rgb.hwb = function(rgb2) {
-      var r = rgb2[0];
-      var g = rgb2[1];
-      var b = rgb2[2];
-      var h = convert.rgb.hsl(rgb2)[0];
-      var w = 1 / 255 * Math.min(r, Math.min(g, b));
-      b = 1 - 1 / 255 * Math.max(r, Math.max(g, b));
-      return [h, w * 100, b * 100];
+    convert.rgb.hwb = function(rgb) {
+      var r = rgb[0];
+      var g = rgb[1];
+      var b2 = rgb[2];
+      var h = convert.rgb.hsl(rgb)[0];
+      var w = 1 / 255 * Math.min(r, Math.min(g, b2));
+      b2 = 1 - 1 / 255 * Math.max(r, Math.max(g, b2));
+      return [h, w * 100, b2 * 100];
     };
-    convert.rgb.cmyk = function(rgb2) {
-      var r = rgb2[0] / 255;
-      var g = rgb2[1] / 255;
-      var b = rgb2[2] / 255;
+    convert.rgb.cmyk = function(rgb) {
+      var r = rgb[0] / 255;
+      var g = rgb[1] / 255;
+      var b2 = rgb[2] / 255;
       var c;
       var m;
-      var y;
+      var y2;
       var k;
-      k = Math.min(1 - r, 1 - g, 1 - b);
+      k = Math.min(1 - r, 1 - g, 1 - b2);
       c = (1 - r - k) / (1 - k) || 0;
       m = (1 - g - k) / (1 - k) || 0;
-      y = (1 - b - k) / (1 - k) || 0;
-      return [c * 100, m * 100, y * 100, k * 100];
+      y2 = (1 - b2 - k) / (1 - k) || 0;
+      return [c * 100, m * 100, y2 * 100, k * 100];
     };
-    function comparativeDistance(x, y) {
-      return Math.pow(x[0] - y[0], 2) + Math.pow(x[1] - y[1], 2) + Math.pow(x[2] - y[2], 2);
+    function comparativeDistance(x, y2) {
+      return Math.pow(x[0] - y2[0], 2) + Math.pow(x[1] - y2[1], 2) + Math.pow(x[2] - y2[2], 2);
     }
-    convert.rgb.keyword = function(rgb2) {
-      var reversed = reverseKeywords[rgb2];
+    convert.rgb.keyword = function(rgb) {
+      var reversed = reverseKeywords[rgb];
       if (reversed) {
         return reversed;
       }
@@ -2503,7 +2420,7 @@ var require_conversions = __commonJS({
       for (var keyword in cssKeywords) {
         if (cssKeywords.hasOwnProperty(keyword)) {
           var value = cssKeywords[keyword];
-          var distance = comparativeDistance(rgb2, value);
+          var distance = comparativeDistance(rgb, value);
           if (distance < currentClosestDistance) {
             currentClosestDistance = distance;
             currentClosestKeyword = keyword;
@@ -2515,57 +2432,57 @@ var require_conversions = __commonJS({
     convert.keyword.rgb = function(keyword) {
       return cssKeywords[keyword];
     };
-    convert.rgb.xyz = function(rgb2) {
-      var r = rgb2[0] / 255;
-      var g = rgb2[1] / 255;
-      var b = rgb2[2] / 255;
+    convert.rgb.xyz = function(rgb) {
+      var r = rgb[0] / 255;
+      var g = rgb[1] / 255;
+      var b2 = rgb[2] / 255;
       r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
       g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
-      b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
-      var x = r * 0.4124 + g * 0.3576 + b * 0.1805;
-      var y = r * 0.2126 + g * 0.7152 + b * 0.0722;
-      var z = r * 0.0193 + g * 0.1192 + b * 0.9505;
-      return [x * 100, y * 100, z * 100];
+      b2 = b2 > 0.04045 ? Math.pow((b2 + 0.055) / 1.055, 2.4) : b2 / 12.92;
+      var x = r * 0.4124 + g * 0.3576 + b2 * 0.1805;
+      var y2 = r * 0.2126 + g * 0.7152 + b2 * 0.0722;
+      var z2 = r * 0.0193 + g * 0.1192 + b2 * 0.9505;
+      return [x * 100, y2 * 100, z2 * 100];
     };
-    convert.rgb.lab = function(rgb2) {
-      var xyz = convert.rgb.xyz(rgb2);
+    convert.rgb.lab = function(rgb) {
+      var xyz = convert.rgb.xyz(rgb);
       var x = xyz[0];
-      var y = xyz[1];
-      var z = xyz[2];
+      var y2 = xyz[1];
+      var z2 = xyz[2];
       var l;
       var a;
-      var b;
+      var b2;
       x /= 95.047;
-      y /= 100;
-      z /= 108.883;
+      y2 /= 100;
+      z2 /= 108.883;
       x = x > 8856e-6 ? Math.pow(x, 1 / 3) : 7.787 * x + 16 / 116;
-      y = y > 8856e-6 ? Math.pow(y, 1 / 3) : 7.787 * y + 16 / 116;
-      z = z > 8856e-6 ? Math.pow(z, 1 / 3) : 7.787 * z + 16 / 116;
-      l = 116 * y - 16;
-      a = 500 * (x - y);
-      b = 200 * (y - z);
-      return [l, a, b];
+      y2 = y2 > 8856e-6 ? Math.pow(y2, 1 / 3) : 7.787 * y2 + 16 / 116;
+      z2 = z2 > 8856e-6 ? Math.pow(z2, 1 / 3) : 7.787 * z2 + 16 / 116;
+      l = 116 * y2 - 16;
+      a = 500 * (x - y2);
+      b2 = 200 * (y2 - z2);
+      return [l, a, b2];
     };
     convert.hsl.rgb = function(hsl) {
       var h = hsl[0] / 360;
-      var s = hsl[1] / 100;
+      var s2 = hsl[1] / 100;
       var l = hsl[2] / 100;
       var t1;
       var t2;
       var t3;
-      var rgb2;
+      var rgb;
       var val;
-      if (s === 0) {
+      if (s2 === 0) {
         val = l * 255;
         return [val, val, val];
       }
       if (l < 0.5) {
-        t2 = l * (1 + s);
+        t2 = l * (1 + s2);
       } else {
-        t2 = l + s - l * s;
+        t2 = l + s2 - l * s2;
       }
       t1 = 2 * l - t2;
-      rgb2 = [0, 0, 0];
+      rgb = [0, 0, 0];
       for (var i = 0; i < 3; i++) {
         t3 = h + 1 / 3 * -(i - 1);
         if (t3 < 0) {
@@ -2583,61 +2500,61 @@ var require_conversions = __commonJS({
         } else {
           val = t1;
         }
-        rgb2[i] = val * 255;
+        rgb[i] = val * 255;
       }
-      return rgb2;
+      return rgb;
     };
     convert.hsl.hsv = function(hsl) {
       var h = hsl[0];
-      var s = hsl[1] / 100;
+      var s2 = hsl[1] / 100;
       var l = hsl[2] / 100;
-      var smin = s;
+      var smin = s2;
       var lmin = Math.max(l, 0.01);
       var sv;
-      var v;
+      var v2;
       l *= 2;
-      s *= l <= 1 ? l : 2 - l;
+      s2 *= l <= 1 ? l : 2 - l;
       smin *= lmin <= 1 ? lmin : 2 - lmin;
-      v = (l + s) / 2;
-      sv = l === 0 ? 2 * smin / (lmin + smin) : 2 * s / (l + s);
-      return [h, sv * 100, v * 100];
+      v2 = (l + s2) / 2;
+      sv = l === 0 ? 2 * smin / (lmin + smin) : 2 * s2 / (l + s2);
+      return [h, sv * 100, v2 * 100];
     };
     convert.hsv.rgb = function(hsv) {
       var h = hsv[0] / 60;
-      var s = hsv[1] / 100;
-      var v = hsv[2] / 100;
+      var s2 = hsv[1] / 100;
+      var v2 = hsv[2] / 100;
       var hi = Math.floor(h) % 6;
       var f = h - Math.floor(h);
-      var p = 255 * v * (1 - s);
-      var q = 255 * v * (1 - s * f);
-      var t = 255 * v * (1 - s * (1 - f));
-      v *= 255;
+      var p = 255 * v2 * (1 - s2);
+      var q2 = 255 * v2 * (1 - s2 * f);
+      var t2 = 255 * v2 * (1 - s2 * (1 - f));
+      v2 *= 255;
       switch (hi) {
         case 0:
-          return [v, t, p];
+          return [v2, t2, p];
         case 1:
-          return [q, v, p];
+          return [q2, v2, p];
         case 2:
-          return [p, v, t];
+          return [p, v2, t2];
         case 3:
-          return [p, q, v];
+          return [p, q2, v2];
         case 4:
-          return [t, p, v];
+          return [t2, p, v2];
         case 5:
-          return [v, p, q];
+          return [v2, p, q2];
       }
     };
     convert.hsv.hsl = function(hsv) {
       var h = hsv[0];
-      var s = hsv[1] / 100;
-      var v = hsv[2] / 100;
-      var vmin = Math.max(v, 0.01);
+      var s2 = hsv[1] / 100;
+      var v2 = hsv[2] / 100;
+      var vmin = Math.max(v2, 0.01);
       var lmin;
       var sl;
       var l;
-      l = (2 - s) * v;
-      lmin = (2 - s) * vmin;
-      sl = s * vmin;
+      l = (2 - s2) * v2;
+      lmin = (2 - s2) * vmin;
+      sl = s2 * vmin;
       sl /= lmin <= 1 ? lmin : 2 - lmin;
       sl = sl || 0;
       l /= 2;
@@ -2649,7 +2566,7 @@ var require_conversions = __commonJS({
       var bl = hwb[2] / 100;
       var ratio = wh + bl;
       var i;
-      var v;
+      var v2;
       var f;
       var n;
       if (ratio > 1) {
@@ -2657,134 +2574,134 @@ var require_conversions = __commonJS({
         bl /= ratio;
       }
       i = Math.floor(6 * h);
-      v = 1 - bl;
+      v2 = 1 - bl;
       f = 6 * h - i;
       if ((i & 1) !== 0) {
         f = 1 - f;
       }
-      n = wh + f * (v - wh);
+      n = wh + f * (v2 - wh);
       var r;
       var g;
-      var b;
+      var b2;
       switch (i) {
         default:
         case 6:
         case 0:
-          r = v;
+          r = v2;
           g = n;
-          b = wh;
+          b2 = wh;
           break;
         case 1:
           r = n;
-          g = v;
-          b = wh;
+          g = v2;
+          b2 = wh;
           break;
         case 2:
           r = wh;
-          g = v;
-          b = n;
+          g = v2;
+          b2 = n;
           break;
         case 3:
           r = wh;
           g = n;
-          b = v;
+          b2 = v2;
           break;
         case 4:
           r = n;
           g = wh;
-          b = v;
+          b2 = v2;
           break;
         case 5:
-          r = v;
+          r = v2;
           g = wh;
-          b = n;
+          b2 = n;
           break;
       }
-      return [r * 255, g * 255, b * 255];
+      return [r * 255, g * 255, b2 * 255];
     };
     convert.cmyk.rgb = function(cmyk) {
       var c = cmyk[0] / 100;
       var m = cmyk[1] / 100;
-      var y = cmyk[2] / 100;
+      var y2 = cmyk[2] / 100;
       var k = cmyk[3] / 100;
       var r;
       var g;
-      var b;
+      var b2;
       r = 1 - Math.min(1, c * (1 - k) + k);
       g = 1 - Math.min(1, m * (1 - k) + k);
-      b = 1 - Math.min(1, y * (1 - k) + k);
-      return [r * 255, g * 255, b * 255];
+      b2 = 1 - Math.min(1, y2 * (1 - k) + k);
+      return [r * 255, g * 255, b2 * 255];
     };
     convert.xyz.rgb = function(xyz) {
       var x = xyz[0] / 100;
-      var y = xyz[1] / 100;
-      var z = xyz[2] / 100;
+      var y2 = xyz[1] / 100;
+      var z2 = xyz[2] / 100;
       var r;
       var g;
-      var b;
-      r = x * 3.2406 + y * -1.5372 + z * -0.4986;
-      g = x * -0.9689 + y * 1.8758 + z * 0.0415;
-      b = x * 0.0557 + y * -0.204 + z * 1.057;
+      var b2;
+      r = x * 3.2406 + y2 * -1.5372 + z2 * -0.4986;
+      g = x * -0.9689 + y2 * 1.8758 + z2 * 0.0415;
+      b2 = x * 0.0557 + y2 * -0.204 + z2 * 1.057;
       r = r > 31308e-7 ? 1.055 * Math.pow(r, 1 / 2.4) - 0.055 : r * 12.92;
       g = g > 31308e-7 ? 1.055 * Math.pow(g, 1 / 2.4) - 0.055 : g * 12.92;
-      b = b > 31308e-7 ? 1.055 * Math.pow(b, 1 / 2.4) - 0.055 : b * 12.92;
+      b2 = b2 > 31308e-7 ? 1.055 * Math.pow(b2, 1 / 2.4) - 0.055 : b2 * 12.92;
       r = Math.min(Math.max(0, r), 1);
       g = Math.min(Math.max(0, g), 1);
-      b = Math.min(Math.max(0, b), 1);
-      return [r * 255, g * 255, b * 255];
+      b2 = Math.min(Math.max(0, b2), 1);
+      return [r * 255, g * 255, b2 * 255];
     };
     convert.xyz.lab = function(xyz) {
       var x = xyz[0];
-      var y = xyz[1];
-      var z = xyz[2];
+      var y2 = xyz[1];
+      var z2 = xyz[2];
       var l;
       var a;
-      var b;
+      var b2;
       x /= 95.047;
-      y /= 100;
-      z /= 108.883;
+      y2 /= 100;
+      z2 /= 108.883;
       x = x > 8856e-6 ? Math.pow(x, 1 / 3) : 7.787 * x + 16 / 116;
-      y = y > 8856e-6 ? Math.pow(y, 1 / 3) : 7.787 * y + 16 / 116;
-      z = z > 8856e-6 ? Math.pow(z, 1 / 3) : 7.787 * z + 16 / 116;
-      l = 116 * y - 16;
-      a = 500 * (x - y);
-      b = 200 * (y - z);
-      return [l, a, b];
+      y2 = y2 > 8856e-6 ? Math.pow(y2, 1 / 3) : 7.787 * y2 + 16 / 116;
+      z2 = z2 > 8856e-6 ? Math.pow(z2, 1 / 3) : 7.787 * z2 + 16 / 116;
+      l = 116 * y2 - 16;
+      a = 500 * (x - y2);
+      b2 = 200 * (y2 - z2);
+      return [l, a, b2];
     };
     convert.lab.xyz = function(lab) {
       var l = lab[0];
       var a = lab[1];
-      var b = lab[2];
+      var b2 = lab[2];
       var x;
-      var y;
-      var z;
-      y = (l + 16) / 116;
-      x = a / 500 + y;
-      z = y - b / 200;
-      var y2 = Math.pow(y, 3);
+      var y2;
+      var z2;
+      y2 = (l + 16) / 116;
+      x = a / 500 + y2;
+      z2 = y2 - b2 / 200;
+      var y22 = Math.pow(y2, 3);
       var x2 = Math.pow(x, 3);
-      var z2 = Math.pow(z, 3);
-      y = y2 > 8856e-6 ? y2 : (y - 16 / 116) / 7.787;
+      var z22 = Math.pow(z2, 3);
+      y2 = y22 > 8856e-6 ? y22 : (y2 - 16 / 116) / 7.787;
       x = x2 > 8856e-6 ? x2 : (x - 16 / 116) / 7.787;
-      z = z2 > 8856e-6 ? z2 : (z - 16 / 116) / 7.787;
+      z2 = z22 > 8856e-6 ? z22 : (z2 - 16 / 116) / 7.787;
       x *= 95.047;
-      y *= 100;
-      z *= 108.883;
-      return [x, y, z];
+      y2 *= 100;
+      z2 *= 108.883;
+      return [x, y2, z2];
     };
     convert.lab.lch = function(lab) {
       var l = lab[0];
       var a = lab[1];
-      var b = lab[2];
-      var hr;
+      var b2 = lab[2];
+      var hr2;
       var h;
       var c;
-      hr = Math.atan2(b, a);
-      h = hr * 360 / 2 / Math.PI;
+      hr2 = Math.atan2(b2, a);
+      h = hr2 * 360 / 2 / Math.PI;
       if (h < 0) {
         h += 360;
       }
-      c = Math.sqrt(a * a + b * b);
+      c = Math.sqrt(a * a + b2 * b2);
       return [l, c, h];
     };
     convert.lch.lab = function(lch) {
@@ -2792,23 +2709,23 @@ var require_conversions = __commonJS({
       var c = lch[1];
       var h = lch[2];
       var a;
-      var b;
-      var hr;
-      hr = h / 360 * 2 * Math.PI;
-      a = c * Math.cos(hr);
-      b = c * Math.sin(hr);
-      return [l, a, b];
+      var b2;
+      var hr2;
+      hr2 = h / 360 * 2 * Math.PI;
+      a = c * Math.cos(hr2);
+      b2 = c * Math.sin(hr2);
+      return [l, a, b2];
     };
     convert.rgb.ansi16 = function(args) {
       var r = args[0];
       var g = args[1];
-      var b = args[2];
+      var b2 = args[2];
       var value = 1 in arguments ? arguments[1] : convert.rgb.hsv(args)[2];
       value = Math.round(value / 50);
       if (value === 0) {
         return 30;
       }
-      var ansi = 30 + (Math.round(b / 255) << 2 | Math.round(g / 255) << 1 | Math.round(r / 255));
+      var ansi = 30 + (Math.round(b2 / 255) << 2 | Math.round(g / 255) << 1 | Math.round(r / 255));
       if (value === 2) {
         ansi += 60;
       }
@@ -2820,8 +2737,8 @@ var require_conversions = __commonJS({
     convert.rgb.ansi256 = function(args) {
       var r = args[0];
       var g = args[1];
-      var b = args[2];
-      if (r === g && g === b) {
+      var b2 = args[2];
+      if (r === g && g === b2) {
         if (r < 8) {
           return 16;
         }
@@ -2830,7 +2747,7 @@ var require_conversions = __commonJS({
         }
         return Math.round((r - 8) / 247 * 24) + 232;
       }
-      var ansi = 16 + 36 * Math.round(r / 255 * 5) + 6 * Math.round(g / 255 * 5) + Math.round(b / 255 * 5);
+      var ansi = 16 + 36 * Math.round(r / 255 * 5) + 6 * Math.round(g / 255 * 5) + Math.round(b2 / 255 * 5);
       return ansi;
     };
     convert.ansi16.rgb = function(args) {
@@ -2845,8 +2762,8 @@ var require_conversions = __commonJS({
       var mult = (~~(args > 50) + 1) * 0.5;
       var r = (color & 1) * mult * 255;
       var g = (color >> 1 & 1) * mult * 255;
-      var b = (color >> 2 & 1) * mult * 255;
-      return [r, g, b];
+      var b2 = (color >> 2 & 1) * mult * 255;
+      return [r, g, b2];
     };
     convert.ansi256.rgb = function(args) {
       if (args >= 232) {
@@ -2857,8 +2774,8 @@ var require_conversions = __commonJS({
       var rem;
       var r = Math.floor(args / 36) / 5 * 255;
       var g = Math.floor((rem = args % 36) / 6) / 5 * 255;
-      var b = rem % 6 / 5 * 255;
-      return [r, g, b];
+      var b2 = rem % 6 / 5 * 255;
+      return [r, g, b2];
     };
     convert.rgb.hex = function(args) {
       var integer = ((Math.round(args[0]) & 255) << 16) + ((Math.round(args[1]) & 255) << 8) + (Math.round(args[2]) & 255);
@@ -2879,15 +2796,15 @@ var require_conversions = __commonJS({
       var integer = parseInt(colorString, 16);
       var r = integer >> 16 & 255;
       var g = integer >> 8 & 255;
-      var b = integer & 255;
-      return [r, g, b];
+      var b2 = integer & 255;
+      return [r, g, b2];
     };
-    convert.rgb.hcg = function(rgb2) {
-      var r = rgb2[0] / 255;
-      var g = rgb2[1] / 255;
-      var b = rgb2[2] / 255;
-      var max = Math.max(Math.max(r, g), b);
-      var min = Math.min(Math.min(r, g), b);
+    convert.rgb.hcg = function(rgb) {
+      var r = rgb[0] / 255;
+      var g = rgb[1] / 255;
+      var b2 = rgb[2] / 255;
+      var max = Math.max(Math.max(r, g), b2);
+      var min = Math.min(Math.min(r, g), b2);
       var chroma = max - min;
       var grayscale;
       var hue;
@@ -2899,9 +2816,9 @@ var require_conversions = __commonJS({
       if (chroma <= 0) {
         hue = 0;
       } else if (max === r) {
-        hue = (g - b) / chroma % 6;
+        hue = (g - b2) / chroma % 6;
       } else if (max === g) {
-        hue = 2 + (b - r) / chroma;
+        hue = 2 + (b2 - r) / chroma;
       } else {
         hue = 4 + (r - g) / chroma + 4;
       }
@@ -2910,14 +2827,14 @@ var require_conversions = __commonJS({
       return [hue * 360, chroma * 100, grayscale * 100];
     };
     convert.hsl.hcg = function(hsl) {
-      var s = hsl[1] / 100;
+      var s2 = hsl[1] / 100;
       var l = hsl[2] / 100;
       var c = 1;
       var f = 0;
       if (l < 0.5) {
-        c = 2 * s * l;
+        c = 2 * s2 * l;
       } else {
-        c = 2 * s * (1 - l);
+        c = 2 * s2 * (1 - l);
       }
       if (c < 1) {
         f = (l - 0.5 * c) / (1 - c);
@@ -2925,12 +2842,12 @@ var require_conversions = __commonJS({
       return [hsl[0], c * 100, f * 100];
     };
     convert.hsv.hcg = function(hsv) {
-      var s = hsv[1] / 100;
-      var v = hsv[2] / 100;
-      var c = s * v;
+      var s2 = hsv[1] / 100;
+      var v2 = hsv[2] / 100;
+      var c = s2 * v2;
       var f = 0;
       if (c < 1) {
-        f = (v - c) / (1 - c);
+        f = (v2 - c) / (1 - c);
       }
       return [hsv[0], c * 100, f * 100];
     };
@@ -2943,13 +2860,13 @@ var require_conversions = __commonJS({
       }
       var pure = [0, 0, 0];
       var hi = h % 1 * 6;
-      var v = hi % 1;
-      var w = 1 - v;
+      var v2 = hi % 1;
+      var w = 1 - v2;
       var mg = 0;
       switch (Math.floor(hi)) {
         case 0:
           pure[0] = 1;
-          pure[1] = v;
+          pure[1] = v2;
           pure[2] = 0;
           break;
         case 1:
@@ -2960,7 +2877,7 @@ var require_conversions = __commonJS({
         case 2:
           pure[0] = 0;
           pure[1] = 1;
-          pure[2] = v;
+          pure[2] = v2;
           break;
         case 3:
           pure[0] = 0;
@@ -2968,7 +2885,7 @@ var require_conversions = __commonJS({
           pure[2] = 1;
           break;
         case 4:
-          pure[0] = v;
+          pure[0] = v2;
           pure[1] = 0;
           pure[2] = 1;
           break;
@@ -2987,47 +2904,47 @@ var require_conversions = __commonJS({
     convert.hcg.hsv = function(hcg) {
       var c = hcg[1] / 100;
       var g = hcg[2] / 100;
-      var v = c + g * (1 - c);
+      var v2 = c + g * (1 - c);
       var f = 0;
-      if (v > 0) {
-        f = c / v;
+      if (v2 > 0) {
+        f = c / v2;
       }
-      return [hcg[0], f * 100, v * 100];
+      return [hcg[0], f * 100, v2 * 100];
     };
     convert.hcg.hsl = function(hcg) {
       var c = hcg[1] / 100;
       var g = hcg[2] / 100;
       var l = g * (1 - c) + 0.5 * c;
-      var s = 0;
+      var s2 = 0;
       if (l > 0 && l < 0.5) {
-        s = c / (2 * l);
+        s2 = c / (2 * l);
       } else if (l >= 0.5 && l < 1) {
-        s = c / (2 * (1 - l));
+        s2 = c / (2 * (1 - l));
       }
-      return [hcg[0], s * 100, l * 100];
+      return [hcg[0], s2 * 100, l * 100];
     };
     convert.hcg.hwb = function(hcg) {
       var c = hcg[1] / 100;
       var g = hcg[2] / 100;
-      var v = c + g * (1 - c);
-      return [hcg[0], (v - c) * 100, (1 - v) * 100];
+      var v2 = c + g * (1 - c);
+      return [hcg[0], (v2 - c) * 100, (1 - v2) * 100];
     };
     convert.hwb.hcg = function(hwb) {
       var w = hwb[1] / 100;
-      var b = hwb[2] / 100;
-      var v = 1 - b;
-      var c = v - w;
+      var b2 = hwb[2] / 100;
+      var v2 = 1 - b2;
+      var c = v2 - w;
       var g = 0;
       if (c < 1) {
-        g = (v - c) / (1 - c);
+        g = (v2 - c) / (1 - c);
       }
       return [hwb[0], c * 100, g * 100];
     };
     convert.apple.rgb = function(apple) {
       return [apple[0] / 65535 * 255, apple[1] / 65535 * 255, apple[2] / 65535 * 255];
     };
-    convert.rgb.apple = function(rgb2) {
-      return [rgb2[0] / 255 * 65535, rgb2[1] / 255 * 65535, rgb2[2] / 255 * 65535];
+    convert.rgb.apple = function(rgb) {
+      return [rgb[0] / 255 * 65535, rgb[1] / 255 * 65535, rgb[2] / 255 * 65535];
     };
     convert.gray.rgb = function(args) {
       return [args[0] / 100 * 255, args[0] / 100 * 255, args[0] / 100 * 255];
@@ -3035,23 +2952,23 @@ var require_conversions = __commonJS({
     convert.gray.hsl = convert.gray.hsv = function(args) {
       return [0, 0, args[0]];
     };
-    convert.gray.hwb = function(gray3) {
-      return [0, 100, gray3[0]];
+    convert.gray.hwb = function(gray) {
+      return [0, 100, gray[0]];
     };
-    convert.gray.cmyk = function(gray3) {
-      return [0, 0, 0, gray3[0]];
+    convert.gray.cmyk = function(gray) {
+      return [0, 0, 0, gray[0]];
     };
-    convert.gray.lab = function(gray3) {
-      return [gray3[0], 0, 0];
+    convert.gray.lab = function(gray) {
+      return [gray[0], 0, 0];
     };
-    convert.gray.hex = function(gray3) {
-      var val = Math.round(gray3[0] / 100 * 255) & 255;
+    convert.gray.hex = function(gray) {
+      var val = Math.round(gray[0] / 100 * 255) & 255;
       var integer = (val << 16) + (val << 8) + val;
       var string = integer.toString(16).toUpperCase();
       return "000000".substring(string.length) + string;
     };
-    convert.rgb.gray = function(rgb2) {
-      var val = (rgb2[0] + rgb2[1] + rgb2[2]) / 3;
+    convert.rgb.gray = function(rgb) {
+      var val = (rgb[0] + rgb[1] + rgb[2]) / 3;
       return [val / 255 * 100];
     };
   }
@@ -3101,15 +3018,15 @@ var require_route = __commonJS({
     }
     function wrapConversion(toModel, graph) {
       var path2 = [graph[toModel].parent, toModel];
-      var fn = conversions[graph[toModel].parent][toModel];
+      var fn2 = conversions[graph[toModel].parent][toModel];
       var cur = graph[toModel].parent;
       while (graph[cur].parent) {
         path2.unshift(graph[cur].parent);
-        fn = link2(conversions[graph[cur].parent][cur], fn);
+        fn2 = link2(conversions[graph[cur].parent][cur], fn2);
         cur = graph[cur].parent;
       }
-      fn.conversion = path2;
-      return fn;
+      fn2.conversion = path2;
+      return fn2;
     }
     module2.exports = function(fromModel) {
       var graph = deriveBFS(fromModel);
@@ -3136,7 +3053,7 @@ var require_color_convert = __commonJS({
     var route = require_route();
     var convert = {};
     var models = Object.keys(conversions);
-    function wrapRaw(fn) {
+    function wrapRaw(fn2) {
       var wrappedFn = function(args) {
         if (args === void 0 || args === null) {
           return args;
@@ -3144,14 +3061,14 @@ var require_color_convert = __commonJS({
         if (arguments.length > 1) {
           args = Array.prototype.slice.call(arguments);
         }
-        return fn(args);
+        return fn2(args);
       };
-      if ("conversion" in fn) {
-        wrappedFn.conversion = fn.conversion;
+      if ("conversion" in fn2) {
+        wrappedFn.conversion = fn2.conversion;
       }
       return wrappedFn;
     }
-    function wrapRounded(fn) {
+    function wrapRounded(fn2) {
       var wrappedFn = function(args) {
         if (args === void 0 || args === null) {
           return args;
@@ -3159,7 +3076,7 @@ var require_color_convert = __commonJS({
         if (arguments.length > 1) {
           args = Array.prototype.slice.call(arguments);
         }
-        var result = fn(args);
+        var result = fn2(args);
         if (typeof result === "object") {
           for (var len = result.length, i = 0; i < len; i++) {
             result[i] = Math.round(result[i]);
@@ -3167,8 +3084,8 @@ var require_color_convert = __commonJS({
         }
         return result;
       };
-      if ("conversion" in fn) {
-        wrappedFn.conversion = fn.conversion;
+      if ("conversion" in fn2) {
+        wrappedFn.conversion = fn2.conversion;
       }
       return wrappedFn;
     }
@@ -3179,9 +3096,9 @@ var require_color_convert = __commonJS({
       var routes = route(fromModel);
       var routeModels = Object.keys(routes);
       routeModels.forEach(function(toModel) {
-        var fn = routes[toModel];
-        convert[fromModel][toModel] = wrapRounded(fn);
-        convert[fromModel][toModel].raw = wrapRaw(fn);
+        var fn2 = routes[toModel];
+        convert[fromModel][toModel] = wrapRounded(fn2);
+        convert[fromModel][toModel].raw = wrapRaw(fn2);
       });
     });
     module2.exports = convert;
@@ -3194,17 +3111,17 @@ var require_ansi_styles = __commonJS({
     "use strict";
     init_cjs_shims();
     var colorConvert = require_color_convert();
-    var wrapAnsi162 = (fn, offset) => function() {
-      const code = fn.apply(colorConvert, arguments);
+    var wrapAnsi162 = (fn2, offset) => function() {
+      const code = fn2.apply(colorConvert, arguments);
       return `\x1B[${code + offset}m`;
     };
-    var wrapAnsi2562 = (fn, offset) => function() {
-      const code = fn.apply(colorConvert, arguments);
+    var wrapAnsi2562 = (fn2, offset) => function() {
+      const code = fn2.apply(colorConvert, arguments);
       return `\x1B[${38 + offset};5;${code}m`;
     };
-    var wrapAnsi16m2 = (fn, offset) => function() {
-      const rgb2 = fn.apply(colorConvert, arguments);
-      return `\x1B[${38 + offset};2;${rgb2[0]};${rgb2[1]};${rgb2[2]}m`;
+    var wrapAnsi16m2 = (fn2, offset) => function() {
+      const rgb = fn2.apply(colorConvert, arguments);
+      return `\x1B[${38 + offset};2;${rgb[0]};${rgb[1]};${rgb[2]}m`;
     };
     function assembleStyles2() {
       const codes = /* @__PURE__ */ new Map();
@@ -3281,7 +3198,7 @@ var require_ansi_styles = __commonJS({
         });
       }
       const ansi2ansi = (n) => n;
-      const rgb2rgb = (r, g, b) => [r, g, b];
+      const rgb2rgb = (r, g, b2) => [r, g, b2];
       styles2.color.close = "\x1B[39m";
       styles2.bgColor.close = "\x1B[49m";
       styles2.color.ansi = {
@@ -3337,11 +3254,11 @@ var require_has_flag = __commonJS({
   "node_modules/.pnpm/has-flag@3.0.0/node_modules/has-flag/index.js"(exports2, module2) {
     "use strict";
     init_cjs_shims();
-    module2.exports = (flag, argv4) => {
-      argv4 = argv4 || process.argv;
+    module2.exports = (flag, argv2) => {
+      argv2 = argv2 || process.argv;
       const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
-      const pos = argv4.indexOf(prefix + flag);
-      const terminatorPos = argv4.indexOf("--");
+      const pos = argv2.indexOf(prefix + flag);
+      const terminatorPos = argv2.indexOf("--");
       return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
     };
   }
@@ -3354,15 +3271,15 @@ var require_supports_color = __commonJS({
     init_cjs_shims();
     var os2 = require("os");
     var hasFlag = require_has_flag();
-    var env2 = process.env;
+    var env = process.env;
     var forceColor;
     if (hasFlag("no-color") || hasFlag("no-colors") || hasFlag("color=false")) {
       forceColor = false;
     } else if (hasFlag("color") || hasFlag("colors") || hasFlag("color=true") || hasFlag("color=always")) {
       forceColor = true;
     }
-    if ("FORCE_COLOR" in env2) {
-      forceColor = env2.FORCE_COLOR.length === 0 || parseInt(env2.FORCE_COLOR, 10) !== 0;
+    if ("FORCE_COLOR" in env) {
+      forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
     }
     function translateLevel(level) {
       if (level === 0) {
@@ -3396,37 +3313,37 @@ var require_supports_color = __commonJS({
         }
         return 1;
       }
-      if ("CI" in env2) {
-        if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI"].some((sign) => sign in env2) || env2.CI_NAME === "codeship") {
+      if ("CI" in env) {
+        if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI"].some((sign) => sign in env) || env.CI_NAME === "codeship") {
           return 1;
         }
         return min;
       }
-      if ("TEAMCITY_VERSION" in env2) {
-        return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env2.TEAMCITY_VERSION) ? 1 : 0;
+      if ("TEAMCITY_VERSION" in env) {
+        return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
       }
-      if (env2.COLORTERM === "truecolor") {
+      if (env.COLORTERM === "truecolor") {
         return 3;
       }
-      if ("TERM_PROGRAM" in env2) {
-        const version2 = parseInt((env2.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
-        switch (env2.TERM_PROGRAM) {
+      if ("TERM_PROGRAM" in env) {
+        const version2 = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+        switch (env.TERM_PROGRAM) {
           case "iTerm.app":
             return version2 >= 3 ? 3 : 2;
           case "Apple_Terminal":
             return 2;
         }
       }
-      if (/-256(color)?$/i.test(env2.TERM)) {
+      if (/-256(color)?$/i.test(env.TERM)) {
         return 2;
       }
-      if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env2.TERM)) {
+      if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
         return 1;
       }
-      if ("COLORTERM" in env2) {
+      if ("COLORTERM" in env) {
         return 1;
       }
-      if (env2.TERM === "dumb") {
+      if (env.TERM === "dumb") {
         return min;
       }
       return min;
@@ -3526,14 +3443,14 @@ var require_templates = __commonJS({
       const styles2 = [];
       const chunks = [];
       let chunk = [];
-      tmp.replace(TEMPLATE_REGEX, (m, escapeChar, inverse2, style2, close, chr) => {
+      tmp.replace(TEMPLATE_REGEX, (m, escapeChar, inverse, style2, close, chr) => {
         if (escapeChar) {
           chunk.push(unescape(escapeChar));
         } else if (style2) {
           const str = chunk.join("");
           chunk = [];
           chunks.push(styles2.length === 0 ? str : buildStyle(chalk, styles2)(str));
-          styles2.push({ inverse: inverse2, styles: parseStyle(style2) });
+          styles2.push({ inverse, styles: parseStyle(style2) });
         } else if (close) {
           if (styles2.length === 0) {
             throw new Error("Found extraneous } in Chalk template literal");
@@ -3738,25 +3655,25 @@ var require_lib2 = __commonJS({
     var _picocolors = _interopRequireWildcard(require_picocolors(), true);
     function _getRequireWildcardCache(e) {
       if ("function" != typeof WeakMap) return null;
-      var r = /* @__PURE__ */ new WeakMap(), t = /* @__PURE__ */ new WeakMap();
+      var r = /* @__PURE__ */ new WeakMap(), t2 = /* @__PURE__ */ new WeakMap();
       return (_getRequireWildcardCache = function(e2) {
-        return e2 ? t : r;
+        return e2 ? t2 : r;
       })(e);
     }
     function _interopRequireWildcard(e, r) {
       if (!r && e && e.__esModule) return e;
       if (null === e || "object" != typeof e && "function" != typeof e) return { default: e };
-      var t = _getRequireWildcardCache(r);
-      if (t && t.has(e)) return t.get(e);
+      var t2 = _getRequireWildcardCache(r);
+      if (t2 && t2.has(e)) return t2.get(e);
       var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor;
       for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) {
         var i = a ? Object.getOwnPropertyDescriptor(e, u) : null;
         i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u];
       }
-      return n.default = e, t && t.set(e, n), n;
+      return n.default = e, t2 && t2.set(e, n), n;
     }
     var colors = typeof process === "object" && (process.env.FORCE_COLOR === "0" || process.env.FORCE_COLOR === "false") ? (0, _picocolors.createColors)(false) : _picocolors.default;
-    var compose = (f, g) => (v) => f(g(v));
+    var compose = (f, g) => (v2) => f(g(v2));
     var sometimesKeywords = /* @__PURE__ */ new Set(["as", "async", "from", "get", "of", "set"]);
     function getDefs(colors2) {
       return {
@@ -3877,25 +3794,25 @@ var require_lib3 = __commonJS({
     var _picocolors = _interopRequireWildcard(require_picocolors(), true);
     function _getRequireWildcardCache(e) {
       if ("function" != typeof WeakMap) return null;
-      var r = /* @__PURE__ */ new WeakMap(), t = /* @__PURE__ */ new WeakMap();
+      var r = /* @__PURE__ */ new WeakMap(), t2 = /* @__PURE__ */ new WeakMap();
       return (_getRequireWildcardCache = function(e2) {
-        return e2 ? t : r;
+        return e2 ? t2 : r;
       })(e);
     }
     function _interopRequireWildcard(e, r) {
       if (!r && e && e.__esModule) return e;
       if (null === e || "object" != typeof e && "function" != typeof e) return { default: e };
-      var t = _getRequireWildcardCache(r);
-      if (t && t.has(e)) return t.get(e);
+      var t2 = _getRequireWildcardCache(r);
+      if (t2 && t2.has(e)) return t2.get(e);
       var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor;
       for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) {
         var i = a ? Object.getOwnPropertyDescriptor(e, u) : null;
         i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u];
       }
-      return n.default = e, t && t.set(e, n), n;
+      return n.default = e, t2 && t2.set(e, n), n;
     }
     var colors = typeof process === "object" && (process.env.FORCE_COLOR === "0" || process.env.FORCE_COLOR === "false") ? (0, _picocolors.createColors)(false) : _picocolors.default;
-    var compose = (f, g) => (v) => f(g(v));
+    var compose = (f, g) => (v2) => f(g(v2));
     var pcWithForcedColor = void 0;
     function getColors(forceColor) {
       if (forceColor) {
@@ -4184,7 +4101,7 @@ var require_cjs = __commonJS({
     Object.defineProperty(exports2, "signals", { enumerable: true, get: function() {
       return signals_js_1.signals;
     } });
-    var processOk2 = (process9) => !!process9 && typeof process9 === "object" && typeof process9.removeListener === "function" && typeof process9.emit === "function" && typeof process9.reallyExit === "function" && typeof process9.listeners === "function" && typeof process9.kill === "function" && typeof process9.pid === "number" && typeof process9.on === "function";
+    var processOk2 = (process10) => !!process10 && typeof process10 === "object" && typeof process10.removeListener === "function" && typeof process10.emit === "function" && typeof process10.reallyExit === "function" && typeof process10.listeners === "function" && typeof process10.kill === "function" && typeof process10.pid === "number" && typeof process10.on === "function";
     var kExitEmitter2 = Symbol.for("signal-exit emitter");
     var global2 = globalThis;
     var ObjectDefineProperty2 = Object.defineProperty.bind(Object);
@@ -4210,12 +4127,12 @@ var require_cjs = __commonJS({
           configurable: false
         });
       }
-      on(ev, fn) {
-        this.listeners[ev].push(fn);
+      on(ev, fn2) {
+        this.listeners[ev].push(fn2);
       }
-      removeListener(ev, fn) {
+      removeListener(ev, fn2) {
         const list3 = this.listeners[ev];
-        const i = list3.indexOf(fn);
+        const i = list3.indexOf(fn2);
         if (i === -1) {
           return;
         }
@@ -4231,8 +4148,8 @@ var require_cjs = __commonJS({
         }
         this.emitted[ev] = true;
         let ret = false;
-        for (const fn of this.listeners[ev]) {
-          ret = fn(code, signal) === true || ret;
+        for (const fn2 of this.listeners[ev]) {
+          ret = fn2(code, signal) === true || ret;
         }
         if (ev === "exit") {
           ret = this.emit("afterExit", code, signal) || ret;
@@ -4269,7 +4186,7 @@ var require_cjs = __commonJS({
       // "SIGHUP" throws an `ENOSYS` error on Windows,
       // so use a supported signal instead
       /* c8 ignore start */
-      #hupSig = process8.platform === "win32" ? "SIGINT" : "SIGHUP";
+      #hupSig = process9.platform === "win32" ? "SIGINT" : "SIGHUP";
       /* c8 ignore stop */
       #emitter = new Emitter2();
       #process;
@@ -4277,29 +4194,29 @@ var require_cjs = __commonJS({
       #originalProcessReallyExit;
       #sigListeners = {};
       #loaded = false;
-      constructor(process9) {
+      constructor(process10) {
         super();
-        this.#process = process9;
+        this.#process = process10;
         this.#sigListeners = {};
         for (const sig of signals_js_1.signals) {
           this.#sigListeners[sig] = () => {
             const listeners = this.#process.listeners(sig);
             let { count } = this.#emitter;
-            const p = process9;
+            const p = process10;
             if (typeof p.__signal_exit_emitter__ === "object" && typeof p.__signal_exit_emitter__.count === "number") {
               count += p.__signal_exit_emitter__.count;
             }
             if (listeners.length === count) {
               this.unload();
               const ret = this.#emitter.emit("exit", null, sig);
-              const s = sig === "SIGHUP" ? this.#hupSig : sig;
+              const s2 = sig === "SIGHUP" ? this.#hupSig : sig;
               if (!ret)
-                process9.kill(process9.pid, s);
+                process10.kill(process10.pid, s2);
             }
           };
         }
-        this.#originalProcessReallyExit = process9.reallyExit;
-        this.#originalProcessEmit = process9.emit;
+        this.#originalProcessReallyExit = process10.reallyExit;
+        this.#originalProcessEmit = process10.emit;
       }
       onExit(cb, opts) {
         if (!processOk2(this.#process)) {
@@ -4326,10 +4243,10 @@ var require_cjs = __commonJS({
         this.#emitter.count += 1;
         for (const sig of signals_js_1.signals) {
           try {
-            const fn = this.#sigListeners[sig];
-            if (fn)
-              this.#process.on(sig, fn);
-          } catch (_) {
+            const fn2 = this.#sigListeners[sig];
+            if (fn2)
+              this.#process.on(sig, fn2);
+          } catch (_2) {
           }
         }
         this.#process.emit = (ev, ...a) => {
@@ -4351,7 +4268,7 @@ var require_cjs = __commonJS({
           }
           try {
             this.#process.removeListener(sig, listener);
-          } catch (_) {
+          } catch (_2) {
           }
         });
         this.#process.emit = this.#originalProcessEmit;
@@ -4380,8 +4297,8 @@ var require_cjs = __commonJS({
         }
       }
     };
-    var process8 = globalThis.process;
-    _a = signalExitWrap2(processOk2(process8) ? new SignalExit2(process8) : new SignalExitFallback2()), /**
+    var process9 = globalThis.process;
+    _a = signalExitWrap2(processOk2(process9) ? new SignalExit2(process9) : new SignalExitFallback2()), /**
      * Called when the process is exiting, whether via signal, explicit
      * exit, or running out of stuff to do.
      *
@@ -4640,7 +4557,7 @@ var require_tree_kill = __commonJS({
     init_cjs_shims();
     var childProcess = require("child_process");
     var spawn4 = childProcess.spawn;
-    var exec3 = childProcess.exec;
+    var exec2 = childProcess.exec;
     module2.exports = function(pid, signal, callback) {
       if (typeof signal === "function" && callback === void 0) {
         callback = signal;
@@ -4660,7 +4577,7 @@ var require_tree_kill = __commonJS({
       pidsToProcess[pid] = 1;
       switch (process.platform) {
         case "win32":
-          exec3("taskkill /pid " + pid + " /T /F", callback);
+          exec2("taskkill /pid " + pid + " /T /F", callback);
           break;
         case "darwin":
           buildProcessTree(pid, tree, pidsToProcess, function(parentPid) {
@@ -4744,6 +4661,2751 @@ var require_tree_kill = __commonJS({
   }
 });
 
+// node_modules/.pnpm/encodeurl@1.0.2/node_modules/encodeurl/index.js
+var require_encodeurl = __commonJS({
+  "node_modules/.pnpm/encodeurl@1.0.2/node_modules/encodeurl/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = encodeUrl;
+    var ENCODE_CHARS_REGEXP = /(?:[^\x21\x25\x26-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E]|%(?:[^0-9A-Fa-f]|[0-9A-Fa-f][^0-9A-Fa-f]|$))+/g;
+    var UNMATCHED_SURROGATE_PAIR_REGEXP = /(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF]([^\uDC00-\uDFFF]|$)/g;
+    var UNMATCHED_SURROGATE_PAIR_REPLACE = "$1\uFFFD$2";
+    function encodeUrl(url) {
+      return String(url).replace(UNMATCHED_SURROGATE_PAIR_REGEXP, UNMATCHED_SURROGATE_PAIR_REPLACE).replace(ENCODE_CHARS_REGEXP, encodeURI);
+    }
+  }
+});
+
+// node_modules/.pnpm/escape-html@1.0.3/node_modules/escape-html/index.js
+var require_escape_html = __commonJS({
+  "node_modules/.pnpm/escape-html@1.0.3/node_modules/escape-html/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var matchHtmlRegExp = /["'&<>]/;
+    module2.exports = escapeHtml;
+    function escapeHtml(string) {
+      var str = "" + string;
+      var match2 = matchHtmlRegExp.exec(str);
+      if (!match2) {
+        return str;
+      }
+      var escape;
+      var html = "";
+      var index = 0;
+      var lastIndex = 0;
+      for (index = match2.index; index < str.length; index++) {
+        switch (str.charCodeAt(index)) {
+          case 34:
+            escape = "&quot;";
+            break;
+          case 38:
+            escape = "&amp;";
+            break;
+          case 39:
+            escape = "&#39;";
+            break;
+          case 60:
+            escape = "&lt;";
+            break;
+          case 62:
+            escape = "&gt;";
+            break;
+          default:
+            continue;
+        }
+        if (lastIndex !== index) {
+          html += str.substring(lastIndex, index);
+        }
+        lastIndex = index + 1;
+        html += escape;
+      }
+      return lastIndex !== index ? html + str.substring(lastIndex, index) : html;
+    }
+  }
+});
+
+// node_modules/.pnpm/parseurl@1.3.3/node_modules/parseurl/index.js
+var require_parseurl = __commonJS({
+  "node_modules/.pnpm/parseurl@1.3.3/node_modules/parseurl/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var url = require("url");
+    var parse5 = url.parse;
+    var Url = url.Url;
+    module2.exports = parseurl;
+    module2.exports.original = originalurl;
+    function parseurl(req) {
+      var url2 = req.url;
+      if (url2 === void 0) {
+        return void 0;
+      }
+      var parsed = req._parsedUrl;
+      if (fresh(url2, parsed)) {
+        return parsed;
+      }
+      parsed = fastparse(url2);
+      parsed._raw = url2;
+      return req._parsedUrl = parsed;
+    }
+    function originalurl(req) {
+      var url2 = req.originalUrl;
+      if (typeof url2 !== "string") {
+        return parseurl(req);
+      }
+      var parsed = req._parsedOriginalUrl;
+      if (fresh(url2, parsed)) {
+        return parsed;
+      }
+      parsed = fastparse(url2);
+      parsed._raw = url2;
+      return req._parsedOriginalUrl = parsed;
+    }
+    function fastparse(str) {
+      if (typeof str !== "string" || str.charCodeAt(0) !== 47) {
+        return parse5(str);
+      }
+      var pathname = str;
+      var query = null;
+      var search = null;
+      for (var i = 1; i < str.length; i++) {
+        switch (str.charCodeAt(i)) {
+          case 63:
+            if (search === null) {
+              pathname = str.substring(0, i);
+              query = str.substring(i + 1);
+              search = str.substring(i);
+            }
+            break;
+          case 9:
+          /* \t */
+          case 10:
+          /* \n */
+          case 12:
+          /* \f */
+          case 13:
+          /* \r */
+          case 32:
+          /*    */
+          case 35:
+          /* #  */
+          case 160:
+          case 65279:
+            return parse5(str);
+        }
+      }
+      var url2 = Url !== void 0 ? new Url() : {};
+      url2.path = str;
+      url2.href = str;
+      url2.pathname = pathname;
+      if (search !== null) {
+        url2.query = query;
+        url2.search = search;
+      }
+      return url2;
+    }
+    function fresh(url2, parsedUrl) {
+      return typeof parsedUrl === "object" && parsedUrl !== null && (Url === void 0 || parsedUrl instanceof Url) && parsedUrl._raw === url2;
+    }
+  }
+});
+
+// node_modules/.pnpm/depd@2.0.0/node_modules/depd/index.js
+var require_depd = __commonJS({
+  "node_modules/.pnpm/depd@2.0.0/node_modules/depd/index.js"(exports2, module2) {
+    init_cjs_shims();
+    var relative15 = require("path").relative;
+    module2.exports = depd;
+    var basePath2 = process.cwd();
+    function containsNamespace(str, namespace) {
+      var vals = str.split(/[ ,]+/);
+      var ns = String(namespace).toLowerCase();
+      for (var i = 0; i < vals.length; i++) {
+        var val = vals[i];
+        if (val && (val === "*" || val.toLowerCase() === ns)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function convertDataDescriptorToAccessor(obj, prop, message) {
+      var descriptor = Object.getOwnPropertyDescriptor(obj, prop);
+      var value = descriptor.value;
+      descriptor.get = function getter() {
+        return value;
+      };
+      if (descriptor.writable) {
+        descriptor.set = function setter(val) {
+          return value = val;
+        };
+      }
+      delete descriptor.value;
+      delete descriptor.writable;
+      Object.defineProperty(obj, prop, descriptor);
+      return descriptor;
+    }
+    function createArgumentsString(arity) {
+      var str = "";
+      for (var i = 0; i < arity; i++) {
+        str += ", arg" + i;
+      }
+      return str.substr(2);
+    }
+    function createStackString(stack) {
+      var str = this.name + ": " + this.namespace;
+      if (this.message) {
+        str += " deprecated " + this.message;
+      }
+      for (var i = 0; i < stack.length; i++) {
+        str += "\n    at " + stack[i].toString();
+      }
+      return str;
+    }
+    function depd(namespace) {
+      if (!namespace) {
+        throw new TypeError("argument namespace is required");
+      }
+      var stack = getStack2();
+      var site = callSiteLocation(stack[1]);
+      var file = site[0];
+      function deprecate(message) {
+        log3.call(deprecate, message);
+      }
+      deprecate._file = file;
+      deprecate._ignored = isignored(namespace);
+      deprecate._namespace = namespace;
+      deprecate._traced = istraced(namespace);
+      deprecate._warned = /* @__PURE__ */ Object.create(null);
+      deprecate.function = wrapfunction;
+      deprecate.property = wrapproperty;
+      return deprecate;
+    }
+    function eehaslisteners(emitter, type2) {
+      var count = typeof emitter.listenerCount !== "function" ? emitter.listeners(type2).length : emitter.listenerCount(type2);
+      return count > 0;
+    }
+    function isignored(namespace) {
+      if (process.noDeprecation) {
+        return true;
+      }
+      var str = process.env.NO_DEPRECATION || "";
+      return containsNamespace(str, namespace);
+    }
+    function istraced(namespace) {
+      if (process.traceDeprecation) {
+        return true;
+      }
+      var str = process.env.TRACE_DEPRECATION || "";
+      return containsNamespace(str, namespace);
+    }
+    function log3(message, site) {
+      var haslisteners = eehaslisteners(process, "deprecation");
+      if (!haslisteners && this._ignored) {
+        return;
+      }
+      var caller;
+      var callFile;
+      var callSite;
+      var depSite;
+      var i = 0;
+      var seen = false;
+      var stack = getStack2();
+      var file = this._file;
+      if (site) {
+        depSite = site;
+        callSite = callSiteLocation(stack[1]);
+        callSite.name = depSite.name;
+        file = callSite[0];
+      } else {
+        i = 2;
+        depSite = callSiteLocation(stack[i]);
+        callSite = depSite;
+      }
+      for (; i < stack.length; i++) {
+        caller = callSiteLocation(stack[i]);
+        callFile = caller[0];
+        if (callFile === file) {
+          seen = true;
+        } else if (callFile === this._file) {
+          file = this._file;
+        } else if (seen) {
+          break;
+        }
+      }
+      var key = caller ? depSite.join(":") + "__" + caller.join(":") : void 0;
+      if (key !== void 0 && key in this._warned) {
+        return;
+      }
+      this._warned[key] = true;
+      var msg = message;
+      if (!msg) {
+        msg = callSite === depSite || !callSite.name ? defaultMessage(depSite) : defaultMessage(callSite);
+      }
+      if (haslisteners) {
+        var err = DeprecationError(this._namespace, msg, stack.slice(i));
+        process.emit("deprecation", err);
+        return;
+      }
+      var format = process.stderr.isTTY ? formatColor : formatPlain;
+      var output = format.call(this, msg, caller, stack.slice(i));
+      process.stderr.write(output + "\n", "utf8");
+    }
+    function callSiteLocation(callSite) {
+      var file = callSite.getFileName() || "<anonymous>";
+      var line = callSite.getLineNumber();
+      var colm = callSite.getColumnNumber();
+      if (callSite.isEval()) {
+        file = callSite.getEvalOrigin() + ", " + file;
+      }
+      var site = [file, line, colm];
+      site.callSite = callSite;
+      site.name = callSite.getFunctionName();
+      return site;
+    }
+    function defaultMessage(site) {
+      var callSite = site.callSite;
+      var funcName = site.name;
+      if (!funcName) {
+        funcName = "<anonymous@" + formatLocation(site) + ">";
+      }
+      var context = callSite.getThis();
+      var typeName = context && callSite.getTypeName();
+      if (typeName === "Object") {
+        typeName = void 0;
+      }
+      if (typeName === "Function") {
+        typeName = context.name || typeName;
+      }
+      return typeName && callSite.getMethodName() ? typeName + "." + funcName : funcName;
+    }
+    function formatPlain(msg, caller, stack) {
+      var timestamp = (/* @__PURE__ */ new Date()).toUTCString();
+      var formatted = timestamp + " " + this._namespace + " deprecated " + msg;
+      if (this._traced) {
+        for (var i = 0; i < stack.length; i++) {
+          formatted += "\n    at " + stack[i].toString();
+        }
+        return formatted;
+      }
+      if (caller) {
+        formatted += " at " + formatLocation(caller);
+      }
+      return formatted;
+    }
+    function formatColor(msg, caller, stack) {
+      var formatted = "\x1B[36;1m" + this._namespace + "\x1B[22;39m \x1B[33;1mdeprecated\x1B[22;39m \x1B[0m" + msg + "\x1B[39m";
+      if (this._traced) {
+        for (var i = 0; i < stack.length; i++) {
+          formatted += "\n    \x1B[36mat " + stack[i].toString() + "\x1B[39m";
+        }
+        return formatted;
+      }
+      if (caller) {
+        formatted += " \x1B[36m" + formatLocation(caller) + "\x1B[39m";
+      }
+      return formatted;
+    }
+    function formatLocation(callSite) {
+      return relative15(basePath2, callSite[0]) + ":" + callSite[1] + ":" + callSite[2];
+    }
+    function getStack2() {
+      var limit2 = Error.stackTraceLimit;
+      var obj = {};
+      var prep = Error.prepareStackTrace;
+      Error.prepareStackTrace = prepareObjectStackTrace;
+      Error.stackTraceLimit = Math.max(10, limit2);
+      Error.captureStackTrace(obj);
+      var stack = obj.stack.slice(1);
+      Error.prepareStackTrace = prep;
+      Error.stackTraceLimit = limit2;
+      return stack;
+    }
+    function prepareObjectStackTrace(obj, stack) {
+      return stack;
+    }
+    function wrapfunction(fn2, message) {
+      if (typeof fn2 !== "function") {
+        throw new TypeError("argument fn must be a function");
+      }
+      var args = createArgumentsString(fn2.length);
+      var stack = getStack2();
+      var site = callSiteLocation(stack[1]);
+      site.name = fn2.name;
+      var deprecatedfn = new Function(
+        "fn",
+        "log",
+        "deprecate",
+        "message",
+        "site",
+        '"use strict"\nreturn function (' + args + ") {log.call(deprecate, message, site)\nreturn fn.apply(this, arguments)\n}"
+      )(fn2, log3, this, message, site);
+      return deprecatedfn;
+    }
+    function wrapproperty(obj, prop, message) {
+      if (!obj || typeof obj !== "object" && typeof obj !== "function") {
+        throw new TypeError("argument obj must be object");
+      }
+      var descriptor = Object.getOwnPropertyDescriptor(obj, prop);
+      if (!descriptor) {
+        throw new TypeError("must call property on owner object");
+      }
+      if (!descriptor.configurable) {
+        throw new TypeError("property must be configurable");
+      }
+      var deprecate = this;
+      var stack = getStack2();
+      var site = callSiteLocation(stack[1]);
+      site.name = prop;
+      if ("value" in descriptor) {
+        descriptor = convertDataDescriptorToAccessor(obj, prop, message);
+      }
+      var get3 = descriptor.get;
+      var set = descriptor.set;
+      if (typeof get3 === "function") {
+        descriptor.get = function getter() {
+          log3.call(deprecate, message, site);
+          return get3.apply(this, arguments);
+        };
+      }
+      if (typeof set === "function") {
+        descriptor.set = function setter() {
+          log3.call(deprecate, message, site);
+          return set.apply(this, arguments);
+        };
+      }
+      Object.defineProperty(obj, prop, descriptor);
+    }
+    function DeprecationError(namespace, message, stack) {
+      var error3 = new Error();
+      var stackString;
+      Object.defineProperty(error3, "constructor", {
+        value: DeprecationError
+      });
+      Object.defineProperty(error3, "message", {
+        configurable: true,
+        enumerable: false,
+        value: message,
+        writable: true
+      });
+      Object.defineProperty(error3, "name", {
+        enumerable: false,
+        configurable: true,
+        value: "DeprecationError",
+        writable: true
+      });
+      Object.defineProperty(error3, "namespace", {
+        configurable: true,
+        enumerable: false,
+        value: namespace,
+        writable: true
+      });
+      Object.defineProperty(error3, "stack", {
+        configurable: true,
+        enumerable: false,
+        get: function() {
+          if (stackString !== void 0) {
+            return stackString;
+          }
+          return stackString = createStackString.call(this, stack);
+        },
+        set: function setter(val) {
+          stackString = val;
+        }
+      });
+      return error3;
+    }
+  }
+});
+
+// node_modules/.pnpm/setprototypeof@1.2.0/node_modules/setprototypeof/index.js
+var require_setprototypeof = __commonJS({
+  "node_modules/.pnpm/setprototypeof@1.2.0/node_modules/setprototypeof/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = Object.setPrototypeOf || ({ __proto__: [] } instanceof Array ? setProtoOf : mixinProperties);
+    function setProtoOf(obj, proto) {
+      obj.__proto__ = proto;
+      return obj;
+    }
+    function mixinProperties(obj, proto) {
+      for (var prop in proto) {
+        if (!Object.prototype.hasOwnProperty.call(obj, prop)) {
+          obj[prop] = proto[prop];
+        }
+      }
+      return obj;
+    }
+  }
+});
+
+// node_modules/.pnpm/statuses@2.0.1/node_modules/statuses/codes.json
+var require_codes = __commonJS({
+  "node_modules/.pnpm/statuses@2.0.1/node_modules/statuses/codes.json"(exports2, module2) {
+    module2.exports = {
+      "100": "Continue",
+      "101": "Switching Protocols",
+      "102": "Processing",
+      "103": "Early Hints",
+      "200": "OK",
+      "201": "Created",
+      "202": "Accepted",
+      "203": "Non-Authoritative Information",
+      "204": "No Content",
+      "205": "Reset Content",
+      "206": "Partial Content",
+      "207": "Multi-Status",
+      "208": "Already Reported",
+      "226": "IM Used",
+      "300": "Multiple Choices",
+      "301": "Moved Permanently",
+      "302": "Found",
+      "303": "See Other",
+      "304": "Not Modified",
+      "305": "Use Proxy",
+      "307": "Temporary Redirect",
+      "308": "Permanent Redirect",
+      "400": "Bad Request",
+      "401": "Unauthorized",
+      "402": "Payment Required",
+      "403": "Forbidden",
+      "404": "Not Found",
+      "405": "Method Not Allowed",
+      "406": "Not Acceptable",
+      "407": "Proxy Authentication Required",
+      "408": "Request Timeout",
+      "409": "Conflict",
+      "410": "Gone",
+      "411": "Length Required",
+      "412": "Precondition Failed",
+      "413": "Payload Too Large",
+      "414": "URI Too Long",
+      "415": "Unsupported Media Type",
+      "416": "Range Not Satisfiable",
+      "417": "Expectation Failed",
+      "418": "I'm a Teapot",
+      "421": "Misdirected Request",
+      "422": "Unprocessable Entity",
+      "423": "Locked",
+      "424": "Failed Dependency",
+      "425": "Too Early",
+      "426": "Upgrade Required",
+      "428": "Precondition Required",
+      "429": "Too Many Requests",
+      "431": "Request Header Fields Too Large",
+      "451": "Unavailable For Legal Reasons",
+      "500": "Internal Server Error",
+      "501": "Not Implemented",
+      "502": "Bad Gateway",
+      "503": "Service Unavailable",
+      "504": "Gateway Timeout",
+      "505": "HTTP Version Not Supported",
+      "506": "Variant Also Negotiates",
+      "507": "Insufficient Storage",
+      "508": "Loop Detected",
+      "509": "Bandwidth Limit Exceeded",
+      "510": "Not Extended",
+      "511": "Network Authentication Required"
+    };
+  }
+});
+
+// node_modules/.pnpm/statuses@2.0.1/node_modules/statuses/index.js
+var require_statuses = __commonJS({
+  "node_modules/.pnpm/statuses@2.0.1/node_modules/statuses/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var codes = require_codes();
+    module2.exports = status;
+    status.message = codes;
+    status.code = createMessageToStatusCodeMap(codes);
+    status.codes = createStatusCodeList(codes);
+    status.redirect = {
+      300: true,
+      301: true,
+      302: true,
+      303: true,
+      305: true,
+      307: true,
+      308: true
+    };
+    status.empty = {
+      204: true,
+      205: true,
+      304: true
+    };
+    status.retry = {
+      502: true,
+      503: true,
+      504: true
+    };
+    function createMessageToStatusCodeMap(codes2) {
+      var map = {};
+      Object.keys(codes2).forEach(function forEachCode(code) {
+        var message = codes2[code];
+        var status2 = Number(code);
+        map[message.toLowerCase()] = status2;
+      });
+      return map;
+    }
+    function createStatusCodeList(codes2) {
+      return Object.keys(codes2).map(function mapCode(code) {
+        return Number(code);
+      });
+    }
+    function getStatusCode(message) {
+      var msg = message.toLowerCase();
+      if (!Object.prototype.hasOwnProperty.call(status.code, msg)) {
+        throw new Error('invalid status message: "' + message + '"');
+      }
+      return status.code[msg];
+    }
+    function getStatusMessage(code) {
+      if (!Object.prototype.hasOwnProperty.call(status.message, code)) {
+        throw new Error("invalid status code: " + code);
+      }
+      return status.message[code];
+    }
+    function status(code) {
+      if (typeof code === "number") {
+        return getStatusMessage(code);
+      }
+      if (typeof code !== "string") {
+        throw new TypeError("code must be a number or string");
+      }
+      var n = parseInt(code, 10);
+      if (!isNaN(n)) {
+        return getStatusMessage(n);
+      }
+      return getStatusCode(code);
+    }
+  }
+});
+
+// node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits_browser.js
+var require_inherits_browser = __commonJS({
+  "node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits_browser.js"(exports2, module2) {
+    init_cjs_shims();
+    if (typeof Object.create === "function") {
+      module2.exports = function inherits(ctor, superCtor) {
+        if (superCtor) {
+          ctor.super_ = superCtor;
+          ctor.prototype = Object.create(superCtor.prototype, {
+            constructor: {
+              value: ctor,
+              enumerable: false,
+              writable: true,
+              configurable: true
+            }
+          });
+        }
+      };
+    } else {
+      module2.exports = function inherits(ctor, superCtor) {
+        if (superCtor) {
+          ctor.super_ = superCtor;
+          var TempCtor = function() {
+          };
+          TempCtor.prototype = superCtor.prototype;
+          ctor.prototype = new TempCtor();
+          ctor.prototype.constructor = ctor;
+        }
+      };
+    }
+  }
+});
+
+// node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits.js
+var require_inherits = __commonJS({
+  "node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits.js"(exports2, module2) {
+    init_cjs_shims();
+    try {
+      util = require("util");
+      if (typeof util.inherits !== "function") throw "";
+      module2.exports = util.inherits;
+    } catch (e) {
+      module2.exports = require_inherits_browser();
+    }
+    var util;
+  }
+});
+
+// node_modules/.pnpm/toidentifier@1.0.1/node_modules/toidentifier/index.js
+var require_toidentifier = __commonJS({
+  "node_modules/.pnpm/toidentifier@1.0.1/node_modules/toidentifier/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = toIdentifier;
+    function toIdentifier(str) {
+      return str.split(" ").map(function(token) {
+        return token.slice(0, 1).toUpperCase() + token.slice(1);
+      }).join("").replace(/[^ _0-9a-z]/gi, "");
+    }
+  }
+});
+
+// node_modules/.pnpm/http-errors@2.0.0/node_modules/http-errors/index.js
+var require_http_errors = __commonJS({
+  "node_modules/.pnpm/http-errors@2.0.0/node_modules/http-errors/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var deprecate = require_depd()("http-errors");
+    var setPrototypeOf2 = require_setprototypeof();
+    var statuses = require_statuses();
+    var inherits = require_inherits();
+    var toIdentifier = require_toidentifier();
+    module2.exports = createError;
+    module2.exports.HttpError = createHttpErrorConstructor();
+    module2.exports.isHttpError = createIsHttpErrorFunction(module2.exports.HttpError);
+    populateConstructorExports(module2.exports, statuses.codes, module2.exports.HttpError);
+    function codeClass(status) {
+      return Number(String(status).charAt(0) + "00");
+    }
+    function createError() {
+      var err;
+      var msg;
+      var status = 500;
+      var props = {};
+      for (var i = 0; i < arguments.length; i++) {
+        var arg = arguments[i];
+        var type2 = typeof arg;
+        if (type2 === "object" && arg instanceof Error) {
+          err = arg;
+          status = err.status || err.statusCode || status;
+        } else if (type2 === "number" && i === 0) {
+          status = arg;
+        } else if (type2 === "string") {
+          msg = arg;
+        } else if (type2 === "object") {
+          props = arg;
+        } else {
+          throw new TypeError("argument #" + (i + 1) + " unsupported type " + type2);
+        }
+      }
+      if (typeof status === "number" && (status < 400 || status >= 600)) {
+        deprecate("non-error status code; use only 4xx or 5xx status codes");
+      }
+      if (typeof status !== "number" || !statuses.message[status] && (status < 400 || status >= 600)) {
+        status = 500;
+      }
+      var HttpError = createError[status] || createError[codeClass(status)];
+      if (!err) {
+        err = HttpError ? new HttpError(msg) : new Error(msg || statuses.message[status]);
+        Error.captureStackTrace(err, createError);
+      }
+      if (!HttpError || !(err instanceof HttpError) || err.status !== status) {
+        err.expose = status < 500;
+        err.status = err.statusCode = status;
+      }
+      for (var key in props) {
+        if (key !== "status" && key !== "statusCode") {
+          err[key] = props[key];
+        }
+      }
+      return err;
+    }
+    function createHttpErrorConstructor() {
+      function HttpError() {
+        throw new TypeError("cannot construct abstract class");
+      }
+      inherits(HttpError, Error);
+      return HttpError;
+    }
+    function createClientErrorConstructor(HttpError, name, code) {
+      var className = toClassName(name);
+      function ClientError(message) {
+        var msg = message != null ? message : statuses.message[code];
+        var err = new Error(msg);
+        Error.captureStackTrace(err, ClientError);
+        setPrototypeOf2(err, ClientError.prototype);
+        Object.defineProperty(err, "message", {
+          enumerable: true,
+          configurable: true,
+          value: msg,
+          writable: true
+        });
+        Object.defineProperty(err, "name", {
+          enumerable: false,
+          configurable: true,
+          value: className,
+          writable: true
+        });
+        return err;
+      }
+      inherits(ClientError, HttpError);
+      nameFunc(ClientError, className);
+      ClientError.prototype.status = code;
+      ClientError.prototype.statusCode = code;
+      ClientError.prototype.expose = true;
+      return ClientError;
+    }
+    function createIsHttpErrorFunction(HttpError) {
+      return function isHttpError(val) {
+        if (!val || typeof val !== "object") {
+          return false;
+        }
+        if (val instanceof HttpError) {
+          return true;
+        }
+        return val instanceof Error && typeof val.expose === "boolean" && typeof val.statusCode === "number" && val.status === val.statusCode;
+      };
+    }
+    function createServerErrorConstructor(HttpError, name, code) {
+      var className = toClassName(name);
+      function ServerError(message) {
+        var msg = message != null ? message : statuses.message[code];
+        var err = new Error(msg);
+        Error.captureStackTrace(err, ServerError);
+        setPrototypeOf2(err, ServerError.prototype);
+        Object.defineProperty(err, "message", {
+          enumerable: true,
+          configurable: true,
+          value: msg,
+          writable: true
+        });
+        Object.defineProperty(err, "name", {
+          enumerable: false,
+          configurable: true,
+          value: className,
+          writable: true
+        });
+        return err;
+      }
+      inherits(ServerError, HttpError);
+      nameFunc(ServerError, className);
+      ServerError.prototype.status = code;
+      ServerError.prototype.statusCode = code;
+      ServerError.prototype.expose = false;
+      return ServerError;
+    }
+    function nameFunc(func, name) {
+      var desc = Object.getOwnPropertyDescriptor(func, "name");
+      if (desc && desc.configurable) {
+        desc.value = name;
+        Object.defineProperty(func, "name", desc);
+      }
+    }
+    function populateConstructorExports(exports3, codes, HttpError) {
+      codes.forEach(function forEachCode(code) {
+        var CodeError;
+        var name = toIdentifier(statuses.message[code]);
+        switch (codeClass(code)) {
+          case 400:
+            CodeError = createClientErrorConstructor(HttpError, name, code);
+            break;
+          case 500:
+            CodeError = createServerErrorConstructor(HttpError, name, code);
+            break;
+        }
+        if (CodeError) {
+          exports3[code] = CodeError;
+          exports3[name] = CodeError;
+        }
+      });
+    }
+    function toClassName(name) {
+      return name.substr(-5) !== "Error" ? name + "Error" : name;
+    }
+  }
+});
+
+// node_modules/.pnpm/ms@2.0.0/node_modules/ms/index.js
+var require_ms = __commonJS({
+  "node_modules/.pnpm/ms@2.0.0/node_modules/ms/index.js"(exports2, module2) {
+    init_cjs_shims();
+    var s2 = 1e3;
+    var m = s2 * 60;
+    var h = m * 60;
+    var d = h * 24;
+    var y2 = d * 365.25;
+    module2.exports = function(val, options) {
+      options = options || {};
+      var type2 = typeof val;
+      if (type2 === "string" && val.length > 0) {
+        return parse5(val);
+      } else if (type2 === "number" && isNaN(val) === false) {
+        return options.long ? fmtLong(val) : fmtShort(val);
+      }
+      throw new Error(
+        "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
+      );
+    };
+    function parse5(str) {
+      str = String(str);
+      if (str.length > 100) {
+        return;
+      }
+      var match2 = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
+        str
+      );
+      if (!match2) {
+        return;
+      }
+      var n = parseFloat(match2[1]);
+      var type2 = (match2[2] || "ms").toLowerCase();
+      switch (type2) {
+        case "years":
+        case "year":
+        case "yrs":
+        case "yr":
+        case "y":
+          return n * y2;
+        case "days":
+        case "day":
+        case "d":
+          return n * d;
+        case "hours":
+        case "hour":
+        case "hrs":
+        case "hr":
+        case "h":
+          return n * h;
+        case "minutes":
+        case "minute":
+        case "mins":
+        case "min":
+        case "m":
+          return n * m;
+        case "seconds":
+        case "second":
+        case "secs":
+        case "sec":
+        case "s":
+          return n * s2;
+        case "milliseconds":
+        case "millisecond":
+        case "msecs":
+        case "msec":
+        case "ms":
+          return n;
+        default:
+          return void 0;
+      }
+    }
+    function fmtShort(ms) {
+      if (ms >= d) {
+        return Math.round(ms / d) + "d";
+      }
+      if (ms >= h) {
+        return Math.round(ms / h) + "h";
+      }
+      if (ms >= m) {
+        return Math.round(ms / m) + "m";
+      }
+      if (ms >= s2) {
+        return Math.round(ms / s2) + "s";
+      }
+      return ms + "ms";
+    }
+    function fmtLong(ms) {
+      return plural2(ms, d, "day") || plural2(ms, h, "hour") || plural2(ms, m, "minute") || plural2(ms, s2, "second") || ms + " ms";
+    }
+    function plural2(ms, n, name) {
+      if (ms < n) {
+        return;
+      }
+      if (ms < n * 1.5) {
+        return Math.floor(ms / n) + " " + name;
+      }
+      return Math.ceil(ms / n) + " " + name + "s";
+    }
+  }
+});
+
+// node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/debug.js
+var require_debug = __commonJS({
+  "node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/debug.js"(exports2, module2) {
+    init_cjs_shims();
+    exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
+    exports2.coerce = coerce;
+    exports2.disable = disable;
+    exports2.enable = enable;
+    exports2.enabled = enabled;
+    exports2.humanize = require_ms();
+    exports2.names = [];
+    exports2.skips = [];
+    exports2.formatters = {};
+    var prevTime;
+    function selectColor(namespace) {
+      var hash = 0, i;
+      for (i in namespace) {
+        hash = (hash << 5) - hash + namespace.charCodeAt(i);
+        hash |= 0;
+      }
+      return exports2.colors[Math.abs(hash) % exports2.colors.length];
+    }
+    function createDebug(namespace) {
+      function debug() {
+        if (!debug.enabled) return;
+        var self = debug;
+        var curr = +/* @__PURE__ */ new Date();
+        var ms = curr - (prevTime || curr);
+        self.diff = ms;
+        self.prev = prevTime;
+        self.curr = curr;
+        prevTime = curr;
+        var args = new Array(arguments.length);
+        for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i];
+        }
+        args[0] = exports2.coerce(args[0]);
+        if ("string" !== typeof args[0]) {
+          args.unshift("%O");
+        }
+        var index = 0;
+        args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match2, format) {
+          if (match2 === "%%") return match2;
+          index++;
+          var formatter = exports2.formatters[format];
+          if ("function" === typeof formatter) {
+            var val = args[index];
+            match2 = formatter.call(self, val);
+            args.splice(index, 1);
+            index--;
+          }
+          return match2;
+        });
+        exports2.formatArgs.call(self, args);
+        var logFn = debug.log || exports2.log || console.log.bind(console);
+        logFn.apply(self, args);
+      }
+      debug.namespace = namespace;
+      debug.enabled = exports2.enabled(namespace);
+      debug.useColors = exports2.useColors();
+      debug.color = selectColor(namespace);
+      if ("function" === typeof exports2.init) {
+        exports2.init(debug);
+      }
+      return debug;
+    }
+    function enable(namespaces) {
+      exports2.save(namespaces);
+      exports2.names = [];
+      exports2.skips = [];
+      var split = (typeof namespaces === "string" ? namespaces : "").split(/[\s,]+/);
+      var len = split.length;
+      for (var i = 0; i < len; i++) {
+        if (!split[i]) continue;
+        namespaces = split[i].replace(/\*/g, ".*?");
+        if (namespaces[0] === "-") {
+          exports2.skips.push(new RegExp("^" + namespaces.substr(1) + "$"));
+        } else {
+          exports2.names.push(new RegExp("^" + namespaces + "$"));
+        }
+      }
+    }
+    function disable() {
+      exports2.enable("");
+    }
+    function enabled(name) {
+      var i, len;
+      for (i = 0, len = exports2.skips.length; i < len; i++) {
+        if (exports2.skips[i].test(name)) {
+          return false;
+        }
+      }
+      for (i = 0, len = exports2.names.length; i < len; i++) {
+        if (exports2.names[i].test(name)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function coerce(val) {
+      if (val instanceof Error) return val.stack || val.message;
+      return val;
+    }
+  }
+});
+
+// node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/browser.js
+var require_browser = __commonJS({
+  "node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/browser.js"(exports2, module2) {
+    init_cjs_shims();
+    exports2 = module2.exports = require_debug();
+    exports2.log = log3;
+    exports2.formatArgs = formatArgs;
+    exports2.save = save2;
+    exports2.load = load3;
+    exports2.useColors = useColors;
+    exports2.storage = "undefined" != typeof chrome && "undefined" != typeof chrome.storage ? chrome.storage.local : localstorage();
+    exports2.colors = [
+      "lightseagreen",
+      "forestgreen",
+      "goldenrod",
+      "dodgerblue",
+      "darkorchid",
+      "crimson"
+    ];
+    function useColors() {
+      if (typeof window !== "undefined" && window.process && window.process.type === "renderer") {
+        return true;
+      }
+      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // is firebug? http://stackoverflow.com/a/398120/376773
+      typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) || // is firefox >= v31?
+      // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+      typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // double check webkit in userAgent just in case we are in a worker
+      typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+    }
+    exports2.formatters.j = function(v2) {
+      try {
+        return JSON.stringify(v2);
+      } catch (err) {
+        return "[UnexpectedJSONParseError]: " + err.message;
+      }
+    };
+    function formatArgs(args) {
+      var useColors2 = this.useColors;
+      args[0] = (useColors2 ? "%c" : "") + this.namespace + (useColors2 ? " %c" : " ") + args[0] + (useColors2 ? "%c " : " ") + "+" + exports2.humanize(this.diff);
+      if (!useColors2) return;
+      var c = "color: " + this.color;
+      args.splice(1, 0, c, "color: inherit");
+      var index = 0;
+      var lastC = 0;
+      args[0].replace(/%[a-zA-Z%]/g, function(match2) {
+        if ("%%" === match2) return;
+        index++;
+        if ("%c" === match2) {
+          lastC = index;
+        }
+      });
+      args.splice(lastC, 0, c);
+    }
+    function log3() {
+      return "object" === typeof console && console.log && Function.prototype.apply.call(console.log, console, arguments);
+    }
+    function save2(namespaces) {
+      try {
+        if (null == namespaces) {
+          exports2.storage.removeItem("debug");
+        } else {
+          exports2.storage.debug = namespaces;
+        }
+      } catch (e) {
+      }
+    }
+    function load3() {
+      var r;
+      try {
+        r = exports2.storage.debug;
+      } catch (e) {
+      }
+      if (!r && typeof process !== "undefined" && "env" in process) {
+        r = process.env.DEBUG;
+      }
+      return r;
+    }
+    exports2.enable(load3());
+    function localstorage() {
+      try {
+        return window.localStorage;
+      } catch (e) {
+      }
+    }
+  }
+});
+
+// node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/node.js
+var require_node = __commonJS({
+  "node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/node.js"(exports2, module2) {
+    init_cjs_shims();
+    var tty = require("tty");
+    var util = require("util");
+    exports2 = module2.exports = require_debug();
+    exports2.init = init;
+    exports2.log = log3;
+    exports2.formatArgs = formatArgs;
+    exports2.save = save2;
+    exports2.load = load3;
+    exports2.useColors = useColors;
+    exports2.colors = [6, 2, 3, 4, 5, 1];
+    exports2.inspectOpts = Object.keys(process.env).filter(function(key) {
+      return /^debug_/i.test(key);
+    }).reduce(function(obj, key) {
+      var prop = key.substring(6).toLowerCase().replace(/_([a-z])/g, function(_2, k) {
+        return k.toUpperCase();
+      });
+      var val = process.env[key];
+      if (/^(yes|on|true|enabled)$/i.test(val)) val = true;
+      else if (/^(no|off|false|disabled)$/i.test(val)) val = false;
+      else if (val === "null") val = null;
+      else val = Number(val);
+      obj[prop] = val;
+      return obj;
+    }, {});
+    var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
+    if (1 !== fd && 2 !== fd) {
+      util.deprecate(function() {
+      }, "except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)")();
+    }
+    var stream = 1 === fd ? process.stdout : 2 === fd ? process.stderr : createWritableStdioStream(fd);
+    function useColors() {
+      return "colors" in exports2.inspectOpts ? Boolean(exports2.inspectOpts.colors) : tty.isatty(fd);
+    }
+    exports2.formatters.o = function(v2) {
+      this.inspectOpts.colors = this.useColors;
+      return util.inspect(v2, this.inspectOpts).split("\n").map(function(str) {
+        return str.trim();
+      }).join(" ");
+    };
+    exports2.formatters.O = function(v2) {
+      this.inspectOpts.colors = this.useColors;
+      return util.inspect(v2, this.inspectOpts);
+    };
+    function formatArgs(args) {
+      var name = this.namespace;
+      var useColors2 = this.useColors;
+      if (useColors2) {
+        var c = this.color;
+        var prefix = "  \x1B[3" + c + ";1m" + name + " \x1B[0m";
+        args[0] = prefix + args[0].split("\n").join("\n" + prefix);
+        args.push("\x1B[3" + c + "m+" + exports2.humanize(this.diff) + "\x1B[0m");
+      } else {
+        args[0] = (/* @__PURE__ */ new Date()).toUTCString() + " " + name + " " + args[0];
+      }
+    }
+    function log3() {
+      return stream.write(util.format.apply(util, arguments) + "\n");
+    }
+    function save2(namespaces) {
+      if (null == namespaces) {
+        delete process.env.DEBUG;
+      } else {
+        process.env.DEBUG = namespaces;
+      }
+    }
+    function load3() {
+      return process.env.DEBUG;
+    }
+    function createWritableStdioStream(fd2) {
+      var stream2;
+      var tty_wrap = process.binding("tty_wrap");
+      switch (tty_wrap.guessHandleType(fd2)) {
+        case "TTY":
+          stream2 = new tty.WriteStream(fd2);
+          stream2._type = "tty";
+          if (stream2._handle && stream2._handle.unref) {
+            stream2._handle.unref();
+          }
+          break;
+        case "FILE":
+          var fs = require("fs");
+          stream2 = new fs.SyncWriteStream(fd2, { autoClose: false });
+          stream2._type = "fs";
+          break;
+        case "PIPE":
+        case "TCP":
+          var net = require("net");
+          stream2 = new net.Socket({
+            fd: fd2,
+            readable: false,
+            writable: true
+          });
+          stream2.readable = false;
+          stream2.read = null;
+          stream2._type = "pipe";
+          if (stream2._handle && stream2._handle.unref) {
+            stream2._handle.unref();
+          }
+          break;
+        default:
+          throw new Error("Implement me. Unknown stream file type!");
+      }
+      stream2.fd = fd2;
+      stream2._isStdio = true;
+      return stream2;
+    }
+    function init(debug) {
+      debug.inspectOpts = {};
+      var keys2 = Object.keys(exports2.inspectOpts);
+      for (var i = 0; i < keys2.length; i++) {
+        debug.inspectOpts[keys2[i]] = exports2.inspectOpts[keys2[i]];
+      }
+    }
+    exports2.enable(load3());
+  }
+});
+
+// node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/index.js
+var require_src = __commonJS({
+  "node_modules/.pnpm/debug@2.6.9/node_modules/debug/src/index.js"(exports2, module2) {
+    init_cjs_shims();
+    if (typeof process !== "undefined" && process.type === "renderer") {
+      module2.exports = require_browser();
+    } else {
+      module2.exports = require_node();
+    }
+  }
+});
+
+// node_modules/.pnpm/destroy@1.2.0/node_modules/destroy/index.js
+var require_destroy = __commonJS({
+  "node_modules/.pnpm/destroy@1.2.0/node_modules/destroy/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var EventEmitter3 = require("events").EventEmitter;
+    var ReadStream = require("fs").ReadStream;
+    var Stream = require("stream");
+    var Zlib = require("zlib");
+    module2.exports = destroy;
+    function destroy(stream, suppress) {
+      if (isFsReadStream(stream)) {
+        destroyReadStream(stream);
+      } else if (isZlibStream(stream)) {
+        destroyZlibStream(stream);
+      } else if (hasDestroy(stream)) {
+        stream.destroy();
+      }
+      if (isEventEmitter(stream) && suppress) {
+        stream.removeAllListeners("error");
+        stream.addListener("error", noop);
+      }
+      return stream;
+    }
+    function destroyReadStream(stream) {
+      stream.destroy();
+      if (typeof stream.close === "function") {
+        stream.on("open", onOpenClose);
+      }
+    }
+    function closeZlibStream(stream) {
+      if (stream._hadError === true) {
+        var prop = stream._binding === null ? "_binding" : "_handle";
+        stream[prop] = {
+          close: function() {
+            this[prop] = null;
+          }
+        };
+      }
+      stream.close();
+    }
+    function destroyZlibStream(stream) {
+      if (typeof stream.destroy === "function") {
+        if (stream._binding) {
+          stream.destroy();
+          if (stream._processing) {
+            stream._needDrain = true;
+            stream.once("drain", onDrainClearBinding);
+          } else {
+            stream._binding.clear();
+          }
+        } else if (stream._destroy && stream._destroy !== Stream.Transform.prototype._destroy) {
+          stream.destroy();
+        } else if (stream._destroy && typeof stream.close === "function") {
+          stream.destroyed = true;
+          stream.close();
+        } else {
+          stream.destroy();
+        }
+      } else if (typeof stream.close === "function") {
+        closeZlibStream(stream);
+      }
+    }
+    function hasDestroy(stream) {
+      return stream instanceof Stream && typeof stream.destroy === "function";
+    }
+    function isEventEmitter(val) {
+      return val instanceof EventEmitter3;
+    }
+    function isFsReadStream(stream) {
+      return stream instanceof ReadStream;
+    }
+    function isZlibStream(stream) {
+      return stream instanceof Zlib.Gzip || stream instanceof Zlib.Gunzip || stream instanceof Zlib.Deflate || stream instanceof Zlib.DeflateRaw || stream instanceof Zlib.Inflate || stream instanceof Zlib.InflateRaw || stream instanceof Zlib.Unzip;
+    }
+    function noop() {
+    }
+    function onDrainClearBinding() {
+      this._binding.clear();
+    }
+    function onOpenClose() {
+      if (typeof this.fd === "number") {
+        this.close();
+      }
+    }
+  }
+});
+
+// node_modules/.pnpm/etag@1.8.1/node_modules/etag/index.js
+var require_etag = __commonJS({
+  "node_modules/.pnpm/etag@1.8.1/node_modules/etag/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = etag;
+    var crypto = require("crypto");
+    var Stats = require("fs").Stats;
+    var toString3 = Object.prototype.toString;
+    function entitytag(entity) {
+      if (entity.length === 0) {
+        return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
+      }
+      var hash = crypto.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
+      var len = typeof entity === "string" ? Buffer.byteLength(entity, "utf8") : entity.length;
+      return '"' + len.toString(16) + "-" + hash + '"';
+    }
+    function etag(entity, options) {
+      if (entity == null) {
+        throw new TypeError("argument entity is required");
+      }
+      var isStats = isstats(entity);
+      var weak = options && typeof options.weak === "boolean" ? options.weak : isStats;
+      if (!isStats && typeof entity !== "string" && !Buffer.isBuffer(entity)) {
+        throw new TypeError("argument entity must be string, Buffer, or fs.Stats");
+      }
+      var tag = isStats ? stattag(entity) : entitytag(entity);
+      return weak ? "W/" + tag : tag;
+    }
+    function isstats(obj) {
+      if (typeof Stats === "function" && obj instanceof Stats) {
+        return true;
+      }
+      return obj && typeof obj === "object" && "ctime" in obj && toString3.call(obj.ctime) === "[object Date]" && "mtime" in obj && toString3.call(obj.mtime) === "[object Date]" && "ino" in obj && typeof obj.ino === "number" && "size" in obj && typeof obj.size === "number";
+    }
+    function stattag(stat2) {
+      var mtime = stat2.mtime.getTime().toString(16);
+      var size = stat2.size.toString(16);
+      return '"' + size + "-" + mtime + '"';
+    }
+  }
+});
+
+// node_modules/.pnpm/fresh@0.5.2/node_modules/fresh/index.js
+var require_fresh = __commonJS({
+  "node_modules/.pnpm/fresh@0.5.2/node_modules/fresh/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var CACHE_CONTROL_NO_CACHE_REGEXP = /(?:^|,)\s*?no-cache\s*?(?:,|$)/;
+    module2.exports = fresh;
+    function fresh(reqHeaders, resHeaders) {
+      var modifiedSince = reqHeaders["if-modified-since"];
+      var noneMatch = reqHeaders["if-none-match"];
+      if (!modifiedSince && !noneMatch) {
+        return false;
+      }
+      var cacheControl = reqHeaders["cache-control"];
+      if (cacheControl && CACHE_CONTROL_NO_CACHE_REGEXP.test(cacheControl)) {
+        return false;
+      }
+      if (noneMatch && noneMatch !== "*") {
+        var etag = resHeaders["etag"];
+        if (!etag) {
+          return false;
+        }
+        var etagStale = true;
+        var matches = parseTokenList(noneMatch);
+        for (var i = 0; i < matches.length; i++) {
+          var match2 = matches[i];
+          if (match2 === etag || match2 === "W/" + etag || "W/" + match2 === etag) {
+            etagStale = false;
+            break;
+          }
+        }
+        if (etagStale) {
+          return false;
+        }
+      }
+      if (modifiedSince) {
+        var lastModified = resHeaders["last-modified"];
+        var modifiedStale = !lastModified || !(parseHttpDate(lastModified) <= parseHttpDate(modifiedSince));
+        if (modifiedStale) {
+          return false;
+        }
+      }
+      return true;
+    }
+    function parseHttpDate(date) {
+      var timestamp = date && Date.parse(date);
+      return typeof timestamp === "number" ? timestamp : NaN;
+    }
+    function parseTokenList(str) {
+      var end = 0;
+      var list3 = [];
+      var start = 0;
+      for (var i = 0, len = str.length; i < len; i++) {
+        switch (str.charCodeAt(i)) {
+          case 32:
+            if (start === end) {
+              start = end = i + 1;
+            }
+            break;
+          case 44:
+            list3.push(str.substring(start, end));
+            start = end = i + 1;
+            break;
+          default:
+            end = i + 1;
+            break;
+        }
+      }
+      list3.push(str.substring(start, end));
+      return list3;
+    }
+  }
+});
+
+// node_modules/.pnpm/mime@1.6.0/node_modules/mime/types.json
+var require_types = __commonJS({
+  "node_modules/.pnpm/mime@1.6.0/node_modules/mime/types.json"(exports2, module2) {
+    module2.exports = { "application/andrew-inset": ["ez"], "application/applixware": ["aw"], "application/atom+xml": ["atom"], "application/atomcat+xml": ["atomcat"], "application/atomsvc+xml": ["atomsvc"], "application/bdoc": ["bdoc"], "application/ccxml+xml": ["ccxml"], "application/cdmi-capability": ["cdmia"], "application/cdmi-container": ["cdmic"], "application/cdmi-domain": ["cdmid"], "application/cdmi-object": ["cdmio"], "application/cdmi-queue": ["cdmiq"], "application/cu-seeme": ["cu"], "application/dash+xml": ["mpd"], "application/davmount+xml": ["davmount"], "application/docbook+xml": ["dbk"], "application/dssc+der": ["dssc"], "application/dssc+xml": ["xdssc"], "application/ecmascript": ["ecma"], "application/emma+xml": ["emma"], "application/epub+zip": ["epub"], "application/exi": ["exi"], "application/font-tdpfr": ["pfr"], "application/font-woff": [], "application/font-woff2": [], "application/geo+json": ["geojson"], "application/gml+xml": ["gml"], "application/gpx+xml": ["gpx"], "application/gxf": ["gxf"], "application/gzip": ["gz"], "application/hyperstudio": ["stk"], "application/inkml+xml": ["ink", "inkml"], "application/ipfix": ["ipfix"], "application/java-archive": ["jar", "war", "ear"], "application/java-serialized-object": ["ser"], "application/java-vm": ["class"], "application/javascript": ["js", "mjs"], "application/json": ["json", "map"], "application/json5": ["json5"], "application/jsonml+json": ["jsonml"], "application/ld+json": ["jsonld"], "application/lost+xml": ["lostxml"], "application/mac-binhex40": ["hqx"], "application/mac-compactpro": ["cpt"], "application/mads+xml": ["mads"], "application/manifest+json": ["webmanifest"], "application/marc": ["mrc"], "application/marcxml+xml": ["mrcx"], "application/mathematica": ["ma", "nb", "mb"], "application/mathml+xml": ["mathml"], "application/mbox": ["mbox"], "application/mediaservercontrol+xml": ["mscml"], "application/metalink+xml": ["metalink"], "application/metalink4+xml": ["meta4"], "application/mets+xml": ["mets"], "application/mods+xml": ["mods"], "application/mp21": ["m21", "mp21"], "application/mp4": ["mp4s", "m4p"], "application/msword": ["doc", "dot"], "application/mxf": ["mxf"], "application/octet-stream": ["bin", "dms", "lrf", "mar", "so", "dist", "distz", "pkg", "bpk", "dump", "elc", "deploy", "exe", "dll", "deb", "dmg", "iso", "img", "msi", "msp", "msm", "buffer"], "application/oda": ["oda"], "application/oebps-package+xml": ["opf"], "application/ogg": ["ogx"], "application/omdoc+xml": ["omdoc"], "application/onenote": ["onetoc", "onetoc2", "onetmp", "onepkg"], "application/oxps": ["oxps"], "application/patch-ops-error+xml": ["xer"], "application/pdf": ["pdf"], "application/pgp-encrypted": ["pgp"], "application/pgp-signature": ["asc", "sig"], "application/pics-rules": ["prf"], "application/pkcs10": ["p10"], "application/pkcs7-mime": ["p7m", "p7c"], "application/pkcs7-signature": ["p7s"], "application/pkcs8": ["p8"], "application/pkix-attr-cert": ["ac"], "application/pkix-cert": ["cer"], "application/pkix-crl": ["crl"], "application/pkix-pkipath": ["pkipath"], "application/pkixcmp": ["pki"], "application/pls+xml": ["pls"], "application/postscript": ["ai", "eps", "ps"], "application/prs.cww": ["cww"], "application/pskc+xml": ["pskcxml"], "application/raml+yaml": ["raml"], "application/rdf+xml": ["rdf"], "application/reginfo+xml": ["rif"], "application/relax-ng-compact-syntax": ["rnc"], "application/resource-lists+xml": ["rl"], "application/resource-lists-diff+xml": ["rld"], "application/rls-services+xml": ["rs"], "application/rpki-ghostbusters": ["gbr"], "application/rpki-manifest": ["mft"], "application/rpki-roa": ["roa"], "application/rsd+xml": ["rsd"], "application/rss+xml": ["rss"], "application/rtf": ["rtf"], "application/sbml+xml": ["sbml"], "application/scvp-cv-request": ["scq"], "application/scvp-cv-response": ["scs"], "application/scvp-vp-request": ["spq"], "application/scvp-vp-response": ["spp"], "application/sdp": ["sdp"], "application/set-payment-initiation": ["setpay"], "application/set-registration-initiation": ["setreg"], "application/shf+xml": ["shf"], "application/smil+xml": ["smi", "smil"], "application/sparql-query": ["rq"], "application/sparql-results+xml": ["srx"], "application/srgs": ["gram"], "application/srgs+xml": ["grxml"], "application/sru+xml": ["sru"], "application/ssdl+xml": ["ssdl"], "application/ssml+xml": ["ssml"], "application/tei+xml": ["tei", "teicorpus"], "application/thraud+xml": ["tfi"], "application/timestamped-data": ["tsd"], "application/vnd.3gpp.pic-bw-large": ["plb"], "application/vnd.3gpp.pic-bw-small": ["psb"], "application/vnd.3gpp.pic-bw-var": ["pvb"], "application/vnd.3gpp2.tcap": ["tcap"], "application/vnd.3m.post-it-notes": ["pwn"], "application/vnd.accpac.simply.aso": ["aso"], "application/vnd.accpac.simply.imp": ["imp"], "application/vnd.acucobol": ["acu"], "application/vnd.acucorp": ["atc", "acutc"], "application/vnd.adobe.air-application-installer-package+zip": ["air"], "application/vnd.adobe.formscentral.fcdt": ["fcdt"], "application/vnd.adobe.fxp": ["fxp", "fxpl"], "application/vnd.adobe.xdp+xml": ["xdp"], "application/vnd.adobe.xfdf": ["xfdf"], "application/vnd.ahead.space": ["ahead"], "application/vnd.airzip.filesecure.azf": ["azf"], "application/vnd.airzip.filesecure.azs": ["azs"], "application/vnd.amazon.ebook": ["azw"], "application/vnd.americandynamics.acc": ["acc"], "application/vnd.amiga.ami": ["ami"], "application/vnd.android.package-archive": ["apk"], "application/vnd.anser-web-certificate-issue-initiation": ["cii"], "application/vnd.anser-web-funds-transfer-initiation": ["fti"], "application/vnd.antix.game-component": ["atx"], "application/vnd.apple.installer+xml": ["mpkg"], "application/vnd.apple.mpegurl": ["m3u8"], "application/vnd.apple.pkpass": ["pkpass"], "application/vnd.aristanetworks.swi": ["swi"], "application/vnd.astraea-software.iota": ["iota"], "application/vnd.audiograph": ["aep"], "application/vnd.blueice.multipass": ["mpm"], "application/vnd.bmi": ["bmi"], "application/vnd.businessobjects": ["rep"], "application/vnd.chemdraw+xml": ["cdxml"], "application/vnd.chipnuts.karaoke-mmd": ["mmd"], "application/vnd.cinderella": ["cdy"], "application/vnd.claymore": ["cla"], "application/vnd.cloanto.rp9": ["rp9"], "application/vnd.clonk.c4group": ["c4g", "c4d", "c4f", "c4p", "c4u"], "application/vnd.cluetrust.cartomobile-config": ["c11amc"], "application/vnd.cluetrust.cartomobile-config-pkg": ["c11amz"], "application/vnd.commonspace": ["csp"], "application/vnd.contact.cmsg": ["cdbcmsg"], "application/vnd.cosmocaller": ["cmc"], "application/vnd.crick.clicker": ["clkx"], "application/vnd.crick.clicker.keyboard": ["clkk"], "application/vnd.crick.clicker.palette": ["clkp"], "application/vnd.crick.clicker.template": ["clkt"], "application/vnd.crick.clicker.wordbank": ["clkw"], "application/vnd.criticaltools.wbs+xml": ["wbs"], "application/vnd.ctc-posml": ["pml"], "application/vnd.cups-ppd": ["ppd"], "application/vnd.curl.car": ["car"], "application/vnd.curl.pcurl": ["pcurl"], "application/vnd.dart": ["dart"], "application/vnd.data-vision.rdz": ["rdz"], "application/vnd.dece.data": ["uvf", "uvvf", "uvd", "uvvd"], "application/vnd.dece.ttml+xml": ["uvt", "uvvt"], "application/vnd.dece.unspecified": ["uvx", "uvvx"], "application/vnd.dece.zip": ["uvz", "uvvz"], "application/vnd.denovo.fcselayout-link": ["fe_launch"], "application/vnd.dna": ["dna"], "application/vnd.dolby.mlp": ["mlp"], "application/vnd.dpgraph": ["dpg"], "application/vnd.dreamfactory": ["dfac"], "application/vnd.ds-keypoint": ["kpxx"], "application/vnd.dvb.ait": ["ait"], "application/vnd.dvb.service": ["svc"], "application/vnd.dynageo": ["geo"], "application/vnd.ecowin.chart": ["mag"], "application/vnd.enliven": ["nml"], "application/vnd.epson.esf": ["esf"], "application/vnd.epson.msf": ["msf"], "application/vnd.epson.quickanime": ["qam"], "application/vnd.epson.salt": ["slt"], "application/vnd.epson.ssf": ["ssf"], "application/vnd.eszigno3+xml": ["es3", "et3"], "application/vnd.ezpix-album": ["ez2"], "application/vnd.ezpix-package": ["ez3"], "application/vnd.fdf": ["fdf"], "application/vnd.fdsn.mseed": ["mseed"], "application/vnd.fdsn.seed": ["seed", "dataless"], "application/vnd.flographit": ["gph"], "application/vnd.fluxtime.clip": ["ftc"], "application/vnd.framemaker": ["fm", "frame", "maker", "book"], "application/vnd.frogans.fnc": ["fnc"], "application/vnd.frogans.ltf": ["ltf"], "application/vnd.fsc.weblaunch": ["fsc"], "application/vnd.fujitsu.oasys": ["oas"], "application/vnd.fujitsu.oasys2": ["oa2"], "application/vnd.fujitsu.oasys3": ["oa3"], "application/vnd.fujitsu.oasysgp": ["fg5"], "application/vnd.fujitsu.oasysprs": ["bh2"], "application/vnd.fujixerox.ddd": ["ddd"], "application/vnd.fujixerox.docuworks": ["xdw"], "application/vnd.fujixerox.docuworks.binder": ["xbd"], "application/vnd.fuzzysheet": ["fzs"], "application/vnd.genomatix.tuxedo": ["txd"], "application/vnd.geogebra.file": ["ggb"], "application/vnd.geogebra.tool": ["ggt"], "application/vnd.geometry-explorer": ["gex", "gre"], "application/vnd.geonext": ["gxt"], "application/vnd.geoplan": ["g2w"], "application/vnd.geospace": ["g3w"], "application/vnd.gmx": ["gmx"], "application/vnd.google-apps.document": ["gdoc"], "application/vnd.google-apps.presentation": ["gslides"], "application/vnd.google-apps.spreadsheet": ["gsheet"], "application/vnd.google-earth.kml+xml": ["kml"], "application/vnd.google-earth.kmz": ["kmz"], "application/vnd.grafeq": ["gqf", "gqs"], "application/vnd.groove-account": ["gac"], "application/vnd.groove-help": ["ghf"], "application/vnd.groove-identity-message": ["gim"], "application/vnd.groove-injector": ["grv"], "application/vnd.groove-tool-message": ["gtm"], "application/vnd.groove-tool-template": ["tpl"], "application/vnd.groove-vcard": ["vcg"], "application/vnd.hal+xml": ["hal"], "application/vnd.handheld-entertainment+xml": ["zmm"], "application/vnd.hbci": ["hbci"], "application/vnd.hhe.lesson-player": ["les"], "application/vnd.hp-hpgl": ["hpgl"], "application/vnd.hp-hpid": ["hpid"], "application/vnd.hp-hps": ["hps"], "application/vnd.hp-jlyt": ["jlt"], "application/vnd.hp-pcl": ["pcl"], "application/vnd.hp-pclxl": ["pclxl"], "application/vnd.hydrostatix.sof-data": ["sfd-hdstx"], "application/vnd.ibm.minipay": ["mpy"], "application/vnd.ibm.modcap": ["afp", "listafp", "list3820"], "application/vnd.ibm.rights-management": ["irm"], "application/vnd.ibm.secure-container": ["sc"], "application/vnd.iccprofile": ["icc", "icm"], "application/vnd.igloader": ["igl"], "application/vnd.immervision-ivp": ["ivp"], "application/vnd.immervision-ivu": ["ivu"], "application/vnd.insors.igm": ["igm"], "application/vnd.intercon.formnet": ["xpw", "xpx"], "application/vnd.intergeo": ["i2g"], "application/vnd.intu.qbo": ["qbo"], "application/vnd.intu.qfx": ["qfx"], "application/vnd.ipunplugged.rcprofile": ["rcprofile"], "application/vnd.irepository.package+xml": ["irp"], "application/vnd.is-xpr": ["xpr"], "application/vnd.isac.fcs": ["fcs"], "application/vnd.jam": ["jam"], "application/vnd.jcp.javame.midlet-rms": ["rms"], "application/vnd.jisp": ["jisp"], "application/vnd.joost.joda-archive": ["joda"], "application/vnd.kahootz": ["ktz", "ktr"], "application/vnd.kde.karbon": ["karbon"], "application/vnd.kde.kchart": ["chrt"], "application/vnd.kde.kformula": ["kfo"], "application/vnd.kde.kivio": ["flw"], "application/vnd.kde.kontour": ["kon"], "application/vnd.kde.kpresenter": ["kpr", "kpt"], "application/vnd.kde.kspread": ["ksp"], "application/vnd.kde.kword": ["kwd", "kwt"], "application/vnd.kenameaapp": ["htke"], "application/vnd.kidspiration": ["kia"], "application/vnd.kinar": ["kne", "knp"], "application/vnd.koan": ["skp", "skd", "skt", "skm"], "application/vnd.kodak-descriptor": ["sse"], "application/vnd.las.las+xml": ["lasxml"], "application/vnd.llamagraphics.life-balance.desktop": ["lbd"], "application/vnd.llamagraphics.life-balance.exchange+xml": ["lbe"], "application/vnd.lotus-1-2-3": ["123"], "application/vnd.lotus-approach": ["apr"], "application/vnd.lotus-freelance": ["pre"], "application/vnd.lotus-notes": ["nsf"], "application/vnd.lotus-organizer": ["org"], "application/vnd.lotus-screencam": ["scm"], "application/vnd.lotus-wordpro": ["lwp"], "application/vnd.macports.portpkg": ["portpkg"], "application/vnd.mcd": ["mcd"], "application/vnd.medcalcdata": ["mc1"], "application/vnd.mediastation.cdkey": ["cdkey"], "application/vnd.mfer": ["mwf"], "application/vnd.mfmp": ["mfm"], "application/vnd.micrografx.flo": ["flo"], "application/vnd.micrografx.igx": ["igx"], "application/vnd.mif": ["mif"], "application/vnd.mobius.daf": ["daf"], "application/vnd.mobius.dis": ["dis"], "application/vnd.mobius.mbk": ["mbk"], "application/vnd.mobius.mqy": ["mqy"], "application/vnd.mobius.msl": ["msl"], "application/vnd.mobius.plc": ["plc"], "application/vnd.mobius.txf": ["txf"], "application/vnd.mophun.application": ["mpn"], "application/vnd.mophun.certificate": ["mpc"], "application/vnd.mozilla.xul+xml": ["xul"], "application/vnd.ms-artgalry": ["cil"], "application/vnd.ms-cab-compressed": ["cab"], "application/vnd.ms-excel": ["xls", "xlm", "xla", "xlc", "xlt", "xlw"], "application/vnd.ms-excel.addin.macroenabled.12": ["xlam"], "application/vnd.ms-excel.sheet.binary.macroenabled.12": ["xlsb"], "application/vnd.ms-excel.sheet.macroenabled.12": ["xlsm"], "application/vnd.ms-excel.template.macroenabled.12": ["xltm"], "application/vnd.ms-fontobject": ["eot"], "application/vnd.ms-htmlhelp": ["chm"], "application/vnd.ms-ims": ["ims"], "application/vnd.ms-lrm": ["lrm"], "application/vnd.ms-officetheme": ["thmx"], "application/vnd.ms-outlook": ["msg"], "application/vnd.ms-pki.seccat": ["cat"], "application/vnd.ms-pki.stl": ["stl"], "application/vnd.ms-powerpoint": ["ppt", "pps", "pot"], "application/vnd.ms-powerpoint.addin.macroenabled.12": ["ppam"], "application/vnd.ms-powerpoint.presentation.macroenabled.12": ["pptm"], "application/vnd.ms-powerpoint.slide.macroenabled.12": ["sldm"], "application/vnd.ms-powerpoint.slideshow.macroenabled.12": ["ppsm"], "application/vnd.ms-powerpoint.template.macroenabled.12": ["potm"], "application/vnd.ms-project": ["mpp", "mpt"], "application/vnd.ms-word.document.macroenabled.12": ["docm"], "application/vnd.ms-word.template.macroenabled.12": ["dotm"], "application/vnd.ms-works": ["wps", "wks", "wcm", "wdb"], "application/vnd.ms-wpl": ["wpl"], "application/vnd.ms-xpsdocument": ["xps"], "application/vnd.mseq": ["mseq"], "application/vnd.musician": ["mus"], "application/vnd.muvee.style": ["msty"], "application/vnd.mynfc": ["taglet"], "application/vnd.neurolanguage.nlu": ["nlu"], "application/vnd.nitf": ["ntf", "nitf"], "application/vnd.noblenet-directory": ["nnd"], "application/vnd.noblenet-sealer": ["nns"], "application/vnd.noblenet-web": ["nnw"], "application/vnd.nokia.n-gage.data": ["ngdat"], "application/vnd.nokia.n-gage.symbian.install": ["n-gage"], "application/vnd.nokia.radio-preset": ["rpst"], "application/vnd.nokia.radio-presets": ["rpss"], "application/vnd.novadigm.edm": ["edm"], "application/vnd.novadigm.edx": ["edx"], "application/vnd.novadigm.ext": ["ext"], "application/vnd.oasis.opendocument.chart": ["odc"], "application/vnd.oasis.opendocument.chart-template": ["otc"], "application/vnd.oasis.opendocument.database": ["odb"], "application/vnd.oasis.opendocument.formula": ["odf"], "application/vnd.oasis.opendocument.formula-template": ["odft"], "application/vnd.oasis.opendocument.graphics": ["odg"], "application/vnd.oasis.opendocument.graphics-template": ["otg"], "application/vnd.oasis.opendocument.image": ["odi"], "application/vnd.oasis.opendocument.image-template": ["oti"], "application/vnd.oasis.opendocument.presentation": ["odp"], "application/vnd.oasis.opendocument.presentation-template": ["otp"], "application/vnd.oasis.opendocument.spreadsheet": ["ods"], "application/vnd.oasis.opendocument.spreadsheet-template": ["ots"], "application/vnd.oasis.opendocument.text": ["odt"], "application/vnd.oasis.opendocument.text-master": ["odm"], "application/vnd.oasis.opendocument.text-template": ["ott"], "application/vnd.oasis.opendocument.text-web": ["oth"], "application/vnd.olpc-sugar": ["xo"], "application/vnd.oma.dd2+xml": ["dd2"], "application/vnd.openofficeorg.extension": ["oxt"], "application/vnd.openxmlformats-officedocument.presentationml.presentation": ["pptx"], "application/vnd.openxmlformats-officedocument.presentationml.slide": ["sldx"], "application/vnd.openxmlformats-officedocument.presentationml.slideshow": ["ppsx"], "application/vnd.openxmlformats-officedocument.presentationml.template": ["potx"], "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ["xlsx"], "application/vnd.openxmlformats-officedocument.spreadsheetml.template": ["xltx"], "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ["docx"], "application/vnd.openxmlformats-officedocument.wordprocessingml.template": ["dotx"], "application/vnd.osgeo.mapguide.package": ["mgp"], "application/vnd.osgi.dp": ["dp"], "application/vnd.osgi.subsystem": ["esa"], "application/vnd.palm": ["pdb", "pqa", "oprc"], "application/vnd.pawaafile": ["paw"], "application/vnd.pg.format": ["str"], "application/vnd.pg.osasli": ["ei6"], "application/vnd.picsel": ["efif"], "application/vnd.pmi.widget": ["wg"], "application/vnd.pocketlearn": ["plf"], "application/vnd.powerbuilder6": ["pbd"], "application/vnd.previewsystems.box": ["box"], "application/vnd.proteus.magazine": ["mgz"], "application/vnd.publishare-delta-tree": ["qps"], "application/vnd.pvi.ptid1": ["ptid"], "application/vnd.quark.quarkxpress": ["qxd", "qxt", "qwd", "qwt", "qxl", "qxb"], "application/vnd.realvnc.bed": ["bed"], "application/vnd.recordare.musicxml": ["mxl"], "application/vnd.recordare.musicxml+xml": ["musicxml"], "application/vnd.rig.cryptonote": ["cryptonote"], "application/vnd.rim.cod": ["cod"], "application/vnd.rn-realmedia": ["rm"], "application/vnd.rn-realmedia-vbr": ["rmvb"], "application/vnd.route66.link66+xml": ["link66"], "application/vnd.sailingtracker.track": ["st"], "application/vnd.seemail": ["see"], "application/vnd.sema": ["sema"], "application/vnd.semd": ["semd"], "application/vnd.semf": ["semf"], "application/vnd.shana.informed.formdata": ["ifm"], "application/vnd.shana.informed.formtemplate": ["itp"], "application/vnd.shana.informed.interchange": ["iif"], "application/vnd.shana.informed.package": ["ipk"], "application/vnd.simtech-mindmapper": ["twd", "twds"], "application/vnd.smaf": ["mmf"], "application/vnd.smart.teacher": ["teacher"], "application/vnd.solent.sdkm+xml": ["sdkm", "sdkd"], "application/vnd.spotfire.dxp": ["dxp"], "application/vnd.spotfire.sfs": ["sfs"], "application/vnd.stardivision.calc": ["sdc"], "application/vnd.stardivision.draw": ["sda"], "application/vnd.stardivision.impress": ["sdd"], "application/vnd.stardivision.math": ["smf"], "application/vnd.stardivision.writer": ["sdw", "vor"], "application/vnd.stardivision.writer-global": ["sgl"], "application/vnd.stepmania.package": ["smzip"], "application/vnd.stepmania.stepchart": ["sm"], "application/vnd.sun.wadl+xml": ["wadl"], "application/vnd.sun.xml.calc": ["sxc"], "application/vnd.sun.xml.calc.template": ["stc"], "application/vnd.sun.xml.draw": ["sxd"], "application/vnd.sun.xml.draw.template": ["std"], "application/vnd.sun.xml.impress": ["sxi"], "application/vnd.sun.xml.impress.template": ["sti"], "application/vnd.sun.xml.math": ["sxm"], "application/vnd.sun.xml.writer": ["sxw"], "application/vnd.sun.xml.writer.global": ["sxg"], "application/vnd.sun.xml.writer.template": ["stw"], "application/vnd.sus-calendar": ["sus", "susp"], "application/vnd.svd": ["svd"], "application/vnd.symbian.install": ["sis", "sisx"], "application/vnd.syncml+xml": ["xsm"], "application/vnd.syncml.dm+wbxml": ["bdm"], "application/vnd.syncml.dm+xml": ["xdm"], "application/vnd.tao.intent-module-archive": ["tao"], "application/vnd.tcpdump.pcap": ["pcap", "cap", "dmp"], "application/vnd.tmobile-livetv": ["tmo"], "application/vnd.trid.tpt": ["tpt"], "application/vnd.triscape.mxs": ["mxs"], "application/vnd.trueapp": ["tra"], "application/vnd.ufdl": ["ufd", "ufdl"], "application/vnd.uiq.theme": ["utz"], "application/vnd.umajin": ["umj"], "application/vnd.unity": ["unityweb"], "application/vnd.uoml+xml": ["uoml"], "application/vnd.vcx": ["vcx"], "application/vnd.visio": ["vsd", "vst", "vss", "vsw"], "application/vnd.visionary": ["vis"], "application/vnd.vsf": ["vsf"], "application/vnd.wap.wbxml": ["wbxml"], "application/vnd.wap.wmlc": ["wmlc"], "application/vnd.wap.wmlscriptc": ["wmlsc"], "application/vnd.webturbo": ["wtb"], "application/vnd.wolfram.player": ["nbp"], "application/vnd.wordperfect": ["wpd"], "application/vnd.wqd": ["wqd"], "application/vnd.wt.stf": ["stf"], "application/vnd.xara": ["xar"], "application/vnd.xfdl": ["xfdl"], "application/vnd.yamaha.hv-dic": ["hvd"], "application/vnd.yamaha.hv-script": ["hvs"], "application/vnd.yamaha.hv-voice": ["hvp"], "application/vnd.yamaha.openscoreformat": ["osf"], "application/vnd.yamaha.openscoreformat.osfpvg+xml": ["osfpvg"], "application/vnd.yamaha.smaf-audio": ["saf"], "application/vnd.yamaha.smaf-phrase": ["spf"], "application/vnd.yellowriver-custom-menu": ["cmp"], "application/vnd.zul": ["zir", "zirz"], "application/vnd.zzazz.deck+xml": ["zaz"], "application/voicexml+xml": ["vxml"], "application/wasm": ["wasm"], "application/widget": ["wgt"], "application/winhlp": ["hlp"], "application/wsdl+xml": ["wsdl"], "application/wspolicy+xml": ["wspolicy"], "application/x-7z-compressed": ["7z"], "application/x-abiword": ["abw"], "application/x-ace-compressed": ["ace"], "application/x-apple-diskimage": [], "application/x-arj": ["arj"], "application/x-authorware-bin": ["aab", "x32", "u32", "vox"], "application/x-authorware-map": ["aam"], "application/x-authorware-seg": ["aas"], "application/x-bcpio": ["bcpio"], "application/x-bdoc": [], "application/x-bittorrent": ["torrent"], "application/x-blorb": ["blb", "blorb"], "application/x-bzip": ["bz"], "application/x-bzip2": ["bz2", "boz"], "application/x-cbr": ["cbr", "cba", "cbt", "cbz", "cb7"], "application/x-cdlink": ["vcd"], "application/x-cfs-compressed": ["cfs"], "application/x-chat": ["chat"], "application/x-chess-pgn": ["pgn"], "application/x-chrome-extension": ["crx"], "application/x-cocoa": ["cco"], "application/x-conference": ["nsc"], "application/x-cpio": ["cpio"], "application/x-csh": ["csh"], "application/x-debian-package": ["udeb"], "application/x-dgc-compressed": ["dgc"], "application/x-director": ["dir", "dcr", "dxr", "cst", "cct", "cxt", "w3d", "fgd", "swa"], "application/x-doom": ["wad"], "application/x-dtbncx+xml": ["ncx"], "application/x-dtbook+xml": ["dtb"], "application/x-dtbresource+xml": ["res"], "application/x-dvi": ["dvi"], "application/x-envoy": ["evy"], "application/x-eva": ["eva"], "application/x-font-bdf": ["bdf"], "application/x-font-ghostscript": ["gsf"], "application/x-font-linux-psf": ["psf"], "application/x-font-pcf": ["pcf"], "application/x-font-snf": ["snf"], "application/x-font-type1": ["pfa", "pfb", "pfm", "afm"], "application/x-freearc": ["arc"], "application/x-futuresplash": ["spl"], "application/x-gca-compressed": ["gca"], "application/x-glulx": ["ulx"], "application/x-gnumeric": ["gnumeric"], "application/x-gramps-xml": ["gramps"], "application/x-gtar": ["gtar"], "application/x-hdf": ["hdf"], "application/x-httpd-php": ["php"], "application/x-install-instructions": ["install"], "application/x-iso9660-image": [], "application/x-java-archive-diff": ["jardiff"], "application/x-java-jnlp-file": ["jnlp"], "application/x-latex": ["latex"], "application/x-lua-bytecode": ["luac"], "application/x-lzh-compressed": ["lzh", "lha"], "application/x-makeself": ["run"], "application/x-mie": ["mie"], "application/x-mobipocket-ebook": ["prc", "mobi"], "application/x-ms-application": ["application"], "application/x-ms-shortcut": ["lnk"], "application/x-ms-wmd": ["wmd"], "application/x-ms-wmz": ["wmz"], "application/x-ms-xbap": ["xbap"], "application/x-msaccess": ["mdb"], "application/x-msbinder": ["obd"], "application/x-mscardfile": ["crd"], "application/x-msclip": ["clp"], "application/x-msdos-program": [], "application/x-msdownload": ["com", "bat"], "application/x-msmediaview": ["mvb", "m13", "m14"], "application/x-msmetafile": ["wmf", "emf", "emz"], "application/x-msmoney": ["mny"], "application/x-mspublisher": ["pub"], "application/x-msschedule": ["scd"], "application/x-msterminal": ["trm"], "application/x-mswrite": ["wri"], "application/x-netcdf": ["nc", "cdf"], "application/x-ns-proxy-autoconfig": ["pac"], "application/x-nzb": ["nzb"], "application/x-perl": ["pl", "pm"], "application/x-pilot": [], "application/x-pkcs12": ["p12", "pfx"], "application/x-pkcs7-certificates": ["p7b", "spc"], "application/x-pkcs7-certreqresp": ["p7r"], "application/x-rar-compressed": ["rar"], "application/x-redhat-package-manager": ["rpm"], "application/x-research-info-systems": ["ris"], "application/x-sea": ["sea"], "application/x-sh": ["sh"], "application/x-shar": ["shar"], "application/x-shockwave-flash": ["swf"], "application/x-silverlight-app": ["xap"], "application/x-sql": ["sql"], "application/x-stuffit": ["sit"], "application/x-stuffitx": ["sitx"], "application/x-subrip": ["srt"], "application/x-sv4cpio": ["sv4cpio"], "application/x-sv4crc": ["sv4crc"], "application/x-t3vm-image": ["t3"], "application/x-tads": ["gam"], "application/x-tar": ["tar"], "application/x-tcl": ["tcl", "tk"], "application/x-tex": ["tex"], "application/x-tex-tfm": ["tfm"], "application/x-texinfo": ["texinfo", "texi"], "application/x-tgif": ["obj"], "application/x-ustar": ["ustar"], "application/x-virtualbox-hdd": ["hdd"], "application/x-virtualbox-ova": ["ova"], "application/x-virtualbox-ovf": ["ovf"], "application/x-virtualbox-vbox": ["vbox"], "application/x-virtualbox-vbox-extpack": ["vbox-extpack"], "application/x-virtualbox-vdi": ["vdi"], "application/x-virtualbox-vhd": ["vhd"], "application/x-virtualbox-vmdk": ["vmdk"], "application/x-wais-source": ["src"], "application/x-web-app-manifest+json": ["webapp"], "application/x-x509-ca-cert": ["der", "crt", "pem"], "application/x-xfig": ["fig"], "application/x-xliff+xml": ["xlf"], "application/x-xpinstall": ["xpi"], "application/x-xz": ["xz"], "application/x-zmachine": ["z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8"], "application/xaml+xml": ["xaml"], "application/xcap-diff+xml": ["xdf"], "application/xenc+xml": ["xenc"], "application/xhtml+xml": ["xhtml", "xht"], "application/xml": ["xml", "xsl", "xsd", "rng"], "application/xml-dtd": ["dtd"], "application/xop+xml": ["xop"], "application/xproc+xml": ["xpl"], "application/xslt+xml": ["xslt"], "application/xspf+xml": ["xspf"], "application/xv+xml": ["mxml", "xhvml", "xvml", "xvm"], "application/yang": ["yang"], "application/yin+xml": ["yin"], "application/zip": ["zip"], "audio/3gpp": [], "audio/adpcm": ["adp"], "audio/basic": ["au", "snd"], "audio/midi": ["mid", "midi", "kar", "rmi"], "audio/mp3": [], "audio/mp4": ["m4a", "mp4a"], "audio/mpeg": ["mpga", "mp2", "mp2a", "mp3", "m2a", "m3a"], "audio/ogg": ["oga", "ogg", "spx"], "audio/s3m": ["s3m"], "audio/silk": ["sil"], "audio/vnd.dece.audio": ["uva", "uvva"], "audio/vnd.digital-winds": ["eol"], "audio/vnd.dra": ["dra"], "audio/vnd.dts": ["dts"], "audio/vnd.dts.hd": ["dtshd"], "audio/vnd.lucent.voice": ["lvp"], "audio/vnd.ms-playready.media.pya": ["pya"], "audio/vnd.nuera.ecelp4800": ["ecelp4800"], "audio/vnd.nuera.ecelp7470": ["ecelp7470"], "audio/vnd.nuera.ecelp9600": ["ecelp9600"], "audio/vnd.rip": ["rip"], "audio/wav": ["wav"], "audio/wave": [], "audio/webm": ["weba"], "audio/x-aac": ["aac"], "audio/x-aiff": ["aif", "aiff", "aifc"], "audio/x-caf": ["caf"], "audio/x-flac": ["flac"], "audio/x-m4a": [], "audio/x-matroska": ["mka"], "audio/x-mpegurl": ["m3u"], "audio/x-ms-wax": ["wax"], "audio/x-ms-wma": ["wma"], "audio/x-pn-realaudio": ["ram", "ra"], "audio/x-pn-realaudio-plugin": ["rmp"], "audio/x-realaudio": [], "audio/x-wav": [], "audio/xm": ["xm"], "chemical/x-cdx": ["cdx"], "chemical/x-cif": ["cif"], "chemical/x-cmdf": ["cmdf"], "chemical/x-cml": ["cml"], "chemical/x-csml": ["csml"], "chemical/x-xyz": ["xyz"], "font/collection": ["ttc"], "font/otf": ["otf"], "font/ttf": ["ttf"], "font/woff": ["woff"], "font/woff2": ["woff2"], "image/apng": ["apng"], "image/bmp": ["bmp"], "image/cgm": ["cgm"], "image/g3fax": ["g3"], "image/gif": ["gif"], "image/ief": ["ief"], "image/jp2": ["jp2", "jpg2"], "image/jpeg": ["jpeg", "jpg", "jpe"], "image/jpm": ["jpm"], "image/jpx": ["jpx", "jpf"], "image/ktx": ["ktx"], "image/png": ["png"], "image/prs.btif": ["btif"], "image/sgi": ["sgi"], "image/svg+xml": ["svg", "svgz"], "image/tiff": ["tiff", "tif"], "image/vnd.adobe.photoshop": ["psd"], "image/vnd.dece.graphic": ["uvi", "uvvi", "uvg", "uvvg"], "image/vnd.djvu": ["djvu", "djv"], "image/vnd.dvb.subtitle": [], "image/vnd.dwg": ["dwg"], "image/vnd.dxf": ["dxf"], "image/vnd.fastbidsheet": ["fbs"], "image/vnd.fpx": ["fpx"], "image/vnd.fst": ["fst"], "image/vnd.fujixerox.edmics-mmr": ["mmr"], "image/vnd.fujixerox.edmics-rlc": ["rlc"], "image/vnd.ms-modi": ["mdi"], "image/vnd.ms-photo": ["wdp"], "image/vnd.net-fpx": ["npx"], "image/vnd.wap.wbmp": ["wbmp"], "image/vnd.xiff": ["xif"], "image/webp": ["webp"], "image/x-3ds": ["3ds"], "image/x-cmu-raster": ["ras"], "image/x-cmx": ["cmx"], "image/x-freehand": ["fh", "fhc", "fh4", "fh5", "fh7"], "image/x-icon": ["ico"], "image/x-jng": ["jng"], "image/x-mrsid-image": ["sid"], "image/x-ms-bmp": [], "image/x-pcx": ["pcx"], "image/x-pict": ["pic", "pct"], "image/x-portable-anymap": ["pnm"], "image/x-portable-bitmap": ["pbm"], "image/x-portable-graymap": ["pgm"], "image/x-portable-pixmap": ["ppm"], "image/x-rgb": ["rgb"], "image/x-tga": ["tga"], "image/x-xbitmap": ["xbm"], "image/x-xpixmap": ["xpm"], "image/x-xwindowdump": ["xwd"], "message/rfc822": ["eml", "mime"], "model/gltf+json": ["gltf"], "model/gltf-binary": ["glb"], "model/iges": ["igs", "iges"], "model/mesh": ["msh", "mesh", "silo"], "model/vnd.collada+xml": ["dae"], "model/vnd.dwf": ["dwf"], "model/vnd.gdl": ["gdl"], "model/vnd.gtw": ["gtw"], "model/vnd.mts": ["mts"], "model/vnd.vtu": ["vtu"], "model/vrml": ["wrl", "vrml"], "model/x3d+binary": ["x3db", "x3dbz"], "model/x3d+vrml": ["x3dv", "x3dvz"], "model/x3d+xml": ["x3d", "x3dz"], "text/cache-manifest": ["appcache", "manifest"], "text/calendar": ["ics", "ifb"], "text/coffeescript": ["coffee", "litcoffee"], "text/css": ["css"], "text/csv": ["csv"], "text/hjson": ["hjson"], "text/html": ["html", "htm", "shtml"], "text/jade": ["jade"], "text/jsx": ["jsx"], "text/less": ["less"], "text/markdown": ["markdown", "md"], "text/mathml": ["mml"], "text/n3": ["n3"], "text/plain": ["txt", "text", "conf", "def", "list", "log", "in", "ini"], "text/prs.lines.tag": ["dsc"], "text/richtext": ["rtx"], "text/rtf": [], "text/sgml": ["sgml", "sgm"], "text/slim": ["slim", "slm"], "text/stylus": ["stylus", "styl"], "text/tab-separated-values": ["tsv"], "text/troff": ["t", "tr", "roff", "man", "me", "ms"], "text/turtle": ["ttl"], "text/uri-list": ["uri", "uris", "urls"], "text/vcard": ["vcard"], "text/vnd.curl": ["curl"], "text/vnd.curl.dcurl": ["dcurl"], "text/vnd.curl.mcurl": ["mcurl"], "text/vnd.curl.scurl": ["scurl"], "text/vnd.dvb.subtitle": ["sub"], "text/vnd.fly": ["fly"], "text/vnd.fmi.flexstor": ["flx"], "text/vnd.graphviz": ["gv"], "text/vnd.in3d.3dml": ["3dml"], "text/vnd.in3d.spot": ["spot"], "text/vnd.sun.j2me.app-descriptor": ["jad"], "text/vnd.wap.wml": ["wml"], "text/vnd.wap.wmlscript": ["wmls"], "text/vtt": ["vtt"], "text/x-asm": ["s", "asm"], "text/x-c": ["c", "cc", "cxx", "cpp", "h", "hh", "dic"], "text/x-component": ["htc"], "text/x-fortran": ["f", "for", "f77", "f90"], "text/x-handlebars-template": ["hbs"], "text/x-java-source": ["java"], "text/x-lua": ["lua"], "text/x-markdown": ["mkd"], "text/x-nfo": ["nfo"], "text/x-opml": ["opml"], "text/x-org": [], "text/x-pascal": ["p", "pas"], "text/x-processing": ["pde"], "text/x-sass": ["sass"], "text/x-scss": ["scss"], "text/x-setext": ["etx"], "text/x-sfv": ["sfv"], "text/x-suse-ymp": ["ymp"], "text/x-uuencode": ["uu"], "text/x-vcalendar": ["vcs"], "text/x-vcard": ["vcf"], "text/xml": [], "text/yaml": ["yaml", "yml"], "video/3gpp": ["3gp", "3gpp"], "video/3gpp2": ["3g2"], "video/h261": ["h261"], "video/h263": ["h263"], "video/h264": ["h264"], "video/jpeg": ["jpgv"], "video/jpm": ["jpgm"], "video/mj2": ["mj2", "mjp2"], "video/mp2t": ["ts"], "video/mp4": ["mp4", "mp4v", "mpg4"], "video/mpeg": ["mpeg", "mpg", "mpe", "m1v", "m2v"], "video/ogg": ["ogv"], "video/quicktime": ["qt", "mov"], "video/vnd.dece.hd": ["uvh", "uvvh"], "video/vnd.dece.mobile": ["uvm", "uvvm"], "video/vnd.dece.pd": ["uvp", "uvvp"], "video/vnd.dece.sd": ["uvs", "uvvs"], "video/vnd.dece.video": ["uvv", "uvvv"], "video/vnd.dvb.file": ["dvb"], "video/vnd.fvt": ["fvt"], "video/vnd.mpegurl": ["mxu", "m4u"], "video/vnd.ms-playready.media.pyv": ["pyv"], "video/vnd.uvvu.mp4": ["uvu", "uvvu"], "video/vnd.vivo": ["viv"], "video/webm": ["webm"], "video/x-f4v": ["f4v"], "video/x-fli": ["fli"], "video/x-flv": ["flv"], "video/x-m4v": ["m4v"], "video/x-matroska": ["mkv", "mk3d", "mks"], "video/x-mng": ["mng"], "video/x-ms-asf": ["asf", "asx"], "video/x-ms-vob": ["vob"], "video/x-ms-wm": ["wm"], "video/x-ms-wmv": ["wmv"], "video/x-ms-wmx": ["wmx"], "video/x-ms-wvx": ["wvx"], "video/x-msvideo": ["avi"], "video/x-sgi-movie": ["movie"], "video/x-smv": ["smv"], "x-conference/x-cooltalk": ["ice"] };
+  }
+});
+
+// node_modules/.pnpm/mime@1.6.0/node_modules/mime/mime.js
+var require_mime = __commonJS({
+  "node_modules/.pnpm/mime@1.6.0/node_modules/mime/mime.js"(exports2, module2) {
+    init_cjs_shims();
+    var path2 = require("path");
+    var fs = require("fs");
+    function Mime() {
+      this.types = /* @__PURE__ */ Object.create(null);
+      this.extensions = /* @__PURE__ */ Object.create(null);
+    }
+    Mime.prototype.define = function(map) {
+      for (var type2 in map) {
+        var exts = map[type2];
+        for (var i = 0; i < exts.length; i++) {
+          if (process.env.DEBUG_MIME && this.types[exts[i]]) {
+            console.warn((this._loading || "define()").replace(/.*\//, ""), 'changes "' + exts[i] + '" extension type from ' + this.types[exts[i]] + " to " + type2);
+          }
+          this.types[exts[i]] = type2;
+        }
+        if (!this.extensions[type2]) {
+          this.extensions[type2] = exts[0];
+        }
+      }
+    };
+    Mime.prototype.load = function(file) {
+      this._loading = file;
+      var map = {}, content = fs.readFileSync(file, "ascii"), lines = content.split(/[\r\n]+/);
+      lines.forEach(function(line) {
+        var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
+        map[fields.shift()] = fields;
+      });
+      this.define(map);
+      this._loading = null;
+    };
+    Mime.prototype.lookup = function(path3, fallback) {
+      var ext = path3.replace(/^.*[\.\/\\]/, "").toLowerCase();
+      return this.types[ext] || fallback || this.default_type;
+    };
+    Mime.prototype.extension = function(mimeType) {
+      var type2 = mimeType.match(/^\s*([^;\s]*)(?:;|\s|$)/)[1].toLowerCase();
+      return this.extensions[type2];
+    };
+    var mime = new Mime();
+    mime.define(require_types());
+    mime.default_type = mime.lookup("bin");
+    mime.Mime = Mime;
+    mime.charsets = {
+      lookup: function(mimeType, fallback) {
+        return /^text\/|^application\/(javascript|json)/.test(mimeType) ? "UTF-8" : fallback;
+      }
+    };
+    module2.exports = mime;
+  }
+});
+
+// node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js
+var require_ms2 = __commonJS({
+  "node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js"(exports2, module2) {
+    init_cjs_shims();
+    var s2 = 1e3;
+    var m = s2 * 60;
+    var h = m * 60;
+    var d = h * 24;
+    var w = d * 7;
+    var y2 = d * 365.25;
+    module2.exports = function(val, options) {
+      options = options || {};
+      var type2 = typeof val;
+      if (type2 === "string" && val.length > 0) {
+        return parse5(val);
+      } else if (type2 === "number" && isFinite(val)) {
+        return options.long ? fmtLong(val) : fmtShort(val);
+      }
+      throw new Error(
+        "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
+      );
+    };
+    function parse5(str) {
+      str = String(str);
+      if (str.length > 100) {
+        return;
+      }
+      var match2 = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+        str
+      );
+      if (!match2) {
+        return;
+      }
+      var n = parseFloat(match2[1]);
+      var type2 = (match2[2] || "ms").toLowerCase();
+      switch (type2) {
+        case "years":
+        case "year":
+        case "yrs":
+        case "yr":
+        case "y":
+          return n * y2;
+        case "weeks":
+        case "week":
+        case "w":
+          return n * w;
+        case "days":
+        case "day":
+        case "d":
+          return n * d;
+        case "hours":
+        case "hour":
+        case "hrs":
+        case "hr":
+        case "h":
+          return n * h;
+        case "minutes":
+        case "minute":
+        case "mins":
+        case "min":
+        case "m":
+          return n * m;
+        case "seconds":
+        case "second":
+        case "secs":
+        case "sec":
+        case "s":
+          return n * s2;
+        case "milliseconds":
+        case "millisecond":
+        case "msecs":
+        case "msec":
+        case "ms":
+          return n;
+        default:
+          return void 0;
+      }
+    }
+    function fmtShort(ms) {
+      var msAbs = Math.abs(ms);
+      if (msAbs >= d) {
+        return Math.round(ms / d) + "d";
+      }
+      if (msAbs >= h) {
+        return Math.round(ms / h) + "h";
+      }
+      if (msAbs >= m) {
+        return Math.round(ms / m) + "m";
+      }
+      if (msAbs >= s2) {
+        return Math.round(ms / s2) + "s";
+      }
+      return ms + "ms";
+    }
+    function fmtLong(ms) {
+      var msAbs = Math.abs(ms);
+      if (msAbs >= d) {
+        return plural2(ms, msAbs, d, "day");
+      }
+      if (msAbs >= h) {
+        return plural2(ms, msAbs, h, "hour");
+      }
+      if (msAbs >= m) {
+        return plural2(ms, msAbs, m, "minute");
+      }
+      if (msAbs >= s2) {
+        return plural2(ms, msAbs, s2, "second");
+      }
+      return ms + " ms";
+    }
+    function plural2(ms, msAbs, n, name) {
+      var isPlural = msAbs >= n * 1.5;
+      return Math.round(ms / n) + " " + name + (isPlural ? "s" : "");
+    }
+  }
+});
+
+// node_modules/.pnpm/ee-first@1.1.1/node_modules/ee-first/index.js
+var require_ee_first = __commonJS({
+  "node_modules/.pnpm/ee-first@1.1.1/node_modules/ee-first/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = first;
+    function first(stuff, done) {
+      if (!Array.isArray(stuff))
+        throw new TypeError("arg must be an array of [ee, events...] arrays");
+      var cleanups = [];
+      for (var i = 0; i < stuff.length; i++) {
+        var arr = stuff[i];
+        if (!Array.isArray(arr) || arr.length < 2)
+          throw new TypeError("each array member must be [ee, events...]");
+        var ee = arr[0];
+        for (var j = 1; j < arr.length; j++) {
+          var event2 = arr[j];
+          var fn2 = listener(event2, callback);
+          ee.on(event2, fn2);
+          cleanups.push({
+            ee,
+            event: event2,
+            fn: fn2
+          });
+        }
+      }
+      function callback() {
+        cleanup();
+        done.apply(null, arguments);
+      }
+      function cleanup() {
+        var x;
+        for (var i2 = 0; i2 < cleanups.length; i2++) {
+          x = cleanups[i2];
+          x.ee.removeListener(x.event, x.fn);
+        }
+      }
+      function thunk(fn3) {
+        done = fn3;
+      }
+      thunk.cancel = cleanup;
+      return thunk;
+    }
+    function listener(event2, done) {
+      return function onevent(arg1) {
+        var args = new Array(arguments.length);
+        var ee = this;
+        var err = event2 === "error" ? arg1 : null;
+        for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i];
+        }
+        done(err, ee, event2, args);
+      };
+    }
+  }
+});
+
+// node_modules/.pnpm/on-finished@2.4.1/node_modules/on-finished/index.js
+var require_on_finished = __commonJS({
+  "node_modules/.pnpm/on-finished@2.4.1/node_modules/on-finished/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = onFinished;
+    module2.exports.isFinished = isFinished;
+    var asyncHooks = tryRequireAsyncHooks();
+    var first = require_ee_first();
+    var defer = typeof setImmediate === "function" ? setImmediate : function(fn2) {
+      process.nextTick(fn2.bind.apply(fn2, arguments));
+    };
+    function onFinished(msg, listener) {
+      if (isFinished(msg) !== false) {
+        defer(listener, null, msg);
+        return msg;
+      }
+      attachListener(msg, wrap(listener));
+      return msg;
+    }
+    function isFinished(msg) {
+      var socket2 = msg.socket;
+      if (typeof msg.finished === "boolean") {
+        return Boolean(msg.finished || socket2 && !socket2.writable);
+      }
+      if (typeof msg.complete === "boolean") {
+        return Boolean(msg.upgrade || !socket2 || !socket2.readable || msg.complete && !msg.readable);
+      }
+      return void 0;
+    }
+    function attachFinishedListener(msg, callback) {
+      var eeMsg;
+      var eeSocket;
+      var finished = false;
+      function onFinish(error3) {
+        eeMsg.cancel();
+        eeSocket.cancel();
+        finished = true;
+        callback(error3);
+      }
+      eeMsg = eeSocket = first([[msg, "end", "finish"]], onFinish);
+      function onSocket(socket2) {
+        msg.removeListener("socket", onSocket);
+        if (finished) return;
+        if (eeMsg !== eeSocket) return;
+        eeSocket = first([[socket2, "error", "close"]], onFinish);
+      }
+      if (msg.socket) {
+        onSocket(msg.socket);
+        return;
+      }
+      msg.on("socket", onSocket);
+      if (msg.socket === void 0) {
+        patchAssignSocket(msg, onSocket);
+      }
+    }
+    function attachListener(msg, listener) {
+      var attached = msg.__onFinished;
+      if (!attached || !attached.queue) {
+        attached = msg.__onFinished = createListener(msg);
+        attachFinishedListener(msg, attached);
+      }
+      attached.queue.push(listener);
+    }
+    function createListener(msg) {
+      function listener(err) {
+        if (msg.__onFinished === listener) msg.__onFinished = null;
+        if (!listener.queue) return;
+        var queue2 = listener.queue;
+        listener.queue = null;
+        for (var i = 0; i < queue2.length; i++) {
+          queue2[i](err, msg);
+        }
+      }
+      listener.queue = [];
+      return listener;
+    }
+    function patchAssignSocket(res, callback) {
+      var assignSocket = res.assignSocket;
+      if (typeof assignSocket !== "function") return;
+      res.assignSocket = function _assignSocket(socket2) {
+        assignSocket.call(this, socket2);
+        callback(socket2);
+      };
+    }
+    function tryRequireAsyncHooks() {
+      try {
+        return require("async_hooks");
+      } catch (e) {
+        return {};
+      }
+    }
+    function wrap(fn2) {
+      var res;
+      if (asyncHooks.AsyncResource) {
+        res = new asyncHooks.AsyncResource(fn2.name || "bound-anonymous-fn");
+      }
+      if (!res || !res.runInAsyncScope) {
+        return fn2;
+      }
+      return res.runInAsyncScope.bind(res, fn2, null);
+    }
+  }
+});
+
+// node_modules/.pnpm/range-parser@1.2.1/node_modules/range-parser/index.js
+var require_range_parser = __commonJS({
+  "node_modules/.pnpm/range-parser@1.2.1/node_modules/range-parser/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = rangeParser;
+    function rangeParser(size, str, options) {
+      if (typeof str !== "string") {
+        throw new TypeError("argument str must be a string");
+      }
+      var index = str.indexOf("=");
+      if (index === -1) {
+        return -2;
+      }
+      var arr = str.slice(index + 1).split(",");
+      var ranges = [];
+      ranges.type = str.slice(0, index);
+      for (var i = 0; i < arr.length; i++) {
+        var range = arr[i].split("-");
+        var start = parseInt(range[0], 10);
+        var end = parseInt(range[1], 10);
+        if (isNaN(start)) {
+          start = size - end;
+          end = size - 1;
+        } else if (isNaN(end)) {
+          end = size - 1;
+        }
+        if (end > size - 1) {
+          end = size - 1;
+        }
+        if (isNaN(start) || isNaN(end) || start > end || start < 0) {
+          continue;
+        }
+        ranges.push({
+          start,
+          end
+        });
+      }
+      if (ranges.length < 1) {
+        return -1;
+      }
+      return options && options.combine ? combineRanges(ranges) : ranges;
+    }
+    function combineRanges(ranges) {
+      var ordered = ranges.map(mapWithIndex).sort(sortByRangeStart);
+      for (var j = 0, i = 1; i < ordered.length; i++) {
+        var range = ordered[i];
+        var current = ordered[j];
+        if (range.start > current.end + 1) {
+          ordered[++j] = range;
+        } else if (range.end > current.end) {
+          current.end = range.end;
+          current.index = Math.min(current.index, range.index);
+        }
+      }
+      ordered.length = j + 1;
+      var combined = ordered.sort(sortByRangeIndex).map(mapWithoutIndex);
+      combined.type = ranges.type;
+      return combined;
+    }
+    function mapWithIndex(range, index) {
+      return {
+        start: range.start,
+        end: range.end,
+        index
+      };
+    }
+    function mapWithoutIndex(range) {
+      return {
+        start: range.start,
+        end: range.end
+      };
+    }
+    function sortByRangeIndex(a, b2) {
+      return a.index - b2.index;
+    }
+    function sortByRangeStart(a, b2) {
+      return a.start - b2.start;
+    }
+  }
+});
+
+// node_modules/.pnpm/send@0.18.0/node_modules/send/index.js
+var require_send = __commonJS({
+  "node_modules/.pnpm/send@0.18.0/node_modules/send/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var createError = require_http_errors();
+    var debug = require_src()("send");
+    var deprecate = require_depd()("send");
+    var destroy = require_destroy();
+    var encodeUrl = require_encodeurl();
+    var escapeHtml = require_escape_html();
+    var etag = require_etag();
+    var fresh = require_fresh();
+    var fs = require("fs");
+    var mime = require_mime();
+    var ms = require_ms2();
+    var onFinished = require_on_finished();
+    var parseRange = require_range_parser();
+    var path2 = require("path");
+    var statuses = require_statuses();
+    var Stream = require("stream");
+    var util = require("util");
+    var extname7 = path2.extname;
+    var join22 = path2.join;
+    var normalize = path2.normalize;
+    var resolve3 = path2.resolve;
+    var sep = path2.sep;
+    var BYTES_RANGE_REGEXP = /^ *bytes=/;
+    var MAX_MAXAGE = 60 * 60 * 24 * 365 * 1e3;
+    var UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
+    module2.exports = send;
+    module2.exports.mime = mime;
+    function send(req, path3, options) {
+      return new SendStream(req, path3, options);
+    }
+    function SendStream(req, path3, options) {
+      Stream.call(this);
+      var opts = options || {};
+      this.options = opts;
+      this.path = path3;
+      this.req = req;
+      this._acceptRanges = opts.acceptRanges !== void 0 ? Boolean(opts.acceptRanges) : true;
+      this._cacheControl = opts.cacheControl !== void 0 ? Boolean(opts.cacheControl) : true;
+      this._etag = opts.etag !== void 0 ? Boolean(opts.etag) : true;
+      this._dotfiles = opts.dotfiles !== void 0 ? opts.dotfiles : "ignore";
+      if (this._dotfiles !== "ignore" && this._dotfiles !== "allow" && this._dotfiles !== "deny") {
+        throw new TypeError('dotfiles option must be "allow", "deny", or "ignore"');
+      }
+      this._hidden = Boolean(opts.hidden);
+      if (opts.hidden !== void 0) {
+        deprecate("hidden: use dotfiles: '" + (this._hidden ? "allow" : "ignore") + "' instead");
+      }
+      if (opts.dotfiles === void 0) {
+        this._dotfiles = void 0;
+      }
+      this._extensions = opts.extensions !== void 0 ? normalizeList(opts.extensions, "extensions option") : [];
+      this._immutable = opts.immutable !== void 0 ? Boolean(opts.immutable) : false;
+      this._index = opts.index !== void 0 ? normalizeList(opts.index, "index option") : ["index.html"];
+      this._lastModified = opts.lastModified !== void 0 ? Boolean(opts.lastModified) : true;
+      this._maxage = opts.maxAge || opts.maxage;
+      this._maxage = typeof this._maxage === "string" ? ms(this._maxage) : Number(this._maxage);
+      this._maxage = !isNaN(this._maxage) ? Math.min(Math.max(0, this._maxage), MAX_MAXAGE) : 0;
+      this._root = opts.root ? resolve3(opts.root) : null;
+      if (!this._root && opts.from) {
+        this.from(opts.from);
+      }
+    }
+    util.inherits(SendStream, Stream);
+    SendStream.prototype.etag = deprecate.function(function etag2(val) {
+      this._etag = Boolean(val);
+      debug("etag %s", this._etag);
+      return this;
+    }, "send.etag: pass etag as option");
+    SendStream.prototype.hidden = deprecate.function(function hidden(val) {
+      this._hidden = Boolean(val);
+      this._dotfiles = void 0;
+      debug("hidden %s", this._hidden);
+      return this;
+    }, "send.hidden: use dotfiles option");
+    SendStream.prototype.index = deprecate.function(function index(paths2) {
+      var index2 = !paths2 ? [] : normalizeList(paths2, "paths argument");
+      debug("index %o", paths2);
+      this._index = index2;
+      return this;
+    }, "send.index: pass index as option");
+    SendStream.prototype.root = function root(path3) {
+      this._root = resolve3(String(path3));
+      debug("root %s", this._root);
+      return this;
+    };
+    SendStream.prototype.from = deprecate.function(
+      SendStream.prototype.root,
+      "send.from: pass root as option"
+    );
+    SendStream.prototype.root = deprecate.function(
+      SendStream.prototype.root,
+      "send.root: pass root as option"
+    );
+    SendStream.prototype.maxage = deprecate.function(function maxage(maxAge) {
+      this._maxage = typeof maxAge === "string" ? ms(maxAge) : Number(maxAge);
+      this._maxage = !isNaN(this._maxage) ? Math.min(Math.max(0, this._maxage), MAX_MAXAGE) : 0;
+      debug("max-age %d", this._maxage);
+      return this;
+    }, "send.maxage: pass maxAge as option");
+    SendStream.prototype.error = function error3(status, err) {
+      if (hasListeners(this, "error")) {
+        return this.emit("error", createHttpError(status, err));
+      }
+      var res = this.res;
+      var msg = statuses.message[status] || String(status);
+      var doc = createHtmlDocument("Error", escapeHtml(msg));
+      clearHeaders(res);
+      if (err && err.headers) {
+        setHeaders(res, err.headers);
+      }
+      res.statusCode = status;
+      res.setHeader("Content-Type", "text/html; charset=UTF-8");
+      res.setHeader("Content-Length", Buffer.byteLength(doc));
+      res.setHeader("Content-Security-Policy", "default-src 'none'");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.end(doc);
+    };
+    SendStream.prototype.hasTrailingSlash = function hasTrailingSlash() {
+      return this.path[this.path.length - 1] === "/";
+    };
+    SendStream.prototype.isConditionalGET = function isConditionalGET() {
+      return this.req.headers["if-match"] || this.req.headers["if-unmodified-since"] || this.req.headers["if-none-match"] || this.req.headers["if-modified-since"];
+    };
+    SendStream.prototype.isPreconditionFailure = function isPreconditionFailure() {
+      var req = this.req;
+      var res = this.res;
+      var match2 = req.headers["if-match"];
+      if (match2) {
+        var etag2 = res.getHeader("ETag");
+        return !etag2 || match2 !== "*" && parseTokenList(match2).every(function(match3) {
+          return match3 !== etag2 && match3 !== "W/" + etag2 && "W/" + match3 !== etag2;
+        });
+      }
+      var unmodifiedSince = parseHttpDate(req.headers["if-unmodified-since"]);
+      if (!isNaN(unmodifiedSince)) {
+        var lastModified = parseHttpDate(res.getHeader("Last-Modified"));
+        return isNaN(lastModified) || lastModified > unmodifiedSince;
+      }
+      return false;
+    };
+    SendStream.prototype.removeContentHeaderFields = function removeContentHeaderFields() {
+      var res = this.res;
+      res.removeHeader("Content-Encoding");
+      res.removeHeader("Content-Language");
+      res.removeHeader("Content-Length");
+      res.removeHeader("Content-Range");
+      res.removeHeader("Content-Type");
+    };
+    SendStream.prototype.notModified = function notModified() {
+      var res = this.res;
+      debug("not modified");
+      this.removeContentHeaderFields();
+      res.statusCode = 304;
+      res.end();
+    };
+    SendStream.prototype.headersAlreadySent = function headersAlreadySent() {
+      var err = new Error("Can't set headers after they are sent.");
+      debug("headers already sent");
+      this.error(500, err);
+    };
+    SendStream.prototype.isCachable = function isCachable() {
+      var statusCode = this.res.statusCode;
+      return statusCode >= 200 && statusCode < 300 || statusCode === 304;
+    };
+    SendStream.prototype.onStatError = function onStatError(error3) {
+      switch (error3.code) {
+        case "ENAMETOOLONG":
+        case "ENOENT":
+        case "ENOTDIR":
+          this.error(404, error3);
+          break;
+        default:
+          this.error(500, error3);
+          break;
+      }
+    };
+    SendStream.prototype.isFresh = function isFresh() {
+      return fresh(this.req.headers, {
+        etag: this.res.getHeader("ETag"),
+        "last-modified": this.res.getHeader("Last-Modified")
+      });
+    };
+    SendStream.prototype.isRangeFresh = function isRangeFresh() {
+      var ifRange = this.req.headers["if-range"];
+      if (!ifRange) {
+        return true;
+      }
+      if (ifRange.indexOf('"') !== -1) {
+        var etag2 = this.res.getHeader("ETag");
+        return Boolean(etag2 && ifRange.indexOf(etag2) !== -1);
+      }
+      var lastModified = this.res.getHeader("Last-Modified");
+      return parseHttpDate(lastModified) <= parseHttpDate(ifRange);
+    };
+    SendStream.prototype.redirect = function redirect(path3) {
+      var res = this.res;
+      if (hasListeners(this, "directory")) {
+        this.emit("directory", res, path3);
+        return;
+      }
+      if (this.hasTrailingSlash()) {
+        this.error(403);
+        return;
+      }
+      var loc = encodeUrl(collapseLeadingSlashes(this.path + "/"));
+      var doc = createHtmlDocument("Redirecting", 'Redirecting to <a href="' + escapeHtml(loc) + '">' + escapeHtml(loc) + "</a>");
+      res.statusCode = 301;
+      res.setHeader("Content-Type", "text/html; charset=UTF-8");
+      res.setHeader("Content-Length", Buffer.byteLength(doc));
+      res.setHeader("Content-Security-Policy", "default-src 'none'");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Location", loc);
+      res.end(doc);
+    };
+    SendStream.prototype.pipe = function pipe(res) {
+      var root = this._root;
+      this.res = res;
+      var path3 = decode2(this.path);
+      if (path3 === -1) {
+        this.error(400);
+        return res;
+      }
+      if (~path3.indexOf("\0")) {
+        this.error(400);
+        return res;
+      }
+      var parts;
+      if (root !== null) {
+        if (path3) {
+          path3 = normalize("." + sep + path3);
+        }
+        if (UP_PATH_REGEXP.test(path3)) {
+          debug('malicious path "%s"', path3);
+          this.error(403);
+          return res;
+        }
+        parts = path3.split(sep);
+        path3 = normalize(join22(root, path3));
+      } else {
+        if (UP_PATH_REGEXP.test(path3)) {
+          debug('malicious path "%s"', path3);
+          this.error(403);
+          return res;
+        }
+        parts = normalize(path3).split(sep);
+        path3 = resolve3(path3);
+      }
+      if (containsDotFile(parts)) {
+        var access = this._dotfiles;
+        if (access === void 0) {
+          access = parts[parts.length - 1][0] === "." ? this._hidden ? "allow" : "ignore" : "allow";
+        }
+        debug('%s dotfile "%s"', access, path3);
+        switch (access) {
+          case "allow":
+            break;
+          case "deny":
+            this.error(403);
+            return res;
+          case "ignore":
+          default:
+            this.error(404);
+            return res;
+        }
+      }
+      if (this._index.length && this.hasTrailingSlash()) {
+        this.sendIndex(path3);
+        return res;
+      }
+      this.sendFile(path3);
+      return res;
+    };
+    SendStream.prototype.send = function send2(path3, stat2) {
+      var len = stat2.size;
+      var options = this.options;
+      var opts = {};
+      var res = this.res;
+      var req = this.req;
+      var ranges = req.headers.range;
+      var offset = options.start || 0;
+      if (headersSent(res)) {
+        this.headersAlreadySent();
+        return;
+      }
+      debug('pipe "%s"', path3);
+      this.setHeader(path3, stat2);
+      this.type(path3);
+      if (this.isConditionalGET()) {
+        if (this.isPreconditionFailure()) {
+          this.error(412);
+          return;
+        }
+        if (this.isCachable() && this.isFresh()) {
+          this.notModified();
+          return;
+        }
+      }
+      len = Math.max(0, len - offset);
+      if (options.end !== void 0) {
+        var bytes = options.end - offset + 1;
+        if (len > bytes) len = bytes;
+      }
+      if (this._acceptRanges && BYTES_RANGE_REGEXP.test(ranges)) {
+        ranges = parseRange(len, ranges, {
+          combine: true
+        });
+        if (!this.isRangeFresh()) {
+          debug("range stale");
+          ranges = -2;
+        }
+        if (ranges === -1) {
+          debug("range unsatisfiable");
+          res.setHeader("Content-Range", contentRange("bytes", len));
+          return this.error(416, {
+            headers: { "Content-Range": res.getHeader("Content-Range") }
+          });
+        }
+        if (ranges !== -2 && ranges.length === 1) {
+          debug("range %j", ranges);
+          res.statusCode = 206;
+          res.setHeader("Content-Range", contentRange("bytes", len, ranges[0]));
+          offset += ranges[0].start;
+          len = ranges[0].end - ranges[0].start + 1;
+        }
+      }
+      for (var prop in options) {
+        opts[prop] = options[prop];
+      }
+      opts.start = offset;
+      opts.end = Math.max(offset, offset + len - 1);
+      res.setHeader("Content-Length", len);
+      if (req.method === "HEAD") {
+        res.end();
+        return;
+      }
+      this.stream(path3, opts);
+    };
+    SendStream.prototype.sendFile = function sendFile(path3) {
+      var i = 0;
+      var self = this;
+      debug('stat "%s"', path3);
+      fs.stat(path3, function onstat(err, stat2) {
+        if (err && err.code === "ENOENT" && !extname7(path3) && path3[path3.length - 1] !== sep) {
+          return next(err);
+        }
+        if (err) return self.onStatError(err);
+        if (stat2.isDirectory()) return self.redirect(path3);
+        self.emit("file", path3, stat2);
+        self.send(path3, stat2);
+      });
+      function next(err) {
+        if (self._extensions.length <= i) {
+          return err ? self.onStatError(err) : self.error(404);
+        }
+        var p = path3 + "." + self._extensions[i++];
+        debug('stat "%s"', p);
+        fs.stat(p, function(err2, stat2) {
+          if (err2) return next(err2);
+          if (stat2.isDirectory()) return next();
+          self.emit("file", p, stat2);
+          self.send(p, stat2);
+        });
+      }
+    };
+    SendStream.prototype.sendIndex = function sendIndex(path3) {
+      var i = -1;
+      var self = this;
+      function next(err) {
+        if (++i >= self._index.length) {
+          if (err) return self.onStatError(err);
+          return self.error(404);
+        }
+        var p = join22(path3, self._index[i]);
+        debug('stat "%s"', p);
+        fs.stat(p, function(err2, stat2) {
+          if (err2) return next(err2);
+          if (stat2.isDirectory()) return next();
+          self.emit("file", p, stat2);
+          self.send(p, stat2);
+        });
+      }
+      next();
+    };
+    SendStream.prototype.stream = function stream(path3, options) {
+      var self = this;
+      var res = this.res;
+      var stream2 = fs.createReadStream(path3, options);
+      this.emit("stream", stream2);
+      stream2.pipe(res);
+      function cleanup() {
+        destroy(stream2, true);
+      }
+      onFinished(res, cleanup);
+      stream2.on("error", function onerror(err) {
+        cleanup();
+        self.onStatError(err);
+      });
+      stream2.on("end", function onend() {
+        self.emit("end");
+      });
+    };
+    SendStream.prototype.type = function type2(path3) {
+      var res = this.res;
+      if (res.getHeader("Content-Type")) return;
+      var type3 = mime.lookup(path3);
+      if (!type3) {
+        debug("no content-type");
+        return;
+      }
+      var charset = mime.charsets.lookup(type3);
+      debug("content-type %s", type3);
+      res.setHeader("Content-Type", type3 + (charset ? "; charset=" + charset : ""));
+    };
+    SendStream.prototype.setHeader = function setHeader(path3, stat2) {
+      var res = this.res;
+      this.emit("headers", res, path3, stat2);
+      if (this._acceptRanges && !res.getHeader("Accept-Ranges")) {
+        debug("accept ranges");
+        res.setHeader("Accept-Ranges", "bytes");
+      }
+      if (this._cacheControl && !res.getHeader("Cache-Control")) {
+        var cacheControl = "public, max-age=" + Math.floor(this._maxage / 1e3);
+        if (this._immutable) {
+          cacheControl += ", immutable";
+        }
+        debug("cache-control %s", cacheControl);
+        res.setHeader("Cache-Control", cacheControl);
+      }
+      if (this._lastModified && !res.getHeader("Last-Modified")) {
+        var modified = stat2.mtime.toUTCString();
+        debug("modified %s", modified);
+        res.setHeader("Last-Modified", modified);
+      }
+      if (this._etag && !res.getHeader("ETag")) {
+        var val = etag(stat2);
+        debug("etag %s", val);
+        res.setHeader("ETag", val);
+      }
+    };
+    function clearHeaders(res) {
+      var headers = getHeaderNames(res);
+      for (var i = 0; i < headers.length; i++) {
+        res.removeHeader(headers[i]);
+      }
+    }
+    function collapseLeadingSlashes(str) {
+      for (var i = 0; i < str.length; i++) {
+        if (str[i] !== "/") {
+          break;
+        }
+      }
+      return i > 1 ? "/" + str.substr(i) : str;
+    }
+    function containsDotFile(parts) {
+      for (var i = 0; i < parts.length; i++) {
+        var part = parts[i];
+        if (part.length > 1 && part[0] === ".") {
+          return true;
+        }
+      }
+      return false;
+    }
+    function contentRange(type2, size, range) {
+      return type2 + " " + (range ? range.start + "-" + range.end : "*") + "/" + size;
+    }
+    function createHtmlDocument(title2, body) {
+      return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>' + title2 + "</title>\n</head>\n<body>\n<pre>" + body + "</pre>\n</body>\n</html>\n";
+    }
+    function createHttpError(status, err) {
+      if (!err) {
+        return createError(status);
+      }
+      return err instanceof Error ? createError(status, err, { expose: false }) : createError(status, err);
+    }
+    function decode2(path3) {
+      try {
+        return decodeURIComponent(path3);
+      } catch (err) {
+        return -1;
+      }
+    }
+    function getHeaderNames(res) {
+      return typeof res.getHeaderNames !== "function" ? Object.keys(res._headers || {}) : res.getHeaderNames();
+    }
+    function hasListeners(emitter, type2) {
+      var count = typeof emitter.listenerCount !== "function" ? emitter.listeners(type2).length : emitter.listenerCount(type2);
+      return count > 0;
+    }
+    function headersSent(res) {
+      return typeof res.headersSent !== "boolean" ? Boolean(res._header) : res.headersSent;
+    }
+    function normalizeList(val, name) {
+      var list3 = [].concat(val || []);
+      for (var i = 0; i < list3.length; i++) {
+        if (typeof list3[i] !== "string") {
+          throw new TypeError(name + " must be array of strings or false");
+        }
+      }
+      return list3;
+    }
+    function parseHttpDate(date) {
+      var timestamp = date && Date.parse(date);
+      return typeof timestamp === "number" ? timestamp : NaN;
+    }
+    function parseTokenList(str) {
+      var end = 0;
+      var list3 = [];
+      var start = 0;
+      for (var i = 0, len = str.length; i < len; i++) {
+        switch (str.charCodeAt(i)) {
+          case 32:
+            if (start === end) {
+              start = end = i + 1;
+            }
+            break;
+          case 44:
+            if (start !== end) {
+              list3.push(str.substring(start, end));
+            }
+            start = end = i + 1;
+            break;
+          default:
+            end = i + 1;
+            break;
+        }
+      }
+      if (start !== end) {
+        list3.push(str.substring(start, end));
+      }
+      return list3;
+    }
+    function setHeaders(res, headers) {
+      var keys2 = Object.keys(headers);
+      for (var i = 0; i < keys2.length; i++) {
+        var key = keys2[i];
+        res.setHeader(key, headers[key]);
+      }
+    }
+  }
+});
+
+// node_modules/.pnpm/serve-static@1.15.0/node_modules/serve-static/index.js
+var require_serve_static = __commonJS({
+  "node_modules/.pnpm/serve-static@1.15.0/node_modules/serve-static/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var encodeUrl = require_encodeurl();
+    var escapeHtml = require_escape_html();
+    var parseUrl = require_parseurl();
+    var resolve3 = require("path").resolve;
+    var send = require_send();
+    var url = require("url");
+    module2.exports = serveStatic;
+    module2.exports.mime = send.mime;
+    function serveStatic(root, options) {
+      if (!root) {
+        throw new TypeError("root path required");
+      }
+      if (typeof root !== "string") {
+        throw new TypeError("root path must be a string");
+      }
+      var opts = Object.create(options || null);
+      var fallthrough = opts.fallthrough !== false;
+      var redirect = opts.redirect !== false;
+      var setHeaders = opts.setHeaders;
+      if (setHeaders && typeof setHeaders !== "function") {
+        throw new TypeError("option setHeaders must be function");
+      }
+      opts.maxage = opts.maxage || opts.maxAge || 0;
+      opts.root = resolve3(root);
+      var onDirectory = redirect ? createRedirectDirectoryListener() : createNotFoundDirectoryListener();
+      return function serveStatic2(req, res, next) {
+        if (req.method !== "GET" && req.method !== "HEAD") {
+          if (fallthrough) {
+            return next();
+          }
+          res.statusCode = 405;
+          res.setHeader("Allow", "GET, HEAD");
+          res.setHeader("Content-Length", "0");
+          res.end();
+          return;
+        }
+        var forwardError = !fallthrough;
+        var originalUrl = parseUrl.original(req);
+        var path2 = parseUrl(req).pathname;
+        if (path2 === "/" && originalUrl.pathname.substr(-1) !== "/") {
+          path2 = "";
+        }
+        var stream = send(req, path2, opts);
+        stream.on("directory", onDirectory);
+        if (setHeaders) {
+          stream.on("headers", setHeaders);
+        }
+        if (fallthrough) {
+          stream.on("file", function onFile() {
+            forwardError = true;
+          });
+        }
+        stream.on("error", function error3(err) {
+          if (forwardError || !(err.statusCode < 500)) {
+            next(err);
+            return;
+          }
+          next();
+        });
+        stream.pipe(res);
+      };
+    }
+    function collapseLeadingSlashes(str) {
+      for (var i = 0; i < str.length; i++) {
+        if (str.charCodeAt(i) !== 47) {
+          break;
+        }
+      }
+      return i > 1 ? "/" + str.substr(i) : str;
+    }
+    function createHtmlDocument(title2, body) {
+      return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>' + title2 + "</title>\n</head>\n<body>\n<pre>" + body + "</pre>\n</body>\n</html>\n";
+    }
+    function createNotFoundDirectoryListener() {
+      return function notFound() {
+        this.error(404);
+      };
+    }
+    function createRedirectDirectoryListener() {
+      return function redirect(res) {
+        if (this.hasTrailingSlash()) {
+          this.error(404);
+          return;
+        }
+        var originalUrl = parseUrl.original(this.req);
+        originalUrl.path = null;
+        originalUrl.pathname = collapseLeadingSlashes(originalUrl.pathname + "/");
+        var loc = encodeUrl(url.format(originalUrl));
+        var doc = createHtmlDocument("Redirecting", 'Redirecting to <a href="' + escapeHtml(loc) + '">' + escapeHtml(loc) + "</a>");
+        res.statusCode = 301;
+        res.setHeader("Content-Type", "text/html; charset=UTF-8");
+        res.setHeader("Content-Length", Buffer.byteLength(doc));
+        res.setHeader("Content-Security-Policy", "default-src 'none'");
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("Location", loc);
+        res.end(doc);
+      };
+    }
+  }
+});
+
+// node_modules/.pnpm/unpipe@1.0.0/node_modules/unpipe/index.js
+var require_unpipe = __commonJS({
+  "node_modules/.pnpm/unpipe@1.0.0/node_modules/unpipe/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    module2.exports = unpipe;
+    function hasPipeDataListeners(stream) {
+      var listeners = stream.listeners("data");
+      for (var i = 0; i < listeners.length; i++) {
+        if (listeners[i].name === "ondata") {
+          return true;
+        }
+      }
+      return false;
+    }
+    function unpipe(stream) {
+      if (!stream) {
+        throw new TypeError("argument stream is required");
+      }
+      if (typeof stream.unpipe === "function") {
+        stream.unpipe();
+        return;
+      }
+      if (!hasPipeDataListeners(stream)) {
+        return;
+      }
+      var listener;
+      var listeners = stream.listeners("close");
+      for (var i = 0; i < listeners.length; i++) {
+        listener = listeners[i];
+        if (listener.name !== "cleanup" && listener.name !== "onclose") {
+          continue;
+        }
+        listener.call(stream);
+      }
+    }
+  }
+});
+
+// node_modules/.pnpm/finalhandler@1.3.0/node_modules/finalhandler/index.js
+var require_finalhandler = __commonJS({
+  "node_modules/.pnpm/finalhandler@1.3.0/node_modules/finalhandler/index.js"(exports2, module2) {
+    "use strict";
+    init_cjs_shims();
+    var debug = require_src()("finalhandler");
+    var encodeUrl = require_encodeurl();
+    var escapeHtml = require_escape_html();
+    var onFinished = require_on_finished();
+    var parseUrl = require_parseurl();
+    var statuses = require_statuses();
+    var unpipe = require_unpipe();
+    var DOUBLE_SPACE_REGEXP = /\x20{2}/g;
+    var NEWLINE_REGEXP = /\n/g;
+    var defer = typeof setImmediate === "function" ? setImmediate : function(fn2) {
+      process.nextTick(fn2.bind.apply(fn2, arguments));
+    };
+    var isFinished = onFinished.isFinished;
+    function createHtmlDocument(message) {
+      var body = escapeHtml(message).replace(NEWLINE_REGEXP, "<br>").replace(DOUBLE_SPACE_REGEXP, " &nbsp;");
+      return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Error</title>\n</head>\n<body>\n<pre>' + body + "</pre>\n</body>\n</html>\n";
+    }
+    module2.exports = finalhandler;
+    function finalhandler(req, res, options) {
+      var opts = options || {};
+      var env = opts.env || process.env.NODE_ENV || "development";
+      var onerror = opts.onerror;
+      return function(err) {
+        var headers;
+        var msg;
+        var status;
+        if (!err && headersSent(res)) {
+          debug("cannot 404 after headers sent");
+          return;
+        }
+        if (err) {
+          status = getErrorStatusCode(err);
+          if (status === void 0) {
+            status = getResponseStatusCode(res);
+          } else {
+            headers = getErrorHeaders(err);
+          }
+          msg = getErrorMessage(err, status, env);
+        } else {
+          status = 404;
+          msg = "Cannot " + req.method + " " + encodeUrl(getResourceName(req));
+        }
+        debug("default %s", status);
+        if (err && onerror) {
+          defer(onerror, err, req, res);
+        }
+        if (headersSent(res)) {
+          debug("cannot %d after headers sent", status);
+          if (req.socket) {
+            req.socket.destroy();
+          }
+          return;
+        }
+        send(req, res, status, headers, msg);
+      };
+    }
+    function getErrorHeaders(err) {
+      if (!err.headers || typeof err.headers !== "object") {
+        return void 0;
+      }
+      var headers = /* @__PURE__ */ Object.create(null);
+      var keys2 = Object.keys(err.headers);
+      for (var i = 0; i < keys2.length; i++) {
+        var key = keys2[i];
+        headers[key] = err.headers[key];
+      }
+      return headers;
+    }
+    function getErrorMessage(err, status, env) {
+      var msg;
+      if (env !== "production") {
+        msg = err.stack;
+        if (!msg && typeof err.toString === "function") {
+          msg = err.toString();
+        }
+      }
+      return msg || statuses.message[status];
+    }
+    function getErrorStatusCode(err) {
+      if (typeof err.status === "number" && err.status >= 400 && err.status < 600) {
+        return err.status;
+      }
+      if (typeof err.statusCode === "number" && err.statusCode >= 400 && err.statusCode < 600) {
+        return err.statusCode;
+      }
+      return void 0;
+    }
+    function getResourceName(req) {
+      try {
+        return parseUrl.original(req).pathname;
+      } catch (e) {
+        return "resource";
+      }
+    }
+    function getResponseStatusCode(res) {
+      var status = res.statusCode;
+      if (typeof status !== "number" || status < 400 || status > 599) {
+        status = 500;
+      }
+      return status;
+    }
+    function headersSent(res) {
+      return typeof res.headersSent !== "boolean" ? Boolean(res._header) : res.headersSent;
+    }
+    function send(req, res, status, headers, message) {
+      function write4() {
+        var body = createHtmlDocument(message);
+        res.statusCode = status;
+        if (req.httpVersionMajor < 2) {
+          res.statusMessage = statuses.message[status];
+        }
+        res.removeHeader("Content-Encoding");
+        res.removeHeader("Content-Language");
+        res.removeHeader("Content-Range");
+        setHeaders(res, headers);
+        res.setHeader("Content-Security-Policy", "default-src 'none'");
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Content-Length", Buffer.byteLength(body, "utf8"));
+        if (req.method === "HEAD") {
+          res.end();
+          return;
+        }
+        res.end(body, "utf8");
+      }
+      if (isFinished(req)) {
+        write4();
+        return;
+      }
+      unpipe(req);
+      onFinished(req, write4);
+      req.resume();
+    }
+    function setHeaders(res, headers) {
+      if (!headers) {
+        return;
+      }
+      var keys2 = Object.keys(headers);
+      for (var i = 0; i < keys2.length; i++) {
+        var key = keys2[i];
+        res.setHeader(key, headers[key]);
+      }
+    }
+  }
+});
+
 // syncify/api.ts
 var api_exports = {};
 __export(api_exports, {
@@ -4778,7 +7440,7 @@ function stripJsonComments(jsonString, { whitespace = true, trailingCommas = fal
   if (typeof jsonString !== "string") {
     throw new TypeError(`Expected argument \`jsonString\` to be a \`string\`, got \`${typeof jsonString}\``);
   }
-  const strip2 = whitespace ? stripWithWhitespace : stripWithoutWhitespace;
+  const strip = whitespace ? stripWithWhitespace : stripWithoutWhitespace;
   let isInsideString = false;
   let isInsideComment = false;
   let offset = 0;
@@ -4805,12 +7467,12 @@ function stripJsonComments(jsonString, { whitespace = true, trailingCommas = fal
     } else if (isInsideComment === singleComment && currentCharacter + nextCharacter === "\r\n") {
       index++;
       isInsideComment = false;
-      buffer += strip2(jsonString, offset, index);
+      buffer += strip(jsonString, offset, index);
       offset = index;
       continue;
     } else if (isInsideComment === singleComment && currentCharacter === "\n") {
       isInsideComment = false;
-      buffer += strip2(jsonString, offset, index);
+      buffer += strip(jsonString, offset, index);
       offset = index;
     } else if (!isInsideComment && currentCharacter + nextCharacter === "/*") {
       buffer += jsonString.slice(offset, index);
@@ -4821,14 +7483,14 @@ function stripJsonComments(jsonString, { whitespace = true, trailingCommas = fal
     } else if (isInsideComment === multiComment && currentCharacter + nextCharacter === "*/") {
       index++;
       isInsideComment = false;
-      buffer += strip2(jsonString, offset, index + 1);
+      buffer += strip(jsonString, offset, index + 1);
       offset = index + 1;
       continue;
     } else if (trailingCommas && !isInsideComment) {
       if (commaIndex !== -1) {
         if (currentCharacter === "}" || currentCharacter === "]") {
           buffer += jsonString.slice(offset, index);
-          result += strip2(buffer, 0, 1) + buffer.slice(1);
+          result += strip(buffer, 0, 1) + buffer.slice(1);
           buffer = "";
           offset = index;
           commaIndex = -1;
@@ -4845,275 +7507,187 @@ function stripJsonComments(jsonString, { whitespace = true, trailingCommas = fal
       }
     }
   }
-  return result + buffer + (isInsideComment ? strip2(jsonString.slice(offset)) : jsonString.slice(offset));
+  return result + buffer + (isInsideComment ? strip(jsonString.slice(offset)) : jsonString.slice(offset));
 }
 
-// syncify/ansi/symbol.ts
+// packages/ansi/dist/index.js
 init_cjs_shims();
-
-// syncify/ansi/colors.ts
-init_cjs_shims();
-
-// node_modules/.pnpm/ansis@3.3.2/node_modules/ansis/index.mjs
-init_cjs_shims();
-var import_index = __toESM(require_ansis(), 1);
-var { ansi256, fg, bgAnsi256, bg, rgb, bgRgb, hex, bgHex, reset, inverse, hidden, visible, bold, dim, italic, underline, strikethrough, strike, black, red, green, yellow, blue, magenta, cyan, white, grey, gray, blackBright, redBright, greenBright, yellowBright, blueBright, magentaBright, cyanBright, whiteBright, bgBlack, bgRed, bgGreen, bgYellow, bgBlue, bgMagenta, bgCyan, bgWhite, bgGrey, bgGray, bgBlackBright, bgRedBright, bgGreenBright, bgYellowBright, bgBlueBright, bgMagentaBright, bgCyanBright, bgWhiteBright } = import_index.default;
-
-// syncify/ansi/colors.ts
-var clear = "\x1B[H\x1B[2J";
-import_index.default.extend(
-  {
-    brown: "#c19a6b",
-    pink: "#ff75d1",
-    teal: "#91EBC2",
-    lightGray: "#2a2a2e",
-    orange: "#FFAB40",
-    lavender: "#8080FF",
-    neonGreen: "#56ef83",
-    neonCyan: "#69d5fd",
-    neonRouge: "#FF8095",
-    neonMagenta: "#7b68ee"
-  }
-);
-var {
-  // STANDARD
-  cyan: cyan2,
-  red: red2,
-  green: green2,
-  yellow: yellow2,
-  magenta: magenta2,
-  blue: blue2,
-  white: white2,
-  gray: gray2,
-  dim: dim2,
-  // BRIGHT
-  cyanBright: cyanBright2,
-  redBright: redBright2,
-  greenBright: greenBright2,
-  yellowBright: yellowBright2,
-  magentaBright: magentaBright2,
-  blueBright: blueBright2,
-  whiteBright: whiteBright2,
-  // OTHER
-  strip,
-  // STYLES
-  underline: underline2,
-  bold: bold2,
-  reset: reset2,
-  // CUSTOM
-  lightGray,
-  pink,
-  brown,
-  teal,
-  orange,
-  lavender,
-  neonGreen,
-  neonCyan,
-  neonRouge,
-  neonMagenta
-} = import_index.default;
-
-// syncify/ansi/symbol.ts
-var Tree = {
-  /**
-   * Tree Line Top
-   *
-   * ```bash
-   * ┌─
-   * ```
-   */
-  open: `${lightGray.open}\u250C\u2500${lightGray.close} `,
-  /**
-   * Tree Line Stub
-   *
-   * ```bash
-   * ├
-   * ```
-   */
-  stub: `${lightGray.open}\u251C${lightGray.close}  `,
-  /**
-   * Tree Line Dash
-   *
-   * ```bash
-   * ├─
-   * ```
-   */
-  dash: `${lightGray.open}\u251C\u2500${lightGray.close} `,
-  /**
-   * Tree Line (without suffixed whitespace)
-   *
-   * ```bash
-   * │
-   * ```
-   */
-  trim: `${lightGray.open}\u2502${lightGray.close}`,
-  /**
-   * Tree Line
-   *
-   * ```bash
-   * │
-   * ```
-   */
-  line: `${lightGray.open}\u2502${lightGray.close}  `,
-  /**
-   * Tree Line Next
-   *
-   * Newline plus line (i.e: `\n` will prepend but not append)
-   *
-   * ```bash
-   *
-   * │
-   * ```
-   */
-  next: `${"\n"}${lightGray.open}\u2502${lightGray.close}`,
-  /**
-   * Tree Line After
-   *
-   * Line appended with newline (i.e: `\n` will append)
-   *
-   * ```bash
-   * │
-   *
-   * ```
-   */
-  after: `${lightGray.open}\u2502${lightGray.close}`,
-  /**
-   * Tree Line Wrap
-   *
-   * Newlines and line (i.e: `\n` will prepend and append)
-   *
-   * ```bash
-   *
-   * │
-   *
-   * ```
-   */
-  wrap: `${"\n"}${lightGray.open}\u2502${lightGray.close}${"\n"}`,
-  /**
-   * Tree Line Base
-   *
-   * ```bash
-   * └─
-   * ```
-   */
-  base: `${lightGray.open}\u2514\u2500${lightGray.close} `,
-  /**
-   * Tree Line Red (Red Dim)
-   *
-   * ```bash
-   * │
-   * ```
-   */
-  red: `${red2.dim.open}\u2502${red2.dim.close}  `,
-  /**
-   * Tree Line Red (Red Dim)
-   *
-   * ```bash
-   * │
-   * ```
-   */
-  redTrim: `${red2.dim.open}\u2502${red2.dim.close}`,
-  /**
-   * Tree Line Warning (Yellow Dim)
-   *
-   * ```bash
-   * │
-   * ```
-   */
-  yellow: `${yellow2.dim.open}\u2502${yellow2.dim.close}  `,
-  /**
-   * Tree Line Warning (Yellow Dim)
-   *
-   * ```bash
-   * │
-   * ```
-   */
-  yellowTrim: `${yellow2.dim.open}\u2502${yellow2.dim.close}`,
-  /**
-   * Tree Line Indentation
-   *
-   * Symbols used for next level lines
-   */
-  indent: {
-    /**
-     * Tree Indent Line Top
-     *
-     * ```bash
-     * ├──┬─
-     * ```
-     */
-    edge: `${lightGray.open}\u251C\u2500\u2500\u252C\u2500${lightGray.close} `,
-    /**
-     * Tree Indent Line  Fall
-     *
-     * ```bash
-     * ├──┐
-     * ```
-     */
-    fall: `${lightGray.open}\u251C\u2500\u2500\u2510${lightGray.close} `,
-    /**
-     * Tree Indent Line
-     *
-     * ```bash
-     * │  │
-     * ```
-     */
-    line: `${lightGray.open}\u2502  \u2502${lightGray.close} `,
-    /**
-     * Tree Indent Line Stub
-     *
-     * ```bash
-     * │  ├
-     * ```
-     */
-    stub: `${lightGray.open}\u2502  \u251C${lightGray.close} `,
-    /**
-     * Tree Indent Line Dash
-     *
-     * ```bash
-     * │  ├─
-     * ```
-     */
-    dash: `${lightGray.open}\u2502  \u251C\u2500${lightGray.close} `,
-    /**
-     * Tree Indent Line Base
-     *
-     * ```bash
-     * │  └─
-     * ```
-     */
-    base: `${lightGray.open}\u2502  \u2514\u2500${lightGray.close} `
-  }
+var import_node_process = require("process");
+var import_node_child_process = require("child_process");
+var import_node_url = require("url");
+var import_node_path = require("path");
+var fe = Object.create;
+var q = Object.defineProperty;
+var ye = Object.getOwnPropertyDescriptor;
+var xe = Object.getOwnPropertyNames;
+var Be = Object.getPrototypeOf;
+var we = Object.prototype.hasOwnProperty;
+var Ce = (e, n) => () => (n || e((n = { exports: {} }).exports, n), n.exports);
+var Ae = (e, n, r, o) => {
+  if (n && typeof n == "object" || typeof n == "function") for (let l of xe(n)) !we.call(e, l) && l !== r && q(e, l, { get: () => n[l], enumerable: !(o = ye(n, l)) || o.enumerable });
+  return e;
 };
-var PIP = `${gray2.open}|${gray2.close}`;
-var HSH = `${gray2.open}#${gray2.close}`;
-var PLS = `${gray2.open}+${gray2.close}`;
-var MIN = `${gray2.open}-${gray2.close}`;
-var COM = `${gray2.open},${gray2.close}`;
-var CHK = `${neonGreen.open}\u2713${neonGreen.close}`;
-var BAD = `${redBright2.open}\u{10102}${redBright2.close}`;
-var COL = `${gray2.open}:${gray2.close}`;
-var ARR = `${gray2.open}\u2192${gray2.close}`;
-var CHV = `${gray2.open}\u25B8${gray2.close}`;
-var ARL = `${gray2.open}\u2942${gray2.close}`;
-var TLD = `${gray2.open}~${gray2.close}`;
-var DSH = `${gray2.open}\u2014${gray2.close}`;
-var LPR = `${gray2.open}(${gray2.close}`;
-var RPR = `${gray2.open})${gray2.close}`;
-var LCB = `${gray2.open}{${gray2.close}`;
-var RCB = `${gray2.open}}${gray2.close}`;
-var LSB = `${gray2.open}[${gray2.close}`;
-var RSB = `${gray2.open}]${gray2.close}`;
-var LAN = `${gray2.open}<${gray2.close}`;
-var RAN = `${gray2.open}>${gray2.close}`;
+var Oe = (e, n, r) => (r = e != null ? fe(Be(e)) : {}, Ae(n || !e || !e.__esModule ? q(r, "default", { value: e, enumerable: true }) : r, e));
+var ge = Ce((ae, Y) => {
+  "use strict";
+  Object.defineProperty(ae, "__esModule", { value: true });
+  var { round: C, floor: K, max: Re } = Math, oe = (e) => {
+    let [, n] = /([a-f\d]{3,6})/i.exec(e) || [], r = n ? n.length : 0;
+    if (r === 3) n = n[0] + n[0] + n[1] + n[1] + n[2] + n[2];
+    else if (r !== 6) return [0, 0, 0];
+    let o = parseInt(n, 16);
+    return [o >> 16 & 255, o >> 8 & 255, 255 & o];
+  }, te = (e, n, r) => e === n && n === r ? e < 8 ? 16 : e > 248 ? 231 : C((e - 8) / 247 * 24) + 232 : 16 + 36 * C(e / 51) + 6 * C(n / 51) + C(r / 51), U = (e) => {
+    let n, r, o, l, p, a;
+    return e < 8 ? 30 + e : e < 16 ? e - 8 + 90 : (e >= 232 ? n = r = o = (10 * (e - 232) + 8) / 255 : (a = (e -= 16) % 36, n = K(e / 36) / 5, r = K(a / 6) / 5, o = a % 6 / 5), l = 2 * Re(n, r, o), l === 0 ? 30 : (p = 30 + (C(o) << 2 | C(r) << 1 | C(n)), l === 2 ? p + 60 : p));
+  }, X = (e, n, r) => U(te(e, n, r)), j = ((e) => {
+    let n = ($2) => !!u.find((H) => $2.test(H)), r = globalThis, o = r.Deno, l = o != null, p = r.process || o || {}, a = p.stdout, N = (l ? o.build.os : p.platform) === "win32", u = p.argv || p.args || [], d = p.env || {}, g = -1;
+    if (l) try {
+      d = d.toObject();
+    } catch {
+      g = 0;
+    }
+    let c = "FORCE_COLOR", x = d[c], B = parseInt(x), m = x === "false" ? 0 : isNaN(B) ? 3 : B, w = "NO_COLOR" in d || m === 0 || n(/^-{1,2}(no-color|color=(false|never))$/), P = c in d && m || n(/^-{1,2}color=?(true|always)?$/), be = (d.NEXT_RUNTIME || "").indexOf("edge") > -1 || "PM2_HOME" in d && "pm_id" in d || (l ? o.isatty(1) : a && "isTTY" in a);
+    return w ? 0 : (g < 0 && (g = (($2, H, $e) => {
+      let { TERM: I, COLORTERM: W } = $2;
+      return "TF_BUILD" in $2 ? 1 : "TEAMCITY_VERSION" in $2 ? 2 : "CI" in $2 ? ["GITHUB_ACTIONS", "GITEA_ACTIONS"].some((he) => he in $2) ? 3 : 1 : !H || /-mono|dumb/i.test(I) ? 0 : $e || W === "truecolor" || W === "24bit" || I === "xterm-kitty" ? 3 : /-256(colou?r)?$/i.test(I) ? 2 : /^screen|^tmux|^xterm|^vt[1-5][0-9]([0-9])?|^ansi|color|cygwin|linux|mintty|rxvt/i.test(I) ? 1 : 3;
+    })(d, be, N)), P && g === 0 ? 3 : g);
+  })(), se = j > 0, ie = { open: "", close: "" }, i = se ? (e, n) => ({ open: `\x1B[${e}m`, close: `\x1B[${n}m` }) : () => ie, h = 39, f = 49, Z = (e) => (n, r, o) => e(te(n, r, o)), Q = (e) => (n) => {
+    let [r, o, l] = oe(n);
+    return e(r, o, l);
+  }, L = (e) => i(`38;5;${e}`, h), E = (e) => i(`48;5;${e}`, f), M = (e, n, r) => i(`38;2;${e};${n};${r}`, h), k = (e, n, r) => i(`48;2;${e};${n};${r}`, f);
+  j === 1 ? (L = (e) => i(U(e), h), E = (e) => i(U(e) + 10, f), M = (e, n, r) => i(X(e, n, r), h), k = (e, n, r) => i(X(e, n, r) + 10, f)) : j === 2 && (M = Z(L), k = Z(E));
+  var A, F, R = { ansi256: L, bgAnsi256: E, fg: L, bg: E, rgb: M, bgRgb: k, hex: Q(M), bgHex: Q(k), visible: ie, reset: i(0, 0), inverse: i(7, 27), hidden: i(8, 28), bold: i(1, 22), dim: i(2, 22), italic: i(3, 23), underline: i(4, 24), strikethrough: i(9, 29), strike: i(9, 29), grey: i(90, h), gray: i(90, h), bgGrey: i(100, f), bgGray: i(100, f) }, Me = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"], ee = "Bright", O = 30;
+  for (A of Me) F = "bg" + A[0].toUpperCase() + A.slice(1), R[A] = i(O, h), R[A + ee] = i(O + 60, h), R[F] = i(O + 10, f), R[F + ee] = i(O + 70, f), O++;
+  var { defineProperty: _e, defineProperties: ve, setPrototypeOf: le } = Object, Se = /[][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, Te = /(\r?\n)/g, ne = {}, re = ({ _p: e }, { open: n, close: r }) => {
+    let o = (a, ...N) => {
+      if (!a) return "";
+      let u = o._p, { _a: d, _b: g } = u, c = a.raw != null ? String.raw(a, ...N) : "" + a;
+      if (c.includes("\x1B")) for (; u != null; ) {
+        let x = u.close, B = x.length;
+        if (B) {
+          let m, w = 0, P = "";
+          for (; ~(m = c.indexOf(x, w)); ) P += c.slice(w, m) + u.open, w = m + B;
+          w && (c = P + c.slice(w));
+        }
+        u = u._p;
+      }
+      return c.includes(`
+`) && (c = c.replace(Te, g + "$1" + d)), d + c + g;
+    }, l = n, p = r;
+    return e != null && (l = e._a + n, p = r + e._b), le(o, D), o._p = { open: n, close: r, _a: l, _b: p, _p: e }, o.open = l, o.close = p, o;
+  }, ce = function() {
+    let e = (n) => "" + n;
+    return e.isSupported = () => se, e.strip = (n) => n.replace(Se, ""), e.extend = (n) => {
+      for (let r in n) {
+        let o = n[r], l = typeof o, p = l === "string" ? M(...oe(o)) : o;
+        ne[r] = l === "function" ? { get() {
+          return (...a) => re(this, o(...a));
+        } } : { get() {
+          let a = re(this, p);
+          return _e(this, r, { value: a }), a;
+        } };
+      }
+      D = ve({}, ne), le(e, D);
+    }, e.extend(R), e;
+  }, D, Ge = new ce();
+  Y.exports = Ge, Y.exports.Ansis = ce;
+});
+var b = Oe(ge(), 1);
+var { ansi256: ke, fg: ze, bgAnsi256: He, bg: Fe, rgb: Ue, bgRgb: je, hex: De, bgHex: Ye, reset: Je, inverse: Ve, hidden: We, visible: qe, bold: Ke, dim: Xe, italic: Ze, underline: Qe, strikethrough: en, strike: nn, black: rn, red: on, green: tn, yellow: sn, blue: ln, magenta: cn, cyan: an, white: gn, grey: pn, gray: dn, blackBright: un, redBright: mn, greenBright: bn, yellowBright: $n, blueBright: hn, magentaBright: fn, cyanBright: yn, whiteBright: xn, bgBlack: Bn, bgRed: wn, bgGreen: Cn, bgYellow: An, bgBlue: On, bgMagenta: Rn, bgCyan: Mn, bgWhite: _n, bgGrey: vn, bgGray: Sn, bgBlackBright: Tn, bgRedBright: Gn, bgGreenBright: Nn, bgYellowBright: Pn, bgBlueBright: In, bgMagentaBright: Ln, bgCyanBright: En, bgWhiteBright: kn } = b.default;
+var Un = "\x1B[H\x1B[2J";
+b.default.extend({ brown: "#c19a6b", pink: "#ff75d1", teal: "#91EBC2", lightGray: "#2a2a2e", orange: "#FFAB40", lavender: "#8080FF", neonGreen: "#56ef83", neonCyan: "#69d5fd", neonRouge: "#FF8095", neonMagenta: "#7b68ee" });
+var { cyan: Dn, red: _, green: Yn, yellow: v, magenta: Jn, blue: Vn, white: Wn, gray: t, dim: qn, cyanBright: Kn, redBright: J, greenBright: Xn, yellowBright: Zn, magentaBright: Qn, blueBright: er, whiteBright: pe, strip: nr, underline: rr, bold: or, reset: tr, lightGray: s, pink: sr, brown: ir, teal: lr, orange: cr, lavender: ar, neonGreen: V, neonCyan: gr, neonRouge: pr, neonMagenta: dr } = b.default;
+var de = { open: `${s.open}\u250C\u2500${s.close} `, stub: `${s.open}\u251C${s.close}  `, dash: `${s.open}\u251C\u2500${s.close} `, trim: `${s.open}\u2502${s.close}`, line: `${s.open}\u2502${s.close}  `, next: `
+${s.open}\u2502${s.close}`, after: `${s.open}\u2502${s.close}`, wrap: `
+${s.open}\u2502${s.close}
+`, base: `${s.open}\u2514\u2500${s.close} `, red: `${_.dim.open}\u2502${_.dim.close}  `, redTrim: `${_.dim.open}\u2502${_.dim.close}`, yellow: `${v.dim.open}\u2502${v.dim.close}  `, yellowTrim: `${v.dim.open}\u2502${v.dim.close}`, indent: { edge: `${s.open}\u251C\u2500\u2500\u252C\u2500${s.close} `, fall: `${s.open}\u251C\u2500\u2500\u2510${s.close} `, line: `${s.open}\u2502  \u2502${s.close} `, stub: `${s.open}\u2502  \u251C${s.close} `, dash: `${s.open}\u2502  \u251C\u2500${s.close} `, base: `${s.open}\u2502  \u2514\u2500${s.close} ` } };
+var br = `${t.open}|${t.close}`;
+var $r = `${t.open}#${t.close}`;
+var hr = `${t.open}+${t.close}`;
+var fr = `${t.open}-${t.close}`;
+var yr = `${t.open},${t.close}`;
+var xr = `${V.open}\u2713${V.close}`;
+var Br = `${J.open}\u{10102}${J.close}`;
+var wr = `${t.open}:${t.close}`;
+var Cr = `${t.open}\u2192${t.close}`;
+var Ar = `${t.open}\u25B8${t.close}`;
+var Or = `${t.open}\u2942${t.close}`;
+var Rr = `${t.open}~${t.close}`;
+var Mr = `${t.open}\u2014${t.close}`;
+var _r = `${t.open}(${t.close}`;
+var vr = `${t.open})${t.close}`;
+var Sr = `${t.open}{${t.close}`;
+var Tr = `${t.open}}${t.close}`;
+var Gr = `${t.open}[${t.close}`;
+var Nr = `${t.open}]${t.close}`;
+var Pr = `${t.open}<${t.close}`;
+var Ir = `${t.open}>${t.close}`;
+function Ur(e, n = {}) {
+  let r = Object.assign({ showPercentage: true, barColor: "neonGreen", percentColor: "whiteBright", barSize: 40, clearOnComplete: false }, n), o = 0, l = (g) => de.line + g + " ".repeat(Math.max(0, r.barSize - g.length)), p = (g, c = false) => (c ? "\u25B1" : "\u25B0").repeat(g), a = () => {
+    r.clearOnComplete && console.clear();
+  };
+  return { stop: a, increment: (g = 1) => {
+    let c = o + g;
+    o = Math.min(c, e), o === e && a();
+  }, decrement: (g = 1) => {
+    let c = o - g;
+    o = Math.max(c, 0);
+  }, render: (g) => {
+    let c = Math.round(o / e * r.barSize), x = p(c), B = p(r.barSize - c, true), m = b.default[r.barColor](x) + s(B);
+    return r.showPercentage && (m += (g || pe)(` ${String(Math.round(o / e * 100))}%`)), l(m);
+  }, get percent() {
+    return o;
+  } };
+}
+function z(e, n, r) {
+  return (0, import_node_child_process.execFileSync)(e, n, { encoding: "utf8", shell: r, stdio: ["ignore", "pipe", "ignore"] }).trim();
+}
+function me(e, n) {
+  let r = (0, import_node_path.dirname)((0, import_node_url.fileURLToPath)(importMetaUrl));
+  return z((0, import_node_path.join)(r, e), [], n).split(/\r?\n/);
+}
+function y(e, n) {
+  let r = Number.parseInt(e, 10);
+  return { wrap: r > 85 ? 85 : r, cols: Number.parseInt(e, 10), rows: Number.parseInt(n, 10) };
+}
+function Wr() {
+  if (import_node_process.stdout && import_node_process.stdout.columns && import_node_process.stdout.rows) return y(import_node_process.stdout.columns, import_node_process.stdout.rows);
+  if (import_node_process.stderr && import_node_process.stderr.columns && import_node_process.stderr.rows) return y(import_node_process.stderr.columns, import_node_process.stderr.rows);
+  if (import_node_process.env.COLUMNS && import_node_process.env.LINES) return y(import_node_process.env.COLUMNS, import_node_process.env.LINES);
+  if (import_node_process.platform === "win32") try {
+    let e = me("vendor/windows/term-size.exe", false);
+    if (e.length === 2) return y(e[0], e[1]);
+  } catch {
+  }
+  else {
+    if (import_node_process.platform === "darwin") try {
+      let e = me("vendor/macos/term-size", true);
+      if (e.length === 2) return y(e[0], e[1]);
+    } catch {
+    }
+    try {
+      let e = z("resize", ["-u"]).match(/\d+/g);
+      if (e.length === 2) return y(e[0], e[1]);
+    } catch {
+    }
+    if (import_node_process.env.TERM) try {
+      let e = z("tput", ["cols"]), n = z("tput", ["lines"]);
+      if (e && n) return y(e, n);
+    } catch {
+    }
+  }
+  return y(80, 24);
+}
+var export_Ansis = b.Ansis;
 
 // syncify/utils/native.ts
 init_cjs_shims();
 var import_node_console = require("console");
-var import_node_process = require("process");
+var import_node_process2 = require("process");
 var import_node_events = require("events");
 var event = new import_node_events.EventEmitter();
-var { error, log, warn, clear: clear2 } = new import_node_console.Console(import_node_process.stdout, import_node_process.stderr);
+var { error, log, warn, clear } = new import_node_console.Console(import_node_process2.stdout, import_node_process2.stderr);
 var {
   create,
   assign,
@@ -5207,7 +7781,7 @@ function getTime() {
   const hur = now.getHours();
   const min = now.getMinutes();
   const sec = now.getSeconds();
-  return (hur < 10 ? `0${hur}` : hur) + COL + (min < 10 ? `0${min}` : min) + COL + (sec < 10 ? `0${sec}` : sec);
+  return (hur < 10 ? `0${hur}` : hur) + wr + (min < 10 ? `0${min}` : min) + wr + (sec < 10 ? `0${sec}` : sec);
 }
 function getChunk(array, perChunk = 2) {
   return array.reduce((acc, item, index) => {
@@ -5238,8 +7812,8 @@ function checksum(input) {
 function handleize(string) {
   return string.toLowerCase().replace(/[^a-z0-9_:]+/g, "-").replace(/-$/, "").replace(/^-/, "");
 }
-function plural(word, size2) {
-  if (size2 >= 2 || size2 === 0) return word[word.length - 1] !== "s" ? `${word}s` : word;
+function plural(word, size) {
+  if (size >= 2 || size === 0) return word[word.length - 1] !== "s" ? `${word}s` : word;
   return word[word.length - 1] !== "s" ? word : word.slice(0, -1);
 }
 function toUpcase(value) {
@@ -5247,8 +7821,8 @@ function toUpcase(value) {
 }
 function addSuffix(number) {
   const a = number % 10;
-  const b = number % 100;
-  return number + (a === 1 && b !== 11 ? "st" : a === 2 && b !== 12 ? "nd" : a === 3 && b !== 13 ? "rd" : "th");
+  const b2 = number % 100;
+  return number + (a === 1 && b2 !== 11 ? "st" : a === 2 && b2 !== 12 ? "nd" : a === 3 && b2 !== 13 ? "rd" : "th");
 }
 function glueString(...input) {
   return input.join(" ");
@@ -5257,21 +7831,21 @@ function glue(...input) {
   return isArray(input[0]) ? input[0].join("") : input.join("");
 }
 function ws(array, prop = null) {
-  let size2 = 0;
+  let size = 0;
   if (isArray(array)) {
     for (const item of array) {
       if (prop) {
-        if (item[prop].length > size2) size2 = item[prop].length;
+        if (item[prop].length > size) size = item[prop].length;
       } else {
-        if (item.length > size2) size2 = item.length;
+        if (item.length > size) size = item.length;
       }
     }
   } else {
-    for (const item in array) if (item.length > size2) size2 = item.length;
+    for (const item in array) if (item.length > size) size = item.length;
   }
-  size2 = size2 + 1;
+  size = size + 1;
   return function curried(string) {
-    const n = isString(string) ? size2 - string.length : size2 - string;
+    const n = isString(string) ? size - string.length : size - string;
     return n < 1 ? " " : " ".repeat(n);
   };
 }
@@ -5287,7 +7861,7 @@ function isEmptyString(input) {
 }
 function isEmpty(input) {
   if (isObject(input)) {
-    for (const _ in input) return false;
+    for (const _2 in input) return false;
     return true;
   }
   if (isArray(input)) return input.length === 0;
@@ -5319,7 +7893,7 @@ function isNaN2(param) {
   return Number.isNaN(param);
 }
 function isNull(param) {
-  return Object.prototype.toString.call(param).slice(8, -1) === "Null";
+  return param === null;
 }
 function isUndefined(param) {
   return typeof param === "undefined";
@@ -5330,392 +7904,12 @@ function isBuffer(param) {
 
 // syncify/index.ts
 init_cjs_shims();
-var import_node_process10 = require("process");
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/allFalse.js
-init_cjs_shims();
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isTruthy.js
-init_cjs_shims();
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/type.js
-init_cjs_shims();
-function type(input) {
-  if (input === null) {
-    return "Null";
-  } else if (input === void 0) {
-    return "Undefined";
-  } else if (Number.isNaN(input)) {
-    return "NaN";
-  }
-  const typeResult = Object.prototype.toString.call(input).slice(8, -1);
-  return typeResult === "AsyncFunction" ? "Promise" : typeResult;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isArray.js
-init_cjs_shims();
-var { isArray: isArray2 } = Array;
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isTruthy.js
-function isTruthy(x) {
-  if (isArray2(x)) {
-    return x.length > 0;
-  }
-  if (type(x) === "Object") {
-    return Object.keys(x).length > 0;
-  }
-  return Boolean(x);
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/allFalse.js
-function allFalse(...inputs) {
-  let counter = 0;
-  while (counter < inputs.length) {
-    const x = inputs[counter];
-    if (type(x) === "Function") {
-      if (isTruthy(x())) {
-        return false;
-      }
-    } else if (isTruthy(x)) {
-      return false;
-    }
-    counter++;
-  }
-  return true;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/allTrue.js
-init_cjs_shims();
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isFalsy.js
-init_cjs_shims();
-function isFalsy(x) {
-  if (isArray2(x)) {
-    return x.length === 0;
-  }
-  if (type(x) === "Object") {
-    return Object.keys(x).length === 0;
-  }
-  return !x;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/allTrue.js
-function allTrue(...inputs) {
-  let counter = 0;
-  while (counter < inputs.length) {
-    const x = inputs[counter];
-    if (type(x) === "Function") {
-      if (isFalsy(x())) {
-        return false;
-      }
-    } else if (isFalsy(x)) {
-      return false;
-    }
-    counter++;
-  }
-  return true;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/anyTrue.js
-init_cjs_shims();
-function anyTrue(...inputs) {
-  let counter = 0;
-  while (counter < inputs.length) {
-    const x = inputs[counter];
-    if (type(x) === "Function") {
-      if (isTruthy(x())) {
-        return true;
-      }
-    } else if (isTruthy(x)) {
-      return true;
-    }
-    counter++;
-  }
-  return false;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/createPath.js
-init_cjs_shims();
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isInteger.js
-init_cjs_shims();
-function _isInteger(n) {
-  return n << 0 === n;
-}
-var isInteger = Number.isInteger || _isInteger;
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/createPath.js
-function createPath(path2, delimiter = ".") {
-  return typeof path2 === "string" ? path2.split(delimiter).map((x) => isInteger(x) ? Number(x) : x) : path2;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/path.js
-init_cjs_shims();
-function pathFn(pathInput, obj) {
-  let willReturn = obj;
-  let counter = 0;
-  const pathArrValue = createPath(pathInput);
-  while (counter < pathArrValue.length) {
-    if (willReturn === null || willReturn === void 0) {
-      return void 0;
-    }
-    if (willReturn[pathArrValue[counter]] === null) return void 0;
-    willReturn = willReturn[pathArrValue[counter]];
-    counter++;
-  }
-  return willReturn;
-}
-function path(pathInput, obj) {
-  if (arguments.length === 1) return (_obj) => path(pathInput, _obj);
-  if (obj === null || obj === void 0) {
-    return void 0;
-  }
-  return pathFn(pathInput, obj);
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/equals.js
-init_cjs_shims();
-function _indexOf(valueToFind, list3) {
-  if (!isArray2(list3))
-    throw new Error(`Cannot read property 'indexOf' of ${list3}`);
-  const typeOfValue = type(valueToFind);
-  if (!["Array", "NaN", "Object", "RegExp"].includes(typeOfValue))
-    return list3.indexOf(valueToFind);
-  let index = -1;
-  let foundIndex = -1;
-  const { length } = list3;
-  while (++index < length && foundIndex === -1)
-    if (equals(list3[index], valueToFind))
-      foundIndex = index;
-  return foundIndex;
-}
-function _arrayFromIterator(iter) {
-  const list3 = [];
-  let next;
-  while (!(next = iter.next()).done)
-    list3.push(next.value);
-  return list3;
-}
-function _compareSets(a, b) {
-  if (a.size !== b.size)
-    return false;
-  const aList = _arrayFromIterator(a.values());
-  const bList = _arrayFromIterator(b.values());
-  const filtered = aList.filter((aInstance) => _indexOf(aInstance, bList) === -1);
-  return filtered.length === 0;
-}
-function compareErrors(a, b) {
-  if (a.message !== b.message) return false;
-  if (a.toString !== b.toString) return false;
-  return a.toString() === b.toString();
-}
-function parseDate(maybeDate) {
-  if (!maybeDate.toDateString) return [false];
-  return [true, maybeDate.getTime()];
-}
-function parseRegex(maybeRegex) {
-  if (maybeRegex.constructor !== RegExp) return [false];
-  return [true, maybeRegex.toString()];
-}
-function equals(a, b) {
-  if (arguments.length === 1) return (_b) => equals(a, _b);
-  if (Object.is(a, b)) return true;
-  const aType = type(a);
-  if (aType !== type(b)) return false;
-  if (aType === "Function")
-    return a.name === void 0 ? false : a.name === b.name;
-  if (["NaN", "Null", "Undefined"].includes(aType)) return true;
-  if (["BigInt", "Number"].includes(aType)) {
-    if (Object.is(-0, a) !== Object.is(-0, b)) return false;
-    return a.toString() === b.toString();
-  }
-  if (["Boolean", "String"].includes(aType))
-    return a.toString() === b.toString();
-  if (aType === "Array") {
-    const aClone = Array.from(a);
-    const bClone = Array.from(b);
-    if (aClone.toString() !== bClone.toString())
-      return false;
-    let loopArrayFlag = true;
-    aClone.forEach((aCloneInstance, aCloneIndex) => {
-      if (loopArrayFlag) {
-        if (aCloneInstance !== bClone[aCloneIndex] && !equals(aCloneInstance, bClone[aCloneIndex]))
-          loopArrayFlag = false;
-      }
-    });
-    return loopArrayFlag;
-  }
-  const aRegex = parseRegex(a);
-  const bRegex = parseRegex(b);
-  if (aRegex[0])
-    return bRegex[0] ? aRegex[1] === bRegex[1] : false;
-  else if (bRegex[0]) return false;
-  const aDate = parseDate(a);
-  const bDate = parseDate(b);
-  if (aDate[0])
-    return bDate[0] ? aDate[1] === bDate[1] : false;
-  else if (bDate[0]) return false;
-  if (a instanceof Error) {
-    if (!(b instanceof Error)) return false;
-    return compareErrors(a, b);
-  }
-  if (aType === "Set")
-    return _compareSets(a, b);
-  if (aType === "Object") {
-    const aKeys = Object.keys(a);
-    if (aKeys.length !== Object.keys(b).length)
-      return false;
-    let loopObjectFlag = true;
-    aKeys.forEach((aKeyInstance) => {
-      if (loopObjectFlag) {
-        const aValue = a[aKeyInstance];
-        const bValue = b[aKeyInstance];
-        if (aValue !== bValue && !equals(aValue, bValue))
-          loopObjectFlag = false;
-      }
-    });
-    return loopObjectFlag;
-  }
-  return false;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/delay.js
-init_cjs_shims();
-var DELAY = "RAMBDAX_DELAY";
-function delay(ms) {
-  return new Promise((resolve3) => {
-    setTimeout(() => {
-      resolve3(DELAY);
-    }, ms);
-  });
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/includes.js
-init_cjs_shims();
-function includes(valueToFind, iterable) {
-  if (arguments.length === 1)
-    return (_iterable) => includes(valueToFind, _iterable);
-  if (typeof iterable === "string") {
-    return iterable.includes(valueToFind);
-  }
-  if (!iterable) {
-    throw new TypeError(`Cannot read property 'indexOf' of ${iterable}`);
-  }
-  if (!isArray2(iterable)) return false;
-  return _indexOf(valueToFind, iterable) > -1;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/isType.js
-init_cjs_shims();
-function isType(xType, x) {
-  if (arguments.length === 1) {
-    return (xHolder) => isType(xType, xHolder);
-  }
-  return type(x) === xType;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/mapParallelAsync.js
-init_cjs_shims();
-async function mapParallelAsyncFn(fn, arr) {
-  const promised = arr.map((a, i) => fn(a, i));
-  return Promise.all(promised);
-}
-function mapParallelAsync(fn, arr) {
-  if (arguments.length === 1) {
-    return async (holder) => mapParallelAsyncFn(fn, holder);
-  }
-  return new Promise((resolve3, reject) => {
-    mapParallelAsyncFn(fn, arr).then(resolve3).catch(reject);
-  });
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/omit.js
-init_cjs_shims();
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/includes.js
-init_cjs_shims();
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/compare.js
-init_cjs_shims();
-function compare(a, b) {
-  return String(a) === String(b);
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/includes.js
-function includes2(a, list3) {
-  let index = -1;
-  const { length } = list3;
-  while (++index < length)
-    if (compare(list3[index], a))
-      return true;
-  return false;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/omit.js
-function omit(propsToOmit, obj) {
-  if (arguments.length === 1) return (_obj) => omit(propsToOmit, _obj);
-  if (obj === null || obj === void 0)
-    return void 0;
-  const propsToOmitValue = createPath(propsToOmit, ",");
-  const willReturn = {};
-  for (const key in obj)
-    if (!includes2(key, propsToOmitValue))
-      willReturn[key] = obj[key];
-  return willReturn;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/has.js
-init_cjs_shims();
-function has2(prop, obj) {
-  if (arguments.length === 1) return (_obj) => has2(prop, _obj);
-  if (!obj) return false;
-  return obj.hasOwnProperty(prop);
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/hasPath.js
-init_cjs_shims();
-function hasPath(pathInput, obj) {
-  if (arguments.length === 1) {
-    return (objHolder) => hasPath(pathInput, objHolder);
-  }
-  return path(pathInput, obj) !== void 0;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/isEmpty.js
-init_cjs_shims();
-function isEmpty2(input) {
-  const inputType = type(input);
-  if (["Undefined", "NaN", "Number", "Null"].includes(inputType))
-    return false;
-  if (!input) return true;
-  if (inputType === "Object") {
-    return Object.keys(input).length === 0;
-  }
-  if (inputType === "Array") {
-    return input.length === 0;
-  }
-  return false;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/isNil.js
-init_cjs_shims();
-function isNil2(x) {
-  return x === void 0 || x === null;
-}
-
-// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/last.js
-init_cjs_shims();
-function last(listOrString) {
-  if (typeof listOrString === "string") {
-    return listOrString[listOrString.length - 1] || "";
-  }
-  return listOrString[listOrString.length - 1];
-}
+var import_node_process9 = __toESM(require("process"));
 
 // syncify/modes/upload.ts
 init_cjs_shims();
 var import_fast_glob = __toESM(require("fast-glob"));
-var import_pathe8 = require("pathe");
+var import_node_path8 = require("path");
 var import_fs_extra3 = require("fs-extra");
 
 // syncify/requests/client.ts
@@ -5836,6 +8030,345 @@ async function pMap(iterable, mapper, {
 }
 var pMapSkip = Symbol("skip");
 
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/allFalse.js
+init_cjs_shims();
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isTruthy.js
+init_cjs_shims();
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/type.js
+init_cjs_shims();
+function type(input) {
+  if (input === null) {
+    return "Null";
+  } else if (input === void 0) {
+    return "Undefined";
+  } else if (Number.isNaN(input)) {
+    return "NaN";
+  }
+  const typeResult = Object.prototype.toString.call(input).slice(8, -1);
+  return typeResult === "AsyncFunction" ? "Promise" : typeResult;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isArray.js
+init_cjs_shims();
+var { isArray: isArray2 } = Array;
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isTruthy.js
+function isTruthy(x) {
+  if (isArray2(x)) {
+    return x.length > 0;
+  }
+  if (type(x) === "Object") {
+    return Object.keys(x).length > 0;
+  }
+  return Boolean(x);
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/allFalse.js
+function allFalse(...inputs) {
+  let counter = 0;
+  while (counter < inputs.length) {
+    const x = inputs[counter];
+    if (type(x) === "Function") {
+      if (isTruthy(x())) {
+        return false;
+      }
+    } else if (isTruthy(x)) {
+      return false;
+    }
+    counter++;
+  }
+  return true;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/anyTrue.js
+init_cjs_shims();
+function anyTrue(...inputs) {
+  let counter = 0;
+  while (counter < inputs.length) {
+    const x = inputs[counter];
+    if (type(x) === "Function") {
+      if (isTruthy(x())) {
+        return true;
+      }
+    } else if (isTruthy(x)) {
+      return true;
+    }
+    counter++;
+  }
+  return false;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/createPath.js
+init_cjs_shims();
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/isInteger.js
+init_cjs_shims();
+function _isInteger(n) {
+  return n << 0 === n;
+}
+var isInteger = Number.isInteger || _isInteger;
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/createPath.js
+function createPath(path2, delimiter = ".") {
+  return typeof path2 === "string" ? path2.split(delimiter).map((x) => isInteger(x) ? Number(x) : x) : path2;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/path.js
+init_cjs_shims();
+function pathFn(pathInput, obj) {
+  let willReturn = obj;
+  let counter = 0;
+  const pathArrValue = createPath(pathInput);
+  while (counter < pathArrValue.length) {
+    if (willReturn === null || willReturn === void 0) {
+      return void 0;
+    }
+    if (willReturn[pathArrValue[counter]] === null) return void 0;
+    willReturn = willReturn[pathArrValue[counter]];
+    counter++;
+  }
+  return willReturn;
+}
+function path(pathInput, obj) {
+  if (arguments.length === 1) return (_obj) => path(pathInput, _obj);
+  if (obj === null || obj === void 0) {
+    return void 0;
+  }
+  return pathFn(pathInput, obj);
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/equals.js
+init_cjs_shims();
+function _indexOf(valueToFind, list3) {
+  if (!isArray2(list3))
+    throw new Error(`Cannot read property 'indexOf' of ${list3}`);
+  const typeOfValue = type(valueToFind);
+  if (!["Array", "NaN", "Object", "RegExp"].includes(typeOfValue))
+    return list3.indexOf(valueToFind);
+  let index = -1;
+  let foundIndex = -1;
+  const { length } = list3;
+  while (++index < length && foundIndex === -1)
+    if (equals(list3[index], valueToFind))
+      foundIndex = index;
+  return foundIndex;
+}
+function _arrayFromIterator(iter) {
+  const list3 = [];
+  let next;
+  while (!(next = iter.next()).done)
+    list3.push(next.value);
+  return list3;
+}
+function _compareSets(a, b2) {
+  if (a.size !== b2.size)
+    return false;
+  const aList = _arrayFromIterator(a.values());
+  const bList = _arrayFromIterator(b2.values());
+  const filtered = aList.filter((aInstance) => _indexOf(aInstance, bList) === -1);
+  return filtered.length === 0;
+}
+function compareErrors(a, b2) {
+  if (a.message !== b2.message) return false;
+  if (a.toString !== b2.toString) return false;
+  return a.toString() === b2.toString();
+}
+function parseDate(maybeDate) {
+  if (!maybeDate.toDateString) return [false];
+  return [true, maybeDate.getTime()];
+}
+function parseRegex(maybeRegex) {
+  if (maybeRegex.constructor !== RegExp) return [false];
+  return [true, maybeRegex.toString()];
+}
+function equals(a, b2) {
+  if (arguments.length === 1) return (_b) => equals(a, _b);
+  if (Object.is(a, b2)) return true;
+  const aType = type(a);
+  if (aType !== type(b2)) return false;
+  if (aType === "Function")
+    return a.name === void 0 ? false : a.name === b2.name;
+  if (["NaN", "Null", "Undefined"].includes(aType)) return true;
+  if (["BigInt", "Number"].includes(aType)) {
+    if (Object.is(-0, a) !== Object.is(-0, b2)) return false;
+    return a.toString() === b2.toString();
+  }
+  if (["Boolean", "String"].includes(aType))
+    return a.toString() === b2.toString();
+  if (aType === "Array") {
+    const aClone = Array.from(a);
+    const bClone = Array.from(b2);
+    if (aClone.toString() !== bClone.toString())
+      return false;
+    let loopArrayFlag = true;
+    aClone.forEach((aCloneInstance, aCloneIndex) => {
+      if (loopArrayFlag) {
+        if (aCloneInstance !== bClone[aCloneIndex] && !equals(aCloneInstance, bClone[aCloneIndex]))
+          loopArrayFlag = false;
+      }
+    });
+    return loopArrayFlag;
+  }
+  const aRegex = parseRegex(a);
+  const bRegex = parseRegex(b2);
+  if (aRegex[0])
+    return bRegex[0] ? aRegex[1] === bRegex[1] : false;
+  else if (bRegex[0]) return false;
+  const aDate = parseDate(a);
+  const bDate = parseDate(b2);
+  if (aDate[0])
+    return bDate[0] ? aDate[1] === bDate[1] : false;
+  else if (bDate[0]) return false;
+  if (a instanceof Error) {
+    if (!(b2 instanceof Error)) return false;
+    return compareErrors(a, b2);
+  }
+  if (aType === "Set")
+    return _compareSets(a, b2);
+  if (aType === "Object") {
+    const aKeys = Object.keys(a);
+    if (aKeys.length !== Object.keys(b2).length)
+      return false;
+    let loopObjectFlag = true;
+    aKeys.forEach((aKeyInstance) => {
+      if (loopObjectFlag) {
+        const aValue = a[aKeyInstance];
+        const bValue = b2[aKeyInstance];
+        if (aValue !== bValue && !equals(aValue, bValue))
+          loopObjectFlag = false;
+      }
+    });
+    return loopObjectFlag;
+  }
+  return false;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/delay.js
+init_cjs_shims();
+var DELAY = "RAMBDAX_DELAY";
+function delay(ms) {
+  return new Promise((resolve3) => {
+    setTimeout(() => {
+      resolve3(DELAY);
+    }, ms);
+  });
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/includes.js
+init_cjs_shims();
+function includes(valueToFind, iterable) {
+  if (arguments.length === 1)
+    return (_iterable) => includes(valueToFind, _iterable);
+  if (typeof iterable === "string") {
+    return iterable.includes(valueToFind);
+  }
+  if (!iterable) {
+    throw new TypeError(`Cannot read property 'indexOf' of ${iterable}`);
+  }
+  if (!isArray2(iterable)) return false;
+  return _indexOf(valueToFind, iterable) > -1;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/isType.js
+init_cjs_shims();
+function isType(xType, x) {
+  if (arguments.length === 1) {
+    return (xHolder) => isType(xType, xHolder);
+  }
+  return type(x) === xType;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/mapParallelAsync.js
+init_cjs_shims();
+async function mapParallelAsyncFn(fn2, arr) {
+  const promised = arr.map((a, i) => fn2(a, i));
+  return Promise.all(promised);
+}
+function mapParallelAsync(fn2, arr) {
+  if (arguments.length === 1) {
+    return async (holder) => mapParallelAsyncFn(fn2, holder);
+  }
+  return new Promise((resolve3, reject) => {
+    mapParallelAsyncFn(fn2, arr).then(resolve3).catch(reject);
+  });
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/omit.js
+init_cjs_shims();
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/includes.js
+init_cjs_shims();
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/compare.js
+init_cjs_shims();
+function compare(a, b2) {
+  return String(a) === String(b2);
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/_internals/includes.js
+function includes2(a, list3) {
+  let index = -1;
+  const { length } = list3;
+  while (++index < length)
+    if (compare(list3[index], a))
+      return true;
+  return false;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/omit.js
+function omit(propsToOmit, obj) {
+  if (arguments.length === 1) return (_obj) => omit(propsToOmit, _obj);
+  if (obj === null || obj === void 0)
+    return void 0;
+  const propsToOmitValue = createPath(propsToOmit, ",");
+  const willReturn = {};
+  for (const key in obj)
+    if (!includes2(key, propsToOmitValue))
+      willReturn[key] = obj[key];
+  return willReturn;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/has.js
+init_cjs_shims();
+function has2(prop, obj) {
+  if (arguments.length === 1) return (_obj) => has2(prop, _obj);
+  if (!obj) return false;
+  return obj.hasOwnProperty(prop);
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/hasPath.js
+init_cjs_shims();
+function hasPath(pathInput, obj) {
+  if (arguments.length === 1) {
+    return (objHolder) => hasPath(pathInput, objHolder);
+  }
+  return path(pathInput, obj) !== void 0;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/isEmpty.js
+init_cjs_shims();
+function isEmpty2(input) {
+  const inputType = type(input);
+  if (["Undefined", "NaN", "Number", "Null"].includes(inputType))
+    return false;
+  if (!input) return true;
+  if (inputType === "Object") {
+    return Object.keys(input).length === 0;
+  }
+  if (inputType === "Array") {
+    return input.length === 0;
+  }
+  return false;
+}
+
+// node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/isNil.js
+init_cjs_shims();
+function isNil2(x) {
+  return x === void 0 || x === null;
+}
+
 // syncify/requests/queue.ts
 init_cjs_shims();
 
@@ -5844,7 +8377,7 @@ init_cjs_shims();
 
 // node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.mjs
 init_cjs_shims();
-var import_index2 = __toESM(require_eventemitter3(), 1);
+var import_index = __toESM(require_eventemitter3(), 1);
 
 // node_modules/.pnpm/p-timeout@6.1.2/node_modules/p-timeout/index.js
 init_cjs_shims();
@@ -5968,7 +8501,7 @@ var PriorityQueue = class {
       this.#queue.push(element);
       return;
     }
-    const index = lowerBound(this.#queue, element, (a, b) => b.priority - a.priority);
+    const index = lowerBound(this.#queue, element, (a, b2) => b2.priority - a.priority);
     this.#queue.splice(index, 0, element);
   }
   dequeue() {
@@ -5984,7 +8517,7 @@ var PriorityQueue = class {
 };
 
 // node_modules/.pnpm/p-queue@8.0.1/node_modules/p-queue/dist/index.js
-var PQueue = class extends import_index2.default {
+var PQueue = class extends import_index.default {
   #carryoverConcurrencyCount;
   #isIntervalIgnored;
   #intervalCount = 0;
@@ -6329,8 +8862,8 @@ var timer = new class Timer {
    * Sugar for the `stop` function.
    */
   sec(id) {
-    const t = this.stop(id || true);
-    return t.slice(0, t.lastIndexOf(" "));
+    const t2 = this.stop(id || true);
+    return t2.slice(0, t2.lastIndexOf(" "));
   }
   /**
    * Pause Timer
@@ -6393,9 +8926,9 @@ var timer = new class Timer {
       gt = now ? this.marks[this.marks.length - 1] : this.marks.pop();
     } else if (now) {
       if (now in this.cache) {
-        const s2 = this.cache[now];
+        const s3 = this.cache[now];
         delete this.cache[now];
-        return s2;
+        return s3;
       }
       if (end) {
         gt = this.time[now];
@@ -6406,88 +8939,23 @@ var timer = new class Timer {
     }
     const ms = import_node_perf_hooks.performance.now() - gt;
     if (ms < 1e3) return `${abs(+ms.toFixed(0))}ms`;
-    const s = ms / 1e3;
-    if (s < 60) return `${abs(+s.toFixed(0))}s ${abs(+ms.toFixed(0).slice(1, 4))}ms`;
-    const m = abs(+(s / 60).toFixed(0));
-    return `${m}m ${abs(+(s - 60 * Number(m)).toFixed(0))}s ${abs(+ms.toFixed(0).slice(1, 4))}ms`;
+    const s2 = ms / 1e3;
+    if (s2 < 60) return `${abs(+s2.toFixed(0))}s ${abs(+ms.toFixed(0).slice(1, 4))}ms`;
+    const m = abs(+(s2 / 60).toFixed(0));
+    return `${m}m ${abs(+(s2 - 60 * Number(m)).toFixed(0))}s ${abs(+ms.toFixed(0).slice(1, 4))}ms`;
   }
 }();
 
 // syncify/model/$.ts
 init_cjs_shims();
-var import_node_process3 = require("process");
-
-// syncify/cli/size.ts
-init_cjs_shims();
-var import_node_process2 = require("process");
-var import_node_child_process = require("child_process");
-var import_node_url = require("url");
-var import_pathe = require("pathe");
-function exec(command, args, shell) {
-  return (0, import_node_child_process.execFileSync)(command, args, {
-    encoding: "utf8",
-    shell,
-    stdio: [
-      "ignore",
-      "pipe",
-      "ignore"
-    ]
-  }).trim();
-}
-function execNative(command, shell) {
-  const __dirname = (0, import_pathe.dirname)((0, import_node_url.fileURLToPath)(importMetaUrl));
-  return exec((0, import_pathe.join)(__dirname, command), [], shell).split(/\r?\n/);
-}
-function create2(columns, rows) {
-  const cols = Number.parseInt(columns, 10);
-  return {
-    wrap: cols > 85 ? 85 : cols,
-    cols: Number.parseInt(columns, 10),
-    rows: Number.parseInt(rows, 10)
-  };
-}
-function size() {
-  if (import_node_process2.stdout && import_node_process2.stdout.columns && import_node_process2.stdout.rows) return create2(import_node_process2.stdout.columns, import_node_process2.stdout.rows);
-  if (import_node_process2.stderr && import_node_process2.stderr.columns && import_node_process2.stderr.rows) return create2(import_node_process2.stderr.columns, import_node_process2.stderr.rows);
-  if (import_node_process2.env.COLUMNS && import_node_process2.env.LINES) return create2(import_node_process2.env.COLUMNS, import_node_process2.env.LINES);
-  if (import_node_process2.platform === "win32") {
-    try {
-      const size2 = execNative("vendor/windows/term-size.exe", false);
-      if (size2.length === 2) return create2(size2[0], size2[1]);
-    } catch {
-    }
-  } else {
-    if (import_node_process2.platform === "darwin") {
-      try {
-        const size2 = execNative("vendor/macos/term-size", true);
-        if (size2.length === 2) return create2(size2[0], size2[1]);
-      } catch {
-      }
-    }
-    try {
-      const size2 = exec("resize", ["-u"]).match(/\d+/g);
-      if (size2.length === 2) return create2(size2[0], size2[1]);
-    } catch {
-    }
-    if (import_node_process2.env.TERM) {
-      try {
-        const cols = exec("tput", ["cols"]);
-        const rows = exec("tput", ["lines"]);
-        if (cols && rows) return create2(cols, rows);
-      } catch {
-      }
-    }
-  }
-  return create2(80, 24);
-}
 
 // syncify/const.ts
 init_cjs_shims();
 var SYNCIFY_CONFIG = [
+  "syncify.config.ts",
   "syncify.config.js",
   "syncify.config.mjs",
   "syncify.config.cjs",
-  "syncify.config.ts",
   "syncify.config.json"
 ];
 var CACHE_REFS = [
@@ -6500,14 +8968,6 @@ var CACHE_REFS = [
   "sections",
   "settings",
   "templates"
-];
-var BASE_DIRS = [
-  ["cache", "node_modules"],
-  ["input", "source"],
-  ["output", "theme"],
-  ["export", "export"],
-  ["import", "import"],
-  ["config", "."]
 ];
 var PATH_KEYS = [
   "assets",
@@ -6798,10 +9258,6 @@ var $ = new class Bundle {
    */
   restart = false;
   /**
-   * Cached reference of the CLI commands passed
-   */
-  cli = {};
-  /**
    * Websockets HOT reloading
    */
   wss = null;
@@ -6810,37 +9266,37 @@ var $ = new class Bundle {
    *
    * @default null
    */
-  stats = {};
-  /**
-   * CLI provided filters
-   *
-   * @default null
-   */
-  filters = {};
-  /**
-   * Cache copy of the invoked commands in which syncify was started
-   *
-   * @default null
-   */
-  commands = {};
+  stats = object();
   /**
    * The version defined in the package.json
    *
    * @default null
    */
-  version = "0.3.0-beta";
+  version = "0.0.1-rc.1";
   /**
    * The current working directory
    *
    * @default null
    */
-  cwd = null;
+  cwd = process.cwd();
+  /**
+   * Cache copy of the invoked commands in which syncify was started
+   *
+   * @default null
+   */
+  cmd = null;
   /**
    * The provided command passed on the CLI.
    *
    * @default null
    */
-  argv = import_node_process3.argv.slice(2).join(" ");
+  argv = null;
+  /**
+   * CLI provided filters
+   *
+   * @default null
+   */
+  filters = object();
   /**
    * Error store, holds reference to errors
    *
@@ -6860,13 +9316,13 @@ var $ = new class Bundle {
   /**
    * Theme Publishing
    */
-  publish = {
+  publish = object({
     ngrok: null,
     bindVersion: false,
     publishRole: "unpublished",
     themeLimit: 3,
     tunnelPort: 80
-  };
+  });
   /**
    * Version Control
    *
@@ -6881,7 +9337,7 @@ var $ = new class Bundle {
    *  update: null
    * }
    */
-  vc = {
+  vc = object({
     dir: null,
     number: null,
     zip: null,
@@ -6889,7 +9345,7 @@ var $ = new class Bundle {
     major: 0,
     minor: 0,
     update: null
-  };
+  });
   /**
    * Execution options which describe the invocation and operation
    * instructions Syncify was initialised.
@@ -6903,7 +9359,7 @@ var $ = new class Bundle {
    *  vars: {}
    * }
    */
-  env = {
+  env = object({
     cli: false,
     tree: false,
     dev: true,
@@ -6912,7 +9368,7 @@ var $ = new class Bundle {
     sync: 0,
     file: null,
     vars: {}
-  };
+  });
   /**
    * Hot reload mode options - Use the `mode.hot` reference to
    * determine whether or not HOT reloading is enabled.
@@ -6932,7 +9388,7 @@ var $ = new class Bundle {
    *  alive: {}
    * }
    */
-  hot = {
+  hot = object({
     inject: true,
     server: 3e3,
     socket: 8089,
@@ -6955,11 +9411,11 @@ var $ = new class Bundle {
       "history: false",
       'method: "hot"'
     ].join(", ") + " %}"
-  };
+  });
   /**
    * Log State
    */
-  log = {
+  log = object({
     idle: false,
     group: "Syncify",
     title: "",
@@ -6974,16 +9430,16 @@ var $ = new class Bundle {
       stats: true,
       warnings: true
     }
-  };
+  });
   /**
    * The operation mode executing
    *
    * @default false // all modes are false by default
    */
-  mode = {
+  mode = object({
+    dev: true,
     build: false,
     interactive: false,
-    dev: true,
     prod: false,
     strap: false,
     watch: false,
@@ -6998,7 +9454,6 @@ var $ = new class Bundle {
     pages: false,
     pull: false,
     force: false,
-    views: false,
     script: false,
     image: false,
     style: false,
@@ -7008,7 +9463,7 @@ var $ = new class Bundle {
     release: false,
     publish: false,
     themes: false
-  };
+  });
   /**
    * The configuration file name resolution
    *
@@ -7021,11 +9476,11 @@ var $ = new class Bundle {
    *  type: null
    * }
    */
-  file = {
+  file = object({
     base: null,
     path: null,
     relative: null
-  };
+  });
   /**
    * Files store - Holds a `Set` reference to all files
    */
@@ -7033,7 +9488,7 @@ var $ = new class Bundle {
   /**
    * Base directory path references
    */
-  dirs = {
+  dirs = object({
     cache: null,
     config: null,
     export: null,
@@ -7045,26 +9500,7 @@ var $ = new class Bundle {
       scripts: null,
       styles: null
     }
-  };
-  /**
-   * Passed commands that may be of importance in the transform or build processes.
-   *
-   * @default
-   * {
-   *   config: null,
-   *   delete: null,
-   *   filter: null,
-   *   input: null,
-   *   output: null
-   * }
-   */
-  cmd = {
-    config: null,
-    delete: null,
-    filter: null,
-    input: null,
-    output: null
-  };
+  });
   /**
    * The available stores as per configuration in `package.json` file
    *
@@ -7184,7 +9620,6 @@ var $ = new class Bundle {
     safeSync: true,
     author: "",
     global: null,
-    suffixDir: false,
     language: "html",
     export: {
       quotes: "\u201C\u201D\u2018\u2019",
@@ -7368,7 +9803,7 @@ var $ = new class Bundle {
    * The terminal rows and columns size
    */
   get terminal() {
-    return size();
+    return Wr();
   }
 }();
 
@@ -7570,7 +10005,7 @@ var File = class {
 init_cjs_shims();
 var import_node_readline = require("readline");
 var import_node_util = require("util");
-var import_node_process9 = require("process");
+var import_node_process8 = require("process");
 var import_node_notifier = __toESM(require("node-notifier"));
 
 // syncify/cli/intercept.ts
@@ -7581,7 +10016,7 @@ var import_node_console2 = require("console");
 // syncify/cli/interpolate.ts
 init_cjs_shims();
 
-// syncify/ansi/ansi.ts
+// syncify/cli/tree.ts
 init_cjs_shims();
 
 // node_modules/.pnpm/wrap-ansi@9.0.0/node_modules/wrap-ansi/index.js
@@ -7700,7 +10135,7 @@ init_cjs_shims();
 var ANSI_BACKGROUND_OFFSET = 10;
 var wrapAnsi16 = (offset = 0) => (code) => `\x1B[${code + offset}m`;
 var wrapAnsi256 = (offset = 0) => (code) => `\x1B[${38 + offset};5;${code}m`;
-var wrapAnsi16m = (offset = 0) => (red3, green3, blue3) => `\x1B[${38 + offset};2;${red3};${green3};${blue3}m`;
+var wrapAnsi16m = (offset = 0) => (red, green, blue) => `\x1B[${38 + offset};2;${red};${green};${blue}m`;
 var styles = {
   modifier: {
     reset: [0, 0],
@@ -7795,23 +10230,23 @@ function assembleStyles() {
   styles.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
   Object.defineProperties(styles, {
     rgbToAnsi256: {
-      value: (red3, green3, blue3) => {
-        if (red3 === green3 && green3 === blue3) {
-          if (red3 < 8) {
+      value: (red, green, blue) => {
+        if (red === green && green === blue) {
+          if (red < 8) {
             return 16;
           }
-          if (red3 > 248) {
+          if (red > 248) {
             return 231;
           }
-          return Math.round((red3 - 8) / 247 * 24) + 232;
+          return Math.round((red - 8) / 247 * 24) + 232;
         }
-        return 16 + 36 * Math.round(red3 / 255 * 5) + 6 * Math.round(green3 / 255 * 5) + Math.round(blue3 / 255 * 5);
+        return 16 + 36 * Math.round(red / 255 * 5) + 6 * Math.round(green / 255 * 5) + Math.round(blue / 255 * 5);
       },
       enumerable: false
     },
     hexToRgb: {
-      value: (hex2) => {
-        const matches = /[a-f\d]{6}|[a-f\d]{3}/i.exec(hex2.toString(16));
+      value: (hex) => {
+        const matches = /[a-f\d]{6}|[a-f\d]{3}/i.exec(hex.toString(16));
         if (!matches) {
           return [0, 0, 0];
         }
@@ -7831,7 +10266,7 @@ function assembleStyles() {
       enumerable: false
     },
     hexToAnsi256: {
-      value: (hex2) => styles.rgbToAnsi256(...styles.hexToRgb(hex2)),
+      value: (hex) => styles.rgbToAnsi256(...styles.hexToRgb(hex)),
       enumerable: false
     },
     ansi256ToAnsi: {
@@ -7842,25 +10277,25 @@ function assembleStyles() {
         if (code < 16) {
           return 90 + (code - 8);
         }
-        let red3;
-        let green3;
-        let blue3;
+        let red;
+        let green;
+        let blue;
         if (code >= 232) {
-          red3 = ((code - 232) * 10 + 8) / 255;
-          green3 = red3;
-          blue3 = red3;
+          red = ((code - 232) * 10 + 8) / 255;
+          green = red;
+          blue = red;
         } else {
           code -= 16;
           const remainder = code % 36;
-          red3 = Math.floor(code / 36) / 5;
-          green3 = Math.floor(remainder / 6) / 5;
-          blue3 = remainder % 6 / 5;
+          red = Math.floor(code / 36) / 5;
+          green = Math.floor(remainder / 6) / 5;
+          blue = remainder % 6 / 5;
         }
-        const value = Math.max(red3, green3, blue3) * 2;
+        const value = Math.max(red, green, blue) * 2;
         if (value === 0) {
           return 30;
         }
-        let result = 30 + (Math.round(blue3) << 2 | Math.round(green3) << 1 | Math.round(red3));
+        let result = 30 + (Math.round(blue) << 2 | Math.round(green) << 1 | Math.round(red));
         if (value === 2) {
           result += 60;
         }
@@ -7869,11 +10304,11 @@ function assembleStyles() {
       enumerable: false
     },
     rgbToAnsi: {
-      value: (red3, green3, blue3) => styles.ansi256ToAnsi(styles.rgbToAnsi256(red3, green3, blue3)),
+      value: (red, green, blue) => styles.ansi256ToAnsi(styles.rgbToAnsi256(red, green, blue)),
       enumerable: false
     },
     hexToAnsi: {
-      value: (hex2) => styles.ansi256ToAnsi(styles.hexToAnsi256(hex2)),
+      value: (hex) => styles.ansi256ToAnsi(styles.hexToAnsi256(hex)),
       enumerable: false
     }
   });
@@ -7900,14 +10335,14 @@ var wrapWord = (rows, word, columns) => {
   const characters = [...word];
   let isInsideEscape = false;
   let isInsideLinkEscape = false;
-  let visible2 = stringWidth(stripAnsi(rows.at(-1)));
+  let visible = stringWidth(stripAnsi(rows.at(-1)));
   for (const [index, character] of characters.entries()) {
     const characterLength = stringWidth(character);
-    if (visible2 + characterLength <= columns) {
+    if (visible + characterLength <= columns) {
       rows[rows.length - 1] += character;
     } else {
       rows.push(character);
-      visible2 = 0;
+      visible = 0;
     }
     if (ESCAPES.has(character)) {
       isInsideEscape = true;
@@ -7925,31 +10360,31 @@ var wrapWord = (rows, word, columns) => {
       }
       continue;
     }
-    visible2 += characterLength;
-    if (visible2 === columns && index < characters.length - 1) {
+    visible += characterLength;
+    if (visible === columns && index < characters.length - 1) {
       rows.push("");
-      visible2 = 0;
+      visible = 0;
     }
   }
-  if (!visible2 && rows.at(-1).length > 0 && rows.length > 1) {
+  if (!visible && rows.at(-1).length > 0 && rows.length > 1) {
     rows[rows.length - 2] += rows.pop();
   }
 };
 var stringVisibleTrimSpacesRight = (string) => {
   const words = string.split(" ");
-  let last2 = words.length;
-  while (last2 > 0) {
-    if (stringWidth(words[last2 - 1]) > 0) {
+  let last = words.length;
+  while (last > 0) {
+    if (stringWidth(words[last - 1]) > 0) {
       break;
     }
-    last2--;
+    last--;
   }
-  if (last2 === words.length) {
+  if (last === words.length) {
     return string;
   }
-  return words.slice(0, last2).join(" ") + words.slice(last2).join("");
+  return words.slice(0, last).join(" ") + words.slice(last).join("");
 };
-var exec2 = (string, columns, options = {}) => {
+var exec = (string, columns, options = {}) => {
   if (options.trim !== false && string.trim() === "") {
     return "";
   }
@@ -8034,7 +10469,7 @@ var exec2 = (string, columns, options = {}) => {
   return returnValue;
 };
 function wrapAnsi(string, columns, options) {
-  return String(string).normalize().replaceAll("\r\n", "\n").split("\n").map((line) => exec2(line, columns, options)).join("\n");
+  return String(string).normalize().replaceAll("\r\n", "\n").split("\n").map((line) => exec(line, columns, options)).join("\n");
 }
 
 // node_modules/.pnpm/clean-stack@5.2.0/node_modules/clean-stack/index.js
@@ -8085,26 +10520,26 @@ function cleanStack(stack, { pretty = false, basePath: basePath2, pathFilter } =
   }).join("\n");
 }
 
-// syncify/ansi/ansi.ts
+// syncify/cli/tree.ts
 function Prefix(name, ...suffix) {
   const spacer = name.length > 9 ? "  " : " ".repeat(11 - name.length);
-  const joiner = suffix.length > 0 ? suffix.length === 1 ? ARR + "  " + suffix[0] : suffix.length === 2 ? ARR + "  " + suffix[0] + " " + ARR + " " + suffix[1] : ARR + "  " + suffix[0] + " " + ARR + " " + suffix[1] + " " + Append(suffix[2]) : "";
+  const joiner = suffix.length > 0 ? suffix.length === 1 ? Cr + "  " + suffix[0] : suffix.length === 2 ? Cr + "  " + suffix[0] + " " + Cr + " " + suffix[1] : Cr + "  " + suffix[0] + " " + Cr + " " + suffix[1] + " " + Append(suffix[2]) : "";
   return name + spacer + joiner;
 }
 function Append(input) {
-  return input ? TLD + " " + reset2.gray(input) : "";
+  return input ? Rr + " " + tr.gray(input) : "";
 }
 function Encase(encase, input, { spaced = false } = {}) {
   const WS = spaced ? " " : "";
   switch (encase) {
     case "AN":
-      return LAN + WS + input + WS + RAN;
+      return Pr + WS + input + WS + Ir;
     case "CB":
-      return LCB + WS + input + WS + RCB;
+      return Sr + WS + input + WS + Tr;
     case "PR":
-      return LPR + WS + input + WS + RPR;
+      return _r + WS + input + WS + vr;
     case "SB":
-      return LSB + WS + input + WS + RSB;
+      return Gr + WS + input + WS + Nr;
   }
 }
 var Suffix = object({
@@ -8115,7 +10550,7 @@ var Suffix = object({
    *  ~ Type w and press enter to view
    * ```
    */
-  warning: yellow2(` ${TLD} Type ${bold2("w")} and press ${bold2("enter")} to view`),
+  warning: v(` ${Rr} Type ${or("w")} and press ${or("enter")} to view`),
   /**
    * Error in red stdin suffix with Tilde `~` prefix
    *
@@ -8123,7 +10558,7 @@ var Suffix = object({
    *  ~ Type v and press enter to view
    * ```
    */
-  error: red2(` ${TLD} Type ${bold2("v")} and press ${bold2("enter")} to view`),
+  error: _(` ${Rr} Type ${or("v")} and press ${or("enter")} to view`),
   /**
    * Stack Trace in Gray applied to error contexts
    *
@@ -8131,15 +10566,15 @@ var Suffix = object({
    * Type s and press enter to view stack trace
    * ```
    */
-  stack: gray2(`Type ${bold2("s")} and press ${bold2("enter")} to view stack trace`)
+  stack: t(`Type ${or("s")} and press ${or("enter")} to view stack trace`)
 });
 var Ruler = (width = $.terminal.wrap, newlines = true) => {
   const line = "\u251C" + "\u2500".repeat(width - 10);
-  return newlines ? `${lightGray.open}${"\n"}${line}${"\n"}\u2502${lightGray.close}` : `${lightGray.open}${line}${lightGray.close}`;
+  return newlines ? `${s.open}${"\n"}${line}${"\n"}\u2502${s.close}` : `${s.open}${line}${s.close}`;
 };
-var Top = (label) => Tree.open + reset2.gray(`${label} ~ ${getTime()}`);
+var Top = (label) => de.open + tr.gray(`${label} ~ ${getTime()}`);
 var Wrap = (...input) => {
-  const style2 = object({ color: null, line: Tree.line });
+  const style2 = object({ color: null, line: de.line });
   let lines;
   let write4 = "";
   if (isArray(input[0])) {
@@ -8159,36 +10594,36 @@ var Wrap = (...input) => {
   }
   return write4.trimEnd();
 };
-var Break = (input) => Tree.trim + "\n" + Tree.line + input + "\n" + Tree.trim;
-var Line = (input) => Tree.line + input;
-var LineRed = (input) => Tree.red + input;
-var LineYellow = (input) => Tree.yellow + input;
-var NextLine = (input) => Tree.trim + "\n" + Tree.line + input;
-var Next = (input) => Tree.line + input + "\n" + Tree.line;
-var Dash = (input) => Tree.dash + input;
-var End = (input) => Tree.base + reset2.gray(`${input} ~ ${getTime()}`) + "\n";
+var Break = (input) => de.trim + "\n" + de.line + input + "\n" + de.trim;
+var Line = (input) => de.line + input;
+var LineRed = (input) => de.red + input;
+var LineYellow = (input) => de.yellow + input;
+var NextLine = (input) => de.trim + "\n" + de.line + input;
+var Next = (input) => de.line + input + "\n" + de.line;
+var Dash = (input) => de.dash + input;
+var End = (input) => de.base + tr.gray(`${input} ~ ${getTime()}`) + "\n";
 function Context(data) {
   const space = ws(data.entries);
   const message = Create({ type: data.type || "error" });
   if (isString(data.stack)) {
     const stack = data.cleanStack ? cleanStack(data.stack, { pretty: true, basePath: $.cwd }) : data.stack;
-    message.Wrap(stack.split("\n"), gray2).NL.Newline();
+    message.Wrap(stack.split("\n"), t).NL.Newline();
   }
   for (const key in data.entries) {
     if (isUndefined(data.entries[key])) continue;
     let string;
     if (isNumber(data.entries[key])) {
       if (isNaN2(data.entries[key])) continue;
-      string = neonRouge(sanitize(data.entries[key]));
+      string = pr(sanitize(data.entries[key]));
     } else {
       string = sanitize(data.entries[key]);
     }
     if (string.length === 0) continue;
-    const entry = data.type === "warning" ? yellowBright2(key) : redBright2(key);
+    const entry = data.type === "warning" ? Zn(key) : J(key);
     if (key === "source" || key === "output" || key === "input" || key === "file") {
-      message.Line(entry + COL + " " + space(key) + underline2(string), gray2);
+      message.Line(entry + wr + " " + space(key) + rr(string), t);
     } else {
-      message.Line(entry + COL + " " + space(key) + string, gray2);
+      message.Line(entry + wr + " " + space(key) + string, t);
     }
   }
   if (data.stack === true) message.NL.Line(Suffix.stack);
@@ -8227,21 +10662,21 @@ var Message = class {
       this.type = has3("type") ? options.type : "info";
       this.text = has3("text") ? options.text : [];
       if (this.type === "error") {
-        this.line = Tree.red;
-        this.trim = Tree.redTrim;
+        this.line = de.red;
+        this.trim = de.redTrim;
       } else if (this.type === "warning") {
-        this.line = Tree.yellow;
-        this.trim = Tree.yellowTrim;
+        this.line = de.yellow;
+        this.trim = de.yellowTrim;
       } else if (this.type === "nil") {
         this.line = "";
         this.trim = "";
       } else {
-        this.line = Tree.line;
-        this.trim = Tree.trim;
+        this.line = de.line;
+        this.trim = de.trim;
       }
     } else {
-      this.line = Tree.line;
-      this.trim = Tree.trim;
+      this.line = de.line;
+      this.trim = de.trim;
       this.text = [];
     }
   }
@@ -8275,11 +10710,11 @@ var Message = class {
     if (color) {
       output = color(glue(this.text));
     } else if (this.type === "info") {
-      output = white2(glue(this.text));
+      output = Wn(glue(this.text));
     } else if (this.type === "error") {
-      output = red2(glue(this.text));
+      output = _(glue(this.text));
     } else if (this.type === "warning") {
-      output = yellowBright2(glue(this.text));
+      output = Zn(glue(this.text));
     } else {
       output = glue(this.text);
     }
@@ -8304,11 +10739,11 @@ var Message = class {
     if (color) {
       output = color(glue(this.text));
     } else if (this.type === "info") {
-      output = white2(glue(this.text));
+      output = Wn(glue(this.text));
     } else if (this.type === "error") {
-      output = red2(glue(this.text));
+      output = _(glue(this.text));
     } else if (this.type === "warning") {
-      output = yellowBright2(glue(this.text));
+      output = Zn(glue(this.text));
     } else {
       output = glue(this.text);
     }
@@ -8356,7 +10791,7 @@ var Message = class {
    * ```
    */
   Ruler(width = $.terminal.wrap) {
-    this.text.push(Tree.trim + "\n" + lightGray(`\u251C${"\u2500".repeat(width)}`) + "\n" + Tree.trim + "\n");
+    this.text.push(de.trim + "\n" + s(`\u251C${"\u2500".repeat(width)}`) + "\n" + de.trim + "\n");
     return this;
   }
   /**
@@ -8404,9 +10839,9 @@ var Message = class {
       let input = this.trim + "\n";
       if (color) {
         if (color === "yellow") {
-          input = Tree.yellowTrim + "\n";
+          input = de.yellowTrim + "\n";
         } else if (color === "red") {
-          input = Tree.redTrim + "\n";
+          input = de.redTrim + "\n";
         } else if (color === "") {
           input = "\n";
         }
@@ -8416,11 +10851,11 @@ var Message = class {
       if (line === "") {
         this.text.push("\n");
       } else if (line === "line") {
-        this.text.push(Tree.trim + "\n");
+        this.text.push(de.trim + "\n");
       } else if (line === "yellow") {
-        this.text.push(Tree.yellowTrim + "\n");
+        this.text.push(de.yellowTrim + "\n");
       } else if (line === "red") {
-        this.text.push(Tree.redTrim + "\n");
+        this.text.push(de.redTrim + "\n");
       } else {
         this.text.push(this.trim + "\n");
       }
@@ -8490,7 +10925,7 @@ var Message = class {
    * ```
    */
   Error(input, color) {
-    this.text.push(Tree.red + (color ? color(input) : red2(input)) + "\n");
+    this.text.push(de.red + (color ? color(input) : _(input)) + "\n");
     return this;
   }
   /**
@@ -8501,7 +10936,7 @@ var Message = class {
    * ```
    */
   Warn(input, color) {
-    this.text.push(Tree.yellow + (color ? color(input) : yellow2(input)) + "\n");
+    this.text.push(de.yellow + (color ? color(input) : v(input)) + "\n");
     return this;
   }
   /**
@@ -8565,7 +11000,7 @@ var Message = class {
    * ```
    */
   Dash(input, color) {
-    this.text.push(Tree.dash + (color ? color(input) : input) + "\n");
+    this.text.push(de.dash + (color ? color(input) : input) + "\n");
     return this;
   }
   /**
@@ -8602,11 +11037,11 @@ var Message = class {
   Wrap(...input) {
     const style2 = object({ line: this.line });
     if (this.type === "error") {
-      style2.color = red2;
+      style2.color = _;
     } else if (this.type === "warning") {
-      style2.color = yellow2;
+      style2.color = v;
     } else {
-      style2.color = whiteBright2;
+      style2.color = pe;
     }
     if (isArray(input[0])) {
       if (isFunction(input[1])) style2.color = input.pop();
@@ -8658,9 +11093,9 @@ function Context2(data) {
   for (const key in data.entries) {
     const string = sanitize(data.entries[key]);
     if (key === "source" || key === "output" || key === "input" || key === "file") {
-      data.message.Line(white2(key) + COL + space(key) + TLD + underline2(string), gray2);
+      data.message.Line(Wn(key) + wr + space(key) + Rr + rr(string), t);
     } else {
-      data.message.Line(white2(key) + COL + space(key) + string, gray2);
+      data.message.Line(Wn(key) + wr + space(key) + string, t);
     }
   }
   if (isString(data.stack)) {
@@ -8672,25 +11107,25 @@ function Context2(data) {
   return data.message.toLine();
 }
 function Sample(code, {
-  line = Tree.line,
+  line = de.line,
   span = null
 } = {}) {
   if (line === "red") {
-    line = Tree.red;
+    line = de.red;
   } else if (line === "yellow") {
-    line = Tree.yellow;
+    line = de.yellow;
   }
   if (span !== null) {
     const end = has("end", span) ? span.end : span.start + 1;
     return line + "\n" + [
-      line + blue2(`${span.start - 1}`) + COL,
-      line + blue2(`${span.start}`) + COL + code,
-      line + blue2(`${end}`) + COL
+      line + Vn(`${span.start - 1}`) + wr,
+      line + Vn(`${span.start}`) + wr + code,
+      line + Vn(`${end}`) + wr
     ].join("\n");
   }
   return line + "\n" + line + code;
 }
-function Multiline(input, { type: type2 = "info", color = white2 } = {}) {
+function Multiline(input, { type: type2 = "info", color = Wn } = {}) {
   const line = type2 === "error" ? "red" : type2 === "warn" ? "yellow" : "line";
   return Create({ type: type2 }).Newline(line).Wrap(input, color).toLine();
 }
@@ -8700,7 +11135,7 @@ init_cjs_shims();
 
 // node_modules/.pnpm/log-update@6.1.0/node_modules/log-update/index.js
 init_cjs_shims();
-var import_node_process7 = __toESM(require("process"), 1);
+var import_node_process6 = __toESM(require("process"), 1);
 
 // node_modules/.pnpm/ansi-escapes@7.0.0/node_modules/ansi-escapes/index.js
 init_cjs_shims();
@@ -8741,7 +11176,7 @@ __export(base_exports, {
   scrollUp: () => scrollUp
 });
 init_cjs_shims();
-var import_node_process4 = __toESM(require("process"), 1);
+var import_node_process3 = __toESM(require("process"), 1);
 
 // node_modules/.pnpm/environment@1.1.0/node_modules/environment/index.js
 init_cjs_shims();
@@ -8755,33 +11190,33 @@ var isWebWorker = typeof WorkerGlobalScope !== "undefined" && globalThis instanc
 var isDedicatedWorker = typeof DedicatedWorkerGlobalScope !== "undefined" && globalThis instanceof DedicatedWorkerGlobalScope;
 var isSharedWorker = typeof SharedWorkerGlobalScope !== "undefined" && globalThis instanceof SharedWorkerGlobalScope;
 var isServiceWorker = typeof ServiceWorkerGlobalScope !== "undefined" && globalThis instanceof ServiceWorkerGlobalScope;
-var platform2 = globalThis.navigator?.userAgentData?.platform;
-var isMacOs = platform2 === "macOS" || globalThis.navigator?.platform === "MacIntel" || globalThis.navigator?.userAgent?.includes(" Mac ") === true || globalThis.process?.platform === "darwin";
-var isWindows = platform2 === "Windows" || globalThis.navigator?.platform === "Win32" || globalThis.process?.platform === "win32";
-var isLinux = platform2 === "Linux" || globalThis.navigator?.platform?.startsWith("Linux") === true || globalThis.navigator?.userAgent?.includes(" Linux ") === true || globalThis.process?.platform === "linux";
-var isIos = platform2 === "iOS" || globalThis.navigator?.platform === "MacIntel" && globalThis.navigator?.maxTouchPoints > 1 || /iPad|iPhone|iPod/.test(globalThis.navigator?.platform);
-var isAndroid = platform2 === "Android" || globalThis.navigator?.platform === "Android" || globalThis.navigator?.userAgent?.includes(" Android ") === true || globalThis.process?.platform === "android";
+var platform = globalThis.navigator?.userAgentData?.platform;
+var isMacOs = platform === "macOS" || globalThis.navigator?.platform === "MacIntel" || globalThis.navigator?.userAgent?.includes(" Mac ") === true || globalThis.process?.platform === "darwin";
+var isWindows = platform === "Windows" || globalThis.navigator?.platform === "Win32" || globalThis.process?.platform === "win32";
+var isLinux = platform === "Linux" || globalThis.navigator?.platform?.startsWith("Linux") === true || globalThis.navigator?.userAgent?.includes(" Linux ") === true || globalThis.process?.platform === "linux";
+var isIos = platform === "iOS" || globalThis.navigator?.platform === "MacIntel" && globalThis.navigator?.maxTouchPoints > 1 || /iPad|iPhone|iPod/.test(globalThis.navigator?.platform);
+var isAndroid = platform === "Android" || globalThis.navigator?.platform === "Android" || globalThis.navigator?.userAgent?.includes(" Android ") === true || globalThis.process?.platform === "android";
 
 // node_modules/.pnpm/ansi-escapes@7.0.0/node_modules/ansi-escapes/base.js
 var ESC = "\x1B[";
 var OSC = "\x1B]";
 var BEL = "\x07";
 var SEP = ";";
-var isTerminalApp = !isBrowser && import_node_process4.default.env.TERM_PROGRAM === "Apple_Terminal";
-var isWindows2 = !isBrowser && import_node_process4.default.platform === "win32";
+var isTerminalApp = !isBrowser && import_node_process3.default.env.TERM_PROGRAM === "Apple_Terminal";
+var isWindows2 = !isBrowser && import_node_process3.default.platform === "win32";
 var cwdFunction = isBrowser ? () => {
   throw new Error("`process.cwd()` only works in Node.js, not the browser.");
-} : import_node_process4.default.cwd;
-var cursorTo = (x, y) => {
+} : import_node_process3.default.cwd;
+var cursorTo = (x, y2) => {
   if (typeof x !== "number") {
     throw new TypeError("The `x` argument is required");
   }
-  if (typeof y !== "number") {
+  if (typeof y2 !== "number") {
     return ESC + (x + 1) + "G";
   }
-  return ESC + (y + 1) + SEP + (x + 1) + "H";
+  return ESC + (y2 + 1) + SEP + (x + 1) + "H";
 };
-var cursorMove = (x, y) => {
+var cursorMove = (x, y2) => {
   if (typeof x !== "number") {
     throw new TypeError("The `x` argument is required");
   }
@@ -8791,10 +11226,10 @@ var cursorMove = (x, y) => {
   } else if (x > 0) {
     returnValue += ESC + x + "C";
   }
-  if (y < 0) {
-    returnValue += ESC + -y + "A";
-  } else if (y > 0) {
-    returnValue += ESC + y + "B";
+  if (y2 < 0) {
+    returnValue += ESC + -y2 + "A";
+  } else if (y2 > 0) {
+    returnValue += ESC + y2 + "B";
   }
   return returnValue;
 };
@@ -8811,14 +11246,14 @@ var cursorPrevLine = ESC + "F";
 var cursorHide = ESC + "?25l";
 var cursorShow = ESC + "?25h";
 var eraseLines = (count) => {
-  let clear4 = "";
+  let clear3 = "";
   for (let i = 0; i < count; i++) {
-    clear4 += eraseLine + (i < count - 1 ? cursorUp() : "");
+    clear3 += eraseLine + (i < count - 1 ? cursorUp() : "");
   }
   if (count) {
-    clear4 += cursorLeft;
+    clear3 += cursorLeft;
   }
-  return clear4;
+  return clear3;
 };
 var eraseEndLine = ESC + "K";
 var eraseStartLine = ESC + "1K";
@@ -8882,11 +11317,11 @@ var iTerm = {
 
 // node_modules/.pnpm/cli-cursor@5.0.0/node_modules/cli-cursor/index.js
 init_cjs_shims();
-var import_node_process6 = __toESM(require("process"), 1);
+var import_node_process5 = __toESM(require("process"), 1);
 
 // node_modules/.pnpm/restore-cursor@5.1.0/node_modules/restore-cursor/index.js
 init_cjs_shims();
-var import_node_process5 = __toESM(require("process"), 1);
+var import_node_process4 = __toESM(require("process"), 1);
 
 // node_modules/.pnpm/onetime@7.0.0/node_modules/onetime/index.js
 init_cjs_shims();
@@ -8998,7 +11433,7 @@ if (process.platform === "linux") {
 }
 
 // node_modules/.pnpm/signal-exit@4.1.0/node_modules/signal-exit/dist/mjs/index.js
-var processOk = (process8) => !!process8 && typeof process8 === "object" && typeof process8.removeListener === "function" && typeof process8.emit === "function" && typeof process8.reallyExit === "function" && typeof process8.listeners === "function" && typeof process8.kill === "function" && typeof process8.pid === "number" && typeof process8.on === "function";
+var processOk = (process9) => !!process9 && typeof process9 === "object" && typeof process9.removeListener === "function" && typeof process9.emit === "function" && typeof process9.reallyExit === "function" && typeof process9.listeners === "function" && typeof process9.kill === "function" && typeof process9.pid === "number" && typeof process9.on === "function";
 var kExitEmitter = Symbol.for("signal-exit emitter");
 var global = globalThis;
 var ObjectDefineProperty = Object.defineProperty.bind(Object);
@@ -9024,12 +11459,12 @@ var Emitter = class {
       configurable: false
     });
   }
-  on(ev, fn) {
-    this.listeners[ev].push(fn);
+  on(ev, fn2) {
+    this.listeners[ev].push(fn2);
   }
-  removeListener(ev, fn) {
+  removeListener(ev, fn2) {
     const list3 = this.listeners[ev];
-    const i = list3.indexOf(fn);
+    const i = list3.indexOf(fn2);
     if (i === -1) {
       return;
     }
@@ -9045,8 +11480,8 @@ var Emitter = class {
     }
     this.emitted[ev] = true;
     let ret = false;
-    for (const fn of this.listeners[ev]) {
-      ret = fn(code, signal) === true || ret;
+    for (const fn2 of this.listeners[ev]) {
+      ret = fn2(code, signal) === true || ret;
     }
     if (ev === "exit") {
       ret = this.emit("afterExit", code, signal) || ret;
@@ -9091,29 +11526,29 @@ var SignalExit = class extends SignalExitBase {
   #originalProcessReallyExit;
   #sigListeners = {};
   #loaded = false;
-  constructor(process8) {
+  constructor(process9) {
     super();
-    this.#process = process8;
+    this.#process = process9;
     this.#sigListeners = {};
     for (const sig of signals) {
       this.#sigListeners[sig] = () => {
         const listeners = this.#process.listeners(sig);
         let { count } = this.#emitter;
-        const p = process8;
+        const p = process9;
         if (typeof p.__signal_exit_emitter__ === "object" && typeof p.__signal_exit_emitter__.count === "number") {
           count += p.__signal_exit_emitter__.count;
         }
         if (listeners.length === count) {
           this.unload();
           const ret = this.#emitter.emit("exit", null, sig);
-          const s = sig === "SIGHUP" ? this.#hupSig : sig;
+          const s2 = sig === "SIGHUP" ? this.#hupSig : sig;
           if (!ret)
-            process8.kill(process8.pid, s);
+            process9.kill(process9.pid, s2);
         }
       };
     }
-    this.#originalProcessReallyExit = process8.reallyExit;
-    this.#originalProcessEmit = process8.emit;
+    this.#originalProcessReallyExit = process9.reallyExit;
+    this.#originalProcessEmit = process9.emit;
   }
   onExit(cb, opts) {
     if (!processOk(this.#process)) {
@@ -9140,10 +11575,10 @@ var SignalExit = class extends SignalExitBase {
     this.#emitter.count += 1;
     for (const sig of signals) {
       try {
-        const fn = this.#sigListeners[sig];
-        if (fn)
-          this.#process.on(sig, fn);
-      } catch (_) {
+        const fn2 = this.#sigListeners[sig];
+        if (fn2)
+          this.#process.on(sig, fn2);
+      } catch (_2) {
       }
     }
     this.#process.emit = (ev, ...a) => {
@@ -9165,7 +11600,7 @@ var SignalExit = class extends SignalExitBase {
       }
       try {
         this.#process.removeListener(sig, listener);
-      } catch (_) {
+      } catch (_2) {
       }
     });
     this.#process.emit = this.#originalProcessEmit;
@@ -9225,7 +11660,7 @@ var {
 } = signalExitWrap(processOk(process3) ? new SignalExit(process3) : new SignalExitFallback());
 
 // node_modules/.pnpm/restore-cursor@5.1.0/node_modules/restore-cursor/index.js
-var terminal = import_node_process5.default.stderr.isTTY ? import_node_process5.default.stderr : import_node_process5.default.stdout.isTTY ? import_node_process5.default.stdout : void 0;
+var terminal = import_node_process4.default.stderr.isTTY ? import_node_process4.default.stderr : import_node_process4.default.stdout.isTTY ? import_node_process4.default.stdout : void 0;
 var restoreCursor = terminal ? onetime_default(() => {
   onExit(() => {
     terminal.write("\x1B[?25h");
@@ -9237,14 +11672,14 @@ var restore_cursor_default = restoreCursor;
 // node_modules/.pnpm/cli-cursor@5.0.0/node_modules/cli-cursor/index.js
 var isHidden = false;
 var cliCursor = {};
-cliCursor.show = (writableStream = import_node_process6.default.stderr) => {
+cliCursor.show = (writableStream = import_node_process5.default.stderr) => {
   if (!writableStream.isTTY) {
     return;
   }
   isHidden = false;
   writableStream.write("\x1B[?25h");
 };
-cliCursor.hide = (writableStream = import_node_process6.default.stderr) => {
+cliCursor.hide = (writableStream = import_node_process5.default.stderr) => {
   if (!writableStream.isTTY) {
     return;
   }
@@ -9419,7 +11854,7 @@ function createLogUpdate(stream, { showCursor = false } = {}) {
   let previousLineCount = 0;
   let previousWidth = getWidth(stream);
   let previousOutput = "";
-  const reset3 = () => {
+  const reset = () => {
     previousOutput = "";
     previousWidth = getWidth(stream);
     previousLineCount = 0;
@@ -9441,19 +11876,19 @@ function createLogUpdate(stream, { showCursor = false } = {}) {
   };
   render.clear = () => {
     stream.write(base_exports.eraseLines(previousLineCount));
-    reset3();
+    reset();
   };
   render.done = () => {
-    reset3();
+    reset();
     if (!showCursor) {
       cli_cursor_default.show();
     }
   };
   return render;
 }
-var logUpdate = createLogUpdate(import_node_process7.default.stdout);
+var logUpdate = createLogUpdate(import_node_process6.default.stdout);
 var log_update_default = logUpdate;
-var logUpdateStderr = createLogUpdate(import_node_process7.default.stderr);
+var logUpdateStderr = createLogUpdate(import_node_process6.default.stderr);
 
 // syncify/cli/spinner.ts
 function Spinner2() {
@@ -9519,17 +11954,17 @@ function Spinner2() {
     let color;
     let frame = 0;
     let frames;
-    let size2 = 0;
+    let size = 0;
     if (options.action !== null) {
       options.style = "arrows";
-      color = has("color", options.action) ? options.action.color : neonGreen;
+      color = has("color", options.action) ? options.action.color : V;
       frames = loaders.arrows.frames;
-      size2 = frames.length;
+      size = frames.length;
     } else {
-      color = isFunction(options.color) ? options.color : pink;
+      color = isFunction(options.color) ? options.color : sr;
       message = options.label;
       frames = loaders[options.style].frames;
-      size2 = frames.length;
+      size = frames.length;
     }
     log_update_default.done();
     interval = setInterval(() => {
@@ -9537,13 +11972,13 @@ function Spinner2() {
       let label;
       if (options.action !== null) {
         const string = glueString(
-          bold2(options.action.before),
-          frames[frame = ++frame % size2],
+          or(options.action.before),
+          frames[frame = ++frame % size],
           options.action.after
         );
         label = color(message !== "" ? Prefix(message, string) : string);
       } else {
-        label = color(glueString(frames[frame = ++frame % size2], message));
+        label = color(glueString(frames[frame = ++frame % size], message));
       }
       log_update_default(options.line ? Break(label) : label);
     }, loaders[options.style].interval);
@@ -9575,15 +12010,15 @@ function Spinner2() {
 // syncify/log/errors.ts
 init_cjs_shims();
 
-// syncify/ansi/codeframe.ts
+// syncify/cli/codeframe.ts
 init_cjs_shims();
-var highlight = (string) => redBright2(string.replace(/('[{}_\w\s.-]*?'|"[\w\s.-]*?")/g, orange("$1")).replace(/({{2}-?[a-zA-Z0-9_\-.'"[\]]+-?}{2})/g, teal("$1")).replace(/((?:www|http:|https:)+[^\s]+[\w])/g, underline2("$1")).replace(/(\/)(.*?)(\/)/g, teal("$1") + neonCyan("$2") + teal("$3")).replace(/(\\)(\W)/g, gray2("$1") + neonCyan("$2")).replace(/(:)(?= )/g, gray2("$1")).replace(/(?<=Filename\s)([\w._-]+)(?=\salready)/, neonCyan.bold("$1")));
-var tokens = (string) => string.replace(/({%|{%-}|-%}|%}|{{|{{-|}}|-}}|<\/?|>|:|,)/g, neonCyan("$1")).replace(/(['"].*?['"])/g, gray2("$1"));
+var highlight = (string) => J(string.replace(/('[{}_\w\s.-]*?'|"[\w\s.-]*?")/g, cr("$1")).replace(/({{2}-?[a-zA-Z0-9_\-.'"[\]]+-?}{2})/g, lr("$1")).replace(/((?:www|http:|https:)+[^\s]+[\w])/g, rr("$1")).replace(/(\/)(.*?)(\/)/g, lr("$1") + gr("$2") + lr("$3")).replace(/(\\)(\W)/g, t("$1") + gr("$2")).replace(/(:)(?= )/g, t("$1")).replace(/(?<=Filename\s)([\w._-]+)(?=\salready)/, gr.bold("$1")));
+var tokens = (string) => string.replace(/({%|{%-}|-%}|%}|{{|{{-|}}|-}}|<\/?|>|:|,)/g, gr("$1")).replace(/(['"].*?['"])/g, t("$1"));
 var extract = (text) => {
   let lines = "";
   const valid = text.indexOf("- Valid syntax:");
   if (valid > -1) {
-    lines = "\n" + text.slice(valid).slice(1).replace(/(Valid syntax)(:)(.*)/, redBright2("$1") + gray2("$2") + teal("$3"));
+    lines = "\n" + text.slice(valid).slice(1).replace(/(Valid syntax)(:)(.*)/, J("$1") + t("$2") + lr("$3"));
     return text.slice(0, valid) + lines;
   }
   return text;
@@ -9600,7 +12035,7 @@ var Shopify = (input, source) => {
   if (isString(input)) {
   }
   const frame = [];
-  for (let i = 0, s = input.length; i < s; i++) {
+  for (let i = 0, s2 = input.length; i < s2; i++) {
     let text = input[i];
     if (lineExp.test(text)) {
       const lineIndex = text.indexOf("):");
@@ -9608,10 +12043,10 @@ var Shopify = (input, source) => {
       if (lineIndex > -1 && numberIndex > -1) {
         output.unshift(
           glue(
-            Tree.red,
-            red2.bold(text.slice(0, lineIndex + 2)),
+            de.red,
+            _.bold(text.slice(0, lineIndex + 2)),
             "\n",
-            Tree.redTrim
+            de.redTrim
           )
         );
         line = Number(text.slice(numberIndex + 6, lineIndex));
@@ -9619,29 +12054,29 @@ var Shopify = (input, source) => {
         text = extract(text.slice(lineIndex + 2));
         output.push(
           glue(
-            highlight(Wrap(text, { line: Tree.red, color: redBright2 })),
+            highlight(Wrap(text, { line: de.red, color: J })),
             "\n",
-            Tree.redTrim,
+            de.redTrim,
             "\n",
-            Tree.redTrim
+            de.redTrim
           )
         );
         if (source.length > 1) {
           const before = glue(
-            Tree.redTrim,
+            de.redTrim,
             " ".repeat(space - sanitize(line - 1).length),
-            blue2(`${line - 1}`),
+            Vn(`${line - 1}`),
             " ",
-            Tree.trim
+            de.trim
           );
           const current = glue(
-            Tree.redTrim,
+            de.redTrim,
             " ",
-            red2.bold(">"),
+            _.bold(">"),
             " ",
-            blue2(`${line}`),
+            Vn(`${line}`),
             " ",
-            Tree.trim
+            de.trim
           );
           let match2 = "";
           let errLine = source[line - 1].replace(/\t/g, "  ").trimEnd();
@@ -9666,7 +12101,7 @@ var Shopify = (input, source) => {
           if (prevLine.length > wrapLimit) {
             prevLine = prevLine.slice(0, wrapLimit - 3) + "...";
           }
-          frame.push(before + gray2(prevLine));
+          frame.push(before + t(prevLine));
           errLine = indent + errLine.trimStart();
           if (errLine.length > wrapLimit) {
             errLine = errLine.slice(0, wrapLimit - 3) + "...";
@@ -9675,23 +12110,23 @@ var Shopify = (input, source) => {
             frame.push(
               glue(
                 current,
-                white2(tokens(errLine)),
+                Wn(tokens(errLine)),
                 "\n",
-                Tree.redTrim
+                de.redTrim
               )
             );
           } else {
             frame.push(
-              current + white2(tokens(errLine)),
+              current + Wn(tokens(errLine)),
               glue(
-                Tree.redTrim,
+                de.redTrim,
                 " ".repeat(space - 1),
-                BAD,
+                Br,
                 " ",
-                Tree.redTrim,
+                de.redTrim,
                 " ".repeat(errLine.indexOf(match2)),
-                redBright2("^".repeat(match2.length)),
-                "\n" + Tree.redTrim
+                J("^".repeat(match2.length)),
+                "\n" + de.redTrim
               )
             );
           }
@@ -9701,8 +12136,8 @@ var Shopify = (input, source) => {
       output.push(
         highlight(
           Wrap(text, {
-            line: Tree.red,
-            color: redBright2
+            line: de.red,
+            color: J
           })
         )
       );
@@ -9733,7 +12168,7 @@ function spawn(data) {
     }
     const clean = line.trim().replace(new RegExp($.cwd, "g"), "");
     if (clean.length === 0) {
-      acc.push([Tree.trim]);
+      acc.push([de.trim]);
     } else {
       const prefix = [];
       const nwl2 = wrapAnsi(clean, $.terminal.wrap, {
@@ -9746,7 +12181,7 @@ function spawn(data) {
             line2 = line2 + nwl2.shift();
           }
         }
-        prefix.push(Tree.line + before + line2 + after);
+        prefix.push(de.line + before + line2 + after);
       }
       acc.push(prefix);
     }
@@ -9757,11 +12192,11 @@ function spawn(data) {
   while (newlines.length !== 0) {
     const line = newlines.shift();
     if (newlines.length !== 0 && line.length > 1) {
-      if (format.length > 0 && format[format.length - 1] !== Tree.trim) {
-        format.push(Tree.trim);
+      if (format.length > 0 && format[format.length - 1] !== de.trim) {
+        format.push(de.trim);
       }
       format.push(line.join("\n"));
-    } else if (line === Tree.trim) {
+    } else if (line === de.trim) {
       if (n) {
         n = false;
       } else {
@@ -9787,16 +12222,16 @@ function request(file, e, options) {
       entries: object({
         column,
         line,
-        file: TLD + file,
+        file: Rr + file,
         details: e.statusText,
-        status: white2(sanitize(e.status)),
-        processor: neonMagenta("SHOPIFY API")
+        status: Wn(sanitize(e.status)),
+        processor: dr("SHOPIFY API")
       })
     });
-    const message2 = Create({ type: "error" }).NL.Insert(output2, gray2).NL.Context(context2).toString();
+    const message2 = Create({ type: "error" }).NL.Insert(output2, t).NL.Context(context2).toString();
     if (config.store) {
       config.data.message = output2;
-      config.data.rawMessage = strip(output2);
+      config.data.rawMessage = nr(output2);
       config.data.context = context2;
     }
     if (config.log) error(message2);
@@ -9817,12 +12252,12 @@ function request(file, e, options) {
       config.data.message = message2;
       config.data.context = context2;
     }
-    const output2 = glue(Tree.red, "\n", message2, Context2(context2));
+    const output2 = glue(de.red, "\n", message2, Context2(context2));
     if (config.log) error(output2);
     if (config.store) return config.data;
     return output2;
   }
-  const message = red2("Unknown error has occured");
+  const message = _("Unknown error has occured");
   const context = {
     stack: false,
     entries: {
@@ -9836,7 +12271,7 @@ function request(file, e, options) {
     config.data.context = context;
   }
   const output = glue(
-    Tree.red,
+    de.red,
     "\n",
     message,
     Context2({
@@ -9902,7 +12337,7 @@ function json(e, file) {
   e.fileName = file.base;
   const entries = object();
   let line;
-  const message = Create({ type: "error" }).NL.Wrap(e.message.split("\n")[0], red2.bold).NL;
+  const message = Create({ type: "error" }).NL.Wrap(e.message.split("\n")[0], _.bold).NL;
   if (has("codeFrame", e)) {
     message.Newline();
     const lines = e.codeFrame.split("\n");
@@ -9923,7 +12358,7 @@ function json(e, file) {
   }
   const stack = [];
   const trace = e.stack.split("\n");
-  while (trace.length !== 0) stack.push(Tree.red + trace.shift());
+  while (trace.length !== 0) stack.push(de.red + trace.shift());
   $.errors.add(stack.join("\n"));
   error(
     message.NL.Context({
@@ -9931,14 +12366,14 @@ function json(e, file) {
       entries: {
         line,
         name: e.name,
-        file: TLD + file.relative,
-        processor: neonMagenta("JSON")
+        file: Rr + file.relative,
+        processor: dr("JSON")
       }
     }).toString()
   );
 }
 function sass(file, e) {
-  const message = Create({ type: "error" }).NL.Wrap(e.sassMessage, red2.bold).Newline();
+  const message = Create({ type: "error" }).NL.Wrap(e.sassMessage, _.bold).Newline();
   if (has("span", e)) {
     const { span } = e;
     const code = has("context", span) ? span.context : span.text;
@@ -9948,10 +12383,10 @@ function sass(file, e) {
     const space = sanitize(end.line + 1).length;
     if (start.line === end.line) {
       let same = space - sanitize(end.line).length;
-      if (start.line > 1) message.Line(`${" ".repeat(same) + blue2(`${end.line}`)} ${Tree.trim}`);
+      if (start.line > 1) message.Line(`${" ".repeat(same) + Vn(`${end.line}`)} ${de.trim}`);
       same = space - sanitize(end.line + 1).length;
-      message.Line(`${" ".repeat(same) + blue2(`${end.line + 1}`)} ${Tree.trim} ${code.trimEnd()}`);
-      message.Line(`${" ".repeat(space - 1) + BAD} ${Tree.redTrim} ${" ".repeat(end.column) + bold2("^")}`);
+      message.Line(`${" ".repeat(same) + Vn(`${end.line + 1}`)} ${de.trim} ${code.trimEnd()}`);
+      message.Line(`${" ".repeat(space - 1) + Br} ${de.redTrim} ${" ".repeat(end.column) + or("^")}`);
     } else {
       const content = code.slice(span.start.offset, span.end.offset);
       const lines = content.split("\n");
@@ -9960,7 +12395,7 @@ function sass(file, e) {
         const number = sanitize(from++);
         const same = space - number.length;
         const align = same === 0 ? "" : " ".repeat(same);
-        message.Line(`${align + blue2(number)} ${Tree.trim} ${line}`);
+        message.Line(`${align + Vn(number)} ${de.trim} ${line}`);
       }
     }
   }
@@ -9972,29 +12407,29 @@ function sass(file, e) {
         name: e.name,
         input: file.input,
         cause: e.cause,
-        processor: neonMagenta("SASS Dart")
+        processor: dr("SASS Dart")
       }
     }).toString()
   );
 }
 function esbuild(e) {
-  const message = Create({ type: "error" }).NL.Wrap(e.text, red2.bold).Newline();
+  const message = Create({ type: "error" }).NL.Wrap(e.text, _.bold).Newline();
   const span = e.location;
   const space = sanitize(span.line).length;
   let same = space - sanitize(e.location.line).length;
-  if (span.line > 1) message.Line(`${" ".repeat(same) + blue2(`${span.line - 1}`)} ${Tree.trim}`);
+  if (span.line > 1) message.Line(`${" ".repeat(same) + Vn(`${span.line - 1}`)} ${de.trim}`);
   same = space - sanitize(span.line).length;
   error(
-    message.Line(`${" ".repeat(same) + blue2(`${span.line}`)} ${Tree.trim} ${span.lineText}`).Line(`${" ".repeat(space - 1) + BAD} ${Tree.redTrim} ${" ".repeat(span.column) + bold2("^")}`).NL.NL.Context({
+    message.Line(`${" ".repeat(same) + Vn(`${span.line}`)} ${de.trim} ${span.lineText}`).Line(`${" ".repeat(space - 1) + Br} ${de.redTrim} ${" ".repeat(span.column) + or("^")}`).NL.NL.Context({
       stack: false,
       entries: {
-        suggest: whiteBright2(span.suggestion),
+        suggest: pe(span.suggestion),
         line: e.location.line,
         column: e.location.column,
         plugin: e.pluginName,
         namespace: span.namespace,
-        file: TLD + e.location.file,
-        processor: neonMagenta("ESBuild")
+        file: Rr + e.location.file,
+        processor: dr("ESBuild")
       }
     }).toString()
   );
@@ -10002,87 +12437,38 @@ function esbuild(e) {
 function postcss(file, e) {
   const stack = [];
   const trace = cleanStack(e.stack, { pretty: true, basePath: $.cwd }).split("\n");
-  while (trace.length !== 0) stack.push(Tree.red + trace.shift());
+  while (trace.length !== 0) stack.push(de.red + trace.shift());
   $.errors.add(stack.join("\n"));
   error(
-    Create({ type: "error" }).NL.Wrap(`${e.name}${COL} ${e.reason}`, red2.bold).Newline().Multiline(e.showSourceCode(true)).NL.NL.Context({
+    Create({ type: "error" }).NL.Wrap(`${e.name}${wr} ${e.reason}`, _.bold).Newline().Multiline(e.showSourceCode(true)).NL.NL.Context({
       stack: true,
       entries: {
         line: e.line,
         column: e.column,
         source: file.input,
         file: file.input === e.file ? void 0 : e.file,
-        plugin: blue2(e.plugin),
-        processor: neonMagenta("PostCSS")
+        plugin: Vn(e.plugin),
+        processor: dr("PostCSS")
       }
     }).toString()
   );
 }
 
-// syncify/cli/progress.ts
-init_cjs_shims();
-function progress(total, opts = {}) {
-  const options = assign({
-    showPercentage: true,
-    barColor: "neonGreen",
-    percentColor: "whiteBright",
-    barSize: 40,
-    clearOnComplete: false
-  }, opts);
-  let percent = 0;
-  const align = (output) => Tree.line + output + " ".repeat(Math.max(0, options.barSize - output.length));
-  const bar = (length, empty = false) => (empty ? "\u25B1" : "\u25B0").repeat(length);
-  const stop = () => {
-    if (options.clearOnComplete) console.clear();
-  };
-  const increment = (incrementBy = 1) => {
-    const filled = percent + incrementBy;
-    percent = Math.min(filled, total);
-    if (percent === total) stop();
-  };
-  const decrement = (decrementBy = 1) => {
-    const filled = percent - decrementBy;
-    percent = Math.max(filled, 0);
-  };
-  const render = (percentColor) => {
-    const progress2 = Math.round(percent / total * options.barSize);
-    const filled = bar(progress2);
-    const empty = bar(options.barSize - progress2, true);
-    let output = import_index.default[options.barColor](filled) + lightGray(empty);
-    if (options.showPercentage) {
-      output += (percentColor || whiteBright2)(` ${String(Math.round(percent / total * 100))}%`);
-    }
-    return align(output);
-  };
-  return {
-    stop,
-    increment,
-    decrement,
-    render,
-    /**
-     * Returns the percent filled amount
-     */
-    get percent() {
-      return percent;
-    }
-  };
-}
-
 // syncify/log/runtime.ts
 init_cjs_shims();
-var import_pathe2 = require("pathe");
+var import_node_path2 = require("path");
 
 // syncify/log/throws.ts
 init_cjs_shims();
-var import_node_process8 = require("process");
+var import_node_process7 = require("process");
 var warnings = {};
 function warnOption(group2) {
   if (!has2(group2, warnings)) warnings[group2] = [];
   return (message, value) => {
     if (isUndefined(value)) {
-      warnings[group2].push(yellowBright2(message));
+      warnings[group2].push(Zn(message));
     } else {
-      warnings[group2].push(yellowBright2(message + COL + " " + bold2(value)));
+      warnings[group2].push(Zn(message + wr + " " + or(value)));
     }
   };
 }
@@ -10093,7 +12479,7 @@ function typeError({
   expects
 }) {
   error(
-    Create({ type: "error" }).Line("TYPE ERROR", bold2).NL.Line(`An invalid ${cyan2(option)} type value was provided within your ${bold2($.file.base)} file.`).Line(`The ${cyan2(name)} option has an incorrect type. Syncify will not intialize until this is fixed.`).NL.Line(`provided${COL} ${yellowBright2(type(provided).toLowerCase())}`).Line(`expected${COL} ${blue2(expects.replace(/([|,])/g, gray2("$1")))}`).Line(`location${COL} ${TLD}${gray2.underline($.file.base)}`).NL.Line("How to fix?", gray2.bold).Line(`You need to change the option value to use the ${blue2("expected")} type.`, gray2).Line(`Use the ${white2("defineConfig")} named export for type checking`, gray2).End($.log.group).BR.toString()
+    Create({ type: "error" }).Line("TYPE ERROR", or).NL.Line(`An invalid ${Dn(option)} type value was provided within your ${or($.file.base)} file.`).Line(`The ${Dn(name)} option has an incorrect type. Syncify will not intialize until this is fixed.`).NL.Line(`provided${wr} ${Zn(type(provided).toLowerCase())}`).Line(`expected${wr} ${Vn(expects.replace(/([|,])/g, t("$1")))}`).Line(`location${wr} ${Rr}${t.underline($.file.base)}`).NL.Line("How to fix?", t.bold).Line(`You need to change the option value to use the ${Vn("expected")} type.`, t).Line(`Use the ${Wn("defineConfig")} named export for type checking`, t).End($.log.group).BR.toString()
   );
   process.exit(0);
 }
@@ -10104,13 +12490,13 @@ function invalidCommand({
   fix
 }) {
   if (!provided) {
-    provided = import_node_process8.argv.slice(2).join(" ");
-    expected = whiteBright2(`syncify ${provided} ${cyan2(expected.replace(/([|,-])/g, gray2("$1")))}`);
+    provided = import_node_process7.argv.slice(2).join(" ");
+    expected = pe(`syncify ${provided} ${Dn(expected.replace(/([|,-])/g, t("$1")))}`);
   } else {
-    expected = whiteBright2(`syncify ${expected}`);
+    expected = pe(`syncify ${expected}`);
   }
   error(
-    Create({ type: "error" }).Line("COMMAND ERROR", bold2).NL.Wrap(message).NL.Line(`provided${COL} ${whiteBright2("$")} ${whiteBright2("syncify " + provided)}`).Line(`expected${COL} ${whiteBright2("$")} ${expected}`).NL.Line("How to fix?", gray2.bold).Wrap(fix, gray2).NL.End($.log.group).BR.toString()
+    Create({ type: "error" }).Line("COMMAND ERROR", or).NL.Wrap(message).NL.Line(`provided${wr} ${pe("$")} ${pe("syncify " + provided)}`).Line(`expected${wr} ${pe("$")} ${expected}`).NL.Line("How to fix?", t.bold).Wrap(fix, t).NL.End($.log.group).BR.toString()
   );
   process.exit(0);
 }
@@ -10122,35 +12508,35 @@ function invalidTarget({
   fix
 }) {
   if (REGEX_OR_CHARS.test(provided)) {
-    provided = provided.replace(REGEX_OR_CHARS, gray2("$1"));
+    provided = provided.replace(REGEX_OR_CHARS, t("$1"));
   }
   if (REGEX_OR_CHARS.test(expected)) {
-    expected = expected.replace(REGEX_OR_CHARS, gray2("$1"));
+    expected = expected.replace(REGEX_OR_CHARS, t("$1"));
   }
   error(
-    Create({ type: "error" }).Line("INVALID TARGET", bold2).NL.Wrap(`Invalid ${cyan2(type2)} target provided. `, ...message).NL.Line(`provided${COL} ${yellowBright2(expected)}`).Line(`expected${COL} ${blue2(provided)}`).NL.Line("How to fix?", gray2.bold).Wrap(fix, gray2).End($.log.group).BR.toString()
+    Create({ type: "error" }).Line("INVALID TARGET", or).NL.Wrap(`Invalid ${Dn(type2)} target provided. `, ...message).NL.Line(`provided${wr} ${Zn(expected)}`).Line(`expected${wr} ${Vn(provided)}`).NL.Line("How to fix?", t.bold).Wrap(fix, t).End($.log.group).BR.toString()
   );
   process.exit(0);
 }
 function missingDependency(deps) {
   const message = Create({
     type: "error"
-  }).Line("DEPENDENCY ERROR", bold2).NL;
+  }).Line("DEPENDENCY ERROR", or).NL;
   if (isString(deps)) {
-    message.Wrap(`Missing ${cyan2(deps)} dependency. You need to install ${cyan2(deps)} to use it as a processor.`).NL.Line("How to fix?", gray2.bold).Line("Install the above module as a development dependency, for example:").NL.Line(`$ pnpm add ${deps} -D`, whiteBright2);
+    message.Wrap(`Missing ${Dn(deps)} dependency. You need to install ${Dn(deps)} to use it as a processor.`).NL.Line("How to fix?", t.bold).Line("Install the above module as a development dependency, for example:").NL.Line(`$ pnpm add ${deps} -D`, pe);
   } else {
     const info = [
-      `Missing ${cyan2(`${deps.length}`)} dependencies. You are attempting to use processor`,
+      `Missing ${Dn(`${deps.length}`)} dependencies. You are attempting to use processor`,
       "(transforms) which are not yet installed. Install the below modules as development",
       "dependencies or disable the transform:"
     ];
     message.Wrap(info).Newline();
     for (const dep of deps) {
-      message.Line(`$ pnpm add ${dep} -D`, whiteBright2);
+      message.Line(`$ pnpm add ${dep} -D`, pe);
     }
   }
   error(
-    message.NL.Wrap("If you are using a different package manager please consider adopting pnpm.", gray2).End($.log.group).BR.toString()
+    message.NL.Wrap("If you are using a different package manager please consider adopting pnpm.", t).End($.log.group).BR.toString()
   );
   process.exit(0);
 }
@@ -10161,10 +12547,10 @@ function missingOption({
   reason
 }) {
   if (option.indexOf(".") > -1) {
-    option = option.split(".").filter(Boolean).join(gray2(" \u2192 "));
+    option = option.split(".").filter(Boolean).join(t(" \u2192 "));
   }
   error(
-    Create({ type: "error" }).Line("MISSING OPTION", bold2).NL.Wrap(`Missing ${Encase("CB", cyan2(option))} config option. The ${cyan2(key)} option must be defined`).NL.Line(`expected${COL} ${blue2(expects.replace(/([|,])/g, gray2("$1")))}`).Line(`location${COL} ${gray2.underline($.file.base)}`).NL.Line("Why?", gray2.bold).Wrap(reason, gray2).End($.log.group).BR.toString()
+    Create({ type: "error" }).Line("MISSING OPTION", or).NL.Wrap(`Missing ${Encase("CB", Dn(option))} config option. The ${Dn(key)} option must be defined`).NL.Line(`expected${wr} ${Vn(expects.replace(/([|,])/g, t("$1")))}`).Line(`location${wr} ${t.underline($.file.base)}`).NL.Line("Why?", t.bold).Wrap(reason, t).End($.log.group).BR.toString()
   );
   process.exit(0);
 }
@@ -10176,32 +12562,32 @@ function invalidError({
   reason = [""]
 }) {
   if (option.indexOf(".") > -1) {
-    option = option.split(".").filter(Boolean).join(gray2(" \u2192 "));
+    option = option.split(".").filter(Boolean).join(t(" \u2192 "));
   }
   error(
-    Create({ type: "error" }).Line("INVALID ERROR", bold2).NL.Wrap(`Invalid ${cyan2(option)} configuration. The ${cyan2(name)} option is invalid. `, ...reason).NL.Line(`provided${COL} ${yellowBright2(value)}`).Line(`expected${COL} ${blue2(expects.replace(/([|,])/g, gray2("$1")))}`).NL.Line("How to fix?", gray2.bold).Line("You need to update the option and use one of the expected values.", gray2).Line(`Use the ${white2("defineConfig")} named export for type checking`, gray2).End($.log.group).BR.toString(red2)
+    Create({ type: "error" }).Line("INVALID ERROR", or).NL.Wrap(`Invalid ${Dn(option)} configuration. The ${Dn(name)} option is invalid. `, ...reason).NL.Line(`provided${wr} ${Zn(value)}`).Line(`expected${wr} ${Vn(expects.replace(/([|,])/g, t("$1")))}`).NL.Line("How to fix?", t.bold).Line("You need to update the option and use one of the expected values.", t).Line(`Use the ${Wn("defineConfig")} named export for type checking`, t).End($.log.group).BR.toString(_)
   );
   process.exit(0);
 }
 function missingStores(cwd) {
   error(
-    Create({ type: "error" }).Line(`${"MISSING REFERENCE"}`, bold2).NL.Line(`You have not provided any ${bold2("stores")} within your ${cyan2("package.json")} file.`).NL.Line("How to fix?", white2.bold).Line(`You need to provide ${cyan2("stores")} via ${cyan2("syncify")} key`, gray2).Line("passing both your store name and a key > value list of theme targets.", gray2).NL.Line("{", gray2).Line('  "syncify": {'.replace(/"/g, white2('"')), gray2).Line('    "stores": {'.replace(/"/g, white2('"')), gray2).Line(`      "domain": "${redBright2("your-store")}"`.replace(/"/g, white2('"')), gray2).Line('      "themes": {}'.replace(/"/g, white2('"')), gray2).Line("    }", gray2).Line("  }", gray2).Line("}", gray2).NL.Line(`Replace the ${white2("your-store")} with the name of your .myshopify domain.`, gray2).Line("Syncify will prompt you and provide a list of theme targets to select from.", gray2).NL.End($.log.group).BR.toString()
+    Create({ type: "error" }).Line(`${"MISSING REFERENCE"}`, or).NL.Line(`You have not provided any ${or("stores")} within your ${Dn("package.json")} file.`).NL.Line("How to fix?", Wn.bold).Line(`You need to provide ${Dn("stores")} via ${Dn("syncify")} key`, t).Line("passing both your store name and a key > value list of theme targets.", t).NL.Line("{", t).Line('  "syncify": {'.replace(/"/g, Wn('"')), t).Line('    "stores": {'.replace(/"/g, Wn('"')), t).Line(`      "domain": "${J("your-store")}"`.replace(/"/g, Wn('"')), t).Line('      "themes": {}'.replace(/"/g, Wn('"')), t).Line("    }", t).Line("  }", t).Line("}", t).NL.Line(`Replace the ${Wn("your-store")} with the name of your .myshopify domain.`, t).Line("Syncify will prompt you and provide a list of theme targets to select from.", t).NL.End($.log.group).BR.toString()
   );
   process.exit(0);
 }
 function missingConfig(cwd) {
   error(
-    Create({ type: "nil" }).Line(`${`Missing ${cyan2("syncify.config.js")} configuration`}`, bold2).BR.Line("Unable to resolve a configuration file within the workspace").BR.Line(`at${COL} ${gray2.underline("~" + cwd)}`).BR.Line("How to fix?", white2.bold).Line("You need to add one the following files to your project", gray2).BR.Line(` - ${white2("syncify.config.ts")}`, gray2).Line(` - ${white2("syncify.config.js")}`, gray2).Line(` - ${white2("syncify.config.mjs")}`, gray2).Line(` - ${white2("syncify.config.cjs")}`, gray2).Line(` - ${white2("syncify.config.json")}`, gray2).BR.Line(`You can also provide configuration in your ${white2("package.json")}`, gray2).Line(`file using the ${cyan2('"syncify": { "config": {} }')} 'property.`, gray2).BR.toString(red2)
+    Create({ type: "nil" }).Line(`${`Missing ${Dn("syncify.config.js")} configuration`}`, or).BR.Line("Unable to resolve a configuration file within the workspace").BR.Line(`at${wr} ${t.underline("~" + cwd)}`).BR.Line("How to fix?", Wn.bold).Line("You need to add one the following files to your project", t).BR.Line(` - ${Wn("syncify.config.ts")}`, t).Line(` - ${Wn("syncify.config.js")}`, t).Line(` - ${Wn("syncify.config.mjs")}`, t).Line(` - ${Wn("syncify.config.cjs")}`, t).Line(` - ${Wn("syncify.config.json")}`, t).BR.Line(`You can also provide configuration in your ${Wn("package.json")}`, t).Line(`file using the ${Dn('"syncify": { "config": {} }')} 'property.`, t).BR.toString(_)
   );
   process.exit(0);
 }
 function missingEnv(cwd) {
   const message = [
-    `Missing ${cyan2(".env")} credentials. Syncify could not resolve credentials within the workspace.`,
-    `Check you have ${cyan2(".env")} or ${cyan2("syncify.env")} file present in the root of your project`
+    `Missing ${Dn(".env")} credentials. Syncify could not resolve credentials within the workspace.`,
+    `Check you have ${Dn(".env")} file present in the root of your project`
   ];
   error(
-    Create({ type: "error" }).Line("MISSING ENV", bold2).NL.Wrap(message).NL.End($.log.group).BR.toString(red2)
+    Create({ type: "error" }).Line("MISSING ENV", or).NL.Wrap(message).NL.End($.log.group).BR.toString(_)
   );
   process.exit(0);
 }
@@ -10210,7 +12596,7 @@ function errorRuntime(e, options) {
   if (has2("code", e)) options.entries.code = e.code;
   if (has2("name", e)) options.entries.name = e.name;
   error(
-    Create({ type: "error" }).Line("ERROR", bold2).NL.Wrap(options.message, redBright2).NL.Wrap(message, redBright2.bold).NL.Line("How to fix?", gray2.bold).Wrap(options.solution, gray2).NL.Context({
+    Create({ type: "error" }).Line("ERROR", or).NL.Wrap(options.message, J).NL.Wrap(message, J.bold).NL.Line("How to fix?", t.bold).Wrap(options.solution, t).NL.Context({
       entries: options.entries
     }).NL.End($.log.group).BR.toString()
   );
@@ -10218,41 +12604,41 @@ function errorRuntime(e, options) {
 }
 function throwError(message, solution) {
   error(
-    Create({ type: "error" }).Line("ERROR", bold2).NL.Wrap(message).NL.Line("How to fix?", gray2.bold).Wrap(solution, gray2).NL.End($.log.group).BR.toString()
+    Create({ type: "error" }).Line("ERROR", or).NL.Wrap(message).NL.Line("How to fix?", t.bold).Wrap(solution, t).NL.End($.log.group).BR.toString()
   );
   process.exit(0);
 }
 function unknownError(option, value) {
   if (option.indexOf(".") > -1) {
     option = Encase("CB", glueString(
-      option.split(".").filter(Boolean).join(gray2(" \u2192 ")),
-      ARR,
-      redBright2.bold(value)
+      option.split(".").filter(Boolean).join(t(" \u2192 ")),
+      Cr,
+      J.bold(value)
     ), {
       spaced: true
     });
   }
-  const file = $.file.base === "package.json" ? `${blue2("syncify")} config in the ${blue2("package.json")} file.` : `${blue2($.file.base)} file.`;
+  const file = $.file.base === "package.json" ? `${Vn("syncify")} config in the ${Vn("package.json")} file.` : `${Vn($.file.base)} file.`;
   error(
-    Create({ type: "error" }).Line("ERROR", bold2).NL.Line(`Unknown ${cyan2(option)} option provided.`).NL.Line("How to fix?", gray2.bold).Line(`The ${cyan2(value)} option is invalid or unsupported.`).Line(`You need to remove it from the ${file}`).End($.log.group).BR.toString()
+    Create({ type: "error" }).Line("ERROR", or).NL.Line(`Unknown ${Dn(option)} option provided.`).NL.Line("How to fix?", t.bold).Line(`The ${Dn(value)} option is invalid or unsupported.`).Line(`You need to remove it from the ${file}`).End($.log.group).BR.toString()
   );
   process.exit(0);
 }
 
 // syncify/log/runtime.ts
 var runtime = function($2) {
-  clear3();
+  clear2();
   if ($2.log.config.silent) return;
   $2.env.tree = true;
-  const message = Create().BR.Top("Syncify").NL.Line(`v${$2.version}`, bold2.whiteBright);
+  const message = Create().BR.Top("Syncify").NL.Line(`v${$2.version}`, or.whiteBright);
   if ($2.terminal.cols < 80) {
-    message.Newline("red").Error("TERMINAL WIDTH WARNING", bold2).Newline("red").Error(`Your terminal width is below ${bold2(`${100}`)} columns (currently ${bold2(`${$2.terminal.cols}`)})`).Error("This is not recommended for usage with Syncify (size matters).").Error("Expand your terminal wider for an optimal logging experience.");
+    message.Newline("red").Error("TERMINAL WIDTH WARNING", or).Newline("red").Error(`Your terminal width is below ${or(`${100}`)} columns (currently ${or(`${$2.terminal.cols}`)})`).Error("This is not recommended for usage with Syncify (size matters).").Error("Expand your terminal wider for an optimal logging experience.");
   }
   log(message.toLine());
 };
 runtime.time = function() {
   log(
-    Break(lightGray(`Started in ${timer.stop("runtime")}`))
+    Break(s(`Started in ${timer.stop("runtime")}`))
   );
 };
 runtime.modes = function($2) {
@@ -10264,111 +12650,111 @@ runtime.modes = function($2) {
         "Select theme target/s to be inserted into your package.json file.",
         "You will be given a code example after selecting where you will define",
         "a custom target name. If you would like to create a new theme, then run",
-        `the ${cyan2("publish")} resource`,
-        gray2
+        `the ${Dn("publish")} resource`,
+        t
       ).toLine()
     );
   }
   if ($2.mode.cache) {
     if (seq !== "") {
-      seq += ` ${TLD} cache`;
+      seq += ` ${Rr} cache`;
     } else {
       seq += "cache";
     }
   }
   if ($2.mode.clean) {
     if (seq !== "") {
-      seq += ` ${TLD} clean`;
+      seq += ` ${Rr} clean`;
     } else {
       seq += "clean";
     }
   }
   if ($2.spawn.invoked) {
     if (seq !== "") {
-      seq += ` ${TLD} build`;
+      seq += ` ${Rr} build`;
     } else {
       seq += "build";
     }
   }
   if ($2.mode.build) {
     if (seq !== "") {
-      seq += ` ${TLD} build`;
+      seq += ` ${Rr} build`;
     } else {
       seq += "build";
     }
   }
   if ($2.mode.export) {
     if (seq !== "") {
-      seq += ` ${TLD} export`;
+      seq += ` ${Rr} export`;
     } else {
       seq += "export";
     }
   }
   if ($2.mode.publish) {
     if (seq !== "") {
-      seq += ` ${TLD} publish`;
+      seq += ` ${Rr} publish`;
     } else {
       seq += "publish";
     }
   }
   if ($2.mode.import) {
     if (seq !== "") {
-      seq += ` ${TLD} import`;
+      seq += ` ${Rr} import`;
     } else {
       seq += "import";
     }
   }
   if ($2.mode.watch) {
     if (seq !== "") {
-      seq += ` ${TLD} watch`;
+      seq += ` ${Rr} watch`;
     } else {
       seq += "watch";
     }
     if ($2.mode.hot) {
-      seq += ` ${TLD} hot`;
+      seq += ` ${Rr} hot`;
     }
   }
   if (seq !== "") {
-    message.Line(seq, gray2);
+    message.Line(seq, t);
     seq = "";
   }
   if (!isEmpty2($2.filters)) {
-    message.NL.Line(`Filters${COL}`, white2.bold);
+    message.NL.Line(`Filters${wr}`, Wn.bold);
     const space = ws($2.filters);
     for (const group2 in $2.filters) {
-      const join24 = white2($2.filters[group2].map((k) => (0, import_pathe2.relative)($2.cwd, k)).join(", "));
-      message.Line(` ${TLD} ${group2}${COL}${space(group2)}${join24}`, neonCyan);
+      const join22 = Wn($2.filters[group2].map((k) => (0, import_node_path2.relative)($2.cwd, k)).join(", "));
+      message.Line(` ${Rr} ${group2}${wr}${space(group2)}${join22}`, gr);
     }
   }
   log(message.toLine());
 };
 runtime.spawns = function($2) {
   if ($2.mode.build || $2.mode.watch) {
-    const message = Create().Line(`Spawned${COL}`, white2.bold);
+    const message = Create().Line(`Spawned${wr}`, Wn.bold);
     const space = ws($2.spawn.commands);
     for (const name in $2.spawn.commands) {
       const sp = space(name);
       const pid = $2.spawn.commands[name].pid;
-      message.Line(` ${TLD} ${neonCyan(name)}${COL}${sp}PID ${ARR} #${pink(`${pid}`)}`, gray2);
+      message.Line(` ${Rr} ${gr(name)}${wr}${sp}PID ${Cr} #${sr(`${pid}`)}`, t);
     }
     log(message.toLine());
   }
 };
 runtime.stores = function($2) {
   const text = Create();
-  const size2 = $2.sync.themes.length;
+  const size = $2.sync.themes.length;
   if (allFalse($2.mode.upload, $2.mode.import, $2.mode.build, $2.mode.clean)) {
-    if (size2 > 0) {
-      text.Line(`Editors${COL}`, bold2.white);
+    if (size > 0) {
+      text.Line(`Editors${wr}`, or.white);
       getThemeURLS(text, $2.sync.themes, "editor");
     }
   }
   if (anyTrue($2.mode.upload, $2.mode.import, $2.mode.watch)) {
-    if (size2 > 0) {
+    if (size > 0) {
       if ($2.mode.upload || $2.mode.import) {
-        text.NL.Line(`Targets${COL}`, bold2.white);
+        text.NL.Line(`Targets${wr}`, or.white);
       } else {
-        text.NL.Line(`Previews${COL}`, bold2.white);
+        text.NL.Line(`Previews${wr}`, or.white);
       }
       getThemeURLS(text, $2.sync.themes, "preview");
     }
@@ -10383,28 +12769,28 @@ runtime.warnings = function getRuntimeWarnings($2) {
     return n;
   }, 0);
   if (amount === 0) return;
-  const message = Create({ type: "warning" }).Line(`${amount} ${plural("Warning", amount)}`, bold2);
+  const message = Create({ type: "warning" }).Line(`${amount} ${plural("Warning", amount)}`, or);
   for (const key of props) {
     const item = warnings[key];
     if (item.length > 0) {
       if (item.length === amount) {
-        message.Newline().Line(`${key} ${plural("Warning", item.length)}`, bold2).Newline();
+        message.Newline().Line(`${key} ${plural("Warning", item.length)}`, or).Newline();
       } else {
-        message.Newline().Line(`${item.length} ${key} ${plural("Warning", item.length)}`, bold2);
+        message.Newline().Line(`${item.length} ${key} ${plural("Warning", item.length)}`, or);
       }
       for (const text of item) {
-        message.Line(`${DSH} ${text}`, yellowBright2);
+        message.Line(`${Mr} ${text}`, Zn);
       }
     }
   }
   warn(message.toString());
 };
 function getThemeURLS(text, themes2, url) {
-  const width = themes2.reduce((size2, { target, store }) => {
+  const width = themes2.reduce((size, { target, store }) => {
     const name = store.indexOf(".");
-    if (name > size2.store) size2.store = name;
-    if (target.length > size2.theme) size2.theme = target.length;
-    return size2;
+    if (name > size.store) size.store = name;
+    if (target.length > size.theme) size.theme = target.length;
+    return size;
   }, {
     store: 0,
     theme: 0
@@ -10415,16 +12801,16 @@ function getThemeURLS(text, themes2, url) {
     text.Line(
       glueString(
         " ",
-        TLD,
-        pink(name),
+        Rr,
+        sr(name),
         " ".repeat(width.store - name.length),
-        ARR,
+        Cr,
         " ",
-        pink.bold(target),
+        sr.bold(target),
         " ".repeat(width.theme - target.length),
-        ARR,
+        Cr,
         " ",
-        gray2.underline(type2)
+        t.underline(type2)
       )
     );
   }
@@ -10450,14 +12836,14 @@ var write2 = (message, {
     if (prefix === null) {
       error(
         glueString(
-          LineRed(color ? color(message) : redBright2(message)),
+          LineRed(color ? color(message) : J(message)),
           Append(suffix)
         )
       );
     } else {
       error(
         LineRed(
-          (color || redBright2)(
+          (color || J)(
             Prefix(
               prefix,
               glueString(
@@ -10474,7 +12860,7 @@ var write2 = (message, {
       log(
         LineYellow(
           glueString(
-            color ? color(message) : yellowBright2(message),
+            color ? color(message) : Zn(message),
             Append(suffix)
           )
         )
@@ -10482,7 +12868,7 @@ var write2 = (message, {
     } else {
       log(
         LineYellow(
-          (color || yellowBright2)(
+          (color || Zn)(
             Prefix(
               prefix,
               glueString(
@@ -10499,7 +12885,7 @@ var write2 = (message, {
       log(
         Line(
           glueString(
-            color ? color(message) : whiteBright2(message),
+            color ? color(message) : pe(message),
             Append(suffix)
           )
         )
@@ -10507,7 +12893,7 @@ var write2 = (message, {
     } else {
       log(
         Line(
-          (color || whiteBright2)(
+          (color || pe)(
             Prefix(
               prefix,
               glueString(
@@ -10525,24 +12911,24 @@ var nwl = (entry) => {
   if (entry === "") {
     log("\n");
   } else if (entry === "red") {
-    log(Tree.red);
+    log(de.red);
   } else if (entry === "yellow") {
-    log(Tree.yellow);
+    log(de.yellow);
   } else {
-    log(Tree.line);
+    log(de.line);
   }
 };
-var clear3 = (force = false) => {
+var clear2 = (force = false) => {
   if (force === false && $.log.config.clear === false) return;
-  const count = import_node_process9.stdout.rows - 2;
+  const count = import_node_process8.stdout.rows - 2;
   log(count > 0 ? "\n".repeat(count) : "");
-  (0, import_node_readline.cursorTo)(import_node_process9.stdout, 0, 0);
-  (0, import_node_readline.clearScreenDown)(import_node_process9.stdout);
+  (0, import_node_readline.cursorTo)(import_node_process8.stdout, 0, 0);
+  (0, import_node_readline.clearScreenDown)(import_node_process8.stdout);
 };
 var group = (name) => {
   if ($.log.config.silent || $.env.tree === false) return;
   log(End($.log.group));
-  if ($.log.config.clear && name !== false) clear3();
+  if ($.log.config.clear && name !== false) clear2();
   if (isString(name)) {
     $.log.group = name;
     log("\n" + Top($.log.group));
@@ -10551,13 +12937,13 @@ var group = (name) => {
 var task = (name) => {
   if ($.log.config.silent || $.env.tree === false) return;
   if (isString(name)) {
-    log(Dash(gray2(name) + " " + Append(getTime())));
+    log(Dash(t(name) + " " + Append(getTime())));
   } else {
-    clear3();
+    clear2();
     log(
-      Tree.line + "\n" + Dash(
+      de.line + "\n" + Dash(
         glueString(
-          gray2($.log.group),
+          t($.log.group),
           Append(getTime())
         )
       )
@@ -10569,12 +12955,12 @@ var process7 = (label, ...message) => {
   if (message.length === 2) {
     log(
       Line(
-        whiteBright2(
+        pe(
           Prefix(
             "process",
             glueString(
-              bold2(label),
-              CHV,
+              or(label),
+              Ar,
               message[0],
               Append(message[1])
             )
@@ -10585,11 +12971,11 @@ var process7 = (label, ...message) => {
   } else {
     log(
       Line(
-        whiteBright2(
+        pe(
           Prefix(
             "process",
             glueString(
-              bold2(label),
+              or(label),
               Append(message[0])
             )
           )
@@ -10601,7 +12987,7 @@ var process7 = (label, ...message) => {
 var changed = (file) => {
   if ($.log.config.silent === true || $.mode.watch === false) return;
   timer.start();
-  const name = glueString(file.kind, CHV, toUpcase(file.namespace));
+  const name = glueString(file.kind, Ar, toUpcase(file.namespace));
   const change = has(file.relative, $.log.changes) ? $.log.changes[file.relative] + 1 : 1;
   $.log.changes[file.relative] = change;
   if ($.log.group !== name) {
@@ -10617,7 +13003,7 @@ var changed = (file) => {
   }
   log(
     NextLine(
-      neonCyan(
+      gr(
         Prefix("changed", glueString(
           file.relative,
           Append(`${change} change${change > 1 ? "s" : ""}`)
@@ -10631,24 +13017,24 @@ var minified = (...p) => {
   if (p.length === 1) {
     log(
       Line(
-        whiteBright2(
-          Prefix("minified", bold2(p[0]))
+        pe(
+          Prefix("minified", or(p[0]))
         )
       )
     );
   } else if (p.length === 4) {
     log(
       Line(
-        whiteBright2(
+        pe(
           Prefix(
             "minified",
             glueString(
-              bold2(p[0]),
-              ARR,
+              or(p[0]),
+              Cr,
               p[1],
-              ARL,
+              Or,
               p[2],
-              TLD,
+              Rr,
               "saved",
               p[3]
             )
@@ -10659,14 +13045,14 @@ var minified = (...p) => {
   } else {
     log(
       Line(
-        whiteBright2(
+        pe(
           Prefix(
             "minified",
             glueString(
-              bold2(p[0]),
-              ARL,
+              or(p[0]),
+              Or,
               p[1],
-              TLD,
+              Rr,
               "saved",
               p[2],
               Append(
@@ -10684,7 +13070,7 @@ var syncing = (path2, { hot: hot2 = false } = {}) => {
   if ($.warnings.has(path2)) {
     log(
       LineYellow(
-        yellowBright2(
+        Zn(
           Prefix(
             "warning",
             glueString(
@@ -10699,7 +13085,7 @@ var syncing = (path2, { hot: hot2 = false } = {}) => {
   }
   log(
     Line(
-      magentaBright2(
+      Qn(
         Prefix("syncing", path2)
       )
     )
@@ -10707,8 +13093,8 @@ var syncing = (path2, { hot: hot2 = false } = {}) => {
   if (queue.pending > (hot2 ? 0 : 2)) {
     log(
       Line(
-        orange(
-          Prefix("queued", glueString(path2, TLD, bold2(addSuffix(queue.pending)), "in queue"))
+        cr(
+          Prefix("queued", glueString(path2, Rr, or(addSuffix(queue.pending)), "in queue"))
         )
       )
     );
@@ -10717,7 +13103,7 @@ var syncing = (path2, { hot: hot2 = false } = {}) => {
 var prompt = (message, notify) => {
   log(
     Line(
-      orange(
+      cr(
         Prefix("prompt", message)
       )
     ),
@@ -10741,12 +13127,12 @@ var resource = (type2, store) => {
       for (const [type3, store2, ctime] of $.log.queue) {
         log(
           Line(
-            neonGreen(
+            V(
               Prefix(
                 "uploaded",
                 glueString(
-                  bold2(type3),
-                  ARR,
+                  or(type3),
+                  Cr,
                   store2,
                   Append(ctime)
                 )
@@ -10761,12 +13147,12 @@ var resource = (type2, store) => {
   } else {
     log(
       Line(
-        neonGreen(
+        V(
           Prefix(
             "uploaded",
             glueString(
-              bold2(type2),
-              ARR,
+              or(type2),
+              Cr,
               store.domain,
               Append(timer.stop())
             )
@@ -10790,8 +13176,8 @@ var upload = (theme3) => {
       ] of $.log.queue) {
         log(
           Line(
-            neonGreen(
-              Prefix("uploaded", bold2(target), store, ctime)
+            V(
+              Prefix("uploaded", or(target), store, ctime)
             )
           )
         );
@@ -10802,8 +13188,8 @@ var upload = (theme3) => {
   } else {
     log(
       Line(
-        neonGreen(
-          Prefix("uploaded", bold2(theme3.target), theme3.store, timer.stop())
+        V(
+          Prefix("uploaded", or(theme3.target), theme3.store, timer.stop())
         )
       )
     );
@@ -10812,7 +13198,7 @@ var upload = (theme3) => {
 var invalid = (path2, message) => {
   log(
     LineRed(
-      red2(
+      _(
         Prefix("invalid", path2)
       )
     )
@@ -10832,7 +13218,7 @@ var invalid = (path2, message) => {
         message,
         {
           type: "error",
-          color: red2.bold
+          color: _.bold
         }
       )
     );
@@ -10841,7 +13227,7 @@ var invalid = (path2, message) => {
 var error2 = (input, { suffix = null, notify = null } = {}) => {
   error(
     LineRed(
-      red2(
+      _(
         Prefix("error", suffix ? input + " " + Append(suffix) : input)
       )
     )
@@ -10855,12 +13241,12 @@ var spawn2 = (name) => {
     if (!$.spawn.invoked) $.spawn.invoked = true;
     if ($.log.group !== "Spawn") {
       log(End($.log.group));
-      if ($.log.group !== "Syncify") clear3();
+      if ($.log.group !== "Syncify") clear2();
       log(Top("Spawn"));
       $.log.group = "Spawn";
     }
     if ($.log.title !== name) {
-      log(Next(neonCyan(name)));
+      log(Next(gr(name)));
       $.log.title = name;
     }
     spawn.call(this, input.toString());
@@ -10870,7 +13256,7 @@ var warn2 = (message, suffix) => {
   if (suffix) {
     log(
       LineYellow(
-        yellowBright2(
+        Zn(
           Prefix("warning", message) + Append(suffix)
         )
       )
@@ -10878,7 +13264,7 @@ var warn2 = (message, suffix) => {
   } else {
     log(
       LineYellow(
-        yellowBright2(
+        Zn(
           Prefix("warning", message)
         )
       )
@@ -10888,7 +13274,7 @@ var warn2 = (message, suffix) => {
 var retrying = (file, theme3) => {
   log(
     Line(
-      orange(
+      cr(
         Prefix("retrying", file, theme3.target, theme3.store)
       )
     )
@@ -10897,7 +13283,7 @@ var retrying = (file, theme3) => {
 var deleted = (file, theme3) => {
   log(
     Line(
-      blueBright2(
+      er(
         Prefix("deleted", file, theme3.target, theme3.store)
       )
     )
@@ -10908,18 +13294,18 @@ var transform = (label, ...suffix) => {
   if (suffix.length > 0) {
     log(
       Line(
-        whiteBright2(
+        pe(
           Prefix(
             "transform",
             glueString(
-              bold2(label),
-              ARR,
+              or(label),
+              Cr,
               suffix[0],
               suffix.length === 2 ? glueString(
-                ARR,
+                Cr,
                 suffix[1]
               ) : suffix.length === 3 ? glueString(
-                ARR,
+                Cr,
                 suffix[1],
                 Append(suffix[2])
               ) : ""
@@ -10931,25 +13317,25 @@ var transform = (label, ...suffix) => {
   } else {
     log(
       Line(
-        whiteBright2(
+        pe(
           Prefix(
             "transform",
-            bold2(label)
+            or(label)
           )
         )
       )
     );
   }
 };
-var zipped = (size2, path2) => {
+var zipped = (size, path2) => {
   log(
     Line(
-      whiteBright2(
+      pe(
         Prefix(
           "zipped",
           glueString(
-            bold2("ZIP"),
-            size2,
+            or("ZIP"),
+            size,
             Append(path2)
           )
         )
@@ -10974,18 +13360,18 @@ var skipped = (file, reason) => {
 var title = (label) => {
   log(
     Break(
-      whiteBright2.bold(label)
+      pe.bold(label)
     )
   );
 };
 var hot = (id) => {
   log(
     Line(
-      neonRouge(
+      pr(
         Prefix(
           "reloaded",
           glueString(
-            bold2("HOT RELOAD"),
+            or("HOT RELOAD"),
             Append(timer.now(id))
           )
         )
@@ -10997,13 +13383,13 @@ var exported = (from, to) => {
   if ($.mode.build) return;
   log(
     Line(
-      teal(
+      lr(
         Prefix(
           "exported",
           glueString(
-            bold2(from),
-            ARR,
-            bold2(to)
+            or(from),
+            Cr,
+            or(to)
           )
         )
       )
@@ -11013,12 +13399,12 @@ var exported = (from, to) => {
 var version = (vc, type2) => {
   log(
     Line(
-      whiteBright2(
+      pe(
         Prefix(
           "version",
           glueString(
             vc.number,
-            ARL,
+            Or,
             vc.update.number,
             Append(type2)
           )
@@ -11206,8 +13592,7 @@ async function sync(theme3, file, config) {
 init_cjs_shims();
 var import_axios2 = __toESM(require("axios"));
 var import_fs_extra = require("fs-extra");
-var import_pathe3 = require("pathe");
-var import_prompts = __toESM(require("prompts"));
+var import_node_path3 = require("path");
 async function find2(store, field) {
   if (arguments.length === 1) return (_field) => find2(store, _field);
   if (allFalse(has2("namespace", field), has2("key", field))) {
@@ -11221,8 +13606,8 @@ async function find2(store, field) {
     return void 0;
   });
 }
-async function create3(store, metafield) {
-  if (arguments.length === 1) return (_metafield) => create3(store, _metafield);
+async function create2(store, metafield) {
+  if (arguments.length === 1) return (_metafield) => create2(store, _metafield);
   metafield.type = "json";
   metafield.namespace = "email";
   metafield.value_type = "json_string";
@@ -11234,7 +13619,7 @@ async function create3(store, metafield) {
     console.log(e);
     if (!store.queue) return request(metafield.namespace, e.response);
     if (requeue(e.response.status)) {
-      queue.add(() => create3(store, metafield));
+      queue.add(() => create2(store, metafield));
       return void 0;
     } else {
       return request(store.store, e.response);
@@ -11258,7 +13643,7 @@ async function update(store, id, metafield) {
 async function sync2(store, field) {
   if (is(arguments.length, 1)) return (_field) => sync2(store, _field);
   const data = await find2(store, field);
-  if (!data) return create3(store, field);
+  if (!data) return create2(store, field);
   return update(store, data.id, assign(field, { id: data.id, type: "json" })).catch((e) => {
     if (!store.queue) return request(field.namespace, e.response);
     if (requeue(e.response.status)) {
@@ -11315,31 +13700,31 @@ function client({ stores, themes: themes2 }) {
 
 // syncify/process/files.ts
 init_cjs_shims();
-var import_pathe6 = require("pathe");
+var import_node_path6 = require("path");
 
 // syncify/process/context.ts
 init_cjs_shims();
-var import_pathe5 = require("pathe");
+var import_node_path5 = require("path");
 
 // syncify/utils/paths.ts
 init_cjs_shims();
-var import_pathe4 = require("pathe");
+var import_node_path4 = require("path");
 function globPath(path2) {
   return isArray(path2) ? path2.filter((uri) => /\*/.test(uri)) : /\*/.test(path2) ? path2 : null;
 }
 function lastPath(path2) {
   if (isArray(path2)) return path2.map(lastPath);
   if (path2.indexOf("/") === -1) return path2;
-  const dir = path2.endsWith("/") ? (0, import_pathe4.dirname)(path2.slice(0, -1)) : (0, import_pathe4.dirname)(path2);
+  const dir = path2.endsWith("/") ? (0, import_node_path4.dirname)(path2.slice(0, -1)) : (0, import_node_path4.dirname)(path2);
   const ender = dir.lastIndexOf("/") + 1;
   return dir.slice(ender);
 }
 function parentPath(path2) {
   if (isArray(path2)) return path2.map(parentPath);
-  const last2 = path2.lastIndexOf("/");
-  if (last2 === -1) return path2;
+  const last = path2.lastIndexOf("/");
+  if (last === -1) return path2;
   const glob9 = path2.indexOf("*");
-  return glob9 === -1 ? path2.slice(0, last2) : path2.slice(0, glob9);
+  return glob9 === -1 ? path2.slice(0, last) : path2.slice(0, glob9);
 }
 function normalPath(input, cwd = null) {
   const regex2 = new RegExp(`^\\.?\\/?${input}\\/`);
@@ -11350,53 +13735,18 @@ function normalPath(input, cwd = null) {
     if (regex2.test(path2)) return ignore ? "!" + path2 : path2;
     if (path2.charCodeAt(0) === 46 && path2.charCodeAt(1) === 46 && path2.charCodeAt(2) === 47) {
       throwError(
-        `Invalid path defined at: ${COL} ${yellowBright2(`"${path2}"`)}`,
+        `Invalid path defined at: ${wr} ${Zn(`"${path2}"`)}`,
         ["Paths must be relative to source"]
       );
     }
     if (cwd !== null) {
-      const exists2 = (0, import_pathe4.join)(cwd, path2);
-      return (ignore ? "!" : "") + (exists2.startsWith(input) ? exists2 : (0, import_pathe4.join)(input, path2));
+      const exists2 = (0, import_node_path4.join)(cwd, path2);
+      return (ignore ? "!" : "") + (exists2.startsWith(input) ? exists2 : (0, import_node_path4.join)(input, path2));
     } else {
-      return (ignore ? "!" : "") + (0, import_pathe4.join)(input, path2);
+      return (ignore ? "!" : "") + (0, import_node_path4.join)(input, path2);
     }
   };
 }
-var basePath = (cwd) => (path2) => {
-  if (path2.indexOf("*") !== -1) {
-    throwError(
-      `Base directory path cannot contain glob${COL} ${yellowBright2(`"${path2}"`)}`,
-      ["Ensure that path you are resolving is correctly formed"]
-    );
-  }
-  if (path2.charCodeAt(0) === 46) {
-    if (path2.length === 1) return cwd + "/";
-    if (path2.charCodeAt(1) === 47) {
-      path2 = path2.slice(1);
-    } else {
-      throwError(
-        `Directory path is invalid at${COL} ${yellowBright2(`"${path2}"`)}`,
-        ["Ensure that path you are resolving is correctly formed"]
-      );
-    }
-  }
-  if (path2.charCodeAt(0) === 47) {
-    if (path2.length === 1) {
-      return cwd + "/";
-    } else {
-      path2 = path2.slice(1);
-    }
-  }
-  if (/^[a-zA-Z0-9_-]+/.test(path2)) {
-    path2 = (0, import_pathe4.join)(cwd, path2);
-    return last(path2).charCodeAt(0) === 47 ? path2 : path2 + "/";
-  } else {
-    throwError(
-      `Directory path is invalid at${COL} ${yellowBright2(`"${path2}"`)}`,
-      ["Ensure that path you are resolving is correctly formed"]
-    );
-  }
-};
 
 // syncify/process/context.ts
 function svg(file) {
@@ -11423,20 +13773,20 @@ function style(file) {
   } });
   if (config.snippet) {
     file.namespace = "snippets";
-    file.key = (0, import_pathe5.join)("snippets", config.rename);
+    file.key = (0, import_node_path5.join)("snippets", config.rename);
   } else {
-    file.key = (0, import_pathe5.join)("assets", config.rename);
+    file.key = (0, import_node_path5.join)("assets", config.rename);
   }
   if (file.output) {
-    if (file.data.rename !== (0, import_pathe5.basename)(file.output)) {
+    if (file.data.rename !== (0, import_node_path5.basename)(file.output)) {
       if (config.snippet) {
-        file.output = (0, import_pathe5.join)($.dirs.output, file.key);
+        file.output = (0, import_node_path5.join)($.dirs.output, file.key);
       } else {
-        file.output = (0, import_pathe5.join)(parentPath(file.output), file.data.rename);
+        file.output = (0, import_node_path5.join)(parentPath(file.output), file.data.rename);
       }
     }
   } else {
-    file.output = (0, import_pathe5.join)($.dirs.output, file.key);
+    file.output = (0, import_node_path5.join)($.dirs.output, file.key);
   }
   return file;
 }
@@ -11448,9 +13798,9 @@ function script(file) {
   } });
   return file;
 }
-function schema(fn, file) {
+function schema(fn2, file) {
   defineProperty(file, "data", { get() {
-    return fn;
+    return fn2;
   } });
   return file;
 }
@@ -11458,24 +13808,24 @@ function section(file) {
   if ($.section.prefixDir) {
     if (file.base.endsWith("-group.json")) return file;
     if (isRegex($.section.global) && $.section.global.test(file.input)) return file;
-    const last2 = lastPath(file.input);
-    if ($.section.baseDir.has(last2)) return file;
+    const last = lastPath(file.input);
+    if ($.section.baseDir.has(last)) return file;
     const rename = lastPath(file.input) + $.section.separator + file.base;
     file.name = rename;
-    file.key = (0, import_pathe5.join)(file.namespace, rename);
-    file.output = (0, import_pathe5.join)((0, import_pathe5.dirname)(file.output), rename);
+    file.key = (0, import_node_path5.join)(file.namespace, rename);
+    file.output = (0, import_node_path5.join)((0, import_node_path5.dirname)(file.output), rename);
   }
   return file;
 }
 function snippet(file) {
   if ($.snippet.prefixDir) {
     if (isRegex($.snippet.global) && $.snippet.global.test(file.input)) return file;
-    const last2 = lastPath(file.input);
-    if ($.snippet.baseDir.has(last2)) return file;
-    const rename = last2 + $.snippet.separator + file.base;
+    const last = lastPath(file.input);
+    if ($.snippet.baseDir.has(last)) return file;
+    const rename = last + $.snippet.separator + file.base;
     file.name = rename;
-    file.key = (0, import_pathe5.join)(file.namespace, rename);
-    file.output = (0, import_pathe5.join)((0, import_pathe5.dirname)(file.output), rename);
+    file.key = (0, import_node_path5.join)(file.namespace, rename);
+    file.output = (0, import_node_path5.join)((0, import_node_path5.dirname)(file.output), rename);
   }
   return file;
 }
@@ -11550,11 +13900,11 @@ function setFile(file, input, output) {
   return function(namespace, type2, kind) {
     let key;
     if (type2 === 15 /* Metafield */ || type2 === 16 /* Page */) {
-      key = (0, import_pathe6.join)(lastPath(file.dir), file.base);
+      key = (0, import_node_path6.join)(lastPath(file.dir), file.base);
       output = null;
     } else {
-      key = (0, import_pathe6.join)(namespace, file.base);
-      output = (0, import_pathe6.join)(output, key);
+      key = (0, import_node_path6.join)(namespace, file.base);
+      output = (0, import_node_path6.join)(output, key);
     }
     if (kind === -1) input = $.cache.paths[input];
     file.uuid = uuid();
@@ -11564,7 +13914,7 @@ function setFile(file, input, output) {
     file.kind = kind;
     file.input = input;
     file.output = output;
-    file.relative = (0, import_pathe6.relative)($.cwd, input);
+    file.relative = (0, import_node_path6.relative)($.cwd, input);
     return file;
   };
 }
@@ -11577,7 +13927,7 @@ function setImportFile(parsedFile, output) {
       namespace,
       output,
       kind: getFileKind(file.ext),
-      relative: (0, import_pathe6.relative)($.cwd, output)
+      relative: (0, import_node_path6.relative)($.cwd, output)
     });
   };
 }
@@ -11585,8 +13935,8 @@ function parseFileQuick(path2) {
   return parseFile($.paths, $.dirs.output)(path2);
 }
 function parseFile(paths2, output) {
-  return function fn(path2) {
-    const file = new File((0, import_pathe6.parse)(path2));
+  return function fn2(path2) {
+    const file = new File((0, import_node_path6.parse)(path2));
     const define2 = setFile(file, path2, output);
     if (file.ext === ".liquid") {
       if (paths2.sections.match(path2)) {
@@ -11605,7 +13955,7 @@ function parseFile(paths2, output) {
         return style(define2("snippets" /* Snippets */, 9 /* Style */, "CSS" /* CSS */));
       }
     } else if (file.ext === ".schema" && paths2.schema.match(path2)) {
-      return schema(fn, define2("schema" /* Schema */, 5 /* Schema */, "JSON" /* JSON */));
+      return schema(fn2, define2("schema" /* Schema */, 5 /* Schema */, "JSON" /* JSON */));
     } else if (file.ext === ".json") {
       if (paths2.metafields.match(path2)) {
         return define2("metafields" /* Metafields */, 15 /* Metafield */, "JSON" /* JSON */);
@@ -11622,7 +13972,7 @@ function parseFile(paths2, output) {
       } else if (paths2.metaobject.match(path2)) {
         return define2("templates/metaobject" /* Metaobject */, 1 /* Template */, "JSON" /* JSON */);
       } else if (paths2.schema.match(path2)) {
-        return schema(fn, define2("schema" /* Schema */, 5 /* Schema */, "JSON" /* JSON */));
+        return schema(fn2, define2("schema" /* Schema */, 5 /* Schema */, "JSON" /* JSON */));
       }
     }
     switch (file.ext) {
@@ -11682,8 +14032,8 @@ function parseFile(paths2, output) {
   };
 }
 function importFile(key, outputPath) {
-  const path2 = (0, import_pathe6.join)(outputPath, key);
-  const file = new File((0, import_pathe6.parse)(path2));
+  const path2 = (0, import_node_path6.join)(outputPath, key);
+  const file = new File((0, import_node_path6.parse)(path2));
   const define2 = setImportFile(file, path2);
   if (key.startsWith("sections/")) {
     return define2(key, "sections" /* Sections */);
@@ -11706,9 +14056,9 @@ function importFile(key, outputPath) {
   }
 }
 var outputFile = (output) => (path2) => {
-  const file = new File((0, import_pathe6.parse)(path2));
+  const file = new File((0, import_node_path6.parse)(path2));
   const merge2 = setFile(file, path2, output);
-  switch ((0, import_pathe6.basename)(file.dir)) {
+  switch ((0, import_node_path6.basename)(file.dir)) {
     case "sections":
       return merge2("sections" /* Sections */, 4 /* Section */, -1);
     case "snippets":
@@ -11747,22 +14097,22 @@ function byteSize(string) {
   return isString(string) ? toBuffer(string).toString().length : string.toString().length;
 }
 function byteConvert(bytes) {
-  if (bytes === 0) return `${bold2("0")}b`;
-  const size2 = parseInt(String(
+  if (bytes === 0) return `${or("0")}b`;
+  const size = parseInt(String(
     Math.floor(
       Math.log(bytes) / Math.log(1024)
     )
   ), 10);
-  return size2 === 0 ? `${bold2(`${bytes}`)}${UNITS[size2]}` : `${bold2((bytes / 1024 ** size2).toFixed(1))}${UNITS[size2]}`;
+  return size === 0 ? `${or(`${bytes}`)}${UNITS[size]}` : `${or((bytes / 1024 ** size).toFixed(1))}${UNITS[size]}`;
 }
 function sizeDiff(content, beforeSize) {
-  const size2 = byteSize(content);
+  const size = byteSize(content);
   return {
-    isSmaller: size2 > beforeSize || size2 === beforeSize,
+    isSmaller: size > beforeSize || size === beforeSize,
     gzip: byteConvert(import_node_zlib.default.gzipSync(content).length),
     before: byteConvert(beforeSize),
-    after: byteConvert(size2),
-    saved: byteConvert(beforeSize - size2)
+    after: byteConvert(size),
+    saved: byteConvert(beforeSize - size)
   };
 }
 
@@ -11783,14 +14133,14 @@ async function onAsset(file, input, update2, request2) {
 // syncify/hot/inject.ts
 init_cjs_shims();
 var import_fs_extra2 = require("fs-extra");
-var import_pathe7 = require("pathe");
+var import_node_path7 = require("path");
 var EXP = /{%-?\s*render\s+['"]hot\.js['"]/;
 async function injectSnippet() {
   const key = "snippets/hot.js.liquid";
   const [theme3] = $.sync.themes;
   const snippet2 = await (0, import_fs_extra2.readFile)($.hot.snippet);
   const upload4 = await upload2(snippet2.toString(), { theme: theme3, key });
-  log_update_default(Line(gray2(` ${TLD} ${neonCyan(key)} uploaded snippet injection`)));
+  log_update_default(Line(t(` ${Rr} ${gr(key)} uploaded snippet injection`)));
   return upload4;
 }
 function hasSnippet(content) {
@@ -11819,7 +14169,7 @@ async function ejectRender(path2) {
   const local = await (0, import_fs_extra2.readFile)(path2);
   let content = local.toString();
   const [theme3] = $.sync.themes;
-  const name = (0, import_pathe7.basename)(path2);
+  const name = (0, import_node_path7.basename)(path2);
   const key = `layout/${name}`;
   const string = await find(`layout/${name}`, theme3);
   if (isString(string)) {
@@ -11840,17 +14190,17 @@ async function injectRender(path2) {
   if (!EXP.test(content)) {
     content = writeRender(content);
     await (0, import_fs_extra2.writeFile)(path2, content);
-    log_update_default(Line(gray2(` ${TLD} injected render tag in output layout`)));
+    log_update_default(Line(t(` ${Rr} injected render tag in output layout`)));
   }
   const [theme3] = $.sync.themes;
-  const name = (0, import_pathe7.basename)(path2);
+  const name = (0, import_node_path7.basename)(path2);
   const key = `layout/${name}`;
   const string = await find(`layout/${name}`, theme3);
   if (isString(string)) {
     if (EXP.test(string)) content = removeRender(content);
     const upload4 = await upload2(content, { theme: theme3, key });
     if (upload4) {
-      log_update_default(Line(gray2(` ${TLD} uploaded and inject render tag`)));
+      log_update_default(Line(t(` ${Rr} uploaded and inject render tag`)));
       return true;
     }
     return false;
@@ -11859,11 +14209,11 @@ async function injectRender(path2) {
 }
 
 // syncify/modes/upload.ts
-function getModel(size2) {
-  if (size2 === 0) {
+function getModel(size) {
+  if (size === 0) {
     throwError("Empty output directory", [
-      `There are no files within ${neonCyan((0, import_pathe8.relative)($.cwd, $.dirs.output) + "/**")}`,
-      `You may need to run the ${neonCyan.bold("syncify build")} command and try again.`
+      `There are no files within ${gr((0, import_node_path8.relative)($.cwd, $.dirs.output) + "/**")}`,
+      `You may need to run the ${gr.bold("syncify build")} command and try again.`
     ]);
   }
   const sync4 = /* @__PURE__ */ new Map();
@@ -11875,12 +14225,12 @@ function getModel(size2) {
       sync4.set(key, {
         active: sync4.size === 0,
         log: null,
-        size: size2,
+        size,
         processed: "",
         failed: 0,
         success: 0,
         retry: 0,
-        progress: progress(size2),
+        progress: Ur(size),
         get theme() {
           return theme3;
         },
@@ -11913,10 +14263,10 @@ async function upload3(cb) {
     log_update_default(message.toString());
     interval = setInterval(() => {
       record[3] = Line(
-        gray2(
+        t(
           Prefix(
             "Elapsed",
-            whiteBright2.bold(timer.now("upload"))
+            pe.bold(timer.now("upload"))
           )
         )
       ) + "\n";
@@ -11928,7 +14278,7 @@ async function upload3(cb) {
     const { file, theme: theme3 } = item;
     const key = `${theme3.store}:${theme3.target}`;
     const record = sync4.get(key);
-    const message = Create().NL.Line(toUpcase(file.namespace), bold2.whiteBright).NL.Line(Prefix("Elapsed", whiteBright2.bold(timer.now("upload"))), gray2).Line(Prefix("Duration", whiteBright2(timer.stop(file.uuid))), gray2).Line(Prefix("Size", whiteBright2(stringSize(file.size))), gray2).Newline();
+    const message = Create().NL.Line(toUpcase(file.namespace), or.whiteBright).NL.Line(Prefix("Elapsed", pe.bold(timer.now("upload"))), t).Line(Prefix("Duration", pe(timer.stop(file.uuid))), t).Line(Prefix("Size", pe(stringSize(file.size))), t).Newline();
     if (item.status === 0 /* Success */) {
       if (record.errors.retry.has(file.input)) {
         record.retry -= 1;
@@ -11936,13 +14286,13 @@ async function upload3(cb) {
       }
       record.success += 1;
       record.progress.increment(1);
-      record.processed = neonCyan(file.key);
+      record.processed = gr(file.key);
     } else if (item.status === 1 /* Retry */) {
       if (!record.errors.retry.has(file.input)) {
         record.retry += 1;
         record.errors.retry.add(file.input);
       }
-      record.processed = orange(file.key);
+      record.processed = cr(file.key);
     } else if (item.status === 2 /* Failed */) {
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -11952,15 +14302,15 @@ async function upload3(cb) {
         record.failed += 1;
         record.progress.increment(1);
         record.errors.remote.set(file.output, item);
-        record.processed = redBright2(file.key);
+        record.processed = J(file.key);
       }
     }
-    for (const [id, { success, size: size2, failed, retry, progress: progress2, processed }] of sync4) {
+    for (const [id, { success, size, failed, retry, progress, processed }] of sync4) {
       const [store, target] = id.split(":");
-      const uploaded = `${bold2(`${success}`)} ${white2("of")} ${bold2(`${size2}`)}`;
-      const retrying2 = bold2(`${retry}`);
-      const failures = bold2(`${failed}`);
-      message.Line(`${bold2(target.toUpperCase())}  ${ARR}  ${store}`, whiteBright2).NL.Line(processed).NL.Line(Prefix("uploaded", uploaded), whiteBright2).Line(Prefix("retrying", retrying2), retry > 0 ? orange : whiteBright2).Line(Prefix("failures", failures), failed > 0 ? redBright2 : whiteBright2).NL.Insert(progress2.render()).Newline();
+      const uploaded = `${or(`${success}`)} ${Wn("of")} ${or(`${size}`)}`;
+      const retrying2 = or(`${retry}`);
+      const failures = or(`${failed}`);
+      message.Line(`${or(target.toUpperCase())}  ${Cr}  ${store}`, pe).NL.Line(processed).NL.Line(Prefix("uploaded", uploaded), pe).Line(Prefix("retrying", retrying2), retry > 0 ? cr : pe).Line(Prefix("failures", failures), failed > 0 ? J : pe).NL.Insert(progress.render()).Newline();
     }
     logger(message);
   }
@@ -12001,20 +14351,20 @@ async function upload3(cb) {
     theme: theme3,
     failed,
     success,
-    size: size2
+    size
   } of sync4.values()) {
     if (errors.remote.size > 0) {
-      const name = bold2(`${theme3.target.toUpperCase()} THEME`);
-      const failures = bold2(`${failed}`);
-      const uploaded = `${bold2(`${success}`)} ${white2("of")} ${bold2(`${size2}`)}`;
+      const name = or(`${theme3.target.toUpperCase()} THEME`);
+      const failures = or(`${failed}`);
+      const uploaded = `${or(`${success}`)} ${Wn("of")} ${or(`${size}`)}`;
       log(
-        Create().Line(`${name}  ${ARR}  ${theme3.store}`).NL.Line(Prefix("uploaded", uploaded), neonGreen).Line(Prefix("failures", failures), redBright2).NL.toString()
+        Create().Line(`${name}  ${Cr}  ${theme3.store}`).NL.Line(Prefix("uploaded", uploaded), V).Line(Prefix("failures", failures), J).NL.toString()
       );
       let number = 1;
       for (const record of errors.remote.values()) {
         const errno = `${(number < 10 ? "0" : "") + number++}`;
         nwl();
-        write2(redBright2.bold(`ERROR ${errno}`));
+        write2(J.bold(`ERROR ${errno}`));
         request(record.file.input, record.error);
       }
       hline();
@@ -12023,7 +14373,7 @@ async function upload3(cb) {
   }
   await delay(500);
   if (!hasErrors) {
-    log(Break(gray2("No errors!")));
+    log(Break(t("No errors!")));
   }
   log_update_default(Break("Uploaded Completed"));
   process.exit(0);
@@ -12037,7 +14387,7 @@ var import_fast_glob2 = __toESM(require("fast-glob"));
 // syncify/transform/asset.ts
 init_cjs_shims();
 var import_fs_extra4 = require("fs-extra");
-var import_pathe9 = require("pathe");
+var import_node_path9 = require("path");
 function passthrough(file, sync4) {
   const { type: type2, relative: relative15, kind, key, output } = file;
   return async (data) => {
@@ -12056,9 +14406,9 @@ function passthrough(file, sync4) {
     if ($.mode.hot) {
       syncing(key, { hot: true });
       if (kind === "JavaScript" /* JavaScript */) {
-        $.wss.script(file.uuid, (0, import_pathe9.basename)(key));
+        $.wss.script(file.uuid, (0, import_node_path9.basename)(key));
       } else if (kind === "CSS" /* CSS */) {
-        $.wss.stylesheet(file.uuid, (0, import_pathe9.basename)(key));
+        $.wss.stylesheet(file.uuid, (0, import_node_path9.basename)(key));
       }
     }
     if ($.env.sync !== 0 && $.mode.build === false) {
@@ -12097,7 +14447,7 @@ async function compile(file, sync4, cb) {
 // syncify/transform/liquid.ts
 init_cjs_shims();
 var import_html_minifier_terser = require("html-minifier-terser");
-var import_pathe11 = require("pathe");
+var import_node_path11 = require("path");
 var import_fs_extra7 = require("fs-extra");
 
 // syncify/transform/schema.ts
@@ -12172,7 +14522,7 @@ var getErrorLocation = (string, message) => {
 var addCodePointToUnexpectedToken = (message) => message.replace(
   // TODO[engine:node@>=20]: The token always quoted after Node.js 20
   /(?<=^Unexpected token )(?<quote>')?(.)\k<quote>/,
-  (_, _quote, token) => `"${token}"(${getCodePoint(token)})`
+  (_2, _quote, token) => `"${token}"(${getCodePoint(token)})`
 );
 function parseJson(string, reviver, fileName) {
   if (typeof reviver === "string") {
@@ -12220,7 +14570,7 @@ function getStack(processor2, uri) {
 }
 function schema2(file, options) {
   const stack = getStack("Shared Schema", file.input);
-  const output = Create({ type: "warning" }).NL.Wrap(options.message, yellowBright2).NL.Context({
+  const output = Create({ type: "warning" }).NL.Wrap(options.message, Zn).NL.Context({
     stack: false,
     type: "warning",
     entries: {
@@ -12234,7 +14584,7 @@ function schema2(file, options) {
 }
 var sass2 = (file) => (message, options) => {
   const stack = getStack("sass", file.input);
-  const output = Create({ type: "warning" }).NL.Wrap(message, yellowBright2);
+  const output = Create({ type: "warning" }).NL.Wrap(message, Zn);
   if (has("span", options)) {
     if (isUndefined(options.span)) return;
     const { span } = options;
@@ -12248,11 +14598,11 @@ var sass2 = (file) => (message, options) => {
         const number = sanitize(from++);
         const same = space - number.length;
         const align = same === 0 ? "" : " ".repeat(same);
-        output.Trim(`   ${align + blue2(number)} ${Tree.trim} ${line}`);
+        output.Trim(`   ${align + Vn(number)} ${de.trim} ${line}`);
       }
     }
   }
-  const context = output.NL.Wrap(options.stack, yellowBright2).NL.Context({
+  const context = output.NL.Wrap(options.stack, Zn).NL.Context({
     stack: false,
     entries: {
       source: file.relative,
@@ -12263,7 +14613,7 @@ var sass2 = (file) => (message, options) => {
   if (!$.mode.build) {
     log(
       LineYellow(
-        yellowBright2(
+        Zn(
           Prefix(
             "warning",
             glueString(sanitize(stack.size), plural("warning", stack.size))
@@ -12362,7 +14712,7 @@ async function ExtractSchema(file) {
 }
 function InjectSettings(file, schema3) {
   const settings = [];
-  for (let i = 0, s = schema3.length; i < s; i++) {
+  for (let i = 0, s2 = schema3.length; i < s2; i++) {
     if (!has("$ref", schema3[i])) {
       settings.push(schema3[i]);
       continue;
@@ -12387,12 +14737,12 @@ function InjectSettings(file, schema3) {
             $ref: schema3[i].$ref,
             schema: "settings",
             message: [
-              `An unknown Shared Schema reference key of ${bold2(schema3[i].$ref)} was provided.`,
-              `There is no such key ${bold2(prop)} within the shared schema.`
+              `An unknown Shared Schema reference key of ${or(schema3[i].$ref)} was provided.`,
+              `There is no such key ${or(prop)} within the shared schema.`
             ]
           });
         } else {
-          warn2(`undefined $ref ${bold2(prop)} in ${bold2(key)} `, file.base);
+          warn2(`undefined $ref ${or(prop)} in ${or(key)} `, file.base);
         }
       }
     } else {
@@ -12402,13 +14752,13 @@ function InjectSettings(file, schema3) {
           $ref: schema3[i].$ref,
           schema: "settings",
           message: [
-            `An unknown Shared Schema file reference ${bold2(schema3[i].$ref)} was provided`,
-            `to ${bold2("settings")} within section file ${bold2(file.base)}. There is no known shared`,
+            `An unknown Shared Schema file reference ${or(schema3[i].$ref)} was provided`,
+            `to ${or("settings")} within section file ${or(file.base)}. There is no known shared`,
             "schema file using that name."
           ]
         });
       } else {
-        warn2(`unknown $ref ${bold2(schema3[i].$ref)} `, file.base);
+        warn2(`unknown $ref ${or(schema3[i].$ref)} `, file.base);
       }
     }
   }
@@ -12416,7 +14766,7 @@ function InjectSettings(file, schema3) {
 }
 function InjectBlocks(file, schema3) {
   const blocks = [];
-  for (let i = 0, s = schema3.length; i < s; i++) {
+  for (let i = 0, s2 = schema3.length; i < s2; i++) {
     if (has("$ref", schema3[i])) {
       const [key, prop] = schema3[i].$ref.split(".");
       if ($.section.shared.has(key)) {
@@ -12434,13 +14784,13 @@ function InjectBlocks(file, schema3) {
               $ref: schema3[i].$ref,
               schema: "blocks",
               message: [
-                `An unknown Shared Schema key reference of ${bold2(schema3[i].$ref)} was provided`,
-                `to the ${bold2("blocks")} within section file ${bold2(file.base)}. The shared schema`,
-                `file exists, but the key ${bold2(prop)} does not.`
+                `An unknown Shared Schema key reference of ${or(schema3[i].$ref)} was provided`,
+                `to the ${or("blocks")} within section file ${or(file.base)}. The shared schema`,
+                `file exists, but the key ${or(prop)} does not.`
               ]
             });
           } else {
-            warn2(`undefined $ref ${bold2(prop)} in ${bold2(key)} `, file.base);
+            warn2(`undefined $ref ${or(prop)} in ${or(key)} `, file.base);
           }
         }
       } else {
@@ -12450,13 +14800,13 @@ function InjectBlocks(file, schema3) {
             $ref: schema3[i].$ref,
             schema: "blocks",
             message: [
-              `An unknown Shared Schema file reference ${bold2(schema3[i].$ref)} was provided`,
-              `to ${bold2("blocks")} within section file ${bold2(file.base)}. There is no known shared`,
+              `An unknown Shared Schema file reference ${or(schema3[i].$ref)} was provided`,
+              `to ${or("blocks")} within section file ${or(file.base)}. There is no known shared`,
               "schema file using that name."
             ]
           });
         } else {
-          warn2(`unknown $ref ${bold2(schema3[i].$ref)} `, file.base);
+          warn2(`unknown $ref ${or(schema3[i].$ref)} `, file.base);
         }
       }
     } else {
@@ -12490,15 +14840,15 @@ function InjectBlocks(file, schema3) {
                   schema2(file, {
                     shared: prop,
                     $ref: schema3[i].$ref,
-                    schema: `blocks ${ARR} settings`,
+                    schema: `blocks ${Cr} settings`,
                     message: [
-                      `An unknown Shared Schema key reference of ${bold2(schema3[i].$ref)} was provided`,
-                      `to the ${bold2("blocks")} schema id ${bold2(setting.id)} within section file`,
-                      `${bold2(file.base)}. The shared schema file exists, but the key ${bold2(prop)} does not.`
+                      `An unknown Shared Schema key reference of ${or(schema3[i].$ref)} was provided`,
+                      `to the ${or("blocks")} schema id ${or(setting.id)} within section file`,
+                      `${or(file.base)}. The shared schema file exists, but the key ${or(prop)} does not.`
                     ]
                   });
                 } else {
-                  warn2(`undefined $ref ${bold2(prop)} in ${bold2(key)} `, file.base);
+                  warn2(`undefined $ref ${or(prop)} in ${or(key)} `, file.base);
                 }
               }
             } else {
@@ -12506,15 +14856,15 @@ function InjectBlocks(file, schema3) {
                 schema2(file, {
                   shared: prop,
                   $ref: schema3[i].$ref,
-                  schema: `blocks ${ARR} settings`,
+                  schema: `blocks ${Cr} settings`,
                   message: [
-                    `An unknown Shared Schema file reference ${bold2(schema3[i].$ref)} was provided`,
-                    `to ${bold2("blocks")} schema id ${bold2(setting.id)} within section file ${bold2(file.base)}.`,
+                    `An unknown Shared Schema file reference ${or(schema3[i].$ref)} was provided`,
+                    `to ${or("blocks")} schema id ${or(setting.id)} within section file ${or(file.base)}.`,
                     "There is no known shared schema file using that name."
                   ]
                 });
               } else {
-                warn2(`unknown $ref ${bold2(setting.$ref)} `, file.base);
+                warn2(`unknown $ref ${or(setting.$ref)} `, file.base);
               }
             }
           } else {
@@ -12620,7 +14970,7 @@ async function compile2(file, sync4, cb) {
 
 // syncify/transform/style.ts
 init_cjs_shims();
-var import_pathe10 = require("pathe");
+var import_node_path10 = require("path");
 var import_fs_extra6 = require("fs-extra");
 var import_postcss = __toESM(require("postcss"));
 var sass3 = null;
@@ -12653,24 +15003,24 @@ function write3(file, sync4, hook) {
     $.cache.checksum[file.input] = checksum(content);
     (0, import_fs_extra6.writeFile)(file.output, content).catch(write("Error writing stylesheet to output", {
       input: file.relative,
-      output: (0, import_pathe10.relative)($.cwd, file.output)
+      output: (0, import_node_path10.relative)($.cwd, file.output)
     }));
-    const size2 = sizeDiff(data, file.size);
-    if (size2.isSmaller) {
+    const size = sizeDiff(data, file.size);
+    if (size.isSmaller) {
       if (file.kind === "SCSS" /* SCSS */ || file.kind === "SASS" /* SASS */ || file.kind === "Tailwind" /* Tailwind */) {
-        transform(file.kind, bold2("CSS"), size2.before, timer.stop(file.uuid));
+        transform(file.kind, or("CSS"), size.before, timer.stop(file.uuid));
       } else {
-        transform("CSS", size2.before, `gzip ${size2.gzip}`);
+        transform("CSS", size.before, `gzip ${size.gzip}`);
       }
     } else {
       if (file.kind === "Tailwind" /* Tailwind */) {
-        minified("Tailwind" /* Tailwind */, size2.before, size2.after, size2.saved);
+        minified("Tailwind" /* Tailwind */, size.before, size.after, size.saved);
       } else {
-        minified("CSS", size2.before, size2.after, size2.saved);
+        minified("CSS", size.before, size.after, size.saved);
       }
     }
     if ($.mode.hot) {
-      $.wss.stylesheet(file.uuid, (0, import_pathe10.basename)(file.key));
+      $.wss.stylesheet(file.uuid, (0, import_node_path10.basename)(file.key));
     }
     if (file.kind !== "Tailwind" /* Tailwind */) {
       syncing(file.key);
@@ -12702,10 +15052,10 @@ async function sassProcess(file) {
         }
       });
       if (options.sourcemap) {
-        const map = (0, import_pathe10.join)($.dirs.sourcemaps.styles, file.base + ".map");
+        const map = (0, import_node_path10.join)($.dirs.sourcemaps.styles, file.base + ".map");
         (0, import_fs_extra6.writeFile)(map, JSON.stringify(sourceMap)).catch(
           write("Error writing SASS Source Map file to the cache directory", {
-            file: (0, import_pathe10.relative)($.cwd, map),
+            file: (0, import_node_path10.relative)($.cwd, map),
             source: file.relative
           })
         );
@@ -12897,7 +15247,7 @@ var transform2 = (file) => async (data) => {
     (0, import_fs_extra7.writeFile)(file.output, data).catch(
       write("Error writing liquid file to output", {
         input: file.relative,
-        output: (0, import_pathe11.relative)($.cwd, file.output)
+        output: (0, import_node_path11.relative)($.cwd, file.output)
       })
     );
     transform(file.kind, toUpcase(file.namespace), byteConvert(file.size), timer.now());
@@ -12918,18 +15268,18 @@ var transform2 = (file) => async (data) => {
     (0, import_fs_extra7.writeFile)(file.output, data).catch(
       write("Error writing liquid file to output", {
         input: file.relative,
-        output: (0, import_pathe11.relative)($.cwd, file.output)
+        output: (0, import_node_path11.relative)($.cwd, file.output)
       })
     );
     return data;
   }
   const postmin = removeDashes(htmlmin).replace(/^\s+/gm, "");
   (0, import_fs_extra7.writeFile)(file.output, postmin);
-  const size2 = sizeDiff(data, file.size);
-  if (size2.isSmaller) {
-    transform(`${file.namespace} ${size2.before} \u2192 gzip ${size2.gzip}`);
+  const size = sizeDiff(data, file.size);
+  if (size.isSmaller) {
+    transform(`${file.namespace} ${size.before} \u2192 gzip ${size.gzip}`);
   } else {
-    minified("Liquid", size2.before, size2.after, size2.saved);
+    minified("Liquid", size.before, size.after, size.saved);
   }
   return postmin;
 };
@@ -13018,8 +15368,8 @@ async function jsonCompile(file, data, space = 0) {
     return data;
   }
   if (space === 0) {
-    const size2 = sizeDiff(minified2, file.size);
-    minified("JSON", size2.before, size2.after, size2.saved);
+    const size = sizeDiff(minified2, file.size);
+    minified("JSON", size.before, size.after, size.saved);
   } else {
     transform("JSON", file.namespace, byteConvert(file.size), timer.now());
   }
@@ -13118,7 +15468,7 @@ async function compile5(file, sync4, cb) {
 init_cjs_shims();
 var import_fs_extra9 = require("fs-extra");
 var import_esbuild = __toESM(require("esbuild"));
-var import_pathe12 = require("pathe");
+var import_node_path12 = require("path");
 async function esbuildBundle(bundle) {
   bundle.watch.clear();
   const result = await import_esbuild.default.build(bundle.esbuild);
@@ -13137,7 +15487,7 @@ async function getWatchPaths(bundle, inputs) {
   const { cwd, watch: watch2, mode } = $;
   for (const file in inputs) {
     if (file.indexOf("/node_modules/") > -1) continue;
-    const path2 = (0, import_pathe12.join)(cwd, file);
+    const path2 = (0, import_node_path12.join)(cwd, file);
     if (!bundle.watch.has(path2)) bundle.watch.add(path2);
     if (!watch2.has(path2)) watch2.add(path2);
     if (mode.watch) store.push(path2);
@@ -13196,7 +15546,7 @@ async function compile6(file, sync4, hooks2) {
       const { metafile, outputFiles, warnings: warnings2 } = await import_esbuild.default.build(bundle.esbuild);
       if (trigger2 > 1) {
         nwl();
-        write2((0, import_pathe12.relative)($.cwd, input));
+        write2((0, import_node_path12.relative)($.cwd, input));
       }
       if ($.mode.watch) {
         await getWatchPaths(bundle, metafile.inputs);
@@ -13204,23 +15554,23 @@ async function compile6(file, sync4, hooks2) {
       if (warnings2.length > 0) esbuild2(warnings2);
       for (const { text, path: path2 } of outputFiles) {
         if (path2.endsWith(".map")) {
-          const map = (0, import_pathe12.join)($.dirs.sourcemaps.scripts, `${file.base}.map`);
+          const map = (0, import_node_path12.join)($.dirs.sourcemaps.scripts, `${file.base}.map`);
           (0, import_fs_extra9.writeFile)(map, text).catch(write("Error writing JavaScript Source Map to cache", {
-            file: (0, import_pathe12.relative)($.cwd, map),
+            file: (0, import_node_path12.relative)($.cwd, map),
             source: file.relative
           }));
         } else {
           if ($.mode.terse) {
             if (isNaN(bundle.size)) {
-              transform(file.kind, `${bold2(format.toUpperCase())} bundle`);
+              transform(file.kind, `${or(format.toUpperCase())} bundle`);
               minified(stringSize(text));
             } else {
               const { before, after, saved } = sizeDiff(text, bundle.size);
-              transform(`${bold2(format.toUpperCase())} bundle \u2192 ${bold2(stringSize(text))}`);
+              transform(`${or(format.toUpperCase())} bundle \u2192 ${or(stringSize(text))}`);
               minified(null, before, after, saved);
             }
           } else {
-            transform(`${bold2(format.toUpperCase())} bundle \u2192 ${bold2(stringSize(text))}`);
+            transform(`${or(format.toUpperCase())} bundle \u2192 ${or(stringSize(text))}`);
           }
           let content;
           if (snippet2) {
@@ -13277,7 +15627,7 @@ async function compile6(file, sync4, hooks2) {
 init_cjs_shims();
 var import_svgo = __toESM(require("svgo"));
 var import_svg_sprite = __toESM(require("svg-sprite"));
-var import_pathe13 = require("pathe");
+var import_node_path13 = require("path");
 var import_fs_extra10 = require("fs-extra");
 async function getFile(path2) {
   const svg2 = await (0, import_fs_extra10.readFile)(path2);
@@ -13306,11 +15656,11 @@ function compileSprite(context, request2, _cb) {
     file.kind = "Sprite" /* Sprite */;
     if (config.snippet) {
       file.namespace = "snippets" /* Snippets */;
-      file.key = (0, import_pathe13.join)("snippets", renameFile(file, config.rename));
-      file.output = (0, import_pathe13.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path13.join)("snippets", renameFile(file, config.rename));
+      file.output = (0, import_node_path13.join)($.dirs.output, file.key);
     } else {
-      file.key = (0, import_pathe13.join)("assets", renameFile(file, config.rename));
-      file.output = (0, import_pathe13.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path13.join)("assets", renameFile(file, config.rename));
+      file.output = (0, import_node_path13.join)($.dirs.output, file.key);
     }
     const options = config.sprite === true ? $.processor.sprite : config.sprite;
     const sprite = new import_svg_sprite.default(options);
@@ -13323,15 +15673,15 @@ function compileSprite(context, request2, _cb) {
     if (items) {
       const svgs = items.filter(([path2, svg2]) => {
         if (hasLiquid(svg2)) {
-          skipped((0, import_pathe13.relative)($.cwd, path2), "Liquid Detected");
+          skipped((0, import_node_path13.relative)($.cwd, path2), "Liquid Detected");
           return false;
         }
         return true;
       });
       file.size = 0;
-      for (const [path2, svg2, size3] of svgs) {
+      for (const [path2, svg2, size2] of svgs) {
         sprite.add(path2, null, svg2);
-        file.size = file.size + size3;
+        file.size = file.size + size2;
       }
       const content = await getSprite(sprite);
       const length = svgs.length;
@@ -13342,11 +15692,11 @@ function compileSprite(context, request2, _cb) {
           caller: context.relative
         })
       );
-      const size2 = sizeDiff(content, file.size);
-      if (size2.isSmaller) {
-        transform(`${file.kind} ${size2.before}`, `gzip ${size2.gzip}`);
+      const size = sizeDiff(content, file.size);
+      if (size.isSmaller) {
+        transform(`${file.kind} ${size.before}`, `gzip ${size.gzip}`);
       } else {
-        minified(file.kind, size2.before, size2.after, size2.saved);
+        minified(file.kind, size.before, size.after, size.saved);
       }
       if (request2) {
         syncing(file.key);
@@ -13363,8 +15713,8 @@ function hasLiquid(svg2) {
 function patchPathVoids(svg2) {
   const patch = /<path[^>]*[a-zA-Z"'\s](>)(?!\s*<\/path>)/g;
   if (patch.test(svg2)) {
-    const before = `${gray2(`<${white2("path")}>`)}`;
-    const after = `${neonGreen(`<${white2("path")} />`)}`;
+    const before = `${t(`<${Wn("path")}>`)}`;
+    const after = `${V(`<${Wn("path")} />`)}`;
     transform("SVG", before, after, "patched solidus");
     return svg2.replace(/(<path[^>]*[a-zA-Z"'\s])(>)(?!\s*<\/path>)/g, "$1 /$2");
   }
@@ -13376,11 +15726,11 @@ function compileInline(context, request2, _cb) {
     if ($.mode.watch) timer.start();
     if (config.snippet) {
       file.namespace = "snippets" /* Snippets */;
-      file.key = (0, import_pathe13.join)("snippets", renameFile(file, config.rename));
-      file.output = (0, import_pathe13.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path13.join)("snippets", renameFile(file, config.rename));
+      file.output = (0, import_node_path13.join)($.dirs.output, file.key);
     } else {
-      file.key = (0, import_pathe13.join)("assets", renameFile(file, config.rename));
-      file.output = (0, import_pathe13.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path13.join)("assets", renameFile(file, config.rename));
+      file.output = (0, import_node_path13.join)($.dirs.output, file.key);
     }
     const options = config.svgo === true ? $.processor.svgo : config.svgo;
     const read = await (0, import_fs_extra10.readFile)(file.input);
@@ -13410,11 +15760,11 @@ function compileInline(context, request2, _cb) {
     }
     process7("SVGO", timer.stop());
     const { data } = svg2;
-    const size2 = sizeDiff(data, file.size);
-    if (size2.isSmaller) {
-      transform(`${file.kind} ${size2.before} \u2192 gzip ${size2.gzip}`);
+    const size = sizeDiff(data, file.size);
+    if (size.isSmaller) {
+      transform(`${file.kind} ${size.before} \u2192 gzip ${size.gzip}`);
     } else {
-      minified(file.kind, size2.before, size2.after, size2.saved);
+      minified(file.kind, size.before, size.after, size.saved);
     }
     await (0, import_fs_extra10.writeFile)(file.output, data).catch(
       write("Error writing SVG", {
@@ -13450,7 +15800,7 @@ async function compile7(file, request2, cb) {
 
 // syncify/process/cache.ts
 init_cjs_shims();
-var import_pathe14 = require("pathe");
+var import_node_path14 = require("path");
 var import_fs_extra11 = require("fs-extra");
 var import_node_zlib2 = __toESM(require("zlib"));
 var import_cbor = __toESM(require("cbor"));
@@ -13472,14 +15822,14 @@ function save(uri, data) {
     return (0, import_write_file_atomic.default)(uri, gzip);
   };
 }
-async function getCache(cli) {
+async function getCache() {
   $.cache.uri = create(null);
-  const cachdir = (0, import_pathe14.join)($.cwd, "node_modules", ".cache");
+  const cachdir = (0, import_node_path14.join)($.cwd, "node_modules", ".cache");
   if (!(0, import_fs_extra11.existsSync)(cachdir)) (0, import_fs_extra11.mkdirSync)(cachdir);
-  const root = (0, import_pathe14.join)(cachdir, "syncify");
+  const root = (0, import_node_path14.join)(cachdir, "syncify");
   if (!(0, import_fs_extra11.existsSync)(root)) (0, import_fs_extra11.mkdirSync)(root);
   for (const file of CACHE_REFS) {
-    $.cache.uri[file] = (0, import_pathe14.join)(root, `${file}.bin`);
+    $.cache.uri[file] = (0, import_node_path14.join)(root, `${file}.bin`);
     if ((0, import_fs_extra11.existsSync)($.cache.uri[file])) {
       $.cache[file] = decode($.cache.uri[file]);
     } else {
@@ -13488,7 +15838,7 @@ async function getCache(cli) {
     }
   }
   if (!has("hotSnippet", $.cache.build)) $.cache.build.hotSnippet = [];
-  if (cli.cache) return clearCache();
+  if ($.cmd.cache) return clearCache();
 }
 function clearCache(id = null) {
   if (id === null) {
@@ -13680,15 +16030,15 @@ async function build(cb) {
       }
     };
   }
-  async function bundle(group2, fn) {
+  async function bundle(group2, fn2) {
     const filter = hasFilter && has(group2, $.filters) ? $.filters[group2] : null;
     if (filter && filter.includes(group2) === false) return 0;
     const record = report[group2];
     record.size = record.files.length;
-    record.report = await pMap(record.files, handle(record, fn), { stopOnError: true });
+    record.report = await pMap(record.files, handle(record, fn2), { stopOnError: true });
     record.time = timer.stop(group2);
     const files = record.report.length;
-    const count = bold2(files < 10 ? ` ${files}` : `${files}`);
+    const count = or(files < 10 ? ` ${files}` : `${files}`);
     const space = files === 1 ? "  " : " ";
     message.Line(Prefix(group2, `${count} ${plural("file", files)}${space}${Append(record.time)}`));
   }
@@ -13704,9 +16054,9 @@ async function build(cb) {
   await bundle("scripts", compile6);
   await saveCache();
   if ($.mode.export === false && $.mode.publish === false) {
-    message.NL.Dash("Completed", gray2).NL.Line(Prefix("version", `${$.vc.number}`)).Line(Prefix("processed", `${bold2(`${report.stats.total}`)} files`)).Line(Prefix("bundled", `${bold2(`${report.stats.bundled}`)} files`)).Line(Prefix("skipped", `${bold2(`${report.stats.skipped}`)} files`)).Line(Prefix("duration", timer.now("build"))).Line(Prefix("warnings", bold2(`${$.warnings.size}`))).Line(Prefix("errors", bold2(`${report.stats.errors}`)));
+    message.NL.Dash("Completed", t).NL.Line(Prefix("version", `${$.vc.number}`)).Line(Prefix("processed", `${or(`${report.stats.total}`)} files`)).Line(Prefix("bundled", `${or(`${report.stats.bundled}`)} files`)).Line(Prefix("skipped", `${or(`${report.stats.skipped}`)} files`)).Line(Prefix("duration", timer.now("build"))).Line(Prefix("warnings", or(`${$.warnings.size}`))).Line(Prefix("errors", or(`${report.stats.errors}`)));
     if ($.warnings.size > 0) {
-      message.NL.Dash("Warnings", gray2).Newline();
+      message.NL.Dash("Warnings", t).Newline();
       let group2;
       let count = 0;
       for (const err of $.warnings.keys()) {
@@ -13718,18 +16068,18 @@ async function build(cb) {
             count = count + 1;
             message.Ruler();
           }
-          message.Warn(`${bold2("WARNING")} ${HSH}${bold2(`${count}`)}`, yellowBright2).Newline("yellow").Warn(group2, yellowBright2);
+          message.Warn(`${or("WARNING")} ${$r}${or(`${count}`)}`, Zn).Newline("yellow").Warn(group2, Zn);
           for (const warn3 of warnings2) {
             message.Insert(warn3);
           }
         }
       }
       log(
-        message.NL.End($.log.group).BR.toString(whiteBright2)
+        message.NL.End($.log.group).BR.toString(pe)
       );
     } else {
       log(
-        message.NL.End($.log.group).BR.toString(whiteBright2)
+        message.NL.End($.log.group).BR.toString(pe)
       );
     }
     process.exit(0);
@@ -13744,7 +16094,6 @@ init_cjs_shims();
 init_cjs_shims();
 var import_fs_extra12 = require("fs-extra");
 var import_gray_matter = __toESM(require("gray-matter"));
-var import_prompts2 = __toESM(require("prompts"));
 var import_markdown_it = __toESM(require("markdown-it"));
 var import_turndown = require("@syncify/turndown");
 
@@ -13764,15 +16113,15 @@ function getPageMetafields(file, metafields) {
     ]) {
       if (prop !== "description" && !has2(prop, metafield)) {
         invalid(file.relative, [
-          `Missing ${blue2.bold(prop)} property key value in a ${yellowBright2.bold("metafields")}`,
+          `Missing ${Vn.bold(prop)} property key value in a ${Zn.bold("metafields")}`,
           "value in frontmatter. Frontmatter metafields require you provide the following keys:",
           "",
-          `${gray2("-")} ${white2("key")}`,
-          `${gray2("-")} ${white2("type")}`,
-          `${gray2("-")} ${white2("value")}`,
-          `${gray2("-")} ${white2("namespace")}`,
+          `${t("-")} ${Wn("key")}`,
+          `${t("-")} ${Wn("type")}`,
+          `${t("-")} ${Wn("value")}`,
+          `${t("-")} ${Wn("namespace")}`,
           "",
-          `${gray2("Update the metafield entry to include")} ${white2(prop)}`
+          `${t("Update the metafield entry to include")} ${Wn(prop)}`
         ]);
         return false;
       }
@@ -13780,27 +16129,27 @@ function getPageMetafields(file, metafields) {
         const type2 = metafield[prop];
         if (!checkMetafieldType(type2)) {
           invalid(file.relative, [
-            `Invalid type ${blue2.bold(type2)} provided in frontmatter ${yellowBright2.bold("metafields")}`,
-            `value. Frontmatter metafields ${bold2("must")} be one of following types:`,
+            `Invalid type ${Vn.bold(type2)} provided in frontmatter ${Zn.bold("metafields")}`,
+            `value. Frontmatter metafields ${or("must")} be one of following types:`,
             "",
-            `${gray2("-")} ${white2("boolean")}`,
-            `${gray2("-")} ${white2("color")}`,
-            `${gray2("-")} ${white2("date")}`,
-            `${gray2("-")} ${white2("date_time")}`,
-            `${gray2("-")} ${white2("dimension")}`,
-            `${gray2("-")} ${white2("json")}`,
-            `${gray2("-")} ${white2("money")}`,
-            `${gray2("-")} ${white2("multi_line_text_field")}`,
-            `${gray2("-")} ${white2("number_decimal")}`,
-            `${gray2("-")} ${white2("number_integer")}`,
-            `${gray2("-")} ${white2("rating")}`,
-            `${gray2("-")} ${white2("rich_text_field")}`,
-            `${gray2("-")} ${white2("single_line_text_field")}`,
-            `${gray2("-")} ${white2("url")}`,
-            `${gray2("-")} ${white2("volume")}`,
-            `${gray2("-")} ${white2("weigh")}`,
+            `${t("-")} ${Wn("boolean")}`,
+            `${t("-")} ${Wn("color")}`,
+            `${t("-")} ${Wn("date")}`,
+            `${t("-")} ${Wn("date_time")}`,
+            `${t("-")} ${Wn("dimension")}`,
+            `${t("-")} ${Wn("json")}`,
+            `${t("-")} ${Wn("money")}`,
+            `${t("-")} ${Wn("multi_line_text_field")}`,
+            `${t("-")} ${Wn("number_decimal")}`,
+            `${t("-")} ${Wn("number_integer")}`,
+            `${t("-")} ${Wn("rating")}`,
+            `${t("-")} ${Wn("rich_text_field")}`,
+            `${t("-")} ${Wn("single_line_text_field")}`,
+            `${t("-")} ${Wn("url")}`,
+            `${t("-")} ${Wn("volume")}`,
+            `${t("-")} ${Wn("weigh")}`,
             "",
-            `${gray2("Update the metafield entry to an accepted")} ${white2("type")}`
+            `${t("Update the metafield entry to an accepted")} ${Wn("type")}`
           ]);
           return false;
         }
@@ -13840,14 +16189,14 @@ async function find3(store, page) {
     return void 0;
   });
 }
-async function create4(store, page) {
+async function create3(store, page) {
   if (!$.mode.upload) timer.start();
   const promise = await import_axios3.default.post("/pages.json", { page }, store.client).then(({ data }) => {
     resource("page", store);
     return data.page;
   }).catch((e) => {
     if (requeue(e.response.status)) {
-      queue.add(() => create4(store, page));
+      queue.add(() => create3(store, page));
     } else {
       if (hasPath("response.data", e.response)) {
         request(page.title, e.response);
@@ -13893,7 +16242,7 @@ async function promptAction(store) {
     title: "No matching pages",
     message: "Open CLI and select an option"
   });
-  const prompt6 = await (0, import_prompts2.default)({
+  const prompt6 = await prompts({
     type: "select",
     name: "action",
     message: "Page Resources",
@@ -13949,7 +16298,7 @@ async function selectPage(store) {
       value: 4 /* Cancel */
     }
   );
-  const prompt6 = await (0, import_prompts2.default)({
+  const prompt6 = await prompts({
     type: "select",
     name: "action",
     message: "Choose Page",
@@ -13986,7 +16335,7 @@ async function promptOverwrite(remote) {
     title: "Remote \u2192 Local",
     message: "Remote version has changed"
   });
-  const prompt6 = await (0, import_prompts2.default)({
+  const prompt6 = await prompts({
     type: "select",
     name: "action",
     message: "Page Resources",
@@ -13998,7 +16347,7 @@ async function promptOverwrite(remote) {
     nwl("");
     log(remote.body_html);
     nwl("");
-    const next = await (0, import_prompts2.default)({
+    const next = await prompts({
       type: "select",
       name: "action",
       message: "Page Resources",
@@ -14027,17 +16376,17 @@ function getPayloadFromFrontmatter(file, data) {
     if (/^[./]{1,2}/.test(handle)) {
       before = handle;
       handle = handle.replace(/^[./]{1,2}/, "");
-      warn2(`handle ${CHV} ${before} ${ARR} ${handle}`, "fixed start");
+      warn2(`handle ${Ar} ${before} ${Cr} ${handle}`, "fixed start");
     }
     if (/^pages\//.test(handle)) {
       before = handle;
       handle = handle.replace(/^pages\//, "");
-      warn2(`handle ${CHV} ${before} ${ARR} ${handle}`, "fixed sub-path");
+      warn2(`handle ${Ar} ${before} ${Cr} ${handle}`, "fixed sub-path");
     }
     if (/[_/]/.test(data.handle)) {
       before = handle;
       handle = handle.replace(/[_/]/g, "-");
-      warn2(`handle ${CHV} ${before} ${ARR} ${handle}`, "fixed invalid characters");
+      warn2(`handle ${Ar} ${before} ${Cr} ${handle}`, "fixed invalid characters");
     }
     payload.handle = handle;
   } else {
@@ -14053,7 +16402,7 @@ function getPayloadFromFrontmatter(file, data) {
     if (/\//.test(data.author)) {
       before = data.author;
       author = before.replace(/\//g, " ");
-      warn2(`author ${CHV} ${before} ${ARR} ${author}`, "fixed invalid characters");
+      warn2(`author ${Ar} ${before} ${Cr} ${author}`, "fixed invalid characters");
     }
     payload.author = author;
   } else {
@@ -14063,7 +16412,7 @@ function getPayloadFromFrontmatter(file, data) {
     if (isBoolean(data.published)) {
       payload.published = data.published;
     } else {
-      warn2(`published ${CHV} expected boolean, got ${typeof data.published}`, "defaulted to false");
+      warn2(`published ${Ar} expected boolean, got ${typeof data.published}`, "defaulted to false");
       payload.published = false;
     }
   } else {
@@ -14118,7 +16467,7 @@ async function compile8(file, _cb) {
   if (file.kind === "Markdown" /* Markdown */) {
     timer.start();
     payload.body_html = (0, import_markdown_it.default)($.page.export).render(content);
-    transform(`${bold2("Markdown")} ${ARR} ${bold2("HTML")} ${TLD} ${timer.stop()}`);
+    transform(`${or("Markdown")} ${Cr} ${or("HTML")} ${Rr} ${timer.stop()}`);
   } else {
     transform("HTML");
     payload.body_html = content;
@@ -14128,7 +16477,7 @@ async function compile8(file, _cb) {
   const remote = await find3(store, { handle: payload.handle });
   if (isArray(remote)) {
     invalid(file.relative, [
-      `Multiple pages returned when matching on handle ${blue2.bold(payload.handle)}`,
+      `Multiple pages returned when matching on handle ${Vn.bold(payload.handle)}`,
       "Syncify is unsure on how to handle this request and has cancelled the sync. Please",
       "check the provided handle in your webshop."
     ]);
@@ -14148,16 +16497,16 @@ async function compile8(file, _cb) {
           return prompt6.resume();
         } else if (action === 1 /* Create */) {
           prompt6.resume();
-          syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${gray2(`${TLD} ${file.relative}`)}`);
-          return create4(store, payload);
+          syncing(`/pages/${payload.handle} ${Cr} ${payload.title} ${t(`${Rr} ${file.relative}`)}`);
+          return create3(store, payload);
         } else {
           payload.id = action;
           prompt6.resume();
         }
       } else if (prompt6.action === 1 /* Create */) {
         prompt6.resume();
-        syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${gray2(`${TLD} ${file.relative}`)}`);
-        return create4(store, payload);
+        syncing(`/pages/${payload.handle} ${Cr} ${payload.title} ${t(`${Rr} ${file.relative}`)}`);
+        return create3(store, payload);
       } else {
         return prompt6.resume();
       }
@@ -14173,7 +16522,7 @@ async function compile8(file, _cb) {
         let convert = remote.body_html;
         if ($.page.language === "markdown") {
           const markdown2 = toMarkdown(convert);
-          transform(`${file.name}.html ${ARR} ${file.base}`);
+          transform(`${file.name}.html ${Cr} ${file.base}`);
           convert = (0, import_gray_matter.stringify)("\n" + markdown2, frontmatter.data);
         }
         $.watch.unwatch(file.input);
@@ -14188,7 +16537,7 @@ async function compile8(file, _cb) {
     }
   }
   if ($.mode.build) return payload.body_html;
-  syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${gray2(`${TLD} ${file.relative}`)}`);
+  syncing(`/pages/${payload.handle} ${Cr} ${payload.title} ${t(`${Rr} ${file.relative}`)}`);
   const update2 = await sync3(store, file, payload);
   if (!update2) return;
   await saveCache("pages");
@@ -14270,18 +16619,18 @@ async function list2(store) {
 var import_enquirer = require("enquirer");
 var theme = {
   pointer(choice, i) {
-    const item = this.state.index === i ? lightGray("\u251C ") : lightGray("\u2502 ");
-    return i === 0 ? lightGray("\u2502 ") + "\n" + item : item;
+    const item = this.state.index === i ? s("\u251C ") : s("\u2502 ");
+    return i === 0 ? s("\u2502 ") + "\n" + item : item;
   },
-  prefix: lightGray("\u2502 "),
+  prefix: s("\u2502 "),
   styles: {
-    primary: neonGreen,
-    success: neonGreen,
-    danger: red2.bold,
-    warning: yellowBright2,
-    muted: gray2,
-    disabled: gray2,
-    typing: gray2
+    primary: V,
+    success: V,
+    danger: _.bold,
+    warning: Zn,
+    muted: t,
+    disabled: t,
+    typing: t
   },
   symbols: {
     ellipsisLarge: "",
@@ -14308,14 +16657,14 @@ async function listThemes(store) {
     return {
       name: value.name,
       message: value.name,
-      hint: `${space(value.name)} ${TLD} ${gray2(value.role)}`,
+      hint: `${space(value.name)} ${Rr} ${t(value.role)}`,
       value
     };
   });
   choices.push(
     {
       role: "separator",
-      message: lightGray("\u2500".repeat(separator))
+      message: s("\u2500".repeat(separator))
     },
     {
       name: "create",
@@ -14330,12 +16679,12 @@ async function listThemes(store) {
     choices.push(
       {
         role: "separator",
-        message: lightGray("\u2500".repeat(separator))
+        message: s("\u2500".repeat(separator))
       },
       {
         name: "store",
         message: "Select Stores",
-        hint: `${space("Select Stores")} ${TLD} ${gray2("go back and choose store")}`
+        hint: `${space("Select Stores")} ${Rr} ${t("go back and choose store")}`
       }
     );
   }
@@ -14352,7 +16701,7 @@ async function listThemes(store) {
     },
     format(value) {
       if (isArray(value) && value.length > 0) {
-        return neonCyan(`${value.join(whiteBright2(", "))}`);
+        return gr(`${value.join(pe(", "))}`);
       }
     }
   });
@@ -14366,24 +16715,24 @@ async function listThemes(store) {
     fields.push({
       name: theme3.name,
       message: theme3.name,
-      validate(value, _, field) {
+      validate(value, _2, field) {
         if (field && field.name === theme3.name) {
           if (/[A-Z]/.test(value)) {
-            return "\n" + reset2.redBright("  Target name must be lowercase");
+            return "\n" + tr.redBright("  Target name must be lowercase");
           } else if (/[0-9]/.test(value)) {
-            return "\n" + reset2.redBright("  Target name cannot contain numbers");
+            return "\n" + tr.redBright("  Target name cannot contain numbers");
           } else if (/[ ]/.test(value)) {
-            return "\n" + reset2.redBright("  Target name cannot contain spaces");
+            return "\n" + tr.redBright("  Target name cannot contain spaces");
           } else if (/-/.test(value)) {
-            return "\n" + reset2.redBright("  Target name cannot contain dashes");
+            return "\n" + tr.redBright("  Target name cannot contain dashes");
           }
         }
         return true;
       }
     });
   }
-  theme.styles.primary = neonCyan.italic;
-  theme.styles.typing = neonGreen;
+  theme.styles.primary = gr.italic;
+  theme.styles.typing = V;
   const template = JSON.stringify(config, null, 2);
   const snippet2 = await (0, import_enquirer.prompt)({
     name: "stores",
@@ -14394,10 +16743,10 @@ async function listThemes(store) {
     format() {
       if (this.state.submitted === true) {
         if (this.state.completed !== 100) {
-          return neonGreen(`${this.state.completed}% completed`);
+          return V(`${this.state.completed}% completed`);
         }
       }
-      return ` ${ARR}  ${orange(`${this.state.completed}% completed`)}`;
+      return ` ${Cr}  ${cr(`${this.state.completed}% completed`)}`;
     },
     theme,
     fields,
@@ -14414,14 +16763,14 @@ async function listThemes(store) {
     format() {
       return /^[ty1]/i.test(this.input) ? "Yes" : "No";
     },
-    footer: Tree.line + [
+    footer: de.line + [
       "",
-      gray2("The following store and theme references will be saved"),
-      gray2("to your package.json file on the syncify key property."),
+      t("The following store and theme references will be saved"),
+      t("to your package.json file on the syncify key property."),
       "",
-      JSON.stringify(json2.syncify, null, 2).split("\n").join("\n" + Tree.line),
+      JSON.stringify(json2.syncify, null, 2).split("\n").join("\n" + de.line),
       ""
-    ].join("\n" + Tree.line)
+    ].join("\n" + de.line)
   });
   console.log(save2);
 }
@@ -14431,7 +16780,7 @@ async function listStores() {
     return {
       name: value.domain,
       message: value.store,
-      hint: `${space(value.store)} ${TLD} ${gray2(`https://${value.domain}`)}`,
+      hint: `${space(value.store)} ${Rr} ${t(`https://${value.domain}`)}`,
       value
     };
   });
@@ -14445,7 +16794,7 @@ async function listStores() {
       return this.focused.value;
     },
     format(value) {
-      return neonGreen(value);
+      return V(value);
     }
   });
   return listThemes(store);
@@ -14460,7 +16809,7 @@ async function themes() {
 
 // syncify/modes/import.ts
 init_cjs_shims();
-var import_pathe15 = require("pathe");
+var import_node_path15 = require("path");
 var import_fs_extra13 = require("fs-extra");
 async function getModel3() {
   const sync4 = /* @__PURE__ */ new Map();
@@ -14481,7 +16830,7 @@ async function getModel3() {
         failed: 0,
         success: 0,
         retry: 0,
-        progress: progress(assets.length),
+        progress: Ur(assets.length),
         get files() {
           return assets;
         },
@@ -14499,13 +16848,13 @@ async function getModel3() {
   return sync4;
 }
 function getDoneLog(record, output, time) {
-  const success = `${bold2(`${record.success}`)} ${white2("of")} ${bold2(`${record.size}`)}`;
-  const failed = bold2(`${record.failed}`);
-  const target = bold2(`${record.theme.target.toUpperCase()}`);
-  return Create().Line(Prefix(target, ARR), neonCyan).NL.Line(`completed in ${gray2(time)}`).NL.Line(Prefix("synced", success), whiteBright2).Line(Prefix("errors", failed), record.failed > 0 ? redBright2 : whiteBright2).Line(Prefix("location", gray2.underline(output))).NL.Insert(record.progress.render()).Line.toString();
+  const success = `${or(`${record.success}`)} ${Wn("of")} ${or(`${record.size}`)}`;
+  const failed = or(`${record.failed}`);
+  const target = or(`${record.theme.target.toUpperCase()}`);
+  return Create().Line(Prefix(target, Cr), gr).NL.Line(`completed in ${t(time)}`).NL.Line(Prefix("synced", success), pe).Line(Prefix("errors", failed), record.failed > 0 ? J : pe).Line(Prefix("location", t.underline(output))).NL.Insert(record.progress.render()).Line.toString();
 }
 function getWaitLog(record) {
-  return Create().Line(`${bold2(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`, gray2.dim).NL.Line(`${bold2(addSuffix(record.number))} in queue`, magenta2).NL.Line(Prefix("synced", `${bold2("0")} ${white2("of")} ${bold2(`${record.size}`)}`), gray2.dim).Line(Prefix("retry", bold2("0")), gray2.dim).Line(Prefix("errors", bold2("0")), gray2.dim).NL.Insert(record.progress.render(gray2.dim)).NL.toString();
+  return Create().Line(`${or(record.theme.target.toUpperCase())}  ${Cr}  ${record.theme.store}`, t.dim).NL.Line(`${or(addSuffix(record.number))} in queue`, Jn).NL.Line(Prefix("synced", `${or("0")} ${Wn("of")} ${or(`${record.size}`)}`), t.dim).Line(Prefix("retry", or("0")), t.dim).Line(Prefix("errors", or("0")), t.dim).NL.Insert(record.progress.render(t.dim)).NL.toString();
 }
 async function importing(cb) {
   let remaining = 0;
@@ -14521,14 +16870,14 @@ async function importing(cb) {
     const key = `${theme3.store}:${theme3.target}`;
     const record = sync4.get(key);
     const preview = `https://${theme3.store}?preview_theme_id=${theme3.id}`;
-    const prefix = Create().NL.Line(Prefix("Duration", whiteBright2(timer.now("import"))), gray2).Line(Prefix("Transfers", whiteBright2(`${transfers++}`)), gray2).Line(Prefix("Syncing", pink(`${bold2(theme3.target)}  ${ARR}  ${theme3.store}`)), gray2).Line(Prefix("Preview", underline2(preview)), gray2).Ruler();
+    const prefix = Create().NL.Line(Prefix("Duration", pe(timer.now("import"))), t).Line(Prefix("Transfers", pe(`${transfers++}`)), t).Line(Prefix("Syncing", sr(`${or(theme3.target)}  ${Cr}  ${theme3.store}`)), t).Line(Prefix("Preview", rr(preview)), t).Ruler();
     let processing = "";
     if (item.status === 3 /* Empty */) {
       (0, import_fs_extra13.writeFileSync)(file.output, "");
       record.warning += 1;
       record.transfers += 1;
       record.progress.increment(1);
-      processing = yellowBright2(file.key);
+      processing = Zn(file.key);
     } else if (item.status === 0 /* Success */) {
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -14539,13 +16888,13 @@ async function importing(cb) {
       record.progress.increment(1);
       const buffer = Buffer.from(item.data.value || null, "utf8");
       (0, import_fs_extra13.writeFileSync)(file.output, buffer);
-      processing = neonGreen(file.key);
+      processing = V(file.key);
     } else if (item.status === 1 /* Retry */) {
       if (!record.errors.retry.has(file.output)) {
         record.retry += 1;
         record.errors.retry.add(file.output);
       }
-      processing = orange(file.key);
+      processing = cr(file.key);
     } else if (item.status === 2 /* Failed */) {
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -14557,13 +16906,13 @@ async function importing(cb) {
         record.progress.increment(1);
         record.errors.remote.set(file.output, item);
       }
-      processing = redBright2(file.key);
+      processing = J(file.key);
     }
-    const success = `${bold2(`${record.success}`)} ${white2("of")} ${bold2(`${record.size}`)}`;
-    const retried = bold2(`${record.retry}`);
-    const failed = bold2(`${record.failed}`);
-    const warnings2 = bold2(`${record.warning}`);
-    const status = Create().NL.Line(`${bold2(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`, neonCyan).NL.Line(processing).NL.Line(Prefix("synced", success), whiteBright2).Line(Prefix("retry", retried), record.retry > 0 ? orange : whiteBright2).Line(Prefix("warning", warnings2), record.warning > 0 ? yellowBright2 : whiteBright2).Line(Prefix("failed", failed), record.failed > 0 ? redBright2 : whiteBright2).NL.Insert(record.progress.render()).NL.Ruler();
+    const success = `${or(`${record.success}`)} ${Wn("of")} ${or(`${record.size}`)}`;
+    const retried = or(`${record.retry}`);
+    const failed = or(`${record.failed}`);
+    const warnings2 = or(`${record.warning}`);
+    const status = Create().NL.Line(`${or(record.theme.target.toUpperCase())}  ${Cr}  ${record.theme.store}`, gr).NL.Line(processing).NL.Line(Prefix("synced", success), pe).Line(Prefix("retry", retried), record.retry > 0 ? cr : pe).Line(Prefix("warning", warnings2), record.warning > 0 ? Zn : pe).Line(Prefix("failed", failed), record.failed > 0 ? J : pe).NL.Insert(record.progress.render()).NL.Ruler();
     const message = [prefix.toString()];
     let counter = 0;
     for (const stream of sync4.values()) {
@@ -14585,7 +16934,7 @@ async function importing(cb) {
   remaining = sync4.size - 1;
   for (const [id, record] of sync4) {
     const [store, target] = id.split(":");
-    const output = (0, import_pathe15.join)($.dirs.import, store, target);
+    const output = (0, import_node_path15.join)($.dirs.import, store, target);
     timer.start(id);
     record.active = true;
     for (const { key } of record.files) {
@@ -14602,7 +16951,7 @@ async function importing(cb) {
     await queue.onIdle();
     remaining = remaining - 1;
     record.active = false;
-    record.log = getDoneLog(sync4.get(id), (0, import_pathe15.relative)($.cwd, output), timer.stop(id));
+    record.log = getDoneLog(sync4.get(id), (0, import_node_path15.relative)($.cwd, output), timer.stop(id));
   }
   for (const { errors } of sync4.values()) {
     if (errors.remote.size > 0) {
@@ -14613,41 +16962,40 @@ async function importing(cb) {
 // syncify/modes/export.ts
 init_cjs_shims();
 var import_fs_extra16 = require("fs-extra");
-var import_pathe19 = require("pathe");
+var import_node_path19 = require("path");
 var import_fast_glob4 = require("fast-glob");
 var import_adm_zip = __toESM(require("adm-zip"));
 
 // syncify/process/validate.ts
 init_cjs_shims();
-var import_pathe16 = require("pathe");
+var import_node_path16 = require("path");
 var import_fast_glob3 = require("fast-glob");
-var import_prompts3 = __toESM(require("prompts"));
 async function hasTemplateMismatch(cwd) {
   const files = await (0, import_fast_glob3.glob)("templates/*", { cwd, absolute: true });
   const exclude = /* @__PURE__ */ new Set();
   const exists2 = /* @__PURE__ */ new Set();
   for (const file of files) {
-    const { name } = (0, import_pathe16.parse)(file);
-    const templates = files.filter((path2) => (0, import_pathe16.parse)(path2).name === name);
+    const { name } = (0, import_node_path16.parse)(file);
+    const templates = files.filter((path2) => (0, import_node_path16.parse)(path2).name === name);
     if (templates.length > 1 && !exists2.has(name)) exists2.add(name);
   }
   if (exists2.size === 0) return 1 /* None */;
   if (exists2.size > 1) {
-    write2(`${bold2(`${exists2.size}`)} mismatch template files`, {
+    write2(`${or(`${exists2.size}`)} mismatch template files`, {
       suffix: "error",
       type: "error"
     });
   } else {
-    write2(`${bold2(`${exists2.size}`)} mismatch template file`, {
+    write2(`${or(`${exists2.size}`)} mismatch template file`, {
       suffix: "error",
       type: "error"
     });
   }
-  const resume = prompt(`select ${bold2(".json")} or ${bold2(".liquid")} template`, {
+  const resume = prompt(`select ${or(".json")} or ${or(".liquid")} template`, {
     title: "Export Error",
     message: "Multiple templates detected"
   });
-  const { action } = await (0, import_prompts3.default)([
+  const { action } = await prompts([
     {
       name: "action",
       type: "select",
@@ -14689,24 +17037,24 @@ async function hasTemplateMismatch(cwd) {
         inactive: `${name}.liquid`,
         onState: ({ value }) => {
           if (value) {
-            exclude.add((0, import_pathe16.join)(cwd, "templates", `${name}.liquid`));
+            exclude.add((0, import_node_path16.join)(cwd, "templates", `${name}.liquid`));
           } else {
-            exclude.add((0, import_pathe16.join)(cwd, "templates", `${name}.json`));
+            exclude.add((0, import_node_path16.join)(cwd, "templates", `${name}.json`));
           }
         }
       });
     }
-    await (0, import_prompts3.default)(choices).then(() => resume());
+    await prompts(choices).then(() => resume());
     return exclude;
   } else if (action === "json") {
     for (const name of exists2) {
-      exclude.add((0, import_pathe16.join)(cwd, "templates", `${name}.json`));
+      exclude.add((0, import_node_path16.join)(cwd, "templates", `${name}.json`));
     }
     resume();
     return exclude;
   } else if (action === "liquid") {
     for (const name of exists2) {
-      exclude.add((0, import_pathe16.join)(cwd, "templates", `${name}.liquid`));
+      exclude.add((0, import_node_path16.join)(cwd, "templates", `${name}.liquid`));
     }
     resume();
     return exclude;
@@ -14718,8 +17066,8 @@ async function hasTemplateMismatch(cwd) {
 function isEmptyOutputDir(stats) {
   if (stats.assets === 0 && stats.config === 0 && stats.templates === 0 && stats.layout === 0 && stats.snippets === 0 && stats.sections === 0) {
     throwError("Empty output directory", [
-      `There are no files within ${neonCyan((0, import_pathe16.relative)($.cwd, $.dirs.output) + "/**")}`,
-      `You may need to run the ${neonCyan.bold("syncify build")} command and try again.`
+      `There are no files within ${gr((0, import_node_path16.relative)($.cwd, $.dirs.output) + "/**")}`,
+      `You may need to run the ${gr.bold("syncify build")} command and try again.`
     ]);
   }
 }
@@ -14727,45 +17075,45 @@ function isEmptyOutputDir(stats) {
 // syncify/options/files.ts
 init_cjs_shims();
 var import_dotenv = __toESM(require("dotenv"));
-var import_pathe18 = require("pathe");
+var import_node_path18 = require("path");
 var import_fs_extra15 = require("fs-extra");
 
 // syncify/requests/require.ts
 init_cjs_shims();
 var import_node_url2 = require("url");
 var import_fs_extra14 = require("fs-extra");
-var import_pathe17 = require("pathe");
+var import_node_path17 = require("path");
 var import_esbuild2 = require("esbuild");
-function findUp(name, startDir, stopDir = (0, import_pathe17.parse)(startDir).root) {
+function findUp(name, startDir, stopDir = (0, import_node_path17.parse)(startDir).root) {
   let dir = startDir;
   while (dir !== stopDir) {
-    const file = (0, import_pathe17.join)(dir, name);
+    const file = (0, import_node_path17.join)(dir, name);
     if ((0, import_fs_extra14.existsSync)(file)) return file;
-    if ((0, import_pathe17.extname)(file) !== ".json") {
+    if ((0, import_node_path17.extname)(file) !== ".json") {
       const path2 = file + ".json";
       if ((0, import_fs_extra14.existsSync)(path2)) return path2;
     }
-    dir = (0, import_pathe17.dirname)(dir);
+    dir = (0, import_node_path17.dirname)(dir);
   }
   return null;
 }
 function getTSConfigFromFile(cwd, filename) {
-  if (!(0, import_fs_extra14.existsSync)((0, import_pathe17.join)(cwd, filename))) return null;
-  return (0, import_pathe17.isAbsolute)(filename) ? (0, import_fs_extra14.existsSync)(filename) ? filename : null : findUp(filename, cwd);
+  if (!(0, import_fs_extra14.existsSync)((0, import_node_path17.join)(cwd, filename))) return null;
+  return (0, import_node_path17.isAbsolute)(filename) ? (0, import_fs_extra14.existsSync)(filename) ? filename : null : findUp(filename, cwd);
 }
 function getTSConfigFromExtends(cwd, name) {
-  if ((0, import_pathe17.isAbsolute)(name)) return (0, import_fs_extra14.existsSync)(name) ? name : null;
+  if ((0, import_node_path17.isAbsolute)(name)) return (0, import_fs_extra14.existsSync)(name) ? name : null;
   if (name.startsWith(".")) return findUp(name, cwd);
   return require.resolve(name, { paths: [cwd] });
 }
 function getTSConfig(dir = process.cwd(), name = "tsconfig.json", isExtends = false) {
-  dir = (0, import_pathe17.resolve)(dir);
+  dir = (0, import_node_path17.resolve)(dir);
   const id = isExtends ? getTSConfigFromExtends(dir, name) : getTSConfigFromFile(dir, name);
   if (!id) return null;
   const data = jsonc((0, import_fs_extra14.readFileSync)(id, "utf-8"));
-  const configDir = (0, import_pathe17.dirname)(id);
+  const configDir = (0, import_node_path17.dirname)(id);
   if (has2("baseURL", data.compilerOptions)) {
-    data.compilerOptions.baseUrl = (0, import_pathe17.join)(configDir, data.compilerOptions.baseUrl);
+    data.compilerOptions.baseUrl = (0, import_node_path17.join)(configDir, data.compilerOptions.baseUrl);
   }
   const extendsFiles = [];
   if (data.extends) {
@@ -14808,7 +17156,7 @@ function defaultGetOutputFile(path2, format) {
 }
 function isCommonJSorESM(inputFile) {
   if (typeof jest === "undefined") return "cjs";
-  const ext = (0, import_pathe17.extname)(inputFile);
+  const ext = (0, import_node_path17.extname)(inputFile);
   if (ext === ".js") {
     return $.pkg.type === "module" ? "esm" : "cjs";
   } else if (ext === ".ts") {
@@ -14836,7 +17184,7 @@ function externalPlugin({
     name: "bundle-require:external",
     setup({ onResolve }) {
       onResolve({ filter: /.*/ }, async (args) => {
-        if (args.path.charCodeAt(0) === 46 || (0, import_pathe17.isAbsolute)(args.path)) return;
+        if (args.path.charCodeAt(0) === 46 || (0, import_node_path17.isAbsolute)(args.path)) return;
         if (match(args.path, external)) return { external: true };
         if (match(args.path, notExternal)) return;
         return { external: true };
@@ -14858,12 +17206,12 @@ function injectFileScopePlugin() {
         const contents = await (0, import_fs_extra14.readFile)(args.path, "utf-8");
         const injectLines = [
           `const __injected_filename__ = ${JSON.stringify(args.path)};`,
-          `const __injected_dirname__ = ${JSON.stringify((0, import_pathe17.dirname)(args.path))};`,
+          `const __injected_dirname__ = ${JSON.stringify((0, import_node_path17.dirname)(args.path))};`,
           `const __injected_import_meta_url__ = ${JSON.stringify((0, import_node_url2.pathToFileURL)(args.path).href)};`
         ];
         return {
           contents: glue(injectLines) + contents,
-          loader: inferLoader((0, import_pathe17.extname)(args.path))
+          loader: inferLoader((0, import_node_path17.extname)(args.path))
         };
       });
     }
@@ -14884,7 +17232,7 @@ async function bundleRequire(options) {
     }
     const { text } = result.outputFiles[0];
     const getOutputFile = options.getOutputFile || defaultGetOutputFile;
-    const outfile = (0, import_pathe17.join)($.dirs.cache, getOutputFile(options.filepath, format));
+    const outfile = getOutputFile(options.filepath, format);
     (0, import_fs_extra14.writeFileSync)(outfile, text, "utf8");
     let mod;
     const req = options.require || dynamicImport;
@@ -14924,41 +17272,41 @@ async function bundleRequire(options) {
 }
 
 // syncify/options/files.ts
-async function configFile(cwd) {
+async function configFile() {
   let path2 = null;
   for (const file of SYNCIFY_CONFIG) {
-    path2 = (0, import_pathe18.join)(cwd, file);
+    path2 = (0, import_node_path18.join)($.cwd, file);
     const exists2 = await (0, import_fs_extra15.pathExists)(path2);
     if (exists2) break;
     path2 = null;
   }
   if (path2 === null) return null;
   try {
-    if ((0, import_pathe18.extname)(path2) === ".json") {
+    if ((0, import_node_path18.extname)(path2) === ".json") {
       $.file.path = path2;
-      $.file.relative = (0, import_pathe18.relative)(cwd, path2);
-      $.file.base = (0, import_pathe18.basename)(path2);
+      $.file.relative = (0, import_node_path18.relative)($.cwd, path2);
+      $.file.base = (0, import_node_path18.basename)(path2);
       const json2 = await (0, import_fs_extra15.readFile)(path2);
       return jsonc(json2.toString());
     } else {
       $.file.path = path2;
-      $.file.relative = (0, import_pathe18.relative)(cwd, path2);
-      $.file.base = (0, import_pathe18.basename)(path2);
+      $.file.relative = (0, import_node_path18.relative)($.cwd, path2);
+      $.file.base = (0, import_node_path18.basename)(path2);
       const config = await bundleRequire({
-        cwd,
+        cwd: $.cwd,
         filepath: path2
       });
       return config.mod.syncify || config.mod.default || config.mod;
     }
   } catch (e) {
-    const jsonconfig = (0, import_pathe18.join)(cwd, "syncify.config.json");
+    const jsonconfig = (0, import_node_path18.join)($.cwd, "syncify.config.json");
     const hasFile = await (0, import_fs_extra15.pathExists)(jsonconfig);
     if (hasFile) return (0, import_fs_extra15.readJson)(jsonconfig);
     return null;
   }
 }
-async function getPackageJson(cli) {
-  const uri = (0, import_pathe18.join)(cli.cwd, "package.json");
+async function getPackageJson() {
+  const uri = (0, import_node_path18.join)($.cwd, "package.json");
   const has3 = await (0, import_fs_extra15.pathExists)(uri);
   if (!has3) throw new Error('Missing "package.json" file');
   try {
@@ -14970,16 +17318,14 @@ async function getPackageJson(cli) {
         $.stores = [$.pkg.syncify.stores];
       }
     } else {
-      if (cli.strap === null) {
-        missingStores(cli.cwd);
-      }
+      if (!$.cmd.strap) missingStores($.cwd);
     }
   } catch (e) {
     throw new Error(e);
   }
 }
 async function setPkgVersion(current, increment) {
-  const uri = (0, import_pathe18.join)($.cwd, "package.json");
+  const uri = (0, import_node_path18.join)($.cwd, "package.json");
   try {
     const pkg = await (0, import_fs_extra15.readFile)(uri);
     const str = pkg.toString();
@@ -14989,7 +17335,7 @@ async function setPkgVersion(current, increment) {
     const num = str.slice(sqo, eqo);
     if (num === current) {
       await (0, import_fs_extra15.writeFile)(uri, `${str.slice(0, sqo)}${increment}${str.slice(eqo)}`);
-      await getPackageJson($.cli);
+      await getPackageJson();
       return true;
     } else {
       return false;
@@ -14998,30 +17344,19 @@ async function setPkgVersion(current, increment) {
     throw new Error(e);
   }
 }
-async function getEnvFile(cli) {
-  let path2 = (0, import_pathe18.join)(cli.cwd, ".env");
+async function getEnvFile() {
+  const path2 = (0, import_node_path18.join)($.cwd, ".env");
   if (await (0, import_fs_extra15.pathExists)(path2)) {
-    const env2 = import_dotenv.default.config({ path: path2 });
-    if (env2.error) {
-      throws(env2.error, { path: path2 });
+    const env = import_dotenv.default.config({ path: path2 });
+    if (env.error) {
+      throws(env.error, { path: path2 });
       return null;
     }
     $.env.file = path2;
-    $.env.vars = env2.parsed;
+    $.env.vars = env.parsed;
   } else {
-    path2 = (0, import_pathe18.join)(cli.cwd, "syncify.env");
-    if (await (0, import_fs_extra15.pathExists)(path2)) {
-      const env2 = import_dotenv.default.config({ path: path2 });
-      if (env2.error) {
-        throws(env2.error.message, { path: path2 });
-        return null;
-      }
-      $.env.file = path2;
-      $.env.vars = env2.parsed;
-    } else {
-      if (cli.setup === false && cli.strap === null) {
-        missingEnv(cli.cwd);
-      }
+    if ($.cmd.setup === false && !$.cmd.strap) {
+      missingEnv($.cwd);
     }
   }
 }
@@ -15054,12 +17389,12 @@ async function exporting(cb) {
   }
   const zip = new import_adm_zip.default();
   for (const dir of THEME_DIRS) {
-    const uri = (0, import_pathe19.join)($.dirs.output, dir);
+    const uri = (0, import_node_path19.join)($.dirs.output, dir);
     const has3 = await (0, import_fs_extra16.pathExists)(uri);
     if (has3) {
       const files = await (0, import_fast_glob4.glob)("*", { cwd: uri, absolute: true });
       for (const file of files) {
-        const path2 = `${dir}/${(0, import_pathe19.basename)(file)}`;
+        const path2 = `${dir}/${(0, import_node_path19.basename)(file)}`;
         const stat2 = (0, import_fs_extra16.statSync)(file);
         if (stat2.size === 0) {
           zip.addFile(path2, toBuffer(" "));
@@ -15072,11 +17407,11 @@ async function exporting(cb) {
       }
     }
   }
-  const size2 = byteSize(zip.toBuffer());
+  const size = byteSize(zip.toBuffer());
   if ($.vc.update !== null) {
     if (!await (0, import_fs_extra16.pathExists)($.vc.update.dir)) await (0, import_fs_extra16.mkdir)($.vc.update.dir);
     version($.vc, "bump");
-    zipped(stringSize(size2), (0, import_pathe19.relative)($.cwd, $.vc.update.zip));
+    zipped(stringSize(size), (0, import_node_path19.relative)($.cwd, $.vc.update.zip));
     try {
       await zip.writeZipPromise($.vc.update.zip);
       themeVersion = $.vc.update.number;
@@ -15093,7 +17428,7 @@ async function exporting(cb) {
     } else {
       version($.vc, "overwrite");
     }
-    zipped(stringSize(size2), (0, import_pathe19.relative)($.cwd, $.vc.zip));
+    zipped(stringSize(size), (0, import_node_path19.relative)($.cwd, $.vc.zip));
     try {
       await zip.writeZipPromise($.vc.zip);
     } catch (e) {
@@ -15124,7 +17459,6 @@ async function exporting(cb) {
 // syncify/modes/publish.ts
 init_cjs_shims();
 var import_uWebSockets = __toESM(require("uWebSockets.js"));
-var import_prompts4 = __toESM(require("prompts"));
 var import_fs_extra17 = require("fs-extra");
 async function publish(cb) {
   await exporting(cb);
@@ -15143,17 +17477,17 @@ async function publish(cb) {
   await delay(500);
   timer.start("ngrok");
   const src = `${$.vc.number}.zip`;
-  write2(gray2(src), { prefix: "server" });
+  write2(t(src), { prefix: "server" });
   for (const store of $.sync.stores) {
     timer.start(store.domain);
-    write2(store.domain, { prefix: "webshop", color: neonCyan });
-    write2(`${bold2("role")} ${ARR} ${$.publish.publishRole}`, { prefix: "publish" });
-    write2(bold2(`v${$.vc.number}`), { prefix: "version", color: magentaBright2 });
+    write2(store.domain, { prefix: "webshop", color: gr });
+    write2(`${or("role")} ${Cr} ${$.publish.publishRole}`, { prefix: "publish" });
+    write2(or(`v${$.vc.number}`), { prefix: "version", color: Qn });
     nwl();
     await delay(1e3);
     spinner("uploading", {
       style: "spinning",
-      color: neonGreen
+      color: V
     });
     await delay(2e3);
     spinner.update("dispatched");
@@ -15163,9 +17497,9 @@ async function publish(cb) {
     spinner.update("processing");
     await delay(1e3);
     spinner.stop("done");
-    write2(`${bold2("published")} ${ARR} ${store.domain}`, {
+    write2(`${or("published")} ${Cr} ${store.domain}`, {
       prefix: "status",
-      color: neonGreen,
+      color: V,
       suffix: timer.now(store.domain)
     });
   }
@@ -15173,7 +17507,7 @@ async function publish(cb) {
   nwl();
   group();
   nwl();
-  await (0, import_prompts4.default)([
+  await prompts([
     {
       name: "action",
       hint: " ",
@@ -15207,7 +17541,7 @@ function stdin(data) {
       const prop = items[i];
       if ($.errors[prop].size === 0) continue;
       if (i > 0) hline();
-      write2(bold2.whiteBright(prop));
+      write2(or.whiteBright(prop));
       for (const message of $.errors[prop].values()) {
         if (isString(message) && message.length > 0) {
           error(message);
@@ -15231,7 +17565,7 @@ function stdin(data) {
     for (const prop of warnings2.keys()) {
       const warning = warnings2.get(prop);
       if (warning.size === 0) continue;
-      const message = Create({ type: "warning" }).Newline("yellow").Ruler().Newline("yellow").Line(prop.toUpperCase(), bold2.yellow).Newline("yellow");
+      const message = Create({ type: "warning" }).Newline("yellow").Ruler().Newline("yellow").Line(prop.toUpperCase(), or.yellow).Newline("yellow");
       for (const text of warning.values()) {
         if (isString(text) && text.length > 0) {
           message.Line(text);
@@ -15246,180 +17580,180 @@ function stdin(data) {
 // syncify/log/help.ts
 init_cjs_shims();
 function help(cli) {
-  log(clear);
-  const DSH2 = lightGray("-".repeat(80));
+  log(Un);
+  const DSH = s("-".repeat(80));
   const usage = `
-    ${bold2("SYNCIFY CLI  " + ARR + whiteBright2("  v0.3.0-beta"))}
+    ${or("SYNCIFY CLI  " + Cr + pe("  v0.0.1-rc.1"))}
 
-    ${whiteBright2("Please provide a command argument.")}
+    ${pe("Please provide a command argument.")}
 
-    ${bold2("USAGE" + COL)}
+    ${or("USAGE" + wr)}
 
-    $ syncify                    ${gray2.italic("Show this screen")}
-    $ syncify {store} [theme]    ${gray2.italic("Store and theme targeting")}
+    $ syncify                    ${t.italic("Show this screen")}
+    $ syncify {store} [theme]    ${t.italic("Store and theme targeting")}
 
-    ${bold2("HELP" + COL)}
+    ${or("HELP" + wr)}
 
-    -h, --help                   ${gray2.italic("Print a list of all available commands")}
-    -h, --help examples          ${gray2.italic("Print a list of command examples")}
+    -h, --help                   ${t.italic("Print a list of all available commands")}
+    -h, --help examples          ${t.italic("Print a list of command examples")}
 
   `;
   if (cli.help === null) {
     return log(usage);
   }
   const examples = `
-    ${bold2("SYNCIFY CLI  " + ARR + whiteBright2("  v0.3.0-beta"))}
+    ${or("SYNCIFY CLI  " + Cr + pe("  v0.0.1-rc.1"))}
 
     Below are some usage examples for working with the Syncify CLI.
-    The ${gray2("=")} character is optional and samples are using the ${gray2("$ sy")} alias.
+    The ${t("=")} character is optional and samples are using the ${t("$ sy")} alias.
 
-    ${bold2("TARGETING" + COL)}
+    ${or("TARGETING" + wr)}
 
-    ${gray2("Target 1 store and 1 theme")}:
-    $ sy your-store${gray2("=")}theme-1
+    ${t("Target 1 store and 1 theme")}:
+    $ sy your-store${t("=")}theme-1
 
-    ${gray2("Target 1 store and 2 theme")}:
-    $ sy your-store${gray2("=")}theme-1,some-theme,test-theme
+    ${t("Target 1 store and 2 theme")}:
+    $ sy your-store${t("=")}theme-1,some-theme,test-theme
 
-    ${gray2("Target 2 stores and 1 theme")}:
-    $ sy ---your-store${gray2("=")}theme-1 --another-store${gray2("=")}some-theme
+    ${t("Target 2 stores and 1 theme")}:
+    $ sy --your-store${t("=")}theme-1 --another-store${t("=")}some-theme
 
-    ${gray2("Target 2 stores and 4 theme")}:
-    $ sy --your-store${gray2("=")}theme-1,theme-2 --another-store${gray2("=")}some-theme,test-theme
+    ${t("Target 2 stores and 4 theme")}:
+    $ sy --your-store${t("=")}theme-1,theme-2 --another-store${t("=")}some-theme,test-theme
 
-  ${DSH2}
+  ${DSH}
 
-    ${bold2("BUILDING" + COL)}
+    ${or("BUILDING" + wr)}
 
-    ${gray2("Build theme from source")}:
+    ${t("Build theme from source")}:
     $ sy --build
 
-    ${gray2("Build theme with terse minification")}:
+    ${t("Build theme with terse minification")}:
     $ sy --build --terse
 
-    ${gray2("Build theme and clean")}:
+    ${t("Build theme and clean")}:
     $ sy --build --clean --terse
 
-  ${DSH2}
+  ${DSH}
 
-    ${bold2("WATCHING" + COL)}
+    ${or("WATCHING" + wr)}
 
-    ${gray2("Watch 1 store and 1 theme")}:
-    $ sy your-store${gray2("=")}theme-1 --watch
+    ${t("Watch 1 store and 1 theme")}:
+    $ sy your-store${t("=")}theme-1 --watch
 
-    ${gray2("Watch 1 store and 2 themes with hot reloading")}:
-    $ sy your-store${gray2("=")}theme-1,theme-2 --watch --hot
+    ${t("Watch 1 store and 2 themes with hot reloading")}:
+    $ sy your-store${t("=")}theme-1,theme-2 --watch --hot
 
-    ${gray2("Watch 2 stores and 1 theme")}:
-    $ sy --your-store${gray2("=")}theme-1 --another-store${gray2("=")}some-theme --watch
+    ${t("Watch 2 stores and 1 theme")}:
+    $ sy --your-store${t("=")}theme-1 --another-store${t("=")}some-theme --watch
 
-    ${gray2("Watch 2 stores and 2 themes")}:
-    $ sy --your-store${gray2("=")}theme-1,theme-2 --another-store${gray2("=")}some-theme,test-theme --watch
+    ${t("Watch 2 stores and 2 themes")}:
+    $ sy --your-store${t("=")}theme-1,theme-2 --another-store${t("=")}some-theme,test-theme --watch
 
-    ${gray2("Watch 1 store with 2 themes and clean mode with hot live reloads")}:
-    $ sy your-store${gray2("=")}theme-1,theme-2 --watch --clean --hot
+    ${t("Watch 1 store with 2 themes and clean mode with hot live reloads")}:
+    $ sy your-store${t("=")}theme-1,theme-2 --watch --clean --hot
 
-    ${gray2("Watch 1 store with 2 themes in production mode")}:
-    $ sy your-store${gray2("=")}theme-1,theme-2 --prod --watch
+    ${t("Watch 1 store with 2 themes in production mode")}:
+    $ sy your-store${t("=")}theme-1,theme-2 --prod --watch
 
   `;
   const commands = `
-    ${bold2("SYNCIFY CLI  " + ARR + whiteBright2("  v0.3.0-beta"))}
+    ${or("SYNCIFY CLI  " + Cr + pe("  v0.0.1-rc.1"))}
 
     Welcome to the Syncify CLI. The command line utility assumes that you have
-    defined stores, themes and setup credentials within a ${gray2(".env")} file.
+    defined stores, themes and setup credentials within a ${t(".env")} file.
 
-    ${bold2("ALIASES" + COL)}
+    ${or("ALIASES" + wr)}
 
-      $ sy                         ${gray2.italic("Shorthand for syncify")}
+      $ sy                         ${t.italic("Shorthand for syncify")}
 
-    ${bold2("COMMANDS" + COL)}
+    ${or("COMMANDS" + wr)}
 
-      $ syncify                    ${gray2.italic("Show this screen")}
-      $ syncify {store} [theme]    ${gray2.italic("Store and theme targeting")}
+      $ syncify                    ${t.italic("Show this screen")}
+      $ syncify {store} [theme]    ${t.italic("Store and theme targeting")}
 
-    ${bold2("THEMES" + COL)}
+    ${or("THEMES" + wr)}
 
-        --{store} [theme]          ${gray2.italic("A store reference command (run examples)")}
-      -t, --theme [theme]          ${gray2.italic("A comma seprated list of themes")}
+        --{store} [theme]          ${t.italic("A store reference command (run examples)")}
+      -t, --theme [theme]          ${t.italic("A comma seprated list of themes")}
 
-    ${bold2("PATHS" + COL)}
+    ${or("PATHS" + wr)}
 
-      -c, --config    <path>       ${gray2.italic("Set config directory path")}
-      -i, --input     <path>       ${gray2.italic("Set input directory path")}
-      -o, --output    <path>       ${gray2.italic("Set output directory path")}
+      -c, --config    <path>       ${t.italic("Set config directory path")}
+      -i, --input     <path>       ${t.italic("Set input directory path")}
+      -o, --output    <path>       ${t.italic("Set output directory path")}
 
-    ${bold2("MODES" + COL)}
+    ${or("MODES" + wr)}
 
-      -w, --watch                  ${gray2.italic("Run watch mode")}
-      -b, --build                  ${gray2.italic("Run build mode from input")}
-      -u, --upload                 ${gray2.italic("Run upload mode theme to stores")}
-      -d, --import                 ${gray2.italic("Run download mode from theme and stores")}
-      -e, --export                 ${gray2.italic("Run export mode and generate theme zip")}
-      -p, --publish                ${gray2.italic("Run publish and create a release")}
-      -r, --resource               ${gray2.italic("Run resource mode, resource name expected")}
+      -w, --watch                  ${t.italic("Run watch mode")}
+      -b, --build                  ${t.italic("Run build mode from input")}
+      -u, --upload                 ${t.italic("Run upload mode theme to stores")}
+      -d, --import                 ${t.italic("Run download mode from theme and stores")}
+      -e, --export                 ${t.italic("Run export mode and generate theme zip")}
+      -p, --publish                ${t.italic("Run publish and create a release")}
+      -r, --resource               ${t.italic("Run resource mode, resource name expected")}
 
-    ${bold2("RESOURCES" + COL)}
+    ${or("RESOURCES" + wr)}
 
-      -r, --resource themes        ${gray2.italic("Run the themes resource")}
-      -r, --resource assets        ${gray2.italic("Run the theme assets resource")}
-      -r, --resource pages         ${gray2.italic("Run the pages resource")}
-      -r, --resource metafields    ${gray2.italic("Run the metafields resource")}
-      -r, --resource redirects     ${gray2.italic("Run the redirects resource")}
-      -r, --resource files         ${gray2.italic("Run the files resource")}
+      -r, --resource themes        ${t.italic("Run the themes resource")}
+      -r, --resource assets        ${t.italic("Run the theme assets resource")}
+      -r, --resource pages         ${t.italic("Run the pages resource")}
+      -r, --resource metafields    ${t.italic("Run the metafields resource")}
+      -r, --resource redirects     ${t.italic("Run the redirects resource")}
+      -r, --resource files         ${t.italic("Run the files resource")}
 
-    ${bold2("ENVIRONMENT" + COL)}
+    ${or("ENVIRONMENT" + wr)}
 
-      --dev                       ${gray2.italic("Build in development mode (default)")}
-      --prod                      ${gray2.italic("Build in production mode")}
-      --hot                       ${gray2.italic("Run watch with hot-reloads")}
+      --dev                       ${t.italic("Build in development mode (default)")}
+      --prod                      ${t.italic("Build in production mode")}
+      --hot                       ${t.italic("Run watch with hot-reloads")}
 
-    ${bold2("OPERATIONS" + COL)}
+    ${or("OPERATIONS" + wr)}
 
-      --clean                     ${gray2.italic("Clean the output, use with modes")}
-      --silent                    ${gray2.italic("Silent logging, only errors will print")}
-      --cache                     ${gray2.italic("Purges the local .cache references")}
+      --clean                     ${t.italic("Clean the output, use with modes")}
+      --silent                    ${t.italic("Silent logging, only errors will print")}
+      --cache                     ${t.italic("Purges the local .cache references")}
 
-    ${bold2("TRIGGERS" + COL)}
+    ${or("TRIGGERS" + wr)}
 
-      --spawn  [list]             ${gray2.italic("Invoke a defined spawn child process/s")}
-      --delete [list]             ${gray2.italic("Delete a remote and local file")}
-      --terse  [list]             ${gray2.italic("invoke minify mode, accepts resource/s")}
+      --spawn  [list]             ${t.italic("Invoke a defined spawn child process/s")}
+      --delete [list]             ${t.italic("Delete a remote and local file")}
+      --terse  [list]             ${t.italic("invoke minify mode, accepts resource/s")}
 
-    ${bold2("TRANSFORMS" + COL)}
+    ${or("TRANSFORMS" + wr)}
 
-      --script                    ${gray2.italic("Run the script transform in isolation")}
-      --style                     ${gray2.italic("Run the style transform in isolation")}
-      --svg                       ${gray2.italic("Run the svg transform in isolation")}
-      --image                     ${gray2.italic("Run the image transform in isolation")}
+      --script                    ${t.italic("Run the script transform in isolation")}
+      --style                     ${t.italic("Run the style transform in isolation")}
+      --svg                       ${t.italic("Run the svg transform in isolation")}
+      --image                     ${t.italic("Run the image transform in isolation")}
 
-    ${bold2("UTILITY" + COL)}
+    ${or("UTILITY" + wr)}
 
-      -f, --filter <path>         ${gray2.italic("Filter operation to be used with modes")}
+      -f, --filter <path>         ${t.italic("Filter operation to be used with modes")}
 
-    ${bold2("VERSIONING" + COL)}
+    ${or("VERSIONING" + wr)}
 
-      --bump patch                ${gray2.italic("Apply a patch version bump, use in export mode")}
-      --bump minor                ${gray2.italic("Apply a minor version bump, use in export mode")}
-      --bump major                ${gray2.italic("Apply a major version bump, use in export mode")}
+      --bump patch                ${t.italic("Apply a patch version bump, use in export mode")}
+      --bump minor                ${t.italic("Apply a minor version bump, use in export mode")}
+      --bump major                ${t.italic("Apply a major version bump, use in export mode")}
 
-    ${bold2("STRAPS" + COL)}
+    ${or("STRAPS" + wr)}
 
-      --strap dusk                ${gray2.italic("Import and generate a dusk strap")}
-      --strap dawn                ${gray2.italic("Import and generate a dawn strap")}
-      --strap silk                ${gray2.italic("Import and generate a silk strap")}
+      --strap dusk                ${t.italic("Import and generate a dusk strap")}
+      --strap dawn                ${t.italic("Import and generate a dawn strap")}
+      --strap silk                ${t.italic("Import and generate a silk strap")}
 
-    ${bold2("HELP" + COL)}
+    ${or("HELP" + wr)}
 
-      -h, --help                  ${gray2.italic("Print this screen")}
-      -h, --help examples         ${gray2.italic("Print a list of command examples")}
+      -h, --help                  ${t.italic("Print this screen")}
+      -h, --help examples         ${t.italic("Print a list of command examples")}
 
-    ${DSH2}
+    ${DSH}
 
-    ${gray2("BY \u039D\u0399\u039A\u039F\u039B\u0391\u03A3 \u03A3\u0391\u0392\u0392\u0399\u0394\u0397\u03A3")}
+    ${t("BY \u039D\u0399\u039A\u039F\u039B\u0391\u03A3 \u03A3\u0391\u0392\u0392\u0399\u0394\u0397\u03A3")}
 
-    ${gray2.underline("https://github.com/panoply")}
-    ${gray2.underline("https://x.com/niksavvidis")}
+    ${t.underline("https://github.com/panoply")}
+    ${t.underline("https://x.com/niksavvidis")}
 
   `;
   log(cli.help === "examples" ? examples : commands);
@@ -15432,7 +17766,7 @@ var import_chokidar = require("chokidar");
 // syncify/options/dirs.ts
 init_cjs_shims();
 var import_fs_extra18 = require("fs-extra");
-var import_pathe20 = require("pathe");
+var import_node_path20 = require("path");
 async function setCacheDirs() {
   await createDirs($.dirs.cache);
   await createDirs($.dirs.sourcemaps.root);
@@ -15461,7 +17795,7 @@ async function setThemeDirs(basePath2) {
     }
   }
   for (const dir of THEME_DIRS) {
-    const uri = (0, import_pathe20.join)(basePath2, dir);
+    const uri = (0, import_node_path20.join)(basePath2, dir);
     const name = dir.startsWith("templates/") ? dir.slice(10) : dir;
     if (!await (0, import_fs_extra18.pathExists)(uri)) {
       try {
@@ -15475,41 +17809,6 @@ async function setThemeDirs(basePath2) {
     }
   }
 }
-async function setBaseDirs(cli) {
-  const base = basePath($.cwd);
-  for (const [dir, def] of BASE_DIRS) {
-    if (dir === "cache") {
-      $.dirs[dir] = (0, import_pathe20.join)($.cwd, def, ".syncify");
-      $.dirs.sourcemaps = create(null);
-      $.dirs.sourcemaps.root = (0, import_pathe20.join)($.dirs[dir], "sourcemaps");
-      $.dirs.sourcemaps.scripts = (0, import_pathe20.join)($.dirs.sourcemaps.root, "scripts");
-      $.dirs.sourcemaps.styles = (0, import_pathe20.join)($.dirs.sourcemaps.root, "styles");
-      continue;
-    }
-    if (dir === "import") {
-      $.dirs[dir] = base($.mode.import && has("output", cli) ? cli.output : $.config.import);
-      continue;
-    } else if (dir === "export") {
-      $.dirs[dir] = base($.mode.export && has("output", cli) ? cli.output : $.config.export);
-      continue;
-    } else if (has(dir, cli) && cli[dir] === def && $.config[dir] === def) {
-      $.dirs[dir] = base(cli[dir]);
-      continue;
-    }
-    const path2 = isString(cli[dir]) ? cli[dir] : $.config[dir];
-    if (isString(path2)) {
-      $.dirs[dir] = base(path2);
-    } else {
-      typeError({
-        option: "config",
-        name: dir,
-        provided: path2,
-        expects: "string"
-      });
-    }
-  }
-  $.watch.add($.file.path);
-}
 async function setImportDirs() {
   const { dirs, sync: sync4, mode } = $;
   if (!mode.import) return;
@@ -15522,7 +17821,7 @@ async function setImportDirs() {
   }
   for (const theme3 in sync4.themes) {
     const { store, target } = sync4.themes[theme3];
-    const dir = (0, import_pathe20.join)(dirs.import, store);
+    const dir = (0, import_node_path20.join)(dirs.import, store);
     if (await (0, import_fs_extra18.pathExists)(dir)) {
       if (mode.clean) {
         try {
@@ -15538,7 +17837,7 @@ async function setImportDirs() {
         throw new Error(e);
       }
     }
-    await setThemeDirs((0, import_pathe20.join)(dir, target));
+    await setThemeDirs((0, import_node_path20.join)(dir, target));
   }
 }
 async function createDirs(path2) {
@@ -15569,7 +17868,7 @@ var import_anymatch3 = __toESM(require_anymatch());
 
 // syncify/utils/options.ts
 init_cjs_shims();
-var import_pathe21 = require("pathe");
+var import_node_path21 = require("path");
 var import_fast_glob5 = __toESM(require("fast-glob"));
 var import_anymatch2 = __toESM(require_anymatch());
 var import_fs_extra19 = require("fs-extra");
@@ -15629,9 +17928,9 @@ function authURL(domain) {
     };
   }
   throwError(
-    `Invalid or missing ${cyan2(domain + ".myshopify.com")} credentials`,
+    `Invalid or missing ${Dn(domain + ".myshopify.com")} credentials`,
     [
-      `Your shop credentials in the ${cyan2.bold((0, import_pathe21.basename)($.env.file))} file could`,
+      `Your shop credentials in the ${Dn.bold((0, import_node_path21.basename)($.env.file))} file could`,
       "not be read correctly or are missing. Please check your environment file and ensure",
       "you have provided valid authorization."
     ]
@@ -15646,10 +17945,7 @@ function getResolvedPaths(filePath, hook) {
     const paths2 = [];
     for (const item of filePath) {
       const uri = path2(item);
-      const resolved = import_fast_glob5.default.sync(uri, {
-        cwd,
-        absolute: true
-      });
+      const resolved = import_fast_glob5.default.sync(uri, { cwd, absolute: true });
       if (match2 !== false) {
         const test = hook(uri);
         if (isString(test)) {
@@ -15700,11 +17996,11 @@ function getTransform(transforms, opts) {
       if (opts.flatten) {
         return paths2.map((input) => opts.assertSnippet ? {
           input,
-          rename: (0, import_pathe21.basename)(input),
+          rename: (0, import_node_path21.basename)(input),
           snippet: false
         } : {
           input,
-          rename: (0, import_pathe21.basename)(input)
+          rename: (0, import_node_path21.basename)(input)
         });
       } else {
         return opts.assertSnippet ? {
@@ -15728,11 +18024,11 @@ function getTransform(transforms, opts) {
       if (opts.flatten) {
         return paths2.map((input) => opts.assertSnippet ? {
           input,
-          rename: (0, import_pathe21.basename)(input),
+          rename: (0, import_node_path21.basename)(input),
           snippet: false
         } : {
           input,
-          rename: (0, import_pathe21.basename)(input)
+          rename: (0, import_node_path21.basename)(input)
         });
       } else {
         return opts.assertSnippet ? {
@@ -15842,7 +18138,7 @@ function getTransform(transforms, opts) {
               if (opts.addWatch) $.watch.add(watch2);
               return globPath(watch2);
             });
-            if (hasRenameNamespace(prop)) record.rename = (0, import_pathe21.basename)(prop);
+            if (hasRenameNamespace(prop)) record.rename = (0, import_node_path21.basename)(prop);
             if (paths2) {
               if (opts.flatten) {
                 for (const input of paths2) {
@@ -15914,8 +18210,8 @@ function hasRenameNamespace(rename) {
 function renameFile2(src, rename) {
   let name = rename;
   const dir = lastPath(src);
-  const ext = (0, import_pathe21.extname)(src);
-  const file = (0, import_pathe21.basename)(src, ext);
+  const ext = (0, import_node_path21.extname)(src);
+  const file = (0, import_node_path21.basename)(src, ext);
   if (isUndefined(rename)) return { dir, ext, file, name: file };
   if (/(\[dir\])/.test(name)) name = name.replace("[dir]", dir);
   if (/(\[name\])/.test(name)) name = name.replace("[name]", file);
@@ -16024,7 +18320,7 @@ function setJsonOptions() {
             } else {
               typeError(
                 {
-                  option: `json ${ARR} terse`,
+                  option: `json ${Cr} terse`,
                   name: p,
                   provided: json2.terse[p],
                   expects: "boolean"
@@ -16035,166 +18331,6 @@ function setJsonOptions() {
             $.json.terse.exclude = (0, import_anymatch3.default)(getResolvedPaths(json2.terse[option]));
           }
         }
-      }
-    }
-  }
-}
-
-// syncify/options/modes.ts
-init_cjs_shims();
-function setModes(cli) {
-  const resource2 = anyTrue(cli.pages, cli.metafields, cli.redirects);
-  const transform3 = anyTrue(cli.style, cli.script, cli.image, cli.svg);
-  const watch2 = anyTrue(resource2, cli.upload, cli.import) ? false : cli.watch;
-  $.mode = assign($.mode, {
-    watch: watch2,
-    dev: !cli.prod,
-    prod: cli.prod,
-    setup: cli.setup,
-    strap: cli.strap !== null,
-    hot: allTrue(cli.watch, cli.hot),
-    interactive: cli.interactive,
-    redirects: cli.redirects,
-    metafields: cli.metafields,
-    pages: cli.pages,
-    pull: cli.pull,
-    cache: allTrue(cli.build, cli.cache),
-    force: cli.force,
-    views: cli.views,
-    script: transform3 ? cli.script : false,
-    style: transform3 ? cli.style : false,
-    image: transform3 ? cli.image : false,
-    svg: transform3 ? cli.svg : false,
-    terse: anyTrue(cli.terse, cli.prod),
-    clean: anyTrue(resource2, transform3, cli.upload) ? false : allTrue(cli.export, cli.build) || cli.clean,
-    build: anyTrue(cli.watch, cli.import) ? false : cli.build,
-    upload: anyTrue(transform3, watch2) ? false : cli.upload,
-    export: cli.export,
-    import: anyTrue(resource2, transform3, cli.upload, cli.watch, cli.build) ? false : cli.import,
-    publish: cli.publish,
-    release: isString(cli.release),
-    themes: cli._[0] === "themes"
-  });
-  if ($.mode.themes) {
-    cli._ = [];
-    return;
-  }
-  validateCommands($.mode, cli);
-  if ($.mode.release) {
-    $.mode.clean = true;
-    $.mode.build = true;
-    $.mode.export = true;
-    $.mode.publish = true;
-  }
-  if ($.mode.build) {
-    const build3 = allFalse(
-      $.mode.script,
-      $.mode.style,
-      $.mode.svg,
-      $.mode.pages,
-      $.mode.metafields,
-      $.mode.image
-    );
-    if (build3) {
-      $.mode.script = true;
-      $.mode.style = true;
-      $.mode.svg = true;
-      $.mode.image = true;
-      $.mode.views = true;
-    }
-  }
-}
-function validateCommands(modes, cli) {
-  if (cli.cache && cli.build === false) {
-    invalidCommand({
-      expected: "-b, --build",
-      message: [
-        "Cache resets can only be executed along side build operations"
-      ],
-      fix: [
-        `Attempting to purge cache outside ${bold2("build")} mode Syncify requires you to pass`,
-        "the build mode flags when executing a cache reset, for example:",
-        "\n\n",
-        `${whiteBright2("$")} ${white2(`syncify ${$.argv} ${blue2("-b --cache")}`)}`,
-        "\n\n",
-        `Run ${gray2("syncify --help")} for more information, or pass an execution`,
-        `operation mode as per the ${whiteBright2("expected")} value.`,
-        "\n\n"
-      ]
-    });
-  }
-  if (values(modes).every((cmd) => cmd === false)) {
-    invalidCommand(
-      {
-        expected: "--<cmd>",
-        message: [
-          "Execution is unclear, you have not provided Syncify with a valid operation",
-          "mode to execute"
-        ],
-        fix: [
-          "Syncify requires that you provide an operation. In most cases, this",
-          "error occurs when you have forgotten to pass the mode, for example:",
-          "\n\n",
-          `${whiteBright2("$")} ${whiteBright2(`syncify ${LAN}${cyan2("mode")}${RAN}`)}`,
-          "\n\n",
-          `Run ${blue2("syncify --help")} for more information`
-        ]
-      }
-    );
-  }
-  if (modes.export) {
-    const props = keys(modes);
-    props.push(
-      "filter",
-      // -f
-      "delete",
-      // -d
-      "spawn",
-      // -s
-      "resource"
-      // -r
-    );
-    for (const mode of props) {
-      if (mode === "build" || mode === "clean" || mode === "cache" || mode === "export") continue;
-      if (modes[mode]) {
-        const invalid2 = props.filter((cmd) => cmd !== "build" && cmd !== "clean" && cmd !== "export");
-        invalid2.push(
-          "f\\b",
-          // --filter
-          "u\\b",
-          // --upload
-          "w\\b",
-          // --watch
-          "s\\b",
-          // --spawn
-          "d\\b",
-          // --delete
-          "r\\b"
-          // --resource
-        );
-        const valid = invalid2.map((cmd) => {
-          if (cmd === "filter" || cmd === "f" || cmd === "resource" || cmd === "-r") {
-            return `--?${cmd}.*?(?=(--?${invalid2.join("|--?")}))`;
-          } else {
-            return `--?${cmd}`;
-          }
-        }).join("|");
-        const pexp = new RegExp(`(--?${invalid2.join("|--?")})`, "g");
-        const eexp = new RegExp(`(${valid})`, "g");
-        return invalidCommand(
-          {
-            message: [
-              `Bad command ${LPR}argv${RPR} sequence passed with ${blue2("export")} mode.`,
-              "Theme exports are performed in isolation. You command includes",
-              "execution modes that cannot be run when exporting theme/s"
-            ],
-            provided: $.argv.replace(pexp, red2("$1")).replace(/(--export)/, blue2("$1")),
-            expected: $.argv.replace(eexp, "").replace(/(--export)/, blue2("$1")),
-            fix: [
-              `Removed the flags marked ${red2("red")} as shown in provided aboved.`
-            ]
-          }
-        );
       }
     }
   }
@@ -16273,21 +18409,11 @@ function setSnippetOptions() {
 
 // syncify/options/sections.ts
 init_cjs_shims();
-var import_pathe22 = require("pathe");
+var import_node_path22 = require("path");
 var import_fs_extra20 = require("fs-extra");
 async function setSectionOptions() {
-  if (!isObject($.config.paths.snippets)) return;
   const { sections } = $.config.paths;
-  if (has("input", sections)) return;
-  if (isEmpty(sections.input)) return;
-  if (!isObject(sections)) {
-    typeError({
-      option: "views",
-      name: "sections",
-      expects: "{}",
-      provided: typeof sections
-    });
-  }
+  return;
   for (const option in $.section) {
     if (option === "input") continue;
     if (option === "prefixDir") {
@@ -16360,10 +18486,10 @@ async function setSectionOptions() {
 }
 async function setSharedSchema() {
   for (const uri of $.paths.schema.input) {
-    const ext = (0, import_pathe22.extname)(uri);
-    const key = (0, import_pathe22.basename)(uri, ext);
+    const ext = (0, import_node_path22.extname)(uri);
+    const key = (0, import_node_path22.basename)(uri, ext);
     if ($.section.shared.has(key)) {
-      throwError(`Duplicated shared schema file name ${bold2.yellow(key + ext)} detected.`, [
+      throwError(`Duplicated shared schema file name ${or.yellow(key + ext)} detected.`, [
         "Shared Schema JSON file names must be unique across the workspace.",
         "Update the file name and try again."
       ]);
@@ -16389,16 +18515,16 @@ async function setSharedSchema() {
       $.cache.schema[uri] = /* @__PURE__ */ new Set();
       $.section.shared.set(key, { uri, schema: schema3 });
     } catch (e) {
-      error2((0, import_pathe22.relative)($.cwd, uri), {
+      error2((0, import_node_path22.relative)($.cwd, uri), {
         notify: {
           title: "JSON Error (setSharedSchema)",
-          message: `Error when parsing ${(0, import_pathe22.basename)(uri)}`
+          message: `Error when parsing ${(0, import_node_path22.basename)(uri)}`
         }
       });
       if (e instanceof JSONError) {
         json(e, {
-          relative: (0, import_pathe22.relative)($.cwd, uri),
-          base: (0, import_pathe22.basename)(uri)
+          relative: (0, import_node_path22.relative)($.cwd, uri),
+          base: (0, import_node_path22.basename)(uri)
         });
       }
       return null;
@@ -16420,7 +18546,7 @@ async function setSchemaJson() {
     const start = data.slice(begin);
     const ender = begin + start.search(/{%-?\s*endschema/);
     if (ender < 0) {
-      warn3("Liquid Parse Error", (0, import_pathe22.relative)($.cwd, file));
+      warn3("Liquid Parse Error", (0, import_node_path22.relative)($.cwd, file));
       continue;
     }
     try {
@@ -16459,7 +18585,7 @@ async function setSchemaJson() {
       }
     } catch (e) {
       if (has(file, $.cache.sections)) delete $.cache.sections[file];
-      warn3("JSON Parse Error", (0, import_pathe22.relative)($.cwd, file));
+      warn3("JSON Parse Error", (0, import_node_path22.relative)($.cwd, file));
     }
   }
 }
@@ -16471,15 +18597,15 @@ init_cjs_shims();
 init_cjs_shims();
 var import_enquirer2 = require("enquirer");
 var theme2 = {
-  prefix: lightGray("\u2502 "),
+  prefix: s("\u2502 "),
   styles: {
-    primary: neonGreen,
-    success: neonGreen,
-    danger: red2.bold,
-    warning: yellowBright2,
-    muted: gray2,
-    disabled: gray2,
-    typing: gray2
+    primary: V,
+    success: V,
+    danger: _.bold,
+    warning: Zn,
+    muted: t,
+    disabled: t,
+    typing: t
   },
   symbols: {
     ellipsisLarge: "",
@@ -16496,8 +18622,8 @@ var theme2 = {
     }
   },
   pointer(choice, index) {
-    const prefix = this.state.index === index ? Tree.stub.trimEnd() + " " : Tree.trim + " ";
-    return index === 0 ? Tree.trim + "\n" + prefix : prefix;
+    const prefix = this.state.index === index ? de.stub.trimEnd() + " " : de.trim + " ";
+    return index === 0 ? de.trim + "\n" + prefix : prefix;
   }
 };
 async function Connect(store) {
@@ -16511,14 +18637,14 @@ async function Connect(store) {
     return {
       name: value.name,
       message: value.name,
-      hint: `${space(value.name)} ${TLD} ${gray2(value.role)}`,
+      hint: `${space(value.name)} ${Rr} ${t(value.role)}`,
       value
     };
   });
   choices.push(
     {
       role: "separator",
-      message: lightGray("\u2500".repeat(separator))
+      message: s("\u2500".repeat(separator))
     },
     {
       name: "create",
@@ -16539,7 +18665,7 @@ async function Connect(store) {
     },
     format(value) {
       if (isArray(value) && value.length > 0) {
-        return neonCyan(`${value.join(whiteBright2(", "))}`);
+        return gr(`${value.join(pe(", "))}`);
       }
     }
   });
@@ -16550,24 +18676,24 @@ async function Connect(store) {
     fields.push({
       name: theme3.name,
       message: theme3.name,
-      validate(value, _, field) {
+      validate(value, _2, field) {
         if (field && field.name === theme3.name) {
           if (/[A-Z]/.test(value)) {
-            return "\n" + reset2.redBright("  Target name must be lowercase");
+            return "\n" + tr.redBright("  Target name must be lowercase");
           } else if (/[0-9]/.test(value)) {
-            return "\n" + reset2.redBright("  Target name cannot contain numbers");
+            return "\n" + tr.redBright("  Target name cannot contain numbers");
           } else if (/[ ]/.test(value)) {
-            return "\n" + reset2.redBright("  Target name cannot contain spaces");
+            return "\n" + tr.redBright("  Target name cannot contain spaces");
           } else if (/-/.test(value)) {
-            return "\n" + reset2.redBright("  Target name cannot contain dashes");
+            return "\n" + tr.redBright("  Target name cannot contain dashes");
           }
         }
         return true;
       }
     });
   }
-  style2.styles.primary = neonCyan.italic;
-  style2.styles.typing = neonGreen;
+  style2.styles.primary = gr.italic;
+  style2.styles.typing = V;
   const template = JSON.stringify(config, null, 2);
   const snippet2 = await (0, import_enquirer2.prompt)({
     name: "stores",
@@ -16581,10 +18707,10 @@ async function Connect(store) {
     format() {
       if (this.state.submitted === true) {
         if (this.state.completed !== 100) {
-          return neonGreen(`${this.state.completed}% completed`);
+          return V(`${this.state.completed}% completed`);
         }
       }
-      return ` ${ARR}  ${orange(`${this.state.completed}% completed`)}`;
+      return ` ${Cr}  ${cr(`${this.state.completed}% completed`)}`;
     }
   });
   const json2 = { syncify: JSON.parse(snippet2.stores.result) };
@@ -16598,42 +18724,33 @@ async function Connect(store) {
     format() {
       return /^[ty1]/i.test(this.input) ? "Yes" : "No";
     },
-    footer: Tree.line + [
+    footer: de.line + [
       "",
-      gray2("The following store and theme references will be saved"),
-      gray2("to your package.json file on the syncify key property."),
+      t("The following store and theme references will be saved"),
+      t("to your package.json file on the syncify key property."),
       "",
-      JSON.stringify(json2.syncify, null, 2).split("\n").join("\n" + Tree.line),
+      JSON.stringify(json2.syncify, null, 2).split("\n").join("\n" + de.line),
       ""
-    ].join("\n" + Tree.line)
+    ].join("\n" + de.line)
   });
   console.log(save2);
 }
 
 // syncify/options/sync.ts
 async function setSync(cli) {
-  const storeRequired = anyTrue(
-    $.mode.metafields,
-    $.mode.pages,
-    $.mode.redirects,
-    $.mode.release,
-    $.mode.publish,
-    $.mode.themes
-  );
-  const themeRequired = anyTrue(
-    $.mode.watch,
-    $.mode.upload,
-    $.mode.import
-  );
+  const storeRequired = $.mode.metafields || $.mode.pages || $.mode.redirects || $.mode.release || $.mode.publish || $.mode.themes;
+  const themeRequired = $.mode.watch || $.mode.upload || $.mode.import;
   let stores;
   let items = [];
   let queue2 = false;
-  if (storeRequired && cli._.length === 0 && $.mode.themes === false) {
+  if (storeRequired && $.cmd.stores.length === 0 && $.mode.themes === false) {
     invalidCommand({
       expected: "syncify <store>",
       message: [
-        "You have not provided a store to target, which is required",
-        "when running in a resource mode that syncs to a remote source"
+        "You have not provided a store to target, which is required when",
+        "there are multiple stores defined in your setup. Because you are",
+        "executing syncify in a mode which will transfers files to a remote",
+        "source, it is unable to determine which store to target."
       ],
       fix: [
         "Provide the store target name as the first command argument",
@@ -16644,7 +18761,7 @@ async function setSync(cli) {
   if ($.mode.themes && $.stores.length > 0) {
     items = getStoresFromEnv();
   } else {
-    stores = cli._.length === 0 ? $.stores.map(({ domain }) => domain) : cli._[0].split(",");
+    stores = $.cmd.stores.length === 0 ? $.stores.map(({ domain }) => domain) : $.cmd.stores;
     items = $.stores.filter(({ domain }) => includes(domain, stores));
     queue2 = items.length > 1;
   }
@@ -16672,15 +18789,15 @@ async function setSync(cli) {
           expected: keys(store.themes).join(","),
           provided: target,
           message: [
-            `Unknown theme target (${blue2(target)}) provided to ${blue2(store.domain)} store`,
-            `Your ${blue2($.file.base)} file contains no such theme using this name.`
+            `Unknown theme target (${Vn(target)}) provided to ${Vn(store.domain)} store`,
+            `Your ${Vn("package.json")} file contains no such theme using this name.`
           ],
           fix: [
-            `Provide an ${blue2("expected")} theme target or update/add an existing target.`,
-            `You have ${blue2(`${themes2.length}`)} theme targets defined for ${blue2(store.domain)}:`,
+            `Provide an ${Vn("expected")} theme target or update/add an existing target.`,
+            `You have ${Vn(`${themes2.length}`)} theme targets defined for ${Vn(store.domain)}:`,
             "\n\n",
-            `${DSH} ${themes2.join(`
-${DSH} `)}`,
+            `${Mr} ${themes2.join(`
+${Mr} `)}`,
             "\n\n"
           ]
         });
@@ -16694,33 +18811,16 @@ ${DSH} `)}`,
       });
     }
   }
-  if (storeRequired && $.sync.stores.length === 0) {
-    invalidCommand({
-      expected: "syncify <store>",
-      message: [
-        "You have not provided store to target, which is required",
-        "when running in a resource mode that syncs to a remote source"
-      ],
-      fix: [
-        "Provide the store target name as the first command argument followed by themes",
-        "target/s and other flags. Based on your current configuration:",
-        "\n\n",
-        `${DSH} ${white2("$")} syncify ${$.stores.join(`
-${DSH} ${white2("$")} syncify `)}`,
-        "\n\n"
-      ]
-    });
-  }
   if (themeRequired && $.sync.themes.length === 0) {
     invalidCommand(
       {
         expected: "-t <theme>",
         message: [
           "You have not provided a theme to target, which is required",
-          "when running this resource mode."
+          "when running syncify in this resource mode."
         ],
         fix: [
-          `Provide a theme name to target following a ${blue2("-t")} or ${blue2("--theme")} flag.`,
+          `Provide a theme name to target following a ${Vn("-t")} or ${Vn("--theme")} flag.`,
           "Theme targets should be passed as the 2nd argument, the 1st argument should be store name/s."
         ]
       }
@@ -16738,59 +18838,80 @@ ${DSH} ${white2("$")} syncify `)}`,
 init_cjs_shims();
 var import_fast_glob6 = __toESM(require("fast-glob"));
 var import_anymatch4 = __toESM(require_anymatch());
-var import_pathe23 = require("pathe");
+var import_node_path23 = require("path");
 async function setPaths() {
   const path2 = normalPath($.dirs.input);
-  const getPaths = (key, fallback) => {
+  const warn3 = warnOption("paths");
+  const getGlobs = (key, files, fallback) => {
+    if (isNil(files)) return [path2(fallback)];
+    if (isArray(files)) return files.map(path2);
+    if (isString(files)) return [path2(files)];
+    typeError({
+      option: "paths",
+      expects: "string | string[]",
+      provided: files,
+      name: key
+    });
+  };
+  const renameGlobs = (key, fallback) => {
     const files = $.config.paths[key];
-    if (!files) {
-      return [path2(fallback)];
+    if (isObject(files)) {
+      if (isEmpty(files)) {
+        warn3(`Undefined ${key} paths, using fallback`, "{}");
+        return [path2(fallback)];
+      }
+      const paths2 = [];
+      for (const rename in files) {
+        if (isArray(files[rename])) {
+          paths2.push(...files[rename]);
+        } else if (isString(files)) {
+          paths2.push(files[rename]);
+        } else if (isNil(files[rename])) {
+          typeError({
+            option: `paths ${Cr} ${key}`,
+            expects: "string | string[]",
+            provided: files[rename],
+            name: rename
+          });
+        }
+      }
+      if (paths2.length === 0) {
+        warn3(`Unresolved ${key} paths, using fallback`, "{}");
+        return [path2(fallback)];
+      }
+      return paths2.map(path2);
+    } else {
+      return getGlobs(key, files, fallback);
     }
-    if (isArray(files)) {
-      return files.map(path2);
-    }
-    if (isObject(files) && files.input) {
-      return isArray(files.input) ? files.input.map(path2) : [path2(files.input)];
-    }
-    return [path2(files)];
   };
   for (const key of PATH_KEYS) {
     let paths2 = [];
-    switch (key) {
-      case "customers":
-        paths2 = getPaths(key, "templates/customers/*");
-        break;
-      case "metaobject":
-        paths2 = getPaths(key, "templates/metaobject/*");
-        break;
-      case "schema":
-        paths2 = getPaths(key, "schema/*");
-        break;
-      default:
-        if ($.config.paths[key]) paths2 = getPaths(key, "");
-    }
     if (key === "snippets" || key === "sections") {
-      paths2.forEach((p) => $[key].baseDir.add(lastPath((0, import_pathe23.dirname)(p))));
-    } else if (key === "assets") {
-      paths2.push((0, import_pathe23.join)($.dirs.output, "assets/*"));
+      paths2 = renameGlobs(key, `${key}/*`);
+      paths2.forEach((p) => $[key.slice(0, -1)].baseDir.add(lastPath((0, import_node_path23.dirname)(p))));
+    } else if (key === "customers" || key === "metaobject") {
+      paths2 = getGlobs(key, $.config.paths[key], `templates/${key}/*`);
+    } else {
+      paths2 = getGlobs(key, $.config.paths[key], `${key}/*`);
     }
-    for (const p of paths2) {
-      if (key !== "metafields" && key !== "redirects") {
-        const foundPaths = await (0, import_fast_glob6.default)(p, { cwd: $.cwd });
-        if (foundPaths.length) {
-          foundPaths.forEach((entry) => $.paths[key].input.add(entry));
+    $.paths[key].match = (0, import_anymatch4.default)(paths2);
+    if (key !== "metafields" && key !== "redirects") {
+      if ($.paths[key].input === null) {
+        $.paths[key].input = new Set(paths2);
+        paths2.forEach((p) => $.watch.add(p));
+      } else {
+        (await (0, import_fast_glob6.default)(paths2, { cwd: $.cwd })).forEach((p) => {
+          $.paths[key].input.add(p);
           $.watch.add(p);
-        } else if (key !== "assets" || p !== (0, import_pathe23.join)($.dirs.output, "assets/*")) {
-        }
+        });
       }
-      $.paths[key].match = (0, import_anymatch4.default)(paths2);
     }
   }
 }
 
 // syncify/options/version.ts
 init_cjs_shims();
-var import_pathe24 = require("pathe");
+var import_node_path24 = require("path");
 function parseVersionNumber(version2) {
   const match2 = version2.match(/^(\d{1,2})\.(\d{1,2})\.(\d{1,2})$/);
   if (!match2) {
@@ -16813,23 +18934,23 @@ function setVersion(cli) {
   if ($.cache.build.themeVersion !== $.pkg.number) {
     $.vc.update = parseVersionNumber($.pkg.version);
     $.vc.update.number = $.pkg.version;
-    $.vc.update.dir = (0, import_pathe24.join)($.dirs.export, `v${$.vc.major}`);
-    $.vc.update.zip = (0, import_pathe24.join)($.vc.update.dir, `${$.vc.number}.zip`);
-    const v = parseVersionNumber($.cache.build.themeVersion);
+    $.vc.update.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.major}`);
+    $.vc.update.zip = (0, import_node_path24.join)($.vc.update.dir, `${$.vc.number}.zip`);
+    const v2 = parseVersionNumber($.cache.build.themeVersion);
     $.vc.number = $.cache.build.themeVersion;
-    $.vc.patch = v.patch;
-    $.vc.minor = v.minor;
-    $.vc.major = v.major;
-    $.vc.dir = (0, import_pathe24.join)($.dirs.export, `v${$.vc.major}`);
-    $.vc.zip = (0, import_pathe24.join)($.vc.dir, `${$.vc.number}.zip`);
+    $.vc.patch = v2.patch;
+    $.vc.minor = v2.minor;
+    $.vc.major = v2.major;
+    $.vc.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.major}`);
+    $.vc.zip = (0, import_node_path24.join)($.vc.dir, `${$.vc.number}.zip`);
   } else {
-    const v = parseVersionNumber($.pkg.version);
+    const v2 = parseVersionNumber($.pkg.version);
     $.vc.number = $.pkg.version;
-    $.vc.patch = v.patch;
-    $.vc.minor = v.minor;
-    $.vc.major = v.major;
-    $.vc.dir = (0, import_pathe24.join)($.dirs.export, `v${$.vc.major}`);
-    $.vc.zip = (0, import_pathe24.join)($.vc.dir, `${$.vc.number}.zip`);
+    $.vc.patch = v2.patch;
+    $.vc.minor = v2.minor;
+    $.vc.major = v2.major;
+    $.vc.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.major}`);
+    $.vc.zip = (0, import_node_path24.join)($.vc.dir, `${$.vc.number}.zip`);
   }
   if (cli.release !== null) {
     $.vc.update = object($.vc);
@@ -16842,10 +18963,10 @@ function setVersion(cli) {
     } else if (cli.release === "major") {
       $.vc.update.major = $.vc.major + 1;
       $.vc.update.bump = "major";
-      $.vc.update.dir = (0, import_pathe24.join)($.dirs.export, `v${$.vc.update.major}`);
+      $.vc.update.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.update.major}`);
     }
     $.vc.update.number = `${$.vc.update.major}.${$.vc.update.minor}.${$.vc.update.patch}`;
-    $.vc.update.zip = (0, import_pathe24.join)($.vc.update.dir, `${$.vc.update.number}.zip`);
+    $.vc.update.zip = (0, import_node_path24.join)($.vc.update.dir, `${$.vc.update.number}.zip`);
   }
 }
 
@@ -16855,9 +18976,9 @@ var import_tree_kill = __toESM(require_tree_kill());
 
 // syncify/cli/spawn.ts
 init_cjs_shims();
-var import_cross_spawn = require("cross-spawn");
+var import_node_child_process2 = require("child_process");
 function spawned(name, command, callback) {
-  const child = (0, import_cross_spawn.spawn)(command.cmd, command.args, { stdio: "pipe" });
+  const child = (0, import_node_child_process2.spawn)(command.cmd, command.args, { stdio: "pipe" });
   command.pid = child.pid;
   (async function wait() {
     if ($.env.ready === false) {
@@ -16958,7 +19079,7 @@ function setSpawns() {
     queue.clear();
     nwl("");
     spawn4.streams.forEach((child, name) => {
-      log(`- ${gray2(`pid: #${child.pid} (${name}) process exited`)}`);
+      log(`- ${t(`pid: #${child.pid} (${name}) process exited`)}`);
       (0, import_tree_kill.default)(child.pid);
     });
     nwl("");
@@ -16969,7 +19090,7 @@ function setSpawns() {
 
 // syncify/options/script.ts
 init_cjs_shims();
-var import_pathe25 = require("pathe");
+var import_node_path25 = require("path");
 var import_anymatch5 = __toESM(require_anymatch());
 async function setScriptOptions() {
   if (!has("script", $.config.transform)) return;
@@ -16983,12 +19104,7 @@ async function setScriptOptions() {
     addWatch: false,
     flatten: true
   });
-  const esbuildOptions = omit([
-    "input",
-    "watch",
-    "rename",
-    "snippet"
-  ]);
+  const esbuildOptions = omit(["input", "watch", "rename", "snippet"]);
   if (!has("absWorkingDir", $.processor.esbuild)) {
     $.processor.esbuild.absWorkingDir = $.cwd;
   }
@@ -17057,8 +19173,8 @@ async function setScriptOptions() {
     bundle.uuid = uuid();
     bundle.snippet = script2.snippet;
     bundle.input = script2.input;
-    bundle.output = (0, import_pathe25.join)($.dirs.output, keyDir, rename);
-    bundle.key = (0, import_pathe25.join)(keyDir, rename);
+    bundle.output = (0, import_node_path25.join)($.dirs.output, keyDir, rename);
+    bundle.key = (0, import_node_path25.join)(keyDir, rename);
     bundle.size = NaN;
     bundle.watch = null;
     bundle.watchCustom = null;
@@ -17155,7 +19271,7 @@ async function setScriptOptions() {
 init_cjs_shims();
 var import_fast_glob7 = __toESM(require("fast-glob"));
 var import_anymatch6 = __toESM(require_anymatch());
-var import_pathe26 = require("pathe");
+var import_node_path26 = require("path");
 var import_fs_extra21 = require("fs-extra");
 async function getExternalModules() {
   const postcss4 = await readConfigFile("postcss.config", {
@@ -17254,7 +19370,7 @@ async function setStyleConfig() {
       if (override || isBoolean(style2.tailwind) && style2.tailwind !== false && isNil(style2.tailwind) === false) {
         const tw = merge(override ? style2.tailwind : $.processor.tailwind.config);
         if (isArray(tw.content) && isEmpty(tw.content)) {
-          tw.content = [(0, import_pathe26.join)($.dirs.input, "**", "*.{js,ts,jsx,tsx,vue,svelte,liquid,json,schema}")];
+          tw.content = [(0, import_node_path26.join)($.dirs.input, "**", "*.{js,ts,jsx,tsx,vue,svelte,liquid,json,schema}")];
         }
         defineProperty(bundle, "tailwind", {
           get() {
@@ -17332,7 +19448,7 @@ async function setStyleConfig() {
               if (isArray(style2.sass[option])) {
                 const includePaths = [];
                 for (const path3 of style2.sass[option]) {
-                  const resolve3 = (0, import_pathe26.join)($.cwd, path3);
+                  const resolve3 = (0, import_node_path26.join)($.cwd, path3);
                   if (await (0, import_fs_extra21.exists)(resolve3)) {
                     includePaths.push(resolve3);
                   } else {
@@ -17364,7 +19480,7 @@ async function setStyleConfig() {
           }
         );
       }
-      if (style2.snippet === false && !/\.s[ac]ss/.test((0, import_pathe26.extname)(bundle.input))) {
+      if (style2.snippet === false && !/\.s[ac]ss/.test((0, import_node_path26.extname)(bundle.input))) {
         warn3("Input is not a sass file", bundle.input);
       }
     }
@@ -17416,7 +19532,7 @@ async function setStyleConfig() {
         );
       }
       for (const uri of style2.watch) {
-        const globs = await (0, import_fast_glob7.default)((0, import_pathe26.join)($.cwd, path2(uri)));
+        const globs = await (0, import_fast_glob7.default)((0, import_node_path26.join)($.cwd, path2(uri)));
         if (globs.length === 0 && uri[0] !== "!") {
           warn3("Cannot resolve watch glob/path uri", uri);
         }
@@ -17437,9 +19553,9 @@ async function setStyleConfig() {
       $.watch.add(bundle.input);
     }
     if (isObject(bundle.sass)) {
-      bundle.sass.include.unshift($.cwd, (0, import_pathe26.join)($.cwd, rename.dir));
+      bundle.sass.include.unshift($.cwd, (0, import_node_path26.join)($.cwd, rename.dir));
       if (hasPath("sass.include", style2)) {
-        bundle.sass.include = style2.sass.include.map((p) => (0, import_pathe26.join)($.cwd, p));
+        bundle.sass.include = style2.sass.include.map((p) => (0, import_node_path26.join)($.cwd, p));
       }
     }
     if (has3("snippet")) {
@@ -17492,12 +19608,12 @@ async function setStyleConfig() {
       }
       $.paths.transforms.set(bundle.input, 9 /* Style */);
       if ($.mode.watch) {
-        $.watch.unwatch((0, import_pathe26.join)($.dirs.output, "snippets", bundle.rename));
+        $.watch.unwatch((0, import_node_path26.join)($.dirs.output, "snippets", bundle.rename));
       }
     } else {
       bundle.rename = rename.name;
       if ($.mode.watch) {
-        $.watch.unwatch((0, import_pathe26.join)($.dirs.output, "assets", rename.name));
+        $.watch.unwatch((0, import_node_path26.join)($.dirs.output, "assets", rename.name));
       }
     }
     $.style.push(bundle);
@@ -17555,7 +19671,7 @@ function setLiquidOptions() {
 
 // syncify/options/svg.ts
 init_cjs_shims();
-var import_pathe27 = require("pathe");
+var import_node_path27 = require("path");
 async function setSvgOptions() {
   if (!has("svg", $.config.transform)) return;
   if (!$.config.transform.svg || isEmpty($.config.transform.svg)) return;
@@ -17566,8 +19682,8 @@ async function setSvgOptions() {
   });
   for (const svg2 of svgs) {
     const files = svg2.input.filter((path2) => {
-      if ((0, import_pathe27.extname)(path2) === ".svg") return true;
-      warn3("Excluded file which is not an SVG type", (0, import_pathe27.relative)($.cwd, path2));
+      if ((0, import_node_path27.extname)(path2) === ".svg") return true;
+      warn3("Excluded file which is not an SVG type", (0, import_node_path27.relative)($.cwd, path2));
       return false;
     });
     if (files.length === 0) {
@@ -17606,7 +19722,7 @@ async function setSvgOptions() {
             key: "format",
             expects: "sprite | file",
             reason: [
-              `SVG transforms require you to define ${cyan2("format")} Syncify needs to knows how`,
+              `SVG transforms require you to define ${Dn("format")} Syncify needs to knows how`,
               "it should handle the input and which processor to use for the transform."
             ]
           }
@@ -17638,41 +19754,41 @@ async function setSvgOptions() {
 
 // syncify/options/hot.ts
 init_cjs_shims();
-var import_pathe29 = require("pathe");
+var import_node_path29 = require("path");
 
 // syncify/hot/server.ts
 init_cjs_shims();
 var import_uWebSockets2 = __toESM(require("uWebSockets.js"));
 var import_node_http = __toESM(require("http"));
-var import_serve_static = __toESM(require("serve-static"));
-var import_finalhandler = __toESM(require("finalhandler"));
+var import_serve_static = __toESM(require_serve_static());
+var import_finalhandler = __toESM(require_finalhandler());
 var import_fast_glob8 = __toESM(require("fast-glob"));
 var import_fs_extra22 = require("fs-extra");
-var import_pathe28 = require("pathe");
+var import_node_path28 = require("path");
 var HOTError = {
   enable: true,
   output: []
 };
 async function injection() {
-  log_update_default(Line(gray2("validating snippet injection")));
+  log_update_default(Line(t("validating snippet injection")));
   const snippet2 = await injectSnippet();
   if (snippet2) {
-    log_update_default(Line(gray2("validating layouts")));
+    log_update_default(Line(t("validating layouts")));
     for (const layout in $.hot.alive) {
       const exists2 = await (0, import_fs_extra22.pathExists)(layout);
       if (!exists2) {
-        log_update_default(Line(gray2("layout has not yet been bundled, building now...")));
+        log_update_default(Line(t("layout has not yet been bundled, building now...")));
         const files = import_fast_glob8.default.sync($.paths.layout.config, {
           cwd: $.dirs.input,
           absolute: true
         });
         for (const input of files) {
-          if ((0, import_pathe28.basename)(input) === (0, import_pathe28.basename)(layout)) {
+          if ((0, import_node_path28.basename)(input) === (0, import_node_path28.basename)(layout)) {
             const source = await (0, import_fs_extra22.readFile)(input);
             await (0, import_fs_extra22.writeFile)(layout, source);
           }
         }
-        log_update_default(Line(gray2("layout was bundled from source, injecting hot snippet")));
+        log_update_default(Line(t("layout was bundled from source, injecting hot snippet")));
       }
       try {
         const render = await injectRender(layout);
@@ -17698,18 +19814,18 @@ async function injection() {
 async function server() {
   if (!HOTError.enable) {
     HOTError.output.push(
-      Tree.red,
-      Tree.red + redBright2("Change the socket port address or kill the session occupying it."),
-      Tree.red + redBright2("This error typically occurs when multiple Syncify instances are active.")
+      de.red,
+      de.red + J("Change the socket port address or kill the session occupying it."),
+      de.red + J("This error typically occurs when multiple Syncify instances are active.")
     );
-    error2(redBright2(`${bold2("ERROR")} on ${bold2(`${$.hot.method === "hot" ? "HOT" : "LIVE"} Reload:`)}`));
+    error2(J(`${or("ERROR")} on ${or(`${$.hot.method === "hot" ? "HOT" : "LIVE"} Reload:`)}`));
     log(HOTError.output.join("\n"));
     return null;
   }
-  log(Line(bold2(`${$.hot.method === "hot" ? "HOT Reload" : "LIVE Reload"}${COL}`)));
+  log(Line(or(`${$.hot.method === "hot" ? "HOT Reload" : "LIVE Reload"}${wr}`)));
   log_update_default(Line("configuring HOT Reload"));
   await injection();
-  const url = (0, import_pathe28.join)($.dirs.output, "assets");
+  const url = (0, import_node_path28.join)($.dirs.output, "assets");
   const app = import_uWebSockets2.default.App();
   app.get("/*", (response, request2) => {
     response.writeHeader("Access-Control-Allow-Origin", "*");
@@ -17719,7 +19835,7 @@ async function server() {
   });
   app.listen($.hot.server, (token) => {
     if (token) {
-      log_update_default(Line(`${neonCyan("server")}  ${ARR}  ${gray2("PORT")}  ${ARR} ${pink(`${$.hot.server}`)}`));
+      log_update_default(Line(`${gr("server")}  ${Cr}  ${t("PORT")}  ${Cr} ${sr(`${$.hot.server}`)}`));
     } else {
       console.log("Failed to listen to port " + $.hot.server);
     }
@@ -17756,9 +19872,9 @@ async function socket() {
   }).listen($.hot.socket, (token) => {
     listener = token;
     if (token) {
-      log(Line(`${neonCyan("socket")}  ${ARR}  ${gray2("PORT")}  ${ARR} ${pink(`${$.hot.socket}`)}`));
+      log(Line(`${gr("socket")}  ${Cr}  ${t("PORT")}  ${Cr} ${sr(`${$.hot.socket}`)}`));
       for (const p in $.hot.alive) {
-        log(Line(`${neonCyan("layout")}  ${ARR}  ${gray2((0, import_pathe28.relative)($.cwd, p))}`));
+        log(Line(`${gr("layout")}  ${Cr}  ${t((0, import_node_path28.relative)($.cwd, p))}`));
       }
       nwl();
     } else {
@@ -17882,11 +19998,11 @@ async function setHotReloads() {
       }
     }
   }
-  $.hot.snippet = (0, import_pathe29.join)($.cwd, "node_modules", "@syncify/cli", "hot.js.liquid");
-  $.hot.output = (0, import_pathe29.join)($.dirs.output, "snippets", "hot.js.liquid");
-  const base = (0, import_pathe29.join)($.dirs.output, "layout");
+  $.hot.snippet = (0, import_node_path29.join)($.cwd, "node_modules", "@syncify/cli", "hot.js.liquid");
+  $.hot.output = (0, import_node_path29.join)($.dirs.output, "snippets", "hot.js.liquid");
+  const base = (0, import_node_path29.join)($.dirs.output, "layout");
   for (const layout of $.hot.layouts) {
-    const path2 = (0, import_pathe29.join)(base, layout);
+    const path2 = (0, import_node_path29.join)(base, layout);
     $.hot.alive[path2] = false;
     if (!$.cache.build.hotSnippet.includes(base)) {
       $.cache.build.hotSnippet.push(base);
@@ -17907,63 +20023,63 @@ async function setHotReloads() {
 
 // syncify/options/filters.ts
 init_cjs_shims();
-var import_pathe30 = require("pathe");
+var import_node_path30 = require("path");
 function throwCommandError(type2, cmd) {
   const pattern = [];
   const ref = object();
   if ($.mode.upload) {
     ref.base = "output";
     ref.from = "output";
-    ref.dirs = THEME_DIRS.map((dir) => `${white2("-")} ${blue2(dir)}`);
+    ref.dirs = THEME_DIRS.map((dir) => `${Wn("-")} ${Vn(dir)}`);
     ref.fix = [
-      `The ${blue2("--filter")} (or ${blue2("-f")}) flag command argument expects you`,
+      `The ${Vn("--filter")} (or ${Vn("-f")}) flag command argument expects you`,
       "provide a theme output directory as the starting point. Filtering begins with",
       "a Shopify output directory name, for example:",
       "",
-      `${white2("$")} ${white2(`syncify --filter ${blue2("sections/file.liquid")}`)}`,
-      `${white2("$")} ${white2(`syncify --filter ${blue2("snippets/*")}`)}`,
-      `${white2("$")} ${white2(`syncify --filter ${blue2("templates/*.json")}`)}`,
-      `${white2("$")} ${white2(`syncify --filter ${blue2("!assets/some-file.ext")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("sections/file.liquid")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("snippets/*")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("templates/*.json")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("!assets/some-file.ext")}`)}`,
       "",
-      `Syncify will automatically resolve files from within your defined ${bold2(ref.base)} directory`,
+      `Syncify will automatically resolve files from within your defined ${or(ref.base)} directory`,
       "based on the starting point directory name. You can pass glob star matches following the",
-      `directory namespace or starting point ignores (${blue2("!")}) as long the directory can match.`
+      `directory namespace or starting point ignores (${Vn("!")}) as long the directory can match.`
     ];
   } else {
     ref.base = "input";
     ref.from = "paths";
-    ref.dirs = PATH_KEYS.map((dir) => `${white2("-")} ${blue2(dir)}`);
+    ref.dirs = PATH_KEYS.map((dir) => `${Wn("-")} ${Vn(dir)}`);
     ref.fix = [
-      `The ${blue2("--filter")} (or ${blue2("-f")}) flag command argument expects you`,
-      `provide a ${yellow2.bold("paths")} key name as the starting point. Filtering begins with`,
+      `The ${Vn("--filter")} (or ${Vn("-f")}) flag command argument expects you`,
+      `provide a ${v.bold("paths")} key name as the starting point. Filtering begins with`,
       "a Shopify output directory name, for example:",
       "",
-      `${white2("$")} ${white2(`syncify --filter ${blue2("sections/file.liquid")}`)}`,
-      `${white2("$")} ${white2(`syncify --filter ${blue2("snippets/*")}`)}`,
-      `${white2("$")} ${white2(`syncify --filter ${blue2("templates/*.json")}`)}`,
-      `${white2("$")} ${white2(`syncify --filter ${blue2("!assets/some-file.ext")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("sections/file.liquid")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("snippets/*")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("templates/*.json")}`)}`,
+      `${Wn("$")} ${Wn(`syncify --filter ${Vn("!assets/some-file.ext")}`)}`,
       "",
-      `Syncify will automatically resolve files from within your defined ${bold2(ref.base)} directory`,
-      `based on the starting point ${bold2("paths")} name. You can pass glob star matches following the`,
-      `starting point or ignores (${blue2("!")}) as long the reference can match.`
+      `Syncify will automatically resolve files from within your defined ${or(ref.base)} directory`,
+      `based on the starting point ${or("paths")} name. You can pass glob star matches following the`,
+      `starting point or ignores (${Vn("!")}) as long the reference can match.`
     ];
   }
   if (type2 === "pattern") {
-    pattern.push(`Invalid ${blue2("--filter")} pattern provided. You cannot pass starting point`);
+    pattern.push(`Invalid ${Vn("--filter")} pattern provided. You cannot pass starting point`);
     if (cmd[0] === "*") {
-      pattern.push(`glob (${blue2("*")}) stars as filters, Syncify does not support this.`);
+      pattern.push(`glob (${Vn("*")}) stars as filters, Syncify does not support this.`);
     } else if (cmd[0] === "/") {
-      pattern.push(`path (${blue2("/")}) roots as filters, Syncify does not support this.`);
+      pattern.push(`path (${Vn("/")}) roots as filters, Syncify does not support this.`);
     } else if (cmd[0] === ".") {
-      pattern.push(`dot paths (${blue2(".")})  as filters, Syncify does not support this.`);
+      pattern.push(`dot paths (${Vn(".")})  as filters, Syncify does not support this.`);
     }
     pattern.push(
-      `Use a starting point reference name based on the ${blue2(ref.from)} key property`,
-      `in your ${blue2($.file.base)} file.`
+      `Use a starting point reference name based on the ${Vn(ref.from)} key property`,
+      `in your ${Vn($.file.base)} file.`
     );
   } else {
     pattern.push(
-      `Invalid directory provided. The ${blue2("--filter")} pattern expects the starting point`,
+      `Invalid directory provided. The ${Vn("--filter")} pattern expects the starting point`,
       "directory path be one of the following:",
       "",
       ...ref.dirs,
@@ -17987,7 +20103,7 @@ function parseFilter(base, input, regexp) {
   if (!regexp.test(input)) throwCommandError("dir", input);
   const path2 = input.slice(0, input.indexOf("/"));
   if (!isArray($.filters[path2])) $.filters[path2] = [];
-  $.filters[path2].push((0, import_pathe30.join)(base, input));
+  $.filters[path2].push((0, import_node_path30.join)(base, input));
 }
 function setFilters(cli) {
   if (!has("filter", cli)) return;
@@ -18075,13 +20191,13 @@ async function setPublishConfig() {
         "Missing ngrok auth token",
         [
           "Theme publishing requires an ngrok authorisation token",
-          `This is easy to obtain, visit ${underline2("https://ngrok.com")}`,
-          `and create a ${bold2("free")} account to get a token.`,
+          `This is easy to obtain, visit ${rr("https://ngrok.com")}`,
+          `and create a ${or("free")} account to get a token.`,
           "",
-          `Once you have obtained an auth token, provide it in your ${gray2(".env")}`,
+          `Once you have obtained an auth token, provide it in your ${t(".env")}`,
           "file, use the following environment variable name:",
           "",
-          `${whiteBright2('ngrok_auth_token = ""')}`
+          `${pe('ngrok_auth_token = ""')}`
         ]
       );
     }
@@ -18092,22 +20208,19 @@ async function setPublishConfig() {
 async function define(cli, options) {
   timer.start("runtime");
   runtime($);
-  await getEnvFile(cli);
-  await getPackageJson(cli);
-  await getConfig(cli);
-  await getCache(cli);
-  setMisc(cli);
-  setModes(cli);
-  if ($.mode.setup || $.mode.strap) return;
+  await getEnvFile();
+  await getPackageJson();
+  await getConfig();
+  await getCache();
+  if ($.mode.setup || $.mode.strap || $.mode.themes) return;
   process.env.SYNCIFY_ENV = $.env.dev ? "dev" : "prod";
   process.env.SYNCIFY_WATCH = String($.mode.watch);
-  setBaseDirs(cli);
   setVersion(cli);
   setFilters(cli);
   runtime.modes($);
   await setSync(cli);
   if ($.mode.themes) return;
-  setChokidar(cli.watch || cli.upload);
+  setChokidar();
   setProcessors();
   setPublishConfig();
   setSpawns();
@@ -18137,30 +20250,14 @@ async function define(cli, options) {
       cacheDone()
     ]
   ).catch((e) => {
-    throws(e, {
-      details: "Runtime error"
-    });
+    throws(e, { details: "Runtime error" });
   });
   runtime.warnings($);
   if (!$.mode.build) runtime.time();
   return promise;
 }
-function setMisc(cli) {
-  $.restart = false;
-  $.cli = cli;
-  $.cwd = cli.cwd;
-  $.env.cli = cli.cli;
-  $.env.prod = cli.prod;
-  $.env.dev = cli.dev && !cli.prod;
-  $.terminal.wrap = Math.round($.terminal.cols - $.terminal.cols / 3);
-  const prop = hasProp($.config.log);
-  if (prop("silent")) $.log.config.silent = $.config.log.silent;
-  if (prop("clear")) $.log.config.clear = $.config.log.clear;
-  if (prop("stats")) $.log.config.stats = $.config.log.stats;
-  if (prop("warnings")) $.log.config.warnings = $.config.log.warnings;
-}
-function setChokidar(watch2) {
-  if (!watch2) return;
+function setChokidar() {
+  if (!($.cmd.watch || $.cmd.upload)) return;
   $.watch = new import_chokidar.FSWatcher({
     persistent: true,
     ignoreInitial: true,
@@ -18170,7 +20267,7 @@ function setChokidar(watch2) {
     ignored: ["*.map"],
     ignorePermissionErrors: true
   });
-  $.watch = Object.defineProperties($.watch, {
+  $.watch = defineProperties($.watch, {
     has: {
       value(path2, dir = $.cwd) {
         return $.watch._watched.has(dir) ? $.watch._watched.get(dir).items.has(path2) : false;
@@ -18247,15 +20344,15 @@ function setPlugins() {
     }
   }
 }
-async function getConfig(cli) {
-  const config = await configFile(cli.cwd);
+async function getConfig() {
+  const config = await configFile();
   if (config !== null) {
     $.config = config;
   } else if (has("syncify", $.pkg)) {
     if (has("config", $.pkg.syncify)) {
       $.config = $.pkg.syncify.config;
-    } else if (!has("stores", $.pkg.syncify) && cli.setup === false && cli.strap === null) {
-      missingConfig(cli.cwd);
+    } else if (!has("stores", $.pkg.syncify) && $.cmd.setup === false && !$.cmd.strap) {
+      missingConfig($.cwd);
     }
   }
 }
@@ -18296,15 +20393,15 @@ async function setup() {
   };
   const theme3 = assign({}, theme2, {
     pointer(choice, index) {
-      const prefix = this.state.index === index ? Tree.stub.trimEnd() + " " : Tree.trim + " ";
+      const prefix = this.state.index === index ? de.stub.trimEnd() + " " : de.trim + " ";
       return prefix;
     }
   });
   const messages = [
-    `Existing Setup${COL}  `,
-    `Shopify Domain${COL}  `,
-    `Admin API Token${COL} `,
-    `Ngrok API Token${COL} `
+    `Existing Setup${wr}  `,
+    `Shopify Domain${wr}  `,
+    `Admin API Token${wr} `,
+    `Ngrok API Token${wr} `
   ];
   if ($.env.file !== null) {
     return log(
@@ -18354,9 +20451,9 @@ async function setup() {
   if (isBoolean(scopes)) {
     return log(
       message.NL.Wrap(
-        `Connection failed on ${cyan2(`${domain}.myshopify.com`)}. Please check the API Access Token`,
+        `Connection failed on ${Dn(`${domain}.myshopify.com`)}. Please check the API Access Token`,
         "is correct and you have set the right access scopes, then try again.",
-        red2
+        _
       ).NL.End($.log.group).BR.toString()
     );
   }
@@ -18365,14 +20462,14 @@ async function setup() {
     for (const { handle } of scopes.access_scopes) {
       if (handle in model.scopes) {
         model.scopes[handle] = true;
-        message.Line(`${CHK} ${handle}`);
+        message.Line(`${xr} ${handle}`);
       }
     }
   }
   let count = 0;
   for (const scope in model.scopes) {
     if (model.scopes[scope] === false) {
-      message.Line(`${BAD} ${scope}`, red2);
+      message.Line(`${Br} ${scope}`, _);
       count = count + 1;
     }
   }
@@ -18381,7 +20478,7 @@ async function setup() {
       message.NL.Wrap(
         "Syncify requires read and write access to all the above resources.",
         "Provide access to all scopes listed in red (above) and try again.",
-        red2
+        _
       ).NL.End($.log.group).BR.toString()
     );
   }
@@ -18396,24 +20493,24 @@ async function setup() {
 init_cjs_shims();
 var import_enquirer4 = require("enquirer");
 var import_fs_extra23 = require("fs-extra");
-var import_pathe31 = require("pathe");
+var import_node_path31 = require("path");
 async function strap() {
-  const dir = (0, import_pathe31.join)($.cwd, "node_modules", "@syncify/cli", "straps");
+  const dir = (0, import_node_path31.join)($.cwd, "node_modules", "@syncify/cli", "straps");
   const straps = {
-    dawn: (0, import_pathe31.join)(dir, "dawn"),
-    dusk: (0, import_pathe31.join)(dir, "dusk"),
-    silk: (0, import_pathe31.join)(dir, "silk")
+    dawn: (0, import_node_path31.join)(dir, "dawn"),
+    dusk: (0, import_node_path31.join)(dir, "dusk"),
+    silk: (0, import_node_path31.join)(dir, "silk")
   };
   const theme3 = assign({}, theme2, {
     pointer(choice, index) {
-      const prefix = this.state.index === index ? Tree.stub.trimEnd() + " " : Tree.trim + " ";
+      const prefix = this.state.index === index ? de.stub.trimEnd() + " " : de.trim + " ";
       return prefix;
     }
   });
   const { template } = await (0, import_enquirer4.prompt)({
     type: "select",
     name: "template",
-    message: `Choose Strap${COL}    `,
+    message: `Choose Strap${wr}    `,
     required: true,
     theme: theme3,
     choices: [
@@ -18438,14 +20535,13 @@ async function strap() {
 }
 
 // syncify/index.ts
-async function run(options, config, callback) {
-  if (has2("_", options)) options._ = options._.slice(1);
-  if (import_node_process10.argv.slice(2).length === 0 || options.help === "examples" || isString(options.help) && options.help.length === 0) return help(options);
-  await define(options, config);
+async function run(cmd, config, callback) {
+  if (cmd.help) return help(cmd);
+  await define(cmd, config);
   if ($.mode.themes) return themes();
   if ($.mode.setup) return setup();
   if ($.mode.strap) return strap();
-  process.stdin.on("data", stdin);
+  import_node_process9.default.stdin.on("data", stdin);
   try {
     $.env.ready = true;
     if ($.mode.build && $.mode.export === false) {
@@ -18539,5 +20635,136 @@ imurmurhash/imurmurhash.js:
    * @see http://github.com/garycourt/murmurhash-js
    * @author <a href="mailto:aappleby@gmail.com">Austin Appleby</a>
    * @see http://sites.google.com/site/murmurhash/
+   *)
+
+encodeurl/index.js:
+  (*!
+   * encodeurl
+   * Copyright(c) 2016 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+escape-html/index.js:
+  (*!
+   * escape-html
+   * Copyright(c) 2012-2013 TJ Holowaychuk
+   * Copyright(c) 2015 Andreas Lubbe
+   * Copyright(c) 2015 Tiancheng "Timothy" Gu
+   * MIT Licensed
+   *)
+
+parseurl/index.js:
+  (*!
+   * parseurl
+   * Copyright(c) 2014 Jonathan Ong
+   * Copyright(c) 2014-2017 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+depd/index.js:
+  (*!
+   * depd
+   * Copyright(c) 2014-2018 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+statuses/index.js:
+  (*!
+   * statuses
+   * Copyright(c) 2014 Jonathan Ong
+   * Copyright(c) 2016 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+toidentifier/index.js:
+  (*!
+   * toidentifier
+   * Copyright(c) 2016 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+http-errors/index.js:
+  (*!
+   * http-errors
+   * Copyright(c) 2014 Jonathan Ong
+   * Copyright(c) 2016 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+destroy/index.js:
+  (*!
+   * destroy
+   * Copyright(c) 2014 Jonathan Ong
+   * Copyright(c) 2015-2022 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+etag/index.js:
+  (*!
+   * etag
+   * Copyright(c) 2014-2016 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+fresh/index.js:
+  (*!
+   * fresh
+   * Copyright(c) 2012 TJ Holowaychuk
+   * Copyright(c) 2016-2017 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+ee-first/index.js:
+  (*!
+   * ee-first
+   * Copyright(c) 2014 Jonathan Ong
+   * MIT Licensed
+   *)
+
+on-finished/index.js:
+  (*!
+   * on-finished
+   * Copyright(c) 2013 Jonathan Ong
+   * Copyright(c) 2014 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+range-parser/index.js:
+  (*!
+   * range-parser
+   * Copyright(c) 2012-2014 TJ Holowaychuk
+   * Copyright(c) 2015-2016 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+send/index.js:
+  (*!
+   * send
+   * Copyright(c) 2012 TJ Holowaychuk
+   * Copyright(c) 2014-2022 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+serve-static/index.js:
+  (*!
+   * serve-static
+   * Copyright(c) 2010 Sencha Inc.
+   * Copyright(c) 2011 TJ Holowaychuk
+   * Copyright(c) 2014-2016 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+unpipe/index.js:
+  (*!
+   * unpipe
+   * Copyright(c) 2015 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
+finalhandler/index.js:
+  (*!
+   * finalhandler
+   * Copyright(c) 2014-2022 Douglas Christopher Wilson
+   * MIT Licensed
    *)
 */

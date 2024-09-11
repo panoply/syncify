@@ -7,7 +7,7 @@ import { isFunction, isBuffer, isUndefined, isEmptyString } from 'syncify:utils'
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';
-import { basename } from 'pathe';
+import { basename } from 'node:path';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */

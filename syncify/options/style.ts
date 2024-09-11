@@ -2,7 +2,7 @@ import type { StyleTransform, Processors, StyleBundle, SASSConfig, TailwindConfi
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
 import { hasPath } from 'rambdax';
-import { join, extname } from 'pathe';
+import { join, extname } from 'node:path';
 import { exists } from 'fs-extra';
 import { typeError, invalidError, warnOption, missingDependency, throwError } from 'syncify:log/throws';
 import { normalPath } from 'syncify:utils/paths';

@@ -21,9 +21,9 @@
     }
   },
   "devDependencies": {
-    "@syncify/cli": "workspace:0.3.0-beta",
+    "@syncify/cli": "workspace:0.0.1-rc.1",
     "@syncify/stylelint-config": "workspace:^",
-    "autoprefixer": "^10.4.16",
-    "tailwindcss": "^3.3.3"
+    "autoprefixer": "^10.4.20",
+    "tailwindcss": "^3.4.10"
   }
 }

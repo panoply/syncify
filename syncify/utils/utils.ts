@@ -4,7 +4,7 @@
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import strip from 'strip-json-comments';
-import { COL, DSH } from 'syncify:symbol';
+import { COL, DSH } from '@syncify/ansi';
 import type { MultipleTopLevelPatch } from 'types/internal';
 import { assign, create } from 'syncify:native';
 
@@ -587,10 +587,10 @@ export function uuid (): string {
  *
  * @example
  *
-* isNil(undefined) // true
-* isNil(null)      // true
-* isNil(-1)        // false
-*/
+ * isNil(undefined) // true
+ * isNil(null)      // true
+ * isNil(-1)        // false
+ */
 export function isNil (input: any) {
 
   return input === undefined || input === null;
@@ -598,15 +598,15 @@ export function isNil (input: any) {
 }
 
 /**
-* **isEven**
-*
-* Check whether value is even number
-*
-* @example
-*
-* isEven(50) // true
-* isEven(99) // false
-*/
+ * **isEven**
+ *
+ * Check whether value is even number
+ *
+ * @example
+ *
+ * isEven(50) // true
+ * isEven(99) // false
+ */
 export function isEven (number: number) {
 
   return number % 2 === 0;
@@ -614,14 +614,14 @@ export function isEven (number: number) {
 }
 
 /**
-* **isEmptyString**
-*
-* Check whether a Buffer or String is empty
-*
-* @example
-*
-* isEmptyString(' ') // true
-*/
+ * **isEmptyString**
+ *
+ * Check whether a Buffer or String is empty
+ *
+ * @example
+ *
+ * isEmptyString(' ') // true
+ */
 export function isEmptyString (input: Buffer | string) {
 
   if (isBuffer(input)) return input.toString().trim().length === 0;
@@ -631,16 +631,16 @@ export function isEmptyString (input: Buffer | string) {
 }
 
 /**
-* **isEmpty**
-*
-* Check whether a object or array is empty.
-*
-* @example
-*
-* isEmpty([])  // true
-* isEmpty({})  // true
-* isEmpty([1]) // false
-*/
+ * **isEmpty**
+ *
+ * Check whether a object or array is empty.
+ *
+ * @example
+ *
+ * isEmpty([])  // true
+ * isEmpty({})  // true
+ * isEmpty([1]) // false
+ */
 export function isEmpty (input: any) {
 
   if (isObject(input)) {
@@ -656,15 +656,15 @@ export function isEmpty (input: any) {
 }
 
 /**
-* **isArray**
-*
-* Check if param is an array type
-*
-* @example
-*
-* isArray([]) // true
-* isArray({}) // false
-*/
+ * **isArray**
+ *
+ * Check if param is an array type
+ *
+ * @example
+ *
+ * isArray([]) // true
+ * isArray({}) // false
+ */
 export function isArray <T extends any[]> (param: any): param is T {
 
   return Array.isArray(param);
@@ -672,15 +672,15 @@ export function isArray <T extends any[]> (param: any): param is T {
 }
 
 /**
-* **isObject**
-*
-* Check if param is an object type
-*
-* @example
-*
-* isObject({}) // true
-* isObject([]) // false
-*/
+ * **isObject**
+ *
+ * Check if param is an object type
+ *
+ * @example
+ *
+ * isObject({}) // true
+ * isObject([]) // false
+ */
 export function isObject <T extends object> (param: any): param is T {
 
   return typeof param === 'object';
@@ -688,16 +688,33 @@ export function isObject <T extends object> (param: any): param is T {
 }
 
 /**
-* **isString**
-*
-* Check if param is a string type
-*
-* @example
-*
+ * **isString**
+ *
+ * Check if param is a string type and contains `1` or more characters
+ *
+ * @example
+ *
 * isString('') // true
 * isString(``) // true
 * isString([]) // false
 */
+export function isStringStrict <T extends string> (param: any): param is T {
+
+  return typeof param === 'string' && param.length > 0;
+
+}
+
+/**
+ * **isString**
+ *
+ * Check if param is a string type
+ *
+ * @example
+ *
+ * isString('') // true
+ * isString(``) // true
+ * isString([]) // false
+ */
 export function isString <T extends string> (param: any): param is T {
 
   return typeof param === 'string';
@@ -705,10 +722,10 @@ export function isString <T extends string> (param: any): param is T {
 }
 
 /**
-* **isDate**
-*
-* Check if param is a date type
-*/
+ * **isDate**
+ *
+ * Check if param is a date type
+ */
 export function isDate <T extends Date> (param: any): param is T {
 
   return Object.prototype.toString.call(param).slice(8, -1) === 'Date';
@@ -716,10 +733,10 @@ export function isDate <T extends Date> (param: any): param is T {
 }
 
 /**
-* **isRegex**
-*
-* Check if param is an regular expression type
-*/
+ * **isRegex**
+ *
+ * Check if param is an regular expression type
+ */
 export function isRegex <T extends RegExp> (param: any): param is T {
 
   return Object.prototype.toString.call(param).slice(8, -1) === 'RegExp';
@@ -727,10 +744,10 @@ export function isRegex <T extends RegExp> (param: any): param is T {
 }
 
 /**
-* **isFunction**
-*
-* Check if param is a function type
-*/
+ * **isFunction**
+ *
+ * Check if param is a function type
+ */
 export function isFunction <T extends Function> (param: any): param is T {
 
   return typeof param === 'function';
@@ -738,13 +755,40 @@ export function isFunction <T extends Function> (param: any): param is T {
 }
 
 /**
-* **isBoolean**
-*
-* Check if param is a boolean type
-*/
+ * **isBoolean**
+ *
+ * Check if param is a boolean type
+ */
 export function isBoolean <T extends boolean> (param: any): param is T {
 
   return typeof param === 'boolean';
+
+}
+
+/**
+ * **isConstructor**
+ *
+ * Check if param is a constructor or function prototype
+ */
+export function isConstructor (object: object, key: string) {
+
+  return (key === 'constructor' && isFunction(object[key])) || key === '__proto__';
+
+}
+
+/**
+ * **isNumberStrict**
+ *
+ * Check if param is a number type, `0x` number type or
+ * math-like expression number, float etc (e.g: `-200`, `+200` etc)
+ *
+ * > Used for cli args check
+ */
+export function isNumberStrict <T extends number> (param: any): param is T {
+
+  return isNumber(param) ||
+  /^0x[0-9a-f]+$/i.test(param) ||
+  /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(e[-+]?\d+)?$/.test(param);
 
 }
 
@@ -760,10 +804,10 @@ export function isNumber <T extends number> (param: any): param is T {
 }
 
 /**
-* **isNaN**
-*
-* Check if param is `NaN`
-*/
+ * **isNaN**
+ *
+ * Check if param is `NaN`
+ */
 export function isNaN <T extends number> (param: any): param is T {
 
   return Number.isNaN(param);
@@ -771,21 +815,21 @@ export function isNaN <T extends number> (param: any): param is T {
 }
 
 /**
-* **isNull**
-*
-* Check if param is null type
-*/
+ * **isNull**
+ *
+ * Check if param is null type
+ */
 export function isNull <T extends null> (param: any): param is T {
 
-  return Object.prototype.toString.call(param).slice(8, -1) === 'Null';
+  return param === null;
 
 }
 
 /**
-* **isUndefined**
-*
-* Check if param is a undefined type
-*/
+ * **isUndefined**
+ *
+ * Check if param is a undefined type
+ */
 export function isUndefined <T extends undefined> (param: any): param is T {
 
   return typeof param === 'undefined';
@@ -793,10 +837,10 @@ export function isUndefined <T extends undefined> (param: any): param is T {
 }
 
 /**
-* **isAsync**
-*
-* Check if param is Asynchronous type
-*/
+ * **isAsync**
+ *
+ * Check if param is Asynchronous type
+ */
 export function isAsync<T extends Promise<unknown>> (param: any): param is T {
 
   return toString.call(param).slice(8, -1) === 'AsyncFunction';
@@ -804,10 +848,10 @@ export function isAsync<T extends Promise<unknown>> (param: any): param is T {
 }
 
 /**
-* **isBuffer**
-*
-* Check if param is Buffer type
-*/
+ * **isBuffer**
+ *
+ * Check if param is Buffer type
+ */
 export function isBuffer<T extends Buffer> (param: any): param is T {
 
   return Buffer.isBuffer(param);

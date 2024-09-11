@@ -1,7 +1,7 @@
 import type SASS from 'sass';
 import type { Config as TailwindConfig } from 'tailwindcss';
 import type { Syncify, SASSConfig, StyleBundle, ClientParam } from 'types';
-import { basename, join, relative } from 'pathe';
+import { basename, join, relative } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { timer } from 'syncify:timer';
 import { byteSize, sizeDiff } from 'syncify:sizes';
@@ -10,7 +10,7 @@ import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import * as warn from 'syncify:log/warnings';
 import { File, Kind } from 'syncify:file';
-import { bold } from 'syncify:colors';
+import { bold } from '@syncify/ansi';
 import postcss, { PluginCreator } from 'postcss';
 import { toBuffer } from 'syncify:utils/native';
 import { $ } from 'syncify:state';

@@ -1,7 +1,7 @@
 ---
 title: 'Transforms - JavaScript'
 layout: base
-permalink: '/usage/transforms/javascript/index.html'
+permalink: '/options/transform/javascript/index.html'
 prev:
   label: 'Targeting'
   uri: '/cli/targeting'
