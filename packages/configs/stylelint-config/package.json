@@ -20,11 +20,11 @@
   },
   "dependencies": {
     "stylelint-config-rational-order": "^0.1.2",
-    "stylelint-config-standard-scss": "^11.0.0",
-    "stylelint-scss": "^5.2.1"
+    "stylelint-config-standard-scss": "^13.1.0",
+    "stylelint-scss": "^6.5.1"
   },
   "devDependencies": {
-    "stylelint": "^15.11.0"
+    "stylelint": "^16.9.0"
   },
   "peerDependencies": {
     "stylelint": "^15.11.0"
