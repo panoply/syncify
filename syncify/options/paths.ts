@@ -1,70 +1,92 @@
-import type { Paths, PathsInput } from 'types';
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
-import { dirname, join } from 'pathe';
+import { dirname } from 'node:path';
 import { PATH_KEYS } from 'syncify:const';
-import { isArray, has, isObject } from 'syncify:utils';
+import { isArray, isEmpty, isNil, isObject, isString } from 'syncify:utils';
 import { lastPath, normalPath } from 'syncify:utils/paths';
-// import { warnOption } from 'syncify:log/throws';
+import { typeError, warnOption } from 'syncify:log/throws';
 import { $ } from 'syncify:state';
-
-const getPaths = (paths: Paths) => {
-
-  const path = normalPath($.dirs.input);
-
-  return (key: string, fallback: string): string[] => {
-
-    const files = $.config.paths[key];
-
-    if (!has('paths', $.config)) return [ path(fallback) ];
-
-    if (isArray<string[]>(files)) {
-      return files.map(path);
-    }
-
-    if (isObject<PathsInput>(files) && files.input) {
-
-      return isArray(files.input) ? files.input.map(path) : [ path(files.input) ];
-
-    }
-
-    return [ path(files) ];
-
-  };
-};
+import { ARR } from '@syncify/ansi';
 
 /**
  * Get Paths
  *
  * Utility function for normalizing the paths configuration.
- * This will fix and resolve custom paths. If a user
- * defines the build directory input in directory paths
- * it will ensure it is formed correctly.
+ * This will fix and resolve custom paths. If a user defines the
+ * build directory input in directory paths it will ensure it is formed correctly.
  */
 export async function setPaths () {
 
   const path = normalPath($.dirs.input);
+  const warn = warnOption('paths');
 
-  const getPaths = (key: string, fallback: string): string[] => {
+  const getGlobs = (key: string, files: string | string[], fallback: string): string[] => {
+
+    if (isNil(files)) return [ path(fallback) ];
+    if (isArray<string[]>(files)) return files.map(path);
+    if (isString(files)) return [ path(files) ];
+
+    typeError({
+      option: 'paths',
+      expects: 'string | string[]',
+      provided: files,
+      name: key
+    });
+
+  };
+
+  const renameGlobs = (key: 'sections' | 'snippets', fallback: string): string[] => {
 
     const files = $.config.paths[key];
 
-    if (!files) {
-      return [ path(fallback) ];
+    // sections and snippets accept glob rename objects, so we need to
+    // do a little extra work in order to find resolution correctly.
+    if (isObject<Record<string, string | string[]>>(files)) {
+
+      if (isEmpty(files)) {
+
+        warn(`Undefined ${key} paths, using fallback`, '{}');
+        return [ path(fallback) ];
+
+      }
+
+      const paths: string[] = [];
+
+      for (const rename in files) {
+
+        if (isArray<string[]>(files[rename])) {
+
+          paths.push(...files[rename]);
+
+        } else if (isString(files)) {
+
+          paths.push(files[rename]);
+
+        } else if (isNil(files[rename])) {
+
+          typeError({
+            option: `paths ${ARR} ${key}`,
+            expects: 'string | string[]',
+            provided: files[rename],
+            name: rename
+          });
+
+        }
+
+      }
+
+      if (paths.length === 0) {
+        warn(`Unresolved ${key} paths, using fallback`, '{}');
+        return [ path(fallback) ];
+      }
+
+      return paths.map(path);
+
+    } else {
+
+      return getGlobs(key, files, fallback);
+
     }
-
-    if (isArray<string[]>(files)) {
-      return files.map(path);
-    }
-
-    if (isObject<PathsInput>(files) && files.input) {
-
-      return isArray(files.input) ? files.input.map(path) : [ path(files.input) ];
-
-    }
-
-    return [ path(files) ];
-
   };
 
   // Loop through each path type
@@ -72,36 +94,47 @@ export async function setPaths () {
 
     let paths: string[] = [];
 
-    switch (key) {
-      case 'customers':
-        paths = getPaths(key, 'templates/customers/*'); break;
-      case 'metaobject':
-        paths = getPaths(key, 'templates/metaobject/*'); break;
-      case 'schema':
-        paths = getPaths(key, 'schema/*'); break;
-      default:
-        if ($.config.paths[key]) paths = getPaths(key, '');
-    }
-
-    // Special handling for certain keys
     if (key === 'snippets' || key === 'sections') {
-      paths.forEach(p => $[key].baseDir.add(lastPath(dirname(p))));
-    } else if (key === 'assets') {
-      paths.push(join($.dirs.output, 'assets/*'));
+
+      // snippets and sections accepts object rename structures
+      paths = renameGlobs(key, `${key}/*`);
+
+      // base directory paths
+      paths.forEach(p => $[key.slice(0, -1)].baseDir.add(lastPath(dirname(p))));
+
+    } else if (key === 'customers' || key === 'metaobject') {
+
+      // These paths as defaults are sudirectories of the themes templates
+      paths = getGlobs(key, $.config.paths[key], `templates/${key}/*`);
+
+    } else {
+
+      // all other paths with either be glob string or glob array
+      paths = getGlobs(key, $.config.paths[key], `${key}/*`);
+
     }
 
-    // Process each path
-    for (const p of paths) {
-      if (key !== 'metafields' && key !== 'redirects') {
-        const foundPaths = await glob(p, { cwd: $.cwd });
-        if (foundPaths.length) {
-          foundPaths.forEach(entry => $.paths[key].input.add(entry));
+    $.paths[key].match = anymatch(paths);
+
+    if (key !== 'metafields' && key !== 'redirects') {
+
+      if ($.paths[key].input === null) {
+
+        $.paths[key].input = new Set(paths);
+
+        paths.forEach(p => $.watch.add(p));
+
+      } else {
+
+        (await glob(paths, { cwd: $.cwd })).forEach(p => {
+          $.paths[key].input.add(p);
           $.watch.add(p);
-        } else if (key !== 'assets' || p !== join($.dirs.output, 'assets/*')) {
-          // Optionally log or handle the case where no files are found
-        }
+        });
+
       }
-      $.paths[key].match = anymatch(paths);
+
     }
+
   }
+
 }
