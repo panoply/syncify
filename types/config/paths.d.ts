@@ -1,113 +1,142 @@
+import type { SnippetPaths, SectionPaths } from '../shared';
+
 export interface Paths<T = string | string[]> {
   /**
-   * An array list of files to be uploaded as snippets
+   * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as snippets.
    *
-   * @default 'source/snippets'
-   */
-  snippets?: T | Record<SnippetSeparators, T>
-  /**
-   * An array list of files to be uploaded as sections
+   * @default 'source/snippets/*.{liquid}'
+   * @example
    *
-   * @default 'source/sections'
-   */
-  sections?: T | Record<SnippetSeparators, T>
-  /**
-   * An array list of files to be uploaded as assets
+   * //OPTION 1 - Globs
+   * {
+   *   paths: 'source/snippets/*.liquid'
+   * }
    *
-   * @default 'source/assets'
-   */
-  assets?: T | {
-    /**
-     * An array list of files to be uploaded as assets
-     *
-     * @default 'source/assets'
-     */
-    input: T
-  };
-  /**
-   * An array list of files to be uploaded as layouts
+   * //OPTION 2 - Globs Array
+   * {
+   *   paths: [
+   *    'source/snippets/*.liquid',
+   *    'source/snippets/xxx/*'
+   *   ]
+   * }
    *
-   * @default 'source/layout'
-   */
-  layout?: T | {
-    /**
-     * An array list of files to be uploaded as assets
-     *
-     * @default 'source/assets'
-     */
-    input: T
-  };
-  /**
-   * An array list of files to be uploaded as templates
+   * //OPTION 3 - Rename Object
+   * {
+   *   paths: {
+   *    // Output will be: snippets/foo.bar.liquid
+   *    '[dir].[name]': 'source/snippets/foo/bar.liquid',
+   *    // Output will be: snippets/quz-baz.liquid
+   *    '[name]-[dir]': 'source/snippets/baz/qux.liquid'
+   *   }
+   * }
    *
-   * @default 'source/templates'
-   */
-  templates?: T | Record<TemplateSeparators, T>
-  /**
-   * An array list of files to be uploaded as metaobject templates
    *
-   * @default 'source/templates/metaobject'
+   * //OPTION 4 - Rename Object Glob Array
+   * {
+   *   paths: {
+   *    // Output will be: snippets/foo.bar.liquid
+   *    // Output will be: snippets/baz.qux.liquid
+   *    '[dir].[name]': [
+   *       'source/snippets/foo/bar.liquid',
+   *       'source/snippets/baz/qux.liquid'
+   *    ]
+   *   }
+   * }
    */
-  metaobject?: T | {
-    /**
-     * An array list of files to be uploaded as metaobject templates
-     *
-     * @default 'source/templates/metaobject'
-     */
-    input: T
-  };
+  snippets?: T | Record<SnippetPaths, T>
   /**
-   * An array list of files to be uploaded as template/customers
+   * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as sections.
    *
-   * @default 'source/templates/customers'
+   * > **NOTE**
+   * > This path reference will also sync section group files.
+   *
+   * @default 'source/sections/*.{liquid,json}'
+   * @example
+   *
+   * //OPTION 1 - Globs
+   * {
+   *   paths: 'source/sections/*.liquid'
+   * }
+   *
+   * //OPTION 2 - Globs Array
+   * {
+   *   paths: [
+   *    'source/sections/*.liquid',
+   *    'source/sections/xxx/*'
+   *   ]
+   * }
+   *
+   * //OPTION 3 - Rename Object Glob
+   * {
+   *   paths: {
+   *    // Output will be: sections/foo.bar.liquid
+   *    '[dir].[name]': 'source/sections/foo/bar.liquid',
+   *    // Output will be: sections/quz-baz.liquid
+   *    '[name]-[dir]': 'source/sections/baz/qux.liquid'
+   *   }
+   * }
+   *
+   * //OPTION 4 - Rename Object Glob Array
+   * {
+   *   paths: {
+   *    // Output will be: sections/foo.bar.liquid
+   *    // Output will be: sections/baz.qux.liquid
+   *    '[dir].[name]': [
+   *       'source/sections/foo/bar.liquid',
+   *       'source/sections/baz/qux.liquid'
+   *    ]
+   *   }
+   * }
    */
-  customers?: T | {
-    /**
-     * An array list of files to be uploaded as template/customers
-     *
-     * @default 'source/templates/customers'
-     */
-    input: T
-  };
+  sections?: T | Record<SectionPaths, T>;
   /**
-   * An array list of files to be uploaded as configs, i.e: `settings_schema.json`
+   * A glob string or glob array of files to be uploaded as templates.
+   *
+   * @default 'source/templates/*.{liquid,json}'
+   */
+  templates?: T;
+  /**
+   * A glob string or glob array of files to be uploaded asas metaobject templates
+   *
+   * @default 'source/templates/metaobject/*.{liquid,json}'
+   */
+  metaobject?: T;
+  /**
+   * A glob string or glob array of files to be uploaded as template/customers
+   *
+   * @default 'source/templates/customers/*.{liquid,json}'
+   */
+  customers?: T;
+  /**
+   * A glob string or glob array of files to be uploaded as assets
+   *
+   * @default 'source/assets/*'
+   */
+  assets?: T;
+  /**
+   * A glob string or glob array of files to be uploaded as layouts
+   *
+   * @default 'source/layout/*.liquid'
+   */
+  layout?: T;
+  /**
+   * A glob string or glob array of files to be uploaded as configs, i.e, `settings_schema.json`
    *
    * @default 'source/config/.json'
    */
-  config?: T | {
-    /**
-     * An array list of files to be uploaded as config, i.e: `settings_schema.json`
-     *
-     * @default 'source/config/*.json'
-     */
-    input: T
-  };
+  config?: T;
   /**
-   * An array list of files to be uploaded as config, i.e: `en.default.json`
+   * A glob string or glob array of files to be uploaded as config, i.e, `en.default.json`
    *
    * @default 'source/locales/*.json'
    */
-  locales?: T | {
-    /**
-     * An array list of files to be uploaded as config, i.e: `en.default.json`
-     *
-     * @default 'source/locales/*.json'
-     */
-    input: T
-  };
+  locales?: T;
   /**
-   * An array list of shared section schema `.json` or `.schema` files.
+   * A glob string or glob array of files to be uploaded as **shared schema** `.json` or `.schema` files.
    *
    * @default 'source/schema/*.{json,schema}'
    */
-  schema?: T | {
-    /**
-     * An array list of shared section schema `.json` or `.schema` files.
-     *
-     * @default 'source/schema/*.{json,schema}'
-     */
-    input: T
-  };
+  schema?: T;
   /**
    * **NOT YET AVAILABLE**
    *
@@ -119,29 +148,13 @@ export interface Paths<T = string | string[]> {
    *
    * @default 'source/metafields/'
    */
-  metafields?: T | {
-    /**
-     *
-     * The resolved `metafields` directory path
-     *
-     * @default 'source/metafields/'
-     */
-    input: T
-  };
+  metafields?: T;
   /**
-   * The resolved `pages` directory path
+   * A glob string or glob array string to be uploaded, published and controlled as `pages`
    *
-   * @default 'source/pages'
+   * @default 'source/pages/*.{md,html}'
    */
-  pages?: T | {
-    /**
-     *
-     * The resolved `pages` directory path
-     *
-     * @default 'source/pages'
-     */
-    input: T
-  };
+  pages?: T;
   /**
    * **NOT YET AVAILABLE**
    *
@@ -151,13 +164,5 @@ export interface Paths<T = string | string[]> {
    *
    * @default 'redirects.yaml'
    */
-  redirects?: `${string}.${'yaml' | 'yml'}` | {
-    /**
-     *
-     * The resolved `pages` directory path
-     *
-     * @default 'source/pages'
-     */
-    input: `${string}.${'yaml' | 'yml'}`
-  };
+  redirects?: `${string}.${'yaml' | 'yml'}`;
 }

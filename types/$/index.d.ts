@@ -416,10 +416,6 @@ export interface Modes {
    */
   hot: boolean;
   /**
-   * Run the views transform, `--views`
-   */
-  views: boolean;
-  /**
    * Run the style transform, `--style`
    */
   style: boolean;
@@ -544,14 +540,12 @@ export interface ConfigFile {
 export type SharedSection = Map<string, {
   uri: string;
   description: string | string[] | { [key: string]: string | string[] },
-  schema: {
-    [key: string]: (
-      | SchemaSettings[]
-      | SchemaBlocks[]
-      | SchemaSettings
-      | SchemaBlocks
-    );
-  }
+  schema: Record<string, (
+    | SchemaSettings[]
+    | SchemaBlocks[]
+    | SchemaSettings
+    | SchemaBlocks
+  )>;
 }>
 
 /**
@@ -564,6 +558,10 @@ export type SectionBundle = Merge<Omit<Config.Sections, 'input'>, {
    * Globals pass-through directories
    */
   global: RegExp;
+  /**
+   * Globals pass-through directories
+   */
+  rename: Map<string, string>
   /**
    * Anymatch test instance for section paths
    */
@@ -580,9 +578,7 @@ export type SectionBundle = Merge<Omit<Config.Sections, 'input'>, {
    * The `Set<string>` value contains a list of URI paths to sections
    * referencing the shared schema file
    */
-  schema: {
-    [inputPath: string]: Set<string>;
-  }
+  schema: Record<string, Set<string>>
   /**
    * Shared Schema parsed file.
    *
@@ -597,14 +593,12 @@ export type SectionBundle = Merge<Omit<Config.Sections, 'input'>, {
     /**
      * The parsed JSON schema
      */
-    schema: {
-      [key: string]: (
-        | SchemaSettings[]
-        | SchemaBlocks[]
-        | SchemaSettings
-        | SchemaBlocks
-      );
-    }
+    schema: Record<string, (
+      | SchemaSettings[]
+      | SchemaBlocks[]
+      | SchemaSettings
+      | SchemaBlocks
+    )>;
   }>
 
 }>

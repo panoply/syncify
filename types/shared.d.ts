@@ -42,6 +42,9 @@ export type DirPaths = `${'assets' | 'snippets'}/${string}`
  */
 export type RenamePaths = NamespacePaths;
 
+/**
+ * Snippet Rename Paths
+ */
 export type SnippetPaths = LiteralString<
   | '[name]'
   | '[dir]-[name]'
@@ -52,6 +55,14 @@ export type SnippetPaths = LiteralString<
   | '[name].[dir]'
 >;
 
+/**
+ * Snippet Rename
+ */
+export type SnippetRename = Record<SnippetPaths, string | string[]>
+
+/**
+ * Section Rename Paths
+ */
 export type SectionPaths = LiteralString<
   | '[name]'
   | '[dir]-[name]'
@@ -60,16 +71,30 @@ export type SectionPaths = LiteralString<
   | '[name]_[dir]'
 >;
 
+/**
+ * Snippet Rename
+ */
+export type SectionRename = Record<SectionPaths, string | string[]>
+
+/**
+ * Template Rename Paths
+ */
 export type TemplatePaths = LiteralString<
   | '[name]'
   | '[dir].[name]'
 >;
 
+/**
+ * Custom Rename Paths
+ */
 export type CustomerPaths = LiteralString<
   | '[name]'
   | '[dir].[name]'
 >;
 
+/**
+ * Metaobject Rename Paths
+ */
 export type MetaObjectPaths = LiteralString<
   | '[name]'
   | '[dir]-[name]'

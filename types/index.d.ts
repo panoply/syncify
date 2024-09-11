@@ -6,13 +6,11 @@ export type { Tsconfig } from 'tsconfig-type';
 export type { FileKeys } from './$/file';
 
 export type * from './api';
-export type * from './cli';
 export type * from './shared';
 
 /* CONFIG ------------------------------------- */
 
 export type * from './config';
-export type * from './transform/liquid';
 
 /* STATE -------------------------------------- */
 
@@ -24,6 +22,8 @@ export type * from './$/file';
 export type * from './$';
 export type * from './$/plugin';
 export type * from './$/hot';
+export type * from './$/sections';
+export type * from './$/snippets';
 
 /* TRANSFORM ---------------------------------- */
 

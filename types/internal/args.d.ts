@@ -1,6 +1,4 @@
-/* -------------------------------------------- */
-/* CLI OPTIONS                                  */
-/* -------------------------------------------- */
+import { LiteralString } from 'types/shared';
 
 export interface Commands {
   /**
@@ -18,7 +16,7 @@ export interface Commands {
    * $ syncify store1,store2,store3
    * ```
    */
-  _?: string[];
+  mode?: LiteralString<'themes' | 'strap' | 'setup'>
   /**
    * Whether or not syncify was called via the cli
    *
@@ -38,13 +36,9 @@ export interface Commands {
    */
   interactive?: boolean;
   /**
-   * The current working directory, this a reference to `process.cwd()`
-   */
-  cwd?: string;
-  /**
    * The post-parse temp storage reference to stores
    */
-  store?: string | string[];
+  stores?: string[];
   /**
    * An optional config path to the `syncify.config.js` file.
    *
@@ -122,8 +116,8 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify store_1 -w
-   * $ syncify store_1 --watch
+   * $ sy store_1 -w
+   * $ sy store_1 --watch
    * ```
    */
   watch?: boolean;
@@ -136,12 +130,12 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify
-   * $ syncify -b
-   * $ syncify store_1 --clean --build --theme=prod_theme -u
+   * $ sy
+   * $ sy -b
+   * $ sy store_1 --clean --build --theme=prod_theme -u
    *
    * # Short version for brevity
-   * $ syncify store_1 -t prod_theme -u -b --clean
+   * $ sy store_1 -t prod_theme -u -b --clean
    * ```
    */
   build?: boolean;
@@ -270,8 +264,9 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify store_1 --metafields --pull
-   * $ syncify store_1 --pages --pull
+   * $ sy store_1 -p templates
+   * $ sy store_1 -p metafields
+   * $ sy store_1 -p pages
    * ```
    */
   pull?: boolean;
@@ -284,7 +279,7 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --vsc
+   * $ sy --vsc
    * ```
    */
   vsc?: boolean;
@@ -299,13 +294,13 @@ export interface Commands {
    *
    * ```bash
    * # Uploads only .css assets
-   * $ syncify store_1 -t dev_theme -f assets/*.css -u
+   * $ sy store_1 -t dev_theme -f assets/*.css -u
    *
    * # Builds locales in production mode
-   * $ syncify -f locales/*.json --prod
+   * $ sy -f locales/*.json --prod
    *
    * # Uploads specific page
-   * $ syncify store_1 -u -f pages/shipping-info.md --prod
+   * $ sy store_1 -u -f pages/shipping-info.md --prod
    * ```
    */
   filter?: string;
@@ -319,8 +314,8 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --clean --prod
-   * $ syncify -b --clean --prod # Using with build
+   * $ sy --clean --prod
+   * $ sy -b --clean --prod # Using with build
    * ```
    */
   clean?: boolean;
@@ -338,7 +333,7 @@ export interface Commands {
    * $ syncify --help
    * ```
    */
-  help?: string;
+  help?: boolean;
   /**
    * Hides logs from being printed (shows errors though)
    *
@@ -360,10 +355,10 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify store_1 -w -h
-   * $ syncify store_1 -w --hot
-   * $ syncify store_1 --watch -h
-   * $ syncify store_1 --watch --hot
+   * $ sy store_1 -w -h
+   * $ sy store_1 -w --hot
+   * $ sy store_1 --watch -h
+   * $ sy store_1 --watch --hot
    * ```
    */
   hot?: boolean;
@@ -375,8 +370,8 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --strap dawn
-   * $ syncify --strap silk
+   * $ sy --strap dawn
+   * $ sy --strap silk
    * ```
    */
   strap?: string;
@@ -390,10 +385,16 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify -del assets/image-name.jpg
+   * $ sy -d
+   * $ sy --delete
+   *
+   * # EXAMPLE
+   *
+   * $ sy -d snippets/foo.liquid
+   * $ sy --delete assets/image-name.jpg
    * ```
    */
-  del?: string;
+  delete?: string;
   /**
    * Trigger a spawn, isolating it so it will run as if it were a node script.
    *
@@ -402,14 +403,13 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify -s spawn-name
-   * $ syncify -s spawn-name,some-other-spawn
+   * $ sy -s spawn-name
+   * $ sy -s spawn-name,some-other-spawn
    *
    * # OR
-
-   * $ syncify --spawn spawn-name
-   * $ syncify --spawn spawn-name,some-other-spawn
    *
+   * $ sy --spawn spawn-name
+   * $ sy --spawn spawn-name,some-other-spawn
    * ```
    */
    spawn?: string;
@@ -429,7 +429,7 @@ export interface Commands {
    * $ syncify store_1 --theme=dev,prod,test
    * ```
    */
-  theme?: string[];
+  theme?: string;
   /**
    * An optional input base directory path. This will overwrite and configuration predefined
    * in settings.
@@ -480,26 +480,12 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --bump major
-   * $ syncify --bump minor
-   * $ syncify --bump patch
+   * $ sy --bump major
+   * $ sy --bump minor
+   * $ sy --bump patch
    * ```
    */
   bump?: string;
-  /**
-   * Runs view transforms only (i.e: `.liquid` and `.json` files)
-   * ---
-   *
-   * Example:
-   *
-   * ```bash
-   * $ syncify --views          # executes build
-   * $ syncify -w --views       # executes in watch mode
-   * $ syncify --views --prod   # executes build with minify
-   * $ syncify --views --terse  # executes build with minify
-   * ```
-   */
-  views?: boolean;
   /**
    * Runs the script transform only
    * ---
@@ -508,7 +494,7 @@ export interface Commands {
    *
    * ```bash
    * $ syncify --script          # executes build
-   * $ syncify -w --script       # executes in watch mode
+   * $ syncify --script -w       # executes in watch mode
    * $ syncify --script --prod   # executes build with minify
    * $ syncify --script --terse  # executes build with minify
    * ```
@@ -521,10 +507,10 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --style           # executes build
-   * $ syncify -w --style        # executes in watch mode
-   * $ syncify --style --prod    # executes build with minify
-   * $ syncify --style --terse   # executes build with minify
+   * $ sy --style           # executes build
+   * $ sy --style -w        # executes in watch mode
+   * $ sy --style --prod    # executes build with minify
+   * $ sy --style --terse   # executes build with minify
    * ```
    */
   style?: boolean;
@@ -535,10 +521,10 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --svg           # executes build
-   * $ syncify -w --svg        # executes in watch mode
-   * $ syncify --svg --prod    # executes build with minify
-   * $ syncify --svg --terse   # executes build with minify
+   * $ sy --svg           # executes build
+   * $ sy --svg -w        # executes in watch mode
+   * $ sy --svg --prod    # executes build with minify
+   * $ sy --svg --terse   # executes build with minify
    * ```
    */
   svg?: boolean;
@@ -549,11 +535,41 @@ export interface Commands {
    * Example:
    *
    * ```bash
-   * $ syncify --image           # executes build
-   * $ syncify -w --image        # executes in watch mode
-   * $ syncify --image --prod    # executes build with minify
-   * $ syncify --image --terse   # executes build with minify
+   * $ sy --image           # executes build
+   * $ sy --image -w        # executes in watch mode
+   * $ sy --image --prod    # executes build with minify
+   * $ sy --image --terse   # executes build with minify
    * ```
    */
   image?: boolean;
 }
+
+export interface ParseArgs<T = string | boolean | string[] | boolean[]> {
+  /**
+   * Type of argument.
+   */
+  type: 'string' | 'boolean';
+  /**
+   * Whether this option can be provided multiple times.
+   * If `true`, all values will be collected in an array.
+   * If `false`, values for the option are last-wins.
+   * @default false.
+   */
+  multiple?: boolean;
+  /**
+   * A single character alias for the option.
+   */
+  short?: string;
+  /**
+   * The default option value when it is not set by args.
+   * It must be of the same type as the the `type` property.
+   * When `multiple` is `true`, it must be an array.
+   * @since v18.11.0
+   */
+  default?: T
+}
+
+/**
+ * Parse Arguments Configuration
+ */
+export type Args = { [K in keyof Commands]: ParseArgs<Commands[K]> }
