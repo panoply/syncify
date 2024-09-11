@@ -1,0 +1,35 @@
+{
+  "name": "@syncify/ansi",
+  "version": "0.1.0",
+  "description": "ANSI Colors, Symbols and TUI related terminal enchancements for Syncify.",
+  "type": "module",
+  "main": "../dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    "import": "./dist/index.js",
+    "types": "./types/index.d.ts"
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup --minify"
+  },
+  "keywords": [],
+  "author": {
+    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
+    "url": "https://github.com/panoply",
+    "email": "n.savvidis@gmx.com"
+  },
+  "license": "MIT",
+  "tsup": {
+    "entry": ["src/index.ts"],
+    "dts": true,
+    "clean": true,
+    "platform": "node",
+    "format": "esm",
+    "noExternal": ["ansis"]
+  },
+  "devDependencies": {
+    "ansis": "^3.3.2",
+    "type-fest": "^4.26.1"
+  }
+}
