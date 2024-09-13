@@ -2,7 +2,7 @@
   "name": "@syncify/cli",
   "description": "The next generation build tool for Shopify theme development.",
   "version": "0.0.1-rc.1",
-  "license": "CC BY-NC-ND 4.0",
+  "license": "Apache-2.0",
   "homepage": "https://github.com/panoply/syncify",
   "bugs": "https://github.com/panoply/syncify/issues",
   "repository": {
@@ -62,11 +62,7 @@
   "prettier": "@syncify/prettier-config",
   "eslintConfig": {
     "extends": "@syncify/eslint-config",
-    "ignorePatterns": [
-      "dist",
-      "**/theme",
-      "test/e2e/theme"
-    ],
+    "ignorePatterns": ["dist", "**/theme", "test/e2e/theme"],
     "rules": {
       "object-curly-newline": "off",
       "no-import-assign": "off",
