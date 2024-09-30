@@ -656,9 +656,52 @@ export function hasRenameNamespace (rename: string) {
  * String parser for file renaming. Uses the common braced
  * reference structures found in most bundlers.
  */
-export function renameFile (src: string, rename?: string) {
+export function renameFileParse (src: string, pattern?: string): {
+ /**
+   * The filename extension including the dot, eg: `.liquid`
+   *
+   * @example
+   *
+   * '.ext'
+   */
+  ext: string;
+  /**
+   * The {@link lastPath} parent directory name. This will be used for `[dir]` matches
+   *
+   * @example
+   *
+   * '/project/sections/foo/file.liquid' > 'foo'
+   */
+  dir: string;
+  /**
+   * The filename without extension
+   *
+   * @example
+   *
+   *  'filename.ext' > 'filename'
+   */
+  file: string;
+  /**
+   * The new name of the file (i.e, the rename result).
+   *
+   * @example
+   * // Say we have passed the following arguments:
+   * renameFileParse('/project/sections/foo/file.liquid', '[dir]-[file]')
+   *
+   * // The value here will be the renamed filename, e.g:
+   * 'foo-file.liquid'
+   */
+  name: string;
+  /**
+   * The input base filename including file extension.
+   * @example
+   *
+   * 'filename.ext'
+   */
+  base: string;
+} {
 
-  let name = rename;
+  let rename = pattern;
 
   // Get the filename (remember we flattened this earlier)
   const dir = lastPath(src);
@@ -669,17 +712,20 @@ export function renameFile (src: string, rename?: string) {
   // Get the filename (remember we flattened this earlier)
   const file = basename(src, ext);
 
-  if (isUndefined(rename)) return { dir, ext, file, name: file };
+  if (isUndefined(pattern)) return { dir, ext, file, name: file, base: file + ext };
 
-  if (/(\[dir\])/.test(name)) name = name.replace('[dir]', dir);
-  if (/(\[name\])/.test(name)) name = name.replace('[name]', file);
-  if (/(\[file\])/.test(name)) name = name.replace('[file]', file);
-  if (/(\.?\[ext\])/.test(name)) name = name.replace(/\.?\[ext\]/, ext);
+  if (/(\[dir\])/.test(rename)) rename = rename.replace('[dir]', dir);
+  if (/(\[name\])/.test(rename)) rename = rename.replace('[name]', file);
+  if (/(\[file\])/.test(rename)) rename = rename.replace('[file]', file);
+  if (/(\.?\[ext\])/.test(rename)) rename = rename.replace(/\.?\[ext\]/, ext);
+
+  const name = pattern.replace(pattern, rename);
 
   return {
     ext,
     file,
     dir,
-    name: rename.replace(rename, name)
+    name,
+    base: name + ext
   };
 };
