@@ -553,37 +553,31 @@ export type SharedSection = Map<string, {
  *
  * Sections sub-directory configuration
  */
-export type SectionBundle = Merge<Omit<Config.Sections, 'input'>, {
-  /**
-   * Globals pass-through directories
-   */
-  global: RegExp;
-  /**
-   * Globals pass-through directories
-   */
-  rename: Map<string, string>
-  /**
-   * Anymatch test instance for section paths
-   */
-  paths: Tester;
-  /**
-   * Base directory name used for matching on directory prefixes
-   * The base directory name will equate to the last known directory
-   * before a glob pattern or file reference.
-   */
-  baseDir: Set<string>;
+export interface SectionBundle {
   /**
    * Section Schema which contains Shared Schema occurances.
-   * The `inputPath` is the full URI pointing to shared schema file.
-   * The `Set<string>` value contains a list of URI paths to sections
-   * referencing the shared schema file
+   * The `key` in the object represents the full **input** URI path pointing to shared schema file.
+   * The `Set<string>` value contains a list of URI paths to sections referencing the shared schema file.
+   *
+   * @default
+   * null
+   *
+   * @example
+   * {
+   *   schema: {
+   *     '~user/project/source/schema/example.schema': Set<[
+   *        '~user/project/source/sections/foo.liquid',
+   *        '~user/project/source/sections/bar.liquid',
+   *        '~user/project/source/sections/baz.liquid'
+   *     ]>
+   *  }
+   * }
    */
   schema: Record<string, Set<string>>
   /**
    * Shared Schema parsed file.
    *
-   * The `Map` key is the shared schema **basename** without extension
-   * as per the `$ref` identifier.
+   * The `Map` key is the shared schema **basename** without extension as per the `$ref` identifier.
    */
   shared: Map<string, {
     /**
@@ -593,41 +587,9 @@ export type SectionBundle = Merge<Omit<Config.Sections, 'input'>, {
     /**
      * The parsed JSON schema
      */
-    schema: Record<string, (
-      | SchemaSettings[]
-      | SchemaBlocks[]
-      | SchemaSettings
-      | SchemaBlocks
-    )>;
+    schema: Record<string, SchemaSettings[] | SchemaBlocks[] | SchemaSettings | SchemaBlocks>;
   }>
-
-}>
-
-/* -------------------------------------------- */
-/* SNIPPETS                                     */
-/* -------------------------------------------- */
-
-/**
- * **INTERNAL USE**
- *
- * Snippets sub-directory configuration
- */
-export type SnippetBundle = Merge<Omit<Config.Snippets, 'input'>, {
-  /**
-   * Globals pass-through directories
-   */
-  global: RegExp;
-  /**
-   * Anymatch test instance for section paths
-   */
-  paths: Tester;
- /**
-  * Base directory name used for matching on directory prefixes
-  * The base directory name will equate to the last known directory
-  * before a glob pattern or file reference.
-  */
-  baseDir: Set<string>;
-}>
+}
 
 /* -------------------------------------------- */
 /* PATHS                                        */
@@ -643,16 +605,39 @@ export type PathsBundle = Merge<Config.Paths<Tester>, { transforms?: Map<string,
 export type PathsRef = {
   /**
    * Set of all resolved paths;
+   *
+   * @default null
    */
   input: Set<string>;
   /**
    * A copy of the user define paths
+   *
+   * @default null
    */
   config: string;
   /**
-   * Anymatch tester of all resolved paths
+   * Anymatch tester of all resolved paths which determine a section type
+   *
+   * @default null
    */
   match: Tester;
+  /**
+   * Match rename paths, this array will map to a rename pattern.
+   *
+   * @default []
+   *
+   * @example
+   * {
+   *   rename: [
+   *    [ anymatch(), '[name]'],
+   *    [ anymatch(), '[dir]-[name]']
+   *   ]
+   * }
+   */
+  rename: Array<[
+    match: Tester,
+    pattern: string
+  ]>
 };
 
 export interface PathBundle {
