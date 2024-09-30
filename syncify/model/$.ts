@@ -10,7 +10,7 @@ import { processor } from './processor';
 import { plugins } from './plugins';
 import { object, merge } from 'syncify:utils';
 
-function paths (): Type.PathBundle {
+const paths = (): Type.PathBundle => {
 
   const state = object<Type.PathBundle>();
 
@@ -18,7 +18,8 @@ function paths (): Type.PathBundle {
     state[path] = object<Type.PathsRef>({
       input: null,
       match: null,
-      config: null
+      config: null,
+      rename: []
     });
   }
 
@@ -27,6 +28,17 @@ function paths (): Type.PathBundle {
   return state;
 
 };
+
+const hotrender = () =>
+  '{% render \'hot.js\'' +
+  'server: 3000' +
+  'socket: 8089' +
+  'strategy: "hydrate"' +
+  'scroll: "preserved"' +
+  'label: "visible"' +
+  'history: false' +
+  'method: "hot"' +
+ ' %}';
 
 /**
  * Bundle State Configuration
@@ -232,16 +244,7 @@ export const $ = new class Bundle {
     snippet: null,
     output: null,
     alive: {},
-    renderer: '{% render \'hot.js\'' + [
-      ''
-      , 'server: 3000'
-      , 'socket: 8089'
-      , 'strategy: "hydrate"'
-      , 'scroll: "preserved"'
-      , 'label: "visible"'
-      , 'history: false'
-      , 'method: "hot"'
-    ].join(', ') + ' %}'
+    renderer: hotrender()
   });
 
   /**
@@ -387,34 +390,8 @@ export const $ = new class Bundle {
    * }
    */
   public section: Type.SectionBundle = {
-    global: null,
-    prefixDir: false,
-    separator: '-',
-    paths: null,
-    baseDir: new Set(),
     schema: null,
     shared: new Map()
-  };
-
-  /**
-   * Snippet sub-directory configuration
-   *
-   * @todo
-   * Allow anymatch global patterns
-   *
-   * @default
-   * {
-   *   prefixDir: false,
-   *   separator: '-',
-   *   global: null
-   * }
-   */
-  public snippet: Type.SnippetBundle = {
-    global: null,
-    paths: null,
-    prefixDir: false,
-    separator: '-',
-    baseDir: new Set()
   };
 
   /**
@@ -422,9 +399,13 @@ export const $ = new class Bundle {
    *
    * Includes a special `transforms` Map reference for transform related files
    * which may potentially be using an extension that would lead to it being identified
-   * as a different file type. This occurs when (for example) snippet generated transforms
-   * are inferred. The `transform` option will point to resolved file names and the values
-   * for each entry will equal an enum `Type` number. The following transforms are identifiable:
+   * as a different file type. This occurs when (for example) a snippet generated transform
+   * is set as an output.
+   *
+   * >**NOTE**
+   * >
+   * > The `transform` option will point to resolved file names and the values for each entry
+   * > will equal an enum `Type` number. The following transforms are identifiable:
    *
    * - `7` > `Type.Style`
    * - `8` > `Type.Script`
