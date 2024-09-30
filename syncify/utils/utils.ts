@@ -225,6 +225,7 @@ export async function dynamicImport (id: string, { format }: { format: string })
 
   if (format === 'esm') {
 
+    // @ts-expect-error
     return (file: string) => import(file);
 
   } else {
@@ -683,7 +684,7 @@ export function isArray <T extends any[]> (param: any): param is T {
  */
 export function isObject <T extends object> (param: any): param is T {
 
-  return typeof param === 'object';
+  return Object.prototype.toString.call(param).slice(8, -1) === 'Object';
 
 }
 
@@ -843,7 +844,7 @@ export function isUndefined <T extends undefined> (param: any): param is T {
  */
 export function isAsync<T extends Promise<unknown>> (param: any): param is T {
 
-  return toString.call(param).slice(8, -1) === 'AsyncFunction';
+  return Object.prototype.toString.call(param).slice(8, -1) === 'AsyncFunction';
 
 }
 
