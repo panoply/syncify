@@ -82,6 +82,11 @@ export const console = (...message: any) => {
 export const spinner = Spinner();
 
 /**
+ * Renamed log bucket, which will execute after changed.
+ */
+export const renamed: [ string? ] = [];
+
+/**
  * Log Horizonal Line
  *
  * Prints a horizontal line separator which will default to spanning the wrap of the terminal pane.
@@ -501,6 +506,8 @@ export const changed = (file: File) => {
       )
     )
   );
+
+  if (renamed.length > 0) n.log(renamed.shift());
 
 };
 
@@ -1159,6 +1166,32 @@ export const title = (label: string) => {
 };
 
 /**
+ * Log File Rename - `teal`
+ *
+ * @example
+ *
+* '│ rename → old-name.liquid ⥂ new-name.liquid'
+*/
+export const rename = (from: string, to: string) => {
+
+  renamed.push(
+    x.Line(
+      c.whiteBright(
+        x.Prefix(
+          'renamed',
+          u.glueString(
+            c.bold(from)
+            , ARL
+            , c.bold(to)
+          )
+        )
+      )
+    )
+  );
+
+};
+
+/**
  * Log HOT Reload - `neonRouge`
  *
  * Pass an optional timer `id`
@@ -1185,7 +1218,7 @@ export const hot = (id?: string) => {
 };
 
 /**
- * Log Exported - `whiteBright`
+ * Log Exported - `teal`
  *
  * @example
  *
