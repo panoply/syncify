@@ -43,38 +43,137 @@ export type DirPaths = `${'assets' | 'snippets'}/${string}`
 export type RenamePaths = NamespacePaths;
 
 /**
- * Snippet Rename Paths
- */
-export type SnippetPaths = LiteralString<
-  | '[name]'
-  | '[dir]-[name]'
-  | '[dir]_[name]'
-  | '[dir].[name]'
-  | '[name]-[dir]'
-  | '[name]_[dir]'
-  | '[name].[dir]'
->;
-
-/**
- * Snippet Rename
- */
-export type SnippetRename = Record<SnippetPaths, string | string[]>
-
-/**
  * Section Rename Paths
  */
-export type SectionPaths = LiteralString<
-  | '[name]'
-  | '[dir]-[name]'
-  | '[dir]_[name]'
-  | '[name]-[dir]'
-  | '[name]_[dir]'
->;
+export interface SectionPaths<T = string | string[]> {
+
+  /**
+   * Uses the filename as per the source, idenitical behaviour as that of `[name]`.
+   *
+   * @example
+   * {
+   *   sections: {
+   *    '[dir]-[name]': [
+   *      'sections/foo/*', // sections in this directory will prefix foo-
+   *      'sections/bar/*' // sections in this directory will prefix bar-
+   *    ],
+   *    '*': [
+   *      './sections/**'  // all other sections will use source name
+   *    ]
+   *   }
+   * }
+   */
+  '*'?: T;
+  /**
+   * Use the filename as per the source. Passing `[name]` only will result in fallback
+   * behaviour, as that of `'*'`.
+   *
+   * @example
+   * @example
+   * {
+   *   sections: {
+   *    '[dir]-[name]': [
+   *      'sections/foo/*', // sections in this directory will prefix foo-
+   *    ],
+   *    'xxx-[name]': [
+   *      'sections/bar/*', // sections in this directory will prefix xxx-
+   *    ],
+   *    '[name]': [
+   *      './sections/**'  // all other sections will use source filename
+   *    ]
+   *   }
+   * }
+   */
+  '[name]'?: T;
+  /**
+   * Prefix directory name and suffix filename in **kebab-case** format.
+   *
+   * @example
+   * 'layout/header.liquid' > 'layout-header.liquid'
+   */
+  '[dir]-[name]'?: T;
+  /**
+   * Prefix directory name and suffix filename in **snake_case** format.
+   *
+   * @example
+   * 'layout/header.liquid' > 'layout_header.liquid'
+   */
+  '[dir]_[name]'?: T;
+  /**
+   * Prefix filename and suffix directory in **kebab-case** format.
+   *
+   * @example
+   * 'layout/header.liquid' > 'header-layout.liquid'
+   */
+  '[name]-[dir]'?: T;
+  /**
+   * Prefix filename and suffix directory in **snake_case** format.
+   *
+   * @example
+   * 'layout/header.liquid' > 'header_layout.liquid'
+   */
+  '[name]_[dir]'?: T;
+}
 
 /**
- * Snippet Rename
+ * Snippet Rename Paths
  */
-export type SectionRename = Record<SectionPaths, string | string[]>
+export interface SnippetPaths<T extends string | string[]> {
+
+  /**
+   * Use the filename as per the source.
+   *
+   * @example
+   * 'foo.liquid' > 'foo.liquid'
+   */
+  '[name]'?: T;
+  /**
+   * Prefix directory name and suffix filename in **kebab-case** format.
+   *
+   * @example
+   * 'xxx/foo.liquid' > 'xxx-foo.liquid'
+   */
+  '[dir]-[name]'?: T;
+  /**
+   * Prefix directory name and suffix filename in **snake_case** format.
+   *
+   * @example
+   * 'xxx/foo.liquid' > 'xxx_foo.liquid'
+   */
+  '[dir]_[name]'?: T;
+  /**
+   * Prefix directory name and suffix filename with **dot** separator.
+   *
+   * @example
+   * 'xxx/foo.liquid' > 'xxx.foo.liquid'
+   */
+  '[dir].[name]'?: T;
+  /**
+   * Prefix filename and suffix directory in **kebab-case** format.
+   *
+   * @example
+   * 'xxx/foo.liquid' > 'foo-xxx.liquid'
+   */
+  '[name]-[dir]'?: T;
+  /**
+   * Prefix filename and suffix directory in **snake_case** format.
+   *
+   * @example
+   * 'layout/foo.liquid' > 'header_foo.liquid'
+   */
+  '[name]_[dir]'?: T;
+  /**
+   * Prefix filename and suffix directory with **dot** separator.
+   *
+   * @example
+   * 'xxx/foo.liquid' > 'foo.xxx.liquid'
+   */
+  '[name].[dir]'?: T;
+  /**
+   * Custom string rename
+   */
+  [rename: string]: T
+}
 
 /**
  * Template Rename Paths
