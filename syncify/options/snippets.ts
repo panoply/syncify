@@ -10,6 +10,7 @@ import { Snippets } from 'types';
  */
 export function setSnippetOptions () {
 
+  return;
   if (!isObject($.config.paths.snippets)) return;
 
   const { snippets } = $.config.paths as { snippets: Snippets };
