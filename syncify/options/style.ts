@@ -6,7 +6,7 @@ import { join, extname } from 'node:path';
 import { exists } from 'fs-extra';
 import { typeError, invalidError, warnOption, missingDependency, throwError } from 'syncify:log/throws';
 import { normalPath } from 'syncify:utils/paths';
-import { getModules, renameFile, readConfigFile, getTransform } from 'syncify:utils/options';
+import { getModules, renameFileParse, readConfigFile, getTransform } from 'syncify:utils/options';
 import * as u from 'syncify:utils';
 import { load } from 'syncify:transform/style';
 import { Type } from 'syncify:file';
@@ -359,7 +359,7 @@ export async function setStyleConfig () {
     }
 
     // Rename file
-    let rename: ReturnType<typeof renameFile> = renameFile(style.rename);
+    let rename: ReturnType<typeof renameFileParse> = renameFileParse(style.rename);
 
     // Package options has rename value
     if (has('rename') && u.isNil(style) === false) {
@@ -376,7 +376,7 @@ export async function setStyleConfig () {
         );
       }
 
-      rename = renameFile(bundle.input, style.rename);
+      rename = renameFileParse(bundle.input, style.rename);
 
       // Validate the file new name.
       if (/[a-zA-Z0-9_.-]+/.test(rename.name) === false) {
