@@ -1,10 +1,12 @@
-import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
+import { ScriptBundle, SVGBundle, StyleBundle } from 'types';
 import { join, dirname, basename } from 'node:path';
 import { defineProperty } from 'syncify:native';
 import { isRegex, isUndefined } from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { lastPath, parentPath } from 'syncify:utils/paths';
-import { Type } from 'syncify:file';
+import { Type, File, Namespace } from 'syncify:file';
+import { renameFileParse } from 'syncify:utils/options';
+import * as log from 'syncify:log';
 
 /**
  * Script Context
@@ -52,7 +54,7 @@ export function style (file: File<StyleBundle>) {
   defineProperty(file, 'data', { get () { return config; } });
 
   if (config.snippet) {
-    file.namespace = 'snippets';
+    file.namespace = Namespace.Snippets;
     file.key = join('snippets', config.rename);
   } else {
     file.key = join('assets', config.rename);
@@ -105,20 +107,24 @@ export function schema (fn: (path: string) => File, file: File) {
 
 export function section (file: File) {
 
-  if ($.section.prefixDir) {
+  if (file.base.endsWith('-group.json')) return file;
 
-    if (file.base.endsWith('-group.json')) return file;
-    if (isRegex($.section.global) && $.section.global.test(file.input)) return file;
+  if ($.paths.sections.rename.length > 0) {
 
-    const last = lastPath(file.input);
+    const find = $.paths.sections.rename.find(([ match ]) => match(file.input));
 
-    if ($.section.baseDir.has(last)) return file;
+    if (isUndefined(find)) return file;
 
-    const rename = lastPath(file.input) + $.section.separator + file.base;
+    const oldName = file.base;
+    const rename = renameFileParse(file.input, find[1]);
 
-    file.name = rename;
-    file.key = join(file.namespace, rename);
-    file.output = join(dirname(file.output), rename);
+    file.name = rename.name;
+    file.ext = rename.ext;
+    file.base = rename.base;
+    file.key = join(file.namespace, file.name + file.ext);
+    file.output = join(dirname(file.output), rename.base);
+
+    log.rename(oldName, file.base);
 
   }
 
