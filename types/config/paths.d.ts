@@ -1,4 +1,4 @@
-import type { SnippetPaths, SectionPaths } from '../shared';
+import { SectionPaths } from 'types/shared';
 
 export interface Paths<T = string | string[]> {
   /**
@@ -9,12 +9,12 @@ export interface Paths<T = string | string[]> {
    *
    * //OPTION 1 - Globs
    * {
-   *   paths: 'source/snippets/*.liquid'
+   *   snippets: 'source/snippets/*.liquid'
    * }
    *
    * //OPTION 2 - Globs Array
    * {
-   *   paths: [
+   *   snippets: [
    *    'source/snippets/*.liquid',
    *    'source/snippets/xxx/*'
    *   ]
@@ -22,7 +22,7 @@ export interface Paths<T = string | string[]> {
    *
    * //OPTION 3 - Rename Object
    * {
-   *   paths: {
+   *   snippets: {
    *    // Output will be: snippets/foo.bar.liquid
    *    '[dir].[name]': 'source/snippets/foo/bar.liquid',
    *    // Output will be: snippets/quz-baz.liquid
@@ -33,7 +33,7 @@ export interface Paths<T = string | string[]> {
    *
    * //OPTION 4 - Rename Object Glob Array
    * {
-   *   paths: {
+   *   snippets: {
    *    // Output will be: snippets/foo.bar.liquid
    *    // Output will be: snippets/baz.qux.liquid
    *    '[dir].[name]': [
@@ -43,7 +43,7 @@ export interface Paths<T = string | string[]> {
    *   }
    * }
    */
-  snippets?: T | Record<SnippetPaths, T>
+  snippets?: T | Record<string, T> | SectionPaths<T>;
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as sections.
    *
@@ -55,12 +55,12 @@ export interface Paths<T = string | string[]> {
    *
    * //OPTION 1 - Globs
    * {
-   *   paths: 'source/sections/*.liquid'
+   *   sections: 'source/sections/*.liquid'
    * }
    *
    * //OPTION 2 - Globs Array
    * {
-   *   paths: [
+   *   sections: [
    *    'source/sections/*.liquid',
    *    'source/sections/xxx/*'
    *   ]
@@ -68,7 +68,7 @@ export interface Paths<T = string | string[]> {
    *
    * //OPTION 3 - Rename Object Glob
    * {
-   *   paths: {
+   *   sections: {
    *    // Output will be: sections/foo.bar.liquid
    *    '[dir].[name]': 'source/sections/foo/bar.liquid',
    *    // Output will be: sections/quz-baz.liquid
@@ -78,7 +78,7 @@ export interface Paths<T = string | string[]> {
    *
    * //OPTION 4 - Rename Object Glob Array
    * {
-   *   paths: {
+   *   sections: {
    *    // Output will be: sections/foo.bar.liquid
    *    // Output will be: sections/baz.qux.liquid
    *    '[dir].[name]': [
@@ -88,7 +88,7 @@ export interface Paths<T = string | string[]> {
    *   }
    * }
    */
-  sections?: T | Record<SectionPaths, T>;
+  sections?: T | Record<string, T> | SectionPaths<T>;
   /**
    * A glob string or glob array of files to be uploaded as templates.
    *
