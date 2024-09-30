@@ -5,7 +5,6 @@ import { missingConfig } from 'syncify:log/throws';
 import { configFile, getEnvFile, getPackageJson } from './files';
 import { setImportDirs, setThemeDirs, setCacheDirs } from './dirs';
 import { setJsonOptions } from './json';
-import { setSnippetOptions } from './snippets';
 import { setSectionOptions } from './sections';
 import { setSync } from './sync';
 import { setPaths } from './paths';
@@ -91,7 +90,6 @@ export async function define (cli: Commands, options?: Config) {
 
   setJsonOptions();
   setLiquidOptions();
-  setSnippetOptions();
   setPlugins();
 
   if (!$.mode.build) log.runtime.stores($);
