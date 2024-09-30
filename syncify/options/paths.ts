@@ -1,12 +1,12 @@
 import glob from 'fast-glob';
 import anymatch from 'anymatch';
-import { dirname } from 'node:path';
 import { PATH_KEYS } from 'syncify:const';
 import { isArray, isEmpty, isNil, isObject, isString } from 'syncify:utils';
-import { lastPath, normalPath } from 'syncify:utils/paths';
+import { normalPath } from 'syncify:utils/paths';
 import { typeError, warnOption } from 'syncify:log/throws';
 import { $ } from 'syncify:state';
 import { ARR } from '@syncify/ansi';
+import { SectionPaths } from 'types';
 
 /**
  * Get Paths
@@ -41,50 +41,113 @@ export async function setPaths () {
 
     // sections and snippets accept glob rename objects, so we need to
     // do a little extra work in order to find resolution correctly.
-    if (isObject<Record<string, string | string[]>>(files)) {
+    if (isObject<SectionPaths>(files)) {
 
       if (isEmpty(files)) {
-
-        warn(`Undefined ${key} paths, using fallback`, '{}');
+        warn(`Undefined path/s on "${key}", using fallback`, '{}');
         return [ path(fallback) ];
-
       }
 
-      const paths: string[] = [];
+      let resolved: number = 0;
 
-      for (const rename in files) {
+      if ('*' in files && '[name]' in files) {
 
-        if (isArray<string[]>(files[rename])) {
+        warn('Multiple fallback rename keys, paths will be merged', '"*" and "[name]"');
 
-          paths.push(...files[rename]);
+        if (isArray(files['*'])) {
+
+          if (isArray(files['[name]'])) {
+            files['*'] = [ ...files['*'], ...files['[name]'] ];
+          } else if (isString(files['[name]'])) {
+            files['*'].push(files['[name]']);
+          }
+
+          delete files['[name]'];
+
+        } else if (isArray(files['[name]'])) {
+
+          if (isArray(files['*'])) {
+            files['[name]'] = [ ...files['[name]'], ...files['*'] ];
+          } else if (isString(files['*'])) {
+            files['[name]'].push(files['*']);
+          }
+
+          delete files['*'];
+
+        }
+      }
+
+      const global: [ string?, string[]? ] = [];
+      const rename: Array<[string, string[]]> = [];
+
+      for (const pattern in files) {
+
+        if (isArray<string[]>(files[pattern])) {
+
+          const value: [ string, string[] ] = [
+            pattern,
+            files[pattern].map(p => {
+              const v = path(p);
+              $.watch.add(v);
+              return v;
+            })
+          ];
+
+          if (resolved === 0) resolved = value[1].length;
+
+          if (pattern === '*' || pattern === '[name]') {
+            global.push(...value);
+          } else {
+            rename.push(value);
+          }
 
         } else if (isString(files)) {
 
-          paths.push(files[rename]);
+          const value: [ string, string[] ] = [ pattern, [ path(files[pattern]) ] ];
 
-        } else if (isNil(files[rename])) {
+          if (resolved === 0) resolved = value[1].length;
+
+          $.watch.add(value[1]);
+
+          if (pattern === '*' || pattern === '[name]') {
+            global.push(...value);
+          } else {
+            rename.push(value);
+          }
+
+        } else if (isNil(files[pattern])) {
 
           typeError({
             option: `paths ${ARR} ${key}`,
             expects: 'string | string[]',
-            provided: files[rename],
-            name: rename
+            provided: files[pattern],
+            name: pattern
           });
 
         }
-
       }
 
-      if (paths.length === 0) {
-        warn(`Unresolved ${key} paths, using fallback`, '{}');
+      if (resolved === 0) {
+        warn(`Unresolved path/s in "${key}"`, '{}');
         return [ path(fallback) ];
       }
 
-      return paths.map(path);
+      $.paths[key].rename = [ [ anymatch(global[1]), global[0] ] ];
+
+      for (const [ pattern, globs ] of rename) {
+
+        $.paths[key].rename.push([
+          anymatch([ ...global[1].map(p => p[0] !== '!' ? `!${p}` : p), ...globs ]),
+          pattern
+        ]);
+
+      }
+
+      return global[1].concat(rename.flatMap((value) => value[1]));
 
     } else {
 
-      return getGlobs(key, files, fallback);
+      return getGlobs(key, files as string | string[], fallback);
 
     }
   };
@@ -98,9 +161,6 @@ export async function setPaths () {
 
       // snippets and sections accepts object rename structures
       paths = renameGlobs(key, `${key}/*`);
-
-      // base directory paths
-      paths.forEach(p => $[key.slice(0, -1)].baseDir.add(lastPath(dirname(p))));
 
     } else if (key === 'customers' || key === 'metaobject') {
 
@@ -116,22 +176,12 @@ export async function setPaths () {
 
     $.paths[key].match = anymatch(paths);
 
-    if (key !== 'metafields' && key !== 'redirects') {
+    if (key !== 'metafields' && key !== 'redirects' && $.paths[key].input !== null) {
 
-      if ($.paths[key].input === null) {
-
-        $.paths[key].input = new Set(paths);
-
-        paths.forEach(p => $.watch.add(p));
-
-      } else {
-
-        (await glob(paths, { cwd: $.cwd })).forEach(p => {
-          $.paths[key].input.add(p);
-          $.watch.add(p);
-        });
-
-      }
+      (await glob(paths, { cwd: $.cwd })).forEach(p => {
+        $.paths[key].input.add(p);
+        $.watch.add(p);
+      });
 
     }
 
