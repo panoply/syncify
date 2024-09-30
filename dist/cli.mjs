@@ -14733,21 +14733,24 @@ function section(file) {
     file.name = rename2.name;
     file.ext = rename2.ext;
     file.base = rename2.base;
-    file.key = join5(file.namespace, file.name + file.ext);
+    file.key = join5(file.namespace, rename2.base);
     file.output = join5(dirname3(file.output), rename2.base);
     rename(oldName, file.base);
   }
   return file;
 }
 function snippet(file) {
-  if ($.snippet.prefixDir) {
-    if (isRegex($.snippet.global) && $.snippet.global.test(file.input)) return file;
-    const last2 = lastPath(file.input);
-    if ($.snippet.baseDir.has(last2)) return file;
-    const rename2 = last2 + $.snippet.separator + file.base;
-    file.name = rename2;
-    file.key = join5(file.namespace, rename2);
-    file.output = join5(dirname3(file.output), rename2);
+  if ($.paths.snippets.rename.length > 0) {
+    const find4 = $.paths.snippets.rename.find(([match2]) => match2(file.input));
+    if (isUndefined(find4)) return file;
+    const oldName = file.base;
+    const rename2 = renameFileParse(file.input, find4[1]);
+    file.name = rename2.name;
+    file.ext = rename2.ext;
+    file.base = rename2.base;
+    file.key = join5(file.namespace, rename2.base);
+    file.output = join5(dirname3(file.output), rename2.base);
+    rename(oldName, file.base);
   }
   return file;
 }

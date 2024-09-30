@@ -1,9 +1,9 @@
 import { ScriptBundle, SVGBundle, StyleBundle } from 'types';
 import { join, dirname, basename } from 'node:path';
 import { defineProperty } from 'syncify:native';
-import { isRegex, isUndefined } from 'syncify:utils';
+import { isUndefined } from 'syncify:utils';
 import { $ } from 'syncify:state';
-import { lastPath, parentPath } from 'syncify:utils/paths';
+import { parentPath } from 'syncify:utils/paths';
 import { Type, File, Namespace } from 'syncify:file';
 import { renameFileParse } from 'syncify:utils/options';
 import * as log from 'syncify:log';
@@ -121,7 +121,7 @@ export function section (file: File) {
     file.name = rename.name;
     file.ext = rename.ext;
     file.base = rename.base;
-    file.key = join(file.namespace, file.name + file.ext);
+    file.key = join(file.namespace, rename.base);
     file.output = join(dirname(file.output), rename.base);
 
     log.rename(oldName, file.base);
@@ -134,19 +134,22 @@ export function section (file: File) {
 
 export function snippet (file: File) {
 
-  if ($.snippet.prefixDir) {
+  if ($.paths.snippets.rename.length > 0) {
 
-    if (isRegex($.snippet.global) && $.snippet.global.test(file.input)) return file;
+    const find = $.paths.snippets.rename.find(([ match ]) => match(file.input));
 
-    const last = lastPath(file.input);
+    if (isUndefined(find)) return file;
 
-    if ($.snippet.baseDir.has(last)) return file;
+    const oldName = file.base;
+    const rename = renameFileParse(file.input, find[1]);
 
-    const rename = last + $.snippet.separator + file.base;
+    file.name = rename.name;
+    file.ext = rename.ext;
+    file.base = rename.base;
+    file.key = join(file.namespace, rename.base);
+    file.output = join(dirname(file.output), rename.base);
 
-    file.name = rename;
-    file.key = join(file.namespace, rename);
-    file.output = join(dirname(file.output), rename);
+    log.rename(oldName, file.base);
 
   }
 

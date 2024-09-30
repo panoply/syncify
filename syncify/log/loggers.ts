@@ -1166,7 +1166,7 @@ export const title = (label: string) => {
 };
 
 /**
- * Log File Rename - `teal`
+ * Log File Rename - `whiteBright`
  *
  * @example
  *
