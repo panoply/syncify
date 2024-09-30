@@ -31,7 +31,7 @@
           "url": "/examples/"
         },
         {
-          "title": "Boycott Shopify CLI",
+          "title": "Migration Guide",
           "url": "/examples/"
         }
       ]
@@ -85,16 +85,20 @@
           "url": "/usage/using-transforms/"
         },
         {
+          "title": "Spawn",
+          "url": "/usage/spawn/"
+        },
+        {
           "title": "HOT Reloading",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/hot-reloading/"
         },
         {
           "title": "Shared Schema",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/shared-schema/"
         },
         {
           "title": "Markdown Pages",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/markdown-pages/"
         },
         {
           "title": "Metafields",

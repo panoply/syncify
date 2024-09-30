@@ -9,41 +9,6 @@
     }
   }
 
-  @keyframes move {
-    0% {
-      opacity: 0;
-      left: -200%;
-    }
-    10% {
-      opacity: 1;
-    }
-
-    70% {
-      opacity: 0;
-    }
-    100% {
-      left: 200%;
-    }
-  }
-
-  @keyframes move-right {
-    0% {
-      opacity: 0;
-      right: -20%;
-    }
-
-    10% {
-      opacity: 1;
-    }
-
-    50% {
-      opacity: 0;
-    }
-    100% {
-      right: 150%;
-    }
-  }
-
   &-github {
     a {
       position: absolute;
@@ -125,6 +90,11 @@
   text-align: center;
 }
 
+.goto-docs {
+  max-width: 180px;
+  min-height: 100px;
+}
+
 .goto-link {
   font-family: $font-family-heading;
   font-size: 0.745rem;
@@ -132,13 +102,21 @@
   color: $link-color;
   border: $border-width $border-color solid;
   border-radius: 5px;
-  padding: 10px 0;
+  padding: 10px 20px;
   text-align: center;
+  max-width: 150px;
   background-color: $code-bg;
 
   &:hover {
-    color: $white;
     background-color: $code-bg;
+  }
+}
+
+.pleb {
+  font-size: 11px;
+
+  &:hover {
+    color: $white !important;
   }
 }
 

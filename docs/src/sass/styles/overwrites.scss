@@ -109,6 +109,13 @@ table {
   }
 }
 
+h5 {
+  margin-top: $spacer-4 !important;
+  font-size: 1rem;
+  margin-bottom: $spacer-2;
+  color: #dddddd;
+}
+
 blockquote > p {
   > a > code {
     color: $papyrus-js-object;
@@ -255,4 +262,13 @@ blockquote > p {
       background-image: url(icon-minus($white));
     }
   }
+}
+
+.page-404 {
+  overflow: hidden;
+}
+
+.logo-404 > svg {
+  width: 100px;
+  height: 50px;
 }

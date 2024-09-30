@@ -121,6 +121,7 @@ module.exports = defineConfig(function (config) {
   config.addPlugin(terser);
   config.addPassthroughCopy({ 'src/assets/fonts/': 'assets/fonts' });
 
+
   return {
     htmlTemplateEngine: 'liquid',
     passthroughFileCopy: false,
@@ -136,7 +137,7 @@ module.exports = defineConfig(function (config) {
       input: 'src/views',
       output: 'public',
       includes: 'include',
-      layouts: 'layout',
+      layouts: '',
       data: 'data'
     }
   };

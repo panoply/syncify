@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>
+      {{- title | prepend: 'Syncify | ' -}}
+    </title>
+    {%- include 'head' -%}
+    <script
+      src="{{'/bundle.min.js' | url }}"
+      spx-eval="false"
+      defer></script>
+  </head>
+
+  <body>
+
+    {%- if page.url == '/' -%}
+
+      {%- include 'include/landing' -%}
+
+    {%- else -%}
+
+      {%- include 'include/navbar' -%}
+
+      <div class="container-fluid container-wrapper">
+        <aside
+          class="pr-3 br vh-100 d-none d-sm-block sidebar drawer-left drawer-panel"
+          spx-component="drawer"
+          spx-drawer:direction="left"
+          spx-drawer:width="280">
+          {%- include 'include/sidebar' -%}
+        </aside>
+        <div
+          id="content"
+          class="row jc-center jc-md-around content-offset">
+          <main class="col-11 col-sm-9 pb-4">
+            {%- include 'include/breadcrumb' -%}
+            {{- content -}}
+            {%- include 'include/paginate' -%}
+          </main>
+          {%- if anchors -%}
+            <div
+              class="col-auto anchors"
+              spx-component="scrollspy">
+              <ul>
+                {%- for name in anchors -%}
+                  <li>
+                    <a
+                      href="{{ name | anchor }}"
+                      spx-node="scrollspy.href">{{- name -}}</a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+    {%- endif -%}
+    {%- sprite -%}
+    {%- search 'syncify' -%}
+
+    <div
+      class="drawer-backdrop"
+      spx-node="drawer.backdrop"></div>
+  </body>
+</html>

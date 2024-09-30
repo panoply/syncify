@@ -5,25 +5,24 @@
     <div class="hero d-grid ai-center col-11 col-xl-6 m-auto">
       <div class="hero-github">
         <a href="https://github.com/panoply/spx">
-          {% svg 'github', 'icon icon-github' %}
+          {%- svg 'github', 'icon icon-github' -%}
         </a>
       </div>
 
       <div class="d-flex flex-col as-center jc-center">
 
-
         <a
           spx-target="body"
           href="/what-is-syncify/"
           class="hero-logo d-block m-auto mb-3">
-          {% svg 'logo-text' %}
+          {%- svg 'logo-text' -%}
         </a>
 
       </div>
 
       <div class="d-flex flex-column m-auto tc fw-lighter pb-2">
         <span class="ff-base d-block uncase mt-1 hero-caption d-none d-sm-block">
-          {{ content }}
+          {{- content -}}
         </span>
       </div>
 
@@ -31,21 +30,28 @@
         <a
           spx-target="body"
           href="/what-is-syncify/"
-          class="col-5 col-md-2 goto-link tc">
+          class="col-5 col-md-3 goto-link tc">
           DOCUMENTATION
         </a>
         <span class="col-12 col-md-auto fs-xs fc-gray ff-heading tc px-3 my-3 my-sm-0">OR</span>
         <a
           spx-target="body"
-          href="/tutorial/"
-          class="col-5 col-md-2 goto-link">
-          I'm a PLEB
+          href="/what-is-syncify/"
+          class="col-5 col-md-3 goto-link tc">
+          TUTORIAL
+        </a>
+      </div>
+      <div class="row jc-center mt-2">
+        <a
+          href="https://shopify.dev/docs/storefronts/themes/tools/cli"
+          class="col-auto col-md pleb fc-dark-gray tc">
+          No thanks, I'd prefer to continue life as a pleb.
         </a>
       </div>
 
     </div>
     <div class="version upper fc-dark-gray ff-head">
-      {{ pkg.version | prepend: 'version ' }}
+      {{- pkg.version | prepend: 'version ' -}}
     </div>
 
   </div>

@@ -13,16 +13,39 @@ anchors:
 
 Syncify is a specialized tool designed for Shopify theme development, positioning itself as an advanced alternative to the Shopify CLI. It offers a suite of features aimed at enhancing productivity through a structured yet flexible approach to store development.
 
-### Key Features
+##### ✔ Multi-Theme and Store Management
 
-- **Multi-Theme and Store Management:** Syncify allows for the monitoring and synchronization of changes across various themes and storefronts.
-- **Customizable Directory Support:** Features intelligent path mapping to accommodate and adapt to user-defined directory structures.
-- **HOT Reloading:** Implements hot reloading for assets, sections, snippets, templates, and layouts to streamline development.
-- **Comprehensive Logging:** Provides a terminal user interface with clear, informative, and aesthetically structured logs.
-- **Metafields Synchronization:** Offers a methodical approach to managing metafields globally via JSON configurations.
-- **Tool Integration:** Designed to work alongside other build processes, enhancing compatibility with existing workflows.
-- **Extended Sync Capabilities:** Includes options for syncing additional resources such as Files, Pages, and Redirects.
-- **Modular Section Usage:** Introduces a straightforward method for utilizing reusable sections across different parts of the store.
+&nbsp;&nbsp;&nbsp;&nbsp;Syncify allows for the monitoring and synchronization of changes across various themes and storefronts.
+
+##### ✔ Customizable Directory Support
+
+&nbsp;&nbsp;&nbsp;&nbsp;Features intelligent path mapping to accommodate and adapt to user-defined directory structures.
+
+##### ✔ HOT Reloading
+
+&nbsp;&nbsp;&nbsp;&nbsp;Implements hot reloading for assets, sections, snippets, templates, and layouts to streamline development.
+
+##### ✔ Comprehensive Logging
+
+&nbsp;&nbsp;&nbsp;&nbsp;Provides a terminal user interface with clear, informative, and aesthetically structured logs.
+
+##### ✔ Metafields Synchronization
+
+&nbsp;&nbsp;&nbsp;&nbsp;Offers a methodical approach to managing metafields globally via JSON configurations.
+
+##### ✔ Tool Integration
+
+&nbsp;&nbsp;&nbsp;&nbsp;Designed to work alongside other build processes, enhancing compatibility with existing workflows.
+
+##### ✔ Extended Sync Capabilities
+
+&nbsp;&nbsp;&nbsp;&nbsp;Includes options for syncing additional resources such as Files, Pages, and Redirects.
+
+##### ✔ Modular Section Usage
+
+&nbsp;&nbsp;&nbsp;&nbsp;Introduces a straightforward method for utilizing reusable sections across different parts of the store.
+
+---
 
 # Developer Driven Innovation
 
@@ -34,7 +57,9 @@ Syncify isn't just a tool; it's a beacon for developers tired of navigating thro
 
 **Syncify embodies the spirit of developer empowerment within the Shopify ecosystem. It's not merely a tool but a symbol of resistance against inadequate corporate solutions, advocating for a development environment where community-driven innovation thrives.**
 
-> If you are looking to move an existing store from the Shopify CLI to Syncify, then have a look at [Boycotting Shopify CLI](/boycotting-shopify-cli) migration guide.
+> If you are looking to move an existing store from the Shopify CLI to Syncify, then have a look at [Migration Guide](/migration-guide/) migration guide.
+
+---
 
 # Rationale
 
@@ -60,6 +85,6 @@ Not all Shopify projects are created equal. Syncify's design acknowledges this b
 
 As e-commerce evolves, so do the tools needed to manage it. Syncify's extensible nature suggests it's built with future developments in mind, potentially making it a long-term investment in a developer's toolkit.
 
-# Shopify CLI Contrast:
+### Shopify CLI Contrast:
 
 When compared to the Shopify CLI, Syncify offers a departure from the conventional single-structure methodology. This flexibility can significantly enhance the development process for those who find the rigid structure of the CLI limiting.

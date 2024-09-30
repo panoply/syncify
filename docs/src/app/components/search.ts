@@ -20,14 +20,25 @@ export class Search extends spx.Component<typeof Search.define> {
     ]
   };
 
-  async connect () {
+  /**
+   * SPX Connect Lifecyle Method
+   */
+  public async connect () {
 
-    const list = await fetch(this.state.source);
-    this.index = await list.json();
+    this.index = await this.getJSON();
 
   }
 
-  hide () {
+  /**
+   * Get search index
+   */
+  private async getJSON () {
+
+    return (await fetch(this.state.source)).json();
+
+  }
+
+  private hide () {
 
     document.removeEventListener('click', this.outsideClick);
 
@@ -98,10 +109,12 @@ export class Search extends spx.Component<typeof Search.define> {
       this.result = matchSorter(this.index.content, input, this.match);
 
       if (this.result.length === 0) {
+
         this.dom.listNode.innerHTML = '';
         this.dom.listNode.classList.add('no-results');
         this.noResults.innerHTML = this.nothing;
         this.dom.listNode.appendChild(this.noResults);
+
       } else {
 
         const filter = this.result.sort((a, b) => a.sort - b.sort).map(content => this.item(content));

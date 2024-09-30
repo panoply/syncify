@@ -1,0 +1,52 @@
+---
+title: 'Page not found!'
+permalink: 404.html
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>
+      {{- title | prepend: 'Syncify | ' -}}
+    </title>
+    {%- include 'head' -%}
+    <script
+      src="{{'/bundle.min.js' | url }}"
+      spx-eval="false"
+      defer></script>
+  </head>
+
+  <body class="page-404">
+    <div class="container-fluid">
+      <div class="d-flex flex-col as-center jc-center">
+        <a
+          spx-target="body"
+          href="/what-is-syncify/"
+          class="logo-404 d-block m-auto">
+          {%- svg 'logo-text' -%}
+        </a>
+      </div>
+      <div class="row jc-center ai-center py-3 vh-100">
+        <div class="col-11 col-sm-9 col-md-6 tc py-sm-4">
+          <h1 class="h1-x2 mb-3">
+            404
+          </h1>
+          <h4 class="h1-sm">
+            {{- title -}}
+          </h4>
+          <div class="d-block py-4 fs-lg">
+            This page does not exist or is under development.
+          </div>
+          <div class="d-block">
+            <button
+              class="btn"
+              onclick="window.history.back()">
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {%- sprite -%}
+  </body>
+</html>
