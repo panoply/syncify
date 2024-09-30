@@ -3,8 +3,8 @@ import { basename, extname, relative } from 'node:path';
 import { readFile } from 'fs-extra';
 import { File } from 'syncify:file';
 import parseJSON, { JSONError } from 'parse-json';
-import { typeError, invalidError, throwError, warnOption } from 'syncify:log/throws';
-import { isObject, isString, isArray, isBoolean, checksum, has, hasProp, isEmpty } from 'syncify:utils';
+import { throwError, warnOption } from 'syncify:log/throws';
+import { isObject, isArray, checksum, has, hasProp } from 'syncify:utils';
 import * as error from 'syncify:errors';
 import * as log from 'syncify:log';
 import { bold } from '@syncify/ansi';
@@ -18,108 +18,15 @@ import { defineProperty } from 'syncify:native';
  */
 export async function setSectionOptions () {
 
-  const { sections } = $.config.paths;
+  if ($.paths.schema.input !== null && $.paths.schema.input.size > 0) {
 
-  return;
+    await setSharedSchema();
+    await setSchemaJson();
 
-  // Iterate over all the properties in sections option
-  for (const option in $.section) {
+    defineProperty($.section, 'schema', { get () { return $.cache.schema; } });
 
-    if (option === 'input') continue;
-
-    // Validate the boolean type values of the option
-    if (option === 'prefixDir') {
-      if (isBoolean(sections[option])) {
-
-        $.section[option] = sections[option];
-        continue;
-
-      } else {
-
-        typeError(
-          {
-            option: 'views.sections',
-            name: option,
-            provided: sections[option],
-            expects: 'boolean'
-          }
-        );
-      }
-    }
-
-    // Validate the prefix separator option, in Shopify sections
-    // We cannot use dot prefixes, we ensure only accepted values are defined.
-    if (option === 'separator') {
-      if (isString(sections[option])) {
-
-        // Only these character can be prefixers
-        if (/[@:_-]/.test(sections[option])) {
-
-          $.section[option] = sections[option];
-
-          continue;
-
-        } else {
-
-          invalidError(
-            {
-              option: 'view.sections',
-              name: option,
-              value: sections[option],
-              expects: '@ | _ | : | -'
-            }
-          );
-        }
-      } else {
-
-        typeError(
-          {
-            option: 'views.sections',
-            name: option,
-            provided: sections[option],
-            expects: 'string'
-          }
-        );
-      }
-    }
-
-    // Validate the global globs which should have no prefixes applied.
-    if (option === 'global') {
-
-      const globals = isString(sections[option]) ? [ sections[option] ] : sections[option];
-
-      if (isArray(globals)) {
-
-        if (globals.length > 0) {
-          $.section[option] = new RegExp(`${globals.join('|')}`);
-          continue;
-        }
-
-      } else {
-
-        typeError(
-          {
-            option: 'paths.sections',
-            name: option,
-            provided: sections[option],
-            expects: 'string | string[]'
-          }
-        );
-      }
-    }
-
-    if (
-      option === 'shared' &&
-      $.paths.schema.input !== null &&
-      $.paths.schema.input.size > 0) {
-
-      await setSharedSchema();
-      await setSchemaJson();
-
-      defineProperty($.section, 'schema', { get () { return $.cache.schema; } });
-
-    }
   }
+
 };
 
 export async function setSharedSchema () {
