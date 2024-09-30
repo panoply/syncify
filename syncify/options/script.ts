@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import anymatch from 'anymatch';
 import { omit } from 'rambdax';
 import { Namespace, Type } from 'syncify:file';
-import { getResolvedPaths, getTransform, renameFile } from 'syncify:utils/options';
+import { getResolvedPaths, getTransform, renameFileParse } from 'syncify:utils/options';
 import { esbuildBundle } from 'syncify:transform/script';
 import { warnOption, invalidError, typeError, errorRuntime } from 'syncify:log/throws';
 import * as u from 'syncify:utils';
@@ -60,7 +60,7 @@ export async function setScriptOptions () {
     /**
      * Rename file
      */
-    const { name } = renameFile(script.input as string, script.rename); // Rename file
+    const { name } = renameFileParse(script.input as string, script.rename); // Rename file
 
     let rename: string;
 
