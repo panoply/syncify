@@ -6031,7 +6031,7 @@ var require_etag = __commonJS({
     module2.exports = etag;
     var crypto = require("crypto");
     var Stats = require("fs").Stats;
-    var toString3 = Object.prototype.toString;
+    var toString2 = Object.prototype.toString;
     function entitytag(entity) {
       if (entity.length === 0) {
         return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
@@ -6056,7 +6056,7 @@ var require_etag = __commonJS({
       if (typeof Stats === "function" && obj instanceof Stats) {
         return true;
       }
-      return obj && typeof obj === "object" && "ctime" in obj && toString3.call(obj.ctime) === "[object Date]" && "mtime" in obj && toString3.call(obj.mtime) === "[object Date]" && "ino" in obj && typeof obj.ino === "number" && "size" in obj && typeof obj.size === "number";
+      return obj && typeof obj === "object" && "ctime" in obj && toString2.call(obj.ctime) === "[object Date]" && "mtime" in obj && toString2.call(obj.mtime) === "[object Date]" && "ino" in obj && typeof obj.ino === "number" && "size" in obj && typeof obj.size === "number";
     }
     function stattag(stat2) {
       var mtime = stat2.mtime.getTime().toString(16);
@@ -7970,7 +7970,7 @@ var {
 var toArray = Array.from;
 var toBuffer = Buffer.from;
 var { abs } = Math;
-var { toString: toString2 } = Object.prototype;
+var { toString } = Object.prototype;
 
 // syncify/utils/utils.ts
 function merge(source, ...patches) {
@@ -8142,7 +8142,7 @@ function isArray(param) {
   return Array.isArray(param);
 }
 function isObject(param) {
-  return typeof param === "object";
+  return Object.prototype.toString.call(param).slice(8, -1) === "Object";
 }
 function isString(param) {
   return typeof param === "string";
@@ -8173,18 +8173,20 @@ function isBuffer(param) {
 }
 
 // syncify/model/$.ts
-function paths() {
+var paths = () => {
   const state = object();
   for (const path2 of PATH_KEYS) {
     state[path2] = object({
       input: null,
       match: null,
-      config: null
+      config: null,
+      rename: []
     });
   }
   state.transforms = /* @__PURE__ */ new Map();
   return state;
-}
+};
+var hotrender = () => `{% render 'hot.js'server: 3000socket: 8089strategy: "hydrate"scroll: "preserved"label: "visible"history: falsemethod: "hot" %}`;
 var $ = new class Bundle {
   /**
    * The users configuration settings merged with defaults
@@ -8362,16 +8364,7 @@ var $ = new class Bundle {
     snippet: null,
     output: null,
     alive: {},
-    renderer: "{% render 'hot.js'" + [
-      "",
-      "server: 3000",
-      "socket: 8089",
-      'strategy: "hydrate"',
-      'scroll: "preserved"',
-      'label: "visible"',
-      "history: false",
-      'method: "hot"'
-    ].join(", ") + " %}"
+    renderer: hotrender()
   });
   /**
    * Log State
@@ -8508,42 +8501,21 @@ var $ = new class Bundle {
    * }
    */
   section = {
-    global: null,
-    prefixDir: false,
-    separator: "-",
-    paths: null,
-    baseDir: /* @__PURE__ */ new Set(),
     schema: null,
     shared: /* @__PURE__ */ new Map()
-  };
-  /**
-   * Snippet sub-directory configuration
-   *
-   * @todo
-   * Allow anymatch global patterns
-   *
-   * @default
-   * {
-   *   prefixDir: false,
-   *   separator: '-',
-   *   global: null
-   * }
-   */
-  snippet = {
-    global: null,
-    paths: null,
-    prefixDir: false,
-    separator: "-",
-    baseDir: /* @__PURE__ */ new Set()
   };
   /**
    * Directory structure paths.
    *
    * Includes a special `transforms` Map reference for transform related files
    * which may potentially be using an extension that would lead to it being identified
-   * as a different file type. This occurs when (for example) snippet generated transforms
-   * are inferred. The `transform` option will point to resolved file names and the values
-   * for each entry will equal an enum `Type` number. The following transforms are identifiable:
+   * as a different file type. This occurs when (for example) a snippet generated transform
+   * is set as an output.
+   *
+   * >**NOTE**
+   * >
+   * > The `transform` option will point to resolved file names and the values for each entry
+   * > will equal an enum `Type` number. The following transforms are identifiable:
    *
    * - `7` > `Type.Style`
    * - `8` > `Type.Script`
@@ -10738,9 +10710,9 @@ var import_node_process9 = __toESM(require("process"));
 
 // syncify/modes/upload.ts
 init_cjs_shims();
-var import_fast_glob = __toESM(require("fast-glob"));
-var import_node_path9 = require("path");
-var import_fs_extra4 = require("fs-extra");
+var import_fast_glob2 = __toESM(require("fast-glob"));
+var import_node_path11 = require("path");
+var import_fs_extra6 = require("fs-extra");
 
 // syncify/requests/client.ts
 init_cjs_shims();
@@ -13229,6 +13201,7 @@ function getThemeURLS(text, themes2, url) {
 
 // syncify/log/loggers.ts
 var spinner = Spinner2();
+var renamed = [];
 var hline = (options) => {
   log(
     Ruler(
@@ -13422,6 +13395,7 @@ var changed = (file) => {
       )
     )
   );
+  if (renamed.length > 0) log(renamed.shift());
 };
 var minified = (...p) => {
   if ($.mode.export || $.mode.build || $.log.config.silent) return;
@@ -13775,6 +13749,22 @@ var title = (label) => {
     )
   );
 };
+var rename = (from, to) => {
+  renamed.push(
+    Line(
+      pe(
+        Prefix(
+          "renamed",
+          glueString(
+            or(from),
+            Or,
+            or(to)
+          )
+        )
+      )
+    )
+  );
+};
 var hot = (id) => {
   log(
     Line(
@@ -14111,11 +14101,569 @@ function client({ stores, themes: themes2 }) {
 
 // syncify/process/files.ts
 init_cjs_shims();
-var import_node_path7 = require("path");
+var import_node_path9 = require("path");
 
 // syncify/process/context.ts
 init_cjs_shims();
+var import_node_path8 = require("path");
+
+// syncify/utils/options.ts
+init_cjs_shims();
+var import_node_path7 = require("path");
+var import_fast_glob = __toESM(require("fast-glob"));
+var import_anymatch = __toESM(require_anymatch());
+var import_fs_extra4 = require("fs-extra");
+
+// syncify/requests/require.ts
+init_cjs_shims();
+var import_node_url2 = require("url");
+var import_fs_extra3 = require("fs-extra");
 var import_node_path6 = require("path");
+var import_esbuild = require("esbuild");
+function findUp(name, startDir, stopDir = (0, import_node_path6.parse)(startDir).root) {
+  let dir = startDir;
+  while (dir !== stopDir) {
+    const file = (0, import_node_path6.join)(dir, name);
+    if ((0, import_fs_extra3.existsSync)(file)) return file;
+    if ((0, import_node_path6.extname)(file) !== ".json") {
+      const path2 = file + ".json";
+      if ((0, import_fs_extra3.existsSync)(path2)) return path2;
+    }
+    dir = (0, import_node_path6.dirname)(dir);
+  }
+  return null;
+}
+function getTSConfigFromFile(cwd, filename) {
+  if (!(0, import_fs_extra3.existsSync)((0, import_node_path6.join)(cwd, filename))) return null;
+  return (0, import_node_path6.isAbsolute)(filename) ? (0, import_fs_extra3.existsSync)(filename) ? filename : null : findUp(filename, cwd);
+}
+function getTSConfigFromExtends(cwd, name) {
+  if ((0, import_node_path6.isAbsolute)(name)) return (0, import_fs_extra3.existsSync)(name) ? name : null;
+  if (name.startsWith(".")) return findUp(name, cwd);
+  return require.resolve(name, { paths: [cwd] });
+}
+function getTSConfig(dir = process.cwd(), name = "tsconfig.json", isExtends = false) {
+  dir = (0, import_node_path6.resolve)(dir);
+  const id = isExtends ? getTSConfigFromExtends(dir, name) : getTSConfigFromFile(dir, name);
+  if (!id) return null;
+  const data = jsonc((0, import_fs_extra3.readFileSync)(id, "utf-8"));
+  const configDir = (0, import_node_path6.dirname)(id);
+  if (has2("baseURL", data.compilerOptions)) {
+    data.compilerOptions.baseUrl = (0, import_node_path6.join)(configDir, data.compilerOptions.baseUrl);
+  }
+  const extendsFiles = [];
+  if (data.extends) {
+    const extendsList = isArray(data.extends) ? data.extends : [data.extends];
+    const extendsData = {};
+    for (const name2 of extendsList) {
+      const parentConfig = getTSConfig(configDir, name2, true);
+      if (parentConfig) {
+        assign(extendsData, {
+          ...parentConfig?.data,
+          compilerOptions: {
+            ...extendsData.compilerOptions,
+            ...parentConfig?.data?.compilerOptions
+          }
+        });
+        extendsFiles.push(...parentConfig.files);
+      }
+    }
+    assign(data, {
+      ...extendsData,
+      ...data,
+      compilerOptions: {
+        ...extendsData.compilerOptions,
+        ...data.compilerOptions
+      }
+    });
+  }
+  delete data.extends;
+  return {
+    path: id,
+    data,
+    files: [...extendsFiles, id]
+  };
+}
+function loadTSConfig(dir, name) {
+  return getTSConfig(dir, name);
+}
+function defaultGetOutputFile(path2, format) {
+  return path2.replace(REGEX_EXTJS, `.bundled_${uuid()}.${format === "esm" ? "mjs" : "cjs"}`);
+}
+function isCommonJSorESM(inputFile) {
+  if (typeof jest === "undefined") return "cjs";
+  const ext = (0, import_node_path6.extname)(inputFile);
+  if (ext === ".js") {
+    return $.pkg.type === "module" ? "esm" : "cjs";
+  } else if (ext === ".ts") {
+    return "esm";
+  } else if (ext === ".mjs") {
+    return "esm";
+  }
+  return "cjs";
+}
+function tsconfigPathsToRegExp(paths2) {
+  return paths2 === null ? null : keys(paths2 || {}).map((key) => new RegExp(`^${key.replace(/\*/, ".*")}$`));
+}
+function match(id, patterns) {
+  if (!patterns) return false;
+  return patterns.some((p) => {
+    if (isRegex(p)) return p.test(id);
+    return id === p || id.startsWith(p + "/");
+  });
+}
+function externalPlugin({
+  external,
+  notExternal
+} = {}) {
+  return {
+    name: "bundle-require:external",
+    setup({ onResolve }) {
+      onResolve({ filter: /.*/ }, async (args) => {
+        if (args.path.charCodeAt(0) === 46 || (0, import_node_path6.isAbsolute)(args.path)) return;
+        if (match(args.path, external)) return { external: true };
+        if (match(args.path, notExternal)) return;
+        return { external: true };
+      });
+    }
+  };
+}
+function injectFileScopePlugin() {
+  return {
+    name: "bundle-require:inject-file-scope",
+    setup(ctx) {
+      ctx.initialOptions.define = {
+        ...ctx.initialOptions.define,
+        __dirname: "__injected_dirname__",
+        __filename: "__injected_filename__",
+        "import.meta.url": "__injected_import_meta_url__"
+      };
+      ctx.onLoad({ filter: REGEX_EXTJS }, async (args) => {
+        const contents = await (0, import_fs_extra3.readFile)(args.path, "utf-8");
+        const injectLines = [
+          `const __injected_filename__ = ${JSON.stringify(args.path)};`,
+          `const __injected_dirname__ = ${JSON.stringify((0, import_node_path6.dirname)(args.path))};`,
+          `const __injected_import_meta_url__ = ${JSON.stringify((0, import_node_url2.pathToFileURL)(args.path).href)};`
+        ];
+        return {
+          contents: glue(injectLines) + contents,
+          loader: inferLoader((0, import_node_path6.extname)(args.path))
+        };
+      });
+    }
+  };
+}
+async function bundleRequire(options) {
+  if (!REGEX_EXTJS.test(options.filepath)) {
+    throw new Error(`${options.filepath} is not a valid JS file`);
+  }
+  const preserveTemporaryFile = options.preserveTemporaryFile ?? !!process.env.BUNDLE_REQUIRE_PRESERVE;
+  const cwd = options.cwd || $.cwd;
+  const format = options.format ?? isCommonJSorESM(options.filepath);
+  const tsc = options.tsconfig === null ? null : loadTSConfig(cwd, options.tsconfig);
+  const resolvePaths = tsconfigPathsToRegExp(tsc?.data.compilerOptions?.paths || {});
+  async function extractResult(result) {
+    if (!result.outputFiles) {
+      throw new Error("[bundle-require] no output files");
+    }
+    const { text } = result.outputFiles[0];
+    const getOutputFile = options.getOutputFile || defaultGetOutputFile;
+    const outfile = getOutputFile(options.filepath, format);
+    (0, import_fs_extra3.writeFileSync)(outfile, text, "utf8");
+    let mod;
+    const req = options.require || dynamicImport;
+    try {
+      mod = await req(format === "esm" ? (0, import_node_url2.pathToFileURL)(outfile).href : outfile, { format });
+    } finally {
+      if (!preserveTemporaryFile) await (0, import_fs_extra3.unlink)(outfile);
+    }
+    return {
+      mod,
+      dependencies: result.metafile ? keys(result.metafile.inputs) : []
+    };
+  }
+  ;
+  const ctx = await (0, import_esbuild.build)({
+    ...options.esbuildOptions,
+    entryPoints: [options.filepath],
+    absWorkingDir: cwd,
+    outfile: "out.js",
+    format,
+    write: false,
+    platform: "node",
+    sourcemap: "inline",
+    bundle: true,
+    metafile: true,
+    plugins: [
+      ...has2("plugins", options.esbuildOptions) ? options.esbuildOptions.plugins : [],
+      externalPlugin({
+        external: options.external,
+        notExternal: resolvePaths
+      }),
+      injectFileScopePlugin()
+    ]
+  });
+  const extract2 = await extractResult(ctx);
+  return extract2;
+}
+
+// syncify/utils/options.ts
+function getStoresFromEnv() {
+  const stores = [];
+  const admin = /* @__PURE__ */ new Set();
+  for (const prop in $.env.vars) {
+    const p = prop.toLowerCase();
+    if (p.endsWith("_api_token")) {
+      stores.push({
+        domain: `${p.slice(0, p.indexOf("_api_token"))}`,
+        themes: {}
+      });
+    } else if (p.endsWith("_api_key")) {
+      const domain = `${p.slice(0, p.indexOf("_api_key"))}`;
+      if (!admin.has(domain)) {
+        stores.push({ domain, themes: {} });
+        admin.add(domain);
+      }
+    } else if (p.endsWith("_api_secret")) {
+      const domain = `${p.slice(0, p.indexOf("_api_secret"))}`;
+      if (!admin.has(domain)) {
+        stores.push({ domain, themes: {} });
+        admin.add(domain);
+      }
+    }
+  }
+  if (stores.length > 0) return stores;
+  missingEnv($.cwd);
+}
+function authURL(domain) {
+  let api_token = domain + "_api_token";
+  if (!has(api_token, $.env.vars)) {
+    api_token = api_token.toUpperCase();
+  }
+  if (has(api_token, $.env.vars)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      headers: { "X-Shopify-Access-Token": $.env.vars[api_token] }
+    };
+  }
+  let api_key = domain + "_api_key";
+  let api_secret = domain + "_api_secret";
+  if (!has(api_key, $.env.vars)) {
+    api_key = api_key.toUpperCase();
+  }
+  if (!has(api_secret, $.env.vars)) {
+    api_secret = api_secret.toUpperCase();
+  }
+  if (has(api_key, $.env.vars) && has(api_secret, $.env.vars)) {
+    return {
+      baseURL: `https://${domain}.myshopify.com/admin`,
+      auth: {
+        username: $.env.vars[api_key],
+        password: $.env.vars[api_secret]
+      }
+    };
+  }
+  throwError(
+    `Invalid or missing ${Dn(domain + ".myshopify.com")} credentials`,
+    [
+      `Your shop credentials in the ${Dn.bold((0, import_node_path7.basename)($.env.file))} file could`,
+      "not be read correctly or are missing. Please check your environment file and ensure",
+      "you have provided valid authorization."
+    ]
+  );
+}
+function getResolvedPaths(filePath, hook) {
+  const { cwd } = $;
+  const match2 = isFunction(hook) ? [] : false;
+  const warn3 = warnOption("Path Resolver");
+  const path2 = normalPath($.dirs.input, $.cwd);
+  if (isArray(filePath)) {
+    const paths2 = [];
+    for (const item of filePath) {
+      const uri = path2(item);
+      const resolved = import_fast_glob.default.sync(uri, { cwd, absolute: true });
+      if (match2 !== false) {
+        const test = hook(uri);
+        if (isString(test)) {
+          match2.push(test);
+        } else if (isArray(test)) {
+          match2.push(...test);
+        }
+      }
+      if (resolved.length === 0) {
+        warn3("No files can be resolved in", item);
+      } else {
+        paths2.push(...resolved);
+      }
+    }
+    return match2 === false ? paths2 : { paths: paths2, match: (0, import_anymatch.default)(match2) };
+  }
+  if (isString(filePath)) {
+    const uri = path2(filePath);
+    const paths2 = import_fast_glob.default.sync(uri, { cwd });
+    if (paths2.length === 0) {
+      warn3("No files can be resolved in", filePath);
+    }
+    if (match2 !== false) {
+      const test = hook(uri);
+      if (isString(test)) {
+        match2.push(test);
+      } else if (isArray(test)) {
+        match2.push(...test);
+      }
+    }
+    return match2 === false ? paths2 : { paths: paths2, match: (0, import_anymatch.default)(match2) };
+  }
+  typeError({
+    option: "uri",
+    name: "uri/path",
+    provided: filePath,
+    expects: "string | string[]"
+  });
+}
+function getTransform(transforms, opts) {
+  if (!has("assertSnippet", opts)) opts.assertSnippet = true;
+  if (isString(transforms)) {
+    const { paths: paths2, match: match2 } = getResolvedPaths(transforms, (watch2) => {
+      if (opts.addWatch) $.watch.add(watch2);
+      return globPath(watch2);
+    });
+    if (paths2) {
+      if (opts.flatten) {
+        return paths2.map((input) => opts.assertSnippet ? {
+          input,
+          rename: (0, import_node_path7.basename)(input),
+          snippet: false
+        } : {
+          input,
+          rename: (0, import_node_path7.basename)(input)
+        });
+      } else {
+        return opts.assertSnippet ? {
+          input: paths2,
+          rename: "[name].[ext]",
+          snippet: false,
+          match: match2
+        } : {
+          input: paths2,
+          rename: "[name].[ext]",
+          match: match2
+        };
+      }
+    }
+  } else if (isArray(transforms)) {
+    if (transforms.every(isString)) {
+      const { paths: paths2, match: match2 } = getResolvedPaths(transforms, (watch2) => {
+        if (opts.addWatch) $.watch.add(watch2);
+        return globPath(watch2);
+      });
+      if (opts.flatten) {
+        return paths2.map((input) => opts.assertSnippet ? {
+          input,
+          rename: (0, import_node_path7.basename)(input),
+          snippet: false
+        } : {
+          input,
+          rename: (0, import_node_path7.basename)(input)
+        });
+      } else {
+        return opts.assertSnippet ? {
+          input: paths2,
+          rename: "[name].[ext]",
+          snippet: false,
+          match: match2
+        } : {
+          input: paths2,
+          rename: "[name].[ext]",
+          match: match2
+        };
+      }
+    } else if (transforms.every(isObject)) {
+      return transforms.map((option) => {
+        if (!has("input", option)) {
+          invalidError({
+            option: "tranform",
+            name: "input",
+            value: option,
+            expects: "{ input: string | string[] }"
+          });
+        }
+        const { paths: paths2, match: match2 } = getResolvedPaths(option.input, (watch2) => {
+          if (opts.addWatch) $.watch.add(watch2);
+          return globPath(watch2);
+        });
+        option.match = match2;
+        option.input = paths2[0];
+        if (opts.assertSnippet && !has("snippet", option)) option.snippet = false;
+        if (!has("rename", option)) {
+          option.rename = option.snippet ? "[name].liquid" : "[name].[ext]";
+        }
+        return option;
+      });
+    }
+  } else if (isObject(transforms)) {
+    const config = [];
+    if (has("input", transforms)) {
+      const record = merge(transforms);
+      const { paths: paths2, match: match2 } = getResolvedPaths(record.input, (watch2) => {
+        if (opts.addWatch) $.watch.add(watch2);
+        return globPath(watch2);
+      });
+      if (opts.assertSnippet && !has("snippet", record)) {
+        record.snippet = false;
+      }
+      if (!has("rename", record)) {
+        record.rename = record.snippet ? "[name].liquid" : "[name].[ext]";
+      }
+      if (opts.flatten) {
+        for (const input of paths2) {
+          config.push(assign({}, record, { input }));
+        }
+      } else {
+        record.input = paths2;
+        record.match = match2;
+        config.push(record);
+      }
+    } else {
+      for (const prop in transforms) {
+        const record = { snippet: prop.startsWith("snippets/") };
+        const asset = prop.startsWith("assets/");
+        const option = transforms[prop];
+        const rename2 = asset || record.snippet;
+        if (isString(option)) {
+          if (rename2) {
+            record.rename = asset ? prop.slice(7) : prop.slice(9);
+          }
+          const { paths: paths2, match: match2 } = getResolvedPaths(option, (watch2) => {
+            if (opts.addWatch) $.watch.add(watch2);
+            return globPath(watch2);
+          });
+          if (paths2) {
+            if (opts.flatten) {
+              for (const input of paths2) config.push(assign({}, record, { input }));
+            } else {
+              config.push(assign({}, record, { input: paths2, match: match2 }));
+            }
+          }
+        } else if (isObject(option)) {
+          if (!has("input", option)) {
+            invalidError({
+              option: "transform",
+              name: prop,
+              value: option,
+              expects: "{ input: string | string[] }"
+            });
+          }
+          const { paths: paths2, match: match2 } = getResolvedPaths(option.input, (watch2) => {
+            if (opts.addWatch) $.watch.add(watch2);
+            return globPath(watch2);
+          });
+          if (paths2.length > 0) {
+            const merge2 = rename2 ? assign({}, option, record, { rename: asset ? prop.slice(7) : prop.slice(9) }) : assign({}, record, option);
+            if (opts.flatten) {
+              for (const input of paths2) {
+                config.push(assign({}, merge2, { input }));
+              }
+            } else {
+              config.push(assign(merge2, { input: paths2, match: match2 }));
+            }
+          }
+        } else if (isArray(option)) {
+          if (option.every(isString)) {
+            const { paths: paths2, match: match2 } = getResolvedPaths(option, (watch2) => {
+              if (opts.addWatch) $.watch.add(watch2);
+              return globPath(watch2);
+            });
+            if (hasRenameNamespace(prop)) record.rename = (0, import_node_path7.basename)(prop);
+            if (paths2) {
+              if (opts.flatten) {
+                for (const input of paths2) {
+                  config.push(assign({}, record, { input }));
+                }
+              } else {
+                config.push(assign({}, record, { input: paths2, match: match2 }));
+              }
+            }
+          } else {
+            typeError({
+              option: "transform",
+              name: prop,
+              provided: option,
+              expects: "string[]"
+            });
+          }
+        }
+      }
+    }
+    return config;
+  }
+}
+function getModules(pkg, name) {
+  if (has("devDependencies", pkg)) {
+    if (has(name, pkg.devDependencies)) return true;
+  }
+  if (has("dependencies", pkg)) {
+    if (has(name, pkg.dependencies)) return true;
+  }
+  if (has("peerDependencies", pkg)) {
+    if (has(name, pkg.peerDependencies)) return true;
+  }
+  if (has("optionalDependencies", pkg)) {
+    if (has(name, pkg.peerDependencies)) return true;
+  }
+  return false;
+}
+async function getConfigFilePath(filename) {
+  for (const ext of CONFIG_FILE_EXT) {
+    const filepath = `${filename}.${ext}`;
+    const fileExists = await (0, import_fs_extra4.pathExists)(filepath);
+    if (fileExists) return filepath;
+  }
+  return null;
+}
+async function readConfigFile(filename, options) {
+  try {
+    const path2 = await getConfigFilePath(filename);
+    if (path2 !== null) {
+      const config = await bundleRequire({
+        cwd: $.cwd,
+        filepath: path2,
+        ...options || {}
+      });
+      return {
+        path: path2,
+        config: config.mod.syncify || config.mod.default || config.mod
+      };
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+function hasRenameNamespace(rename2) {
+  return /\[(?:file|name|dir|ext)\]/.test(rename2);
+}
+function renameFileParse(src, pattern) {
+  let rename2 = pattern;
+  const dir = lastPath(src);
+  const ext = (0, import_node_path7.extname)(src);
+  const file = (0, import_node_path7.basename)(src, ext);
+  if (isUndefined(pattern)) return { dir, ext, file, name: file, base: file + ext };
+  if (/(\[dir\])/.test(rename2)) rename2 = rename2.replace("[dir]", dir);
+  if (/(\[name\])/.test(rename2)) rename2 = rename2.replace("[name]", file);
+  if (/(\[file\])/.test(rename2)) rename2 = rename2.replace("[file]", file);
+  if (/(\.?\[ext\])/.test(rename2)) rename2 = rename2.replace(/\.?\[ext\]/, ext);
+  const name = pattern.replace(pattern, rename2);
+  return {
+    ext,
+    file,
+    dir,
+    name,
+    base: name + ext
+  };
+}
+
+// syncify/process/context.ts
 function svg(file) {
   const config = $.svg.filter((context) => {
     if (context.input.has(file.input)) return true;
@@ -14139,21 +14687,21 @@ function style(file) {
     return config;
   } });
   if (config.snippet) {
-    file.namespace = "snippets";
-    file.key = (0, import_node_path6.join)("snippets", config.rename);
+    file.namespace = "snippets" /* Snippets */;
+    file.key = (0, import_node_path8.join)("snippets", config.rename);
   } else {
-    file.key = (0, import_node_path6.join)("assets", config.rename);
+    file.key = (0, import_node_path8.join)("assets", config.rename);
   }
   if (file.output) {
-    if (file.data.rename !== (0, import_node_path6.basename)(file.output)) {
+    if (file.data.rename !== (0, import_node_path8.basename)(file.output)) {
       if (config.snippet) {
-        file.output = (0, import_node_path6.join)($.dirs.output, file.key);
+        file.output = (0, import_node_path8.join)($.dirs.output, file.key);
       } else {
-        file.output = (0, import_node_path6.join)(parentPath(file.output), file.data.rename);
+        file.output = (0, import_node_path8.join)(parentPath(file.output), file.data.rename);
       }
     }
   } else {
-    file.output = (0, import_node_path6.join)($.dirs.output, file.key);
+    file.output = (0, import_node_path8.join)($.dirs.output, file.key);
   }
   return file;
 }
@@ -14172,15 +14720,18 @@ function schema(fn2, file) {
   return file;
 }
 function section(file) {
-  if ($.section.prefixDir) {
-    if (file.base.endsWith("-group.json")) return file;
-    if (isRegex($.section.global) && $.section.global.test(file.input)) return file;
-    const last2 = lastPath(file.input);
-    if ($.section.baseDir.has(last2)) return file;
-    const rename = lastPath(file.input) + $.section.separator + file.base;
-    file.name = rename;
-    file.key = (0, import_node_path6.join)(file.namespace, rename);
-    file.output = (0, import_node_path6.join)((0, import_node_path6.dirname)(file.output), rename);
+  if (file.base.endsWith("-group.json")) return file;
+  if ($.paths.sections.rename.length > 0) {
+    const find4 = $.paths.sections.rename.find(([match2]) => match2(file.input));
+    if (isUndefined(find4)) return file;
+    const oldName = file.base;
+    const rename2 = renameFileParse(file.input, find4[1]);
+    file.name = rename2.name;
+    file.ext = rename2.ext;
+    file.base = rename2.base;
+    file.key = (0, import_node_path8.join)(file.namespace, file.name + file.ext);
+    file.output = (0, import_node_path8.join)((0, import_node_path8.dirname)(file.output), rename2.base);
+    rename(oldName, file.base);
   }
   return file;
 }
@@ -14189,10 +14740,10 @@ function snippet(file) {
     if (isRegex($.snippet.global) && $.snippet.global.test(file.input)) return file;
     const last2 = lastPath(file.input);
     if ($.snippet.baseDir.has(last2)) return file;
-    const rename = last2 + $.snippet.separator + file.base;
-    file.name = rename;
-    file.key = (0, import_node_path6.join)(file.namespace, rename);
-    file.output = (0, import_node_path6.join)((0, import_node_path6.dirname)(file.output), rename);
+    const rename2 = last2 + $.snippet.separator + file.base;
+    file.name = rename2;
+    file.key = (0, import_node_path8.join)(file.namespace, rename2);
+    file.output = (0, import_node_path8.join)((0, import_node_path8.dirname)(file.output), rename2);
   }
   return file;
 }
@@ -14250,15 +14801,15 @@ function getFileKind(ext) {
   }
   return "Unknown" /* Unknown */;
 }
-function renameFile({ name, dir, ext, namespace }, rename) {
-  let newName = rename;
+function renameFile({ name, dir, ext, namespace }, rename2) {
+  let newName = rename2;
   if (/\[dir\]/.test(newName)) newName = newName.replace(/\[dir\]/g, dir);
   if (/\[name\]/.test(newName)) newName = newName.replace(/\[name\]/g, name);
   if (/\[file\]/.test(newName)) newName = newName.replace(/\[file\]/g, name);
   if (/\[ext\]/.test(newName)) newName = newName.replace(/\[ext\]/g, ext);
-  if (namespace === "snippets" && rename.endsWith(".liquid") === false) return newName + ".liquid";
-  if (!rename.endsWith(".[ext]") || !rename.endsWith(ext)) {
-    return /\.[a-z]+$/.test(rename) ? newName : newName + ext;
+  if (namespace === "snippets" && rename2.endsWith(".liquid") === false) return newName + ".liquid";
+  if (!rename2.endsWith(".[ext]") || !rename2.endsWith(ext)) {
+    return /\.[a-z]+$/.test(rename2) ? newName : newName + ext;
   }
   return newName;
 }
@@ -14267,11 +14818,11 @@ function setFile(file, input, output) {
   return function(namespace, type2, kind) {
     let key;
     if (type2 === 15 /* Metafield */ || type2 === 16 /* Page */) {
-      key = (0, import_node_path7.join)(lastPath(file.dir), file.base);
+      key = (0, import_node_path9.join)(lastPath(file.dir), file.base);
       output = null;
     } else {
-      key = (0, import_node_path7.join)(namespace, file.base);
-      output = (0, import_node_path7.join)(output, key);
+      key = (0, import_node_path9.join)(namespace, file.base);
+      output = (0, import_node_path9.join)(output, key);
     }
     if (kind === -1) input = $.cache.paths[input];
     file.uuid = uuid();
@@ -14281,7 +14832,7 @@ function setFile(file, input, output) {
     file.kind = kind;
     file.input = input;
     file.output = output;
-    file.relative = (0, import_node_path7.relative)($.cwd, input);
+    file.relative = (0, import_node_path9.relative)($.cwd, input);
     return file;
   };
 }
@@ -14294,7 +14845,7 @@ function setImportFile(parsedFile, output) {
       namespace,
       output,
       kind: getFileKind(file.ext),
-      relative: (0, import_node_path7.relative)($.cwd, output)
+      relative: (0, import_node_path9.relative)($.cwd, output)
     });
   };
 }
@@ -14303,7 +14854,7 @@ function parseFileQuick(path2) {
 }
 function parseFile(paths2, output) {
   return function fn2(path2) {
-    const file = new File((0, import_node_path7.parse)(path2));
+    const file = new File((0, import_node_path9.parse)(path2));
     const define2 = setFile(file, path2, output);
     if (file.ext === ".liquid") {
       if (paths2.sections.match(path2)) {
@@ -14399,8 +14950,8 @@ function parseFile(paths2, output) {
   };
 }
 function importFile(key, outputPath) {
-  const path2 = (0, import_node_path7.join)(outputPath, key);
-  const file = new File((0, import_node_path7.parse)(path2));
+  const path2 = (0, import_node_path9.join)(outputPath, key);
+  const file = new File((0, import_node_path9.parse)(path2));
   const define2 = setImportFile(file, path2);
   if (key.startsWith("sections/")) {
     return define2(key, "sections" /* Sections */);
@@ -14423,9 +14974,9 @@ function importFile(key, outputPath) {
   }
 }
 var outputFile = (output) => (path2) => {
-  const file = new File((0, import_node_path7.parse)(path2));
+  const file = new File((0, import_node_path9.parse)(path2));
   const merge2 = setFile(file, path2, output);
-  switch ((0, import_node_path7.basename)(file.dir)) {
+  switch ((0, import_node_path9.basename)(file.dir)) {
     case "sections":
       return merge2("sections" /* Sections */, 4 /* Section */, -1);
     case "snippets":
@@ -14499,13 +15050,13 @@ async function onAsset(file, input, update2, request2) {
 
 // syncify/hot/inject.ts
 init_cjs_shims();
-var import_fs_extra3 = require("fs-extra");
-var import_node_path8 = require("path");
+var import_fs_extra5 = require("fs-extra");
+var import_node_path10 = require("path");
 var EXP = /{%-?\s*render\s+['"]hot\.js['"]/;
 async function injectSnippet() {
   const key = "snippets/hot.js.liquid";
   const [theme3] = $.sync.themes;
-  const snippet2 = await (0, import_fs_extra3.readFile)($.hot.snippet);
+  const snippet2 = await (0, import_fs_extra5.readFile)($.hot.snippet);
   const upload4 = await upload2(snippet2.toString(), { theme: theme3, key });
   log_update_default(Line(t(` ${Rr} ${gr(key)} uploaded snippet injection`)));
   return upload4;
@@ -14531,12 +15082,12 @@ function writeRender(content) {
   return start + "\n" + $.hot.renderer + "\n" + content.slice(ender);
 }
 async function ejectRender(path2) {
-  const exists2 = await (0, import_fs_extra3.pathExists)(path2);
+  const exists2 = await (0, import_fs_extra5.pathExists)(path2);
   if (!exists2) return null;
-  const local = await (0, import_fs_extra3.readFile)(path2);
+  const local = await (0, import_fs_extra5.readFile)(path2);
   let content = local.toString();
   const [theme3] = $.sync.themes;
-  const name = (0, import_node_path8.basename)(path2);
+  const name = (0, import_node_path10.basename)(path2);
   const key = `layout/${name}`;
   const string = await find(`layout/${name}`, theme3);
   if (isString(string)) {
@@ -14550,17 +15101,17 @@ async function ejectRender(path2) {
   }
 }
 async function injectRender(path2) {
-  const exists2 = await (0, import_fs_extra3.pathExists)(path2);
+  const exists2 = await (0, import_fs_extra5.pathExists)(path2);
   if (!exists2) return null;
-  const local = await (0, import_fs_extra3.readFile)(path2);
+  const local = await (0, import_fs_extra5.readFile)(path2);
   let content = local.toString();
   if (!EXP.test(content)) {
     content = writeRender(content);
-    await (0, import_fs_extra3.writeFile)(path2, content);
+    await (0, import_fs_extra5.writeFile)(path2, content);
     log_update_default(Line(t(` ${Rr} injected render tag in output layout`)));
   }
   const [theme3] = $.sync.themes;
-  const name = (0, import_node_path8.basename)(path2);
+  const name = (0, import_node_path10.basename)(path2);
   const key = `layout/${name}`;
   const string = await find(`layout/${name}`, theme3);
   if (isString(string)) {
@@ -14579,7 +15130,7 @@ async function injectRender(path2) {
 function getModel(size) {
   if (size === 0) {
     throwError("Empty output directory", [
-      `There are no files within ${gr((0, import_node_path9.relative)($.cwd, $.dirs.output) + "/**")}`,
+      `There are no files within ${gr((0, import_node_path11.relative)($.cwd, $.dirs.output) + "/**")}`,
       `You may need to run the ${gr.bold("syncify build")} command and try again.`
     ]);
   }
@@ -14617,7 +15168,7 @@ async function upload3(cb) {
   const request2 = client($.sync);
   const hashook = isFunction(cb);
   const parse5 = outputFile($.dirs.output);
-  const files = import_fast_glob.default.sync(`${$.dirs.output}/**`).sort();
+  const files = import_fast_glob2.default.sync(`${$.dirs.output}/**`).sort();
   const sync4 = getModel(files.length);
   let interval = null;
   await delay(500);
@@ -14687,7 +15238,7 @@ async function upload3(cb) {
     const file = parse5(path2);
     let input;
     try {
-      const read = await (0, import_fs_extra4.readFile)(file.output);
+      const read = await (0, import_fs_extra6.readFile)(file.output);
       input = read.toString();
       if (file.namespace === "layout") {
         if (hasSnippet(input)) {
@@ -14748,13 +15299,13 @@ async function upload3(cb) {
 
 // syncify/modes/build.ts
 init_cjs_shims();
-var import_anymatch = __toESM(require_anymatch());
-var import_fast_glob2 = __toESM(require("fast-glob"));
+var import_anymatch2 = __toESM(require_anymatch());
+var import_fast_glob3 = __toESM(require("fast-glob"));
 
 // syncify/transform/asset.ts
 init_cjs_shims();
-var import_fs_extra5 = require("fs-extra");
-var import_node_path10 = require("path");
+var import_fs_extra7 = require("fs-extra");
+var import_node_path12 = require("path");
 function passthrough(file, sync4) {
   const { type: type2, relative: relative15, kind, key, output } = file;
   return async (data) => {
@@ -14762,7 +15313,7 @@ function passthrough(file, sync4) {
       if ($.mode.watch) {
         $.watch.unwatch(output);
       }
-      await (0, import_fs_extra5.writeFile)(output, data).catch(
+      await (0, import_fs_extra7.writeFile)(output, data).catch(
         write("Error writing asset to output directory", {
           file: relative15,
           source: relative15
@@ -14773,9 +15324,9 @@ function passthrough(file, sync4) {
     if ($.mode.hot) {
       syncing(key, { hot: true });
       if (kind === "JavaScript" /* JavaScript */) {
-        $.wss.script(file.uuid, (0, import_node_path10.basename)(key));
+        $.wss.script(file.uuid, (0, import_node_path12.basename)(key));
       } else if (kind === "CSS" /* CSS */) {
-        $.wss.stylesheet(file.uuid, (0, import_node_path10.basename)(key));
+        $.wss.stylesheet(file.uuid, (0, import_node_path12.basename)(key));
       }
     }
     if ($.env.sync !== 0 && $.mode.build === false) {
@@ -14785,7 +15336,7 @@ function passthrough(file, sync4) {
 }
 async function compile(file, sync4, cb) {
   const copy2 = passthrough(file, sync4);
-  const data = await (0, import_fs_extra5.readFile)(file.input).catch(
+  const data = await (0, import_fs_extra7.readFile)(file.input).catch(
     write("Error reading asset file", {
       file: file.relative,
       source: file.relative
@@ -14814,12 +15365,12 @@ async function compile(file, sync4, cb) {
 // syncify/transform/liquid.ts
 init_cjs_shims();
 var import_html_minifier_terser = require("html-minifier-terser");
-var import_node_path12 = require("path");
-var import_fs_extra8 = require("fs-extra");
+var import_node_path14 = require("path");
+var import_fs_extra10 = require("fs-extra");
 
 // syncify/transform/schema.ts
 init_cjs_shims();
-var import_fs_extra6 = require("fs-extra");
+var import_fs_extra8 = require("fs-extra");
 
 // node_modules/.pnpm/parse-json@8.1.0/node_modules/parse-json/index.js
 init_cjs_shims();
@@ -15040,7 +15591,7 @@ function minifySchema(schema3) {
 
 // syncify/transform/schema.ts
 async function ExtractSchema(file) {
-  const read = await (0, import_fs_extra6.readFile)(file.input);
+  const read = await (0, import_fs_extra8.readFile)(file.input);
   const content = read.toString();
   const open = content.search(/{%-?\s*schema/);
   if (open < 0) return [content, null, null];
@@ -15246,7 +15797,7 @@ function InjectBlocks(file, schema3) {
 }
 async function ParseSharedSchema(file) {
   try {
-    const read = await (0, import_fs_extra6.readFile)(file.input);
+    const read = await (0, import_fs_extra8.readFile)(file.input);
     const hash = checksum(read);
     if (has(file.input, $.cache.schema) && $.cache.checksum[file.input] === hash && $.section.shared.has(file.name)) {
       return $.section.shared.get(file.name);
@@ -15337,8 +15888,8 @@ async function compile2(file, sync4, cb) {
 
 // syncify/transform/style.ts
 init_cjs_shims();
-var import_node_path11 = require("path");
-var import_fs_extra7 = require("fs-extra");
+var import_node_path13 = require("path");
+var import_fs_extra9 = require("fs-extra");
 var import_postcss = __toESM(require("postcss"));
 var sass3 = null;
 var tailwind = null;
@@ -15368,9 +15919,9 @@ function write3(file, sync4, hook) {
       content = data;
     }
     $.cache.checksum[file.input] = checksum(content);
-    (0, import_fs_extra7.writeFile)(file.output, content).catch(write("Error writing stylesheet to output", {
+    (0, import_fs_extra9.writeFile)(file.output, content).catch(write("Error writing stylesheet to output", {
       input: file.relative,
-      output: (0, import_node_path11.relative)($.cwd, file.output)
+      output: (0, import_node_path13.relative)($.cwd, file.output)
     }));
     const size = sizeDiff(data, file.size);
     if (size.isSmaller) {
@@ -15387,7 +15938,7 @@ function write3(file, sync4, hook) {
       }
     }
     if ($.mode.hot) {
-      $.wss.stylesheet(file.uuid, (0, import_node_path11.basename)(file.key));
+      $.wss.stylesheet(file.uuid, (0, import_node_path13.basename)(file.key));
     }
     if (file.kind !== "Tailwind" /* Tailwind */) {
       syncing(file.key);
@@ -15419,10 +15970,10 @@ async function sassProcess(file) {
         }
       });
       if (options.sourcemap) {
-        const map = (0, import_node_path11.join)($.dirs.sourcemaps.styles, file.base + ".map");
-        (0, import_fs_extra7.writeFile)(map, JSON.stringify(sourceMap)).catch(
+        const map = (0, import_node_path13.join)($.dirs.sourcemaps.styles, file.base + ".map");
+        (0, import_fs_extra9.writeFile)(map, JSON.stringify(sourceMap)).catch(
           write("Error writing SASS Source Map file to the cache directory", {
-            file: (0, import_node_path11.relative)($.cwd, map),
+            file: (0, import_node_path13.relative)($.cwd, map),
             source: file.relative
           })
         );
@@ -15476,7 +16027,7 @@ async function tailwindProcess(file) {
 }
 async function readStyleFile(file) {
   try {
-    const css = await (0, import_fs_extra7.readFile)(file.input);
+    const css = await (0, import_fs_extra9.readFile)(file.input);
     file.size = byteSize(css);
     return {
       css: css.toString(),
@@ -15611,10 +16162,10 @@ var transform2 = (file) => async (data) => {
     }
   }
   if (!$.mode.terse) {
-    (0, import_fs_extra8.writeFile)(file.output, data).catch(
+    (0, import_fs_extra10.writeFile)(file.output, data).catch(
       write("Error writing liquid file to output", {
         input: file.relative,
-        output: (0, import_node_path12.relative)($.cwd, file.output)
+        output: (0, import_node_path14.relative)($.cwd, file.output)
       })
     );
     transform(file.kind, toUpcase(file.namespace), byteConvert(file.size), timer.now());
@@ -15632,16 +16183,16 @@ var transform2 = (file) => async (data) => {
   }
   process7("HTML Terser", timer.now());
   if (isNil(htmlmin)) {
-    (0, import_fs_extra8.writeFile)(file.output, data).catch(
+    (0, import_fs_extra10.writeFile)(file.output, data).catch(
       write("Error writing liquid file to output", {
         input: file.relative,
-        output: (0, import_node_path12.relative)($.cwd, file.output)
+        output: (0, import_node_path14.relative)($.cwd, file.output)
       })
     );
     return data;
   }
   const postmin = removeDashes(htmlmin).replace(/^\s+/gm, "");
-  (0, import_fs_extra8.writeFile)(file.output, postmin);
+  (0, import_fs_extra10.writeFile)(file.output, postmin);
   const size = sizeDiff(data, file.size);
   if (size.isSmaller) {
     transform(`${file.namespace} ${size.before} \u2192 gzip ${size.gzip}`);
@@ -15652,7 +16203,7 @@ var transform2 = (file) => async (data) => {
 };
 async function compile4(file, sync4, cb) {
   if ($.mode.watch) timer.start();
-  const read = await (0, import_fs_extra8.readFile)(file.input);
+  const read = await (0, import_fs_extra10.readFile)(file.input);
   let input = read.toString();
   if ($.mode.build) {
     if (file.namespace === "layout") {
@@ -15703,8 +16254,8 @@ async function compile4(file, sync4, cb) {
 
 // syncify/transform/json.ts
 init_cjs_shims();
-var import_fs_extra9 = require("fs-extra");
-function parse2(file, data) {
+var import_fs_extra11 = require("fs-extra");
+function parse3(file, data) {
   try {
     return parseJson(data);
   } catch (e) {
@@ -15741,7 +16292,7 @@ async function jsonCompile(file, data, space = 0) {
     transform("JSON", file.namespace, byteConvert(file.size), timer.now());
   }
   if (file.type === 15 /* Metafield */) return minified2;
-  (0, import_fs_extra9.writeFile)(file.output, minified2).catch(
+  (0, import_fs_extra11.writeFile)(file.output, minified2).catch(
     write("Error writing JSON", {
       file: file.relative
     })
@@ -15750,7 +16301,7 @@ async function jsonCompile(file, data, space = 0) {
 }
 async function compile5(file, sync4, cb) {
   $.mode.watch && timer.start();
-  const json2 = await (0, import_fs_extra9.readFile)(file.input).catch(
+  const json2 = await (0, import_fs_extra11.readFile)(file.input).catch(
     write("Error reading JSON file", {
       file: file.relative
     })
@@ -15769,7 +16320,7 @@ async function compile5(file, sync4, cb) {
         }
       }
     }
-    const data = parse2(file, read);
+    const data = parse3(file, read);
     if (data === null) return null;
     if (isEmpty(data)) {
       skipped(file, "empty file");
@@ -15809,9 +16360,9 @@ async function compile5(file, sync4, cb) {
       } else if (isArray(update2) || isObject(update2)) {
         content = await jsonCompile(file, sanitize(update2), space);
       } else if (isString(update2)) {
-        content = await jsonCompile(file, parse2(file, update2), space);
+        content = await jsonCompile(file, parse3(file, update2), space);
       } else if (isBuffer(update2)) {
-        content = await jsonCompile(file, parse2(file, update2.toString()), space);
+        content = await jsonCompile(file, parse3(file, update2.toString()), space);
       }
     } else {
       content = await jsonCompile(file, data, space);
@@ -15833,12 +16384,12 @@ async function compile5(file, sync4, cb) {
 
 // syncify/transform/script.ts
 init_cjs_shims();
-var import_fs_extra10 = require("fs-extra");
-var import_esbuild = __toESM(require("esbuild"));
-var import_node_path13 = require("path");
+var import_fs_extra12 = require("fs-extra");
+var import_esbuild2 = __toESM(require("esbuild"));
+var import_node_path15 = require("path");
 async function esbuildBundle(bundle) {
   bundle.watch.clear();
-  const result = await import_esbuild.default.build(bundle.esbuild);
+  const result = await import_esbuild2.default.build(bundle.esbuild);
   if ($.mode.terse && $.mode.build) {
     bundle.size = byteSize(result.outputFiles[0].text);
   }
@@ -15854,7 +16405,7 @@ async function getWatchPaths(bundle, inputs) {
   const { cwd, watch: watch2, mode } = $;
   for (const file in inputs) {
     if (file.indexOf("/node_modules/") > -1) continue;
-    const path2 = (0, import_node_path13.join)(cwd, file);
+    const path2 = (0, import_node_path15.join)(cwd, file);
     if (!bundle.watch.has(path2)) bundle.watch.add(path2);
     if (!watch2.has(path2)) watch2.add(path2);
     if (mode.watch) store.push(path2);
@@ -15910,10 +16461,10 @@ async function compile6(file, sync4, hooks2) {
       esbuild: { format }
     } = bundle;
     try {
-      const { metafile, outputFiles, warnings: warnings2 } = await import_esbuild.default.build(bundle.esbuild);
+      const { metafile, outputFiles, warnings: warnings2 } = await import_esbuild2.default.build(bundle.esbuild);
       if (trigger2 > 1) {
         nwl();
-        write2((0, import_node_path13.relative)($.cwd, input));
+        write2((0, import_node_path15.relative)($.cwd, input));
       }
       if ($.mode.watch) {
         await getWatchPaths(bundle, metafile.inputs);
@@ -15921,9 +16472,9 @@ async function compile6(file, sync4, hooks2) {
       if (warnings2.length > 0) esbuild2(warnings2);
       for (const { text, path: path2 } of outputFiles) {
         if (path2.endsWith(".map")) {
-          const map = (0, import_node_path13.join)($.dirs.sourcemaps.scripts, `${file.base}.map`);
-          (0, import_fs_extra10.writeFile)(map, text).catch(write("Error writing JavaScript Source Map to cache", {
-            file: (0, import_node_path13.relative)($.cwd, map),
+          const map = (0, import_node_path15.join)($.dirs.sourcemaps.scripts, `${file.base}.map`);
+          (0, import_fs_extra12.writeFile)(map, text).catch(write("Error writing JavaScript Source Map to cache", {
+            file: (0, import_node_path15.relative)($.cwd, map),
             source: file.relative
           }));
         } else {
@@ -15946,7 +16497,7 @@ async function compile6(file, sync4, hooks2) {
               content = hook(file, content);
               if (content === null) continue;
             }
-            await (0, import_fs_extra10.writeFile)(output, content).catch(
+            await (0, import_fs_extra12.writeFile)(output, content).catch(
               write("Error writing inline <script> snippet", {
                 file: file.relative
               })
@@ -15958,7 +16509,7 @@ async function compile6(file, sync4, hooks2) {
               content = hook(file, content);
               if (content === null) continue;
             }
-            await (0, import_fs_extra10.writeFile)(output, content).catch(write("Error writing JavaScript asset", {
+            await (0, import_fs_extra12.writeFile)(output, content).catch(write("Error writing JavaScript asset", {
               file: file.relative
             }));
           }
@@ -15994,10 +16545,10 @@ async function compile6(file, sync4, hooks2) {
 init_cjs_shims();
 var import_svgo = __toESM(require("svgo"));
 var import_svg_sprite = __toESM(require("svg-sprite"));
-var import_node_path14 = require("path");
-var import_fs_extra11 = require("fs-extra");
+var import_node_path16 = require("path");
+var import_fs_extra13 = require("fs-extra");
 async function getFile(path2) {
-  const svg2 = await (0, import_fs_extra11.readFile)(path2);
+  const svg2 = await (0, import_fs_extra13.readFile)(path2);
   return [
     path2,
     svg2.toString(),
@@ -16023,11 +16574,11 @@ function compileSprite(context, request2, _cb) {
     file.kind = "Sprite" /* Sprite */;
     if (config.snippet) {
       file.namespace = "snippets" /* Snippets */;
-      file.key = (0, import_node_path14.join)("snippets", renameFile(file, config.rename));
-      file.output = (0, import_node_path14.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path16.join)("snippets", renameFile(file, config.rename));
+      file.output = (0, import_node_path16.join)($.dirs.output, file.key);
     } else {
-      file.key = (0, import_node_path14.join)("assets", renameFile(file, config.rename));
-      file.output = (0, import_node_path14.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path16.join)("assets", renameFile(file, config.rename));
+      file.output = (0, import_node_path16.join)($.dirs.output, file.key);
     }
     const options = config.sprite === true ? $.processor.sprite : config.sprite;
     const sprite = new import_svg_sprite.default(options);
@@ -16040,7 +16591,7 @@ function compileSprite(context, request2, _cb) {
     if (items) {
       const svgs = items.filter(([path2, svg2]) => {
         if (hasLiquid(svg2)) {
-          skipped((0, import_node_path14.relative)($.cwd, path2), "Liquid Detected");
+          skipped((0, import_node_path16.relative)($.cwd, path2), "Liquid Detected");
           return false;
         }
         return true;
@@ -16053,7 +16604,7 @@ function compileSprite(context, request2, _cb) {
       const content = await getSprite(sprite);
       const length = svgs.length;
       process7("SVG Sprite", `${length} ${plural("SVG", length)}`, timer.stop());
-      await (0, import_fs_extra11.writeFile)(file.output, content).catch(
+      await (0, import_fs_extra13.writeFile)(file.output, content).catch(
         write("Error writing SVG Sprite", {
           file: file.key,
           caller: context.relative
@@ -16093,14 +16644,14 @@ function compileInline(context, request2, _cb) {
     if ($.mode.watch) timer.start();
     if (config.snippet) {
       file.namespace = "snippets" /* Snippets */;
-      file.key = (0, import_node_path14.join)("snippets", renameFile(file, config.rename));
-      file.output = (0, import_node_path14.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path16.join)("snippets", renameFile(file, config.rename));
+      file.output = (0, import_node_path16.join)($.dirs.output, file.key);
     } else {
-      file.key = (0, import_node_path14.join)("assets", renameFile(file, config.rename));
-      file.output = (0, import_node_path14.join)($.dirs.output, file.key);
+      file.key = (0, import_node_path16.join)("assets", renameFile(file, config.rename));
+      file.output = (0, import_node_path16.join)($.dirs.output, file.key);
     }
     const options = config.svgo === true ? $.processor.svgo : config.svgo;
-    const read = await (0, import_fs_extra11.readFile)(file.input);
+    const read = await (0, import_fs_extra13.readFile)(file.input);
     const node = read.toString();
     if (hasLiquid(node)) {
       skipped(file, "Liquid Detected");
@@ -16133,7 +16684,7 @@ function compileInline(context, request2, _cb) {
     } else {
       minified(file.kind, size.before, size.after, size.saved);
     }
-    await (0, import_fs_extra11.writeFile)(file.output, data).catch(
+    await (0, import_fs_extra13.writeFile)(file.output, data).catch(
       write("Error writing SVG", {
         file: file.key,
         caller: context.relative
@@ -16167,14 +16718,14 @@ async function compile7(file, request2, cb) {
 
 // syncify/process/cache.ts
 init_cjs_shims();
-var import_node_path15 = require("path");
-var import_fs_extra12 = require("fs-extra");
+var import_node_path17 = require("path");
+var import_fs_extra14 = require("fs-extra");
 var import_node_zlib2 = __toESM(require("zlib"));
 var import_cbor = __toESM(require("cbor"));
 var import_write_file_atomic = __toESM(require_lib4());
 var cq = new PQueue();
 function decode(uri) {
-  const content = (0, import_fs_extra12.readFileSync)(uri);
+  const content = (0, import_fs_extra14.readFileSync)(uri);
   const gunzip = import_node_zlib2.default.gunzipSync(content);
   return import_cbor.default.decode(gunzip);
 }
@@ -16191,13 +16742,13 @@ function save(uri, data) {
 }
 async function getCache() {
   $.cache.uri = create(null);
-  const cachdir = (0, import_node_path15.join)($.cwd, "node_modules", ".cache");
-  if (!(0, import_fs_extra12.existsSync)(cachdir)) (0, import_fs_extra12.mkdirSync)(cachdir);
-  const root = (0, import_node_path15.join)(cachdir, "syncify");
-  if (!(0, import_fs_extra12.existsSync)(root)) (0, import_fs_extra12.mkdirSync)(root);
+  const cachdir = (0, import_node_path17.join)($.cwd, "node_modules", ".cache");
+  if (!(0, import_fs_extra14.existsSync)(cachdir)) (0, import_fs_extra14.mkdirSync)(cachdir);
+  const root = (0, import_node_path17.join)(cachdir, "syncify");
+  if (!(0, import_fs_extra14.existsSync)(root)) (0, import_fs_extra14.mkdirSync)(root);
   for (const file of CACHE_REFS) {
-    $.cache.uri[file] = (0, import_node_path15.join)(root, `${file}.bin`);
-    if ((0, import_fs_extra12.existsSync)($.cache.uri[file])) {
+    $.cache.uri[file] = (0, import_node_path17.join)(root, `${file}.bin`);
+    if ((0, import_fs_extra14.existsSync)($.cache.uri[file])) {
       $.cache[file] = decode($.cache.uri[file]);
     } else {
       $.cache[file] = {};
@@ -16288,7 +16839,7 @@ function getModel2() {
   }
   return report;
 }
-async function build(cb) {
+async function build2(cb) {
   timer.start("build");
   if (!$.mode.export) {
     nwl();
@@ -16301,8 +16852,8 @@ async function build(cb) {
   const report = getModel2();
   const hasFilter = isEmpty($.filters) === false;
   const parse5 = parseFile($.paths, $.dirs.output);
-  const match2 = (0, import_anymatch.default)(toArray($.watch.values()));
-  const globs = await (0, import_fast_glob2.default)("**", { absolute: true, cwd: $.dirs.input });
+  const match2 = (0, import_anymatch2.default)(toArray($.watch.values()));
+  const globs = await (0, import_fast_glob3.default)("**", { absolute: true, cwd: $.dirs.input });
   const cache = $.cache.paths;
   for (const path2 of globs.filter(match2)) {
     const file = parse5(path2);
@@ -16459,7 +17010,7 @@ init_cjs_shims();
 
 // syncify/transform/pages.ts
 init_cjs_shims();
-var import_fs_extra13 = require("fs-extra");
+var import_fs_extra15 = require("fs-extra");
 var import_gray_matter = __toESM(require("gray-matter"));
 var import_markdown_it = __toESM(require("markdown-it"));
 var import_turndown = require("@syncify/turndown");
@@ -16820,7 +17371,7 @@ async function compile8(file, _cb) {
     skipped(file, "pages do not support multistore sync");
     return null;
   }
-  const read = await (0, import_fs_extra13.readFile)(file.input);
+  const read = await (0, import_fs_extra15.readFile)(file.input);
   if (isEmpty2(read.toString())) {
     if ($.mode.watch) skipped(file, "empty file");
     return null;
@@ -16893,7 +17444,7 @@ async function compile8(file, _cb) {
           convert = (0, import_gray_matter.stringify)("\n" + markdown2, frontmatter.data);
         }
         $.watch.unwatch(file.input);
-        await (0, import_fs_extra13.writeFile)(file.input, convert);
+        await (0, import_fs_extra15.writeFile)(file.input, convert);
         setPageCache(store.domain, remote);
         $.watch.add(file.input);
       } else if (prompt6.action === 4 /* Cancel */) {
@@ -17176,8 +17727,8 @@ async function themes() {
 
 // syncify/modes/import.ts
 init_cjs_shims();
-var import_node_path16 = require("path");
-var import_fs_extra14 = require("fs-extra");
+var import_node_path18 = require("path");
+var import_fs_extra16 = require("fs-extra");
 async function getModel3() {
   const sync4 = /* @__PURE__ */ new Map();
   let width = 0;
@@ -17240,7 +17791,7 @@ async function importing(cb) {
     const prefix = Create().NL.Line(Prefix("Duration", pe(timer.now("import"))), t).Line(Prefix("Transfers", pe(`${transfers++}`)), t).Line(Prefix("Syncing", sr(`${or(theme3.target)}  ${Cr}  ${theme3.store}`)), t).Line(Prefix("Preview", rr(preview)), t).Ruler();
     let processing = "";
     if (item.status === 3 /* Empty */) {
-      (0, import_fs_extra14.writeFileSync)(file.output, "");
+      (0, import_fs_extra16.writeFileSync)(file.output, "");
       record.warning += 1;
       record.transfers += 1;
       record.progress.increment(1);
@@ -17254,7 +17805,7 @@ async function importing(cb) {
       record.transfers += 1;
       record.progress.increment(1);
       const buffer = Buffer.from(item.data.value || null, "utf8");
-      (0, import_fs_extra14.writeFileSync)(file.output, buffer);
+      (0, import_fs_extra16.writeFileSync)(file.output, buffer);
       processing = V(file.key);
     } else if (item.status === 1 /* Retry */) {
       if (!record.errors.retry.has(file.output)) {
@@ -17301,7 +17852,7 @@ async function importing(cb) {
   remaining = sync4.size - 1;
   for (const [id, record] of sync4) {
     const [store, target] = id.split(":");
-    const output = (0, import_node_path16.join)($.dirs.import, store, target);
+    const output = (0, import_node_path18.join)($.dirs.import, store, target);
     timer.start(id);
     record.active = true;
     for (const { key } of record.files) {
@@ -17318,7 +17869,7 @@ async function importing(cb) {
     await queue.onIdle();
     remaining = remaining - 1;
     record.active = false;
-    record.log = getDoneLog(sync4.get(id), (0, import_node_path16.relative)($.cwd, output), timer.stop(id));
+    record.log = getDoneLog(sync4.get(id), (0, import_node_path18.relative)($.cwd, output), timer.stop(id));
   }
   for (const { errors } of sync4.values()) {
     if (errors.remote.size > 0) {
@@ -17328,22 +17879,22 @@ async function importing(cb) {
 
 // syncify/modes/export.ts
 init_cjs_shims();
-var import_fs_extra17 = require("fs-extra");
-var import_node_path20 = require("path");
-var import_fast_glob4 = require("fast-glob");
+var import_fs_extra18 = require("fs-extra");
+var import_node_path21 = require("path");
+var import_fast_glob5 = require("fast-glob");
 var import_adm_zip = __toESM(require("adm-zip"));
 
 // syncify/process/validate.ts
 init_cjs_shims();
-var import_node_path17 = require("path");
-var import_fast_glob3 = require("fast-glob");
+var import_node_path19 = require("path");
+var import_fast_glob4 = require("fast-glob");
 async function hasTemplateMismatch(cwd) {
-  const files = await (0, import_fast_glob3.glob)("templates/*", { cwd, absolute: true });
+  const files = await (0, import_fast_glob4.glob)("templates/*", { cwd, absolute: true });
   const exclude = /* @__PURE__ */ new Set();
   const exists2 = /* @__PURE__ */ new Set();
   for (const file of files) {
-    const { name } = (0, import_node_path17.parse)(file);
-    const templates = files.filter((path2) => (0, import_node_path17.parse)(path2).name === name);
+    const { name } = (0, import_node_path19.parse)(file);
+    const templates = files.filter((path2) => (0, import_node_path19.parse)(path2).name === name);
     if (templates.length > 1 && !exists2.has(name)) exists2.add(name);
   }
   if (exists2.size === 0) return 1 /* None */;
@@ -17404,9 +17955,9 @@ async function hasTemplateMismatch(cwd) {
         inactive: `${name}.liquid`,
         onState: ({ value }) => {
           if (value) {
-            exclude.add((0, import_node_path17.join)(cwd, "templates", `${name}.liquid`));
+            exclude.add((0, import_node_path19.join)(cwd, "templates", `${name}.liquid`));
           } else {
-            exclude.add((0, import_node_path17.join)(cwd, "templates", `${name}.json`));
+            exclude.add((0, import_node_path19.join)(cwd, "templates", `${name}.json`));
           }
         }
       });
@@ -17415,13 +17966,13 @@ async function hasTemplateMismatch(cwd) {
     return exclude;
   } else if (action === "json") {
     for (const name of exists2) {
-      exclude.add((0, import_node_path17.join)(cwd, "templates", `${name}.json`));
+      exclude.add((0, import_node_path19.join)(cwd, "templates", `${name}.json`));
     }
     resume();
     return exclude;
   } else if (action === "liquid") {
     for (const name of exists2) {
-      exclude.add((0, import_node_path17.join)(cwd, "templates", `${name}.liquid`));
+      exclude.add((0, import_node_path19.join)(cwd, "templates", `${name}.liquid`));
     }
     resume();
     return exclude;
@@ -17433,7 +17984,7 @@ async function hasTemplateMismatch(cwd) {
 function isEmptyOutputDir(stats) {
   if (stats.assets === 0 && stats.config === 0 && stats.templates === 0 && stats.layout === 0 && stats.snippets === 0 && stats.sections === 0) {
     throwError("Empty output directory", [
-      `There are no files within ${gr((0, import_node_path17.relative)($.cwd, $.dirs.output) + "/**")}`,
+      `There are no files within ${gr((0, import_node_path19.relative)($.cwd, $.dirs.output) + "/**")}`,
       `You may need to run the ${gr.bold("syncify build")} command and try again.`
     ]);
   }
@@ -17442,223 +17993,28 @@ function isEmptyOutputDir(stats) {
 // syncify/options/files.ts
 init_cjs_shims();
 var import_dotenv = __toESM(require("dotenv"));
-var import_node_path19 = require("path");
-var import_fs_extra16 = require("fs-extra");
-
-// syncify/requests/require.ts
-init_cjs_shims();
-var import_node_url2 = require("url");
-var import_fs_extra15 = require("fs-extra");
-var import_node_path18 = require("path");
-var import_esbuild2 = require("esbuild");
-function findUp(name, startDir, stopDir = (0, import_node_path18.parse)(startDir).root) {
-  let dir = startDir;
-  while (dir !== stopDir) {
-    const file = (0, import_node_path18.join)(dir, name);
-    if ((0, import_fs_extra15.existsSync)(file)) return file;
-    if ((0, import_node_path18.extname)(file) !== ".json") {
-      const path2 = file + ".json";
-      if ((0, import_fs_extra15.existsSync)(path2)) return path2;
-    }
-    dir = (0, import_node_path18.dirname)(dir);
-  }
-  return null;
-}
-function getTSConfigFromFile(cwd, filename) {
-  if (!(0, import_fs_extra15.existsSync)((0, import_node_path18.join)(cwd, filename))) return null;
-  return (0, import_node_path18.isAbsolute)(filename) ? (0, import_fs_extra15.existsSync)(filename) ? filename : null : findUp(filename, cwd);
-}
-function getTSConfigFromExtends(cwd, name) {
-  if ((0, import_node_path18.isAbsolute)(name)) return (0, import_fs_extra15.existsSync)(name) ? name : null;
-  if (name.startsWith(".")) return findUp(name, cwd);
-  return require.resolve(name, { paths: [cwd] });
-}
-function getTSConfig(dir = process.cwd(), name = "tsconfig.json", isExtends = false) {
-  dir = (0, import_node_path18.resolve)(dir);
-  const id = isExtends ? getTSConfigFromExtends(dir, name) : getTSConfigFromFile(dir, name);
-  if (!id) return null;
-  const data = jsonc((0, import_fs_extra15.readFileSync)(id, "utf-8"));
-  const configDir = (0, import_node_path18.dirname)(id);
-  if (has2("baseURL", data.compilerOptions)) {
-    data.compilerOptions.baseUrl = (0, import_node_path18.join)(configDir, data.compilerOptions.baseUrl);
-  }
-  const extendsFiles = [];
-  if (data.extends) {
-    const extendsList = isArray(data.extends) ? data.extends : [data.extends];
-    const extendsData = {};
-    for (const name2 of extendsList) {
-      const parentConfig = getTSConfig(configDir, name2, true);
-      if (parentConfig) {
-        assign(extendsData, {
-          ...parentConfig?.data,
-          compilerOptions: {
-            ...extendsData.compilerOptions,
-            ...parentConfig?.data?.compilerOptions
-          }
-        });
-        extendsFiles.push(...parentConfig.files);
-      }
-    }
-    assign(data, {
-      ...extendsData,
-      ...data,
-      compilerOptions: {
-        ...extendsData.compilerOptions,
-        ...data.compilerOptions
-      }
-    });
-  }
-  delete data.extends;
-  return {
-    path: id,
-    data,
-    files: [...extendsFiles, id]
-  };
-}
-function loadTSConfig(dir, name) {
-  return getTSConfig(dir, name);
-}
-function defaultGetOutputFile(path2, format) {
-  return path2.replace(REGEX_EXTJS, `.bundled_${uuid()}.${format === "esm" ? "mjs" : "cjs"}`);
-}
-function isCommonJSorESM(inputFile) {
-  if (typeof jest === "undefined") return "cjs";
-  const ext = (0, import_node_path18.extname)(inputFile);
-  if (ext === ".js") {
-    return $.pkg.type === "module" ? "esm" : "cjs";
-  } else if (ext === ".ts") {
-    return "esm";
-  } else if (ext === ".mjs") {
-    return "esm";
-  }
-  return "cjs";
-}
-function tsconfigPathsToRegExp(paths2) {
-  return paths2 === null ? null : keys(paths2 || {}).map((key) => new RegExp(`^${key.replace(/\*/, ".*")}$`));
-}
-function match(id, patterns) {
-  if (!patterns) return false;
-  return patterns.some((p) => {
-    if (isRegex(p)) return p.test(id);
-    return id === p || id.startsWith(p + "/");
-  });
-}
-function externalPlugin({
-  external,
-  notExternal
-} = {}) {
-  return {
-    name: "bundle-require:external",
-    setup({ onResolve }) {
-      onResolve({ filter: /.*/ }, async (args) => {
-        if (args.path.charCodeAt(0) === 46 || (0, import_node_path18.isAbsolute)(args.path)) return;
-        if (match(args.path, external)) return { external: true };
-        if (match(args.path, notExternal)) return;
-        return { external: true };
-      });
-    }
-  };
-}
-function injectFileScopePlugin() {
-  return {
-    name: "bundle-require:inject-file-scope",
-    setup(ctx) {
-      ctx.initialOptions.define = {
-        ...ctx.initialOptions.define,
-        __dirname: "__injected_dirname__",
-        __filename: "__injected_filename__",
-        "import.meta.url": "__injected_import_meta_url__"
-      };
-      ctx.onLoad({ filter: REGEX_EXTJS }, async (args) => {
-        const contents = await (0, import_fs_extra15.readFile)(args.path, "utf-8");
-        const injectLines = [
-          `const __injected_filename__ = ${JSON.stringify(args.path)};`,
-          `const __injected_dirname__ = ${JSON.stringify((0, import_node_path18.dirname)(args.path))};`,
-          `const __injected_import_meta_url__ = ${JSON.stringify((0, import_node_url2.pathToFileURL)(args.path).href)};`
-        ];
-        return {
-          contents: glue(injectLines) + contents,
-          loader: inferLoader((0, import_node_path18.extname)(args.path))
-        };
-      });
-    }
-  };
-}
-async function bundleRequire(options) {
-  if (!REGEX_EXTJS.test(options.filepath)) {
-    throw new Error(`${options.filepath} is not a valid JS file`);
-  }
-  const preserveTemporaryFile = options.preserveTemporaryFile ?? !!process.env.BUNDLE_REQUIRE_PRESERVE;
-  const cwd = options.cwd || $.cwd;
-  const format = options.format ?? isCommonJSorESM(options.filepath);
-  const tsc = options.tsconfig === null ? null : loadTSConfig(cwd, options.tsconfig);
-  const resolvePaths = tsconfigPathsToRegExp(tsc?.data.compilerOptions?.paths || {});
-  async function extractResult(result) {
-    if (!result.outputFiles) {
-      throw new Error("[bundle-require] no output files");
-    }
-    const { text } = result.outputFiles[0];
-    const getOutputFile = options.getOutputFile || defaultGetOutputFile;
-    const outfile = getOutputFile(options.filepath, format);
-    (0, import_fs_extra15.writeFileSync)(outfile, text, "utf8");
-    let mod;
-    const req = options.require || dynamicImport;
-    try {
-      mod = await req(format === "esm" ? (0, import_node_url2.pathToFileURL)(outfile).href : outfile, { format });
-    } finally {
-      if (!preserveTemporaryFile) await (0, import_fs_extra15.unlink)(outfile);
-    }
-    return {
-      mod,
-      dependencies: result.metafile ? keys(result.metafile.inputs) : []
-    };
-  }
-  ;
-  const ctx = await (0, import_esbuild2.build)({
-    ...options.esbuildOptions,
-    entryPoints: [options.filepath],
-    absWorkingDir: cwd,
-    outfile: "out.js",
-    format,
-    write: false,
-    platform: "node",
-    sourcemap: "inline",
-    bundle: true,
-    metafile: true,
-    plugins: [
-      ...has2("plugins", options.esbuildOptions) ? options.esbuildOptions.plugins : [],
-      externalPlugin({
-        external: options.external,
-        notExternal: resolvePaths
-      }),
-      injectFileScopePlugin()
-    ]
-  });
-  const extract2 = await extractResult(ctx);
-  return extract2;
-}
-
-// syncify/options/files.ts
+var import_node_path20 = require("path");
+var import_fs_extra17 = require("fs-extra");
 async function configFile() {
   let path2 = null;
   for (const file of SYNCIFY_CONFIG) {
-    path2 = (0, import_node_path19.join)($.cwd, file);
-    const exists2 = await (0, import_fs_extra16.pathExists)(path2);
+    path2 = (0, import_node_path20.join)($.cwd, file);
+    const exists2 = await (0, import_fs_extra17.pathExists)(path2);
     if (exists2) break;
     path2 = null;
   }
   if (path2 === null) return null;
   try {
-    if ((0, import_node_path19.extname)(path2) === ".json") {
+    if ((0, import_node_path20.extname)(path2) === ".json") {
       $.file.path = path2;
-      $.file.relative = (0, import_node_path19.relative)($.cwd, path2);
-      $.file.base = (0, import_node_path19.basename)(path2);
-      const json2 = await (0, import_fs_extra16.readFile)(path2);
+      $.file.relative = (0, import_node_path20.relative)($.cwd, path2);
+      $.file.base = (0, import_node_path20.basename)(path2);
+      const json2 = await (0, import_fs_extra17.readFile)(path2);
       return jsonc(json2.toString());
     } else {
       $.file.path = path2;
-      $.file.relative = (0, import_node_path19.relative)($.cwd, path2);
-      $.file.base = (0, import_node_path19.basename)(path2);
+      $.file.relative = (0, import_node_path20.relative)($.cwd, path2);
+      $.file.base = (0, import_node_path20.basename)(path2);
       const config = await bundleRequire({
         cwd: $.cwd,
         filepath: path2
@@ -17666,18 +18022,18 @@ async function configFile() {
       return config.mod.syncify || config.mod.default || config.mod;
     }
   } catch (e) {
-    const jsonconfig = (0, import_node_path19.join)($.cwd, "syncify.config.json");
-    const hasFile = await (0, import_fs_extra16.pathExists)(jsonconfig);
-    if (hasFile) return (0, import_fs_extra16.readJson)(jsonconfig);
+    const jsonconfig = (0, import_node_path20.join)($.cwd, "syncify.config.json");
+    const hasFile = await (0, import_fs_extra17.pathExists)(jsonconfig);
+    if (hasFile) return (0, import_fs_extra17.readJson)(jsonconfig);
     return null;
   }
 }
 async function getPackageJson() {
-  const uri = (0, import_node_path19.join)($.cwd, "package.json");
-  const has3 = await (0, import_fs_extra16.pathExists)(uri);
+  const uri = (0, import_node_path20.join)($.cwd, "package.json");
+  const has3 = await (0, import_fs_extra17.pathExists)(uri);
   if (!has3) throw new Error('Missing "package.json" file');
   try {
-    $.pkg = await (0, import_fs_extra16.readJson)(uri);
+    $.pkg = await (0, import_fs_extra17.readJson)(uri);
     if (hasPath("syncify.stores", $.pkg)) {
       if (isArray($.pkg.syncify.stores)) {
         $.stores = $.pkg.syncify.stores;
@@ -17692,16 +18048,16 @@ async function getPackageJson() {
   }
 }
 async function setPkgVersion(current, increment) {
-  const uri = (0, import_node_path19.join)($.cwd, "package.json");
+  const uri = (0, import_node_path20.join)($.cwd, "package.json");
   try {
-    const pkg = await (0, import_fs_extra16.readFile)(uri);
+    const pkg = await (0, import_fs_extra17.readFile)(uri);
     const str = pkg.toString();
     const ver = str.indexOf('"version"');
     const sqo = str.indexOf('"', ver + 10) + 1;
     const eqo = str.indexOf('"', sqo + 1);
     const num = str.slice(sqo, eqo);
     if (num === current) {
-      await (0, import_fs_extra16.writeFile)(uri, `${str.slice(0, sqo)}${increment}${str.slice(eqo)}`);
+      await (0, import_fs_extra17.writeFile)(uri, `${str.slice(0, sqo)}${increment}${str.slice(eqo)}`);
       await getPackageJson();
       return true;
     } else {
@@ -17712,8 +18068,8 @@ async function setPkgVersion(current, increment) {
   }
 }
 async function getEnvFile() {
-  const path2 = (0, import_node_path19.join)($.cwd, ".env");
-  if (await (0, import_fs_extra16.pathExists)(path2)) {
+  const path2 = (0, import_node_path20.join)($.cwd, ".env");
+  if (await (0, import_fs_extra17.pathExists)(path2)) {
     const env = import_dotenv.default.config({ path: path2 });
     if (env.error) {
       throws(env.error, { path: path2 });
@@ -17734,7 +18090,7 @@ async function exporting(cb) {
   timer.start("export");
   if ($.mode.build) {
     group("Build");
-    await build(cb);
+    await build2(cb);
   } else {
     isEmptyOutputDir($.stats);
   }
@@ -17751,18 +18107,18 @@ async function exporting(cb) {
     group("Export");
   }
   nwl();
-  if (!await (0, import_fs_extra17.pathExists)($.dirs.export)) {
-    await (0, import_fs_extra17.mkdir)($.dirs.export);
+  if (!await (0, import_fs_extra18.pathExists)($.dirs.export)) {
+    await (0, import_fs_extra18.mkdir)($.dirs.export);
   }
   const zip = new import_adm_zip.default();
   for (const dir of THEME_DIRS) {
-    const uri = (0, import_node_path20.join)($.dirs.output, dir);
-    const has3 = await (0, import_fs_extra17.pathExists)(uri);
+    const uri = (0, import_node_path21.join)($.dirs.output, dir);
+    const has3 = await (0, import_fs_extra18.pathExists)(uri);
     if (has3) {
-      const files = await (0, import_fast_glob4.glob)("*", { cwd: uri, absolute: true });
+      const files = await (0, import_fast_glob5.glob)("*", { cwd: uri, absolute: true });
       for (const file of files) {
-        const path2 = `${dir}/${(0, import_node_path20.basename)(file)}`;
-        const stat2 = (0, import_fs_extra17.statSync)(file);
+        const path2 = `${dir}/${(0, import_node_path21.basename)(file)}`;
+        const stat2 = (0, import_fs_extra18.statSync)(file);
         if (stat2.size === 0) {
           zip.addFile(path2, toBuffer(" "));
           warn2(path2, "empty file");
@@ -17776,9 +18132,9 @@ async function exporting(cb) {
   }
   const size = byteSize(zip.toBuffer());
   if ($.vc.update !== null) {
-    if (!await (0, import_fs_extra17.pathExists)($.vc.update.dir)) await (0, import_fs_extra17.mkdir)($.vc.update.dir);
+    if (!await (0, import_fs_extra18.pathExists)($.vc.update.dir)) await (0, import_fs_extra18.mkdir)($.vc.update.dir);
     version($.vc, "bump");
-    zipped(stringSize(size), (0, import_node_path20.relative)($.cwd, $.vc.update.zip));
+    zipped(stringSize(size), (0, import_node_path21.relative)($.cwd, $.vc.update.zip));
     try {
       await zip.writeZipPromise($.vc.update.zip);
       themeVersion = $.vc.update.number;
@@ -17789,13 +18145,13 @@ async function exporting(cb) {
       });
     }
   } else {
-    if (!await (0, import_fs_extra17.pathExists)($.vc.dir)) {
-      await (0, import_fs_extra17.mkdir)($.vc.dir);
+    if (!await (0, import_fs_extra18.pathExists)($.vc.dir)) {
+      await (0, import_fs_extra18.mkdir)($.vc.dir);
       version($.vc, "created");
     } else {
       version($.vc, "overwrite");
     }
-    zipped(stringSize(size), (0, import_node_path20.relative)($.cwd, $.vc.zip));
+    zipped(stringSize(size), (0, import_node_path21.relative)($.cwd, $.vc.zip));
     try {
       await zip.writeZipPromise($.vc.zip);
     } catch (e) {
@@ -17826,7 +18182,7 @@ async function exporting(cb) {
 // syncify/modes/publish.ts
 init_cjs_shims();
 var import_uWebSockets = __toESM(require("uWebSockets.js"));
-var import_fs_extra18 = require("fs-extra");
+var import_fs_extra19 = require("fs-extra");
 async function publish(cb) {
   await exporting(cb);
   timer.start("publish");
@@ -17835,7 +18191,7 @@ async function publish(cb) {
     response.writeHeader("Access-Control-Allow-Origin", "*");
     response.writeHeader("Cache-Control", "public, max-age=0");
     const uri = $.vc.dir + request2.getUrl();
-    (0, import_fs_extra18.existsSync)(uri) ? response.end((0, import_fs_extra18.readFileSync)(uri)) : response.endWithoutBody();
+    (0, import_fs_extra19.existsSync)(uri) ? response.end((0, import_fs_extra19.readFileSync)(uri)) : response.endWithoutBody();
   }).listen($.publish.tunnelPort, (token) => {
     if (!token) {
       console.log("Failed to listen to port " + $.publish.tunnelPort);
@@ -18133,367 +18489,6 @@ var import_chokidar = require("chokidar");
 // syncify/options/json.ts
 init_cjs_shims();
 var import_anymatch3 = __toESM(require_anymatch());
-
-// syncify/utils/options.ts
-init_cjs_shims();
-var import_node_path21 = require("path");
-var import_fast_glob5 = __toESM(require("fast-glob"));
-var import_anymatch2 = __toESM(require_anymatch());
-var import_fs_extra19 = require("fs-extra");
-function getStoresFromEnv() {
-  const stores = [];
-  const admin = /* @__PURE__ */ new Set();
-  for (const prop in $.env.vars) {
-    const p = prop.toLowerCase();
-    if (p.endsWith("_api_token")) {
-      stores.push({
-        domain: `${p.slice(0, p.indexOf("_api_token"))}`,
-        themes: {}
-      });
-    } else if (p.endsWith("_api_key")) {
-      const domain = `${p.slice(0, p.indexOf("_api_key"))}`;
-      if (!admin.has(domain)) {
-        stores.push({ domain, themes: {} });
-        admin.add(domain);
-      }
-    } else if (p.endsWith("_api_secret")) {
-      const domain = `${p.slice(0, p.indexOf("_api_secret"))}`;
-      if (!admin.has(domain)) {
-        stores.push({ domain, themes: {} });
-        admin.add(domain);
-      }
-    }
-  }
-  if (stores.length > 0) return stores;
-  missingEnv($.cwd);
-}
-function authURL(domain) {
-  let api_token = domain + "_api_token";
-  if (!has(api_token, $.env.vars)) {
-    api_token = api_token.toUpperCase();
-  }
-  if (has(api_token, $.env.vars)) {
-    return {
-      baseURL: `https://${domain}.myshopify.com/admin`,
-      headers: { "X-Shopify-Access-Token": $.env.vars[api_token] }
-    };
-  }
-  let api_key = domain + "_api_key";
-  let api_secret = domain + "_api_secret";
-  if (!has(api_key, $.env.vars)) {
-    api_key = api_key.toUpperCase();
-  }
-  if (!has(api_secret, $.env.vars)) {
-    api_secret = api_secret.toUpperCase();
-  }
-  if (has(api_key, $.env.vars) && has(api_secret, $.env.vars)) {
-    return {
-      baseURL: `https://${domain}.myshopify.com/admin`,
-      auth: {
-        username: $.env.vars[api_key],
-        password: $.env.vars[api_secret]
-      }
-    };
-  }
-  throwError(
-    `Invalid or missing ${Dn(domain + ".myshopify.com")} credentials`,
-    [
-      `Your shop credentials in the ${Dn.bold((0, import_node_path21.basename)($.env.file))} file could`,
-      "not be read correctly or are missing. Please check your environment file and ensure",
-      "you have provided valid authorization."
-    ]
-  );
-}
-function getResolvedPaths(filePath, hook) {
-  const { cwd } = $;
-  const match2 = isFunction(hook) ? [] : false;
-  const warn3 = warnOption("Path Resolver");
-  const path2 = normalPath($.dirs.input, $.cwd);
-  if (isArray(filePath)) {
-    const paths2 = [];
-    for (const item of filePath) {
-      const uri = path2(item);
-      const resolved = import_fast_glob5.default.sync(uri, { cwd, absolute: true });
-      if (match2 !== false) {
-        const test = hook(uri);
-        if (isString(test)) {
-          match2.push(test);
-        } else if (isArray(test)) {
-          match2.push(...test);
-        }
-      }
-      if (resolved.length === 0) {
-        warn3("No files can be resolved in", item);
-      } else {
-        paths2.push(...resolved);
-      }
-    }
-    return match2 === false ? paths2 : { paths: paths2, match: (0, import_anymatch2.default)(match2) };
-  }
-  if (isString(filePath)) {
-    const uri = path2(filePath);
-    const paths2 = import_fast_glob5.default.sync(uri, { cwd });
-    if (paths2.length === 0) {
-      warn3("No files can be resolved in", filePath);
-    }
-    if (match2 !== false) {
-      const test = hook(uri);
-      if (isString(test)) {
-        match2.push(test);
-      } else if (isArray(test)) {
-        match2.push(...test);
-      }
-    }
-    return match2 === false ? paths2 : { paths: paths2, match: (0, import_anymatch2.default)(match2) };
-  }
-  typeError({
-    option: "uri",
-    name: "uri/path",
-    provided: filePath,
-    expects: "string | string[]"
-  });
-}
-function getTransform(transforms, opts) {
-  if (!has("assertSnippet", opts)) opts.assertSnippet = true;
-  if (isString(transforms)) {
-    const { paths: paths2, match: match2 } = getResolvedPaths(transforms, (watch2) => {
-      if (opts.addWatch) $.watch.add(watch2);
-      return globPath(watch2);
-    });
-    if (paths2) {
-      if (opts.flatten) {
-        return paths2.map((input) => opts.assertSnippet ? {
-          input,
-          rename: (0, import_node_path21.basename)(input),
-          snippet: false
-        } : {
-          input,
-          rename: (0, import_node_path21.basename)(input)
-        });
-      } else {
-        return opts.assertSnippet ? {
-          input: paths2,
-          rename: "[name].[ext]",
-          snippet: false,
-          match: match2
-        } : {
-          input: paths2,
-          rename: "[name].[ext]",
-          match: match2
-        };
-      }
-    }
-  } else if (isArray(transforms)) {
-    if (transforms.every(isString)) {
-      const { paths: paths2, match: match2 } = getResolvedPaths(transforms, (watch2) => {
-        if (opts.addWatch) $.watch.add(watch2);
-        return globPath(watch2);
-      });
-      if (opts.flatten) {
-        return paths2.map((input) => opts.assertSnippet ? {
-          input,
-          rename: (0, import_node_path21.basename)(input),
-          snippet: false
-        } : {
-          input,
-          rename: (0, import_node_path21.basename)(input)
-        });
-      } else {
-        return opts.assertSnippet ? {
-          input: paths2,
-          rename: "[name].[ext]",
-          snippet: false,
-          match: match2
-        } : {
-          input: paths2,
-          rename: "[name].[ext]",
-          match: match2
-        };
-      }
-    } else if (transforms.every(isObject)) {
-      return transforms.map((option) => {
-        if (!has("input", option)) {
-          invalidError({
-            option: "tranform",
-            name: "input",
-            value: option,
-            expects: "{ input: string | string[] }"
-          });
-        }
-        const { paths: paths2, match: match2 } = getResolvedPaths(option.input, (watch2) => {
-          if (opts.addWatch) $.watch.add(watch2);
-          return globPath(watch2);
-        });
-        option.match = match2;
-        option.input = paths2[0];
-        if (opts.assertSnippet && !has("snippet", option)) option.snippet = false;
-        if (!has("rename", option)) {
-          option.rename = option.snippet ? "[name].liquid" : "[name].[ext]";
-        }
-        return option;
-      });
-    }
-  } else if (isObject(transforms)) {
-    const config = [];
-    if (has("input", transforms)) {
-      const record = merge(transforms);
-      const { paths: paths2, match: match2 } = getResolvedPaths(record.input, (watch2) => {
-        if (opts.addWatch) $.watch.add(watch2);
-        return globPath(watch2);
-      });
-      if (opts.assertSnippet && !has("snippet", record)) {
-        record.snippet = false;
-      }
-      if (!has("rename", record)) {
-        record.rename = record.snippet ? "[name].liquid" : "[name].[ext]";
-      }
-      if (opts.flatten) {
-        for (const input of paths2) {
-          config.push(assign({}, record, { input }));
-        }
-      } else {
-        record.input = paths2;
-        record.match = match2;
-        config.push(record);
-      }
-    } else {
-      for (const prop in transforms) {
-        const record = { snippet: prop.startsWith("snippets/") };
-        const asset = prop.startsWith("assets/");
-        const option = transforms[prop];
-        const rename = asset || record.snippet;
-        if (isString(option)) {
-          if (rename) {
-            record.rename = asset ? prop.slice(7) : prop.slice(9);
-          }
-          const { paths: paths2, match: match2 } = getResolvedPaths(option, (watch2) => {
-            if (opts.addWatch) $.watch.add(watch2);
-            return globPath(watch2);
-          });
-          if (paths2) {
-            if (opts.flatten) {
-              for (const input of paths2) config.push(assign({}, record, { input }));
-            } else {
-              config.push(assign({}, record, { input: paths2, match: match2 }));
-            }
-          }
-        } else if (isObject(option)) {
-          if (!has("input", option)) {
-            invalidError({
-              option: "transform",
-              name: prop,
-              value: option,
-              expects: "{ input: string | string[] }"
-            });
-          }
-          const { paths: paths2, match: match2 } = getResolvedPaths(option.input, (watch2) => {
-            if (opts.addWatch) $.watch.add(watch2);
-            return globPath(watch2);
-          });
-          if (paths2.length > 0) {
-            const merge2 = rename ? assign({}, option, record, { rename: asset ? prop.slice(7) : prop.slice(9) }) : assign({}, record, option);
-            if (opts.flatten) {
-              for (const input of paths2) {
-                config.push(assign({}, merge2, { input }));
-              }
-            } else {
-              config.push(assign(merge2, { input: paths2, match: match2 }));
-            }
-          }
-        } else if (isArray(option)) {
-          if (option.every(isString)) {
-            const { paths: paths2, match: match2 } = getResolvedPaths(option, (watch2) => {
-              if (opts.addWatch) $.watch.add(watch2);
-              return globPath(watch2);
-            });
-            if (hasRenameNamespace(prop)) record.rename = (0, import_node_path21.basename)(prop);
-            if (paths2) {
-              if (opts.flatten) {
-                for (const input of paths2) {
-                  config.push(assign({}, record, { input }));
-                }
-              } else {
-                config.push(assign({}, record, { input: paths2, match: match2 }));
-              }
-            }
-          } else {
-            typeError({
-              option: "transform",
-              name: prop,
-              provided: option,
-              expects: "string[]"
-            });
-          }
-        }
-      }
-    }
-    return config;
-  }
-}
-function getModules(pkg, name) {
-  if (has("devDependencies", pkg)) {
-    if (has(name, pkg.devDependencies)) return true;
-  }
-  if (has("dependencies", pkg)) {
-    if (has(name, pkg.dependencies)) return true;
-  }
-  if (has("peerDependencies", pkg)) {
-    if (has(name, pkg.peerDependencies)) return true;
-  }
-  if (has("optionalDependencies", pkg)) {
-    if (has(name, pkg.peerDependencies)) return true;
-  }
-  return false;
-}
-async function getConfigFilePath(filename) {
-  for (const ext of CONFIG_FILE_EXT) {
-    const filepath = `${filename}.${ext}`;
-    const fileExists = await (0, import_fs_extra19.pathExists)(filepath);
-    if (fileExists) return filepath;
-  }
-  return null;
-}
-async function readConfigFile(filename, options) {
-  try {
-    const path2 = await getConfigFilePath(filename);
-    if (path2 !== null) {
-      const config = await bundleRequire({
-        cwd: $.cwd,
-        filepath: path2,
-        ...options || {}
-      });
-      return {
-        path: path2,
-        config: config.mod.syncify || config.mod.default || config.mod
-      };
-    }
-    return null;
-  } catch (e) {
-    return null;
-  }
-}
-function hasRenameNamespace(rename) {
-  return /\[(?:file|name|dir|ext)\]/.test(rename);
-}
-function renameFile2(src, rename) {
-  let name = rename;
-  const dir = lastPath(src);
-  const ext = (0, import_node_path21.extname)(src);
-  const file = (0, import_node_path21.basename)(src, ext);
-  if (isUndefined(rename)) return { dir, ext, file, name: file };
-  if (/(\[dir\])/.test(name)) name = name.replace("[dir]", dir);
-  if (/(\[name\])/.test(name)) name = name.replace("[name]", file);
-  if (/(\[file\])/.test(name)) name = name.replace("[file]", file);
-  if (/(\.?\[ext\])/.test(name)) name = name.replace(/\.?\[ext\]/, ext);
-  return {
-    ext,
-    file,
-    dir,
-    name: rename.replace(rename, name)
-  };
-}
-
-// syncify/options/json.ts
 function setJsonOptions() {
   if (!has("transform", $.config) || !has("json", $.config.transform)) return;
   const { json: json2 } = $.config.transform;
@@ -18604,152 +18599,17 @@ function setJsonOptions() {
   }
 }
 
-// syncify/options/snippets.ts
-init_cjs_shims();
-function setSnippetOptions() {
-  if (!isObject($.config.paths.snippets)) return;
-  const { snippets } = $.config.paths;
-  if (has("input", snippets)) return;
-  if (isEmpty(snippets.input)) return;
-  if (!isObject(snippets)) {
-    typeError({
-      option: "paths",
-      name: "snippets",
-      expects: "{}",
-      provided: typeof snippets
-    });
-  }
-  for (const option in $.snippet) {
-    if (option === "input") continue;
-    if (option === "prefixDir") {
-      if (isBoolean(snippets[option])) {
-        $.snippet[option] = snippets[option];
-        continue;
-      } else {
-        typeError({
-          option: "views.snippets",
-          name: option,
-          provided: snippets[option],
-          expects: "boolean"
-        });
-      }
-    }
-    if (option === "separator") {
-      if (isString(snippets[option])) {
-        if (/[.@:_-]/.test(snippets[option])) {
-          $.section[option] = snippets[option];
-          continue;
-        } else {
-          invalidError({
-            option: "views.snippets",
-            name: option,
-            value: snippets[option],
-            expects: "@ | _ | : | - | ."
-          });
-        }
-      } else {
-        typeError({
-          option: "views.snippets",
-          name: option,
-          provided: snippets[option],
-          expects: "string"
-        });
-      }
-    }
-    if (option === "global") {
-      const globals = isString(snippets[option]) ? [snippets[option]] : snippets[option];
-      if (isArray(globals)) {
-        if (globals.length > 0) {
-          $.snippet[option] = new RegExp(`${globals.join("|")}`);
-          continue;
-        }
-      } else {
-        typeError({
-          option: "views.snippets",
-          name: option,
-          provided: snippets[option],
-          expects: "string | string[]"
-        });
-      }
-    }
-  }
-}
-
 // syncify/options/sections.ts
 init_cjs_shims();
 var import_node_path22 = require("path");
 var import_fs_extra20 = require("fs-extra");
 async function setSectionOptions() {
-  const { sections } = $.config.paths;
-  return;
-  for (const option in $.section) {
-    if (option === "input") continue;
-    if (option === "prefixDir") {
-      if (isBoolean(sections[option])) {
-        $.section[option] = sections[option];
-        continue;
-      } else {
-        typeError(
-          {
-            option: "views.sections",
-            name: option,
-            provided: sections[option],
-            expects: "boolean"
-          }
-        );
-      }
-    }
-    if (option === "separator") {
-      if (isString(sections[option])) {
-        if (/[@:_-]/.test(sections[option])) {
-          $.section[option] = sections[option];
-          continue;
-        } else {
-          invalidError(
-            {
-              option: "view.sections",
-              name: option,
-              value: sections[option],
-              expects: "@ | _ | : | -"
-            }
-          );
-        }
-      } else {
-        typeError(
-          {
-            option: "views.sections",
-            name: option,
-            provided: sections[option],
-            expects: "string"
-          }
-        );
-      }
-    }
-    if (option === "global") {
-      const globals = isString(sections[option]) ? [sections[option]] : sections[option];
-      if (isArray(globals)) {
-        if (globals.length > 0) {
-          $.section[option] = new RegExp(`${globals.join("|")}`);
-          continue;
-        }
-      } else {
-        typeError(
-          {
-            option: "paths.sections",
-            name: option,
-            provided: sections[option],
-            expects: "string | string[]"
-          }
-        );
-      }
-    }
-    if (option === "shared" && $.paths.schema.input !== null && $.paths.schema.input.size > 0) {
-      await setSharedSchema();
-      await setSchemaJson();
-      defineProperty($.section, "schema", { get() {
-        return $.cache.schema;
-      } });
-    }
+  if ($.paths.schema.input !== null && $.paths.schema.input.size > 0) {
+    await setSharedSchema();
+    await setSchemaJson();
+    defineProperty($.section, "schema", { get() {
+      return $.cache.schema;
+    } });
   }
 }
 async function setSharedSchema() {
@@ -19106,7 +18966,6 @@ ${Mr} `)}`,
 init_cjs_shims();
 var import_fast_glob6 = __toESM(require("fast-glob"));
 var import_anymatch4 = __toESM(require_anymatch());
-var import_node_path23 = require("path");
 async function setPaths() {
   const path2 = normalPath($.dirs.input);
   const warn3 = warnOption("paths");
@@ -19125,29 +18984,76 @@ async function setPaths() {
     const files = $.config.paths[key];
     if (isObject(files)) {
       if (isEmpty(files)) {
-        warn3(`Undefined ${key} paths, using fallback`, "{}");
+        warn3(`Undefined path/s on "${key}", using fallback`, "{}");
         return [path2(fallback)];
       }
-      const paths2 = [];
-      for (const rename in files) {
-        if (isArray(files[rename])) {
-          paths2.push(...files[rename]);
+      let resolved = 0;
+      if ("*" in files && "[name]" in files) {
+        warn3("Multiple fallback rename keys, paths will be merged", '"*" and "[name]"');
+        if (isArray(files["*"])) {
+          if (isArray(files["[name]"])) {
+            files["*"] = [...files["*"], ...files["[name]"]];
+          } else if (isString(files["[name]"])) {
+            files["*"].push(files["[name]"]);
+          }
+          delete files["[name]"];
+        } else if (isArray(files["[name]"])) {
+          if (isArray(files["*"])) {
+            files["[name]"] = [...files["[name]"], ...files["*"]];
+          } else if (isString(files["*"])) {
+            files["[name]"].push(files["*"]);
+          }
+          delete files["*"];
+        }
+      }
+      const global2 = [];
+      const rename2 = [];
+      for (const pattern in files) {
+        if (isArray(files[pattern])) {
+          const value = [
+            pattern,
+            files[pattern].map((p) => {
+              const v2 = path2(p);
+              $.watch.add(v2);
+              return v2;
+            })
+          ];
+          if (resolved === 0) resolved = value[1].length;
+          if (pattern === "*" || pattern === "[name]") {
+            global2.push(...value);
+          } else {
+            rename2.push(value);
+          }
         } else if (isString(files)) {
-          paths2.push(files[rename]);
-        } else if (isNil(files[rename])) {
+          const value = [pattern, [path2(files[pattern])]];
+          if (resolved === 0) resolved = value[1].length;
+          $.watch.add(value[1]);
+          if (pattern === "*" || pattern === "[name]") {
+            global2.push(...value);
+          } else {
+            rename2.push(value);
+          }
+        } else if (isNil(files[pattern])) {
           typeError({
             option: `paths ${Cr} ${key}`,
             expects: "string | string[]",
-            provided: files[rename],
-            name: rename
+            provided: files[pattern],
+            name: pattern
           });
         }
       }
-      if (paths2.length === 0) {
-        warn3(`Unresolved ${key} paths, using fallback`, "{}");
+      if (resolved === 0) {
+        warn3(`Unresolved path/s in "${key}"`, "{}");
         return [path2(fallback)];
       }
-      return paths2.map(path2);
+      $.paths[key].rename = [[(0, import_anymatch4.default)(global2[1]), global2[0]]];
+      for (const [pattern, globs] of rename2) {
+        $.paths[key].rename.push([
+          (0, import_anymatch4.default)([...global2[1].map((p) => p[0] !== "!" ? `!${p}` : p), ...globs]),
+          pattern
+        ]);
+      }
+      return global2[1].concat(rename2.flatMap((value) => value[1]));
     } else {
       return getGlobs(key, files, fallback);
     }
@@ -19156,30 +19062,24 @@ async function setPaths() {
     let paths2 = [];
     if (key === "snippets" || key === "sections") {
       paths2 = renameGlobs(key, `${key}/*`);
-      paths2.forEach((p) => $[key.slice(0, -1)].baseDir.add(lastPath((0, import_node_path23.dirname)(p))));
     } else if (key === "customers" || key === "metaobject") {
       paths2 = getGlobs(key, $.config.paths[key], `templates/${key}/*`);
     } else {
       paths2 = getGlobs(key, $.config.paths[key], `${key}/*`);
     }
     $.paths[key].match = (0, import_anymatch4.default)(paths2);
-    if (key !== "metafields" && key !== "redirects") {
-      if ($.paths[key].input === null) {
-        $.paths[key].input = new Set(paths2);
-        paths2.forEach((p) => $.watch.add(p));
-      } else {
-        (await (0, import_fast_glob6.default)(paths2, { cwd: $.cwd })).forEach((p) => {
-          $.paths[key].input.add(p);
-          $.watch.add(p);
-        });
-      }
+    if (key !== "metafields" && key !== "redirects" && $.paths[key].input !== null) {
+      (await (0, import_fast_glob6.default)(paths2, { cwd: $.cwd })).forEach((p) => {
+        $.paths[key].input.add(p);
+        $.watch.add(p);
+      });
     }
   }
 }
 
 // syncify/options/version.ts
 init_cjs_shims();
-var import_node_path24 = require("path");
+var import_node_path23 = require("path");
 function parseVersionNumber(version2) {
   const match2 = version2.match(/^(\d{1,2})\.(\d{1,2})\.(\d{1,2})$/);
   if (!match2) {
@@ -19202,23 +19102,23 @@ function setVersion(cli) {
   if ($.cache.build.themeVersion !== $.pkg.number) {
     $.vc.update = parseVersionNumber($.pkg.version);
     $.vc.update.number = $.pkg.version;
-    $.vc.update.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.major}`);
-    $.vc.update.zip = (0, import_node_path24.join)($.vc.update.dir, `${$.vc.number}.zip`);
+    $.vc.update.dir = (0, import_node_path23.join)($.dirs.export, `v${$.vc.major}`);
+    $.vc.update.zip = (0, import_node_path23.join)($.vc.update.dir, `${$.vc.number}.zip`);
     const v2 = parseVersionNumber($.cache.build.themeVersion);
     $.vc.number = $.cache.build.themeVersion;
     $.vc.patch = v2.patch;
     $.vc.minor = v2.minor;
     $.vc.major = v2.major;
-    $.vc.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.major}`);
-    $.vc.zip = (0, import_node_path24.join)($.vc.dir, `${$.vc.number}.zip`);
+    $.vc.dir = (0, import_node_path23.join)($.dirs.export, `v${$.vc.major}`);
+    $.vc.zip = (0, import_node_path23.join)($.vc.dir, `${$.vc.number}.zip`);
   } else {
     const v2 = parseVersionNumber($.pkg.version);
     $.vc.number = $.pkg.version;
     $.vc.patch = v2.patch;
     $.vc.minor = v2.minor;
     $.vc.major = v2.major;
-    $.vc.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.major}`);
-    $.vc.zip = (0, import_node_path24.join)($.vc.dir, `${$.vc.number}.zip`);
+    $.vc.dir = (0, import_node_path23.join)($.dirs.export, `v${$.vc.major}`);
+    $.vc.zip = (0, import_node_path23.join)($.vc.dir, `${$.vc.number}.zip`);
   }
   if (cli.release !== null) {
     $.vc.update = object($.vc);
@@ -19231,10 +19131,10 @@ function setVersion(cli) {
     } else if (cli.release === "major") {
       $.vc.update.major = $.vc.major + 1;
       $.vc.update.bump = "major";
-      $.vc.update.dir = (0, import_node_path24.join)($.dirs.export, `v${$.vc.update.major}`);
+      $.vc.update.dir = (0, import_node_path23.join)($.dirs.export, `v${$.vc.update.major}`);
     }
     $.vc.update.number = `${$.vc.update.major}.${$.vc.update.minor}.${$.vc.update.patch}`;
-    $.vc.update.zip = (0, import_node_path24.join)($.vc.update.dir, `${$.vc.update.number}.zip`);
+    $.vc.update.zip = (0, import_node_path23.join)($.vc.update.dir, `${$.vc.update.number}.zip`);
   }
 }
 
@@ -19358,7 +19258,7 @@ function setSpawns() {
 
 // syncify/options/script.ts
 init_cjs_shims();
-var import_node_path25 = require("path");
+var import_node_path24 = require("path");
 var import_anymatch5 = __toESM(require_anymatch());
 async function setScriptOptions() {
   if (!has("script", $.config.transform)) return;
@@ -19378,10 +19278,10 @@ async function setScriptOptions() {
   }
   for (const script2 of transforms) {
     const keyDir = script2.snippet ? "snippets" : "assets";
-    const { name } = renameFile2(script2.input, script2.rename);
-    let rename;
+    const { name } = renameFileParse(script2.input, script2.rename);
+    let rename2;
     if (!name.endsWith(".js") && !name.endsWith(".mjs")) {
-      rename = name + ".js";
+      rename2 = name + ".js";
     } else if (name.endsWith(".cjs")) {
       invalidError({
         option: "transform.script",
@@ -19394,12 +19294,12 @@ async function setScriptOptions() {
         ]
       });
     } else {
-      rename = name;
+      rename2 = name;
     }
     const has3 = hasProp(script2);
     const bundle = object();
     if (script2.snippet) {
-      if (!rename.endsWith(".liquid")) rename = rename + ".liquid";
+      if (!rename2.endsWith(".liquid")) rename2 = rename2 + ".liquid";
       bundle.attrs = [];
       bundle.snippet = true;
       bundle.namespace = "snippets" /* Snippets */;
@@ -19441,8 +19341,8 @@ async function setScriptOptions() {
     bundle.uuid = uuid();
     bundle.snippet = script2.snippet;
     bundle.input = script2.input;
-    bundle.output = (0, import_node_path25.join)($.dirs.output, keyDir, rename);
-    bundle.key = (0, import_node_path25.join)(keyDir, rename);
+    bundle.output = (0, import_node_path24.join)($.dirs.output, keyDir, rename2);
+    bundle.key = (0, import_node_path24.join)(keyDir, rename2);
     bundle.size = NaN;
     bundle.watch = null;
     bundle.watchCustom = null;
@@ -19539,7 +19439,7 @@ async function setScriptOptions() {
 init_cjs_shims();
 var import_fast_glob7 = __toESM(require("fast-glob"));
 var import_anymatch6 = __toESM(require_anymatch());
-var import_node_path26 = require("path");
+var import_node_path25 = require("path");
 var import_fs_extra21 = require("fs-extra");
 async function getExternalModules() {
   const postcss4 = await readConfigFile("postcss.config", {
@@ -19638,7 +19538,7 @@ async function setStyleConfig() {
       if (override || isBoolean(style2.tailwind) && style2.tailwind !== false && isNil(style2.tailwind) === false) {
         const tw = merge(override ? style2.tailwind : $.processor.tailwind.config);
         if (isArray(tw.content) && isEmpty(tw.content)) {
-          tw.content = [(0, import_node_path26.join)($.dirs.input, "**", "*.{js,ts,jsx,tsx,vue,svelte,liquid,json,schema}")];
+          tw.content = [(0, import_node_path25.join)($.dirs.input, "**", "*.{js,ts,jsx,tsx,vue,svelte,liquid,json,schema}")];
         }
         defineProperty(bundle, "tailwind", {
           get() {
@@ -19716,7 +19616,7 @@ async function setStyleConfig() {
               if (isArray(style2.sass[option])) {
                 const includePaths = [];
                 for (const path3 of style2.sass[option]) {
-                  const resolve3 = (0, import_node_path26.join)($.cwd, path3);
+                  const resolve3 = (0, import_node_path25.join)($.cwd, path3);
                   if (await (0, import_fs_extra21.exists)(resolve3)) {
                     includePaths.push(resolve3);
                   } else {
@@ -19748,11 +19648,11 @@ async function setStyleConfig() {
           }
         );
       }
-      if (style2.snippet === false && !/\.s[ac]ss/.test((0, import_node_path26.extname)(bundle.input))) {
+      if (style2.snippet === false && !/\.s[ac]ss/.test((0, import_node_path25.extname)(bundle.input))) {
         warn3("Input is not a sass file", bundle.input);
       }
     }
-    let rename = renameFile2(style2.rename);
+    let rename2 = renameFileParse(style2.rename);
     if (has3("rename") && isNil(style2) === false) {
       if (isString(style2.rename) === false) {
         typeError(
@@ -19764,26 +19664,26 @@ async function setStyleConfig() {
           }
         );
       }
-      rename = renameFile2(bundle.input, style2.rename);
-      if (/[a-zA-Z0-9_.-]+/.test(rename.name) === false) {
+      rename2 = renameFileParse(bundle.input, style2.rename);
+      if (/[a-zA-Z0-9_.-]+/.test(rename2.name) === false) {
         typeError(
           {
             option: "sass",
             name: "rename",
-            provided: rename,
+            provided: rename2,
             expects: "Characters: [a-zA-Z0-9_.-]"
           }
         );
       }
-      if (rename.name.endsWith(".css")) {
-        bundle.rename = rename.name;
+      if (rename2.name.endsWith(".css")) {
+        bundle.rename = rename2.name;
       } else {
-        if (rename.name.endsWith(".scss")) {
-          rename.name = rename.name.replace(".scss", ".css");
-        } else if (rename.name.endsWith(".sass")) {
-          rename.name = rename.name.replace(".sass", ".css");
-        } else if (!rename.name.endsWith(".liquid")) {
-          rename.name = rename.name + ".css";
+        if (rename2.name.endsWith(".scss")) {
+          rename2.name = rename2.name.replace(".scss", ".css");
+        } else if (rename2.name.endsWith(".sass")) {
+          rename2.name = rename2.name.replace(".sass", ".css");
+        } else if (!rename2.name.endsWith(".liquid")) {
+          rename2.name = rename2.name + ".css";
         }
       }
     }
@@ -19800,7 +19700,7 @@ async function setStyleConfig() {
         );
       }
       for (const uri of style2.watch) {
-        const globs = await (0, import_fast_glob7.default)((0, import_node_path26.join)($.cwd, path2(uri)));
+        const globs = await (0, import_fast_glob7.default)((0, import_node_path25.join)($.cwd, path2(uri)));
         if (globs.length === 0 && uri[0] !== "!") {
           warn3("Cannot resolve watch glob/path uri", uri);
         }
@@ -19821,9 +19721,9 @@ async function setStyleConfig() {
       $.watch.add(bundle.input);
     }
     if (isObject(bundle.sass)) {
-      bundle.sass.include.unshift($.cwd, (0, import_node_path26.join)($.cwd, rename.dir));
+      bundle.sass.include.unshift($.cwd, (0, import_node_path25.join)($.cwd, rename2.dir));
       if (hasPath("sass.include", style2)) {
-        bundle.sass.include = style2.sass.include.map((p) => (0, import_node_path26.join)($.cwd, p));
+        bundle.sass.include = style2.sass.include.map((p) => (0, import_node_path25.join)($.cwd, p));
       }
     }
     if (has3("snippet")) {
@@ -19869,19 +19769,19 @@ async function setStyleConfig() {
     }
     if (bundle.snippet) {
       if (!has("rename", bundle)) {
-        bundle.rename = rename.name;
+        bundle.rename = rename2.name;
       }
-      if (rename.name.endsWith(".liquid") === false || bundle.rename.endsWith(".liquid") === false) {
-        bundle.rename = rename.name + ".liquid";
+      if (rename2.name.endsWith(".liquid") === false || bundle.rename.endsWith(".liquid") === false) {
+        bundle.rename = rename2.name + ".liquid";
       }
       $.paths.transforms.set(bundle.input, 9 /* Style */);
       if ($.mode.watch) {
-        $.watch.unwatch((0, import_node_path26.join)($.dirs.output, "snippets", bundle.rename));
+        $.watch.unwatch((0, import_node_path25.join)($.dirs.output, "snippets", bundle.rename));
       }
     } else {
-      bundle.rename = rename.name;
+      bundle.rename = rename2.name;
       if ($.mode.watch) {
-        $.watch.unwatch((0, import_node_path26.join)($.dirs.output, "assets", rename.name));
+        $.watch.unwatch((0, import_node_path25.join)($.dirs.output, "assets", rename2.name));
       }
     }
     $.style.push(bundle);
@@ -19939,7 +19839,7 @@ function setLiquidOptions() {
 
 // syncify/options/svg.ts
 init_cjs_shims();
-var import_node_path27 = require("path");
+var import_node_path26 = require("path");
 async function setSvgOptions() {
   if (!has("svg", $.config.transform)) return;
   if (!$.config.transform.svg || isEmpty($.config.transform.svg)) return;
@@ -19950,8 +19850,8 @@ async function setSvgOptions() {
   });
   for (const svg2 of svgs) {
     const files = svg2.input.filter((path2) => {
-      if ((0, import_node_path27.extname)(path2) === ".svg") return true;
-      warn3("Excluded file which is not an SVG type", (0, import_node_path27.relative)($.cwd, path2));
+      if ((0, import_node_path26.extname)(path2) === ".svg") return true;
+      warn3("Excluded file which is not an SVG type", (0, import_node_path26.relative)($.cwd, path2));
       return false;
     });
     if (files.length === 0) {
@@ -20022,7 +19922,7 @@ async function setSvgOptions() {
 
 // syncify/options/hot.ts
 init_cjs_shims();
-var import_node_path29 = require("path");
+var import_node_path28 = require("path");
 
 // syncify/hot/server.ts
 init_cjs_shims();
@@ -20032,7 +19932,7 @@ var import_serve_static = __toESM(require_serve_static());
 var import_finalhandler = __toESM(require_finalhandler());
 var import_fast_glob8 = __toESM(require("fast-glob"));
 var import_fs_extra22 = require("fs-extra");
-var import_node_path28 = require("path");
+var import_node_path27 = require("path");
 var HOTError = {
   enable: true,
   output: []
@@ -20051,7 +19951,7 @@ async function injection() {
           absolute: true
         });
         for (const input of files) {
-          if ((0, import_node_path28.basename)(input) === (0, import_node_path28.basename)(layout)) {
+          if ((0, import_node_path27.basename)(input) === (0, import_node_path27.basename)(layout)) {
             const source = await (0, import_fs_extra22.readFile)(input);
             await (0, import_fs_extra22.writeFile)(layout, source);
           }
@@ -20093,7 +19993,7 @@ async function server() {
   log(Line(or(`${$.hot.method === "hot" ? "HOT Reload" : "LIVE Reload"}${wr}`)));
   log_update_default(Line("configuring HOT Reload"));
   await injection();
-  const url = (0, import_node_path28.join)($.dirs.output, "assets");
+  const url = (0, import_node_path27.join)($.dirs.output, "assets");
   const app = import_uWebSockets2.default.App();
   app.get("/*", (response, request2) => {
     response.writeHeader("Access-Control-Allow-Origin", "*");
@@ -20142,7 +20042,7 @@ async function socket() {
     if (token) {
       log(Line(`${gr("socket")}  ${Cr}  ${t("PORT")}  ${Cr} ${sr(`${$.hot.socket}`)}`));
       for (const p in $.hot.alive) {
-        log(Line(`${gr("layout")}  ${Cr}  ${t((0, import_node_path28.relative)($.cwd, p))}`));
+        log(Line(`${gr("layout")}  ${Cr}  ${t((0, import_node_path27.relative)($.cwd, p))}`));
       }
       nwl();
     } else {
@@ -20266,11 +20166,11 @@ async function setHotReloads() {
       }
     }
   }
-  $.hot.snippet = (0, import_node_path29.join)($.cwd, "node_modules", "@syncify/cli", "hot.js.liquid");
-  $.hot.output = (0, import_node_path29.join)($.dirs.output, "snippets", "hot.js.liquid");
-  const base = (0, import_node_path29.join)($.dirs.output, "layout");
+  $.hot.snippet = (0, import_node_path28.join)($.cwd, "node_modules", "@syncify/cli", "hot.js.liquid");
+  $.hot.output = (0, import_node_path28.join)($.dirs.output, "snippets", "hot.js.liquid");
+  const base = (0, import_node_path28.join)($.dirs.output, "layout");
   for (const layout of $.hot.layouts) {
-    const path2 = (0, import_node_path29.join)(base, layout);
+    const path2 = (0, import_node_path28.join)(base, layout);
     $.hot.alive[path2] = false;
     if (!$.cache.build.hotSnippet.includes(base)) {
       $.cache.build.hotSnippet.push(base);
@@ -20291,7 +20191,7 @@ async function setHotReloads() {
 
 // syncify/options/filters.ts
 init_cjs_shims();
-var import_node_path30 = require("path");
+var import_node_path29 = require("path");
 function throwCommandError(type2, cmd2) {
   const pattern = [];
   const ref = object();
@@ -20371,7 +20271,7 @@ function parseFilter(base, input, regexp) {
   if (!regexp.test(input)) throwCommandError("dir", input);
   const path2 = input.slice(0, input.indexOf("/"));
   if (!isArray($.filters[path2])) $.filters[path2] = [];
-  $.filters[path2].push((0, import_node_path30.join)(base, input));
+  $.filters[path2].push((0, import_node_path29.join)(base, input));
 }
 function setFilters(cli) {
   if (!has("filter", cli)) return;
@@ -20505,7 +20405,6 @@ async function define(cli, options) {
   if ($.mode.themes) return;
   setJsonOptions();
   setLiquidOptions();
-  setSnippetOptions();
   setPlugins();
   if (!$.mode.build) runtime.stores($);
   await setSectionOptions();
@@ -20761,13 +20660,13 @@ async function setup() {
 init_cjs_shims();
 var import_enquirer4 = require("enquirer");
 var import_fs_extra23 = require("fs-extra");
-var import_node_path31 = require("path");
+var import_node_path30 = require("path");
 async function strap() {
-  const dir = (0, import_node_path31.join)($.cwd, "node_modules", "@syncify/cli", "straps");
+  const dir = (0, import_node_path30.join)($.cwd, "node_modules", "@syncify/cli", "straps");
   const straps = {
-    dawn: (0, import_node_path31.join)(dir, "dawn"),
-    dusk: (0, import_node_path31.join)(dir, "dusk"),
-    silk: (0, import_node_path31.join)(dir, "silk")
+    dawn: (0, import_node_path30.join)(dir, "dawn"),
+    dusk: (0, import_node_path30.join)(dir, "dusk"),
+    silk: (0, import_node_path30.join)(dir, "silk")
   };
   const theme3 = assign({}, theme2, {
     pointer(choice, index) {
@@ -20816,7 +20715,7 @@ async function run(cmd2, config, callback) {
   try {
     $.env.ready = true;
     if ($.mode.build && $.mode.export === false) {
-      return build(callback);
+      return build2(callback);
     } else if ($.mode.watch) {
       return watch(callback);
     } else if ($.mode.upload) {
