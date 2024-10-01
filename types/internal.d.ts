@@ -1,4 +1,4 @@
-export * from './internal/args';
+export * from './internal/commands';
 export * from './internal/enquirer';
 export * from './internal/transform';
 export * from './internal/reports';
