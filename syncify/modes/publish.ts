@@ -1,12 +1,10 @@
 import type { Syncify } from 'types';
-import ngrok from 'ngrok';
 import uWS from 'uWebSockets.js';
 import { delay } from 'rambdax';
 import { timer } from 'syncify:timer';
 import * as log from 'syncify:log';
 import { exporting } from 'syncify:modes/export';
-import { ARR, COL } from '@syncify/ansi';
-import { bold, gray, magentaBright, neonCyan, neonGreen } from '@syncify/ansi';
+import { ARR, bold, gray, magentaBright, neonCyan, neonGreen } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 import { existsSync, readFileSync } from 'fs-extra';
 

@@ -1,6 +1,5 @@
 import type { Commands } from 'types';
-import { COL, ARR } from '@syncify/ansi';
-import { gray, bold, lightGray, whiteBright, clear } from '@syncify/ansi';
+import { COL, ARR, gray, bold, lightGray, whiteBright, clear } from '@syncify/ansi';
 import { log } from 'syncify:native';
 
 export function help (cli: Commands) {

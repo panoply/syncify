@@ -11,9 +11,8 @@ import { axios } from 'syncify:requests/queue';
  */
 export async function get (client: AxiosRequestConfig) {
 
-  return axios.get<
-  Responses.Access<'GET'>,
-  Responses.Access<'GET'>>('/oauth/access_scopes.json', client).then(({ data }) => {
+  return axios.get<Responses.Access<'GET'>, Responses.Access<'GET'>>('/oauth/access_scopes.json', client)
+  .then(({ data }) => {
 
     return data;
 

@@ -13,16 +13,13 @@ import { AxiosResponse } from 'axios';
 import { onAsset } from 'syncify:plugins/hooks';
 import { hasSnippet, removeRender } from 'syncify:hot/inject';
 import { throwError } from 'syncify:log/throws';
-import { Progress } from 'syncify:cli/progress';
 import { Events } from 'syncify:requests/assets';
 import { timer } from 'syncify:timer';
 import { Prefix, Create, CreateClosure, Line, Break } from 'syncify:cli/tree';
-import { ARR } from '@syncify/ansi';
-
+import { Progress, ARR } from '@syncify/ansi';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import * as c from '@syncify/ansi';
-
 import { $ } from 'syncify:state';
 
 interface RequestParams {

@@ -3,10 +3,23 @@ import { argv } from 'node:process';
 import { isUndefined, isString, glueString } from 'syncify:utils';
 import { error } from 'syncify:native';
 import { REGEX_OR_CHARS } from 'syncify:const';
-import { Tree, COL, TLD, ARR } from '@syncify/ansi';
-import { blue, bold, cyan, gray, red, redBright, white, whiteBright, yellowBright } from '@syncify/ansi';
 import { Encase, Create } from 'syncify:cli/tree';
 import { $ } from 'syncify:state';
+import {
+  Tree,
+  COL,
+  TLD,
+  ARR,
+  blue,
+  bold,
+  cyan,
+  gray,
+  red,
+  redBright,
+  white,
+  whiteBright,
+  yellowBright
+} from '@syncify/ansi';
 
 /**
  * Warning Store

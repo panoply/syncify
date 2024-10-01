@@ -89,9 +89,7 @@ export async function upload (asset: string, config: {theme: Theme, key: FileKey
     }
   });
 
-  return axios<Requests.Asset<'PUT'>, Responses.Asset<'PUT'>>(request)
-  .then(() => true)
-  .catch((e: AxiosError) => {
+  return axios<Requests.Asset<'PUT'>, Responses.Asset<'PUT'>>(request).then(() => true).catch((e: AxiosError) => {
 
     log.error(config.key);
     error.request(config.key, e.response);

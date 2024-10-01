@@ -1,9 +1,9 @@
 import type { AxiosError, AxiosRequestConfig } from 'axios';
-import type { Theme, File, FileKeys, Requests } from 'types';
+import type { Theme, File, FileKeys } from 'types';
 import axios from 'axios';
 import { queue } from 'syncify:requests/queue';
 import { assign } from 'syncify:utils/native';
-import * as timer from 'syncify:utils/timer';
+import { timer } from 'syncify:utils/timer';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';
@@ -122,7 +122,7 @@ let limit: number;
  * REST endpoint. When request rates are exceeded
  * the handler will re-queue them.
  */
-export async function sync (theme: Theme, file: File, config: Requests.) {
+export async function sync (theme: Theme, file: File, config: any) {
 
   if (queue.isPaused) return;
 
