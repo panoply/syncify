@@ -290,21 +290,10 @@ export default defineConfig({
     sections: 'sections/*.liquid',
     snippets: 'snippets/*.liquid',
     metafields: 'metafields/**/*.json',
-    metaobject: [
-      'templates/metaobject/*.json'
-    ],
-    customers: [
-      'templates/customers/*.json',
-      'templates/customers/*.liquid'
-    ],
-    pages: [
-      'pages/*.md',
-      'pages/*.html'
-    ],
-    templates: [
-      'templates/*.json',
-      'templates/*.liquid'
-    ],
+    metaobject: 'templates/metaobject/*.json',
+    customers: 'templates/customers/*.{json,liquid}',
+    pages: 'pages/*.{md,html}',
+    templates: 'templates/*.{json,liquid}',
   },
   hot: {
     label: 'visible',
@@ -315,9 +304,13 @@ export default defineConfig({
     scroll: 'preserved',
     server: 3000,
     socket: 8089,
-    layouts: [
-      'theme.liquid'
-    ],
+    layouts: ['theme.liquid'],
+  },
+  publish: {
+    tunnelPort: 80,
+    publishRole: 'unpublished',
+    bindVersion: true,
+    themeLimit: 3
   },
   log: {
     clear: true,
@@ -329,41 +322,15 @@ export default defineConfig({
     build: {},
     watch: {},
   },
-  views: {
-    snippets: {
-      separator: '-',
-      global: [],
-      prefixDir: false,
-      renamePatterns: {}
-    },
-    sections: {
-      separator: '-',
-      prefixDir: false,
-      global: [],
-      renamePatterns: {}
-    },
-    pages: {
-      safeSync: true,
-      author: '',
-      importLanguage: 'html',
-      suffixDir: false,
-      global: []
-    }
-  },
   transform: {
     script: {},
     style: {},
     svg: {},
-    image: {}
+    image: {},
+    json: {},
+    liquid: {}
   },
   processors: {
-    json: {
-      crlf: false,
-      indent: 2,
-      useTab: false,
-      exclude: []
-    }
-
     // Refer to transforms section for usage
     //
     // esbuild: {},
@@ -373,31 +340,6 @@ export default defineConfig({
     // svgo: {},
     // sprite: {},
     // sharp: {},
-
-  },
-  terser: {
-    json: {
-      assets: true,
-      config: true,
-      locales: true,
-      metafields: true,
-      templates: true,
-      exclude: []
-    },
-    views: {
-      collapseWhitespace: true,
-      minifySchema: true,
-      minifyScript: true,
-      minifyStyle: true,
-      removeComments: true,
-      stripDashes: true,
-      exclude: []
-    },
-
-    // Refer to terser section for usage
-    //
-    // script: {},
-    // style: {},
   }
 });
 ```
