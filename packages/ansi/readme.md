@@ -5,5 +5,5 @@ Terminal utilities for the [Syncify CLI](https://syncify.sh) Shopify theme devel
 ### Installation
 
 ```bash
-$ pnpm add @syncify/terminal -D
+$ pnpm add @syncify/ansi -D
 ```
