@@ -16,7 +16,7 @@ const paths = (): Type.PathBundle => {
 
   for (const path of PATH_KEYS) {
     state[path] = object<Type.PathsRef>({
-      input: null,
+      input: new Set(),
       match: null,
       config: null,
       rename: []
