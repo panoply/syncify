@@ -8328,7 +8328,6 @@ var axios = import_axios.default.create({
   headers: {}
 });
 var queue = new PQueue({
-  // concurrency: 5,
   interval: 500,
   intervalCap: 2
 });
@@ -9216,7 +9215,7 @@ var paths = () => {
   const state = object();
   for (const path2 of PATH_KEYS) {
     state[path2] = object({
-      input: null,
+      input: /* @__PURE__ */ new Set(),
       match: null,
       config: null,
       rename: []
@@ -18801,7 +18800,7 @@ async function setPaths() {
       paths2 = getGlobs(key, $.config.paths[key], `${key}/*`);
     }
     $.paths[key].match = (0, import_anymatch4.default)(paths2);
-    if (key !== "metafields" && key !== "redirects" && $.paths[key].input !== null) {
+    if (key !== "metafields" && key !== "redirects") {
       (await (0, import_fast_glob6.default)(paths2, { cwd: $.cwd })).forEach((p) => {
         $.paths[key].input.add(p);
         $.watch.add(p);
