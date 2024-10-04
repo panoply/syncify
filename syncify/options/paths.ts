@@ -176,7 +176,7 @@ export async function setPaths () {
 
     $.paths[key].match = anymatch(paths);
 
-    if (key !== 'metafields' && key !== 'redirects' && $.paths[key].input !== null) {
+    if (key !== 'metafields' && key !== 'redirects') {
 
       (await glob(paths, { cwd: $.cwd })).forEach(p => {
         $.paths[key].input.add(p);
