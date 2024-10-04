@@ -29,7 +29,7 @@ export interface Commands {
    * @default false
    */
   setup?: boolean;
- /**
+  /**
    * Whether or not syncify interactive command prompt
    *
    * @default false
