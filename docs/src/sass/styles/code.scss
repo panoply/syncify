@@ -85,3 +85,18 @@ h2 {
     font-size: 0.65em;
   }
 }
+
+:not(pre, h2, h3) > code[class*='language-'] {
+  word-wrap: break-word;
+  padding: 0.1rem 0.1rem 0.2rem 0.1rem;
+  margin: 0rem;
+  border-radius: 0.2rem;
+  letter-spacing: 0.0235rem;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: $white;
+  font-family: $font-family-code;
+  text-shadow: none;
+  border: 0;
+  //-webkit-font-smoothing: subpixel-antialiased;
+}

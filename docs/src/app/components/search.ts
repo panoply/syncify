@@ -5,20 +5,18 @@ import spx, { SPX } from 'spx';
 import { matchSorter } from 'match-sorter';
 import { glue } from '../utils';
 
-export class Search extends spx.Component<typeof Search.define> {
-
-  static define = {
-    id: 'search',
-    state: {
-      active: Boolean,
-      query: String,
-      source: String
-    },
-    nodes: <const>[
-      'list',
-      'input'
-    ]
-  };
+export class Search extends spx.Component({
+  id: 'search',
+  state: {
+    active: Boolean,
+    query: String,
+    source: String
+  },
+  nodes: <const>[
+    'list',
+    'input'
+  ]
+}) {
 
   /**
    * SPX Connect Lifecyle Method
@@ -42,8 +40,8 @@ export class Search extends spx.Component<typeof Search.define> {
 
     document.removeEventListener('click', this.outsideClick);
 
-    this.dom.listNode.classList.replace('d-block', 'd-none');
-    this.dom.inputNode.classList.remove('is-active', 'is-results');
+    this.listNode.classList.replace('d-block', 'd-none');
+    this.inputNode.classList.remove('is-active', 'is-results');
     this.state.active = false;
 
   }
@@ -57,7 +55,7 @@ export class Search extends spx.Component<typeof Search.define> {
 
   outsideClick (event: Event) {
 
-    if (this.dom.listNode !== event.target && this.dom.inputNode !== event.target) {
+    if (this.listNode !== event.target && this.inputNode !== event.target) {
 
       this.hide();
 
@@ -67,21 +65,21 @@ export class Search extends spx.Component<typeof Search.define> {
 
   onFocus () {
 
-    if (!this.dom.inputNode.classList.contains('is-active')) {
-      this.dom.inputNode.classList.add('is-active');
+    if (!this.inputNode.classList.contains('is-active')) {
+      this.inputNode.classList.add('is-active');
     }
 
     setTimeout(() => {
 
-      if (this.result.length > 0 && !this.dom.listNode.classList.contains('d-block')) {
-        this.dom.listNode.classList.replace('d-none', 'd-block');
-        this.dom.inputNode.classList.add('is-results');
+      if (this.result.length > 0 && !this.listNode.classList.contains('d-block')) {
+        this.listNode.classList.replace('d-none', 'd-block');
+        this.inputNode.classList.add('is-results');
       }
 
       if (this.state.query.length <= 2) {
-        this.dom.inputNode.classList.remove('is-results');
+        this.inputNode.classList.remove('is-results');
       } else {
-        this.dom.inputNode.classList.add('is-results');
+        this.inputNode.classList.add('is-results');
       }
 
     }, 300);
@@ -110,10 +108,10 @@ export class Search extends spx.Component<typeof Search.define> {
 
       if (this.result.length === 0) {
 
-        this.dom.listNode.innerHTML = '';
-        this.dom.listNode.classList.add('no-results');
+        this.listNode.innerHTML = '';
+        this.listNode.classList.add('no-results');
         this.noResults.innerHTML = this.nothing;
-        this.dom.listNode.appendChild(this.noResults);
+        this.listNode.appendChild(this.noResults);
 
       } else {
 
@@ -126,16 +124,16 @@ export class Search extends spx.Component<typeof Search.define> {
     } else {
 
       if (input.length === 0) {
-        this.dom.inputNode.classList.remove('is-results');
-        this.dom.listNode.classList.replace('d-block', 'd-none');
+        this.inputNode.classList.remove('is-results');
+        this.listNode.classList.replace('d-block', 'd-none');
       }
 
       return;
 
     }
 
-    if (!this.dom.listNode.classList.contains('d-block')) {
-      this.dom.listNode.classList.replace('d-none', 'd-block');
+    if (!this.listNode.classList.contains('d-block')) {
+      this.listNode.classList.replace('d-none', 'd-block');
     }
 
     this.inputOpen();
@@ -174,8 +172,8 @@ export class Search extends spx.Component<typeof Search.define> {
 
     const match = new RegExp(`(${query})`, 'gi');
 
-    this.dom.listNode.classList.contains('no-results') && this.dom.listNode.classList.remove('no-results');
-    this.dom.listNode.innerHTML = '';
+    this.listNode.classList.contains('no-results') && this.listNode.classList.remove('no-results');
+    this.listNode.innerHTML = '';
 
     const nodes = result.map(({ content, page, heading }) => {
 
@@ -210,7 +208,7 @@ export class Search extends spx.Component<typeof Search.define> {
 
     });
 
-    this.dom.listNode.append(...nodes);
+    this.listNode.append(...nodes);
 
   }
 

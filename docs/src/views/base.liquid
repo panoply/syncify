@@ -21,7 +21,9 @@
 
       {%- include 'include/navbar' -%}
 
-      <div class="container-fluid container-wrapper">
+      <div
+        class="container-fluid container-wrapper"
+        id="content">
         <aside
           class="pr-3 br vh-100 d-none d-sm-block sidebar drawer-left drawer-panel"
           spx-component="drawer"
@@ -29,9 +31,7 @@
           spx-drawer:width="280">
           {%- include 'include/sidebar' -%}
         </aside>
-        <div
-          id="content"
-          class="row jc-center jc-md-around content-offset">
+        <div class="row jc-center jc-md-around content-offset">
           <main class="col-11 col-sm-9 pb-4">
             {%- include 'include/breadcrumb' -%}
             {{- content -}}

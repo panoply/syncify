@@ -22,19 +22,21 @@
       </span>
 
       <div class="col-auto tr pl-5  mr-auto">
-        <ul class="list-pipe mb-0 navbar-menu">
-          <li>
-            <a
-              href="/documentation"
-              class="active">Docs</a>
-          </li>
-          <li>
-            <a href="#">CLI</a>
-          </li>
-          <li class="pr-4">
-            <a href="#">OPTIONS</a>
-          </li>
-
+        <ul
+          class="list-pipe mb-0 navbar-menu"
+          id="menu">
+          {%- for link in navigation.navbar -%}
+            <li>
+              <a
+                href="{{ link.url }}"
+                spx-target="body"
+                {%- if page.url contains link.url -%}
+                  class="active"
+                {%- endif -%}>
+                {{- link.title -}}
+              </a>
+            </li>
+          {%- endfor -%}
         </ul>
       </div>
       <div class="col-auto pl-3  ml-auto ">

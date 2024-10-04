@@ -1,108 +1,180 @@
 <nav
-  id="menu"
   class="sidebar-menu mt-4 mb-2 sticky"
-  spx-component="sidebar">
+  spx-component="sidebar"
+  data-relapse>
 
-  {%- for parent in navigation.menu -%}
+  {%- if page.url contains '/reference/' -%}
+    {%- assign links = navigation.reference -%}
+  {%- else -%}
+    {%- assign links = navigation.docs -%}
+  {%- endif -%}
+  {%- assign has_child = false -%}
 
-    {%-
-      liquid
-      #
-      # PARENT NAVIGATION GROUP
-      #
-      assign mapped_groups = parent.links | map: 'url'
-      assign parent_expand = false
-      if mapped_groups contains page.url
-        assign parent_expand = true
-      endif
-    -%}
+  {%- for parent in links -%}
 
     {%- if parent.url -%}
       <a
         spx-scroll="0"
         href="{{ parent.url | url }}"
-        {%- if parent_expand -%}
-          aria-expanded="true"
-          class="menu-link active"
-        {%- else -%}
-          class="menu-link"
-        {%- endif -%}>
+        aria-expanded="true"
+        spx-node="sidebar.link"
+        spx@click="sidebar.onLink"
+        class="menu-link {% if parent.url contains page.url -%}active{%- endif -%}">
         {{- parent.title -}}
       </a>
     {%- else -%}
+
+      {%-
+        liquid
+        #
+        # PARENT NAVIGATION GROUP
+        #
+        assign mapped_groups = parent.links | map: 'url'
+        assign parent_expand = false
+        if mapped_groups contains page.url
+          assign parent_expand = true
+        endif
+      -%}
+
       <button
         type="button"
         {%- if parent_expand -%}
           aria-expanded="true"
-          class="menu-link active"
+          class="menu active"
         {%- else -%}
-          class="menu-link"
+          class="menu"
         {%- endif -%}>
         {{- parent.title -}}
       </button>
-    {%- endif -%}
-    <ul
-      class="list rel my-0"
-      {%- unless parent_expand -%}
-        hidden="true"
-      {%- endunless -%}>
-      {%- for child in parent.links -%}
-        {%-
-          liquid
-          #
-          # CHILD NAVIGATION GROUP
-          #
-          assign mapped_child = child.links | map: 'url'
-          assign child_expand = false
-          if mapped_child contains page.url
-            assign child_expand = true
-          endif
-        -%}
-        {%- if child.links -%}
-          <li data-relapse>
-            <button
-              type="button"
-              {%- if page.url == child.url or child_expand -%}
-                aria-expanded="true"
-                class="menu-link active"
-              {%- else -%}
-                class="child-link"
-              {%- endif -%}>
-              {{- child.title -}}
-            </button>
-            <ul
-              class="child-list rel pl-2"
-              {%- unless child_expand -%}
-                hidden="true"
-              {%- endunless -%}>
-              {%- for child in child.links -%}
-                <li class="pl-1">
-                  <a
-                    spx-scroll="0"
-                    href="{{ child.url | url }}"
-                    {%- if page.url == child.url -%}
-                      class="active"
-                    {%- endif -%}>
-                    {{- child.title -}}
-                  </a>
-                </li>
+      <div class="d-block">
+        <ul
+          class="menu-list rel my-0"
+          {%- unless parent_expand -%}
+            hidden="true"
+          {%- endunless -%}>
+
+          {%- for child in parent.links -%}
+
+            {%- if child.links -%}
+
+              {%-
+                liquid
+                #
+                # CHILD NAVIGATION GROUP
+                #
+                assign mapped_child = child.links | map: 'url'
+                assign child_expand = false
+                if mapped_child contains page.url
+                  assign child_expand = true
+                endif
+              -%}
+              <li data-relapse>
+
+                <button
+                  type="button"
+                  {%- if parent_expand -%}
+                    aria-expanded="true"
+                    class="menu-links py-0 active"
+                  {%- else -%}
+                    class="menu-links py-0"
+                  {%- endif -%}>
+                  {{- child.title -}}
+                </button>
+                <div>
+                  <ul
+                    class="submenu-list rel pl-2"
+                    {%- unless child_expand -%}
+                      hidden="true"
+                    {%- endunless -%}>
+
+                    {%- for item in child.links -%}
+                      <li class="pl-1">
+                        <a
+                          spx-scroll="0"
+                          spx-node="sidebar.link"
+                          spx@click="sidebar.onLink"
+                          href="{{ item.url | url }}"
+                          {%- if page.url == item.url -%}
+                            class="active"
+                          {%- endif -%}>
+                          {{- item.title -}}
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
+              </li>
+
+            {%- else -%}
+              <li>
+                <a
+                  spx-scroll="0"
+                  href="{{ child.url | url }}"
+                  aria-disabled="true"
+                  spx-node="sidebar.link"
+                  spx@click="sidebar.onLink"
+                  {%- if page.url == child.url -%}
+                    class="active"
+                  {%- endif -%}>
+                  {{- child.title -}}
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- if parent.submenu -%}
+
+            {%-
+              liquid
+              #
+              # CHILD NAVIGATION GROUP
+              #
+              assign mapped_child = parent.submenu | map: 'url'
+              assign child_expand = false
+              if mapped_child contains page.url
+                assign child_expand = true
+              endif
+            -%}
+            <li data-relapse>
+              {%- for submenu in parent.submenu -%}
+                <button
+                  type="button"
+                  {%- if parent_expand -%}
+                    aria-expanded="true"
+                    class="submenu active"
+                  {%- else -%}
+                    class="submenu"
+                  {%- endif -%}>
+                  {{- submenu.title -}}
+                </button>
+                <div>
+                  <ul
+                    class="submenu-list rel pl-2"
+                    {%- unless child_expand -%}
+                      hidden="true"
+                    {%- endunless -%}>
+                    {%- for item in submenu.links -%}
+                      <li class="pl-1">
+                        <a
+                          spx-scroll="0"
+                          spx-node="sidebar.link"
+                          spx@click="sidebar.onLink"
+                          href="{{ item.url | url }}"
+                          {%- if page.url == item.url -%}
+                            class="active"
+                          {%- endif -%}>
+                          {{- item.title -}}
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
               {%- endfor -%}
-            </ul>
-          </li>
-        {%- else -%}
-          <li>
-            <a
-              spx-scroll="0"
-              href="{{ child.url | url }}"
-              aria-disabled="true"
-              {%- if page.url == child.url -%}
-                class="active"
-              {%- endif -%}>
-              {{- child.title -}}
-            </a>
-          </li>
-        {%- endif -%}
-      {%- endfor -%}
-    </ul>
+            </li>
+          {%- endif -%}
+        </ul>
+      </div>
+    {%- endif -%}
   {%- endfor -%}
+
 </nav>

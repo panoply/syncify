@@ -53,8 +53,6 @@ The `paths` option allows you to define your themes structure. You themes struct
 :::: grid row dir-each my-5
 ::: grid col fs-sm
 
-#### Structure
-
 ```treeview
 /
 ├── source/
@@ -80,8 +78,6 @@ The `paths` option allows you to define your themes structure. You themes struct
 :::
 ::: grid col-8
 
-#### Configuration
-
 <!-- prettier-ignore -->
 ```js
 import { defineConfig } from '@syncify/cli';
@@ -95,13 +91,14 @@ export default defineConfig({
     locales: 'locales/*.json',
     layout: 'layout/*.liquid',
     metafields: 'metafields/**/*.json',
+    schema: 'schema/*.{schema,json}',
     sections: 'sections/**/*.{liquid,json}',
     snippets: 'snippets/**/*.liquid',
     templates: 'templates/*.{liquid,json}',
     customers: 'templates/customers/*.{liquid,json}',
-    schema: 'schema/*.{schema,json}',
     metaobject: 'templates/metaobject/*.{liquid,json}',
-    pages: 'pages/*.{md,html}'
+    pages: 'pages/*.{md,html}',
+    redirects: 'redirects.yaml'
   }
 })
 ```
@@ -117,10 +114,8 @@ By default, Syncify assumes you are using the above theme architecture and it wi
 
 Using the default structure is certainly not the preferred approach when leveraging Syncify and you are encouraged to establish an input (theme) structure which suits your project and adheres to your workflow or tastes. Below is a basic example of how we can architect a **customized structure** using the `paths` option.
 
-:::: grid row dir-each
+:::: grid row dir-each mb-4
 ::: grid col fs-sm
-
-#### Structure
 
 ```treeview
 /
@@ -137,6 +132,7 @@ Using the default structure is certainly not the preferred approach when leverag
         ├── customers/
         ├── meta/
         ├── sections/
+        │   └── schema/
         ├── snippets/
         ├── templates/
         └── theme.liquid
@@ -144,8 +140,6 @@ Using the default structure is certainly not the preferred approach when leverag
 
 :::
 ::: grid col-8
-
-#### Configuration
 
 <!-- prettier-ignore -->
 ```js
@@ -176,78 +170,81 @@ export default defineConfig({
 
 Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration (the tool defaults to this). The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify can digest.
 
-:::: grid row jc-center dir-each
-::: grid col fs-sm
+:::: grid row gx-4 bd jc-center ai-center mx-1 mt-4 rd-x rd-t
+::: grid col fs-sm tc
 
-#### Default Structure
+##### Default Structure
 
-The structure which syncify will default.
+:::
+::: grid col fs-sm px-4 bx tc
+
+##### Customized Structure
+
+:::
+::: grid col fs-sm tc
+
+##### Output Structure
+
+:::
+::::
+
+:::: grid row gx-4 bd jc-center ai-center mx-1 mb-4 rd-b rd-x bt-0
+::: grid col ph-440
 
 ```treeview
-/
-└── source/
-    ├── assets/
-    ├── config/
-    ├── files/
-    ├── layout/
-    ├── locales/
-    ├── pages/
-    ├── metafields/
-    │   └── namespace/
-    ├── schema/
-    ├── sections/
-    ├── snippets/
-    └── templates/
-        ├── metaobject/
-        └── customers/
+source/
+├── assets/
+├── config/
+├── files/
+├── layout/
+├── locales/
+├── pages/
+├── metafields/
+│   └── namespace/
+├── schema/
+├── sections/
+├── snippets/
+└── templates/
+    ├── metaobject/
+    └── customers/
 ```
 
 :::
-::: grid col fs-sm
-
-#### Customized Structure
-
-An example of how you _could_ structure themes.
+::: grid col bx px-4 ph-440
 
 ```treeview
-/
-└── source/
-    ├── assets/
-    │   └── icons/
-    ├── data/
-    │   ├── config/
-    │   ├── locales/
-    │   └── metafields/
-    │      └── namespace/
-    ├── pages/
-    └── views/
-        ├── customers/
-        ├── meta/
-        ├── sections/
-        ├── snippets/
-        ├── templates/
-        └── theme.liquid
+source/
+├── assets/
+│   └── icons/
+├── data/
+│   ├── config/
+│   ├── locales/
+│   └── metafields/
+│      └── namespace/
+├── pages/
+└── views/
+    ├── customers/
+    ├── meta/
+    ├── sections/
+    ├── snippets/
+    ├── templates/
+    └── theme.liquid
 ```
 
 :::
-::: grid col fs-sm
-
-#### Output Structure
-
-The output structure which syncify generates.
+::: grid col ph-440
 
 ```treeview
-/
-└── output/
-    ├── assets/
-    ├── config/
-    ├── layout/
-    ├── locales/
-    ├── sections/
-    ├── snippets/
-    └── templates/
-        ├── metaobject/
-        └── customers/
+theme/
+├── assets/
+├── config/
+├── layout/
+├── locales/
+├── sections/
+├── snippets/
+└── templates/
+    ├── metaobject/
+    └── customers/
 ```
 
 :::

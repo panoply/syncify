@@ -11,52 +11,34 @@ anchors:
 
 # Spawn
 
-The spawn option accepts a **key** > **value** list of commands (i.e: scripts) which can be used when running in **watch** (`--watch`) or **build** (`--build`) modes. The Spawn configuration option allows you to leverage additional build tools and have them execute in parallel with Syncify as child processes.
+Shopify theme development, while streamlined by tools like Syncify, occasionally demands functionalities that extend beyond its built-in capabilities. For these instances, the `spawn` option allows concurrent execution during `build` and/or `watch` phases alongside Syncify as child processes. This ensures that additional scripts, third-party tools, or even features from the official Shopify CLI can be integrated, rather than executed in isolation.
 
-> Spawned processes allow you use your preferred asset bundlers such as [Rollup](#), [Webpack](#), [Gulp](#) and many more without having to run multiple npm-scripts.
+# Options
 
----
+In the context of Syncify, there are two operational modes from which you can initiate a spawned process. In `watch` mode, the spawned process operates concurrently with Syncify, executing commands in the sequence they are defined. It's important to include any necessary flags or arguments with these commands so they run correctly alongside Syncify's monitoring activities.
 
-# Overview
-
-There are 2 available modes from which you can trigger a spawned process. When a process is spawned in `watch` mode it will run along side Syncify in parallel and execute sequentially in the order of which each spawn is defined. You need to provide any --flags your command (build tool or bundler) requires when running. Spawning a process in `build` mode will trigger spawned commands only 1 time, so it is here where you would provide the compile-only or build-only command, ie: not using watch flags/arguments.
-
-The Syncify **build** mode re-builds the entire theme and you might choose to run this mode using the Syncify `--prod` flag, if you require context of the environment, mode or action taking place within spawned config files, then take a look at the available [Utilities](#utilities) which Syncify exposes to help conditionally load plugins or trigger different build types in accordance with the Syncify execution cycle.
-
-### CLI
-
-```bash
---spawn <name>   # spawn targeting
--s <name>
-```
-
-### Configuration
+When a process is spawned in `build` mode, it triggers the execution of defined commands just once. This mode is ideal for commands focused on compilation or a one-time build process, where you might not need ongoing monitoring. When you're running in `build` mode, Syncify re-builds the entire theme, which could be particularly useful when preparing for production using the `--prod` flag. If your spawned processes need to adapt based on the environment or the specific action Syncify is performing, you can leverage Syncify's spawn utilities. These utilities allow for conditional loading of plugins or the execution of different build types, aligning with Syncify's current operational phase.
 
 <!-- prettier-ignore -->
 ```ts
 import { defineConfig } from '@syncify/cli';
 
 export default defineConfig({
-
-    // ...
-
     spawn: {
-      build: {},
-      watch: {}
+      build: {}, // Build mode, key is process name and value is command
+      watch: {}  // Watch mode, key is process name and value is command
     }
   }
 })
 ```
 
-# Usage
+# Example Usage
 
-In most situations you will leverage the spawn option to compile something like TypeScript or JavaScript but it is important to note that this capability is not specific to these assets types. Syncify is using [cross-spawn](https://www.npmjs.com/package/cross-spawn) under the hood to help negate any cross-platform issues that may arise. Below are a couple examples where we spawn up 2 well known JavaScript bundlers and lastly we illustrate how to spawn multiple processes.
+In most cases, you'll use the `spawn` option to compile assets like TypeScript or JavaScript, but it's important to note that this capability isn't limited to those file types. Let's create a couple of spawns to demonstrate how to take full advantage of this feature. For simplicity, in this example we'll use two popular JavaScript bundlers [Rollup](https://rollupjs.org/) and [Webpack](https://webpack.js.org/).
 
-> All stdout/stderr/stdio from spawned processes will be piped through and intercepted by Syncify, which might result in output being stripped of color.
+> All stdout, stderr, and stdio from spawned processes will be piped through Syncify, which may result in output losing its color formatting. There are workarounds for this, sometimes its merely a matter of passing an additional flag.
 
-### Rollup Example
-
-If you are processing JavaScript asset files using the [Rollup](https://rollupjs.org/) bundler you can spawn build and watch processes by providing the rollup commands to each mode accordingly. Rollup is a fantastic choice for handling `.js` files. In this example, it is assumed that a `rollup.config.js` file is located in the root of your project.
+First, let's start with [Rollup](https://rollupjs.org/) and assume that a `rollup.config.js` file is located in the root our project. We want to have Rollup spawn for `build` and `watch` processes and thus we will pass the appropriate Rollup commands to each mode, in your `syncify.config` file we will add the following:
 
 <!-- prettier-ignore -->
 ```ts
@@ -75,11 +57,7 @@ export default defineConfig({
 })
 ```
 
-### Webpack Example
-
-If you are processing JavaScript asset files using the [Webpack](https://webpack.js.org/) bundler you can spawn build and watch processes by providing the webpack commands to each mode accordingly. You will need to be using the [Webpack CLI](https://github.com/webpack/webpack-cli) module to ensure a successful spawn is triggered.
-
-> Notice how we also provide the `--color` flag in the spawn. If you omit this flag then the webpack logs will be printed to the CLI without colors, when using webpack you should provide this flag.
+Next, lets add [Webpack](https://webpack.js.org/). We need to do a little bit extra for Webpack and install the [Webpack CLI](https://github.com/webpack/webpack-cli) module as Webpack does not have CLI capabilities available out of the box, so after doing that just like we did with Rollup, let's have also have Webpack spawn for both `build` and `watch` processes by including the relative commands:
 
 <!-- prettier-ignore -->
 ```ts
@@ -98,11 +76,9 @@ export default defineConfig({
 })
 ```
 
-### Multiple Processes
+> We also include the `--color` flag to retain colored output in the CLI. If this flag is omitted, Webpack logs will be printed without color.
 
-Though it is unlikely you'd ever need to include 2 different JavaScript bundlers in a project there is nothing stopping you from doing such a thing. For the sake of brevity, the below example illustrates how we can execute multiple spawned child processes to run in parallel with Syncify. Notice how we have also included an additional **gulp** spawn in `build` and `watch` modes. Syncify will trigger these processes in sequentially order, Rollup (1), Gulp (2) and Webpack (3).
-
-> Aside from attempting to spawn Syncify itself, there is no limitation or restrictions imposed on what you choose to run along side Syncify.
+While it's uncommon to use two different JavaScript bundlers in a single project, we are not going to focus on the irregularities here, as strange as it might be. Aside from attempting to spawn Syncify itself, there is no limitation or restrictions imposed on what you choose to run along side Syncify. The main takeaway is that there's nothing preventing you from doing something like this, the tool will not judge you. Let's have a look at how our configuration looks with both the Rollup and Webpack spawns defined:
 
 <!-- prettier-ignore -->
 ```ts
@@ -113,12 +89,10 @@ export default defineConfig({
       build: {
         rollup: 'rollup -c',
         webpack: 'webpack --color',
-        gulp: 'gulp watch-task'
       },
       watch: {
         webpack: 'webpack --watch --color',
         rollup: 'rollup -c -w',
-        gulp: 'gulp watch-task'
       }
     }
   }

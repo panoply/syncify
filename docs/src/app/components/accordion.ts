@@ -6,23 +6,21 @@ import qvp from 'qvp';
 /* CLASS                                        */
 /* -------------------------------------------- */
 
-export class Accordion extends spx.Component<typeof Accordion.define> {
+export class Accordion extends spx.Component({
+  state: {
+    multiple: Boolean,
+    persist: Boolean
+  },
+  nodes: <const>[
+    'viewport'
+  ]
+}) {
 
   public relapse: Relapse;
 
-  static define = {
-    state: {
-      multiple: Boolean,
-      persist: Boolean
-    },
-    nodes: <const>[
-      'viewport'
-    ]
-  };
-
   onmount () {
 
-    this.relapse = relapse(this.root, qvp.test([ 'xs', 'sm' ]) ? {
+    this.relapse = relapse(this.view, qvp.test([ 'xs', 'sm' ]) ? {
       multiple: true,
       persist: false
     } : {

@@ -46,7 +46,8 @@
     "fuse.js": "^7.0.0",
     "match-sorter": "^6.3.4",
     "qvp": "^0.3.2",
-    "relapse": "^0.9.1"
+    "relapse": "^0.9.1",
+    "spx": "link:../../spx"
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",

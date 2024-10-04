@@ -130,8 +130,8 @@ import qvp from 'qvp';
 //   }
 
 //   open() {
-//     if (!this.html.classList.contains('slideout-open')) {
-//       this.html.classList.add('slideout-open');
+//     if (!this.root.classList.contains('slideout-open')) {
+//       this.root.classList.add('slideout-open');
 //     }
 //     this._setTransition();
 //     this._translateXTo(this._translateTo);
@@ -150,7 +150,7 @@ import qvp from 'qvp';
 //     this._translateXTo(0);
 //     this._opened = false;
 //     setTimeout(() => {
-//       this.html.classList.remove('slideout-open');
+//       this.root.classList.remove('slideout-open');
 //       this.panel.style.transition = this.panel.style[`${this.prefix}transform`] = this.panel.style.transform = '';
 //     }, this._duration + 50);
 //     return this;
@@ -254,8 +254,8 @@ import qvp from 'qvp';
 //           this._opening = false;
 //         }
 
-//         if (!this._moved && !this.html.classList.contains('slideout-open')) {
-//           this.html.classList.add('slideout-open');
+//         if (!this._moved && !this.root.classList.contains('slideout-open')) {
+//           this.root.classList.add('slideout-open');
 //         }
 
 //         this.panel.style[`${this.prefix}transform`] = this.panel.style.transform = `translateX(${translateX}px)`;
@@ -307,7 +307,34 @@ import qvp from 'qvp';
 //   }
 // }
 
-export class Drawer extends spx.Component<typeof Drawer.define> {
+export class Drawer extends spx.Component({
+  name: 'drawer',
+  sugar: true,
+  nodes: <const>[
+    'mount',
+    'backdrop'
+  ],
+  state: {
+    outsideClick: Boolean,
+    height: String,
+    width: String,
+    offset: String,
+    direction: String,
+    shift: String,
+    redraw: String,
+    backdropClass: {
+      typeof: String,
+      default: 'backdrop'
+    },
+    useParent: Boolean,
+    isOpen: Boolean,
+    bodyScroll: Boolean,
+    mode: {
+      typeof: String,
+      default: 'overlay'
+    }
+  }
+}) {
 
   static opened: string = null;
 
@@ -315,36 +342,6 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
    * The backdrop element
    */
   static backdrop: HTMLDivElement = null;
-
-  /**
-   * Stimulus: values
-   */
-  static define = {
-    state: {
-      outsideClick: Boolean,
-      height: String,
-      width: String,
-      offset: String,
-      direction: String,
-      shift: String,
-      redraw: String,
-      backdropClass: {
-        typeof: String,
-        default: 'backdrop'
-      },
-      useParent: Boolean,
-      isOpen: Boolean,
-      bodyScroll: Boolean,
-      mode: {
-        typeof: String,
-        default: 'overlay'
-      }
-    },
-    nodes: <const>[
-      'mount',
-      'backdrop'
-    ]
-  };
 
   /**
    * Returns the drawer direction class name
@@ -369,19 +366,6 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
 
   connect () {
 
-    console.log(this.root);
-
-    if (this.state.useParent) {
-      this.target = this.root.parentElement;
-      this.target.ariaHidden = 'true';
-    } else {
-      this.target = this.root;
-    }
-
-    if (this.target.classList.contains('d-none')) {
-      this.target.classList.remove('d-none');
-    }
-
     if (this.state.mode !== 'overlay' && this.state.hasShift === false) {
       console.error('Missing "data-drawer-shift-value" defintions on:', this.target);
     }
@@ -391,6 +375,17 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
   }
 
   onmount () {
+
+    if (this.state.useParent) {
+      this.target = this.view.parentElement;
+      this.target.ariaHidden = 'true';
+    } else {
+      this.target = this.view;
+    }
+
+    if (this.target.classList.contains('d-none')) {
+      this.target.classList.remove('d-none');
+    }
 
     if (this.state.hasWidth) {
       this.target.style.setProperty('width', this.state.width);
@@ -409,8 +404,8 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
       this.target.style.setProperty('z-index', '0');
     }
 
-    if (this.html.classList.contains('drawer-open')) {
-      this.html.classList.remove('drawer-open');
+    if (this.root.classList.contains('drawer-open')) {
+      this.root.classList.remove('drawer-open');
     }
 
     if (this.state.isOpen) {
@@ -431,8 +426,8 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
       this.target.classList.add('drawer-active');
     }
 
-    if (this.state.hasBackdropClass && !this.dom.backdropNode.classList.contains(this.state.backdropClass)) {
-      this.dom.backdropNode.classList.add(this.state.backdropClass);
+    if (this.state.hasBackdropClass && !this.backdrop.hasClass(this.state.backdropClass)) {
+      this.backdrop.classList.add(this.state.backdropClass);
     }
 
     if (this.state.bodyScroll === false) {
@@ -445,14 +440,14 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
 
     if (this.state.hasWidth) {
       if (this.state.direction === 'top') {
-        this.dom.backdropNode.style.setProperty('transform', `translateY(-${this.state.offset})`);
+        this.backdrop.style.setProperty('transform', `translateY(-${this.state.offset})`);
       } else {
-        this.dom.backdropNode.style.setProperty('transform', `translateX(-${this.state.width})`);
+        this.backdrop.style.setProperty('transform', `translateX(-${this.state.width})`);
       }
     }
 
-    this.html.classList.add('drawer-open');
-    this.dom.backdropNode.addEventListener('click', this.toggle, { once: true });
+    this.root.classList.add('drawer-open');
+    this.backdrop.addEventListener('click', this.toggle, { once: true });
     this.target.addEventListener('touchstart', this.touchStart, { passive: true });
     this.target.ariaHidden = 'false';
   }
@@ -464,7 +459,7 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
     }
 
     if (this.state.hasWidth) {
-      this.dom.backdropNode.style.removeProperty('transform');
+      this.backdrop.style.removeProperty('transform');
     }
 
     if (this.state.bodyScroll === false) {
@@ -477,9 +472,9 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
       this.target.addEventListener('transitionend', this.transition);
     }
 
-    this.html.classList.remove('drawer-open');
+    this.root.classList.remove('drawer-open');
     this.target.removeEventListener('touchstart', this.touchStart);
-    this.dom.backdropNode.removeEventListener('click', this.toggle);
+    this.backdrop.removeEventListener('click', this.toggle);
     this.target.classList.remove('drawer-active');
     this.target.ariaHidden = 'true';
 
@@ -499,8 +494,8 @@ export class Drawer extends spx.Component<typeof Drawer.define> {
       }
     }
 
-    if (this.state.hasBackdropClass && this.dom.backdropNode.classList.contains(this.state.backdropClass)) {
-      this.dom.backdropNode.classList.remove(this.state.backdropClass);
+    if (this.state.hasBackdropClass && this.backdrop.classList.contains(this.state.backdropClass)) {
+      this.backdrop.classList.remove(this.state.backdropClass);
     }
 
     if (this.state.mode === 'pull') {

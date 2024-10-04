@@ -1,7 +1,7 @@
 ---
 title: 'Transforms - JavaScript'
 layout: base
-permalink: '/options/transform/javascript/index.html'
+permalink: '/options/transform/script/index.html'
 prev:
   label: 'Targeting'
   uri: '/cli/targeting'
@@ -14,7 +14,7 @@ navs:
   - 'Default Options'
 ---
 
-# JavaScript
+# Script
 
 Syncify supports JavaScript bundling, tree-shaking, code splitting and minification out of the box. Under the hood, Syncify leverages [ESBuild](https://esbuild.github.io/) and the `script` transform configuration option allows developers to process JavaScript in a fast and effecient manner. Syncify script tranforms apply compatible presets for handling JavaScript files with ESBuild and provides developers distribution control with support for snippet generation.
 

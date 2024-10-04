@@ -7,3 +7,5 @@ anchors:
 ---
 
 # Syncify CLI
+
+Syncify is intended to be used as a CLI tool. It provides an extensive list of control on the command line.

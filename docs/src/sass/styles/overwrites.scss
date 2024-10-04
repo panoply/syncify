@@ -272,3 +272,54 @@ blockquote > p {
   width: 100px;
   height: 50px;
 }
+
+.icon-output {
+  width: 40px;
+  height: 40px;
+}
+
+h1 {
+  > code {
+    text-transform: initial;
+    border: none !important;
+    font-size: 1rem !important;
+  }
+}
+
+h5 {
+  margin-bottom: 15px;
+  > code {
+    float: right;
+    text-transform: lowercase;
+    border: none !important;
+    font-size: 0.845rem !important;
+  }
+}
+
+.ph-440 .papyrus {
+  height: 450px;
+  border: none !important;
+}
+
+ol {
+  margin-top: $spacer-4;
+  margin-bottom: $spacer-4;
+  padding-left: $spacer-5;
+  margin-left: $spacer-1;
+  list-style-type: decimal;
+
+  li {
+    font-size: 1rem;
+    // font-family: $font-family-heading;
+    // text-transform: uppercase;
+    margin-bottom: $spacer-1;
+    color: $white;
+
+    &::marker {
+      color: $gray-500;
+      font-weight: bold;
+      font-family: $font-family-heading;
+      margin-right: $spacer-2;
+    }
+  }
+}

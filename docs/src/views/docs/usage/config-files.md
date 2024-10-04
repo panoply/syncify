@@ -16,11 +16,11 @@ Syncify supports `syncify.config.ts` and `package.json` configurations. Dependin
 
 Syncify supports JSON, JSONC, JavaScript and TypeScript external configuration files. The TypeScript `syncify.config.ts` type is the recommended configuration file to use along the `defaultConfig` named import.
 
-- syncify.config.ts
-- syncify.config.js
-- syncify.config.mjs
-- syncify.config.cjs
-- syncify.config.json
+1. syncify.config.ts
+2. syncify.config.js
+3. syncify.config.mjs
+4. syncify.config.cjs
+5. syncify.config.json
 
 ---
 

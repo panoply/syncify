@@ -14,7 +14,17 @@
     "url": "https://discord.gg/shopify-developers-597504637167468564",
     "target": "_blank"
   },
-  "menu": [
+  "navbar": [
+    {
+      "title": "Documentation",
+      "url": "/what-is-syncify/"
+    },
+    {
+      "title": "Examples",
+      "url": "/reference/"
+    }
+  ],
+  "docs": [
     {
       "title": "Introduction",
       "links": [
@@ -69,10 +79,6 @@
           "url": "/usage/config-files/"
         },
         {
-          "title": "Modes",
-          "url": "/usage/syncify-cli/"
-        },
-        {
           "title": "Directory Structures",
           "url": "/usage/directory-structures/"
         },
@@ -82,7 +88,7 @@
         },
         {
           "title": "Transforms",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/transforms/"
         },
         {
           "title": "Spawn",
@@ -143,24 +149,346 @@
       ]
     },
     {
-      "title": "Options",
-      "links": [
+      "title": "CLI",
+      "submenu": [
         {
-          "title": "Input",
-          "url": "/configuration/input/"
+          "title": "Commands",
+          "links": [
+            {
+              "title": "--input",
+              "url": "/configuration/input/"
+            },
+            {
+              "title": "--output",
+              "url": "/configuration/output/"
+            },
+            {
+              "title": "--import",
+              "url": "/configuration/output/"
+            },
+            {
+              "title": "--export",
+              "url": "/configuration/output/"
+            },
+            {
+              "title": "--config",
+              "url": "/configuration/output/"
+            }
+          ]
         },
         {
-          "title": "Output",
-          "url": "/configuration/output/"
+          "title": "Paths",
+          "links": [
+            {
+              "title": "Redirects",
+              "url": "/options/pages/redirects/"
+            },
+            {
+              "title": "Assets",
+              "url": "/options/pages/assets/"
+            },
+            {
+              "title": "Files",
+              "url": "/options/pages/files/"
+            },
+            {
+              "title": "Config",
+              "url": "/options/pages/config/"
+            },
+            {
+              "title": "Locales",
+              "url": "/options/pages/locales/"
+            },
+            {
+              "title": "Layout",
+              "url": "/options/pages/layout/"
+            },
+            {
+              "title": "Sections",
+              "url": "/options/pages/sections/"
+            },
+            {
+              "title": "Snippets",
+              "url": "/options/pages/snippets/"
+            },
+            {
+              "title": "Metafields",
+              "url": "/options/pages/metafields/"
+            },
+            {
+              "title": "Metaobject",
+              "url": "/options/pages/metaobject/"
+            },
+            {
+              "title": "Customers",
+              "url": "/options/pages/customers/"
+            },
+            {
+              "title": "Pages",
+              "url": "/options/pages/pages/"
+            },
+            {
+              "title": "Templates",
+              "url": "/options/pages/templates/"
+            }
+          ]
+        },
+        {
+          "title": "HOT",
+          "links": [
+            {
+              "title": "label",
+              "url": "/options/hot/label"
+            },
+            {
+              "title": "history",
+              "url": "/options/hot/history"
+            },
+            {
+              "title": "method",
+              "url": "/options/hot/method"
+            },
+            {
+              "title": "inject",
+              "url": "/options/hot/inject"
+            },
+            {
+              "title": "strategy",
+              "url": "/options/hot/strategy"
+            },
+            {
+              "title": "scroll",
+              "url": "/options/hot/scroll"
+            },
+            {
+              "title": "server",
+              "url": "/options/hot/server"
+            },
+            {
+              "title": "socket",
+              "url": "/options/hot/socket"
+            },
+            {
+              "title": "layouts",
+              "url": "/options/hot/layouts"
+            }
+          ]
+        },
+        {
+          "title": "Publish",
+          "links": [
+            {
+              "title": "tunnelPort",
+              "url": "/options/publish/tunnelPort/"
+            },
+            {
+              "title": "publishRole",
+              "url": "/options/publish/publishRole/"
+            },
+            {
+              "title": "bindVersion",
+              "url": "/options/publish/bindVersion/"
+            },
+            {
+              "title": "themeLimit",
+              "url": "/options/publish/themeLimit/"
+            }
+          ]
+        },
+        {
+          "title": "Transform",
+          "links": [
+            {
+              "title": "script",
+              "url": "/options/transform/script/"
+            },
+            {
+              "title": "style",
+              "url": "/options/transform/style/"
+            },
+            {
+              "title": "svg",
+              "url": "/options/transform/svg/"
+            },
+            {
+              "title": "image",
+              "url": "/options/transform/image/"
+            },
+            {
+              "title": "json",
+              "url": "/options/transform/json/"
+            },
+            {
+              "title": "liquid",
+              "url": "/options/transform/liquid/"
+            }
+          ]
+        },
+        {
+          "title": "Processors",
+          "links": [
+            {
+              "title": "esbuild",
+              "url": "/options/processors/esbuild/"
+            },
+            {
+              "title": "sass",
+              "url": "/options/processors/sass/"
+            },
+            {
+              "title": "postcss",
+              "url": "/options/processors/postcss/"
+            },
+            {
+              "title": "tailwind",
+              "url": "/options/processors/tailwind/"
+            },
+            {
+              "title": "svgo",
+              "url": "/options/processors/svgo/"
+            },
+            {
+              "title": "sprite",
+              "url": "/options/processors/sprite/"
+            },
+            {
+              "title": "sharp",
+              "url": "/options/processors/sharp/"
+            }
+          ]
+        },
+        {
+          "title": "Log",
+          "links": [
+            {
+              "title": "clear",
+              "url": "/options/log/clear/"
+            },
+            {
+              "title": "silent",
+              "url": "/options/log/silent/"
+            },
+            {
+              "title": "stats",
+              "url": "/options/log/stats/"
+            },
+            {
+              "title": "warnings",
+              "url": "/options/log/warnings/"
+            }
+          ]
+        },
+        {
+          "title": "Spawn",
+          "links": [
+            {
+              "title": "build",
+              "url": "/options/spawn/build/"
+            },
+            {
+              "title": "watch",
+              "url": "/options/spawn/watch/"
+            }
+          ]
         }
       ]
     },
     {
-      "title": "CLI Commands",
+      "title": "Options",
       "links": [
         {
-          "title": "Modes",
-          "url": "/cli-commands/modes/"
+          "title": "Input",
+          "url": "/options/input/"
+        },
+        {
+          "title": "Output",
+          "url": "/options/output/"
+        },
+        {
+          "title": "Import",
+          "url": "/options/output/"
+        },
+        {
+          "title": "Export",
+          "url": "/options/output/"
+        },
+        {
+          "title": "Config",
+          "url": "/options/output/"
+        },
+        {
+          "title": "Paths",
+          "url": "/options/paths/"
+        },
+        {
+          "title": "Hot",
+          "url": "/options/paths/"
+        },
+        {
+          "title": "Publish",
+          "url": "/options/paths/"
+        },
+        {
+          "title": "Log",
+          "url": "/options/log"
+        },
+        {
+          "title": "Spawn",
+          "url": "/options/spawn"
+        },
+        {
+          "title": "Transform",
+          "links": [
+            {
+              "title": "Script",
+              "url": "/options/transform/script/"
+            },
+            {
+              "title": "Style",
+              "url": "/options/transform/style/"
+            },
+            {
+              "title": "SVG",
+              "url": "/options/transform/svg/"
+            },
+            {
+              "title": "JSON",
+              "url": "/options/transform/json/"
+            },
+            {
+              "title": "Liquid",
+              "url": "/options/transform/liquid/"
+            }
+          ]
+        },
+        {
+          "title": "Processors",
+          "links": [
+            {
+              "title": "ESBuild",
+              "url": "/options/processors/esbuild/"
+            },
+            {
+              "title": "SASS",
+              "url": "/options/processors/sass/"
+            },
+            {
+              "title": "PostCSS",
+              "url": "/options/processors/postcss/"
+            },
+            {
+              "title": "Tailwind",
+              "url": "/options/processors/tailwind/"
+            },
+            {
+              "title": "SVGO",
+              "url": "/options/processors/svgo/"
+            },
+            {
+              "title": "Sprites",
+              "url": "/options/processors/sprite/"
+            }
+          ]
         }
       ]
     },

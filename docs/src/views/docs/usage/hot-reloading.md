@@ -12,19 +12,27 @@ anchors:
 
 # HOT Reloading
 
-Live reloading (otherwise known as **HOT Reloads** ) is supported in watch mode. Syncify leverages websocket's, XHR and statically served endpoints to provide this capability with zero configuration or the need to install or setup additional tooling. No extensions and no complexities. Syncify will listen for messages sent via websocket on the client and carry out HOT replacements of Assets, Sections, Snippets, Layouts and Templates without triggering full-page refreshes. HOT Reloads can be enabled by passing the `--hot` flag via the CLI. The Syncify HOT reload tends to be considerably faster than using the Shopify CLI.
+Syncify supports **HOT Reloads**, also known as Live Reloading, which operates in watch mode. This feature facilitates real-time, in-place updates of various components such as assets, sections, snippets, layouts, and templates without necessitating full-page refreshes. To activate HOT Reloading, simply use the `--hot` flag during initialization. Additionally, an interface API is provided for those seeking programmatic control over the reloading process.
 
-### Assets
+The functionality of HOT Reloading in Syncify is powered by the robust [uWebSockets.js](https://github.com/uNetworking/uWebSockets.js) module. When HOT mode is engaged, Syncify injects temporary scripts into your theme. These scripts utilize XHR for communication, DOM Diffs for identifying changes, Morphs for applying updates, and a static server setup to manage and execute operations during a watch session.
+
+HOT Reloads perform on average 5x - 7x faster than HOT Reload by the Shopify CLI. This is largely due to Syncify's capability to carry out **Real HOT Reloads** with support for in-place replacement of all theme content types. While the Shopify CLI can manage HOT Section Reloads, it falls short in handling in-place updates for other content types, and instead it will triggers hard refreshes, i.e, **Fake HOT Reloads**.
+
+#### HOT Assets
 
 SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out the URL's or containing source with localhost equivalents served statically by Syncify.
 
-### Section
+#### HOT Sections
 
 Dynamic sections, static sections of a combination of both are fetched via the Ajax [Section rendering API](https://shopify.dev/docs/api/section-rendering). Replacements are applied to fragments in real-time and surrounding nodes are left intact.
 
-### Others
+#### HOT Snippets
 
-In order to provide HOT replacements Syncify employs a mild form of DOM hydration. Snippets, templates and Liquid/JSON layout files will reflect changes near instantly and upto 10x faster than invoking a hard-refresh.
+SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out the URL's or containing source with localhost equivalents served statically by Syncify.
+
+#### HOT Templates
+
+SASS/CSS, TypeScript/JavaScript and SVG asset file types are HOT reloaded by swapping out the URL's or containing source with localhost equivalents served statically by Syncify.
 
 ---
 
@@ -42,18 +50,16 @@ $ syncify dev -w --hot
 import { definedConfig } from '@syncify/cli';
 
 export default defineConfig({
-  ...
   hot: {
     strategy: 'replace',
     inject: true,
     label: 'visible',
-    layouts: ['theme.liquid'],
     method: 'hot',
     scroll: 'preserved',
     server: 3000,
-    socket: 8089
-  },
-  ...
+    socket: 8089,
+    layouts: ['theme.liquid']
+  }
 });
 ```
 
