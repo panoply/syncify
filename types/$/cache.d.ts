@@ -26,10 +26,6 @@ export namespace Cache {
      * The last time a build was executed
      */
     lastBuild: number;
-    /**
-     * List of layouts where hot snippet exists
-     */
-    hotSnippet: string[]
   }
 
   /**
@@ -262,6 +258,7 @@ export namespace Cache {
   export interface Model extends PathModel, StoreModel {
     build: Build;
     uri: {
+      chrome: string;
       build: string;
       paths: string;
       checksum: string;
