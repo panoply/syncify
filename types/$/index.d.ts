@@ -19,6 +19,20 @@ import type * as Config from '../config';
 
 export interface Dirs extends Config.Directories {
   /**
+   * Chrome `userDataDir` directory for devtools instance
+   *
+   * @default
+   * '/Users/sissel/.syncify/.chrome'
+   */
+  chrome: string;
+  /**
+   * Static directory containing file injections for HOT Reloads - Paths are relative to root
+   *
+   * @default
+   * 'node_modules/.syncify/static'
+   */
+  static: string;
+  /**
    * Sourcemaps directories - Writes are relative to root
    *
    * @default
@@ -272,6 +286,12 @@ export interface Store<T = any> {
    * Queue
    */
   queue: boolean;
+  /**
+   * Password used for password protected stores
+   *
+   * @default null
+   */
+  password: string;
 }
 
 /* -------------------------------------------- */

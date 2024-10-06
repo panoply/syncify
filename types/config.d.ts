@@ -5,8 +5,8 @@
 /* -------------------------------------------- */
 
 import type { Merge, PackageJson } from 'type-fest';
-import type { HOTConfig } from './$/hot';
 import type { PluginHooks } from './$/plugin';
+import type { HOT } from './config/hot';
 import type { Stores } from './config/stores';
 import type { Directories } from './config/directories';
 import type { Logger } from './config/logger';
@@ -19,8 +19,8 @@ import type { Processors } from './config/processors';
 /* EXPORTS                                      */
 /* -------------------------------------------- */
 
-export type { HOTConfig } from './$/hot';
 export type { PluginHooks } from './$/plugin';
+export type { HOT } from './config/hot';
 export type { Stores } from './config/stores';
 export type { Directories } from './config/directories';
 export type { Logger } from './config/logger';
@@ -48,13 +48,13 @@ export interface Config<T = Stores> extends Directories {
    *
    * Hot reloading options. Passing boolean `true` will use defaults.
    * Set to `false` to disable live reloads. Optionally configure
-   * reloads by passing configuration _object_.
+   * reloads by passing configuration `object`
    *
    * > Hot reloading is only possible in **watch** mode.
    *
    * @default false
    */
-  hot?: boolean | HOTConfig;
+  hot?: boolean | HOT;
   /**
    * **Log**
    *
@@ -151,7 +151,7 @@ export interface SyncifyConfig extends Directories {
    *
    * @default false
    */
-  hot?: boolean | HOTConfig;
+  hot?: boolean | HOT;
   /**
    * **Log**
    *

@@ -1,5 +1,5 @@
 import type { BuildOptions } from 'esbuild';
-import type { JSONConfig } from '../transform/json';
+import type { JSONTerse } from '../transform/json';
 import type { SharpConfig } from '../transform/image';
 import type { SASSConfig, PostCSSConfig } from '../transform/style';
 import type { SVGOConfig, SVGSpriteConfig } from '../transform/svg';
@@ -21,7 +21,7 @@ export interface ProcessorsBundle {
    * > The options will also be used in **development** (`dev`)
    * mode when uploading `.json` files to stores/themes.
    */
-  json?: JSONConfig;
+  json?: JSONTerse;
   /**
    * [ESBuild](https://esbuild.github.io/) Config
    *
