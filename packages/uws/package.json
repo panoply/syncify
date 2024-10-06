@@ -1,0 +1,23 @@
+{
+  "name": "@syncify/uws",
+  "version": "0.1.0",
+  "description": "Packaged reference of uWebSockets.js for usage within Syncify",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "import": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "tsup --minify"
+  },
+  "license": "Apache-2.0",
+  "files": ["dist"],
+  "tsup": {
+    "entry": ["src/index.ts"],
+    "dts": true
+  },
+  "dependencies": {
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.48.0"
+  }
+}

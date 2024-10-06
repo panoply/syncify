@@ -1,0 +1,17 @@
+{
+  "typeAcquisition": {
+    "enable": true
+  },
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "strictNullChecks": false,
+    "noEmitOnError": true,
+    "allowSyntheticDefaultImports": true,
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
