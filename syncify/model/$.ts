@@ -4,6 +4,8 @@ import type * as Type from 'types';
 import type { Commands } from 'types/internal';
 import type { ChildProcess } from 'node:child_process';
 import { size } from '@syncify/ansi';
+import { join } from 'node:path';
+import { homedir, tmpdir } from 'node:os';
 import { PATH_KEYS } from 'syncify:const';
 import { defaults } from './defaults';
 import { processor } from './processor';
@@ -28,17 +30,6 @@ const paths = (): Type.PathBundle => {
   return state;
 
 };
-
-const hotrender = () =>
-  '{% render \'hot.js\'' +
-  'server: 3000' +
-  'socket: 8089' +
-  'strategy: "hydrate"' +
-  'scroll: "preserved"' +
-  'label: "visible"' +
-  'history: false' +
-  'method: "hot"' +
- ' %}';
 
 /**
  * Bundle State Configuration
@@ -154,9 +145,56 @@ export const $ = new class Bundle {
   public warnings: Type.Warnings = new Map();
 
   /**
+   * Home or temporary directory is home fails
+   *
+   * @example
+   * '/Users/sissel/.syncify/'
+   * // OR
+   * '/var/folders/m3/5574nnhn0yj488ccryqr7tc80000gn/T'
+   */
+  public home: string = join(homedir() || tmpdir(), '.syncify');
+
+  /**
+   * Base directory path references
+   */
+  public dirs: Type.Dirs = object<Type.Dirs>({
+    chrome: null,
+    static: null,
+    cache: null,
+    config: null,
+    export: null,
+    import: null,
+    input: null,
+    output: null,
+    sourcemaps: {
+      root: null,
+      scripts: null,
+      styles: null
+    }
+  });
+
+  /**
+   * The configuration file name resolution
+   *
+   * @default
+   * {
+   *  base: null,
+   *  ext: null,
+   *  path: null,
+   *  relative: null
+   *  type: null
+   * }
+   */
+  public file: Type.ConfigFile = object<Type.ConfigFile>({
+    base: null,
+    path: null,
+    relative: null
+  });
+
+  /**
    * Theme Publishing
    */
-  public publish: Type.PublishBundle = object({
+  public publish: Type.PublishBundle = object<Type.PublishBundle>({
     ngrok: null,
     bindVersion: false,
     publishRole: 'unpublished',
@@ -178,7 +216,7 @@ export const $ = new class Bundle {
    *  update: null
    * }
    */
-  public vc: Type.VC = object({
+  public vc: Type.VC = object<Type.VC>({
     dir: null,
     number: null,
     zip: null,
@@ -201,7 +239,7 @@ export const $ = new class Bundle {
    *  vars: {}
    * }
    */
-  public env: Type.Env = object({
+  public env: Type.Env = object<Type.Env>({
     cli: false,
     tree: false,
     dev: true,
@@ -231,26 +269,36 @@ export const $ = new class Bundle {
    *  alive: {}
    * }
    */
-  public hot: Type.HOTBundle = object({
-    inject: true,
+  public hot: Type.HOTBundle = object<Type.HOTBundle>({
     server: 3000,
     socket: 8089,
-    history: false,
     method: 'hot',
     strategy: 'hydrate',
-    scroll: 'preserved',
-    layouts: [ 'theme.liquid' ],
     label: 'visible',
-    snippet: null,
-    output: null,
-    alive: {},
-    renderer: hotrender()
+    source: null,
+    previewBar: false,
+    loadEventJS: '',
+    chromeFlags: [
+      '--disable-gpu',
+      '--no-sandbox',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--disable-extensions',
+      '--disable-sync',
+      '--disable-password-manager',
+      '--disable-save-password-bubble',
+      '--disable-translate',
+      '--disable-features=TranslateUI',
+      '--disable-infobars',
+      '--disable-web-security',
+      '--test-type'
+    ]
   });
 
   /**
    * Log State
    */
-  public log: Type.LogBundle = object({
+  public log: Type.LogBundle = object<Type.LogBundle>({
     idle: false,
     group: 'Syncify',
     title: NIL,
@@ -302,44 +350,9 @@ export const $ = new class Bundle {
   });
 
   /**
-   * The configuration file name resolution
-   *
-   * @default
-   * {
-   *  base: null,
-   *  ext: null,
-   *  path: null,
-   *  relative: null
-   *  type: null
-   * }
-   */
-  public file: Type.ConfigFile = object({
-    base: null,
-    path: null,
-    relative: null
-  });
-
-  /**
    * Files store - Holds a `Set` reference to all files
    */
   public files: Map<string, Set<string>> = new Map();
-
-  /**
-   * Base directory path references
-   */
-  public dirs: Type.Dirs = object({
-    cache: null,
-    config: null,
-    export: null,
-    import: null,
-    input: null,
-    output: null,
-    sourcemaps: {
-      root: null,
-      scripts: null,
-      styles: null
-    }
-  });
 
   /**
    * The available stores as per configuration in `package.json` file
