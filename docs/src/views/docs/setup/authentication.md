@@ -51,3 +51,11 @@ YOUR-SHOP-TWO_TOKEN = 'shpat_abcdefghijklmnopqrstuvwz'      // your-shop-two.mys
 YOUR-SHOP-THREE_API_KEY = 'abcdefghijklmnopqrstuvwz'        // your-shop-three.myshopify.com
 YOUR-SHOP-THREE_API_SECRET = 'abcdefghijklmnopqrstuvwz'     // your-shop-three.myshopify.com
 ```
+
+### Password Protected Stores
+
+If you are are working in partner account or password protected store, you can have Syncify automatically log you in during development phases. You can provide passwords within `.env` files following the same format as credentials.
+
+```js
+YOUR-SHOP-NAME_PASSWORD = 'example' // your-shop-name.myshopify.com
+```
