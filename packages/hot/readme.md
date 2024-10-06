@@ -1,22 +1,19 @@
 # @syncify/hot
 
-HOT Reload client used to perform live reloading using websocket. This module will be injected into store theme layouts and is responsible for morphs and traversal loads.
-
-# Installation
-
-```bash
-$ pnpm add @syncify/hot -D
-```
+HOT Reload client used to perform live reloading using websocket.
 
 # Usage
 
-Running in HOT mode will result in Syncify injecting a snippet into layouts. The snippet is the socket receiver that is responsible for executing replacements/morphs and exposes programmatic control for developers who can to customize or hook into the HOT reload rendering cycles.
+Syncify will automatically inject script via the devtools protocol.
 
 ```ts
+// INIT
+window.syncify.connect(/* options */);
+
 // STATUS
 //
-window.syncify.ready: boolean
-window.syncify.connected: boolean;
+window.syncify.isReady: boolean
+window.syncify.isConnected: boolean;
 
 // RELOADS
 //

@@ -4,7 +4,6 @@ import { relative } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { File, Type } from 'syncify:file';
 import { queue } from 'syncify:requests/client';
-import { hasSnippet, inject, removeRender } from 'syncify:hot/inject';
 import { byteConvert, byteSize, sizeDiff } from 'syncify:sizes';
 import { timer } from 'syncify:timer';
 import * as log from 'syncify:log';
@@ -149,12 +148,6 @@ async function htmlMinify (file: File, content: string) {
  */
 const transform = (file: File) => async (data: string) => {
 
-  if (file.type === Type.Layout && $.mode.hot) {
-    if (hasSnippet(data) === false) {
-      data = inject(data);
-    }
-  }
-
   if (!$.mode.terse) {
 
     writeFile(file.output, data).catch(
@@ -243,14 +236,6 @@ export async function compile (file: File, sync: ClientParam<File>, cb: Syncify)
 
   let input = read.toString();
 
-  if ($.mode.build) {
-    if (file.namespace === 'layout') {
-      if (hasSnippet(input)) {
-        input = removeRender(input);
-      }
-    }
-  }
-
   if (file.type === Type.Section) {
     const section = await CreateSection(file);
     if (section === null) return null;
@@ -286,8 +271,11 @@ export async function compile (file: File, sync: ClientParam<File>, cb: Syncify)
     const request = await tailwindParse(file, [ [ file, content ] ]);
 
     for (const req of request) {
-      await sync('put', req[0], req[1]);
+
       log.syncing(req[0].key);
+
+      await sync('put', req[0], req[1]);
+
     }
 
   } else {

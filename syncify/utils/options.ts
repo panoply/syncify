@@ -34,14 +34,26 @@ export function getStoresFromEnv () {
   const stores: Stores[] = [];
   const admin: Set<string> = new Set();
 
+  const getStorefrontPassword = (domain: string) => {
+    const lowercase = `${domain}_password`;
+    const uppercase = lowercase.toUpperCase();
+    return lowercase in $.env.vars
+      ? $.env.vars[lowercase]
+      : uppercase in $.env.vars ? $.env.vars[uppercase] : null;
+  };
+
   for (const prop in $.env.vars) {
 
     const p = prop.toLowerCase();
 
     if (p.endsWith('_api_token')) {
 
+      const domain = p.slice(0, p.indexOf('_api_token'));
+      const password = getStorefrontPassword(domain);
+
       stores.push({
-        domain: `${p.slice(0, p.indexOf('_api_token'))}`,
+        domain,
+        password,
         themes: {}
       });
 
@@ -51,7 +63,9 @@ export function getStoresFromEnv () {
 
       if (!admin.has(domain)) {
 
-        stores.push({ domain, themes: {} });
+        const password = getStorefrontPassword(domain);
+
+        stores.push({ domain, password, themes: {} });
         admin.add(domain);
 
       }
@@ -62,7 +76,9 @@ export function getStoresFromEnv () {
 
       if (!admin.has(domain)) {
 
-        stores.push({ domain, themes: {} });
+        const password = getStorefrontPassword(domain);
+
+        stores.push({ domain, password, themes: {} });
         admin.add(domain);
 
       }

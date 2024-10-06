@@ -1,11 +1,10 @@
 import type { HOTBundle } from 'types';
 import { join } from 'node:path';
 import { allFalse } from 'rambdax';
-import { socket } from 'syncify:hot/server';
+import { socket } from 'syncify:hot/socket';
 import { isObject, isBoolean, hasProp, isNil, isEmpty } from 'syncify:utils';
 import { warnOption, typeError, unknownError, invalidError } from 'syncify:log/throws';
 import { $ } from 'syncify:state';
-import { ejectRender } from 'syncify:hot/inject';
 
 /**
  * Hot Reloading Setup
@@ -15,31 +14,10 @@ import { ejectRender } from 'syncify:hot/inject';
  */
 export async function setHotReloads () {
 
-  if ($.mode.watch !== true) {
+  if ($.mode.watch !== true) return;
+  if ($.mode.hot === false && $.config.hot === false) return;
 
-    if ($.cache.build.hotSnippet.length > 0) {
-      for (const path of $.cache.build.hotSnippet) await ejectRender(path);
-      $.cache.build.hotSnippet = [];
-    }
-
-    return;
-
-  }
-
-  if ($.mode.hot === false && $.config.hot === false) {
-
-    if ($.cache.build.hotSnippet.length > 0) {
-      for (const path of $.cache.build.hotSnippet) await ejectRender(path);
-      $.cache.build.hotSnippet = [];
-    }
-
-    return;
-
-  }
-
-  if ($.mode.hot === false && $.config.hot === true) {
-    $.mode.hot = true;
-  }
+  $.hot.source = join($.cwd, 'node_modules', '@syncify/cli', 'hot.min.js');
 
   const warn = warnOption('HOT Reloads');
 
@@ -52,12 +30,14 @@ export async function setHotReloads () {
   }
 
   if (allFalse(isObject($.config.hot), isBoolean($.config.hot), isNil($.config.hot))) {
+
     typeError({
       option: 'config',
       name: 'hot',
       provided: $.config.hot,
       expects: 'boolean | {}'
     });
+
   }
 
   if (isObject($.config.hot) && isEmpty($.config.hot) === false) {
@@ -67,7 +47,9 @@ export async function setHotReloads () {
     for (const prop in $.config.hot) {
 
       if (!has(prop as keyof HOTBundle)) {
+
         unknownError(`hot.${prop}`, $.config.hot[prop]);
+
       }
 
       if (prop === 'label') {
@@ -140,34 +122,6 @@ export async function setHotReloads () {
 
     }
   }
-
-  $.hot.snippet = join($.cwd, 'node_modules', '@syncify/cli', 'hot.js.liquid');
-  $.hot.output = join($.dirs.output, 'snippets', 'hot.js.liquid');
-
-  const base = join($.dirs.output, 'layout');
-
-  for (const layout of $.hot.layouts) {
-
-    const path = join(base, layout);
-
-    $.hot.alive[path] = false;
-
-    if (!$.cache.build.hotSnippet.includes(base)) {
-      $.cache.build.hotSnippet.push(base);
-    }
-  }
-
-  $.hot.renderer = '{% render \'hot.js\'' + [
-    ''
-    , `server: ${$.hot.server}`
-    , `socket: ${$.hot.socket}`
-    , `strategy: "${$.hot.strategy}"`
-    , `scroll: "${$.hot.scroll}"`
-    , `label: "${$.hot.label}"`
-    , `history: "${$.hot.history}`
-    , `method: "${$.hot.method}"`
-
-  ].join(', ') + ' %}';
 
   $.wss = await socket();
 

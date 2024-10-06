@@ -984,6 +984,23 @@ export const deleted = (file: string, theme: Theme) => {
   );
 };
 
+/**
+ * Log Deleted - `blueBright`
+ *
+ * @example
+ *
+* '│ deleted → dir/filename.ext → theme ~ store.myshopify.com'
+*/
+export const browser = (url: string) => {
+
+  n.log(
+    x.Dash(
+      c.lightGray(url)
+    )
+  );
+
+};
+
 /* -------------------------------------------- */
 /* TRANSFORM                                    */
 /* -------------------------------------------- */

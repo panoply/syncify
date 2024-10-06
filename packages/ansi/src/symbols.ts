@@ -133,7 +133,7 @@ export const Tree = {
      */
     edge: `${lightGray.open}├──┬─${lightGray.close} `,
     /**
-     * Tree Indent Line  Fall
+     * Tree Indent Line Fall
      *
      * ```bash
      * ├──┐

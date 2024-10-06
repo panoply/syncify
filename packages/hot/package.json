@@ -2,9 +2,8 @@
   "name": "@syncify/hot",
   "version": "0.2.0",
   "scripts": {
-    "dev": "esbuild ./src/index.ts --bundle --format=iife --banner:js='<script id=\"syncify-hot-injection\">' --footer:js='</script>' --outfile=hot.js.liquid --watch",
-    "build:dist": "esbuild ./src/index.ts --bundle --format=iife --bundle --outfile=index.js --minify",
-    "build": "esbuild ./src/index.ts --bundle --format=iife --banner:js='<script id=\"syncify-hot-injection\">' --footer:js='</script>' --minify --outfile=hot.js.liquid"
+    "dev": "esbuild ./index.ts --bundle --format=iife --outfile=../../hot.min.js --watch",
+    "build": "esbuild ./index.ts --bundle --format=iife --minify --outfile=../../hot.min.js"
   },
   "main": "./index.js",
   "repository": {
@@ -18,12 +17,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "mithril": "^2.2.2",
     "morphdom": "^2.7.4"
   },
   "devDependencies": {
     "@syncify/eslint-config": "workspace:^",
     "@syncify/tsconfig": "workspace:^",
-    "esbuild": "^0.23.1"
+    "esbuild": "^0.24.0"
   }
 }

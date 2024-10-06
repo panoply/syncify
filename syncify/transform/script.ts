@@ -1,7 +1,7 @@
 import type { Syncify, ClientParam, ScriptBundle } from 'types';
 import { writeFile } from 'fs-extra';
 import esbuild, { Metafile } from 'esbuild';
-import { join, relative } from 'node:path';
+import { basename, join, relative } from 'node:path';
 import { isType } from 'rambdax';
 import { File } from 'syncify:file';
 import { timer } from 'syncify:timer';
@@ -224,9 +224,9 @@ export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: C
 
             log.syncing(key, { hot: true });
 
-            $.wss.script(file.uuid, file.base);
+            $.wss.script(file.uuid, basename(key));
 
-            await sync('put', bundle, content);
+            sync('put', bundle, content);
 
           } else if (!$.mode.build) {
 

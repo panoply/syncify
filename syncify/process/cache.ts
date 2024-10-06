@@ -10,7 +10,7 @@ import cbor from 'cbor';
 import writeFileAtomic from 'write-file-atomic';
 import { CACHE_REFS } from 'syncify:const';
 import { JSONTemplatesSchema, SettingsSchema } from 'types/internal';
-import { has } from 'syncify:utils';
+import { has, object } from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { create } from 'syncify:native';
 
@@ -87,8 +87,6 @@ export async function getCache () {
     }
   }
 
-  if (!has('hotSnippet', $.cache.build)) $.cache.build.hotSnippet = [];
-
   if ($.cmd.cache) return clearCache();
 
 }
@@ -99,7 +97,7 @@ export function clearCache (id: keyof Cache.Model = null) {
 
     for (const key of CACHE_REFS) {
       if (!isEmpty($.cache[key])) {
-        $.cache[key] = {};
+        $.cache[key] = object();
         cq.add(save($.cache.uri[key], $.cache[key]));
       }
     }

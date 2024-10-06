@@ -80,7 +80,13 @@ export async function setSync (cli: Commands) {
     const client = authURL(store.domain);
 
     // Set store endpoints
-    const sidx = $.sync.stores.push({ store: store.domain, domain, client, queue }) - 1;
+    const sidx = $.sync.stores.push({
+      store: store.domain,
+      password: store.password,
+      domain,
+      client,
+      queue
+    }) - 1;
 
     // skip if mode is themes
     if ($.mode.themes) continue;

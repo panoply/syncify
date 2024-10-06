@@ -4,6 +4,22 @@ import type { Commands } from 'types/internal';
 export const SHA_256_HASH_LENGTH = 32;
 
 /**
+ * HOT SOCKET TOPICS
+ */
+export const HOT_SOCKET_TOPICS = [
+  'script',
+  'stylesheet',
+  'section',
+  'svg',
+  'assets',
+  'reload',
+  'replace',
+  'connect',
+  'disconnect',
+  'connected'
+];
+
+/**
  * Syncify configuration file types
  */
 export const SYNCIFY_CONFIG = [
@@ -27,6 +43,15 @@ export const CACHE_REFS: Array<Cache.Keys> = [
   'sections',
   'settings',
   'templates'
+];
+
+/**
+ * Syncify `/Users/sissel/.syncify/` Directories
+ *
+ * The value represents a key within `$.dirs` values will be prefixed by a dot.
+ */
+export const HOME_DIRS: Array<string> = [
+  'chrome'
 ];
 
 /**
