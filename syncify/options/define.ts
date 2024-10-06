@@ -3,7 +3,7 @@ import type { Commands } from 'types/internal';
 import { FSWatcher } from 'chokidar';
 import { missingConfig } from 'syncify:log/throws';
 import { configFile, getEnvFile, getPackageJson } from './files';
-import { setImportDirs, setThemeDirs, setCacheDirs } from './dirs';
+import { setImportDirs, setThemeDirs, setCacheDirs, setHomeDirs } from './dirs';
 import { setJsonOptions } from './json';
 import { setSectionOptions } from './sections';
 import { setSync } from './sync';
@@ -24,6 +24,7 @@ import { timer } from 'syncify:timer';
 import { $ } from 'syncify:state';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
+import { LaunchChrome } from 'syncify:hot/launch';
 
 /**
  * Define Configs
@@ -75,6 +76,7 @@ export async function define (cli: Commands, options?: Config) {
 
   await Promise.all(
     [
+      setHomeDirs(),
       setCacheDirs(),
       setThemeDirs(),
       setImportDirs(),
@@ -113,6 +115,11 @@ export async function define (cli: Commands, options?: Config) {
   log.runtime.warnings($);
 
   if (!$.mode.build) log.runtime.time();
+
+  await LaunchChrome().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
 
   return promise;
 

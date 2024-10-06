@@ -90,23 +90,25 @@ export const LaunchChrome = async () => {
         awaitPromise: true,
         expression: /* js */`
             ${PreviewBar()}
-            ${Expression()}
+            ${$.mode.hot ? Expression() : ''}
           `
       });
 
     });
 
-    Page.navigatedWithinDocument(async (params: { url: string }) => {
+    if ($.mode.hot) {
+      Page.navigatedWithinDocument(async (params: { url: string }) => {
 
-      await Runtime.evaluate({
-        returnByValue: true,
-        awaitPromise: true,
-        expression: /* js */`
-          window.syncify.sections.load();
-        `
+        await Runtime.evaluate({
+          returnByValue: true,
+          awaitPromise: true,
+          expression: /* js */`
+            window.syncify.sections.load();
+          `
+        });
+
       });
-
-    });
+    }
 
     process.on('exit', () => chrome.kill());
 

@@ -11,7 +11,6 @@ import { byteSize, stringSize } from 'syncify:sizes';
 import { isFunction, toUpcase, glue } from 'syncify:utils';
 import { AxiosResponse } from 'axios';
 import { onAsset } from 'syncify:plugins/hooks';
-import { hasSnippet, removeRender } from 'syncify:hot/inject';
 import { throwError } from 'syncify:log/throws';
 import { Events } from 'syncify:requests/assets';
 import { timer } from 'syncify:timer';
@@ -318,13 +317,6 @@ export async function upload (cb?: Syncify): Promise<void> {
       const read = await readFile(file.output);
 
       input = read.toString();
-
-      // Remove HOT snippet occurances
-      if (file.namespace === 'layout') {
-        if (hasSnippet(input)) {
-          input = removeRender(input);
-        }
-      }
 
       file.size = byteSize(input);
 
