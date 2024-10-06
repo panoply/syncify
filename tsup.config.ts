@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsup';
 import { join } from 'path';
-import { writeFileSync, readFileSync, copyFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import * as pkg from './package.json';
 
 const cwd = process.cwd();
@@ -21,8 +21,6 @@ function importSchema () {
   writeFileSync(join(syncifySchema, 'sections.json'), sections);
   writeFileSync(join(syncifySchema, 'env.json'), env);
 
-  copyFileSync(join(packages, 'hot', 'hot.js.liquid'), join(cwd, 'hot.js.liquid'));
-
 }
 
 importSchema();
@@ -33,11 +31,13 @@ const noExternal = [
   // Syncify Specific
   '@syncify/ansi',
 
+  // HOT Related
+  'chrome-launcher',
+
+  // Others
   'anymatch',
   'clean-stack',
   'log-update',
-  'mergerino',
-  'minimist',
   'p-map',
   'p-queue',
   'parse-json',
@@ -53,6 +53,9 @@ const external = [
 
   // Syncify Specific
   '@syncify/turndown',
+
+  // HOT Related
+  'chrome-remote-interface',
 
   // Third parties
   'adm-zip',
@@ -71,7 +74,6 @@ const external = [
   'markdown-it',
   'ngrok',
   'node-notifier',
-  'node:path',
   'postcss',
   'scrollable-cli',
   'svg-sprite',
@@ -79,7 +81,6 @@ const external = [
   'uWebSockets.js',
 
   // BUILD DEPS
-  'ava',
   'eslint',
   'prettier',
   'tsconfig-type',
