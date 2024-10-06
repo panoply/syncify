@@ -121,6 +121,9 @@
       /*
       /* DIRECTORIES
       /* -------------------------------------------- */
+      "syncify:browser/*": [
+        "./syncify/browser/*"
+      ],
       "syncify:process/*": [
         "./syncify/process/*"
       ],
