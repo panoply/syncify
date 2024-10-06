@@ -65,7 +65,7 @@ export const Tree = {
    *
    * ```
    */
-  after: `${lightGray.open}│${lightGray.close}`,
+  after: `${lightGray.open}│${lightGray.close}\n`,
   /**
    * Tree Line Wrap
    *
