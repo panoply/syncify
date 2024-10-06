@@ -3,10 +3,30 @@ import { mkdir, emptyDir, pathExists, readdirSync } from 'fs-extra';
 import { join } from 'node:path';
 import { isArray, isString, has } from 'syncify:utils';
 import { basePath } from 'syncify:utils/paths';
-import { THEME_DIRS, BASE_DIRS } from 'syncify:const';
+import { THEME_DIRS, BASE_DIRS, HOME_DIRS } from 'syncify:const';
 import { typeError } from 'syncify:log/throws';
 import { create } from 'syncify:native';
 import { $ } from 'syncify:state';
+
+/**
+ * Create Home Directories
+ *
+ * Generates the `.syncify` directory within `/User/`.
+ * All required directories will be generated here.
+ */
+export async function setHomeDirs () {
+
+  await createDirs($.home);
+
+  for (const dir of HOME_DIRS) {
+
+    $.dirs[dir] = join($.home, `.${dir}`);
+
+    await createDirs($.dirs[dir]);
+
+  }
+
+}
 
 /**
  * Set Cache
@@ -101,49 +121,51 @@ export async function setBaseDirs (cli: Commands) {
 
   const base = basePath($.cwd);
 
-  for (const [ dir, def ] of BASE_DIRS) {
+  for (const [ key, dir ] of BASE_DIRS) {
 
-    if (dir === 'cache') {
+    if (key === 'cache') {
 
-      $.dirs[dir] = join($.cwd, def, '.syncify');
+      $.dirs[key] = join($.cwd, dir, '.syncify'); // node_modules/.syncify/
+      $.dirs.static = join($.dirs[key], 'static'); // node_modules/.syncify/static
+
       $.dirs.sourcemaps = create(null);
-      $.dirs.sourcemaps.root = join($.dirs[dir], 'sourcemaps');
-      $.dirs.sourcemaps.scripts = join($.dirs.sourcemaps.root, 'scripts');
-      $.dirs.sourcemaps.styles = join($.dirs.sourcemaps.root, 'styles');
+      $.dirs.sourcemaps.root = join($.dirs[key], 'sourcemaps'); // node_modules/.syncify/sourcemaps
+      $.dirs.sourcemaps.scripts = join($.dirs.sourcemaps.root, 'scripts'); // node_modules/.syncify/sourcemaps/scripts
+      $.dirs.sourcemaps.styles = join($.dirs.sourcemaps.root, 'styles'); // node_modules/.syncify/sourcemaps/styles
 
       continue;
 
-    } if (dir === 'import') {
+    } if (key === 'import') {
 
-      $.dirs[dir] = base($.mode.import && has('output', cli) ? cli.output : $.config.import);
-
-      continue;
-
-    } else if (dir === 'export') {
-
-      $.dirs[dir] = base($.mode.export && has('output', cli) ? cli.output : $.config.export);
+      $.dirs[key] = base($.mode.import && has('output', cli) ? cli.output : $.config.import);
 
       continue;
 
-    } else if (has(dir, cli) && cli[dir] === def && $.config[dir] === def) {
+    } else if (key === 'export') {
 
-      $.dirs[dir] = base(cli[dir]);
+      $.dirs[key] = base($.mode.export && has('output', cli) ? cli.output : $.config.export);
+
+      continue;
+
+    } else if (has(key, cli) && cli[key] === dir && $.config[key] === dir) {
+
+      $.dirs[key] = base(cli[key]);
 
       continue;
 
     }
 
-    const path = isString(cli[dir]) ? cli[dir] : $.config[dir];
+    const path = isString(cli[key]) ? cli[key] : $.config[key];
 
     if (isString(path)) {
 
-      $.dirs[dir] = base(path);
+      $.dirs[key] = base(path);
 
     } else {
 
       typeError({
         option: 'config',
-        name: dir,
+        name: key,
         provided: path,
         expects: 'string'
       });
