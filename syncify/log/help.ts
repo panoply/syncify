@@ -1,4 +1,4 @@
-import type { Commands } from 'types';
+import type { Commands } from 'types/internal';
 import { COL, ARR, gray, bold, lightGray, whiteBright, clear } from '@syncify/ansi';
 import { log } from 'syncify:native';
 
@@ -23,9 +23,16 @@ export function help (cli: Commands) {
     -h, --help                   ${gray.italic('Print a list of all available commands')}
     -h, --help examples          ${gray.italic('Print a list of command examples')}
 
+    ${DSH}
+
+    ${gray('BY ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ')}
+
+    ${gray.underline('https://github.com/panoply')}
+    ${gray.underline('https://x.com/niksavvidis')}
+
   `;
 
-  if (cli.help === null) {
+  if (cli.help === 'show' || cli.help === null) {
 
     return log(usage);
 
