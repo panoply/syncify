@@ -178,13 +178,18 @@ export async function setPaths () {
 
     if (key !== 'metafields' && key !== 'redirects') {
 
-      (await glob(paths, { cwd: $.cwd })).forEach(p => {
-        $.paths[key].input.add(p);
+      for (const p of paths) {
+
+        const globs = await glob.async(paths, { cwd: $.cwd });
+
         $.watch.add(p);
-      });
 
+        for (let i = 0, s = globs.length; i < s; i++) {
+          $.paths[key].input.add(globs[i]);
+          $.watch.add(globs[i]);
+        }
+      }
     }
-
   }
 
 }
