@@ -1,6 +1,6 @@
 {
   "name": "@syncify/ansi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ANSI Colors, Symbols and TUI related terminal enchancements for Syncify.",
   "type": "module",
   "main": "../dist/index.js",
