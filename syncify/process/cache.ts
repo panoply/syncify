@@ -51,7 +51,7 @@ function save (uri: string, data: any) {
 
     gzip[9] = 0x03;
 
-    return writeFileAtomic(uri, gzip);
+    await writeFileAtomic(uri, gzip);
 
   };
 
@@ -60,8 +60,7 @@ function save (uri: string, data: any) {
 /**
  * Setup Cache
  *
- * Called during the runtime define and is responsible
- * for setting up the cache references.
+ * Called during the runtime define and is responsible for setting up the cache references.
  */
 export async function getCache () {
 
@@ -87,8 +86,9 @@ export async function getCache () {
     }
   }
 
-  if ($.cmd.cache) return clearCache();
-
+  if ($.cmd.cache) {
+    return clearCache();
+  }
 }
 
 export function clearCache (id: keyof Cache.Model = null) {
