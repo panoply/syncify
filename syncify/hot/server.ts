@@ -1,4 +1,4 @@
-import uWS from 'uWebSockets.js';
+import { uWS } from '@syncify/uws';
 import { readFileSync, existsSync, ensureFile, readFile } from 'fs-extra';
 import { join, extname } from 'node:path';
 import { ARR, COL, Tree, bold, gray, redBright, neonCyan, pink } from '@syncify/ansi';
@@ -68,7 +68,7 @@ export async function server () {
 
       if (existsSync(uri) && ensureFile(uri)) {
         response.end(readFileSync(uri));
-      } else if (key.endsWith('hot.min.js')) {
+      } else if (key.endsWith('hot.js')) {
         response.end(hot);
       } else {
         response.endWithoutBody();
