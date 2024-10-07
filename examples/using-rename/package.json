@@ -1,0 +1,22 @@
+{
+  "name": "@syncify/using-paths",
+  "version": "0.1.0",
+  "description": "Syncify example usage with custom paths",
+  "private": true,
+  "license": "MIT",
+  "syncify": {
+    "stores": {
+      "domain": "syncify",
+      "themes": {
+        "dusk": 137200533745
+      }
+    }
+  },
+  "devDependencies": {
+    "@syncify/cli": "workspace:0.0.1-rc.1",
+    "autoprefixer": "^10.4.20",
+    "esbuild": "^0.23.1",
+    "postcss": "^8.4.45",
+    "svgo": "^3.3.2"
+  }
+}
