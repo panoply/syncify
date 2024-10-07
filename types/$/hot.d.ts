@@ -1,14 +1,14 @@
 /* -------------------------------------------- */
 /* LIVE RELOADS                                 */
 /* -------------------------------------------- */
-import type { TemplatedApp } from 'uWebSockets.js';
+import type { uWS } from '@syncify/uws';
 import type { HOT } from '../config/hot';
 
 export interface WSS {
   /**
    * The `wss` instance
    */
-  get http(): TemplatedApp; // Server<typeof WebSocket, typeof IncomingMessage>
+  get http(): uWS.TemplatedApp; // Server<typeof WebSocket, typeof IncomingMessage>
   /**
    * Hot Socket for `<script>` tags,
    *
@@ -61,7 +61,7 @@ export interface HOTBundle extends HOT {
    * The resolved location of the hot injection source
    *
    * @default
-   * 'node_modules/@syncify/cli/hot.min.js'
+   * 'node_modules/@syncify/cli/hot.js'
    */
   source?: string;
   /**
