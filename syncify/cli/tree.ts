@@ -906,7 +906,7 @@ class Message {
    */
   Insert (input: string, color?: Ansis) {
 
-    this.text.push((color ? color(input) : input) + NWL);
+    this.text.push((color ? color(input) : input));
 
     return this;
 
