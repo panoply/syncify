@@ -333,7 +333,7 @@ export interface Commands {
    * $ syncify --help
    * ```
    */
-  help?: boolean;
+  help?: string;
   /**
    * Hides logs from being printed (shows errors though)
    *
