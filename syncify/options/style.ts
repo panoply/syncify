@@ -40,7 +40,7 @@ type SassDartProcess = Processors['sass']
  */
 async function getExternalModules () {
 
-  const postcss = await readConfigFile<PostCSSProcess>('postcss.config', {
+  const postcss = await readConfigFile<PostCSSProcess>(join($.dirs.config, 'postcss.config'), {
     tsconfig: null
   });
 
@@ -63,7 +63,8 @@ async function getExternalModules () {
       ]);
     }
 
-    const tw = await readConfigFile<TailwindConfig>('tailwind.config', {
+
+    const tw = await readConfigFile<TailwindConfig>(join($.dirs.config, 'tailwind.config'), {
       tsconfig: null
     });
 
