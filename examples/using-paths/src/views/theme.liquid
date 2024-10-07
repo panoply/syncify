@@ -13,12 +13,15 @@
       {{ page_title }}
     </title>
 
-
     <style>
       {{ settings.body_font | font_face }}
     </style>
 
-    {{ 'style.css' | asset_url | stylesheet_tag }}
+    {{ 'base.min.css' | asset_url | stylesheet_tag }}
+
+    <script
+      type="module"
+      src="{{ 'bundle.min.js' | asset_url }}"></script>
 
     {{ content_for_header }}
 

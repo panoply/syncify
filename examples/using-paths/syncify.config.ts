@@ -28,7 +28,8 @@ export default defineConfig(
       svg: {
         input: 'src/assets/icons/*.svg',
         snippet: true,
-        rename: 'icon.[file]'
+        rename: 'icon.[file]',
+        format: 'file'
       }
     },
     processors: {

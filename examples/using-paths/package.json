@@ -13,10 +13,10 @@
     }
   },
   "devDependencies": {
-    "@syncify/cli": "workspace:0.0.1-rc.1",
+    "@syncify/cli": "workspace:^",
     "autoprefixer": "^10.4.20",
-    "esbuild": "^0.23.1",
-    "postcss": "^8.4.45",
+    "esbuild": "^0.24.0",
+    "postcss": "^8.4.47",
     "svgo": "^3.3.2"
   }
 }

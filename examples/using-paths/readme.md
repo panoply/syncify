@@ -1,6 +1,8 @@
 # Syncify using Paths
 
-Example usage of custom directory architecture in Syncify. Using the `paths` configuration option, you can create custom structures according to your preference or project requirements.
+Example usage of custom directory architecture in Syncify. Using the `paths` configuration option, you can create custom `input` structures according to your preference or project requirements.
+
+> The [Using Rename](/examples/using-rename/) example extends upon this example to showcase how we can use `paths` to also rename files.
 
 <pre><code><strong>PASSWORD</strong>  →   <code>access</code>
 <strong>PREVIEW</strong>   →   <a href="https://syncify.myshopify.com?preview_theme_id=137588605169">https://syncify.myshopify.com?preview_theme_id=137588605169</a>
@@ -12,15 +14,25 @@ Example usage of custom directory architecture in Syncify. Using the `paths` con
 - Shared Schema File
 - PostCSS Style Transform
 - SVG Inline Icon Snippet
-- TypeScript > JavaScript Transform
+- TypeScript → JavaScript Transform
 - Sub-directories and custom architecture
 
-### Usage
+### Commands
+
+This example assumes you know the command line prompt of Syncify, below are some basics:
+
+```bash
+$ sy -w       # watch
+$ sy -w --hot # watch with hot reloading
+$ sy -b       # build the theme
+```
+
+### Strap
 
 This example intends to showcase build execution. You can optionally use this example as a starting point boilerplate. Open your terminal and run the following command:
 
 ```bash
-$ pnpx @syncify/cli --strap using-paths
+$ pnpm sy --strap using-paths
 ```
 
 ### Overview
