@@ -332,7 +332,8 @@ export const Shopify = (input: string | string[], source: string[]): {
               glue(
                 current,
                 c.white(tokens(errLine)),
-                NWL, Tree.redTrim
+                NWL,
+                Tree.redTrim
               )
             );
 
