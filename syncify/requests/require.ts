@@ -248,7 +248,9 @@ export function injectFileScopePlugin (): Plugin {
 export async function bundleRequire<T = any> (options: BundleRequire): BundleResolve<T> {
 
   if (!REGEX_EXTJS.test(options.filepath)) {
+
     throw new Error(`${options.filepath} is not a valid JS file`);
+
   }
 
   const preserveTemporaryFile = options.preserveTemporaryFile ?? !!process.env.BUNDLE_REQUIRE_PRESERVE;
@@ -312,8 +314,7 @@ export async function bundleRequire<T = any> (options: BundleRequire): BundleRes
     ]
   });
 
-  const extract = await extractResult(ctx);
 
-  return extract;
+  return extractResult(ctx)
 
 }
