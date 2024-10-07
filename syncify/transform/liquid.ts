@@ -1,4 +1,4 @@
-import type { ClientParam, Syncify } from 'types';
+import type { ClientParam, LiquidBundle, Syncify } from 'types';
 import { minify } from 'html-minifier-terser';
 import { relative } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
@@ -12,6 +12,7 @@ import { CreateSection } from 'syncify:schema';
 import { checksum, isBuffer, isFunction, isString, isUndefined, isNil, toUpcase } from 'syncify:utils';
 import { tailwindParse } from 'syncify:style';
 import { $ } from 'syncify:state';
+import { SchemaSectionTag } from 'types/internal';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -228,7 +229,7 @@ const transform = (file: File) => async (data: string) => {
  * Compiles file content and applies minification
  * returning the base64 processed string.
  */
-export async function compile (file: File, sync: ClientParam<File>, cb: Syncify) {
+export async function compile <T = any>(file: File, sync: ClientParam<T>, cb: Syncify) {
 
   if ($.mode.watch) timer.start();
 
@@ -274,6 +275,8 @@ export async function compile (file: File, sync: ClientParam<File>, cb: Syncify)
 
       log.syncing(req[0].key);
 
+      if (sync === null) continue;
+
       await sync('put', req[0], req[1]);
 
     }
@@ -282,7 +285,9 @@ export async function compile (file: File, sync: ClientParam<File>, cb: Syncify)
 
     log.syncing(file.key);
 
-    await sync('put', file, content);
+    if (sync && sync !== null) {
+      await sync('put', file, content);
+    }
 
   }
 
@@ -293,5 +298,7 @@ export async function compile (file: File, sync: ClientParam<File>, cb: Syncify)
       await queue.onIdle().then(() => $.wss.replace());
     }
   }
+
+  return content;
 
 };

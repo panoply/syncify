@@ -111,9 +111,9 @@ export async function jsonCompile (file: File, data: string, space = 0) {
  * cb that one can optionally execute
  * from within scripts.
  */
-export async function compile <T extends JSONBundle> (
-  file: File<T>,
-  sync: ClientParam<T>,
+export async function compile (
+  file: File,
+  sync: ClientParam,
   cb?: Syncify
 ): Promise<string> {
 
@@ -220,27 +220,33 @@ export async function compile <T extends JSONBundle> (
 
     $.cache.checksum[file.input] = u.checksum(content);
 
-    if (file.type !== Type.Style && $.processor.tailwind.map !== null) {
+    if (u.isFunction(sync)) {
 
-      const request = await tailwindParse(file, [ [ file, content ] ]);
+      if (file.type !== Type.Style && $.processor.tailwind.map !== null) {
 
-      for (const req of request) {
+        const request = await tailwindParse(file, [ [ file, content ] ]);
 
-        await sync('put', req[0], req[1]);
+        for (const req of request) {
 
-        log.syncing(req[0].key);
+          await sync('put', req[0], req[1]);
+
+          log.syncing(req[0].key);
+
+        }
+
+      } else {
+
+        log.syncing(file.key);
+
+        await sync('put', file, content);
 
       }
 
-    } else {
-
-      log.syncing(file.key);
-
-      await sync('put', file, content);
+      $.mode.hot && await queue.onIdle().then(() => $.wss.replace());
 
     }
 
-    $.mode.hot && await queue.onIdle().then(() => $.wss.replace());
+    return content;
 
   }
 };

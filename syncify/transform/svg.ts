@@ -294,7 +294,7 @@ export function compileInline (
  * @param request The Shipify request client
  * @param cb The Syncify callback hook for API usage
  */
-export async function compile (file: File<SVGBundle[]>, request?: ClientParam<SVGBundle[]>, cb?: Syncify) {
+export async function compile (file: File<SVGBundle[]>, request?: ClientParam, cb?: Syncify) {
 
   if ($.mode.watch) timer.start();
 

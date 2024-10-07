@@ -217,8 +217,7 @@ export async function tailwindParse (file: File, queue: [File, string][]) {
 /**
  * Tailwind Processor
  *
- * An isolated tailwind transform used in `content[]` triggers
- * from views.
+ * An isolated tailwind transform used in `content[]` triggered from views.
  */
 export async function tailwindProcess (file: File<StyleBundle>) {
 
@@ -346,7 +345,7 @@ export function createSnippet (string: string, attrs: string[]) {
 /**
  * SASS and PostCSS Compiler
  */
-export async function compile <T extends StyleBundle> (file: File<StyleBundle>, sync: ClientParam<T>, cb: Syncify) {
+export async function compile <T extends StyleBundle> (file: File<StyleBundle>, sync: ClientParam, cb: Syncify) {
 
   if ($.mode.watch) timer.start();
   if ($.mode.hot) timer.start(file.uuid);
@@ -355,9 +354,11 @@ export async function compile <T extends StyleBundle> (file: File<StyleBundle>, 
 
   try {
 
-    if (u.isUndefined(file.data) || (
-      u.isBoolean(file.data.sass) &&
-      file.data.sass === false)) return readStyleFile(file);
+    if (u.isUndefined(file.data)) {
+
+      return readStyleFile(file);
+
+    }
 
     const out = await sassProcess(file);
 

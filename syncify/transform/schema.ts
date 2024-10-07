@@ -481,7 +481,7 @@ async function ParseSharedSchema (file: File) {
  * Returns re-generated section files with the applied shared
  * schema injects.
  */
-export async function CreateSection (file: File<SchemaSectionTag>) {
+export async function CreateSection <T extends SchemaSectionTag>(file: File<T>) {
 
   const read = await ExtractSchema(file);
 

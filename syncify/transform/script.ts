@@ -119,7 +119,7 @@ function runHook (hook: Syncify) {
  *
  * Used for Script transformations.
  */
-export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: ClientParam<T>, hooks: Syncify) {
+export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: ClientParam, hooks: Syncify) {
 
   if (!file.data) return;
 

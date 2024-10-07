@@ -71,7 +71,7 @@ function passthrough (file: File, sync: ClientParam<AssetRequest>) {
  * Applies a copy operation for files marked as
  * assets. No transformation will apply.
  */
-export async function compile (file: File, sync: ClientParam<AssetRequest>, cb: Syncify) {
+export async function compile (file: File, sync: ClientParam, cb: Syncify) {
 
   const copy = passthrough(file, sync);
   const data = await readFile(file.input).catch(
