@@ -279,6 +279,20 @@ blockquote > p {
 }
 
 h1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  > code.language-typescript,
+  > code.language-bash {
+    float: right;
+    text-transform: initial;
+    border: none !important;
+    font-size: 1rem !important;
+  }
+}
+
+h1 {
   > code {
     text-transform: initial;
     border: none !important;
