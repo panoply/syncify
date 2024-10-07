@@ -136,7 +136,7 @@ export function setFile (file: File, input: string, output: string) {
     file.kind = kind as Kind;
     file.input = input;
     file.output = output;
-    file.relative = relative($.cwd, input);
+    file.relative = input ? relative($.cwd, input) : $.cwd;
 
     return file;
 
