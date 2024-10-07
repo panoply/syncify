@@ -2,10 +2,12 @@
   "name": "@syncify/uws",
   "version": "0.1.0",
   "description": "Packaged reference of uWebSockets.js for usage within Syncify",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     "import": "./dist/index.js",
+    "require": "./dist/index.js",
     "types": "./dist/index.d.ts"
   },
   "scripts": {
