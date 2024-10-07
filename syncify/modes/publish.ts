@@ -1,5 +1,5 @@
 import type { Syncify } from 'types';
-import uWS from 'uWebSockets.js';
+import { uWS } from '@syncify/uws';
 import { delay } from 'rambdax';
 import { timer } from 'syncify:timer';
 import * as log from 'syncify:log';
