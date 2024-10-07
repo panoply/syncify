@@ -75,6 +75,11 @@ export async function setSvgOptions () {
         bundle.format = 'sprite';
         bundle.sprite = u.isObject(svg.sprite) ? u.merge($.processor.sprite, svg.sprite) : true;
 
+      } else if (bundle.snippet === true) {
+
+        bundle.format = 'file';
+        bundle.svgo = u.isObject(svg.svgo) ? u.merge($.processor.svgo, svg.svgo) : true;
+
       } else {
 
         e.missingOption(
