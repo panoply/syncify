@@ -14,7 +14,7 @@ dump.rdb
 tests/
 packages/**/dist
 straps/dusk-advanced/theme
-
+examples/using-paths/theme
 # DOCS
 #########################################
 
