@@ -3,7 +3,7 @@ import type { Commands } from 'types/internal';
 import { FSWatcher } from 'chokidar';
 import { missingConfig } from 'syncify:log/throws';
 import { configFile, getEnvFile, getPackageJson } from './files';
-import { setImportDirs, setThemeDirs, setCacheDirs, setHomeDirs } from './dirs';
+import { setImportDirs, setThemeDirs, setCacheDirs, setHomeDirs, setBaseDirs } from './dirs';
 import { setJsonOptions } from './json';
 import { setSectionOptions } from './sections';
 import { setSync } from './sync';
@@ -57,6 +57,8 @@ export async function define (cli: Commands, options?: Config) {
 
   if ($.mode.setup || $.mode.strap || $.mode.themes) return;
 
+  await setBaseDirs(cli);
+
   process.env.SYNCIFY_ENV = $.env.dev ? 'dev' : 'prod';
   process.env.SYNCIFY_WATCH = String($.mode.watch);
 
@@ -74,6 +76,7 @@ export async function define (cli: Commands, options?: Config) {
   setPublishConfig();
   setSpawns();
 
+  // MUST RUN AFTER THE ABOVE
   await Promise.all(
     [
       setHomeDirs(),
@@ -114,12 +117,18 @@ export async function define (cli: Commands, options?: Config) {
 
   log.runtime.warnings($);
 
-  if (!$.mode.build) log.runtime.time();
+  if (!$.mode.build) {
+    log.runtime.time();
+  }
 
-  await LaunchChrome().catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
+  if ($.mode.watch && $.mode.hot) {
+
+    await LaunchChrome().catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
+
+  }
 
   return promise;
 
