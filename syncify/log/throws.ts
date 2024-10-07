@@ -336,13 +336,16 @@ export function missingOption ({
     Create({ type: 'error' })
     .Line('MISSING OPTION', bold)
     .NL
-    .Wrap(`Missing ${Encase('CB', cyan(option))} config option. The ${cyan(key)} option must be defined`)
+    .Wrap(
+      `Missing ${Encase('CB', cyan(option), { spaced: true })} config option. The ${cyan(key)} option must be defined`
+    )
     .NL
     .Line(`expected${COL} ${blue(expects.replace(/([|,])/g, gray('$1')))}`)
     .Line(`location${COL} ${gray.underline($.file.base)}`)
     .NL
     .Line('Why?', gray.bold)
     .Wrap(reason, gray)
+    .Newline('line')
     .End($.log.group)
     .BR
     .toString()
