@@ -96,7 +96,17 @@ export const renamed: [ string? ] = [];
  * ├────────────────────────────────────────────────
  * │
  */
-export const hline = (options?: { width?: number, newlines?: boolean }) => {
+export const hline = (options: { width?: number, newlines?: boolean } = {}) => {
+
+  if (u.isEmpty(options)) {
+    options.width = $.terminal.wrap;
+    options.newlines = false;
+  } else {
+    n.assign({
+      width: $.terminal.wrap,
+      newlines: false
+    }, options);
+  }
 
   n.log(
     x.Ruler(
