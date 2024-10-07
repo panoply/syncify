@@ -49,7 +49,7 @@ export async function run (cmd: Commands, config?: Config, callback?: Syncify) {
   /* HELP                                         */
   /* -------------------------------------------- */
 
-  if (cmd.help) return help(cmd);
+  if (cmd.help === 'show') return help(cmd);
 
   /* -------------------------------------------- */
   /* DEFINE OPTIONS                               */
