@@ -328,6 +328,7 @@ export async function upload (cb?: Syncify): Promise<void> {
 
         const update = cb.apply({ ...file }, input);
 
+        // @ts-ignore
         await onAsset(file, input, update, request.assets);
 
       }
@@ -347,14 +348,9 @@ export async function upload (cb?: Syncify): Promise<void> {
 
   clearInterval(interval);
 
-  log.update.clear();
-  log.group('Errors');
-
   /* -------------------------------------------- */
   /* POST PROCESSING                              */
   /* -------------------------------------------- */
-
-  let hasErrors = false;
 
   for (const {
     errors,
@@ -366,17 +362,20 @@ export async function upload (cb?: Syncify): Promise<void> {
 
     if (errors.remote.size > 0) {
 
+      log.update.clear();
+      log.group('Errors');
+
       const name = c.bold(`${theme.target.toUpperCase()} THEME`);
       const failures = c.bold(`${failed}`);
       const uploaded = `${c.bold(`${success}`)} ${c.white('of')} ${c.bold(`${size}`)}`;
 
       log.out(
         Create()
+        .NL
         .Line(`${name}  ${ARR}  ${theme.store}`)
         .NL
         .Line(Prefix('uploaded', uploaded), c.neonGreen)
         .Line(Prefix('failures', failures), c.redBright)
-        .NL
         .toString()
       );
 
@@ -387,13 +386,13 @@ export async function upload (cb?: Syncify): Promise<void> {
         const errno = `${(number < 10 ? '0' : '') + number++}`;
 
         log.nwl();
-        log.write(c.redBright.bold(`ERROR ${errno}`));
+        log.write(c.bold(`ERROR ${errno}`), { type: 'error' });
         error.request(record.file.input, record.error);
 
       }
 
+      log.nwl();
       log.hline();
-      hasErrors = true;
 
     }
 
@@ -401,11 +400,8 @@ export async function upload (cb?: Syncify): Promise<void> {
 
   await delay(500);
 
-  if (!hasErrors) {
-    log.out(Break(c.gray('No errors!')));
-  }
-
-  log.update(Break('Uploaded Completed'));
+  log.update(Break(c.neonGreen.bold('Uploaded Completed')));
+  log.group(false);
 
   process.exit(0);
 
