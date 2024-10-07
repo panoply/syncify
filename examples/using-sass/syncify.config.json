@@ -23,9 +23,7 @@
         "input": "source/assets/styles/bootstrap.scss",
         "rename": "bootstrap.min.[ext]",
         "sass": {
-          "include": [
-            "node_modules/bootstrap"
-          ]
+          "include": ["node_modules/bootstrap"]
         }
       },
       {
