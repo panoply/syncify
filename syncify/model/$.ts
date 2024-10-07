@@ -110,7 +110,7 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public cmd: Commands = null;
+  public cmd: Commands = object();
 
   /**
    * The provided command passed on the CLI.
@@ -279,6 +279,7 @@ export const $ = new class Bundle {
     previewBar: false,
     loadEventJS: '',
     chromeFlags: [
+      '--restore-last-session',
       '--disable-gpu',
       '--no-sandbox',
       '--no-first-run',
