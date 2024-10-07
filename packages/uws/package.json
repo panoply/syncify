@@ -1,6 +1,6 @@
 {
   "name": "@syncify/uws",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Packaged reference of uWebSockets.js for usage within Syncify",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
