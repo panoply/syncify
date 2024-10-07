@@ -3,7 +3,6 @@ import { parseArgs } from 'node:util';
 import { $ } from 'syncify:state';
 import { assign } from 'syncify:utils/native';
 import { has } from 'syncify:utils';
-import { setBaseDirs } from 'syncify:options/dirs';
 import { setModes } from 'syncify:options/modes';
 
 export function cmd (args: string[], options: Omit<Args, 'strap' | 'mode' | 'store'>) {
@@ -16,7 +15,12 @@ export function cmd (args: string[], options: Omit<Args, 'strap' | 'mode' | 'sto
   });
 
   $.argv = args.slice(2).join(WSP).trimStart();
-  $.cmd = assign(values);
+  $.cmd = assign($.cmd, { help: null }, values);
+
+  if (tokens.length === 2) {
+    $.cmd.help = 'show';
+    return $.cmd;
+  }
 
   if (tokens[2].kind === 'positional') {
     for (const token of tokens.slice(2)) {
@@ -37,7 +41,6 @@ export function cmd (args: string[], options: Omit<Args, 'strap' | 'mode' | 'sto
   $.terminal.wrap = Math.round($.terminal.cols - ($.terminal.cols / 3));
 
   setModes($.cmd);
-  setBaseDirs($.cmd);
 
   return $.cmd;
 
