@@ -15,7 +15,7 @@ import { File, Type } from 'syncify:file';
 import { parseFile } from 'syncify:process/files';
 import { toArray } from 'syncify:native';
 import { sizeDiff } from 'syncify:sizes';
-import { isUndefined, has, plural, isEmpty } from 'syncify:utils';
+import { isUndefined, has, plural, isEmpty, isObject } from 'syncify:utils';
 import { timer } from 'syncify:timer';
 import { $ } from 'syncify:state';
 import { saveCache } from 'syncify:process/cache';
@@ -174,8 +174,8 @@ export async function build (cb?: Syncify) {
         cache[file.output] = file.input;
 
         const value = file.ext === '.json'
-          ? await json(file, cb as any)
-          : await transform(file, cb);
+          ? await json(file, null, cb as any)
+          : await transform(file, null, cb);
 
         if (value === null || isNaN(file.size)) {
 
@@ -199,7 +199,7 @@ export async function build (cb?: Syncify) {
           output: file.key,
           error: null,
           time: timer.stop(file.uuid),
-          size: sizeDiff(value, file.size)
+          size: sizeDiff(isObject<any>(value) && has('css', value) ? value.css : value, file.size)
         };
 
       } catch (e) {
@@ -207,6 +207,8 @@ export async function build (cb?: Syncify) {
         report.stats.errors += 1;
 
         errors.Line(e.message);
+
+        console.log(e);
 
         return {
           name: file.base,
@@ -252,6 +254,7 @@ export async function build (cb?: Syncify) {
   await bundle('assets', assets);
   await bundle('styles', styles);
   await bundle('scripts', script);
+
   await saveCache();
 
   if ($.mode.export === false && $.mode.publish === false) {
