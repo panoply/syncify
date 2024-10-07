@@ -15,25 +15,21 @@ const Expression = () => /* js */`
 
       const inject = document.getElementById('syncify-hot-injection');
 
-      if (inject) {
-        console.log('Script already injected.');
-        return resolve();
-      }
+      if (inject) return resolve();
 
       const script = document.createElement('script');
-      script.setAttribute('spx-eval', 'false');
       script.setAttribute('id', 'syncify-hot-injection');
-      script.setAttribute('src', 'http://localhost:${$.hot.server}/hot.min.js');
+      script.setAttribute('spx-eval', 'false');
+      script.setAttribute('src', 'http://localhost:${$.hot.server}/hot.js');
 
       script.onload = () => {
 
-        // console.log('Script loaded successfully.');
-
         window.syncify.connect({
+          label: ${$.hot.label === 'visible' ? 'true' : 'false'},
           server: ${$.hot.server},
           socket: ${$.hot.socket},
           strategy: "${$.hot.strategy}",
-          method: "${$.hot.method}"
+          mode: "${$.hot.method}"
         });
 
         resolve();
@@ -46,11 +42,9 @@ const Expression = () => /* js */`
       };
 
       document.head.appendChild(script);
-      // console.log('Script appended to the document.');
 
     } catch (err) {
 
-      // console.error('Error during script injection:', err);
       reject(err);
 
     }
