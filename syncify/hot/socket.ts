@@ -1,5 +1,5 @@
 import type { WSS } from 'types';
-import uWS from 'uWebSockets.js';
+import { uWS } from '@syncify/uws';
 import { HOT_SOCKET_TOPICS } from 'syncify:const';
 import { kill } from 'syncify:cli/exit';
 import { ARR, gray, neonCyan, pink } from '@syncify/ansi';
