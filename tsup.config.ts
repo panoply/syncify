@@ -53,6 +53,7 @@ const external = [
 
   // Syncify Specific
   '@syncify/turndown',
+  '@syncify/uws',
 
   // HOT Related
   'chrome-remote-interface',
@@ -78,7 +79,7 @@ const external = [
   'scrollable-cli',
   'svg-sprite',
   'svgo',
-  'uWebSockets.js',
+  // 'uWebSockets.js',
 
   // BUILD DEPS
   'eslint',
