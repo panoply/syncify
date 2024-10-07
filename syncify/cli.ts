@@ -39,9 +39,8 @@ run(
       short: 'f'
     },
     help: {
-      type: 'boolean',
+      type: 'string',
       short: 'h',
-      default: false
     },
 
     /* VERSION CONTROL ---------------------------- */
