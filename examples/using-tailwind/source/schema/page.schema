@@ -4,7 +4,7 @@
       "type": "text",
       "label": "Title",
       "id": "title",
-      "default": "Syncify",
+      "default": "Tailwind Example",
       "info": "An example section schema setting"
     },
     {

@@ -3,11 +3,6 @@
   "version": "0.1.0",
   "description": "Syncify example usage with Tailwind",
   "private": true,
-  "scripts": {
-    "dev": "sy -w",
-    "build": "sy -b",
-    "publish": ""
-  },
   "license": "MIT",
   "stylelint": {
     "extends": "@syncify/stylelint-config"
@@ -21,9 +16,9 @@
     }
   },
   "devDependencies": {
-    "@syncify/cli": "workspace:0.0.1-rc.1",
+    "@syncify/cli": "workspace:^",
     "@syncify/stylelint-config": "workspace:^",
     "autoprefixer": "^10.4.20",
-    "tailwindcss": "^3.4.10"
+    "tailwindcss": "^3.4.13"
   }
 }

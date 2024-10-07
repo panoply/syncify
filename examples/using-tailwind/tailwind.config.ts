@@ -18,7 +18,7 @@ export default <Config>{
         vw: '100vw'
       },
       height: {
-        vh: '95vh'
+        vh: '50vh'
       },
       colors: {
         accent: 'hsla(var(--color-accent) / <alpha-value>)',

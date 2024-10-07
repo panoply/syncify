@@ -1,8 +1,8 @@
 # Syncify using Tailwind
 
-Example usage for Tailwind with Syncify. There are few different ways you can leverage Tailwind in style transforms, this example uses a `tailwind.config.ts` (TypeScript) file. You may optionally choose to use a `.js`, `.cjs` or `.mjs` file.
+Example usage of Tailwind with Syncify. There are few different ways you can leverage Tailwind in style transforms, this example uses a `tailwind.config.ts` (TypeScript) file. You may optionally choose to use a `.js`, `.cjs` or `.mjs` file.
 
-> **Note**
+> NOTE!
 > The file extension used does not matter because Syncify will process all configuration files the same way.
 
 <pre><code><strong>PASSWORD</strong>  →   <code>access</code>
@@ -11,6 +11,7 @@ Example usage for Tailwind with Syncify. There are few different ways you can le
 
 ### Showcasing
 
+- Default Directory Structure
 - Preset VSCode Workspace
 - Shared Schema File
 - Tailwind Style Transform

@@ -4,7 +4,7 @@ export default defineConfig(
   {
     transform: {
       style: {
-        'assets/stylesheet.css': {
+        'assets/[name].min': {
           input: 'assets/style/base.css',
           tailwind: true
         }
