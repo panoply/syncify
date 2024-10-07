@@ -1,11 +1,13 @@
 {
   "name": "@syncify/hot",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
-    "dev": "esbuild ./index.ts --bundle --format=iife --outfile=../../hot.min.js --watch",
-    "build": "esbuild ./index.ts --bundle --format=iife --minify --outfile=../../hot.min.js"
+    "dev": "esbuild ./src/index.ts --bundle --format=iife --outfile=../../hot.js --watch",
+    "build": "pnpm run build:out && pnpm run build:hot",
+    "build:out": "esbuild ./src/index.ts --bundle --format=iife --minify --outfile=../../hot.js",
+    "build:hot": "esbuild ./src/index.ts --bundle --format=iife --minify --outfile=hot.js"
   },
-  "main": "./index.js",
+  "main": "./hot.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/panoply/syncify.git"
@@ -16,12 +18,10 @@
     "email": "n.savvidis@gmx.com"
   },
   "license": "MIT",
-  "dependencies": {
-    "morphdom": "^2.7.4"
-  },
   "devDependencies": {
     "@syncify/eslint-config": "workspace:^",
     "@syncify/tsconfig": "workspace:^",
-    "esbuild": "^0.24.0"
+    "esbuild": "^0.24.0",
+    "morphdom": "^2.7.4"
   }
 }

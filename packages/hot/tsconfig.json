@@ -4,6 +4,6 @@
     "enable": true
   },
   "include": [
-    "*"
+    "src/*"
   ]
 }

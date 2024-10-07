@@ -1,24 +1,7 @@
 import morph from 'morphdom';
 import { LiteralUnion } from 'type-fest';
-
-interface Options {
-  /**
-   * The Server URL
-   */
-  server?: number;
-  /**
-   * The Websocket url
-   */
-  socket?: number;
-  /**
-   * The reload strategy
-   */
-  strategy?: LiteralUnion<'hydrate' | 'replace', string>;
-  /**
-   * The reload method
-   */
-  method?: LiteralUnion<'hot' |'refresh', string>
-}
+import { PatchWebComponents } from './patch';
+import { Options } from './options';
 
 declare global {
 
@@ -105,7 +88,7 @@ declare global {
        */
       assets?: () => void;
       /**
-       * Change the vnode style
+       * Change the label style
        */
       style?: {
         /**
@@ -121,41 +104,25 @@ declare global {
   }
 }
 
-(function Syncify (options: Options) {
+(function syncify (options: Options) {
 
   if (!document) return;
   if (!window.syncify) window.syncify = Object.create(null);
 
   const parser = new DOMParser();
   const WebC = new Map();
+  const errors = [];
 
   let isReady: boolean = false;
   let isConnected: boolean = false;
   let socket: WebSocket;
+  let showLabel: boolean = options.label;
+  let mode: LiteralUnion<'hot' | 'live' | 'refresh', string> = options.mode;
   let strategy: LiteralUnion<'hydrate' | 'replace', string> = options.strategy;
-  let method: LiteralUnion<'hot' |'refresh', string> = options.method;
   let serverUrl: string = `http://localhost:${options.server}/`;
   let socketUrl: string = `ws://localhost:${options.socket}/ws`;
 
   Object.defineProperties(window.syncify, {
-    isReady: {
-      get () {
-        return isReady;
-      }
-    },
-    isConnected: {
-      get () {
-        return isConnected;
-      }
-    },
-    errors: {
-      value: []
-    },
-    WebC: {
-      get () {
-        return WebC;
-      }
-    },
     options: {
       get () {
         return options;
@@ -170,8 +137,10 @@ declare global {
             socketUrl = `ws://localhost:${options.socket}/ws`;
           } else if (p === 'strategy') {
             strategy = options[p];
-          } else if (p === 'method') {
-            method = options[p];
+          } else if (p === 'label') {
+            showLabel = options[p];
+          } else if (p === 'mode') {
+            mode = options[p];
           }
         }
       }
@@ -179,26 +148,26 @@ declare global {
   });
 
   /* -------------------------------------------- */
-  /* VIRTUAL NODE                                 */
-  /* -------------------------------------------- */
-
-  // const zap = m.trust('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>');
-
-  // const setting = m.trust('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>');
-
-  // const refresh = m.trust('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-cw"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>');
-
-  // const logo = '<svg fill="currentColor" width="12px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92 92"><path d="M45.6607 0h45.62v26.07h-45.62c-5.1825.0079-10.1505 2.0703-13.8151 5.7349-3.6647 3.6646-5.7269 8.6326-5.7349 13.8152-.0768 4.8168 1.7153 9.4761 5 13H1.76071c-1.191519-4.2298-1.7839619-8.6057-1.76001194-13 0-5.9896 1.17974194-11.9206 3.47186194-17.4543 2.29212-5.5336 5.65171-10.5616 9.88704-14.7969 4.2353-4.23528 9.2633-7.59491 14.7969-9.88703C33.6902 1.18976 39.6211.0100098 45.6107.0100098L45.6607 0Zm0 91.23H.050716V65.17H45.6607c5.1826-.0079 10.1506-2.0702 13.8152-5.7348s5.7269-8.6326 5.7348-13.8151c.0769-4.8169-1.7152-9.4762-5-13h29.32c1.1916 4.2297 1.784 8.6057 1.7601 13 .0013 5.9912-1.1779 11.924-3.47 17.4595-2.2922 5.5355-5.6525 10.5651-9.8889 14.8016-4.2365 4.2364-9.2661 7.5967-14.8016 9.8889-5.5355 2.2921-11.4683 3.4713-17.4596 3.47l-.01-.0101Z" fill="#4DBB73"/></svg>';
-
-  /* -------------------------------------------- */
   /* CONSTANTS                                    */
   /* -------------------------------------------- */
 
   const morphs = {
     onBeforeElUpdated: function (fromEl: Element, toEl: Element) {
+
       if (fromEl.id === 'syncify-hot-label') return false;
-      if (fromEl.tagName === 'SCRIPT' && fromEl.hasAttribute('src')) return false;
+
+      if (
+        fromEl.tagName === 'SCRIPT' &&
+        fromEl.hasAttribute('src') &&
+        fromEl.getAttribute('src').startsWith(serverUrl)) return false;
+
+      if (
+        fromEl.tagName === 'LINK' &&
+        fromEl.hasAttribute('href') &&
+        fromEl.getAttribute('href').startsWith(serverUrl)) return false;
+
       if (fromEl.isEqualNode(toEl)) return false;
+
       return true;
     }
   };
@@ -206,88 +175,6 @@ declare global {
   /* -------------------------------------------- */
   /* WEB COMPONENTS                               */
   /* -------------------------------------------- */
-
-  function PatchWebComponents () {
-
-    const methods = {
-      customElementDefine: customElements.define,
-      customElementsGet: customElements.get,
-      querySelector: Document.prototype.querySelector,
-      querySelectorAll: Document.prototype.querySelectorAll,
-      getElementsByTagName: Document.prototype.getElementsByTagName,
-      matches: Element.prototype.matches,
-      closest: Element.prototype.closest
-    };
-
-    const uuid = (length = 10, current?: string) => {
-      current = current || '';
-      return length
-        ? uuid(--length, 'abcdefghiklmnopqrstuvwxyz'.charAt(Math.floor(Math.random() * 60)) + current)
-        : current;
-    };
-
-    function replaceSelector (selector: string) {
-      return WebC.has(selector) ? WebC.get(selector) : selector;
-    }
-
-    // Patch querySelector
-    Document.prototype.querySelector = function (selector: string) {
-      return methods.querySelector.call(this, replaceSelector(selector));
-    };
-
-    // Patch querySelectorAll
-    Document.prototype.querySelectorAll = function (selector: string) {
-      return methods.querySelectorAll.call(this, replaceSelector(selector));
-    };
-
-    // Patch querySelectorAll
-    Document.prototype.getElementsByName = function (selector: string) {
-      return methods.getElementsByTagName.call(this, replaceSelector(selector));
-    };
-
-    // Patch matches
-    Element.prototype.matches = function (selector: string) {
-      return methods.matches.call(this, replaceSelector(selector));
-    };
-
-    // Patch matches
-    Element.prototype.closest = function (selector: string) {
-      return methods.closest.call(this, replaceSelector(selector));
-    };
-
-    customElements.get = function (name: string): CustomElementConstructor {
-      return methods.customElementsGet.call(customElements, replaceSelector(name));
-    };
-
-    customElements.define = function (name: string, constructor: CustomElementConstructor, options?: any) {
-
-      if (WebC.has(name)) {
-
-        const newName = `${name}-${uuid()}`;
-        const oldName = WebC.get(name);
-
-        methods.customElementDefine.call(customElements, newName, constructor, options);
-
-        document.body.querySelectorAll(oldName).forEach(oldElement => {
-          console.info(`Syncify: Web Component '${name}' was refined to ${newName} (refresh to reset)`);
-          const newElement = document.createElement(newName);
-          newElement.innerHTML = oldElement.innerHTML;
-          oldElement.replaceWith(newElement);
-        });
-
-        WebC.set(name, newName);
-
-      } else {
-
-        console.info(`Syncify: Web component '${name}' will be monkey patched during HOT Mode.`);
-
-        methods.customElementDefine.call(customElements, name, constructor, options);
-        WebC.set(name, name);
-
-      }
-    };
-
-  };
 
   /* -------------------------------------------- */
   /* UTILITIES                                    */
@@ -308,7 +195,6 @@ declare global {
      */
     const mount = (dom: HTMLElement) => {
 
-      if (method === 'refresh') return;
       if (node instanceof Element && dom.contains(node)) return;
 
       const parent = document.createElement('div');
@@ -323,7 +209,7 @@ declare global {
         bottom: '0',
         right: '0',
         margin: '0 auto',
-        display: 'flex',
+        display: showLabel ? 'flex' : 'none',
         color: '#fff',
         zIndex: '2147483647',
         fontFamily: 'system-ui',
@@ -362,7 +248,6 @@ declare global {
      * Unmount and remove label
      */
     const unmount = (dom: HTMLElement) => {
-      if (method === 'refresh') return;
       dom.removeChild(node);
       node = undefined;
     };
@@ -371,7 +256,6 @@ declare global {
      * Label Event
      */
     const event = (value?: string) => {
-      if (method === 'refresh') return;
       if (value !== undefined) {
         node.innerText = value;
       }
@@ -520,21 +404,6 @@ declare global {
   /* SECTIONS                                     */
   /* -------------------------------------------- */
 
-  const onloads = (function () {
-
-    let href: string = '';
-
-    const observer = new MutationObserver(function () {
-      if (location.href !== href) {
-        href = location.href;
-        setTimeout(() => sections.load(), 250);
-      }
-    });
-
-    return observer;
-
-  })();
-
   /**
    * Assert new value hash so scripts reload
    */
@@ -563,15 +432,15 @@ declare global {
    */
   function stylesheets (dom: Document, uri?: string) {
 
-    dom.querySelectorAll('link[rel=stylesheet]').forEach((node) => {
+    const elements = dom.querySelectorAll<HTMLLinkElement>('link[rel=stylesheet]');
 
+    for (let i = 0, s = elements.length; i < s; i++) {
+
+      const node = elements[i];
       const href = node.getAttribute('href');
+      if (assetMatch(href, uri)) node.setAttribute('href', serverUrl + params(href));
 
-      if (assetMatch(href, uri)) {
-        node.setAttribute('href', options.server + params(href));
-      }
-
-    });
+    }
 
     return dom;
 
@@ -591,34 +460,36 @@ declare global {
       const node = elements[i];
       const src = node.getAttribute('src');
 
-      if (!assetMatch(src, uri)) continue;
+      if (assetMatch(src, uri)) {
 
-      const promise = new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
 
-        const script = document.createElement('script');
-        script.setAttribute('src', serverUrl + params(src));
-        const attrs = Array.from(node.attributes);
+          const script = document.createElement('script');
+          script.setAttribute('src', serverUrl + params(src));
+          const attrs = Array.from(node.attributes);
 
-        for (const attr of attrs) {
-          if (attr.nodeName !== 'src') {
-            script.setAttribute(attr.nodeName, attr.nodeValue);
+          for (const attr of attrs) {
+            if (attr.nodeName !== 'src') {
+              script.setAttribute(attr.nodeName, attr.nodeValue);
+            }
           }
-        }
 
-        script.onload = () => {
-          resolve(src);
-        };
+          script.onload = () => {
+            resolve(src);
+          };
 
-        script.onerror = (e) => {
-          console.error('Syncify: Failed to HOT Reload script:', e);
-          reject(new Error('HOT Script Error'));
-        };
+          script.onerror = (e) => {
+            console.error('Syncify: Failed to HOT Reload script:', e);
+            reject(new Error('HOT Script Error'));
+          };
 
-        node.replaceWith(script);
+          node.replaceWith(script);
 
-      });
+        });
 
-      promises.push(promise);
+        promises.push(promise);
+
+      }
 
     };
 
@@ -631,9 +502,8 @@ declare global {
   function assets (dom: Document) {
 
     stylesheets(dom);
-    scripts(dom);
 
-    return dom;
+    return Promise.allSettled(scripts(dom));
 
   };
 
@@ -664,18 +534,20 @@ declare global {
     ws(socket);
   }
 
-  const HOTBody = () => req(location.href, 'document').then((doc: Document) => {
+  const HOTBody = () => req(location.href, 'document').then((newDom: Document) => {
 
-    const newDom = assets(doc);
+    assets(newDom).then(() => {
 
-    if (strategy === 'hydrate') {
-      morph(document.body, newDom.body, morphs);
-    } else {
-      document.body.replaceWith(newDom.body);
-    }
+      if (strategy === 'hydrate') {
+        morph(document.body, newDom.body, morphs);
+      } else {
+        document.body.replaceWith(newDom.body);
+      }
 
-    sections.load(document.body);
-    label.mount(document.body);
+      sections.load(document.body);
+      label.mount(document.body);
+
+    });
 
   });
 
@@ -689,7 +561,6 @@ declare global {
     socket.addEventListener('close', () => {
       socket = null;
       isConnected = false;
-      onloads.disconnect();
       label.event('DISCONNECTED');
       setTimeout(websocket, 5000);
     });
@@ -697,7 +568,7 @@ declare global {
     socket.addEventListener('open', () => {
       if (!isConnected) {
         isConnected = true;
-        label.event('HOT');
+        label.event(mode === 'hot' ? 'HOT' : 'LIVE');
       }
     });
 
@@ -712,6 +583,8 @@ declare global {
       string
     >
 
+    const PREFIX = mode === 'hot' ? 'HOT ' : 'LIVE ';
+
     socket.addEventListener('message', function ({ data }: { data: Data }) {
 
       if (data === 'connected') {
@@ -720,7 +593,6 @@ declare global {
 
           timer.start();
           label.event('Reconnecting');
-          onloads.observe(null);
 
           return HOTBody().then(() => {
             label.event(`Reconnected in ${timer.stop()}`);
@@ -742,7 +614,7 @@ declare global {
       } else if (data === 'replace') {
 
         timer.start();
-        label.event('HOT RELOAD');
+        label.event(`${PREFIX} RELOAD`);
 
         if (!isNaN(timeout)) clearTimeout(timeout);
 
@@ -754,6 +626,17 @@ declare global {
       } else {
 
         timer.start();
+
+        if (mode === 'live') {
+
+          return req(location.href, 'document').then((newDom: Document) => {
+            document.body.replaceWith(newDom.body);
+            label.mount(document.body);
+            label.event(`Reloaded in ${timer.stop()}`);
+            timeout = NaN;
+          });
+
+        }
 
         const [ type, id, uuid ] = data.split(',');
 
@@ -768,8 +651,8 @@ declare global {
 
           const uri = `${location.pathname}?sections=${id}`;
           nodes.length > 1
-            ? label.event(`${nodes.length} HOT SECTIONS`)
-            : label.event('HOT SECTION');
+            ? label.event(`${nodes.length} ${PREFIX}SECTIONS`)
+            : label.event(`${PREFIX}SECTION`);
 
           return req(uri, 'json').then((value: Record<string, string>) => {
 
@@ -793,7 +676,7 @@ declare global {
 
           }).catch(e => {
 
-            window.syncify.errors.push({
+            errors.push({
               title: 'XHR Error fetching section',
               description: `Section with id: ${id} failed to return a response from Shopify`,
               group: 'sections'
@@ -805,7 +688,7 @@ declare global {
 
         } else if (type === 'script') {
 
-          label.event(`HOT JavaScript: ${id}`);
+          label.event(`${PREFIX}JavaScript: ${id}`);
 
           Promise.allSettled(scripts(document, id)).then(() => {
             socket.send(uuid);
@@ -814,7 +697,7 @@ declare global {
 
         } else if (type === 'stylesheet') {
 
-          label.event(`HOT Stylesheet: ${id}`);
+          label.event(`${PREFIX}Stylesheet: ${id}`);
 
           stylesheets(document, id);
 
@@ -875,32 +758,77 @@ declare global {
   /* EXPOSED METHODS                              */
   /* -------------------------------------------- */
 
-  window.syncify.connect = connect;
-  window.syncify.disconnect = disconnect;
-  window.syncify.sections = sections;
-  window.syncify.assets = () => assets(document);
-  window.syncify.refresh = () => top.location.reload();
-  window.syncify.reload = () => req(location.href, 'text').then((doc: string) => {
+  Object.defineProperties(window.syncify, {
+    isReady: {
+      get () {
+        return isReady;
+      }
+    },
+    isConnected: {
+      get () {
+        return isConnected;
+      }
+    },
+    errors: {
+      get () {
+        return errors;
+      }
+    },
+    WebC: {
+      get () {
+        return WebC;
+      }
+    },
+    connect: {
+      value: connect
+    },
+    disconnect: {
+      value: disconnect
+    },
+    sections: {
+      value: sections
+    },
+    assets: {
+      value () {
+        return assets(document);
+      }
+    },
+    refresh: {
+      value () {
+        return top.location.reload();
+      }
+    },
+    reload: {
+      value (callback?: (dom: Document) => void) {
+        req(location.href, 'document').then((newDom: Document) => {
 
-    const { body } = document;
-    const dom = parser.parseFromString(doc, 'text/html');
+          if (strategy === 'hydrate') {
 
-    if (strategy === 'hydrate') {
-      morph(body, assets(dom).body, morphs);
-    } else {
-      body.replaceWith(dom.body);
+            assets(newDom).then(() => {
+              morph(document.body, newDom.body, morphs);
+              if (typeof callback === 'function') callback(document);
+            });
+
+          } else {
+            document.body.replaceWith(newDom.body);
+            if (typeof callback === 'function') callback(document);
+          }
+
+        });
+      }
     }
   });
 
   document.addEventListener('readystatechange', () => {
     if (document.readyState === 'interactive') {
-      PatchWebComponents();
+      PatchWebComponents(WebC);
     }
   });
 
 })({
+  label: true,
   server: 3000,
   socket: 8089,
   strategy: 'hydrate',
-  method: 'hot'
+  mode: 'hot'
 });
