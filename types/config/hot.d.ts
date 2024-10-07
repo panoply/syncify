@@ -61,11 +61,15 @@ export interface HOT {
    */
   chromeFlags?: string[];
   /**
-   * Which live reload method should Syncify use?
+   * Which reload method should Syncify use?
    *
    * > `hot`
    * >
    * > Hot reloads assets and views with automatic refresh upon changes
+   *
+   * > `live`
+   * >
+   * > Live reloading will replace the document `<body>` for every change
    *
    * > `refresh`
    * >
@@ -73,7 +77,7 @@ export interface HOT {
    *
    * @default 'hot'
    */
-  method?: 'hot' | 'refresh';
+  method?: 'hot' | 'live' | 'refresh';
   /**
    * The HOT strategy to use. Syncify supports 2 different replacement strategies
    * and you will need choose which one to use depending on your project type.
