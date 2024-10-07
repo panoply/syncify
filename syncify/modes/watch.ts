@@ -110,6 +110,7 @@ export function watch (callback: Syncify) {
 
         case Type.Metafield:
 
+          // @ts-expect-error
           return json(file, request.metafields, callback);
 
       }
