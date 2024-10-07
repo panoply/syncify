@@ -149,251 +149,6 @@
       ]
     },
     {
-      "title": "CLI",
-      "submenu": [
-        {
-          "title": "Commands",
-          "links": [
-            {
-              "title": "--input",
-              "url": "/configuration/input/"
-            },
-            {
-              "title": "--output",
-              "url": "/configuration/output/"
-            },
-            {
-              "title": "--import",
-              "url": "/configuration/output/"
-            },
-            {
-              "title": "--export",
-              "url": "/configuration/output/"
-            },
-            {
-              "title": "--config",
-              "url": "/configuration/output/"
-            }
-          ]
-        },
-        {
-          "title": "Paths",
-          "links": [
-            {
-              "title": "Redirects",
-              "url": "/options/pages/redirects/"
-            },
-            {
-              "title": "Assets",
-              "url": "/options/pages/assets/"
-            },
-            {
-              "title": "Files",
-              "url": "/options/pages/files/"
-            },
-            {
-              "title": "Config",
-              "url": "/options/pages/config/"
-            },
-            {
-              "title": "Locales",
-              "url": "/options/pages/locales/"
-            },
-            {
-              "title": "Layout",
-              "url": "/options/pages/layout/"
-            },
-            {
-              "title": "Sections",
-              "url": "/options/pages/sections/"
-            },
-            {
-              "title": "Snippets",
-              "url": "/options/pages/snippets/"
-            },
-            {
-              "title": "Metafields",
-              "url": "/options/pages/metafields/"
-            },
-            {
-              "title": "Metaobject",
-              "url": "/options/pages/metaobject/"
-            },
-            {
-              "title": "Customers",
-              "url": "/options/pages/customers/"
-            },
-            {
-              "title": "Pages",
-              "url": "/options/pages/pages/"
-            },
-            {
-              "title": "Templates",
-              "url": "/options/pages/templates/"
-            }
-          ]
-        },
-        {
-          "title": "HOT",
-          "links": [
-            {
-              "title": "label",
-              "url": "/options/hot/label"
-            },
-            {
-              "title": "history",
-              "url": "/options/hot/history"
-            },
-            {
-              "title": "method",
-              "url": "/options/hot/method"
-            },
-            {
-              "title": "inject",
-              "url": "/options/hot/inject"
-            },
-            {
-              "title": "strategy",
-              "url": "/options/hot/strategy"
-            },
-            {
-              "title": "scroll",
-              "url": "/options/hot/scroll"
-            },
-            {
-              "title": "server",
-              "url": "/options/hot/server"
-            },
-            {
-              "title": "socket",
-              "url": "/options/hot/socket"
-            },
-            {
-              "title": "layouts",
-              "url": "/options/hot/layouts"
-            }
-          ]
-        },
-        {
-          "title": "Publish",
-          "links": [
-            {
-              "title": "tunnelPort",
-              "url": "/options/publish/tunnelPort/"
-            },
-            {
-              "title": "publishRole",
-              "url": "/options/publish/publishRole/"
-            },
-            {
-              "title": "bindVersion",
-              "url": "/options/publish/bindVersion/"
-            },
-            {
-              "title": "themeLimit",
-              "url": "/options/publish/themeLimit/"
-            }
-          ]
-        },
-        {
-          "title": "Transform",
-          "links": [
-            {
-              "title": "script",
-              "url": "/options/transform/script/"
-            },
-            {
-              "title": "style",
-              "url": "/options/transform/style/"
-            },
-            {
-              "title": "svg",
-              "url": "/options/transform/svg/"
-            },
-            {
-              "title": "image",
-              "url": "/options/transform/image/"
-            },
-            {
-              "title": "json",
-              "url": "/options/transform/json/"
-            },
-            {
-              "title": "liquid",
-              "url": "/options/transform/liquid/"
-            }
-          ]
-        },
-        {
-          "title": "Processors",
-          "links": [
-            {
-              "title": "esbuild",
-              "url": "/options/processors/esbuild/"
-            },
-            {
-              "title": "sass",
-              "url": "/options/processors/sass/"
-            },
-            {
-              "title": "postcss",
-              "url": "/options/processors/postcss/"
-            },
-            {
-              "title": "tailwind",
-              "url": "/options/processors/tailwind/"
-            },
-            {
-              "title": "svgo",
-              "url": "/options/processors/svgo/"
-            },
-            {
-              "title": "sprite",
-              "url": "/options/processors/sprite/"
-            },
-            {
-              "title": "sharp",
-              "url": "/options/processors/sharp/"
-            }
-          ]
-        },
-        {
-          "title": "Log",
-          "links": [
-            {
-              "title": "clear",
-              "url": "/options/log/clear/"
-            },
-            {
-              "title": "silent",
-              "url": "/options/log/silent/"
-            },
-            {
-              "title": "stats",
-              "url": "/options/log/stats/"
-            },
-            {
-              "title": "warnings",
-              "url": "/options/log/warnings/"
-            }
-          ]
-        },
-        {
-          "title": "Spawn",
-          "links": [
-            {
-              "title": "build",
-              "url": "/options/spawn/build/"
-            },
-            {
-              "title": "watch",
-              "url": "/options/spawn/watch/"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "title": "Options",
       "links": [
         {
@@ -406,15 +161,15 @@
         },
         {
           "title": "Import",
-          "url": "/options/output/"
+          "url": "/options/import/"
         },
         {
           "title": "Export",
-          "url": "/options/output/"
+          "url": "/options/export/"
         },
         {
           "title": "Config",
-          "url": "/options/output/"
+          "url": "/options/config/"
         },
         {
           "title": "Paths",
@@ -422,7 +177,7 @@
         },
         {
           "title": "Hot",
-          "url": "/options/paths/"
+          "url": "/options/hot/"
         },
         {
           "title": "Publish",
