@@ -17,7 +17,7 @@ export async function setHotReloads () {
   if ($.mode.watch !== true) return;
   if ($.mode.hot === false && $.config.hot === false) return;
 
-  $.hot.source = join($.cwd, 'node_modules', '@syncify/cli', 'hot.min.js');
+  $.hot.source = join($.cwd, 'node_modules', '@syncify/cli', 'hot.js');
 
   const warn = warnOption('HOT Reloads');
 
@@ -80,29 +80,15 @@ export async function setHotReloads () {
 
       } else if (prop === 'method') {
 
-        if ($.config.hot[prop] === 'hot' || $.config.hot[prop] === 'refresh') {
+        if ($.config.hot[prop] === 'hot' || $.config.hot[prop] === 'live' || $.config.hot[prop] === 'refresh') {
           $.hot[prop] = $.config.hot[prop];
         } else {
           invalidError({
             option: 'hot',
             name: prop,
             value: $.config.hot[prop],
-            expects: 'hot | refresh'
+            expects: 'hot | live | refresh'
           });
-        }
-
-      } else if (prop === 'scroll') {
-
-        if ($.config.hot[prop] === 'preserved' || $.config.hot[prop] === 'top') {
-          $.hot[prop] = $.config.hot[prop];
-        } else {
-          invalidError({
-            option: 'hot',
-            name: prop,
-            value: $.config.hot[prop],
-            expects: 'preserved | top'
-          });
-
         }
 
       } else if (typeof $.hot[prop] === typeof $.config.hot[prop]) {
