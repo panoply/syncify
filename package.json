@@ -18,7 +18,7 @@
     "dist",
     "types",
     "schema",
-    "hot.js.liquid",
+    "hot.js",
     "LICENCE",
     "package.json",
     "pnpm-lock.yaml"
@@ -66,7 +66,7 @@
       "dist",
       "**/theme",
       "test/e2e/theme",
-      "hot.min.js"
+      "**/hot.js"
     ],
     "rules": {
       "object-curly-newline": "off",
@@ -88,6 +88,7 @@
   },
   "dependencies": {
     "@syncify/turndown": "^0.2.0",
+    "@syncify/uws": "^0.1.1",
     "adm-zip": "^0.5.16",
     "axios": "^1.7.7",
     "cbor": "^9.0.2",
@@ -108,8 +109,7 @@
     "postcss": "^8.4.47",
     "postcss-load-config": "^6.0.1",
     "svg-sprite": "^2.0.4",
-    "svgo": "^3.3.2",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.48.0"
+    "svgo": "^3.3.2"
   },
   "devDependencies": {
     "@liquify/schema": "^0.9.5",
@@ -141,6 +141,11 @@
     "typescript": "^5.6.2",
     "wrap-ansi": "^9.0.0",
     "write-file-atomic": "^6.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "eslint": "^8.56.0"
+    }
   },
   "peerDependencies": {
     "sass": "^1.69.4",
