@@ -1,4 +1,4 @@
-import type { ClientParam, JSONBundle, Syncify } from 'types';
+import type { ClientParam, Syncify } from 'types';
 import { isNil } from 'rambdax';
 import { readFile, writeFile } from 'fs-extra';
 import parseJSON, { JSONError } from 'parse-json';
