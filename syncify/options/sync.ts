@@ -25,8 +25,6 @@ export async function setSync (cli: Commands) {
     $.mode.metafields ||
     $.mode.pages ||
     $.mode.redirects ||
-    $.mode.release ||
-    $.mode.publish ||
     $.mode.themes
   );
 

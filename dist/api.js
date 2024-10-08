@@ -15018,13 +15018,13 @@ async function importing(cb) {
     const record = sync4.get(key);
     const preview = `https://${theme3.store}?preview_theme_id=${theme3.id}`;
     const prefix = Create().NL.Line(Prefix("Duration", pe(timer.now("import"))), t).Line(Prefix("Transfers", pe(`${transfers++}`)), t).Line(Prefix("Syncing", sr(`${or(theme3.target)}  ${Cr}  ${theme3.store}`)), t).Line(Prefix("Preview", rr(preview)), t).Ruler();
-    let processing = "";
+    let processing2 = "";
     if (item.status === 3 /* Empty */) {
       (0, import_fs_extra14.writeFileSync)(file.output, "");
       record.warning += 1;
       record.transfers += 1;
       record.progress.increment(1);
-      processing = Zn(file.key);
+      processing2 = Zn(file.key);
     } else if (item.status === 0 /* Success */) {
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -15035,13 +15035,13 @@ async function importing(cb) {
       record.progress.increment(1);
       const buffer = Buffer.from(item.data.value || null, "utf8");
       (0, import_fs_extra14.writeFileSync)(file.output, buffer);
-      processing = V(file.key);
+      processing2 = V(file.key);
     } else if (item.status === 1 /* Retry */) {
       if (!record.errors.retry.has(file.output)) {
         record.retry += 1;
         record.errors.retry.add(file.output);
       }
-      processing = cr(file.key);
+      processing2 = cr(file.key);
     } else if (item.status === 2 /* Failed */) {
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -15053,13 +15053,13 @@ async function importing(cb) {
         record.progress.increment(1);
         record.errors.remote.set(file.output, item);
       }
-      processing = J(file.key);
+      processing2 = J(file.key);
     }
     const success = `${or(`${record.success}`)} ${Wn("of")} ${or(`${record.size}`)}`;
     const retried = or(`${record.retry}`);
     const failed = or(`${record.failed}`);
     const warnings2 = or(`${record.warning}`);
-    const status = Create().NL.Line(`${or(record.theme.target.toUpperCase())}  ${Cr}  ${record.theme.store}`, gr).NL.Line(processing).NL.Line(Prefix("synced", success), pe).Line(Prefix("retry", retried), record.retry > 0 ? cr : pe).Line(Prefix("warning", warnings2), record.warning > 0 ? Zn : pe).Line(Prefix("failed", failed), record.failed > 0 ? J : pe).NL.Insert(record.progress.render()).NL.Ruler();
+    const status = Create().NL.Line(`${or(record.theme.target.toUpperCase())}  ${Cr}  ${record.theme.store}`, gr).NL.Line(processing2).NL.Line(Prefix("synced", success), pe).Line(Prefix("retry", retried), record.retry > 0 ? cr : pe).Line(Prefix("warning", warnings2), record.warning > 0 ? Zn : pe).Line(Prefix("failed", failed), record.failed > 0 ? J : pe).NL.Insert(record.progress.render()).NL.Ruler();
     const message = [prefix.toString()];
     let counter = 0;
     for (const stream of sync4.values()) {
@@ -15437,25 +15437,59 @@ async function exporting(cb) {
 
 // syncify/modes/publish.ts
 init_cjs_shims();
+
+// syncify/requests/themes.ts
+init_cjs_shims();
+var import_axios4 = __toESM(require("axios"));
+async function get2(id, store) {
+  return import_axios4.default.get(`themes/${id}.json`, store.client).then(({ data }) => {
+    return data.theme;
+  }).catch((e) => {
+    return request(store.store, e.response);
+  });
+}
+async function list2(store) {
+  return import_axios4.default.get("themes.json", store.client).then(({ data }) => {
+    return data.themes;
+  }).catch((e) => {
+    return request(store.store, e.response);
+  });
+}
+async function processing(id, store) {
+  await delay(1e3);
+  const theme3 = await get2(id, store);
+  if (theme3.processing) {
+    return processing(id, store);
+  }
+}
+async function publish(store, theme3) {
+  return import_axios4.default.post("themes.json", { theme: theme3 }, store.client).then(({ data }) => {
+    return data.theme;
+  }).catch((e) => {
+    return request(store.store, e.response);
+  });
+}
+
+// syncify/modes/publish.ts
+var import_ngrok = __toESM(require("ngrok"));
 var import_uws = require("@syncify/uws");
 var import_fs_extra17 = require("fs-extra");
-async function publish(cb) {
+async function publish2(cb) {
   await exporting(cb);
   timer.start("publish");
   title("Publishing");
   const app = import_uws.uWS.App().get("/*", (response, request2) => {
     response.writeHeader("Access-Control-Allow-Origin", "*");
     response.writeHeader("Cache-Control", "public, max-age=0");
-    const uri = $.vc.dir + request2.getUrl();
+    const uri = $.vc.dir + `/${$.vc.number}.zip`;
     (0, import_fs_extra17.existsSync)(uri) ? response.end((0, import_fs_extra17.readFileSync)(uri)) : response.endWithoutBody();
-  }).listen($.publish.tunnelPort, (token) => {
+  }).listen(3e3, (token) => {
     if (!token) {
       console.log("Failed to listen to port " + $.publish.tunnelPort);
     }
   });
   await delay(500);
-  timer.start("ngrok");
-  const src = `${$.vc.number}.zip`;
+  const src = `http://localhost:3000/${$.vc.number}.zip`;
   write2(t(src), { prefix: "server" });
   for (const store of $.sync.stores) {
     timer.start(store.domain);
@@ -15463,18 +15497,31 @@ async function publish(cb) {
     write2(`${or("role")} ${Cr} ${$.publish.publishRole}`, { prefix: "publish" });
     write2(or(`v${$.vc.number}`), { prefix: "version", color: Qn });
     nwl();
+    log_update_default.clear();
     await delay(1e3);
-    spinner("uploading", {
-      style: "spinning",
-      color: V
+    timer.start("ngrok");
+    const url = await import_ngrok.default.connect({
+      addr: "http://localhost:3000",
+      authtoken: $.env.vars.ngrok_auth_token,
+      onStatusChange(status) {
+        if (status === "closed") {
+          write2("disconnect", { prefix: "ngrok" });
+        } else {
+          write2(`${or("connected")} PORT${wr}${$.publish.tunnelPort}`, {
+            prefix: "ngrok",
+            suffix: timer.stop("ngrok")
+          });
+        }
+      }
     });
-    await delay(2e3);
-    spinner.update("dispatched");
-    await delay(2e3);
-    spinner.update("extracting");
-    await delay(2e3);
-    spinner.update("processing");
-    await delay(1e3);
+    console.log(url);
+    const { id } = await publish(store, {
+      src: url,
+      name: `${$.vc.number}`,
+      role: $.publish.publishRole
+    });
+    nwl();
+    await processing(id, store);
     spinner.stop("done");
     write2(`${or("published")} ${Cr} ${store.domain}`, {
       prefix: "status",
@@ -15483,31 +15530,10 @@ async function publish(cb) {
     });
   }
   app.close();
+  await import_ngrok.default.disconnect();
   nwl();
   group();
   nwl();
-  await prompts([
-    {
-      name: "action",
-      hint: " ",
-      type: "select",
-      message: "Post-Publishing",
-      choices: [
-        {
-          title: "Update Config",
-          value: "config"
-        },
-        {
-          title: "Publish Themes",
-          value: "publish"
-        },
-        {
-          title: "Delete Themes",
-          value: "delete"
-        }
-      ]
-    }
-  ]);
 }
 
 // syncify/log/stdin.ts
@@ -16129,19 +16155,6 @@ init_cjs_shims();
 // syncify/cli/prompts.ts
 init_cjs_shims();
 var import_enquirer = require("enquirer");
-
-// syncify/requests/themes.ts
-init_cjs_shims();
-var import_axios4 = __toESM(require("axios"));
-async function list2(store) {
-  return import_axios4.default.get("themes.json", store.client).then(({ data }) => {
-    return data.themes;
-  }).catch((e) => {
-    return request(store.store, e.response);
-  });
-}
-
-// syncify/cli/prompts.ts
 var theme = {
   prefix: s("\u2502 "),
   styles: {
@@ -16284,7 +16297,7 @@ async function Connect(store) {
 
 // syncify/options/sync.ts
 async function setSync(cli) {
-  const storeRequired = $.mode.metafields || $.mode.pages || $.mode.redirects || $.mode.release || $.mode.publish || $.mode.themes;
+  const storeRequired = $.mode.metafields || $.mode.pages || $.mode.redirects || $.mode.themes;
   const themeRequired = $.mode.watch || $.mode.upload || $.mode.import;
   let stores;
   let items = [];
@@ -19253,7 +19266,7 @@ var import_enquirer4 = require("enquirer");
 
 // syncify/requests/access.ts
 init_cjs_shims();
-async function get2(client2) {
+async function get3(client2) {
   return axios.get("/oauth/access_scopes.json", client2).then(({ data }) => {
     return data;
   }).catch((e) => {
@@ -19345,7 +19358,7 @@ async function setup() {
       return !value || value.length < 10 ? "Invalid Admin API Token" : true;
     }
   });
-  const { ngrok } = await (0, import_enquirer4.prompt)({
+  const { ngrok: ngrok2 } = await (0, import_enquirer4.prompt)({
     type: "input",
     name: "ngrok",
     required: false,
@@ -19356,7 +19369,7 @@ async function setup() {
       return value.length > 2 && value.length < 10 ? "Invalid Ngrok API Token" : true;
     }
   });
-  const scopes = await get2({
+  const scopes = await get3({
     baseURL: `https://${domain}.myshopify.com/admin`,
     headers: { "X-Shopify-Access-Token": token.trim() }
   });
@@ -19398,7 +19411,7 @@ async function setup() {
   model.domain = `${domain}.myshopify.com`;
   model.token = `${domain}_api_token = '${token.trim()}'`;
   model.password = password.trim() === "" ? `# ${domain}_password = ''` : `${domain}_password = '${password.trim()}'`;
-  model.ngrok = ngrok.trim() === "" ? "# ngrok_auth_token = ''" : `ngrok_auth_token = '${ngrok.trim()}'`;
+  model.ngrok = ngrok2.trim() === "" ? "# ngrok_auth_token = ''" : `ngrok_auth_token = '${ngrok2.trim()}'`;
   $.env.file = (0, import_node_path30.join)($.cwd, ".env");
   const env = glueLines(
     "# Ngrok Authorization",
@@ -19545,7 +19558,7 @@ async function run(cmd, config, callback) {
     } else if ($.mode.export && $.mode.publish === false) {
       return exporting(callback);
     } else if ($.mode.publish) {
-      return publish(callback);
+      return publish2(callback);
     } else if ($.mode.interactive) {
       return console.log("TODO: --interactive is not yet supported");
     } else if ($.mode.metafields) {
