@@ -36,6 +36,7 @@ export interface BasePromptOptions {
   required?: boolean
   enabled?: boolean | string
   disabled?: boolean | string;
+  theme?: any;
   /**
    * Function to format user input in the terminal.
    */
@@ -187,6 +188,8 @@ export interface SnippetPromptOptions extends BasePromptOptions {
   type: 'snippet'
   newline?: string
   template?: string
+  required: any;
+  render(): Promise<any>
 }
 
 export interface SortPromptOptions extends BasePromptOptions {
