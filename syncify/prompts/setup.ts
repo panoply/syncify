@@ -1,5 +1,7 @@
 import type { AccessScopes } from 'types';
 import type { Choice, StringPromptOptions } from 'types/internal';
+import { writeFile } from 'fs-extra';
+import { join } from 'node:path';
 import { BAD, CHK, COL, Tree } from '@syncify/ansi';
 import { Create } from 'syncify:cli/tree';
 import { assign } from 'syncify:native';
@@ -8,8 +10,9 @@ import { prompt } from 'enquirer';
 import * as c from '@syncify/ansi';
 import * as log from 'syncify:log';
 import * as access from 'syncify:requests/access';
-import { isBoolean } from 'syncify:utils';
+import { glueLines, isBoolean } from 'syncify:utils';
 import { $ } from 'syncify:state';
+import { getEnvFile, setPackageSyncify } from 'syncify:options/files';
 
 export async function setup () {
 
@@ -17,6 +20,7 @@ export async function setup () {
 
   const model: {
     store: string;
+    password: string;
     domain: string;
     token: string;
     ngrok: string;
@@ -24,6 +28,7 @@ export async function setup () {
     scopes: Record<AccessScopes, boolean>
   } = {
     store: null,
+    password: null,
     domain: null,
     token: null,
     ngrok: null,
@@ -50,18 +55,24 @@ export async function setup () {
   const messages: string[] = [
     `Existing Setup${COL}  `,
     `Shopify Domain${COL}  `,
+    `Store Password${COL}  `,
     `Admin API Token${COL} `,
     `Ngrok API Token${COL} `
   ];
 
-  if ($.env.file !== null) {
+  if ($.env.file === null) {
 
-    return log.out(
+    log.out(
       message
-      .Line('Environment references exist, setup can only be used for new installations.')
+      .Line('Hello Hacker 👋', c.gray)
       .NL
-      .End($.log.group)
-      .BR
+      .Wrap(
+        `This prompt will generate a ${c.cyan('.env')} file containing storefront credentials.`,
+        `When asked for your ${c.bold('Store Password')} this refers to the password used on`,
+        'Password Protected theme pages, not your admin password and is totally optional.',
+        c.gray
+      )
+      .NL
       .toString()
     );
 
@@ -76,19 +87,38 @@ export async function setup () {
       return value + '.myshopify.com';
     },
     validate (value) {
+
       this.state.symbols.pointer = '  ';
-      return (
-        value === '.myshopify.com' || value.length === 0
-      ) ? 'Enter myshopify.com domain name' : true;
+
+      if (value === '.myshopify.com') return 'Enter myshopify.com domain name';
+
+      if ($.stores.length > 0 && $.stores.some(({ domain }) => domain === value)) {
+        return 'You cannot overwrite existing store credentials';
+      }
+
+      return true;
+
     },
     theme
+  });
+
+  const { password } = await prompt<{ password: string }>(<StringPromptOptions> {
+    type: 'input',
+    name: 'password',
+    message: messages[2],
+    required: false,
+    theme,
+    validate (value) {
+      this.state.symbols.pointer = '  ';
+      return true;
+    }
   });
 
   const { token } = await prompt<{ token: string }>(<StringPromptOptions> {
     type: 'input',
     name: 'token',
     required: true,
-    message: messages[2],
+    message: messages[3],
     theme,
     validate (value) {
       this.state.symbols.pointer = '  ';
@@ -99,12 +129,12 @@ export async function setup () {
   const { ngrok } = await prompt<{ ngrok: string }>(<StringPromptOptions> {
     type: 'input',
     name: 'ngrok',
-    required: true,
-    message: messages[3],
+    required: false,
+    message: messages[4],
     theme,
     validate (value) {
       this.state.symbols.pointer = '  ';
-      return (!value || value.length < 10) ? 'Invalid Ngrok API Token' : true;
+      return (value.length > 2 && value.length < 10) ? 'Invalid Ngrok API Token' : true;
     }
   });
 
@@ -168,11 +198,40 @@ export async function setup () {
     );
   }
 
-  log.out(message.toLine());
-
   model.store = domain;
   model.domain = `${domain}.myshopify.com`;
-  model.token = token.trim();
-  model.ngrok = ngrok.trim();
+  model.token = `${domain}_api_token = '${token.trim()}'`;
+
+  model.password = password.trim() === ''
+    ? `# ${domain}_password = ''`
+    : `${domain}_password = '${password.trim()}'`;
+
+  model.ngrok = ngrok.trim() === ''
+    ? '# ngrok_auth_token = \'\''
+    : `ngrok_auth_token = '${ngrok.trim()}'`;
+
+  $.env.file = join($.cwd, '.env');
+
+  const env = glueLines(
+    '# Ngrok Authorization',
+    model.ngrok,
+    '',
+    `# Credentials: ${model.domain}`,
+    model.token,
+    model.password
+  );
+
+  await writeFile($.env.file, env);
+  await getEnvFile();
+  await setPackageSyncify();
+
+  log.out(
+    message
+    .NL
+    .Line(`${CHK} Generated ${c.cyan('.env')} credentials`, c.bold.white)
+    .Line(`${CHK} Defined ${c.cyan('package.json')} stores`, c.bold.white)
+    .End($.log.group)
+    .toString()
+  );
 
 }
