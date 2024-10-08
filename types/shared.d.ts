@@ -1,5 +1,6 @@
 import type { LiteralUnion } from 'type-fest';
 import type { Config } from './config';
+import type { Stores } from './config/stores';
 
 /**
  * Union Type for strings
@@ -244,6 +245,18 @@ export type GetProcessorConfigFile<T> = {
    */
   config: T;
 }
+
+/**
+ * Stores Configuration
+ */
+export interface PKGSyncify {
+  /**
+   * The `stores` property
+   */
+  stores: Omit<Stores, 'password'> | Omit<Stores, 'password'>[];
+
+}
+
 /**
  * Picked `package.json` fields
  */
