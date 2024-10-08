@@ -3,6 +3,7 @@
 import type * as Type from 'types';
 import type { Commands } from 'types/internal';
 import type { ChildProcess } from 'node:child_process';
+import type PackageJson from '@npmcli/package-json';
 import { size } from '@syncify/ansi';
 import { join } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
@@ -57,7 +58,7 @@ export const $ = new class Bundle {
   /**
    * The parsed contents of `package.json` file
    */
-  private static package: Type.PKG = object();
+  private static package: PackageJson;
 
   /**
    * Cache interface
@@ -68,6 +69,14 @@ export const $ = new class Bundle {
    * Chokidar watch instance
    */
   private static watch: Type.WatchBundle = new Set() as unknown as Type.WatchBundle;
+
+  /**
+   * The Syncify Module installation reference
+   *
+   * > This is temporary and will be removed in future versions as it exists
+   * > for support with `--strap` command and applied to dependency key of package.json
+   */
+  public module: string = 'github:panoply/syncify#next';
 
   /**
    * Process Child
@@ -97,13 +106,6 @@ export const $ = new class Bundle {
    * @default null
    */
   public version: string = VERSION;
-
-  /**
-   * The current working directory
-   *
-   * @default null
-   */
-  public cwd: string = process.cwd();
 
   /**
    * Cache copy of the invoked commands in which syncify was started
@@ -155,9 +157,19 @@ export const $ = new class Bundle {
   public home: string = join(homedir() || tmpdir(), '.syncify');
 
   /**
+   * The current working directory
+   *
+   * @default null
+   */
+  public cwd: string = process.cwd();
+
+  /**
    * Base directory path references
    */
   public dirs: Type.Dirs = object<Type.Dirs>({
+    module: join(this.cwd, 'node_modules', '@syncify/cli'),
+    straps: join(this.cwd, 'node_modules', '@syncify/cli', 'straps'),
+    examples: join(this.cwd, 'node_modules', '@syncify/cli', 'examples'),
     chrome: null,
     static: null,
     cache: null,
@@ -610,13 +622,17 @@ export const $ = new class Bundle {
    */
   get config () { return Bundle.defaults; }
   /**
-   * Merge the `package.json` contents
+   * Returns the `package.json` contents
    */
-  set pkg (data: Type.PKG) { Bundle.package = data; }
+  get pkg (): Type.PKG { return <Type.PKG>Bundle.package.content; }
   /**
    * Returns the `package.json` contents
    */
-  get pkg (): Type.PKG { return Bundle.package; }
+  get package () { return Bundle.package; }
+  /**
+   * Returns the `package.json` contents
+   */
+  set package (pkg) { Bundle.package = pkg; }
   /**
    * Plugins
    */
