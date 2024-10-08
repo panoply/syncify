@@ -16,6 +16,7 @@
   },
   "files": [
     "dist",
+    "examples",
     "types",
     "schema",
     "hot.js",
@@ -87,6 +88,7 @@
     }
   },
   "dependencies": {
+    "@npmcli/package-json": "^6.0.1",
     "@syncify/turndown": "^0.2.0",
     "@syncify/uws": "^0.1.1",
     "adm-zip": "^0.5.16",
@@ -119,6 +121,7 @@
     "@types/chrome-remote-interface": "^0.31.14",
     "@types/fs-extra": "^11.0.4",
     "@types/mime-types": "^2.1.4",
+    "@types/npmcli__package-json": "^4.0.4",
     "@types/svg-sprite": "^0.0.39",
     "@types/write-file-atomic": "^4.0.3",
     "anymatch": "^3.1.3",
