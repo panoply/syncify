@@ -535,6 +535,29 @@ export function glue (...input: [ string[] ] | string[]) {
 }
 
 /**
+ * **glue**
+ *
+ * Join `string[]` or `...string[]` (spread) together
+ *
+ * @example
+ *
+ * glue('foo', 'bar', 'bar')
+ * // foo
+ * // bar
+ * // baz
+ *
+ * glue(['foo', 'bar', 'baz'])
+ * // foo
+ * // bar
+ * // baz
+ */
+export function glueLines(...input: [ string[] ] | string[]) {
+
+ return isArray(input[0]) ? input[0].join('\n') : input.join('\n');
+
+}
+
+/**
  * **ws**
  *
  * Equalised Spacing
