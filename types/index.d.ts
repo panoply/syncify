@@ -22,8 +22,6 @@ export type * from './$/file';
 export type * from './$';
 export type * from './$/plugin';
 export type * from './$/hot';
-export type * from './$/sections';
-export type * from './$/snippets';
 
 /* TRANSFORM ---------------------------------- */
 

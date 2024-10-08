@@ -58,18 +58,12 @@
         "sections": {
           "markdownDescription": "Paths to files to be published to the theme `sections` directory. These are either going to be `.liquid` or `.json` (section group) file types. You can provide sub-directory references here and Syncify will re-path values.\n\nSee the `views.sections` options to control how sections should be output.\"",
           "$ref": "#/definitions/path",
-          "default": [
-            "sections/**/*.liquid",
-            "sections/**/*.json"
-          ]
+          "default": ["sections/**/*.liquid", "sections/**/*.json"]
         },
         "templates": {
           "markdownDescription": "Paths to files to be published to the theme `templates` directory.. These can be either JSON or Liquid template files.",
           "$ref": "#/definitions/path",
-          "default": [
-            "templates/*.json",
-            "templates/*.liquid"
-          ]
+          "default": ["templates/*.json", "templates/*.liquid"]
         },
         "customers": {
           "markdownDescription": "Paths to files to be published to the theme `templates/customers` directory. These can be either JSON or Liquid template files.",
@@ -140,117 +134,21 @@
       "additionalProperties": false,
       "properties": {
         "domain": {
-          "description": "Do not include the \"myshopify.com\" portion of the domain.",
+          "markdownDescription": "Do not include the \"myshopify.com\" portion of the domain.",
           "type": "string",
           "pattern": "^[a-zA-Z0-9_-]+$"
         },
         "themes": {
-          "description": "An object list of theme maps where the key properties represent a theme target names and their values the theme id.",
+          "markdownDescription": "An object list of theme maps where the key properties represent a theme target names and their values the theme id.",
           "examples": [{ "dev": 12345678910 }],
           "type": "object",
           "propertyNames": {
             "pattern": "^[a-z0-9_$-]{1,15}$",
-            "description": "Property keys will be used as target references by the CLI. The theme target name cannot contain spaces and cannot exceed 15 characters"
-          }
-        }
-      }
-    },
-    "views": {
-      "type": "object",
-      "additionalProperties": false,
-      "markdownDescription": "Transform options for Liquid/HTML files. In Syncify, **views** are considered files which will render markup.",
-      "properties": {
-        "sections": {
-          "type": "object",
-          "additionalProperties": false,
-          "markdownDescription": "Section file handling (i.e: sub-directory grouping)",
-          "properties": {
-            "prefixDir": {
-              "type": "boolean",
-              "default": false,
-              "markdownDescription": "Sections can be structured within sub-directories. If a section file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the filenames. Prefixing is helpful when you have a large number of sections and want to avoid name collisions. You can control what sub-directories should have pre-fixing applied using the `global[]` option or alternatively do not reference paths to sections which contain sub directories.\n\n**Example**\n\nIf this option is set to `true` and a section path is `source/sections/index/some-file.liquid` then the filename will be prefixed with `index` when it is being written to your defined **output** directory. When referencing it within themes you'd need to use `index_some-file.liquid`\n"
-            },
-            "separator": {
-              "type": "string",
-              "default": "-",
-              "markdownDescription": "Define a separator character to be used when `prefixDir` is enabled.",
-              "oneOf": [
-                { "description": "dash", "enum": ["-"] },
-                {
-                  "description": "underscore",
-                  "enum": ["_"]
-                },
-                { "description": "colon", "enum": [":"] },
-                { "description": "at", "enum": ["@"] }
-              ]
-            },
-            "global": {
-              "markdownDescription": "Global entries will skip prefixing when a sub-directory structure is detected.",
-              "type": "array",
-              "items": { "type": "string" }
-            }
-          }
-        },
-        "snippets": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Snippet specific transform options when processing snippet files",
-          "properties": {
-            "prefixDir": {
-              "type": "boolean",
-              "default": false,
-              "markdownDescription": "Snippets can be structured within sub-directories. If a snippet file is determined to be deeply nested in such a way then this option will enable parent directory name prefixing to be applied the filenames. Prefixing is helpful when you have a large number of snippets and want to avoid name collisions. You can control what sub-directories should have pre-fixing applied using the `global[]` option or alternatively do not reference paths to snippets which contain sub directories.\n\n**Example**\n\nIf this option is set to `true` and a snippet path is `source/snippets/index/some-file.liquid` then the filename will be prefixed with `index` when it is being written to your defined **output** directory. When referencing it within themes you'd need to use `index_some-file.liquid`\n"
-            },
-            "separator": {
-              "type": "string",
-              "default": "-",
-              "markdownDescription": "Define a separator character to be used when `prefixDir` is enabled.",
-              "oneOf": [
-                { "description": "dot", "enum": ["."] },
-                { "description": "dash", "enum": ["-"] },
-                {
-                  "description": "underscore",
-                  "enum": ["_"]
-                },
-                { "description": "colon", "enum": [":"] },
-                { "description": "at", "enum": ["@"] }
-              ]
-            },
-            "global": {
-              "markdownDescription": "Global entries will skip prefixing when a sub-directory structure is detected.",
-              "type": "array",
-              "items": { "type": "string" }
-            }
-          }
-        },
-        "pages": {
-          "type": "object",
-          "additionalProperties": false,
-          "markdownDescription": "Static page handling.",
-          "properties": {
-            "importLanguage": {
-              "type": "string",
-              "markdownDescription": "Whether the pulled page content should be written as HTML or have the HTML converted to Markdown.",
-              "oneOf": [
-                { "enum": ["html"] },
-                { "enum": ["markdown"] }
-              ]
-            },
-            "suffixDir": {
-              "type": "boolean",
-              "markdownDescription": "Whether pages contained in sub-directories should use their directory name as the `template_suffix` when publishing to stores",
-              "default": false
-            },
-            "author": {
-              "markdownDescription": "",
-              "type": "string",
-              "default": ""
-            },
-            "global": {
-              "markdownDescription": "If suffixDir is `true` you can provide a list of page sub-directories or relative files that should pass through without applying the directory name as a template_suffix on the page.\n\n**Cannot contain glob (`*`) stars**\n\n```js\n\n// ✓ This is correct\n{ \"global\": ['some-dir/filename.md' ] }\n\n// ✗ This is incorrect\n{ \"global\": ['some-dir/*.md' ] }\n\n```",
-              "type": "array",
-              "items": { "type": "string" }
-            }
+            "markdownDescription": "Property keys will be used as `target` references by the CLI. The theme target name cannot contain spaces and cannot exceed 15 characters."
+          },
+          "additionalProperties": {
+            "markdownDescription": "The theme id which is a number value.",
+            "type": "number"
           }
         }
       }
@@ -611,13 +509,7 @@
             },
             "legalComments": {
               "type": "string",
-              "enum": [
-                "external",
-                "none",
-                "inline",
-                "eof",
-                "linked"
-              ],
+              "enum": ["external", "none", "inline", "eof", "linked"],
               "default": "inline",
               "description": "Control the preservation of comments in the minified code. Possible values: 'all', 'some', 'none', 'inline'."
             },
@@ -780,7 +672,7 @@
       "required": ["stores"],
       "properties": {
         "stores": {
-          "markdownDescription": "List of Shopify stores to connect. Optionally provide this directly within your `syncify.config` file. If you are using Syncify publishing, then this where you will need to provide store references.",
+          "markdownDescription": "Provide your Shopify stores and themes this project manages.",
           "oneOf": [
             {
               "type": "array",

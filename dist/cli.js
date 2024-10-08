@@ -5787,6 +5787,20 @@ function merge(source, ...patches) {
     return copy2;
   }(arr, arr ? source.slice() : assign({}, source), patches);
 }
+function hasPath(path3, param) {
+  if (isNil(param)) return false;
+  if (isObject(param) === false) return false;
+  let object2 = param;
+  let counter = 0;
+  const props = path3.split(".");
+  while (counter < props.length) {
+    if (isNil(object2)) return false;
+    if (object2[props[counter]] === null) return false;
+    object2 = object2[props[counter]];
+    counter++;
+  }
+  return object2 !== void 0;
+}
 function has(prop, object2) {
   return isObject(object2) ? prop in object2 : false;
 }
@@ -5880,6 +5894,9 @@ function glueString(...input) {
 }
 function glue(...input) {
   return isArray(input[0]) ? input[0].join("") : input.join("");
+}
+function glueLines(...input) {
+  return isArray(input[0]) ? input[0].join("\n") : input.join("\n");
 }
 function ws(array, prop = null) {
   let size = 0;
@@ -5983,7 +6000,7 @@ var $ = new class Bundle {
   /**
    * The parsed contents of `package.json` file
    */
-  static package = object();
+  static package;
   /**
    * Cache interface
    */
@@ -5992,6 +6009,13 @@ var $ = new class Bundle {
    * Chokidar watch instance
    */
   static watch = /* @__PURE__ */ new Set();
+  /**
+   * The Syncify Module installation reference
+   *
+   * > This is temporary and will be removed in future versions as it exists
+   * > for support with `--strap` command and applied to dependency key of package.json
+   */
+  module = "github:panoply/syncify#next";
   /**
    * Process Child
    */
@@ -6016,12 +6040,6 @@ var $ = new class Bundle {
    * @default null
    */
   version = "0.0.1-rc.1";
-  /**
-   * The current working directory
-   *
-   * @default null
-   */
-  cwd = process.cwd();
   /**
    * Cache copy of the invoked commands in which syncify was started
    *
@@ -6066,9 +6084,18 @@ var $ = new class Bundle {
    */
   home = (0, import_node_path2.join)((0, import_node_os.homedir)() || (0, import_node_os.tmpdir)(), ".syncify");
   /**
+   * The current working directory
+   *
+   * @default null
+   */
+  cwd = process.cwd();
+  /**
    * Base directory path references
    */
   dirs = object({
+    module: (0, import_node_path2.join)(this.cwd, "node_modules", "@syncify/cli"),
+    straps: (0, import_node_path2.join)(this.cwd, "node_modules", "@syncify/cli", "straps"),
+    examples: (0, import_node_path2.join)(this.cwd, "node_modules", "@syncify/cli", "examples"),
     chrome: null,
     static: null,
     cache: null,
@@ -6517,16 +6544,22 @@ var $ = new class Bundle {
     return Bundle.defaults;
   }
   /**
-   * Merge the `package.json` contents
+   * Returns the `package.json` contents
    */
-  set pkg(data) {
-    Bundle.package = data;
+  get pkg() {
+    return Bundle.package.content;
   }
   /**
    * Returns the `package.json` contents
    */
-  get pkg() {
+  get package() {
     return Bundle.package;
+  }
+  /**
+   * Returns the `package.json` contents
+   */
+  set package(pkg) {
+    Bundle.package = pkg;
   }
   /**
    * Plugins
@@ -6858,9 +6891,9 @@ function has2(prop, obj) {
 
 // node_modules/.pnpm/rambdax@11.2.0/node_modules/rambdax/src/hasPath.js
 init_cjs_shims();
-function hasPath(pathInput, obj) {
+function hasPath2(pathInput, obj) {
   if (arguments.length === 1) {
-    return (objHolder) => hasPath(pathInput, objHolder);
+    return (objHolder) => hasPath2(pathInput, objHolder);
   }
   return path(pathInput, obj) !== void 0;
 }
@@ -10005,7 +10038,7 @@ function createLogUpdate(stream, { showCursor = false } = {}) {
     previousWidth = getWidth(stream);
     previousLineCount = 0;
   };
-  const render = (...arguments_) => {
+  const render2 = (...arguments_) => {
     if (!showCursor) {
       cli_cursor_default.hide();
     }
@@ -10020,17 +10053,17 @@ function createLogUpdate(stream, { showCursor = false } = {}) {
     stream.write(base_exports.eraseLines(previousLineCount) + output);
     previousLineCount = output.split("\n").length;
   };
-  render.clear = () => {
+  render2.clear = () => {
     stream.write(base_exports.eraseLines(previousLineCount));
     reset();
   };
-  render.done = () => {
+  render2.done = () => {
     reset();
     if (!showCursor) {
       cli_cursor_default.show();
     }
   };
-  return render;
+  return render2;
 }
 var logUpdate = createLogUpdate(import_node_process7.default.stdout);
 var log_update_default = logUpdate;
@@ -10359,7 +10392,7 @@ function request(file, e, options) {
   const defaults3 = { log: true, store: false };
   const config = assign(defaults3, options);
   if (config.store === true) config.data = object();
-  const response = hasPath("error.asset", e.data) ? e.data.error.asset : hasPath("errors.asset", e.data) ? e.data.errors.asset : null;
+  const response = hasPath2("error.asset", e.data) ? e.data.error.asset : hasPath2("errors.asset", e.data) ? e.data.errors.asset : null;
   if (e.status === 422) {
     const { value } = JSON.parse(e.config.data).asset;
     const { output: output2, line, column } = Shopify(response, value.split("\n"));
@@ -10699,8 +10732,8 @@ runtime.modes = function($2) {
     message.NL.Line(`Filters${wr}`, Wn.bold);
     const space = ws($2.filters);
     for (const group2 in $2.filters) {
-      const join24 = Wn($2.filters[group2].map((k) => (0, import_node_path3.relative)($2.cwd, k)).join(", "));
-      message.Line(` ${Rr} ${group2}${wr}${space(group2)}${join24}`, gr);
+      const join25 = Wn($2.filters[group2].map((k) => (0, import_node_path3.relative)($2.cwd, k)).join(", "));
+      message.Line(` ${Rr} ${group2}${wr}${space(group2)}${join25}`, gr);
     }
   }
   log(message.toLine());
@@ -14376,7 +14409,7 @@ function saveCache(id = null) {
 function getPageCache(domain, pageId = NaN) {
   const store = domain.endsWith(".myshopify.com") ? domain.slice(0, domain.indexOf(".myshopify.com")).toLowerCase() : domain.toLowerCase();
   if (isNaN(pageId) === false) {
-    if (hasPath(`${store}.${pageId}`, $.cache.pages)) {
+    if (hasPath2(`${store}.${pageId}`, $.cache.pages)) {
       return $.cache.pages[store][pageId];
     }
     if (!has(store, $.cache.pages)) {
@@ -14704,7 +14737,7 @@ async function create3(store, page) {
     if (requeue(e.response.status)) {
       queue.add(() => create3(store, page));
     } else {
-      if (hasPath("response.data", e.response)) {
+      if (hasPath2("response.data", e.response)) {
         request(page.title, e.response);
       }
     }
@@ -15107,212 +15140,6 @@ function watch(callback) {
   }
 }
 
-// syncify/modes/themes.ts
-init_cjs_shims();
-
-// syncify/requests/themes.ts
-init_cjs_shims();
-var import_axios4 = __toESM(require("axios"));
-async function list2(store) {
-  return import_axios4.default.get("themes.json", store.client).then(({ data }) => {
-    return data.themes;
-  }).catch((e) => {
-    return request(store.store, e.response);
-  });
-}
-
-// syncify/modes/themes.ts
-var import_enquirer = require("enquirer");
-var theme = {
-  pointer(choice, i) {
-    const item = this.state.index === i ? s("\u251C ") : s("\u2502 ");
-    return i === 0 ? s("\u2502 ") + "\n" + item : item;
-  },
-  prefix: s("\u2502 "),
-  styles: {
-    primary: V,
-    success: V,
-    danger: _.bold,
-    warning: Zn,
-    muted: t,
-    disabled: t,
-    typing: t
-  },
-  symbols: {
-    ellipsisLarge: "",
-    ellipsisSmall: "",
-    prefix: {
-      pending: "",
-      submitted: "\u2713",
-      cancelled: "\u{10102}"
-    },
-    separator: {
-      pending: "",
-      submitted: " \u2192 ",
-      cancelled: " \u{10102} "
-    }
-  }
-};
-async function listThemes(store) {
-  let separator = 0;
-  const items = await list2(store);
-  const themes2 = items.filter(({ role }) => role !== "demo");
-  const space = ws(themes2, "name");
-  const choices = themes2.map((value) => {
-    if (value.name.length > separator) separator = value.name.length;
-    return {
-      name: value.name,
-      message: value.name,
-      hint: `${space(value.name)} ${Rr} ${t(value.role)}`,
-      value
-    };
-  });
-  choices.push(
-    {
-      role: "separator",
-      message: s("\u2500".repeat(separator))
-    },
-    {
-      name: "create",
-      message: "Create Theme"
-    },
-    {
-      name: "create",
-      message: "Remove Theme"
-    }
-  );
-  if ($.sync.stores.length > 1) {
-    choices.push(
-      {
-        role: "separator",
-        message: s("\u2500".repeat(separator))
-      },
-      {
-        name: "store",
-        message: "Select Stores",
-        hint: `${space("Select Stores")} ${Rr} ${t("go back and choose store")}`
-      }
-    );
-  }
-  const { targets } = await (0, import_enquirer.prompt)({
-    name: "targets",
-    type: "select",
-    multiple: true,
-    message: "Select Themes",
-    hint: "Press spacebar to select",
-    theme,
-    choices,
-    result(names) {
-      return values(this.map(names));
-    },
-    format(value) {
-      if (isArray(value) && value.length > 0) {
-        return gr(`${value.join(pe(", "))}`);
-      }
-    }
-  });
-  const config = {
-    domain: store.store.toLowerCase(),
-    themes: {}
-  };
-  const fields = [];
-  for (const theme3 of targets) {
-    config.themes["${" + theme3.name + "}"] = theme3.id;
-    fields.push({
-      name: theme3.name,
-      message: theme3.name,
-      validate(value, _2, field) {
-        if (field && field.name === theme3.name) {
-          if (/[A-Z]/.test(value)) {
-            return "\n" + tr.redBright("  Target name must be lowercase");
-          } else if (/[0-9]/.test(value)) {
-            return "\n" + tr.redBright("  Target name cannot contain numbers");
-          } else if (/[ ]/.test(value)) {
-            return "\n" + tr.redBright("  Target name cannot contain spaces");
-          } else if (/-/.test(value)) {
-            return "\n" + tr.redBright("  Target name cannot contain dashes");
-          }
-        }
-        return true;
-      }
-    });
-  }
-  theme.styles.primary = gr.italic;
-  theme.styles.typing = V;
-  const template = JSON.stringify(config, null, 2);
-  const snippet2 = await (0, import_enquirer.prompt)({
-    name: "stores",
-    type: "snippet",
-    required: targets.map(({ name }) => name),
-    message: "Theme Targets",
-    newline: "\n",
-    format() {
-      if (this.state.submitted === true) {
-        if (this.state.completed !== 100) {
-          return V(`${this.state.completed}% completed`);
-        }
-      }
-      return ` ${Cr}  ${cr(`${this.state.completed}% completed`)}`;
-    },
-    theme,
-    fields,
-    template
-  });
-  const json2 = { syncify: JSON.parse(snippet2.stores.result) };
-  const save2 = await (0, import_enquirer.prompt)({
-    name: "save",
-    type: "confirm",
-    message: "Save Settings",
-    theme,
-    initial: true,
-    newline: "\n",
-    format() {
-      return /^[ty1]/i.test(this.input) ? "Yes" : "No";
-    },
-    footer: de.line + [
-      "",
-      t("The following store and theme references will be saved"),
-      t("to your package.json file on the syncify key property."),
-      "",
-      JSON.stringify(json2.syncify, null, 2).split("\n").join("\n" + de.line),
-      ""
-    ].join("\n" + de.line)
-  });
-  console.log(save2);
-}
-async function listStores() {
-  const space = ws($.sync.stores, "store");
-  const choices = $.sync.stores.map((value) => {
-    return {
-      name: value.domain,
-      message: value.store,
-      hint: `${space(value.store)} ${Rr} ${t(`https://${value.domain}`)}`,
-      value
-    };
-  });
-  const { store } = await (0, import_enquirer.prompt)({
-    name: "store",
-    type: "select",
-    message: "Select Stores",
-    choices,
-    theme,
-    result() {
-      return this.focused.value;
-    },
-    format(value) {
-      return V(value);
-    }
-  });
-  return listThemes(store);
-}
-async function themes() {
-  if ($.sync.stores.length > 1) {
-    return listStores();
-  } else {
-    return listThemes($.sync.stores[0]);
-  }
-}
-
 // syncify/modes/import.ts
 init_cjs_shims();
 var import_node_path17 = require("path");
@@ -15583,6 +15410,7 @@ init_cjs_shims();
 var import_dotenv = __toESM(require("dotenv"));
 var import_node_path19 = require("path");
 var import_fs_extra15 = require("fs-extra");
+var import_package_json = __toESM(require("@npmcli/package-json"));
 async function configFile() {
   let path3 = null;
   for (const file of SYNCIFY_CONFIG) {
@@ -15616,37 +15444,63 @@ async function configFile() {
     return null;
   }
 }
+async function setPackageSyncify(pkg = $.pkg) {
+  const syncify = has2("syncify", pkg) ? pkg.syncify : {};
+  if ($.env.file !== null && isEmpty($.env.vars) === false) {
+    const props = keys($.env.vars);
+    const stores = has2("stores", syncify) ? isArray(syncify.stores) ? syncify.stores : [syncify.stores] : [];
+    for (const name of props) {
+      const match2 = name.match(/^([a-zA-Z0-9-]+)_api_(token|key)$/);
+      if (match2 !== null) {
+        if (stores.some(({ domain }) => domain === `${match2[1]}.myshopify.com`)) continue;
+        if (match2[2] === "token") {
+          stores.push({ domain: match2[1], themes: {} });
+        } else if (match2[2] === "key" && has2(`${match2[1]}_api_secret`, $.env.vars)) {
+          stores.push({ domain: match2[1], themes: {} });
+        }
+      }
+    }
+    if (stores.length > 0) {
+      $.package.update({
+        syncify: {
+          stores: stores.length > 1 ? stores : stores[0]
+        }
+      });
+      await $.package.save();
+      return true;
+    }
+  }
+  return false;
+}
 async function getPackageJson() {
-  const uri = (0, import_node_path19.join)($.cwd, "package.json");
-  const has3 = await (0, import_fs_extra15.pathExists)(uri);
+  const has3 = await (0, import_fs_extra15.pathExists)((0, import_node_path19.join)($.cwd, "package.json"));
   if (!has3) throw new Error('Missing "package.json" file');
   try {
-    $.pkg = await (0, import_fs_extra15.readJson)(uri);
-    if (hasPath("syncify.stores", $.pkg)) {
-      if (isArray($.pkg.syncify.stores)) {
-        $.stores = $.pkg.syncify.stores;
-      } else if (isObject($.pkg.syncify.stores) && isEmpty($.pkg.syncify.stores) === false) {
-        $.stores = [$.pkg.syncify.stores];
+    $.package = await import_package_json.default.load($.cwd);
+    const pkg = $.pkg;
+    if (hasPath2("syncify.stores", pkg)) {
+      if (isArray(pkg.syncify.stores)) {
+        $.stores = pkg.syncify.stores;
+      } else if (isObject(pkg.syncify.stores) && isEmpty(pkg.syncify.stores) === false) {
+        $.stores = [pkg.syncify.stores];
       }
-    } else {
-      if (!$.cmd.strap) missingStores($.cwd);
+    } else if (!$.cmd.strap && $.cmd.mode !== "setup") {
+      const hasReference = await setPackageSyncify();
+      if (hasReference) {
+        return getPackageJson();
+      } else {
+        missingStores($.cwd);
+      }
     }
   } catch (e) {
     throw new Error(e);
   }
 }
-async function setPkgVersion(current, increment) {
-  const uri = (0, import_node_path19.join)($.cwd, "package.json");
+async function setPkgVersion(current, version2) {
   try {
-    const pkg = await (0, import_fs_extra15.readFile)(uri);
-    const str = pkg.toString();
-    const ver = str.indexOf('"version"');
-    const sqo = str.indexOf('"', ver + 10) + 1;
-    const eqo = str.indexOf('"', sqo + 1);
-    const num = str.slice(sqo, eqo);
-    if (num === current) {
-      await (0, import_fs_extra15.writeFile)(uri, `${str.slice(0, sqo)}${increment}${str.slice(eqo)}`);
-      await getPackageJson();
+    if ($.pkg.version === version2) {
+      $.package.update({ version: version2 });
+      await $.package.save();
       return true;
     } else {
       return false;
@@ -15666,7 +15520,7 @@ async function getEnvFile() {
     $.env.file = path3;
     $.env.vars = env.parsed;
   } else {
-    if ($.cmd.setup === false && !$.cmd.strap) {
+    if ($.cmd.mode !== "setup") {
       missingEnv($.cwd);
     }
   }
@@ -16460,8 +16314,21 @@ init_cjs_shims();
 
 // syncify/cli/prompts.ts
 init_cjs_shims();
-var import_enquirer2 = require("enquirer");
-var theme2 = {
+var import_enquirer = require("enquirer");
+
+// syncify/requests/themes.ts
+init_cjs_shims();
+var import_axios4 = __toESM(require("axios"));
+async function list2(store) {
+  return import_axios4.default.get("themes.json", store.client).then(({ data }) => {
+    return data.themes;
+  }).catch((e) => {
+    return request(store.store, e.response);
+  });
+}
+
+// syncify/cli/prompts.ts
+var theme = {
   prefix: s("\u2502 "),
   styles: {
     primary: V,
@@ -16493,7 +16360,7 @@ var theme2 = {
 };
 async function Connect(store) {
   let separator = 0;
-  const style2 = { ...theme2 };
+  const style2 = { ...theme };
   const items = await list2(store);
   const themes2 = items.filter(({ role }) => role !== "demo");
   const space = ws(themes2, "name");
@@ -16517,7 +16384,7 @@ async function Connect(store) {
       value: "create"
     }
   );
-  const { targets } = await (0, import_enquirer2.prompt)({
+  const { targets } = await (0, import_enquirer.prompt)({
     name: "targets",
     type: "select",
     multiple: true,
@@ -16560,7 +16427,7 @@ async function Connect(store) {
   style2.styles.primary = gr.italic;
   style2.styles.typing = V;
   const template = JSON.stringify(config, null, 2);
-  const snippet2 = await (0, import_enquirer2.prompt)({
+  const snippet2 = await (0, import_enquirer.prompt)({
     name: "stores",
     type: "snippet",
     required: targets.map(({ name }) => name),
@@ -16579,7 +16446,7 @@ async function Connect(store) {
     }
   });
   const json2 = { syncify: JSON.parse(snippet2.stores.result) };
-  const save2 = await (0, import_enquirer2.prompt)({
+  const save2 = await (0, import_enquirer.prompt)({
     name: "save",
     type: "confirm",
     message: "Save Settings",
@@ -17469,7 +17336,7 @@ async function setStyleConfig() {
     }
     if (isObject(bundle.sass)) {
       bundle.sass.include.unshift($.cwd, (0, import_node_path25.join)($.cwd, rename2.dir));
-      if (hasPath("sass.include", style2)) {
+      if (hasPath2("sass.include", style2)) {
         bundle.sass.include = style2.sass.include.map((p) => (0, import_node_path25.join)($.cwd, p));
       }
     }
@@ -17742,12 +17609,12 @@ async function server() {
 async function socket() {
   let listener;
   const app = await server();
-  const ws2 = app.ws("/ws", {
+  const ws3 = app.ws("/ws", {
     compression: import_uws3.uWS.SHARED_COMPRESSOR,
     maxPayloadLength: 16 * 1024 * 1024,
     idleTimeout: 32,
-    open: (ws3) => {
-      HOT_SOCKET_TOPICS.forEach((topic) => ws3.subscribe(topic));
+    open: (ws4) => {
+      HOT_SOCKET_TOPICS.forEach((topic) => ws4.subscribe(topic));
     },
     message: (_2, message, isBinary) => {
       hot(Buffer.from(message).toString(isBinary ? "binary" : "utf8"));
@@ -17762,22 +17629,22 @@ async function socket() {
     }
   });
   kill(() => {
-    ws2.close();
+    ws3.close();
     import_uws3.uWS.us_listen_socket_close(listener);
   });
   return {
     get http() {
-      return ws2;
+      return ws3;
     },
-    script: (uuid2, src) => ws2.publish("script", `script,${src},${uuid2}`),
-    stylesheet: (uuid2, href) => ws2.publish("stylesheet", `stylesheet,${href},${uuid2}`),
-    section: (id) => ws2.publish("section", `section,${id}`),
-    svg: (id) => ws2.publish("svg", `svg,${id}`),
-    assets: () => ws2.publish("assets", "assets"),
-    reload: () => ws2.publish("reload", "reload"),
-    replace: () => ws2.publish("replace", "replace"),
-    connected: () => ws2.publish("connected", "connected"),
-    disconnect: () => ws2.publish("disconnect", "disconnect")
+    script: (uuid2, src) => ws3.publish("script", `script,${src},${uuid2}`),
+    stylesheet: (uuid2, href) => ws3.publish("stylesheet", `stylesheet,${href},${uuid2}`),
+    section: (id) => ws3.publish("section", `section,${id}`),
+    svg: (id) => ws3.publish("svg", `svg,${id}`),
+    assets: () => ws3.publish("assets", "assets"),
+    reload: () => ws3.publish("reload", "reload"),
+    replace: () => ws3.publish("replace", "replace"),
+    connected: () => ws3.publish("connected", "connected"),
+    disconnect: () => ws3.publish("disconnect", "disconnect")
   };
 }
 
@@ -19176,7 +19043,7 @@ async function define(cli, options) {
   await getPackageJson();
   await getConfig();
   await getCache();
-  if ($.mode.setup || $.mode.strap || $.mode.themes) return;
+  if ($.mode.setup || $.mode.strap) return;
   await setBaseDirs(cli);
   process.env.SYNCIFY_ENV = $.env.dev ? "dev" : "prod";
   process.env.SYNCIFY_WATCH = String($.mode.watch);
@@ -19330,9 +19197,245 @@ async function getConfig() {
   }
 }
 
-// syncify/modes/setup.ts
+// syncify/prompts/themes.ts
 init_cjs_shims();
-var import_enquirer3 = require("enquirer");
+var import_enquirer2 = require("enquirer");
+
+// syncify/prompts/enquirer.ts
+init_cjs_shims();
+async function render() {
+  const { index, keys: keys2 = [], submitted, size } = this.state;
+  const newline = [this.options.newline, "\n"].find((v2) => v2 != null);
+  const prefix = await this.prefix();
+  const separator = await this.separator();
+  const message = await this.message();
+  let prompt6 = [
+    prefix,
+    message,
+    separator
+  ].filter(Boolean).join(" ");
+  this.state.prompt = prompt6;
+  const header = await this.header();
+  const error3 = await this.error() || "";
+  const hint = await this.hint() || "";
+  const body = submitted ? "" : await this.interpolate(this.state);
+  const key = this.state.key = keys2[index] || "";
+  const input = await this.format(key);
+  const footer = await this.footer();
+  if (input) prompt6 += " " + input;
+  if (hint && !input && this.state.completed === 0) prompt6 += " " + hint;
+  this.clear(size);
+  const lines = [
+    header,
+    prompt6,
+    body.split("\n").join(de.next),
+    footer,
+    error3.trim()
+  ];
+  this.write(lines.filter(Boolean).join(newline));
+  this.restore();
+}
+var theme2 = {
+  pointer(choice, i) {
+    const item = this.state.index === i ? s("\u251C ") : s("\u2502 ");
+    return i === 0 ? s("\u2502 ") + "\n" + item : item;
+  },
+  prefix: s("\u2502 "),
+  styles: {
+    primary: V,
+    success: V,
+    danger: _.bold,
+    warning: Zn,
+    muted: t,
+    disabled: t,
+    typing: t
+  },
+  symbols: {
+    ellipsisLarge: "",
+    ellipsisSmall: "",
+    prefix: {
+      pending: "",
+      submitted: "\u2713",
+      cancelled: "\u{10102}"
+    },
+    separator: {
+      pending: "",
+      submitted: " \u2192 ",
+      cancelled: " \u{10102} "
+    }
+  }
+};
+
+// syncify/prompts/themes.ts
+async function listThemes(store) {
+  let separator = 0;
+  const items = await list2(store);
+  const themes2 = items.filter(({ role }) => role !== "demo");
+  const space = ws(themes2, "name");
+  const choices = themes2.map((value) => {
+    if (value.name.length > separator) separator = value.name.length;
+    return {
+      name: value.name,
+      message: value.name,
+      hint: `${space(value.name)} ${Rr} ${t(value.role)}`,
+      value
+    };
+  });
+  choices.push(
+    {
+      role: "separator",
+      message: s("\u2500".repeat(separator))
+    },
+    {
+      name: "create",
+      message: "Create Theme"
+    },
+    {
+      name: "create",
+      message: "Remove Theme"
+    }
+  );
+  if ($.sync.stores.length > 1) {
+    choices.push(
+      {
+        role: "separator",
+        message: s("\u2500".repeat(separator))
+      },
+      {
+        name: "store",
+        message: "Select Stores",
+        hint: `${space("Select Stores")} ${Rr} ${t("go back and choose store")}`
+      }
+    );
+  }
+  const { targets } = await (0, import_enquirer2.prompt)({
+    name: "targets",
+    type: "select",
+    multiple: true,
+    message: "Select Themes",
+    hint: "Press spacebar to select",
+    theme: theme2,
+    choices,
+    result(names) {
+      return values(this.map(names));
+    },
+    format(value) {
+      if (isArray(value) && value.length > 0) {
+        return gr(`${value.join(pe(", "))}`);
+      }
+    }
+  });
+  const config = {
+    domain: store.store.toLowerCase(),
+    themes: {}
+  };
+  const fields = [];
+  for (const theme3 of targets) {
+    config.themes["${" + theme3.name + "}"] = theme3.id;
+    fields.push({
+      name: theme3.name,
+      message: theme3.name,
+      validate(value, _2, field) {
+        if (field && field.name === theme3.name) {
+          if (/[A-Z]/.test(value)) {
+            return "\n" + tr.redBright("  Target name must be lowercase");
+          } else if (/[0-9]/.test(value)) {
+            return "\n" + tr.redBright("  Target name cannot contain numbers");
+          } else if (/[ ]/.test(value)) {
+            return "\n" + tr.redBright("  Target name cannot contain spaces");
+          } else if (/-/.test(value)) {
+            return "\n" + tr.redBright("  Target name cannot contain dashes");
+          }
+        }
+        return true;
+      }
+    });
+  }
+  theme2.styles.primary = gr.italic;
+  theme2.styles.typing = V;
+  const template = JSON.stringify(config, null, 2);
+  const snippet2 = await (0, import_enquirer2.prompt)({
+    name: "stores",
+    type: "snippet",
+    required: targets.map(({ name }) => name),
+    message: "Theme Targets",
+    newline: de.next + de.next,
+    render,
+    format() {
+      if (this.state.submitted === true) {
+        if (this.state.completed !== 100) {
+          return V(`${this.state.completed}% completed`);
+        }
+      }
+      return ` ${Cr}  ${cr(`${this.state.completed}% completed`)}`;
+    },
+    theme: theme2,
+    fields,
+    template
+  });
+  const json2 = { syncify: JSON.parse(snippet2.stores.result) };
+  const save2 = await (0, import_enquirer2.prompt)({
+    name: "save",
+    type: "confirm",
+    message: "Save Settings",
+    theme: theme2,
+    initial: true,
+    newline: "\n",
+    format() {
+      return /^[ty1]/i.test(this.input) ? "Yes" : "No";
+    },
+    footer: de.line + [
+      "",
+      t("The following store and theme references will be saved"),
+      t("to your package.json file on the syncify key property."),
+      "",
+      JSON.stringify(json2.syncify, null, 2).split("\n").join(de.next),
+      ""
+    ].join("\n" + de.line)
+  });
+  if (hasPath("syncify.config", $.pkg)) {
+    json2.syncify.config = $.pkg.config;
+  }
+  console.log(save2);
+}
+async function listStores() {
+  const space = ws($.sync.stores, "store");
+  const choices = $.sync.stores.map((value) => {
+    return {
+      name: value.domain,
+      message: value.store,
+      hint: `${space(value.store)} ${Rr} ${t(`https://${value.domain}`)}`,
+      value
+    };
+  });
+  const { store } = await (0, import_enquirer2.prompt)({
+    name: "store",
+    type: "select",
+    message: "Select Stores",
+    choices,
+    theme: theme2,
+    result() {
+      return this.focused.value;
+    },
+    format(value) {
+      return V(value);
+    }
+  });
+  return listThemes(store);
+}
+async function themes() {
+  if ($.sync.stores.length > 1) {
+    return listStores();
+  } else {
+    return listThemes($.sync.stores[0]);
+  }
+}
+
+// syncify/prompts/setup.ts
+init_cjs_shims();
+var import_fs_extra22 = require("fs-extra");
+var import_node_path30 = require("path");
+var import_enquirer4 = require("enquirer");
 
 // syncify/requests/access.ts
 init_cjs_shims();
@@ -19344,11 +19447,12 @@ async function get2(client2) {
   });
 }
 
-// syncify/modes/setup.ts
+// syncify/prompts/setup.ts
 async function setup() {
   const message = Create({ type: "info" });
   const model = {
     store: null,
+    password: null,
     domain: null,
     token: null,
     ngrok: null,
@@ -19364,7 +19468,7 @@ async function setup() {
       write_themes: false
     }
   };
-  const theme3 = assign({}, theme2, {
+  const theme3 = assign({}, theme, {
     pointer(choice, index) {
       const prefix = this.state.index === index ? de.stub.trimEnd() + " " : de.trim + " ";
       return prefix;
@@ -19373,15 +19477,21 @@ async function setup() {
   const messages = [
     `Existing Setup${wr}  `,
     `Shopify Domain${wr}  `,
+    `Store Password${wr}  `,
     `Admin API Token${wr} `,
     `Ngrok API Token${wr} `
   ];
-  if ($.env.file !== null) {
-    return log(
-      message.Line("Environment references exist, setup can only be used for new installations.").NL.End($.log.group).BR.toString()
+  if ($.env.file === null) {
+    log(
+      message.Line("Hello Hacker \u{1F44B}", t).NL.Wrap(
+        `This prompt will generate a ${Dn(".env")} file containing storefront credentials.`,
+        `When asked for your ${or("Store Password")} this refers to the password used on`,
+        "Password Protected theme pages, not your admin password and is totally optional.",
+        t
+      ).NL.toString()
     );
   }
-  const { domain } = await (0, import_enquirer3.prompt)({
+  const { domain } = await (0, import_enquirer4.prompt)({
     type: "input",
     name: "domain",
     message: messages[1],
@@ -19391,30 +19501,45 @@ async function setup() {
     },
     validate(value) {
       this.state.symbols.pointer = "  ";
-      return value === ".myshopify.com" || value.length === 0 ? "Enter myshopify.com domain name" : true;
+      if (value === ".myshopify.com") return "Enter myshopify.com domain name";
+      if ($.stores.length > 0 && $.stores.some(({ domain: domain2 }) => domain2 === value)) {
+        return "You cannot overwrite existing store credentials";
+      }
+      return true;
     },
     theme: theme3
   });
-  const { token } = await (0, import_enquirer3.prompt)({
+  const { password } = await (0, import_enquirer4.prompt)({
+    type: "input",
+    name: "password",
+    message: messages[2],
+    required: false,
+    theme: theme3,
+    validate(value) {
+      this.state.symbols.pointer = "  ";
+      return true;
+    }
+  });
+  const { token } = await (0, import_enquirer4.prompt)({
     type: "input",
     name: "token",
     required: true,
-    message: messages[2],
+    message: messages[3],
     theme: theme3,
     validate(value) {
       this.state.symbols.pointer = "  ";
       return !value || value.length < 10 ? "Invalid Admin API Token" : true;
     }
   });
-  const { ngrok } = await (0, import_enquirer3.prompt)({
+  const { ngrok } = await (0, import_enquirer4.prompt)({
     type: "input",
     name: "ngrok",
-    required: true,
-    message: messages[3],
+    required: false,
+    message: messages[4],
     theme: theme3,
     validate(value) {
       this.state.symbols.pointer = "  ";
-      return !value || value.length < 10 ? "Invalid Ngrok API Token" : true;
+      return value.length > 2 && value.length < 10 ? "Invalid Ngrok API Token" : true;
     }
   });
   const scopes = await get2({
@@ -19455,56 +19580,134 @@ async function setup() {
       ).NL.End($.log.group).BR.toString()
     );
   }
-  log(message.toLine());
   model.store = domain;
   model.domain = `${domain}.myshopify.com`;
-  model.token = token.trim();
-  model.ngrok = ngrok.trim();
+  model.token = `${domain}_api_token = '${token.trim()}'`;
+  model.password = password.trim() === "" ? `# ${domain}_password = ''` : `${domain}_password = '${password.trim()}'`;
+  model.ngrok = ngrok.trim() === "" ? "# ngrok_auth_token = ''" : `ngrok_auth_token = '${ngrok.trim()}'`;
+  $.env.file = (0, import_node_path30.join)($.cwd, ".env");
+  const env = glueLines(
+    "# Ngrok Authorization",
+    model.ngrok,
+    "",
+    `# Credentials: ${model.domain}`,
+    model.token,
+    model.password
+  );
+  await (0, import_fs_extra22.writeFile)($.env.file, env);
+  await getEnvFile();
+  await setPackageSyncify();
+  log(
+    message.NL.Line(`${xr} Generated ${Dn(".env")} credentials`, or.white).Line(`${xr} Defined ${Dn("package.json")} stores`, or.white).End($.log.group).toString()
+  );
 }
 
-// syncify/modes/strap.ts
+// syncify/prompts/strap.ts
 init_cjs_shims();
-var import_enquirer4 = require("enquirer");
-var import_fs_extra22 = require("fs-extra");
-var import_node_path30 = require("path");
+var import_enquirer5 = require("enquirer");
+var import_fs_extra23 = require("fs-extra");
+var import_node_path31 = require("path");
+var import_package_json2 = __toESM(require("@npmcli/package-json"));
+var STRAPS = [
+  ["dawn", "    Shopify Slop"],
+  ["dusk", "    Stripped Theme"],
+  ["silk", "    Sissel Theme"]
+];
+var EXAMPLES = [
+  ["using-paths", "       Strap with paths usage"],
+  ["using-rename", "      Strap with rename usage"],
+  ["using-sass", "        Strap with sass transform"],
+  ["using-schema", "      Strap using Shared Schema"],
+  ["using-tailwind", "    Strap using Tailwind transform"],
+  ["using-typescript", "  Strap using TypeScript transform"]
+];
 async function strap() {
-  const dir = (0, import_node_path30.join)($.cwd, "node_modules", "@syncify/cli", "straps");
   const straps = {
-    dawn: (0, import_node_path30.join)(dir, "dawn"),
-    dusk: (0, import_node_path30.join)(dir, "dusk"),
-    silk: (0, import_node_path30.join)(dir, "silk")
+    examples: object(),
+    themes: object()
   };
-  const theme3 = assign({}, theme2, {
-    pointer(choice, index) {
-      const prefix = this.state.index === index ? de.stub.trimEnd() + " " : de.trim + " ";
-      return prefix;
-    }
-  });
-  const { template } = await (0, import_enquirer4.prompt)({
+  const choices = {
+    themes: [],
+    examples: []
+  };
+  for (const [name2, hint] of STRAPS) {
+    straps.themes[name2] = { name: name2, path: (0, import_node_path31.join)($.dirs.straps, name2) };
+    choices.themes.push({ name: name2, message: name2, hint });
+  }
+  for (const [name2, hint] of EXAMPLES) {
+    straps.examples[name2] = { name: name2, path: (0, import_node_path31.join)($.dirs.examples, name2) };
+    choices.examples.push({ name: name2, message: name2, hint });
+  }
+  const message = Create({ type: "info" });
+  log(
+    message.Wrap(
+      "Syncify straps provide starting-point themes you can use to jump-start a new project.",
+      "You can choose one of available themes or usage examples.",
+      t
+    ).NL.toString()
+  );
+  const { kind } = await (0, import_enquirer5.prompt)({
     type: "select",
-    name: "template",
-    message: `Choose Strap${wr}    `,
+    name: "kind",
+    message: or(`Select From${wr} `),
     required: true,
-    theme: theme3,
+    theme: theme2,
     choices: [
       {
-        name: "dusk",
-        message: "Dusk  ",
-        hint: "Stripped theme"
+        name: "themes",
+        message: "Themes",
+        hint: "       Boilerplate theme straps"
       },
       {
-        name: "dawn",
-        message: "Dawn  ",
-        hint: "Shopify Slop"
-      },
-      {
-        name: "silk",
-        message: "Silk  ",
-        hint: "Custom theme"
+        name: "examples",
+        message: "Examples",
+        hint: "     One of the usage examples"
       }
     ]
   });
-  (0, import_fs_extra22.copy)(straps[template], $.cwd);
+  const { template } = await (0, import_enquirer5.prompt)({
+    type: "select",
+    name: "template",
+    message: `Choose Strap${wr}`,
+    required: true,
+    theme: theme2,
+    choices: choices[kind]
+  });
+  const strap2 = straps[kind][template];
+  const { name } = await (0, import_enquirer5.prompt)({
+    type: "input",
+    name: "name",
+    message: `Strap Name${wr}  `,
+    theme: theme2
+  });
+  spinner("Generating", { style: "spinning" });
+  await delay(1e3);
+  const dest = (0, import_node_path31.join)($.cwd, name);
+  await (0, import_fs_extra23.copy)(strap2.path, dest, {
+    filter: async (from, to) => {
+      return !(/\/node_modules\/|\/theme\/?|\/\.env|\/\.npmrc/.test(from) && /\/node_modules\/|\/theme\/?|\/\.env|\/\.npmrc/.test(to));
+    }
+  });
+  const pkg = await import_package_json2.default.load(dest);
+  const syncify = {};
+  if (has("config", pkg.content.syncify)) {
+    syncify.config = pkg.content.syncify.config;
+  }
+  pkg.update({
+    name,
+    syncify,
+    devDependencies: Object.assign(pkg.content.devDependencies, {
+      "@syncify/cli": $.module
+    })
+  });
+  await pkg.save();
+  spinner.stop();
+  log(
+    message.NL.Line(`${xr} Strap Generated`, or.white).NL.Wrap(
+      `You can now ${Dn("cd")} into the directory and install dependencies.`,
+      t
+    ).NL.End($.log.group).toString()
+  );
 }
 
 // syncify/api.ts
@@ -19591,10 +19794,6 @@ run(
       type: "string"
     },
     /* HELPERS ------------------------------------ */
-    // strap: {
-    //   type: 'string',
-    //   default: null
-    // },
     setup: {
       type: "boolean",
       default: false

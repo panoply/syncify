@@ -4,15 +4,15 @@ import process from 'node:process';
 import { upload } from 'syncify:modes/upload';
 import { build } from 'syncify:modes/build';
 import { watch } from 'syncify:modes/watch';
-import { themes } from 'syncify:modes/themes';
 import { importing } from 'syncify:modes/import';
 import { exporting } from 'syncify:modes/export';
 import { publish } from 'syncify:modes/publish';
 import { stdin } from 'syncify:log/stdin';
 import { help } from 'syncify:log/help';
 import { define } from 'syncify:options/define';
-import { setup } from 'syncify:modes/setup';
-import { strap } from 'syncify:modes/strap';
+import { themes } from 'syncify:prompts/themes';
+import { setup } from 'syncify:prompts/setup';
+import { strap } from 'syncify:prompts/strap';
 import { $ } from 'syncify:state';
 // import { exception, rejection, signal } from './cli/emitters';
 
