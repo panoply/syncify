@@ -18,6 +18,27 @@ import type * as Config from '../config';
 /* -------------------------------------------- */
 
 export interface Dirs extends Config.Directories {
+ /**
+   * The location of the Syncify node_module
+   *
+   * @default
+   * 'node_modules/@syncify/cli/'
+   */
+  module: string;
+ /**
+   * The location of the Syncify straps included with installation
+   *
+   * @default
+   * 'node_modules/@syncify/cli/straps/'
+   */
+  straps: string;
+ /**
+   * The location of the Syncify example straps included with installation
+   *
+   * @default
+   * 'node_modules/@syncify/cli/examples/'
+   */
+  examples: string;
   /**
    * Chrome `userDataDir` directory for devtools instance
    *
