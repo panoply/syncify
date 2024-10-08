@@ -1,15 +1,18 @@
-import type { Config, ENV, Tsconfig } from 'types';
+import type { Config, ENV, Tsconfig, PKGSyncify, PKG } from 'types';
 import dotenv from 'dotenv';
 import { join, relative, basename, extname } from 'node:path';
-import { pathExists, readFile, readJson, writeFile } from 'fs-extra';
+import { pathExists, readFile, readJson } from 'fs-extra';
 import stripJsonComments from 'strip-json-comments';
 import { bundleRequire } from 'syncify:requests/require';
 import { isArray, isEmpty, isObject, jsonc } from 'syncify:utils';
+import { keys } from 'syncify:native';
 import { throws } from 'syncify:log/errors';
 import { $ } from 'syncify:state';
 import { missingEnv, missingStores } from 'syncify:log/throws';
-import { hasPath } from 'rambdax';
+import { hasPath, has } from 'rambdax';
 import { SYNCIFY_CONFIG } from 'syncify:const';
+import PackageJson from '@npmcli/package-json';
+import { PartialDeep } from 'type-fest';
 
 /**
  * Config Files
@@ -118,6 +121,64 @@ export async function getTSConfig (): Promise<Tsconfig> {
 };
 
 /**
+ * Set `"syncify": {}` reference in Package.json
+ *
+ * This is a fallback workaround in situations where an `.env` file exists
+ * and has containing store references, but no stores have been defined within
+ * the users package.json file.
+ */
+export async function setPackageSyncify (pkg: PKG = $.pkg) {
+
+  const syncify: PartialDeep<PKGSyncify> = has('syncify', pkg) ? pkg.syncify : {};
+
+  // Lets attempt to write stores within package.json based on the .env values
+  if ($.env.file !== null && isEmpty($.env.vars) === false) {
+
+    const props = keys($.env.vars);
+    const stores = has('stores', syncify) ? isArray(syncify.stores) ? syncify.stores : [ syncify.stores ] : [];
+
+    for (const name of props) {
+
+      const match = name.match(/^([a-zA-Z0-9-]+)_api_(token|key)$/);
+
+      if (match !== null) {
+
+        if (stores.some(({ domain }) => domain === `${match[1]}.myshopify.com`)) continue;
+
+        if (match[2] === 'token') {
+
+          // value is _api_token, we will assume Shopify reference
+          stores.push({ domain: match[1], themes: {} });
+
+        } else if (match[2] === 'key' && has(`${match[1]}_api_secret`, $.env.vars)) {
+
+          // when value is _api_key we can confirm shopify reference by checking for secret
+          stores.push({ domain: match[1], themes: {} });
+
+        }
+      }
+    }
+
+    if (stores.length > 0) {
+
+      $.package.update({
+        syncify: {
+          stores: stores.length > 1 ? stores : stores[0]
+        }
+      });
+
+      await $.package.save();
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+}
+
+/**
  * Set Package.json File
  *
  * Resolves `package.json` file. This is triggered at runtime, the
@@ -126,27 +187,36 @@ export async function getTSConfig (): Promise<Tsconfig> {
  */
 export async function getPackageJson () {
 
-  // Save path reference of package
-  const uri = join($.cwd, 'package.json');
-  const has = await pathExists(uri);
-
+  const has = await pathExists(join($.cwd, 'package.json'));
   if (!has) throw new Error('Missing "package.json" file');
 
   try {
 
-    $.pkg = await readJson(uri);
+    $.package = await PackageJson.load($.cwd);
 
-    if (hasPath('syncify.stores', $.pkg)) {
+    const pkg = $.pkg;
 
-      if (isArray($.pkg.syncify.stores)) {
-        $.stores = $.pkg.syncify.stores;
-      } else if (isObject($.pkg.syncify.stores) && isEmpty($.pkg.syncify.stores) === false) {
-        $.stores = [ $.pkg.syncify.stores ];
+    if (hasPath('syncify.stores', pkg)) {
+
+      if (isArray(pkg.syncify.stores)) {
+        $.stores = pkg.syncify.stores;
+      } else if (isObject(pkg.syncify.stores) && isEmpty(pkg.syncify.stores) === false) {
+        $.stores = [ pkg.syncify.stores ];
       }
 
-    } else {
+    } else if (!$.cmd.strap && $.cmd.mode !== 'setup') {
 
-      if (!$.cmd.strap) missingStores($.cwd);
+      const hasReference = await setPackageSyncify();
+
+      if (hasReference) {
+
+        return getPackageJson();
+
+      } else {
+
+        missingStores($.cwd);
+
+      }
 
     }
 
@@ -165,23 +235,15 @@ export async function getPackageJson () {
  * version number, while preserving the JSON indentation.
  * Applies a reparse following the write, updating the the state `$.pkg` reference.
  */
-export async function setPkgVersion (current: string, increment: string) {
-
-  const uri = join($.cwd, 'package.json');
+export async function setPkgVersion (current: string, version: string) {
 
   try {
 
-    const pkg = await readFile(uri);
-    const str = pkg.toString();
-    const ver = str.indexOf('"version"');
-    const sqo = str.indexOf('"', ver + 10) + 1;
-    const eqo = str.indexOf('"', sqo + 1);
-    const num = str.slice(sqo, eqo);
+    if ($.pkg.version === version) {
 
-    if (num === current) {
+      $.package.update({ version });
 
-      await writeFile(uri, `${str.slice(0, sqo)}${increment}${str.slice(eqo)}`);
-      await getPackageJson();
+      await $.package.save();
 
       return true;
 
@@ -223,7 +285,7 @@ export async function getEnvFile (): Promise<ENV.RCFile> {
 
   } else {
 
-    if ($.cmd.setup === false && !$.cmd.strap) {
+    if ($.cmd.mode !== 'setup') {
 
       missingEnv($.cwd);
 
