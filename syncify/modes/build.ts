@@ -173,9 +173,7 @@ export async function build (cb?: Syncify) {
         // update cache paths
         cache[file.output] = file.input;
 
-        const value = file.ext === '.json'
-          ? await json(file, null, cb as any)
-          : await transform(file, null, cb);
+        const value = file.ext === '.json' ? await json(file, null, cb) : await transform(file, null, cb);
 
         if (value === null || isNaN(file.size)) {
 
