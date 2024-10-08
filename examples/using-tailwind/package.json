@@ -7,18 +7,16 @@
   "stylelint": {
     "extends": "@syncify/stylelint-config"
   },
-  "syncify": {
-    "stores": {
-      "domain": "syncify",
-      "themes": {
-        "dusk": 137200533745
-      }
-    }
-  },
   "devDependencies": {
     "@syncify/cli": "workspace:^",
     "@syncify/stylelint-config": "workspace:^",
     "autoprefixer": "^10.4.20",
     "tailwindcss": "^3.4.13"
+  },
+  "syncify": {
+    "stores": {
+      "domain": "syncify",
+      "themes": {}
+    }
   }
 }
