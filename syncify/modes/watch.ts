@@ -26,6 +26,8 @@ export function watch (callback: Syncify) {
 
   if ($.mode.hot) $.wss.connected();
 
+  //  $.watch.add($.file.path)
+
   $.watch.on('all', onchange);
 
   function onchange (event: ChokidorEvents, path: string) {
