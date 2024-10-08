@@ -1,5 +1,5 @@
 import ansis, { Ansis } from 'ansis';
-import { Tree } from './symbols';
+import { Tree } from './tree';
 import { Colors, lightGray, whiteBright } from './colors';
 
 export interface Progress {
