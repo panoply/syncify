@@ -55,7 +55,7 @@ export async function define (cli: Commands, options?: Config) {
   await getConfig();
   await getCache();
 
-  if ($.mode.setup || $.mode.strap || $.mode.themes) return;
+  if ($.mode.setup || $.mode.strap) return;
 
   await setBaseDirs(cli);
 
