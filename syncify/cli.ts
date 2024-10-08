@@ -57,12 +57,6 @@ run(
     },
 
     /* HELPERS ------------------------------------ */
-
-    // strap: {
-    //   type: 'string',
-    //   default: null
-
-    // },
     setup: {
       type: 'boolean',
       default: false
