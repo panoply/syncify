@@ -1,21 +1,15 @@
-# THEMES
 [submodule "straps/themes/dusk"]
 	path = straps/themes/dusk
-	url = https://github.com/SyncifyCLI/dusk
-
-# USAGE EXAMPLES
+	url = https://github.com/syncifycli/dust.git
 [submodule "straps/examples/using-paths"]
 	path = straps/examples/using-paths
-	url = https://github.com/SyncifyCLI/using-paths
-[submodule "straps/examples/using-rename"]
-	path = straps/examples/using-rename
-	url = https://github.com/SyncifyCLI/using-rename
-[submodule "straps/examples/using-sass"]
-	path = straps/examples/using-sass
-	url = https://github.com/SyncifyCLI/using-sass
+	url = https://github.com/syncifycli/using-paths.git
 [submodule "straps/examples/using-schema"]
 	path = straps/examples/using-schema
-	url = https://github.com/SyncifyCLI/using-schema
+	url = https://github.com/syncifycli/using-schema.git
 [submodule "straps/examples/using-tailwind"]
 	path = straps/examples/using-tailwind
-	url = https://github.com/SyncifyCLI/using-tailwind
+	url = https://github.com/syncifycli/using-tailwind.git
+[submodule "straps/examples/using-rename"]
+	path = straps/examples/using-rename
+	url = https://github.com/syncifycli/using-rename.git
