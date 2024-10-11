@@ -1,2 +1,5 @@
+.npmrc
+.env
+
 theme
 node_modules
