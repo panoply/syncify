@@ -38,8 +38,6 @@ export default defineConfig({
   import: 'import',
   export: 'export',
   config: '.',
-  hot: false,
-  clean: true,
   paths: {
     assets: 'assets/*',
     config: 'config/*.json',
@@ -56,9 +54,9 @@ export default defineConfig({
     sections: 'sections/**/*.{liquid,json}'
   },
   transform: {
-    svg: {},
-    style: {},
     script: {},
+    style: {},
+    svg: {},
     json: {},
     liquid: {}
   },
@@ -71,6 +69,14 @@ export default defineConfig({
     publishRole: 'unpublished',
     themeLimit: 3,
     tunnelPort: 80
+  },
+  hot: {
+    server: 3000,
+    socket: 8089,
+    previewBar: false,
+    method: 'hot',
+    label: 'visible',
+    strategy: 'hydrate',
   },
   log: {
     clear: true,

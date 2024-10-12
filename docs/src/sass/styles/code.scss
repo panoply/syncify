@@ -4,6 +4,21 @@
   }
 }
 
+.language-bash {
+  .token.title {
+    font-family: $font-family-heading;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #54627d;
+    line-height: 35px;
+    letter-spacing: 0.02rem;
+
+    .token.punctuation {
+      color: $body-bg;
+    }
+  }
+}
+
 :not(pre) > code {
   word-wrap: break-word;
   padding: 0.12rem 0.45rem 0.21rem 0.45rem;

@@ -46,131 +46,11 @@ Single directory structures are not a viable approach when building modern and p
 
 ---
 
-# Default Structure
-
-The `paths` option allows you to define your themes structure. You themes structure is resolved to the defined `input` directory. Syncify does not require you set a development structure required by Shopify and you should begin to decouple from that logic. The `paths` configuration option can be used to customize your development theme structure. Each path key represents a theme directory or resource point which accepts either a `string` or `string[]` array list of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns. All defined references will automatically resolve to the defined `input` directory starting point, so you do not need to include it within your path definitions.
-
-:::: grid row dir-each my-5
-::: grid col fs-sm
-
-```treeview
-/
-├── source/
-│   ├── assets/
-│   ├── config/
-│   ├── files/
-│   ├── layout/
-│   ├── locales/
-│   ├── pages/
-│   ├── metafields/
-│   │   └── namespace/
-│   ├── schema/
-│   ├── sections/
-│   ├── snippets/
-│   └── templates/
-│       ├── metaobject/
-│       └── customers/
-├── theme/
-├── .env
-└── package.json
-```
-
-:::
-::: grid col-8
-
-<!-- prettier-ignore -->
-```js
-import { defineConfig } from '@syncify/cli';
-
-export default defineConfig({
-  input: 'source',
-  output: 'theme',
-  paths: {
-    assets: 'assets/**',
-    config: 'config/*.json',
-    locales: 'locales/*.json',
-    layout: 'layout/*.liquid',
-    metafields: 'metafields/**/*.json',
-    schema: 'schema/*.{schema,json}',
-    sections: 'sections/**/*.{liquid,json}',
-    snippets: 'snippets/**/*.liquid',
-    templates: 'templates/*.{liquid,json}',
-    customers: 'templates/customers/*.{liquid,json}',
-    metaobject: 'templates/metaobject/*.{liquid,json}',
-    pages: 'pages/*.{md,html}',
-    redirects: 'redirects.yaml'
-  }
-})
-```
-
-:::
-::::
-
-By default, Syncify assumes you are using the above theme architecture and it will use that to build a valid theme **output** structure which Shopify understands. You may notice that the **input** directory is not included within in our `paths` and this is because Syncify applies **input** directory relativity automatically based on the `input` value that was provided. It does not matter whether or not you include **input** prefixes in your `paths`, full resolution will obtained with or without reference.
-
----
-
-# Custom Structure
-
-Using the default structure is certainly not the preferred approach when leveraging Syncify and you are encouraged to establish an input (theme) structure which suits your project and adheres to your workflow or tastes. Below is a basic example of how we can architect a **customized structure** using the `paths` option.
-
-:::: grid row dir-each mb-4
-::: grid col fs-sm
-
-```treeview
-/
-└── source/
-    ├── assets/
-    │   └── files/
-    ├── data/
-    │   ├── config/
-    │   ├── locales/
-    │   └── metafields/
-    │      └── namespace/
-    ├── pages/
-    └── views/
-        ├── customers/
-        ├── meta/
-        ├── sections/
-        │   └── schema/
-        ├── snippets/
-        ├── templates/
-        └── theme.liquid
-```
-
-:::
-::: grid col-8
-
-<!-- prettier-ignore -->
-```js
-import { defineConfig } from '@syncify/cli';
-
-export default defineConfig({
-  input: 'source',
-  output: 'theme',
-  paths: {
-    assets: 'assets/**',
-    config: 'data/config/*.json',
-    locales: 'data/locales/*.json',
-    metafields: 'data/metafields/**/*.json',
-    layout: '*.liquid',
-    sections: 'views/sections/**/*.liquid',
-    snippets: 'views/snippets/**/*.liquid',
-    templates: 'views/templates/*.{liquid,json}',
-    customers: 'views/customers/*.{liquid,json}',
-    schema: 'views/sections/**/*.schema',
-    metaobject: 'views/meta/*.{liquid,json}',
-    pages: 'pages/*.{md,html}'
-  }
-})
-```
-
-:::
-::::
+# Structures
 
 Below are **2** different **input** structures and an **output** structure. The **default structure** is what Syncify will use (as above) if no `paths` have been defined in your configuration (the tool defaults to this). The **customized structure** is an example of how you _could_ arrange an `input` directory using the Syncify `paths` option. The **output structure** is what Syncify will generated as an **output** which Shopify can digest.
 
-:::: grid row gx-4 bd jc-center ai-center mx-1 mt-4 rd-x rd-t
+:::: grid row gx-4 bd jc-center ai-center mr-4 ml-1 mt-4 rd-x rd-t
 ::: grid col fs-sm tc
 
 ##### Default Structure
@@ -188,7 +68,7 @@ Below are **2** different **input** structures and an **output** structure. The 
 :::
 ::::
 
-:::: grid row gx-4 bd jc-center ai-center mx-1 mb-4 rd-b rd-x bt-0
+:::: grid row gx-4 bd jc-center ai-center mr-4 ml-1 mb-4 rd-b rd-x bt-0
 ::: grid col ph-440
 
 ```treeview
@@ -251,3 +131,123 @@ theme/
 ::::
 
 There is no distributed difference between the **default** and **customized** structures illustrated above. Both would generate an **output** that Shopify understands, requires and reasons with. Only the **input** source locations differ. The **output** Syncify creates will always be written to a standard Shopify theme structure regardless of how you may decide to organize **input** paths. Custom structures give you creative freedom and does not impose a restrictive workflow you may have become behest to working with Dawn and the Shopify CLI.
+
+# Default Structure
+
+The `paths` option allows you to define your themes structure. You themes structure is resolved to the defined `input` directory. Syncify does not require you set a development structure required by Shopify and you should begin to decouple from that logic. The `paths` configuration option can be used to customize your development theme structure. Each path key represents a theme directory or resource point which accepts either a `string` or `string[]` array list of glob [anymatch](https://www.npmjs.com/package/anymatch) patterns. All defined references will automatically resolve to the defined `input` directory starting point, so you do not need to include it within your path definitions.
+
+:::: grid row dir-each my-5
+::: grid col fs-sm
+
+```treeview
+/
+├── source/
+│   ├── assets/
+│   ├── config/
+│   ├── files/
+│   ├── layout/
+│   ├── locales/
+│   ├── pages/
+│   ├── metafields/
+│   │   └── namespace/
+│   ├── schema/
+│   ├── sections/
+│   ├── snippets/
+│   └── templates/
+│       ├── metaobject/
+│       └── customers/
+├── theme/
+├── .env
+└── package.json
+```
+
+:::
+::: grid col-8
+
+<!-- prettier-ignore -->
+```js
+import { defineConfig } from '@syncify/cli';
+
+export default defineConfig({
+  input: 'source',
+  output: 'theme',
+  paths: {
+    assets: 'assets/**',
+    config: 'config/*.json',
+    locales: 'locales/*.json',
+    layout: 'layout/*.liquid',
+    metafields: 'metafields/**/*.json',
+    schema: 'schema/*.{schema,json}',
+    sections: 'sections/**/*.{liquid,json}',
+    snippets: 'snippets/**/*.liquid',
+    templates: 'templates/*.{liquid,json}',
+    customers: 'templates/customers/*.{liquid,json}',
+    metaobject: 'templates/metaobject/*.{liquid,json}',
+    pages: 'pages/*.{md,html}',
+    redirects: 'redirects.yaml'
+  }
+})
+```
+
+:::
+::::
+
+By default, Syncify assumes you are using the above theme architecture and it will use that to build a valid theme **output** structure which Shopify understands. You may notice that the **input** directory is not included within in our `paths` and this is because Syncify applies **input** directory relativity automatically based on the `input` value that was provided. It does not matter whether or not you include **input** prefixes in your `paths`, full resolution will obtained with or without reference.
+
+# Custom Structure
+
+Using the default structure is certainly not the preferred approach when leveraging Syncify and you are encouraged to establish an input (theme) structure which suits your project and adheres to your workflow or tastes. Below is a basic example of how we can architect a **customized structure** using the `paths` option.
+
+:::: grid row dir-each mb-4
+::: grid col fs-sm
+
+```treeview
+/
+└── source/
+    ├── assets/
+    │   └── files/
+    ├── data/
+    │   ├── config/
+    │   ├── locales/
+    │   └── metafields/
+    │      └── namespace/
+    ├── pages/
+    └── views/
+        ├── customers/
+        ├── meta/
+        ├── sections/
+        │   └── schema/
+        ├── snippets/
+        ├── templates/
+        └── theme.liquid
+```
+
+:::
+::: grid col-8
+
+<!-- prettier-ignore -->
+```js
+import { defineConfig } from '@syncify/cli';
+
+export default defineConfig({
+  input: 'source',
+  output: 'theme',
+  paths: {
+    assets: 'assets/**',
+    config: 'data/config/*.json',
+    locales: 'data/locales/*.json',
+    metafields: 'data/metafields/**/*.json',
+    layout: '*.liquid',
+    sections: 'views/sections/**/*.liquid',
+    snippets: 'views/snippets/**/*.liquid',
+    templates: 'views/templates/*.{liquid,json}',
+    customers: 'views/customers/*.{liquid,json}',
+    schema: 'views/sections/**/*.schema',
+    metaobject: 'views/meta/*.{liquid,json}',
+    pages: 'pages/*.{md,html}'
+  }
+})
+```
+
+:::
+::::

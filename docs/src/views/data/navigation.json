@@ -33,6 +33,10 @@
           "url": "/what-is-syncify/"
         },
         {
+          "title": "Quickstart",
+          "url": "/quickstart/"
+        },
+        {
           "title": "Getting Help",
           "url": "/getting-help/"
         },
@@ -91,6 +95,10 @@
           "url": "/usage/transforms/"
         },
         {
+          "title": "Processors",
+          "url": "/usage/processors/"
+        },
+        {
           "title": "Spawn",
           "url": "/usage/spawn/"
         },
@@ -108,7 +116,7 @@
         },
         {
           "title": "Metafields",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/metafields/"
         },
         {
           "title": "Frontmatter",
@@ -128,11 +136,11 @@
         },
         {
           "title": "Version Control",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/version-control/"
         },
         {
           "title": "Publishing Themes",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/publishing-themes/"
         },
         {
           "title": "Redirects",
