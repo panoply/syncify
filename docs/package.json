@@ -50,21 +50,21 @@
     "spx": "link:../../spx"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^2.0.1",
+    "@11ty/eleventy": "^3.0.0",
     "@brixtol/bootstrap": "^1.7.5",
     "@fullhuman/postcss-purgecss": "^6.0.0",
     "@sissel/stylelint-config": "^1.2.4",
     "@syncify/cli": "link:..",
     "autoprefixer": "^10.4.20",
-    "concurrently": "^9.0.0",
+    "concurrently": "^9.0.1",
     "cssnano": "^7.0.6",
-    "e11ty": "^0.1.1",
+    "e11ty": "^0.1.2",
     "markdown-it-container": "^4.0.0",
-    "netlify-cli": "^17.35.0",
-    "papyrus": "^0.6.8",
-    "postcss": "^8.4.45",
+    "netlify-cli": "^17.37.0",
+    "papyrus": "^0.6.93",
+    "postcss": "^8.4.47",
     "postcss-cli": "^11.0.0",
-    "sass": "^1.78.0",
-    "tsup": "^8.2.4"
+    "sass": "^1.79.5",
+    "tsup": "^8.3.0"
   }
 }

@@ -82,7 +82,7 @@ module.exports = defineConfig(function (config) {
       block: ({
         raw,
         language
-      }) =>  papyrus.highlight(raw, {
+      }) => papyrus.highlight(raw, {
         language,
         lineNumbers: (
           language === 'json' ||

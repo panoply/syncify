@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig(
   {
     entry: {
-      'bundle.min': './src/app/bundle.ts',
+      'bundle.min': './src/app/bundle.ts'
     },
     outDir: './public',
     outExtension: () => ({ js: '.js' }),
