@@ -47,6 +47,7 @@ run(
 
     publish: {
       type: 'boolean',
+      short: 'p',
       default: false
     },
     release: {
