@@ -1,17 +1,20 @@
 /* eslint-disable no-unused-vars */
-import type { Choice, ArrayPromptOptions } from 'types/internal';
-import * as c from '@syncify/ansi';
-import { prompt } from 'enquirer';
-import { object, ws, has } from 'syncify:utils';
-import { copy } from 'fs-extra';
-import { $ } from 'syncify:state';
+import type { Choice, ArrayPromptOptions, StringPromptOptions } from 'types/internal';
 import { join } from 'node:path';
-import { theme } from './enquirer';
-import * as log from 'syncify:log';
-import { Create } from 'syncify:ansi';
-import { delay } from 'rambdax';
 import PackageJson from '@npmcli/package-json';
-import { PKG } from 'types';
+import { copy, pathExists, remove } from 'fs-extra';
+import { delay } from 'rambdax';
+import { prompt } from 'enquirer';
+import { theme } from 'syncify:prompts/enquirer';
+import { assign, command } from 'syncify:native';
+import { object, hasPath, has } from 'syncify:utils';
+import { execAsync } from 'syncify:utils/child';
+import * as c from '@syncify/ansi';
+import * as log from 'syncify:log';
+import * as throws from 'syncify:log/throws';
+import * as errors from 'syncify:log/errors';
+import { $ } from 'syncify:state';
+import { Config, PKG, Stores } from 'types';
 
 const STRAPS = <const>[
   [ 'dawn', '    Shopify Slop' ],
@@ -28,7 +31,7 @@ const EXAMPLES = <const>[
   [ 'using-typescript', '  Strap using TypeScript transform' ]
 ];
 
-export async function strap () {
+export async function strap (fromSetup = true) {
 
   const straps: {
     [k in 'themes' | 'examples']: Record<typeof STRAPS[number][0] | typeof EXAMPLES[number][0], {
@@ -39,34 +42,34 @@ export async function strap () {
     examples: object(),
     themes: object()
   };
-
   const choices: { themes: Choice[], examples: Choice[] } = {
     themes: [],
     examples: []
   };
-
   for (const [ name, hint ] of STRAPS) {
     straps.themes[name] = { name, path: join($.dirs.straps, name) };
     choices.themes.push({ name, message: name, hint });
   }
-
   for (const [ name, hint ] of EXAMPLES) {
     straps.examples[name] = { name, path: join($.dirs.examples, name) };
     choices.examples.push({ name, message: name, hint });
   }
 
-  const message = Create({ type: 'info' });
+  const message = c.Create({ type: 'info' });
+  const filter = (src: string) => /(package\.json|\.git)|/.test(src);
 
-  log.out(
-    message
-    .Wrap(
-      'Syncify straps provide starting-point themes you can use to jump-start a new project.',
-      'You can choose one of available themes or usage examples.',
-      c.gray
-    )
-    .NL
-    .toString()
-  );
+  if (!fromSetup) {
+    log.out(
+      message
+      .Wrap(
+        'Syncify straps provide starting-point themes you can use to jump start a new project.',
+        'You can choose one of available open source themes or a usage example',
+        c.gray
+      )
+      .NL
+      .toString()
+    );
+  }
 
   const { kind } = await prompt<{ kind: string }>(<ArrayPromptOptions> {
     type: 'select',
@@ -97,64 +100,102 @@ export async function strap () {
     choices: choices[kind]
   });
 
-  const strap: { path: string; name: string; } = straps[kind][template];
-
-  const { name } = await prompt<{ name: string}>(<any>{
+  const { name } = await prompt<{ name: string}>(<StringPromptOptions>{
     type: 'input',
     name: 'name',
-    message: `Strap Name${c.COL}  `,
+    hint: 'This will be used as the theme target name',
+    message: `Theme Name${c.COL}`,
     theme
   });
 
-  log.spinner('Generating', { style: 'spinning' });
+  const dir = fromSetup ? $.cwd : join($.cwd, name);
 
-  await delay(1000);
+  // log.spinner('Creating Strap', { style: 'spinning' });
 
-  const dest = join($.cwd, name);
+  const strapTemplate = join(dir, template);
+  const strapPkgPath = join(strapTemplate, 'package.json');
 
-  await copy(strap.path, dest, {
-    filter: async (from, to) => {
+  await execAsync(`git clone https://github.com/syncifycli/${template}.git`);
 
-      return !(
-        /\/node_modules\/|\/theme\/?|\/\.env|\/\.npmrc/.test(from) &&
-        /\/node_modules\/|\/theme\/?|\/\.env|\/\.npmrc/.test(to)
-      );
-
-    }
-  });
-
-  const pkg = await PackageJson.load(dest);
-
-  const syncify: any = {};
-
-  if (has('config', (pkg.content as PKG).syncify)) {
-    syncify.config = (pkg.content as PKG).syncify.config;
-  }
-
-  pkg.update({
-    name,
-    syncify,
-    devDependencies: Object.assign(pkg.content.devDependencies, {
-      '@syncify/cli': $.module
+  await copy(strapTemplate, dir, { filter }).catch(
+    errors.write('Error copying contents to directory', {
+      from: strapTemplate,
+      to: dir
     })
-  });
-
-  await pkg.save();
-
-  log.spinner.stop();
-
-  log.out(
-    message
-    .NL
-    .Line(`${c.CHK} Strap Generated`, c.bold.white)
-    .NL
-    .Wrap(
-      `You can now ${c.cyan('cd')} into the directory and install dependencies.`
-      , c.gray
-    )
-    .NL
-    .End($.log.group)
-    .toString()
   );
 
+  if (!(await pathExists(strapPkgPath))) {
+
+    throw throws.enoentError({
+      type: 'file',
+      path,
+      task: $.argv,
+      message: [
+        `The strap does not contain a ${c.cyan('package.json')} file.`,
+        'If you are using a pre-release version of Syncify, this will be addressed',
+        'upon official release. Please choose another strap.'
+      ]
+    });
+
+  }
+
+  /** Strap Package */
+  const strapPkg = await PackageJson.load(strapTemplate);
+
+  /** Syncify key */
+  const syncify: {
+    stores?: Stores;
+    config?: Omit<Config, 'stores'>;
+} = {};
+
+  if (hasPath('syncify.config', $.pkg)) {
+    syncify.config = $.pkg.syncify.config;
+  }
+
+  await $.package.update({
+    // @ts-expect-error
+    syncify,
+    devDependencies: assign(
+      strapPkg.content.devDependencies,
+      $.pkg.devDependencies
+    )
+  }).save();
+
+  log.spinner.update('Installing Dependencies');
+
+  await execAsync(`${$.pm} install`);
+
+  remove(join(dir, template));
+
+  log.spinner.update('Building Theme');
+
+  await execAsync(`${$.pm} sy -b`);
+
+  if (fromSetup) {
+
+    log.spinner.update('Publishing theme');
+
+    await execAsync(`${$.pm} sy -p`);
+
+    log.spinner.stop();
+    log.group(false);
+    process.exit(0);
+
+  } else {
+
+    log.out(
+      message
+      .NL
+      .Line(`${c.CHK} Strap Generated`, c.bold.white)
+      .NL
+      .Wrap(
+        `You can now ${c.cyan('cd')} into the directory and install dependencies.`
+        , c.gray
+      )
+      .NL
+      .End($.log.group)
+      .toString()
+    );
+
+  }
 }

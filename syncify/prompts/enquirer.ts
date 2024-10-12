@@ -1,5 +1,5 @@
+import type { Choice } from 'types/internal';
 import { gray, lightGray, neonGreen, red, Tree, yellowBright } from '@syncify/ansi';
-import { Choice } from 'types/internal/enquirer';
 
 export async function render () {
 
