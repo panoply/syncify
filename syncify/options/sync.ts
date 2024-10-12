@@ -7,7 +7,7 @@ import { authURL, getStoresFromEnv } from 'syncify:utils/options';
 import { keys } from 'syncify:native';
 import { has } from 'syncify:utils';
 import { $ } from 'syncify:state';
-import { Connect } from 'syncify:cli/prompts';
+import { listThemes } from 'syncify:prompts/themes';
 
 /**
  * Set Sync
@@ -42,6 +42,7 @@ export async function setSync (cli: Commands) {
   let queue: boolean = false;
 
   if (storeRequired && $.cmd.stores.length === 0 && $.mode.themes === false) {
+
     invalidCommand({
       expected: 'syncify <store>',
       message: [
@@ -103,9 +104,9 @@ export async function setSync (cli: Commands) {
       themes = keys(store.themes);
     }
 
-    if (themes.length === 0) {
+    if (themes.length === 0 && !$.mode.build && !$.mode.publish) {
 
-      await Connect($.sync.stores[sidx]);
+      await listThemes($.sync.stores[sidx]);
 
     }
 

@@ -1,7 +1,7 @@
 import type { Syncify, ClientParam, ScriptBundle } from 'types';
+import { basename, join, relative } from 'node:path';
 import { writeFile } from 'fs-extra';
 import esbuild, { Metafile } from 'esbuild';
-import { basename, join, relative } from 'node:path';
 import { isType } from 'rambdax';
 import { File } from 'syncify:file';
 import { timer } from 'syncify:timer';

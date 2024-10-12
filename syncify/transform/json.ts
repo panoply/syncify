@@ -12,6 +12,7 @@ import * as u from 'syncify:utils';
 import { $ } from 'syncify:state';
 import { queue } from 'syncify:requests/client';
 import { tailwindParse } from 'syncify:style';
+import { sanitize } from '@syncify/ansi';
 
 /**
  * Parse JSON
@@ -111,11 +112,7 @@ export async function jsonCompile (file: File, data: string, space = 0) {
  * cb that one can optionally execute
  * from within scripts.
  */
-export async function compile (
-  file: File,
-  sync: ClientParam,
-  cb?: Syncify
-): Promise<string> {
+export async function compile (file: File, sync: ClientParam, cb?: Syncify): Promise<string> {
 
   $.mode.watch && timer.start();
 
@@ -200,7 +197,7 @@ export async function compile (
 
       } else if (u.isArray(update) || u.isObject(update)) {
 
-        content = await jsonCompile(file, u.sanitize(update), space);
+        content = await jsonCompile(file, sanitize(update), space);
 
       } else if (u.isString(update)) {
 

@@ -1,3 +1,4 @@
+import type { PartialDeep } from 'type-fest';
 import type { Config, ENV, Tsconfig, PKGSyncify, PKG } from 'types';
 import dotenv from 'dotenv';
 import { join, relative, basename, extname } from 'node:path';
@@ -12,7 +13,6 @@ import { missingEnv, missingStores } from 'syncify:log/throws';
 import { hasPath, has } from 'rambdax';
 import { SYNCIFY_CONFIG } from 'syncify:const';
 import PackageJson from '@npmcli/package-json';
-import { PartialDeep } from 'type-fest';
 
 /**
  * Config Files

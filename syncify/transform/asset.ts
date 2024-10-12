@@ -1,4 +1,5 @@
 import type { ClientParam, Syncify } from 'types';
+import { basename } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { isType } from 'rambdax';
 import { AssetRequest } from 'syncify:requests/client';
@@ -7,7 +8,6 @@ import { isFunction, isBuffer, isUndefined, isEmptyString } from 'syncify:utils'
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import { $ } from 'syncify:state';
-import { basename } from 'node:path';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */

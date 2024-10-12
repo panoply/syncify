@@ -91,7 +91,7 @@ export async function define (cli: Commands, options?: Config) {
 
   });
 
-  if ($.mode.themes) return;
+  if ($.mode.themes && !$.mode.build) return;
 
   setJsonOptions();
   setLiquidOptions();

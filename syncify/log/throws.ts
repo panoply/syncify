@@ -3,23 +3,8 @@ import { argv } from 'node:process';
 import { isUndefined, isString, glueString } from 'syncify:utils';
 import { error } from 'syncify:native';
 import { REGEX_OR_CHARS } from 'syncify:const';
-import { Encase, Create } from 'syncify:cli/tree';
 import { $ } from 'syncify:state';
-import {
-  Tree,
-  COL,
-  TLD,
-  ARR,
-  blue,
-  bold,
-  cyan,
-  gray,
-  red,
-  redBright,
-  white,
-  whiteBright,
-  yellowBright
-} from '@syncify/ansi';
+import * as c from '@syncify/ansi';
 
 /**
  * Warning Store
@@ -71,9 +56,9 @@ export function warnOption (group: string) {
 
   return (message: string, value?: string) => {
     if (isUndefined(value)) {
-      warnings[group].push(yellowBright(message));
+      warnings[group].push(c.yellowBright(message));
     } else {
-      warnings[group].push(yellowBright(message + COL + WSP + bold(value)));
+      warnings[group].push(c.yellowBright(message + c.COL + WSP + c.bold(value)));
     }
   };
 };
@@ -90,9 +75,9 @@ export function warnSevere (group: string) {
 
   return (message: string, value?: string) => {
     if (isUndefined(value)) {
-      severities[group].push(Tree.red + red(message));
+      severities[group].push(c.Tree.red + c.red(message));
     } else {
-      severities[group].push(Tree.red + red(message + COL + WSP + bold(value)));
+      severities[group].push(c.Tree.red + c.red(message + c.COL + WSP + c.bold(value)));
     }
   };
 };
@@ -127,19 +112,19 @@ export function typeError ({
 }) {
 
   error(
-    Create({ type: 'error' })
-    .Line('TYPE ERROR', bold)
+    c.Create({ type: 'error' })
+    .Line('TYPE ERROR', c.bold)
     .NL
-    .Line(`An invalid ${cyan(option)} type value was provided within your ${bold($.file.base)} file.`)
-    .Line(`The ${cyan(name)} option has an incorrect type. Syncify will not intialize until this is fixed.`)
+    .Line(`An invalid ${c.cyan(option)} type value was provided within your ${c.bold($.file.base)} file.`)
+    .Line(`The ${c.cyan(name)} option has an incorrect type. Syncify will not intialize until this is fixed.`)
     .NL
-    .Line(`provided${COL} ${yellowBright(type(provided).toLowerCase())}`)
-    .Line(`expected${COL} ${blue(expects.replace(/([|,])/g, gray('$1')))}`)
-    .Line(`location${COL} ${TLD}${gray.underline($.file.base)}`)
+    .Line(`provided${c.COL} ${c.yellowBright(type(provided).toLowerCase())}`)
+    .Line(`expected${c.COL} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}`)
+    .Line(`location${c.COL} ${c.TLD}${c.gray.underline($.file.base)}`)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Line(`You need to change the option value to use the ${blue('expected')} type.`, gray)
-    .Line(`Use the ${white('defineConfig')} named export for type checking`, gray)
+    .Line('How to fix?', c.gray.bold)
+    .Line(`You need to change the option value to use the ${c.blue('expected')} type.`, c.gray)
+    .Line(`Use the ${c.white('defineConfig')} named export for type checking`, c.gray)
     .End($.log.group)
     .BR
     .toString()
@@ -169,22 +154,22 @@ export function invalidCommand ({
 
   if (!provided) {
     provided = argv.slice(2).join(WSP);
-    expected = whiteBright(`syncify ${provided} ${cyan(expected.replace(/([|,-])/g, gray('$1')))}`);
+    expected = c.whiteBright(`syncify ${provided} ${c.cyan(expected.replace(/([|,-])/g, c.gray('$1')))}`);
   } else {
-    expected = whiteBright(`syncify ${expected}`);
+    expected = c.whiteBright(`syncify ${expected}`);
   }
 
   error(
-    Create({ type: 'error' })
-    .Line('COMMAND ERROR', bold)
+    c.Create({ type: 'error' })
+    .Line('COMMAND ERROR', c.bold)
     .NL
     .Wrap(message)
     .NL
-    .Line(`provided${COL} ${whiteBright('$')} ${whiteBright('syncify ' + provided)}`)
-    .Line(`expected${COL} ${whiteBright('$')} ${expected}`)
+    .Line(`provided${c.COL} ${c.whiteBright('$')} ${c.whiteBright('syncify ' + provided)}`)
+    .Line(`expected${c.COL} ${c.whiteBright('$')} ${expected}`)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Wrap(fix, gray)
+    .Line('How to fix?', c.gray.bold)
+    .Wrap(fix, c.gray)
     .NL
     .End($.log.group)
     .BR
@@ -216,24 +201,59 @@ export function invalidTarget ({
 }) {
 
   if (REGEX_OR_CHARS.test(provided)) {
-    provided = provided.replace(REGEX_OR_CHARS, gray('$1'));
+    provided = provided.replace(REGEX_OR_CHARS, c.gray('$1'));
   }
 
   if (REGEX_OR_CHARS.test(expected)) {
-    expected = expected.replace(REGEX_OR_CHARS, gray('$1'));
+    expected = expected.replace(REGEX_OR_CHARS, c.gray('$1'));
   }
 
   error(
-    Create({ type: 'error' })
-    .Line('INVALID TARGET', bold)
+    c.Create({ type: 'error' })
+    .Line('INVALID TARGET', c.bold)
     .NL
-    .Wrap(`Invalid ${cyan(type)} target provided. `, ...message)
+    .Wrap(`Invalid ${c.cyan(type)} target provided. `, ...message)
     .NL
-    .Line(`provided${COL} ${yellowBright(expected)}`)
-    .Line(`expected${COL} ${blue(provided)}`)
+    .Line(`provided${c.COL} ${c.yellowBright(expected)}`)
+    .Line(`expected${c.COL} ${c.blue(provided)}`)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Wrap(fix, gray)
+    .Line('How to fix?', c.gray.bold)
+    .Wrap(fix, c.gray)
+    .End($.log.group)
+    .BR
+    .toString()
+  );
+
+  process.exit(0);
+
+}
+
+/**
+ * ENOENT Error
+ *
+ * Wrapper around ENOENT errors, when a file cannot be found or path cannot be resolved.
+ */
+export function enoentError ({
+  type,
+  path,
+  message,
+  task
+}: {
+  type: 'file' | 'directory',
+  path: string;
+  message: string[];
+  task: string;
+}) {
+
+  error(
+    c.Create({ type: 'error' })
+    .Line('ENOENT ERROR', c.bold)
+    .NL
+    .Wrap(`Failed to resolve ${c.cyan(path)} ${type}.`, ...message)
+    .NL
+    .Line(`task${c.COL} ${c.yellowBright(task)}`)
+    .Line(`path${c.COL} ${c.blue(path)}`)
+    .NL
     .End($.log.group)
     .BR
     .toString()
@@ -250,24 +270,24 @@ export function invalidTarget ({
  */
 export function missingDependency (deps: string | string[]) {
 
-  const message = Create({
+  const message = c.Create({
     type: 'error'
-  }).Line('DEPENDENCY ERROR', bold).NL;
+  }).Line('DEPENDENCY ERROR', c.bold).NL;
 
   if (isString(deps)) {
 
     message
-    .Wrap(`Missing ${cyan(deps)} dependency. You need to install ${cyan(deps)} to use it as a processor.`)
+    .Wrap(`Missing ${c.cyan(deps)} dependency. You need to install ${c.cyan(deps)} to use it as a processor.`)
     .NL
-    .Line('How to fix?', gray.bold)
+    .Line('How to fix?', c.gray.bold)
     .Line('Install the above module as a development dependency, for example:')
     .NL
-    .Line(`$ pnpm add ${deps} -D`, whiteBright);
+    .Line(`$ pnpm add ${deps} -D`, c.whiteBright);
 
   } else {
 
     const info = [
-      `Missing ${cyan(`${deps.length}`)} dependencies. You are attempting to use processor`,
+      `Missing ${c.cyan(`${deps.length}`)} dependencies. You are attempting to use processor`,
       '(transforms) which are not yet installed. Install the below modules as development',
       'dependencies or disable the transform:'
     ];
@@ -277,14 +297,14 @@ export function missingDependency (deps: string | string[]) {
     .Newline();
 
     for (const dep of deps) {
-      message.Line(`$ pnpm add ${dep} -D`, whiteBright);
+      message.Line(`$ pnpm add ${dep} -D`, c.whiteBright);
     }
   }
 
   error(
     message
     .NL
-    .Wrap('If you are using a different package manager please consider adopting pnpm.', gray)
+    .Wrap('If you are using a different package manager please consider adopting pnpm.', c.gray)
     .End($.log.group)
     .BR
     .toString()
@@ -328,23 +348,24 @@ export function missingOption ({
     option = option
     .split('.')
     .filter(Boolean)
-    .join(gray(' → '));
+    .join(c.gray(' → '));
 
   }
 
   error(
-    Create({ type: 'error' })
-    .Line('MISSING OPTION', bold)
+    c.Create({ type: 'error' })
+    .Line('MISSING OPTION', c.bold)
     .NL
     .Wrap(
-      `Missing ${Encase('CB', cyan(option), { spaced: true })} config option. The ${cyan(key)} option must be defined`
+      `Missing ${c.Encase('CB', c.cyan(option), { spaced: true })} config option.`,
+      `The ${c.cyan(key)} option must be defined`
     )
     .NL
-    .Line(`expected${COL} ${blue(expects.replace(/([|,])/g, gray('$1')))}`)
-    .Line(`location${COL} ${gray.underline($.file.base)}`)
+    .Line(`expected${c.COL} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}`)
+    .Line(`location${c.COL} ${c.gray.underline($.file.base)}`)
     .NL
-    .Line('Why?', gray.bold)
-    .Wrap(reason, gray)
+    .Line('Why?', c.gray.bold)
+    .Wrap(reason, c.gray)
     .Newline('line')
     .End($.log.group)
     .BR
@@ -373,18 +394,18 @@ export function missingOption ({
 export function supportOptionError (option: string, invalid: any, fix: string) {
 
   if (option.indexOf('.') > -1) {
-    option = option.split('.').filter(Boolean).join(gray(' → '));
+    option = option.split('.').filter(Boolean).join(c.gray(' → '));
   }
 
   error(
-    Create({ type: 'error' })
-    .Line('OPTION ERROR', bold)
+    c.Create({ type: 'error' })
+    .Line('OPTION ERROR', c.bold)
     .NL
-    .Wrap(`Unsupported ${cyan(option)} configuration. The ${cyan(invalid)} option is not supported in Syncify`)
+    .Wrap(`Unsupported ${c.cyan(option)} configuration. The ${c.cyan(invalid)} option is not supported in Syncify`)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Line(fix, gray)
-    .Line(`Use the ${cyan('defineConfig')} named export for type checking`)
+    .Line('How to fix?', c.gray.bold)
+    .Line(fix, c.gray)
+    .Line(`Use the ${c.cyan('defineConfig')} named export for type checking`)
     .End($.log.group)
     .BR
     .toString()
@@ -435,24 +456,24 @@ export function invalidError ({
     option = option
     .split('.')
     .filter(Boolean)
-    .join(gray(' → '));
+    .join(c.gray(' → '));
   }
 
   error(
-    Create({ type: 'error' })
-    .Line('INVALID ERROR', bold)
+    c.Create({ type: 'error' })
+    .Line('INVALID ERROR', c.bold)
     .NL
-    .Wrap(`Invalid ${cyan(option)} configuration. The ${cyan(name)} option is invalid. `, ...reason)
+    .Wrap(`Invalid ${c.cyan(option)} configuration. The ${c.cyan(name)} option is invalid. `, ...reason)
     .NL
-    .Line(`provided${COL} ${yellowBright(value)}`)
-    .Line(`expected${COL} ${blue(expects.replace(/([|,])/g, gray('$1')))}`)
+    .Line(`provided${c.COL} ${c.yellowBright(value)}`)
+    .Line(`expected${c.COL} ${c.blue(expects.replace(/([|,])/g, c.gray('$1')))}`)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Line('You need to update the option and use one of the expected values.', gray)
-    .Line(`Use the ${white('defineConfig')} named export for type checking`, gray)
+    .Line('How to fix?', c.gray.bold)
+    .Line('You need to update the option and use one of the expected values.', c.gray)
+    .Line(`Use the ${c.white('defineConfig')} named export for type checking`, c.gray)
     .End($.log.group)
     .BR
-    .toString(red)
+    .toString(c.red)
   );
 
   process.exit(0);
@@ -467,26 +488,26 @@ export function invalidError ({
 export function missingStores (cwd: string) {
 
   error(
-    Create({ type: 'error' })
-    .Line(`${'MISSING REFERENCE'}`, bold)
+    c.Create({ type: 'error' })
+    .Line(`${'MISSING REFERENCE'}`, c.bold)
     .NL
-    .Line(`You have not provided any ${bold('stores')} within your ${cyan('package.json')} file.`)
+    .Line(`You have not provided any ${c.bold('stores')} within your ${c.cyan('package.json')} file.`)
     .NL
-    .Line('How to fix?', white.bold)
-    .Line(`You need to provide ${cyan('stores')} via ${cyan('syncify')} key`, gray)
-    .Line('passing both your store name and a key > value list of theme targets.', gray)
+    .Line('How to fix?', c.white.bold)
+    .Line(`You need to provide ${c.cyan('stores')} via ${c.cyan('syncify')} key`, c.gray)
+    .Line('passing both your store name and a key > value list of theme targets.', c.gray)
     .NL
-    .Line('{', gray)
-    .Line('  "syncify": {'.replace(/"/g, white('"')), gray)
-    .Line('    "stores": {'.replace(/"/g, white('"')), gray)
-    .Line(`      "domain": "${redBright('your-store')}"`.replace(/"/g, white('"')), gray)
-    .Line('      "themes": {}'.replace(/"/g, white('"')), gray)
-    .Line('    }', gray)
-    .Line('  }', gray)
-    .Line('}', gray)
+    .Line('{', c.gray)
+    .Line('  "syncify": {'.replace(/"/g, c.white('"')), c.gray)
+    .Line('    "stores": {'.replace(/"/g, c.white('"')), c.gray)
+    .Line(`      "domain": "${c.redBright('your-store')}"`.replace(/"/g, c.white('"')), c.gray)
+    .Line('      "themes": {}'.replace(/"/g, c.white('"')), c.gray)
+    .Line('    }', c.gray)
+    .Line('  }', c.gray)
+    .Line('}', c.gray)
     .NL
-    .Line(`Replace the ${white('your-store')} with the name of your .myshopify domain.`, gray)
-    .Line('Syncify will prompt you and provide a list of theme targets to select from.', gray)
+    .Line(`Replace the ${c.white('your-store')} with the name of your .myshopify domain.`, c.gray)
+    .Line('Syncify will prompt you and provide a list of theme targets to select from.', c.gray)
     .NL
     .End($.log.group)
     .BR
@@ -505,26 +526,26 @@ export function missingStores (cwd: string) {
 export function missingConfig (cwd: string) {
 
   error(
-    Create({ type: 'nil' })
-    .Line(`${`Missing ${cyan('syncify.config.js')} configuration`}`, bold)
+    c.Create({ type: 'nil' })
+    .Line(`${`Missing ${c.cyan('syncify.config.js')} configuration`}`, c.bold)
     .BR
     .Line('Unable to resolve a configuration file within the workspace')
     .BR
-    .Line(`at${COL} ${gray.underline('~' + cwd)}`)
+    .Line(`at${c.COL} ${c.gray.underline('~' + cwd)}`)
     .BR
-    .Line('How to fix?', white.bold)
-    .Line('You need to add one the following files to your project', gray)
+    .Line('How to fix?', c.white.bold)
+    .Line('You need to add one the following files to your project', c.gray)
     .BR
-    .Line(` - ${white('syncify.config.ts')}`, gray)
-    .Line(` - ${white('syncify.config.js')}`, gray)
-    .Line(` - ${white('syncify.config.mjs')}`, gray)
-    .Line(` - ${white('syncify.config.cjs')}`, gray)
-    .Line(` - ${white('syncify.config.json')}`, gray)
+    .Line(` - ${c.white('syncify.config.ts')}`, c.gray)
+    .Line(` - ${c.white('syncify.config.js')}`, c.gray)
+    .Line(` - ${c.white('syncify.config.mjs')}`, c.gray)
+    .Line(` - ${c.white('syncify.config.cjs')}`, c.gray)
+    .Line(` - ${c.white('syncify.config.json')}`, c.gray)
     .BR
-    .Line(`You can also provide configuration in your ${white('package.json')}`, gray)
-    .Line(`file using the ${cyan('"syncify": { "config": {} }')} 'property.`, gray)
+    .Line(`You can also provide configuration in your ${c.white('package.json')}`, c.gray)
+    .Line(`file using the ${c.cyan('"syncify": { "config": {} }')} 'property.`, c.gray)
     .BR
-    .toString(red)
+    .toString(c.red)
   );
 
   process.exit(0);
@@ -539,19 +560,19 @@ export function missingConfig (cwd: string) {
 export function missingEnv (cwd: string) {
 
   const message = [
-    `Missing ${cyan('.env')} credentials. Syncify could not resolve credentials within the workspace.`,
-    `Check you have ${cyan('.env')} file present in the root of your project`
+    `Missing ${c.cyan('.env')} credentials. Syncify could not resolve credentials within the workspace.`,
+    `Check you have ${c.cyan('.env')} file present in the root of your project`
   ];
 
   error(
-    Create({ type: 'error' })
-    .Line('MISSING ENV', bold)
+    c.Create({ type: 'error' })
+    .Line('MISSING ENV', c.bold)
     .NL
     .Wrap(message)
     .NL
     .End($.log.group)
     .BR
-    .toString(red)
+    .toString(c.red)
   );
 
   process.exit(0);
@@ -581,15 +602,15 @@ export function errorRuntime (e: any, options: {
   if (has('name', e)) options.entries.name = e.name;
 
   error(
-    Create({ type: 'error' })
-    .Line('ERROR', bold)
+    c.Create({ type: 'error' })
+    .Line('ERROR', c.bold)
     .NL
-    .Wrap(options.message, redBright)
+    .Wrap(options.message, c.redBright)
     .NL
-    .Wrap(message, redBright.bold)
+    .Wrap(message, c.redBright.bold)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Wrap(options.solution, gray)
+    .Line('How to fix?', c.gray.bold)
+    .Wrap(options.solution, c.gray)
     .NL
     .Context({
       entries: options.entries
@@ -612,13 +633,13 @@ export function errorRuntime (e: any, options: {
 export function throwError (message: string | string, solution: string[]) {
 
   error(
-    Create({ type: 'error' })
-    .Line('ERROR', bold)
+    c.Create({ type: 'error' })
+    .Line('ERROR', c.bold)
     .NL
     .Wrap(message)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Wrap(solution, gray)
+    .Line('How to fix?', c.gray.bold)
+    .Wrap(solution, c.gray)
     .NL
     .End($.log.group)
     .BR
@@ -638,10 +659,10 @@ export function unknownError (option: string, value: any) {
 
   if (option.indexOf('.') > -1) {
 
-    option = Encase('CB', glueString(
-      option.split('.').filter(Boolean).join(gray(' → ')),
-      ARR,
-      redBright.bold(value)
+    option = c.Encase('CB', glueString(
+      option.split('.').filter(Boolean).join(c.gray(' → ')),
+      c.ARR,
+      c.redBright.bold(value)
     ), {
       spaced: true
     });
@@ -649,17 +670,17 @@ export function unknownError (option: string, value: any) {
   }
 
   const file = $.file.base === 'package.json'
-    ? `${blue('syncify')} config in the ${blue('package.json')} file.`
-    : `${blue($.file.base)} file.`;
+    ? `${c.blue('syncify')} config in the ${c.blue('package.json')} file.`
+    : `${c.blue($.file.base)} file.`;
 
   error(
-    Create({ type: 'error' })
-    .Line('ERROR', bold)
+    c.Create({ type: 'error' })
+    .Line('ERROR', c.bold)
     .NL
-    .Line(`Unknown ${cyan(option)} option provided.`)
+    .Line(`Unknown ${c.cyan(option)} option provided.`)
     .NL
-    .Line('How to fix?', gray.bold)
-    .Line(`The ${cyan(value)} option is invalid or unsupported.`)
+    .Line('How to fix?', c.gray.bold)
+    .Line(`The ${c.cyan(value)} option is invalid or unsupported.`)
     .Line(`You need to remove it from the ${file}`)
     .End($.log.group)
     .BR

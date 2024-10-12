@@ -3,11 +3,10 @@ import type { Bundle } from 'syncify:state';
 import { allFalse, anyTrue, isEmpty } from 'rambdax';
 import { relative } from 'node:path';
 import { log, keys, warn } from 'syncify:native';
-import { glueString, plural, ws } from 'syncify:utils';
+import { glueString, plural } from 'syncify:utils';
 import { warnings } from 'syncify:log/throws';
-import { ARR, COL, DSH, TLD, gray, bold, white, neonCyan, pink, yellowBright, lightGray, cyan } from '@syncify/ansi';
+import * as c from '@syncify/ansi';
 import { clear } from 'syncify:log';
-import { Create, CreateClosure, Break } from 'syncify:cli/tree';
 import { timer } from 'syncify:timer';
 
 interface Runtime {
@@ -107,19 +106,19 @@ export const runtime: Runtime = function ($: Bundle) {
 
   $.env.tree = true;
 
-  const message = Create()
+  const message = c.Create()
   .BR
   .Top('Syncify')
   .NL
-  .Line(`v${$.version}`, bold.whiteBright);
+  .Line(`v${$.version}`, c.bold.whiteBright);
 
   if ($.terminal.cols < 80) {
 
     message
     .Newline('red')
-    .Error('TERMINAL WIDTH WARNING', bold)
+    .Error('TERMINAL WIDTH WARNING', c.bold)
     .Newline('red')
-    .Error(`Your terminal width is below ${bold(`${100}`)} columns (currently ${bold(`${$.terminal.cols}`)})`)
+    .Error(`Your terminal width is below ${c.bold(`${100}`)} columns (currently ${c.bold(`${$.terminal.cols}`)})`)
     .Error('This is not recommended for usage with Syncify (size matters).')
     .Error('Expand your terminal wider for an optimal logging experience.');
 
@@ -132,7 +131,7 @@ export const runtime: Runtime = function ($: Bundle) {
 runtime.time = function () {
 
   log(
-    Break(lightGray(`Started in ${timer.stop('runtime')}`))
+    c.Break(c.lightGray(`Started in ${timer.stop('runtime')}`))
   );
 
 };
@@ -143,7 +142,7 @@ runtime.time = function () {
 
 runtime.modes = function ($: Bundle) {
 
-  const message = Create();
+  const message = c.Create();
 
   let seq: string = $.env.prod ? '--prod' : '--dev';
 
@@ -153,15 +152,15 @@ runtime.modes = function ($: Bundle) {
         'Select theme target/s to be inserted into your package.json file.',
         'You will be given a code example after selecting where you will define',
         'a custom target name. If you would like to create a new theme, then run',
-        `the ${cyan('publish')} resource`,
-        gray
+        `the ${c.cyan('publish')} resource`,
+        c.gray
       ).toLine()
     );
   }
 
   if ($.mode.cache) {
     if (seq !== NIL) {
-      seq += ` ${TLD} cache`;
+      seq += ` ${c.TLD} cache`;
     } else {
       seq += 'cache';
     }
@@ -169,7 +168,7 @@ runtime.modes = function ($: Bundle) {
 
   if ($.mode.clean) {
     if (seq !== NIL) {
-      seq += ` ${TLD} clean`;
+      seq += ` ${c.TLD} clean`;
     } else {
       seq += 'clean';
     }
@@ -177,7 +176,7 @@ runtime.modes = function ($: Bundle) {
 
   if ($.spawn.invoked) {
     if (seq !== NIL) {
-      seq += ` ${TLD} build`;
+      seq += ` ${c.TLD} build`;
     } else {
       seq += 'build';
     }
@@ -185,7 +184,7 @@ runtime.modes = function ($: Bundle) {
 
   if ($.mode.build) {
     if (seq !== NIL) {
-      seq += ` ${TLD} build`;
+      seq += ` ${c.TLD} build`;
     } else {
       seq += 'build';
     }
@@ -193,7 +192,7 @@ runtime.modes = function ($: Bundle) {
 
   if ($.mode.export) {
     if (seq !== NIL) {
-      seq += ` ${TLD} export`;
+      seq += ` ${c.TLD} export`;
     } else {
       seq += 'export';
     }
@@ -201,7 +200,7 @@ runtime.modes = function ($: Bundle) {
 
   if ($.mode.publish) {
     if (seq !== NIL) {
-      seq += ` ${TLD} publish`;
+      seq += ` ${c.TLD} publish`;
     } else {
       seq += 'publish';
     }
@@ -209,7 +208,7 @@ runtime.modes = function ($: Bundle) {
 
   if ($.mode.import) {
     if (seq !== NIL) {
-      seq += ` ${TLD} import`;
+      seq += ` ${c.TLD} import`;
     } else {
       seq += 'import';
     }
@@ -217,18 +216,18 @@ runtime.modes = function ($: Bundle) {
 
   if ($.mode.watch) {
     if (seq !== NIL) {
-      seq += ` ${TLD} watch`;
+      seq += ` ${c.TLD} watch`;
     } else {
       seq += 'watch';
     }
 
     if ($.mode.hot) {
-      seq += ` ${TLD} hot`;
+      seq += ` ${c.TLD} hot`;
     }
   }
 
   if (seq !== NIL) {
-    message.Line(seq, gray);
+    message.Line(seq, c.gray);
     seq = NIL;
   }
 
@@ -236,13 +235,13 @@ runtime.modes = function ($: Bundle) {
 
     message
     .NL
-    .Line(`Filters${COL}`, white.bold);
+    .Line(`Filters${c.COL}`, c.white.bold);
 
-    const space = ws($.filters);
+    const space = c.eq($.filters);
 
     for (const group in $.filters) {
-      const join = white($.filters[group].map((k: string) => relative($.cwd, k)).join(', '));
-      message.Line(` ${TLD} ${group}${COL}${space(group)}${join}`, neonCyan);
+      const join = c.white($.filters[group].map((k: string) => relative($.cwd, k)).join(', '));
+      message.Line(` ${c.TLD} ${group}${c.COL}${space(group)}${join}`, c.neonCyan);
     }
 
   }
@@ -259,15 +258,15 @@ runtime.spawns = function ($: Bundle) {
 
   if ($.mode.build || $.mode.watch) {
 
-    const message = Create().Line(`Spawned${COL}`, white.bold);
-    const space = ws($.spawn.commands);
+    const message = c.Create().Line(`Spawned${c.COL}`, c.white.bold);
+    const space = c.eq($.spawn.commands);
 
     for (const name in $.spawn.commands) {
 
       const sp = space(name);
       const pid = $.spawn.commands[name].pid;
 
-      message.Line(` ${TLD} ${neonCyan(name)}${COL}${sp}PID ${ARR} #${pink(`${pid}`)}`, gray);
+      message.Line(` ${c.TLD} ${c.neonCyan(name)}${c.COL}${sp}PID ${c.ARR} #${c.pink(`${pid}`)}`, c.gray);
 
     }
 
@@ -325,7 +324,7 @@ runtime.spawns = function ($: Bundle) {
  */
 runtime.stores = function ($: Bundle) {
 
-  const text = Create();
+  const text = c.Create();
   const size = $.sync.themes.length;
 
   if (allFalse($.mode.upload, $.mode.import, $.mode.build, $.mode.clean)) {
@@ -335,7 +334,7 @@ runtime.stores = function ($: Bundle) {
     /* -------------------------------------------- */
 
     if (size > 0) {
-      text.Line(`Editors${COL}`, bold.white);
+      text.Line(`Editors${c.COL}`, c.bold.white);
       getThemeURLS(text, $.sync.themes, 'editor');
     }
 
@@ -350,9 +349,9 @@ runtime.stores = function ($: Bundle) {
     if (size > 0) {
 
       if ($.mode.upload || $.mode.import) {
-        text.NL.Line(`Targets${COL}`, bold.white);
+        text.NL.Line(`Targets${c.COL}`, c.bold.white);
       } else {
-        text.NL.Line(`Previews${COL}`, bold.white);
+        text.NL.Line(`Previews${c.COL}`, c.bold.white);
       }
 
       getThemeURLS(text, $.sync.themes, 'preview');
@@ -376,7 +375,7 @@ runtime.warnings = function getRuntimeWarnings ($: Bundle) {
 
   if (amount === 0) return;
 
-  const message = Create({ type: 'warning' }).Line(`${amount} ${plural('Warning', amount)}`, bold);
+  const message = c.Create({ type: 'warning' }).Line(`${amount} ${plural('Warning', amount)}`, c.bold);
 
   for (const key of props) {
 
@@ -387,16 +386,16 @@ runtime.warnings = function getRuntimeWarnings ($: Bundle) {
       if (item.length === amount) {
         message
         .Newline()
-        .Line(`${key} ${plural('Warning', item.length)}`, bold)
+        .Line(`${key} ${plural('Warning', item.length)}`, c.bold)
         .Newline();
       } else {
         message
         .Newline()
-        .Line(`${item.length} ${key} ${plural('Warning', item.length)}`, bold);
+        .Line(`${item.length} ${key} ${plural('Warning', item.length)}`, c.bold);
       }
 
       for (const text of item) {
-        message.Line(`${DSH} ${text}`, yellowBright);
+        message.Line(`${c.DSH} ${text}`, c.yellowBright);
       }
     }
   }
@@ -410,7 +409,7 @@ runtime.warnings = function getRuntimeWarnings ($: Bundle) {
  *
  * Generates the theme previews/targets runtime list
  */
-export function getThemeURLS (text: CreateClosure, themes: Theme[], url: 'preview' | 'editor') {
+export function getThemeURLS (text: c.CreateClosure, themes: Theme[], url: 'preview' | 'editor') {
 
   const width = themes.reduce<{
     store: number;
@@ -439,16 +438,16 @@ export function getThemeURLS (text: CreateClosure, themes: Theme[], url: 'previe
     text.Line(
       glueString(
         WSP,
-        TLD,
-        pink(name),
+        c.TLD,
+        c.pink(name),
         WSP.repeat(width.store - name.length),
-        ARR,
+        c.ARR,
         WSP,
-        pink.bold(target),
+        c.pink.bold(target),
         WSP.repeat(width.theme - target.length),
-        ARR,
+        c.ARR,
         WSP,
-        gray.underline(type)
+        c.gray.underline(type)
       )
     );
 

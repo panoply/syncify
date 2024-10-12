@@ -1,9 +1,8 @@
 import { error, keys, warn } from 'syncify:native';
 import { isString } from 'syncify:utils';
-import { bold } from '@syncify/ansi';
+import { bold, Create } from '@syncify/ansi';
 import * as log from 'syncify:log';
 import { $ } from 'syncify:state';
-import { Create } from 'syncify:cli/tree';
 
 export function stdin (data: Buffer) {
 

@@ -1,6 +1,13 @@
 import { Console } from 'node:console';
 import { stdout, stderr } from 'node:process';
 import { EventEmitter } from 'node:events';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
+
+/**
+ * Async Execute
+ */
+export const command = promisify(exec);
 
 /**
  * Event emitter instance
@@ -15,15 +22,7 @@ export const { error, log, warn, clear } = new Console(stdout, stderr);
 /**
  * Native Object methods
  */
-export const {
-  create,
-  assign,
-  defineProperty,
-  defineProperties,
-  keys,
-  values,
-  setPrototypeOf
-} = Object;
+export const { create, assign, defineProperty, defineProperties, keys, values, setPrototypeOf } = Object;
 
 /**
  * Native Array from Method

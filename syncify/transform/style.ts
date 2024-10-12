@@ -10,7 +10,7 @@ import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import * as warn from 'syncify:log/warnings';
 import { File, Kind } from 'syncify:file';
-import { bold } from '@syncify/ansi';
+import { bold, sanitize } from '@syncify/ansi';
 import postcss, { PluginCreator } from 'postcss';
 import { toBuffer } from 'syncify:utils/native';
 import { $ } from 'syncify:state';
@@ -68,7 +68,7 @@ function write <T extends StyleBundle> (file: File<T>, sync: ClientParam<T>, hoo
       if (u.isUndefined(update) || update === false) {
         content = data;
       } else if (u.isString(update) || u.isBuffer(update)) {
-        content = u.sanitize(update);
+        content = sanitize(update);
       }
     } else {
       content = data;
@@ -345,7 +345,7 @@ export function createSnippet (string: string, attrs: string[]) {
 /**
  * SASS and PostCSS Compiler
  */
-export async function compile <T extends StyleBundle> (file: File<StyleBundle>, sync: ClientParam, cb: Syncify) {
+export async function compile (file: File<StyleBundle>, sync: ClientParam, cb: Syncify) {
 
   if ($.mode.watch) timer.start();
   if ($.mode.hot) timer.start(file.uuid);

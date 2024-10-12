@@ -267,35 +267,14 @@ export function parseFile (paths: PathBundle, output: string) {
 
     }
 
-    switch (file.ext) {
-      case '.js':
-      case '.mjs':
-        return script(define(Namespace.Assets, Type.Script, Kind.JavaScript));
-      case '.ts':
-        return script(define(Namespace.Assets, Type.Script, Kind.TypeScript));
-      case '.tsx':
-        return script(define(Namespace.Assets, Type.Script, Kind.TSX));
-      case '.jsx':
-        return script(define(Namespace.Assets, Type.Script, Kind.JSX));
-      case '.svg':
-        return svg(define(Namespace.Assets, Type.Svg, Kind.SVG));
-      case '.css':
-        return style(define(Namespace.Assets, Type.Style, Kind.CSS));
-      case '.scss':
-        return style(define(Namespace.Assets, Type.Style, Kind.SCSS));
-      case '.sass':
-        return style(define(Namespace.Assets, Type.Style, Kind.SASS));
-      case '.md':
-        return define(Namespace.Pages, Type.Page, Kind.Markdown);
-      case '.html':
-        return define(Namespace.Pages, Type.Page, Kind.HTML);
-    }
-
     if (paths.assets.match(path)) {
 
       if ($.spawn.invoked) return define(Namespace.Assets, Type.Spawn);
 
       switch (file.ext) {
+        case '.js':
+        case '.mjs':
+          return define(Namespace.Assets, Type.Asset, Kind.JavaScript);
         case '.json':
           return define(Namespace.Assets, Type.Asset, Kind.JSON);
         case '.svg':
@@ -323,6 +302,30 @@ export function parseFile (paths: PathBundle, output: string) {
           return define(Namespace.Assets, Type.Asset, Kind.Font);
       }
 
+    }
+
+    switch (file.ext) {
+      case '.js':
+      case '.mjs':
+        return script(define(Namespace.Assets, Type.Script, Kind.JavaScript));
+      case '.ts':
+        return script(define(Namespace.Assets, Type.Script, Kind.TypeScript));
+      case '.tsx':
+        return script(define(Namespace.Assets, Type.Script, Kind.TSX));
+      case '.jsx':
+        return script(define(Namespace.Assets, Type.Script, Kind.JSX));
+      case '.svg':
+        return svg(define(Namespace.Assets, Type.Svg, Kind.SVG));
+      case '.css':
+        return style(define(Namespace.Assets, Type.Style, Kind.CSS));
+      case '.scss':
+        return style(define(Namespace.Assets, Type.Style, Kind.SCSS));
+      case '.sass':
+        return style(define(Namespace.Assets, Type.Style, Kind.SASS));
+      case '.md':
+        return define(Namespace.Pages, Type.Page, Kind.Markdown);
+      case '.html':
+        return define(Namespace.Pages, Type.Page, Kind.HTML);
     }
 
     return undefined;

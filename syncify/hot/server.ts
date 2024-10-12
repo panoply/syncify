@@ -1,10 +1,9 @@
 import { uWS } from '@syncify/uws';
 import { readFileSync, existsSync, ensureFile, readFile } from 'fs-extra';
 import { join, extname } from 'node:path';
-import { ARR, COL, Tree, bold, gray, redBright, neonCyan, pink } from '@syncify/ansi';
+import { ARR, COL, Tree, bold, gray, redBright, neonCyan, pink, Line } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 import * as log from 'syncify:log';
-import * as tree from 'syncify:cli/tree';
 
 export const HOTError: {
   /**
@@ -37,8 +36,8 @@ export async function server () {
 
   }
 
-  log.out(tree.Line(bold(`${$.hot.method === 'hot' ? 'HOT Reload' : 'LIVE Reload'}${COL}`)));
-  log.update(tree.Line('configuring HOT Reload'));
+  log.out(Line(bold(`${$.hot.method === 'hot' ? 'HOT Reload' : 'LIVE Reload'}${COL}`)));
+  log.update(Line('configuring HOT Reload'));
 
   const url = join($.dirs.output, 'assets');
   const app = uWS.App();
@@ -80,7 +79,7 @@ export async function server () {
   app.listen($.hot.server, (token) => {
 
     if (token) {
-      log.update(tree.Line(`${neonCyan('server')}  ${ARR}  ${gray('PORT')}  ${ARR} ${pink(`${$.hot.server}`)}`));
+      log.update(Line(`${neonCyan('server')}  ${ARR}  ${gray('PORT')}  ${ARR} ${pink(`${$.hot.server}`)}`));
     } else {
       console.log('Failed to listen to port ' + $.hot.server);
     }

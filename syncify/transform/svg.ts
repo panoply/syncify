@@ -1,8 +1,8 @@
 import type { SVGBundle, Syncify, SVGSpriteConfig, SVGOConfig, ClientParam } from 'types';
 import type { SVGSpriter } from 'svg-sprite';
+import { join, relative } from 'node:path';
 import Svgo from 'svgo';
 import SVGSprite from 'svg-sprite';
-import { join, relative } from 'node:path';
 import { readFile, writeFile } from 'fs-extra';
 import { toArray, assign } from 'syncify:utils/native';
 import { Kind, File, Namespace } from 'syncify:file';

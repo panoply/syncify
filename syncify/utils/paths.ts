@@ -1,5 +1,5 @@
 import { last } from 'rambdax';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, basename } from 'node:path';
 import { COL, yellowBright } from '@syncify/ansi';
 import { throwError } from 'syncify:log/throws';
 import { isArray } from 'syncify:utils';
@@ -117,6 +117,7 @@ export function parentPath (path: string | string[]) {
 export function normalPath (input: string, cwd = null) {
 
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
+  const source = new RegExp(`^\\.?\\/?${basename(input)}\\/`);
 
   /**
    * Prepends the provided input to the path and
@@ -139,10 +140,16 @@ export function normalPath (input: string, cwd = null) {
     }
 
     if (cwd !== null) {
+
       const exists = join(cwd, path);
       return (ignore ? '!' : '') + (exists.startsWith(input) ? exists : join(input, path));
+
     } else {
-      return (ignore ? '!' : '') + join(input, path);
+
+      // We need to remove occurences where input matches base input dir, eg:
+      // source/dir/file > dir/file
+      // This is because the "input" value already represents full resolution.
+      return (ignore ? '!' : '') + join(input, source.test(path) ? path.replace(source, NIL) : path);
     }
 
   };

@@ -6,26 +6,21 @@ import { stdout, stderr } from 'node:process';
 import notifier from 'node-notifier';
 import { intercept } from 'syncify:cli/intercept';
 import { queue } from 'syncify:requests/queue';
-import { Tree, ARL, ARR, CHV, TLD } from '@syncify/ansi';
 import { Multiline } from 'syncify:interpolate';
 import { timer } from 'syncify:timer';
-import { Spinner } from 'syncify:cli/spinner';
 import * as errors from 'syncify:log/errors';
-import * as x from 'syncify:cli/tree';
+import * as n from 'syncify:native';
 import * as c from '@syncify/ansi';
 import * as u from 'syncify:utils';
-import * as n from 'syncify:native';
 import { $ } from 'syncify:state';
-
 
 /* -------------------------------------------- */
 /* REXPORT                                      */
 /* -------------------------------------------- */
 
 export { log as out } from 'syncify:native';
-export { default as update } from 'log-update';
 export { runtime } from 'syncify:log/runtime';
-export { progress } from '@syncify/ansi';
+export { progress, update } from '@syncify/ansi';
 
 /* -------------------------------------------- */
 /* INTERNAL                                     */
@@ -80,7 +75,7 @@ export const console = (...message: any) => {
  * Spinner options
  *
  */
-export const spinner = Spinner();
+export const spinner = c.Spinner();
 
 /**
  * Renamed log bucket, which will execute after changed.
@@ -110,7 +105,7 @@ export const hline = (options: { width?: number, newlines?: boolean } = {}) => {
   }
 
   n.log(
-    x.Ruler(
+    c.Ruler(
       options.width,
       options.newlines
     )
@@ -167,19 +162,19 @@ export const write = (message: string, {
     if (prefix === null) {
       n.error(
         u.glueString(
-          x.LineRed(color ? color(message) : c.redBright(message)),
-          x.Append(suffix)
+          c.LineRed(color ? color(message) : c.redBright(message)),
+          c.Append(suffix)
         )
       );
     } else {
       n.error(
-        x.LineRed(
+        c.LineRed(
           (color || c.redBright)(
-            x.Prefix(
+            c.Prefix(
               prefix
               , u.glueString(
                 message,
-                x.Append(suffix)
+                c.Append(suffix)
               )
             )
           )
@@ -189,22 +184,22 @@ export const write = (message: string, {
   } else if (type === 'warning') {
     if (prefix === null) {
       n.log(
-        x.LineYellow(
+        c.LineYellow(
           u.glueString(
             color ? color(message) : c.yellowBright(message),
-            x.Append(suffix)
+            c.Append(suffix)
           )
         )
       );
     } else {
       n.log(
-        x.LineYellow(
+        c.LineYellow(
           (color || c.yellowBright)(
-            x.Prefix(
+            c.Prefix(
               prefix
               , u.glueString(
                 message,
-                x.Append(suffix)
+                c.Append(suffix)
               )
             )
           )
@@ -214,22 +209,22 @@ export const write = (message: string, {
   } else {
     if (prefix === null) {
       n.log(
-        x.Line(
+        c.Line(
           u.glueString(
             color ? color(message) : c.whiteBright(message),
-            x.Append(suffix)
+            c.Append(suffix)
           )
         )
       );
     } else {
       n.log(
-        x.Line(
+        c.Line(
           (color || c.whiteBright)(
-            x.Prefix(
+            c.Prefix(
               prefix
               , u.glueString(
                 message,
-                x.Append(suffix)
+                c.Append(suffix)
               )
             )
           )
@@ -242,7 +237,7 @@ export const write = (message: string, {
 
 export const message = (message: string) => {
 
-  n.log(x.Line(message));
+  n.log(c.Line(message));
 
 };
 
@@ -260,11 +255,11 @@ export const nwl = (entry?: string | 'red' | 'yellow' | undefined) => {
   if (entry === NIL) {
     n.log(NWL);
   } else if (entry === 'red') {
-    n.log(Tree.red);
+    n.log(c.Tree.red);
   } else if (entry === 'yellow') {
-    n.log(Tree.yellow);
+    n.log(c.Tree.yellow);
   } else {
-    n.log(Tree.line);
+    n.log(c.Tree.line);
   }
 
 };
@@ -363,13 +358,13 @@ export const group = (name?: string | boolean) => {
 
   if ($.log.config.silent || $.env.tree === false) return;
 
-  n.log(x.End($.log.group)); // Close previous group
+  n.log(c.End($.log.group)); // Close previous group
 
   if ($.log.config.clear && name !== false) clear();
 
   if (u.isString(name)) {
     $.log.group = name;
-    n.log(NWL + x.Top($.log.group)); // Open new group
+    n.log(NWL + c.Top($.log.group)); // Open new group
   }
 
 };
@@ -389,17 +384,17 @@ export const task = (name?: string) => {
 
   if (u.isString(name)) {
 
-    n.log(x.Dash(c.gray(name) + WSP + x.Append(u.getTime()))); // Open new group
+    n.log(c.Dash(c.gray(name) + WSP + c.Append(u.getTime()))); // Open new group
 
   } else {
 
     clear();
 
     n.log(
-      Tree.line + NWL + x.Dash(
+      c.Tree.line + NWL + c.Dash(
         u.glueString(
           c.gray($.log.group),
-          x.Append(u.getTime())
+          c.Append(u.getTime())
         )
       )
     );
@@ -431,15 +426,15 @@ export const process = (label: string, ...message: [ string, string? ]) => {
   if (message.length === 2) {
 
     n.log(
-      x.Line(
+      c.Line(
         c.whiteBright(
-          x.Prefix(
+          c.Prefix(
             'process',
             u.glueString(
               c.bold(label)
-              , CHV
+              , c.CHV
               , message[0]
-              , x.Append(message[1])
+              , c.Append(message[1])
             )
           )
         )
@@ -449,13 +444,13 @@ export const process = (label: string, ...message: [ string, string? ]) => {
   } else {
 
     n.log(
-      x.Line(
+      c.Line(
         c.whiteBright(
-          x.Prefix(
+          c.Prefix(
             'process'
             , u.glueString(
               c.bold(label)
-              , x.Append(message[0])
+              , c.Append(message[0])
             )
           )
         )
@@ -481,7 +476,7 @@ export const changed = (file: File) => {
   // Liquid Snippet
   // Liquid Template
   //
-  const name = u.glueString(file.kind, CHV, u.toUpcase(file.namespace));
+  const name = u.glueString(file.kind, c.CHV, u.toUpcase(file.namespace));
   const change = u.has(file.relative, $.log.changes) ? $.log.changes[file.relative] + 1 : 1;
 
   // Increment Change Count
@@ -508,11 +503,11 @@ export const changed = (file: File) => {
   }
 
   n.log(
-    x.NextLine(
+    c.NextLine(
       c.neonCyan(
-        x.Prefix('changed', u.glueString(
+        c.Prefix('changed', u.glueString(
           file.relative,
-          x.Append(`${change} change${change > 1 ? 's' : NIL}`)
+          c.Append(`${change} change${change > 1 ? 's' : NIL}`)
         ))
       )
     )
@@ -537,9 +532,9 @@ export const minified = (...p: MinifiedParams) => {
   if (p.length === 1) {
 
     n.log(
-      x.Line(
+      c.Line(
         c.whiteBright(
-          x.Prefix('minified', c.bold(p[0]))
+          c.Prefix('minified', c.bold(p[0]))
         )
       )
     );
@@ -547,17 +542,17 @@ export const minified = (...p: MinifiedParams) => {
   } else if (p.length === 4) {
 
     n.log(
-      x.Line(
+      c.Line(
         c.whiteBright(
-          x.Prefix(
+          c.Prefix(
             'minified',
             u.glueString(
               c.bold(p[0])
-              , ARR
+              , c.ARR
               , p[1]
-              , ARL
+              , c.ARL
               , p[2]
-              , TLD
+              , c.TLD
               , 'saved'
               , p[3]
             )
@@ -569,18 +564,18 @@ export const minified = (...p: MinifiedParams) => {
   } else {
 
     n.log(
-      x.Line(
+      c.Line(
         c.whiteBright(
-          x.Prefix(
+          c.Prefix(
             'minified'
             , u.glueString(
               c.bold(p[0])
-              , ARL
+              , c.ARL
               , p[1]
-              , TLD
+              , c.TLD
               , 'saved'
               , p[2]
-              , x.Append(
+              , c.Append(
                 timer.now()
               )
             )
@@ -605,14 +600,14 @@ export const syncing = (path: string, { hot = false } = {}) => {
 
   if ($.warnings.has(path)) {
     n.log(
-      x.LineYellow(
+      c.LineYellow(
         c.yellowBright(
-          x.Prefix(
+          c.Prefix(
             'warning',
             u.glueString(
-              u.sanitize($.warnings.get(path).size),
+              c.sanitize($.warnings.get(path).size),
               u.plural('warning', $.warnings[path].size),
-              x.Suffix.warning
+              c.Suffix.warning
             )
           )
         )
@@ -621,9 +616,9 @@ export const syncing = (path: string, { hot = false } = {}) => {
   }
 
   n.log(
-    x.Line(
+    c.Line(
       c.magentaBright(
-        x.Prefix('syncing', path)
+        c.Prefix('syncing', path)
       )
     )
   );
@@ -631,9 +626,9 @@ export const syncing = (path: string, { hot = false } = {}) => {
   if (queue.pending > (hot ? 0 : 2)) {
 
     n.log(
-      x.Line(
+      c.Line(
         c.orange(
-          x.Prefix('queued', u.glueString(path, TLD, c.bold(u.addSuffix(queue.pending)), 'in queue'))
+          c.Prefix('queued', u.glueString(path, c.TLD, c.bold(u.addSuffix(queue.pending)), 'in queue'))
         )
       )
     );
@@ -666,17 +661,17 @@ export const prompt = (message: string, notify?: notifier.Notification) => {
   // close previous group
 
   n.log(
-    x.Line(
+    c.Line(
       c.orange(
-        x.Prefix('prompt', message)
+        c.Prefix('prompt', message)
       )
     ),
-    x.End($.log.group)
+    c.End($.log.group)
   );
 
   if (u.isObject(notify)) notifier.notify(notify).notify();
 
-  return () => n.log(x.Top($.log.group));
+  return () => n.log(c.Top($.log.group));
 
 };
 
@@ -710,15 +705,15 @@ export const resource = (type: string, store: Store) => {
       for (const [ type, store, ctime ] of $.log.queue) {
 
         n.log(
-          x.Line(
+          c.Line(
             c.neonGreen(
-              x.Prefix(
+              c.Prefix(
                 'uploaded',
                 u.glueString(
                   c.bold(type)
-                  , ARR
+                  , c.ARR
                   , store
-                  , x.Append(ctime)
+                  , c.Append(ctime)
                 )
               )
             )
@@ -735,15 +730,15 @@ export const resource = (type: string, store: Store) => {
   } else {
 
     n.log(
-      x.Line(
+      c.Line(
         c.neonGreen(
-          x.Prefix(
+          c.Prefix(
             'uploaded',
             u.glueString(
               c.bold(type),
-              ARR,
+              c.ARR,
               store.domain,
-              x.Append(timer.stop())
+              c.Append(timer.stop())
             )
           )
         )
@@ -781,9 +776,9 @@ export const upload = (theme: Theme) => {
       ] of $.log.queue) {
 
         n.log(
-          x.Line(
+          c.Line(
             c.neonGreen(
-              x.Prefix('uploaded', c.bold(target), store, ctime)
+              c.Prefix('uploaded', c.bold(target), store, ctime)
             )
           )
         );
@@ -798,9 +793,9 @@ export const upload = (theme: Theme) => {
   } else {
 
     n.log(
-      x.Line(
+      c.Line(
         c.neonGreen(
-          x.Prefix('uploaded', c.bold(theme.target), theme.store, timer.stop())
+          c.Prefix('uploaded', c.bold(theme.target), theme.store, timer.stop())
         )
       )
     );
@@ -822,9 +817,9 @@ export const upload = (theme: Theme) => {
 export const invalid = (path: string, message?: string | string[]) => {
 
   n.log(
-    x.LineRed(
+    c.LineRed(
       c.red(
-        x.Prefix('invalid', path)
+        c.Prefix('invalid', path)
       )
     )
   );
@@ -880,9 +875,9 @@ export const error = (input: string, { suffix = null, notify = null }: {
 } = {}) => {
 
   n.error(
-    x.LineRed(
+    c.LineRed(
       c.red(
-        x.Prefix('error', suffix ? input + WSP + x.Append(suffix) : input)
+        c.Prefix('error', suffix ? input + WSP + c.Append(suffix) : input)
       )
     )
   );
@@ -907,12 +902,12 @@ export const spawn = (name: string) => {
 
     if ($.log.group !== 'Spawn') {
 
-      n.log(x.End($.log.group));
+      n.log(c.End($.log.group));
 
       // do not clear if first run
       if ($.log.group !== 'Syncify') clear();
 
-      n.log(x.Top('Spawn'));
+      n.log(c.Top('Spawn'));
 
       // update name reference
       $.log.group = 'Spawn';
@@ -921,7 +916,7 @@ export const spawn = (name: string) => {
 
     if ($.log.title !== name) {
 
-      n.log(x.Next(c.neonCyan(name)));
+      n.log(c.Next(c.neonCyan(name)));
 
       // update spawn process title
       $.log.title = name;
@@ -943,17 +938,17 @@ export const warn = (message: string, suffix?: string) => {
 
   if (suffix) {
     n.log(
-      x.LineYellow(
+      c.LineYellow(
         c.yellowBright(
-          x.Prefix('warning', message) + x.Append(suffix)
+          c.Prefix('warning', message) + c.Append(suffix)
         )
       )
     );
   } else {
     n.log(
-      x.LineYellow(
+      c.LineYellow(
         c.yellowBright(
-          x.Prefix('warning', message)
+          c.Prefix('warning', message)
         )
       )
     );
@@ -968,9 +963,9 @@ export const warn = (message: string, suffix?: string) => {
 export const retrying = (file: string, theme: Theme) => {
 
   n.log(
-    x.Line(
+    c.Line(
       c.orange(
-        x.Prefix('retrying', file, theme.target, theme.store)
+        c.Prefix('retrying', file, theme.target, theme.store)
       )
     )
   );
@@ -987,9 +982,9 @@ export const retrying = (file: string, theme: Theme) => {
 export const deleted = (file: string, theme: Theme) => {
 
   n.log(
-    x.Line(
+    c.Line(
       c.blueBright(
-        x.Prefix('deleted', file, theme.target, theme.store)
+        c.Prefix('deleted', file, theme.target, theme.store)
       )
     )
   );
@@ -1005,7 +1000,7 @@ export const deleted = (file: string, theme: Theme) => {
 export const browser = (url: string) => {
 
   n.log(
-    x.Dash(
+    c.Dash(
       c.lightGray(url)
     )
   );
@@ -1057,21 +1052,21 @@ export const transform = (label: string, ...suffix: [ string?, string?, string? 
   if (suffix.length > 0) {
 
     n.log(
-      x.Line(
+      c.Line(
         c.whiteBright(
-          x.Prefix(
+          c.Prefix(
             'transform'
             , u.glueString(
               c.bold(label)
-              , ARR
+              , c.ARR
               , suffix[0]
               , suffix.length === 2 ? u.glueString(
-                ARR,
+                c.ARR,
                 suffix[1]
               ) : suffix.length === 3 ? u.glueString(
-                ARR,
+                c.ARR,
                 suffix[1],
-                x.Append(suffix[2])
+                c.Append(suffix[2])
               ) : NIL
             )
           )
@@ -1082,9 +1077,9 @@ export const transform = (label: string, ...suffix: [ string?, string?, string? 
   } else {
 
     n.log(
-      x.Line(
+      c.Line(
         c.whiteBright(
-          x.Prefix(
+          c.Prefix(
             'transform'
             , c.bold(label)
           )
@@ -1109,14 +1104,14 @@ export const transform = (label: string, ...suffix: [ string?, string?, string? 
 export const zipped = (size: string, path: string) => {
 
   n.log(
-    x.Line(
+    c.Line(
       c.whiteBright(
-        x.Prefix(
+        c.Prefix(
           'zipped'
           , u.glueString(
             c.bold('ZIP')
             , size
-            , x.Append(path)
+            , c.Append(path)
           )
         )
       )
@@ -1137,14 +1132,14 @@ export const skipped = (file: File | string, reason: string) => {
   if ($.mode.export || $.mode.build) return;
 
   n.log(
-    x.Line(
-      x.Prefix(
+    c.Line(
+      c.Prefix(
         'skipped'
         , u.glueString(
           u.isString(file)
             ? file
             : file.key
-          , x.Append(reason)
+          , c.Append(reason)
         )
       )
     )
@@ -1162,9 +1157,9 @@ export const skipped = (file: File | string, reason: string) => {
 export const ignored = (path: string) => {
 
   n.log(
-    x.Line(
+    c.Line(
       c.yellowBright(
-        x.Prefix(
+        c.Prefix(
           'ignored'
           , path
         )
@@ -1186,7 +1181,7 @@ export const ignored = (path: string) => {
 export const title = (label: string) => {
 
   n.log(
-    x.Break(
+    c.Break(
       c.whiteBright.bold(label)
     )
   );
@@ -1203,13 +1198,13 @@ export const title = (label: string) => {
 export const rename = (from: string, to: string) => {
 
   renamed.push(
-    x.Line(
+    c.Line(
       c.whiteBright(
-        x.Prefix(
+        c.Prefix(
           'renamed',
           u.glueString(
             c.bold(from)
-            , ARL
+            , c.ARL
             , c.bold(to)
           )
         )
@@ -1231,13 +1226,13 @@ export const rename = (from: string, to: string) => {
 export const hot = (id?: string) => {
 
   n.log(
-    x.Line(
+    c.Line(
       c.neonRouge(
-        x.Prefix(
+        c.Prefix(
           'reloaded'
           , u.glueString(
             c.bold('HOT RELOAD')
-            , x.Append(timer.now(id))
+            , c.Append(timer.now(id))
           )
         )
       )
@@ -1257,13 +1252,13 @@ export const exported = (from: string, to: string) => {
   if ($.mode.build) return;
 
   n.log(
-    x.Line(
+    c.Line(
       c.teal(
-        x.Prefix(
+        c.Prefix(
           'exported',
           u.glueString(
             c.bold(from)
-            , ARR
+            , c.ARR
             , c.bold(to)
           )
         )
@@ -1283,13 +1278,13 @@ export const exported = (from: string, to: string) => {
 export const reloaded = (path: string, time: string) => {
 
   n.log(
-    x.Line(
+    c.Line(
       c.whiteBright(
-        x.Prefix(
+        c.Prefix(
           'reloaded',
           u.glueString(
             path
-            , x.Append(time)
+            , c.Append(time)
           )
         )
       )
@@ -1306,15 +1301,15 @@ export const reloaded = (path: string, time: string) => {
 export const version = (vc: VC, type: string) => {
 
   n.log(
-    x.Line(
+    c.Line(
       c.whiteBright(
-        x.Prefix(
+        c.Prefix(
           'version'
           , u.glueString(
             vc.number
-            , ARL
+            , c.ARL
             , vc.update.number
-            , x.Append(type)
+            , c.Append(type)
           )
         )
       )

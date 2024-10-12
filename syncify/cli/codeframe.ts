@@ -1,8 +1,7 @@
-import { Wrap } from 'syncify:cli/tree';
 import * as c from '@syncify/ansi';
+import { BAD, Tree, Wrap, sanitize, glue } from '@syncify/ansi';
+import { isString } from 'syncify:utils';
 import { $ } from 'syncify:state';
-import { BAD, Tree } from '@syncify/ansi';
-import { glue, isString, sanitize } from 'syncify:utils';
 
 /**
  * Shopify Error Highlights

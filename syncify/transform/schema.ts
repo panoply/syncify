@@ -20,8 +20,8 @@ import * as error from 'syncify:errors';
 import { queue } from 'syncify:requests/queue';
 import { File, Type } from 'syncify:file';
 import { $ } from 'syncify:state';
-import { hasProp, plural, has, isArray, isObject, glue, checksum } from 'syncify:utils';
-import { bold, ARR } from '@syncify/ansi';
+import { hasProp, plural, has, isArray, isObject, checksum } from 'syncify:utils';
+import { bold, ARR, glue } from '@syncify/ansi';
 import { minifySchema } from '../terser/liquid';
 
 export function HasSchemaTag (content: string) {
@@ -481,7 +481,7 @@ async function ParseSharedSchema (file: File) {
  * Returns re-generated section files with the applied shared
  * schema injects.
  */
-export async function CreateSection <T extends SchemaSectionTag>(file: File<T>) {
+export async function CreateSection <T extends SchemaSectionTag> (file: File<T>) {
 
   const read = await ExtractSchema(file);
 

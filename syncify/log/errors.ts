@@ -4,18 +4,14 @@ import type { Exception } from 'sass';
 import type { CssSyntaxError } from 'postcss';
 import type { Message } from 'esbuild';
 import type { JSONError } from 'parse-json';
-import wrap from 'wrap-ansi';
-import clean from 'clean-stack';
 import { hasPath } from 'rambdax';
 import { SHOPIFY_REQUEST_ERRORS } from 'syncify:const';
 import { assign, error } from 'syncify:native';
-import { getChunk, glue, detect, sanitize, object, has } from 'syncify:utils';
-import { red, strip, bold, blue, neonMagenta, whiteBright, gray, white, BAD, COL, TLD, Tree } from '@syncify/ansi';
+import { getChunk, detect, object, has } from 'syncify:utils';
 import { Context, Format } from 'syncify:interpolate';
 import { update } from 'syncify:log';
-import { Create } from 'syncify:cli/tree';
 import * as codeframe from 'syncify:cli/codeframe';
-
+import * as c from '@syncify/ansi';
 import { $ } from 'syncify:state';
 
 /**
@@ -77,8 +73,8 @@ export function spawn (this: { name: string; }, data: string) {
 
         const chunk = getChunk(ansi, ansi.length / 2);
 
-        before = glue(chunk[0]);
-        after = glue(chunk[1] || NIL);
+        before = c.glue(chunk[0]);
+        after = c.glue(chunk[1] || NIL);
 
       } else {
 
@@ -92,12 +88,12 @@ export function spawn (this: { name: string; }, data: string) {
 
     if (clean.length === 0) {
 
-      acc.push([ Tree.trim ]);
+      acc.push([ c.Tree.trim ]);
 
     } else {
 
       const prefix: string[] = [];
-      const nwl = wrap(clean, $.terminal.wrap, {
+      const nwl = c.wrapAnsi(clean, $.terminal.wrap, {
         hard: true
       }).split(NWL);
 
@@ -113,7 +109,7 @@ export function spawn (this: { name: string; }, data: string) {
           }
         }
 
-        prefix.push(Tree.line + before + line + after);
+        prefix.push(c.Tree.line + before + line + after);
 
       }
 
@@ -134,13 +130,13 @@ export function spawn (this: { name: string; }, data: string) {
 
     if (newlines.length !== 0 && line.length > 1) {
 
-      if (format.length > 0 && format[format.length - 1] !== Tree.trim) {
-        format.push(Tree.trim);
+      if (format.length > 0 && format[format.length - 1] !== c.Tree.trim) {
+        format.push(c.Tree.trim);
       }
 
       format.push(line.join(NWL));
 
-    } else if (line === Tree.trim) {
+    } else if (line === c.Tree.trim) {
       if (n) {
         n = false;
       } else {
@@ -235,23 +231,23 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
       entries: object({
         column,
         line,
-        file: TLD + file,
+        file: c.TLD + file,
         details: e.statusText,
-        status: white(sanitize(e.status)),
-        processor: neonMagenta('SHOPIFY API')
+        status: c.white(c.sanitize(e.status)),
+        processor: c.neonMagenta('SHOPIFY API')
       })
     });
 
-    const message = Create({ type: 'error' })
+    const message = c.Create({ type: 'error' })
     .NL
-    .Insert(output, gray)
+    .Insert(output, c.gray)
     .NL
     .Context(context)
     .toString();
 
     if (config.store) {
       config.data.message = output;
-      config.data.rawMessage = strip(output);
+      config.data.rawMessage = c.strip(output);
       config.data.context = context;
     }
 
@@ -270,7 +266,7 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
   //
   if (e.status in SHOPIFY_REQUEST_ERRORS) {
 
-    const message = Create({ type: 'error' })
+    const message = c.Create({ type: 'error' })
     .NL
     .Wrap(SHOPIFY_REQUEST_ERRORS[e.status])
     .toLine();
@@ -289,7 +285,7 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
       config.data.context = context;
     }
 
-    const output = glue(Tree.red, NWL, message, Context(context));
+    const output = c.glue(c.Tree.red, NWL, message, Context(context));
 
     if (config.log) error(output);
     if (config.store) return <T>config.data;
@@ -300,7 +296,7 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
 
   // UNKNOWN ERROR
 
-  const message = red('Unknown error has occured');
+  const message = c.red('Unknown error has occured');
   const context = {
     stack: false,
     entries: {
@@ -315,8 +311,8 @@ export function request <T> (file: string, e: AxiosResponse, options?: {
     config.data.context = context;
   }
 
-  const output = glue(
-    Tree.red,
+  const output = c.glue(
+    c.Tree.red,
     NWL,
     message,
     Context({
@@ -363,7 +359,7 @@ export function throws (e: any, entries: { [name: string]: string | number }) {
   if (context.stack === false) {
 
     error(
-      glue(
+      c.glue(
         Format(message, { type: 'error' }),
         Context(context)
       )
@@ -374,7 +370,7 @@ export function throws (e: any, entries: { [name: string]: string | number }) {
   } else {
 
     $.errors.add(
-      glue(
+      c.glue(
         Format(message, { type: 'error' }),
         Context(context)
       )
@@ -396,7 +392,7 @@ export const write = (
 ) => (e: NodeJS.ErrnoException) => {
 
   error(
-    glue(
+    c.glue(
       Format(e.message, { type: 'error' }),
       Context(
         {
@@ -422,7 +418,7 @@ export const write = (
  */
 export function read (details: string, entries: { [name: string]: string }) {
 
-  const message = Create({ type: 'error' }).Break('FILE ERROR');
+  const message = c.Create({ type: 'error' }).Break('FILE ERROR');
 
   return function (e: NodeJS.ErrnoException) {
 
@@ -460,9 +456,9 @@ export function json (e: JSONError, file: File) {
 
   let line: number;
 
-  const message = Create({ type: 'error' })
+  const message = c.Create({ type: 'error' })
   .NL
-  .Wrap(e.message.split(NWL)[0], red.bold)
+  .Wrap(e.message.split(NWL)[0], c.red.bold)
   .NL;
 
   // const isSchema = file.ext === '.liquid';
@@ -499,7 +495,7 @@ export function json (e: JSONError, file: File) {
 
   const stack: string[] = [];
   const trace = e.stack.split(NWL);
-  while (trace.length !== 0) stack.push(Tree.red + trace.shift());
+  while (trace.length !== 0) stack.push(c.Tree.red + trace.shift());
 
   $.errors.add(stack.join(NWL));
 
@@ -511,8 +507,8 @@ export function json (e: JSONError, file: File) {
       entries: {
         line,
         name: e.name,
-        file: TLD + file.relative,
-        processor: neonMagenta('JSON')
+        file: c.TLD + file.relative,
+        processor: c.neonMagenta('JSON')
       }
     }).toString()
   );
@@ -526,9 +522,9 @@ export function json (e: JSONError, file: File) {
  */
 export function sass (file: File, e: Exception) {
 
-  const message = Create({ type: 'error' })
+  const message = c.Create({ type: 'error' })
   .NL
-  .Wrap(e.sassMessage, red.bold)
+  .Wrap(e.sassMessage, c.red.bold)
   .Newline();
 
   if (has('span', e)) {
@@ -541,19 +537,19 @@ export function sass (file: File, e: Exception) {
     message.Newline();
 
     const { start, end } = span;
-    const space = sanitize(end.line + 1).length;
+    const space = c.sanitize(end.line + 1).length;
 
     // ALL MATCHING
     if (start.line === end.line) {
 
-      let same = space - sanitize(end.line).length;
+      let same = space - c.sanitize(end.line).length;
 
-      if (start.line > 1) message.Line(`${WSP.repeat(same) + blue(`${end.line}`)} ${Tree.trim}`);
+      if (start.line > 1) message.Line(`${WSP.repeat(same) + c.blue(`${end.line}`)} ${c.Tree.trim}`);
 
-      same = space - sanitize(end.line + 1).length;
+      same = space - c.sanitize(end.line + 1).length;
 
-      message.Line(`${WSP.repeat(same) + blue(`${end.line + 1}`)} ${Tree.trim} ${code.trimEnd()}`);
-      message.Line(`${WSP.repeat(space - 1) + BAD} ${Tree.redTrim} ${WSP.repeat(end.column) + bold('^')}`);
+      message.Line(`${WSP.repeat(same) + c.blue(`${end.line + 1}`)} ${c.Tree.trim} ${code.trimEnd()}`);
+      message.Line(`${WSP.repeat(space - 1) + c.BAD} ${c.Tree.redTrim} ${WSP.repeat(end.column) + c.bold('^')}`);
 
     } else {
 
@@ -563,10 +559,10 @@ export function sass (file: File, e: Exception) {
       let from = span.start.line + 1;
 
       for (const line of lines) {
-        const number = sanitize(from++);
+        const number = c.sanitize(from++);
         const same = space - number.length;
         const align = same === 0 ? NIL : WSP.repeat(same);
-        message.Line(`${align + blue(number)} ${Tree.trim} ${line}`);
+        message.Line(`${align + c.blue(number)} ${c.Tree.trim} ${line}`);
       }
 
     }
@@ -581,7 +577,7 @@ export function sass (file: File, e: Exception) {
         name: e.name,
         input: file.input,
         cause: e.cause as string,
-        processor: neonMagenta('SASS Dart')
+        processor: c.neonMagenta('SASS Dart')
       }
     }).toString()
   );
@@ -595,36 +591,36 @@ export function sass (file: File, e: Exception) {
  */
 export function esbuild (e: Message) {
 
-  const message = Create({ type: 'error' })
+  const message = c.Create({ type: 'error' })
   .NL
-  .Wrap(e.text, red.bold)
+  .Wrap(e.text, c.red.bold)
   .Newline();
 
   const span = e.location;
-  const space = sanitize(span.line).length;
+  const space = c.sanitize(span.line).length;
 
-  let same = space - sanitize(e.location.line).length;
+  let same = space - c.sanitize(e.location.line).length;
 
-  if (span.line > 1) message.Line(`${WSP.repeat(same) + blue(`${span.line - 1}`)} ${Tree.trim}`);
+  if (span.line > 1) message.Line(`${WSP.repeat(same) + c.blue(`${span.line - 1}`)} ${c.Tree.trim}`);
 
-  same = space - sanitize(span.line).length;
+  same = space - c.sanitize(span.line).length;
 
   error(
     message
-    .Line(`${WSP.repeat(same) + blue(`${span.line}`)} ${Tree.trim} ${span.lineText}`)
-    .Line(`${WSP.repeat(space - 1) + BAD} ${Tree.redTrim} ${WSP.repeat(span.column) + bold('^')}`)
+    .Line(`${WSP.repeat(same) + c.blue(`${span.line}`)} ${c.Tree.trim} ${span.lineText}`)
+    .Line(`${WSP.repeat(space - 1) + c.BAD} ${c.Tree.redTrim} ${WSP.repeat(span.column) + c.bold('^')}`)
     .NL
     .NL
     .Context({
       stack: false,
       entries: {
-        suggest: whiteBright(span.suggestion),
+        suggest: c.whiteBright(span.suggestion),
         line: e.location.line,
         column: e.location.column,
         plugin: e.pluginName,
         namespace: span.namespace,
-        file: TLD + e.location.file,
-        processor: neonMagenta('ESBuild')
+        file: c.TLD + e.location.file,
+        processor: c.neonMagenta('ESBuild')
       }
     }).toString()
   );
@@ -639,16 +635,16 @@ export function esbuild (e: Message) {
 export function postcss (file: File, e: CssSyntaxError) {
 
   const stack: string[] = [];
-  const trace = clean(e.stack, { pretty: true, basePath: $.cwd }).split(NWL);
+  const trace = c.cleanStack(e.stack, { pretty: true, basePath: $.cwd }).split(NWL);
 
-  while (trace.length !== 0) stack.push(Tree.red + trace.shift());
+  while (trace.length !== 0) stack.push(c.Tree.red + trace.shift());
 
   $.errors.add(stack.join(NWL));
 
   error(
-    Create({ type: 'error' })
+    c.Create({ type: 'error' })
     .NL
-    .Wrap(`${e.name}${COL} ${e.reason}`, red.bold)
+    .Wrap(`${e.name}${c.COL} ${e.reason}`, c.red.bold)
     .Newline()
     .Multiline(e.showSourceCode(true))
     .NL
@@ -660,8 +656,8 @@ export function postcss (file: File, e: CssSyntaxError) {
         column: e.column,
         source: file.input,
         file: file.input === e.file ? undefined : e.file,
-        plugin: blue(e.plugin),
-        processor: neonMagenta('PostCSS')
+        plugin: c.blue(e.plugin),
+        processor: c.neonMagenta('PostCSS')
       }
     })
     .toString()

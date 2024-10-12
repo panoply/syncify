@@ -11,6 +11,8 @@ import { $ } from 'syncify:state';
  */
 export async function setPublishConfig () {
 
+  return;
+
   if (u.isObject($.config.publish) && u.isEmpty($.config.publish) === false) {
 
     for (const prop in $.config.publish) {
@@ -102,23 +104,6 @@ export async function setPublishConfig () {
   }
 
   if ($.mode.publish === true || $.mode.release === true) {
-
-    if (!u.has('ngrok_auth_token', $.env.vars)) {
-
-      throwError(
-        'Missing ngrok auth token',
-        [
-          'Theme publishing requires an ngrok authorisation token',
-          `This is easy to obtain, visit ${underline('https://ngrok.com')}`,
-          `and create a ${bold('free')} account to get a token.`,
-          '',
-          `Once you have obtained an auth token, provide it in your ${gray('.env')}`,
-          'file, use the following environment variable name:',
-          '',
-          `${whiteBright('ngrok_auth_token = ""')}`
-        ]
-      );
-    }
 
   }
 

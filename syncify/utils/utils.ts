@@ -6,11 +6,7 @@ import { createRequire } from 'node:module';
 import strip from 'strip-json-comments';
 import { COL, DSH } from '@syncify/ansi';
 import type { MultipleTopLevelPatch } from 'types/internal';
-import { assign, create } from 'syncify:native';
-
-/* -------------------------------------------- */
-/* UTILITIES                                    */
-/* -------------------------------------------- */
+import { assign, create } from './native';
 
 /**
  * **merge**
@@ -225,7 +221,6 @@ export async function dynamicImport (id: string, { format }: { format: string })
 
   if (format === 'esm') {
 
-    // @ts-expect-error
     return (file: string) => import(file);
 
   } else {
@@ -246,7 +241,6 @@ export function getImport <T> (name: string): T {
 
   if (isFunction(require)) return require(name);
 
-  // @ts-expect-error
   return createRequire(import.meta.url)(name);
 
 }
@@ -395,28 +389,6 @@ export function debouncePromise<T extends unknown[]> (
 /* -------------------------------------------- */
 
 /**
- * **sanitize**
- *
- * Sanitizes the log message passed. Converts a `Buffer`, `number`, `object`,
- * `boolean` or an `array` type to a readable string.
- *
- * @example
- *
-* sanitize(true) => 'true'
-* sanitize({ x: 1 }) => '{"x":1}'
-* sanitize(1000) => '1000'
-*/
-export function sanitize (message: number | boolean | string | Buffer | object | any[]): string {
-
-  if (isBuffer(message)) return message.toString();
-  if (isObject(message) || isArray(message)) return JSON.stringify(message);
-  if (isBoolean(message) || isNumber(message)) return `${message}`;
-
-  return isString(message) ? message : String(message);
-
-};
-
-/**
  * **checksum**
  *
  * Creates an MD5 hash from input.
@@ -503,6 +475,22 @@ export function addSuffix (number: number): string {
 }
 
 /**
+ * Returns the package manager
+ */
+export function pm () {
+
+  if (!process.env.npm_config_user_agent) return 'npm';
+
+  const userAgent = process.env.npm_config_user_agent;
+  const pmSpec = userAgent.split(' ')[0];
+  const separatorPos = pmSpec.lastIndexOf('/');
+  const name = pmSpec.substring(0, separatorPos);
+
+  return name === 'npminstall' ? 'cnpm' : name;
+
+}
+
+/**
  * **glueString**
  *
  * Join a string together with a single space character.
@@ -525,22 +513,6 @@ export function glueString (...input: string[]) {
  *
  * @example
  *
- * glue('foo', 'bar', 'bar')   // foobarbaz
- * glue(['foo', 'bar', 'baz']) // foobarbaz
- */
-export function glue (...input: [ string[] ] | string[]) {
-
-  return isArray(input[0]) ? input[0].join('') : input.join('');
-
-}
-
-/**
- * **glue**
- *
- * Join `string[]` or `...string[]` (spread) together
- *
- * @example
- *
  * glue('foo', 'bar', 'bar')
  * // foo
  * // bar
@@ -551,39 +523,9 @@ export function glue (...input: [ string[] ] | string[]) {
  * // bar
  * // baz
  */
-export function glueLines(...input: [ string[] ] | string[]) {
+export function glueLines (...input: [ string[] ] | string[]) {
 
- return isArray(input[0]) ? input[0].join('\n') : input.join('\n');
-
-}
-
-/**
- * **ws**
- *
- * Equalised Spacing
- */
-export function ws (array: any[] | object, prop: string = null) {
-
-  let size: number = 0;
-
-  if (isArray(array)) {
-    for (const item of array) {
-      if (prop) {
-        if (item[prop].length > size) size = item[prop].length;
-      } else {
-        if (item.length > size) size = item.length;
-      }
-    }
-  } else {
-    for (const item in array) if (item.length > size) size = item.length;
-  }
-
-  size = size + 1;
-
-  return function curried (string: string | number) {
-    const n = isString(string) ? size - string.length : size - string;
-    return n < 1 ? WSP : WSP.repeat(n);
-  };
+  return isArray(input[0]) ? input[0].join('\n') : input.join('\n');
 
 }
 

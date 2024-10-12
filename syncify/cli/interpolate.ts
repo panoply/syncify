@@ -1,28 +1,26 @@
-import type { Ansis } from 'ansis';
-import { has, isArray, isString, sanitize, ws } from 'syncify:utils';
-import { Tree, COL, TLD, BAD } from '@syncify/ansi';
-import { gray, cyan, white, magenta, underline, neonCyan, blue, whiteBright, yellowBright, red } from '@syncify/ansi';
-import { Create, CreateClosure, Suffix } from 'syncify:cli/tree';
+import type { LiteralUnion } from 'type-fest';
+import type { Ansis } from '@syncify/ansi';
+import { has, isArray, isString } from 'syncify:utils';
+import * as c from '@syncify/ansi';
 import { $ } from 'syncify:state';
-import { LiteralUnion } from 'type-fest';
 
 function highlight (string: string) {
 
   return string
-  .replace(/(\()(line\s[0-9]+)(\))(:)/g, gray('$1') + whiteBright('$2') + gray('$3') + '$4' + NWL)
-  .replace(/('[{}_\w\s.-]*?'|"[\w\s.-]*?")/g, yellowBright('$1'))
-  .replace(/({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g, cyan('$1') + white('$2') + cyan('$3'))
-  .replace(/((?:www|http:|https:)+[^\s]+[\w])/g, underline('$1'))
-  .replace(/(\/)(.*?)(\/)/g, magenta('$1') + cyan('$2') + magenta('$3'))
-  .replace(/(?<=Filename\s)([\w._-]+)(?=\salready)/, neonCyan.bold('$1'));
+  .replace(/(\()(line\s[0-9]+)(\))(:)/g, c.gray('$1') + c.whiteBright('$2') + c.gray('$3') + '$4' + NWL)
+  .replace(/('[{}_\w\s.-]*?'|"[\w\s.-]*?")/g, c.yellowBright('$1'))
+  .replace(/({{2}-?)([a-zA-Z0-9_\-.'"[\]]+)(-?}{2})/g, c.cyan('$1') + c.white('$2') + c.cyan('$3'))
+  .replace(/((?:www|http:|https:)+[^\s]+[\w])/g, c.underline('$1'))
+  .replace(/(\/)(.*?)(\/)/g, c.magenta('$1') + c.cyan('$2') + c.magenta('$3'))
+  .replace(/(?<=Filename\s)([\w._-]+)(?=\salready)/, c.neonCyan.bold('$1'));
 
 }
 
 function tokens (string: string) {
 
-  return white(string
-  .replace(/({%|{%-}|-%}|%}|{{|{{-|}}|-}}|<\/?|>)/g, cyan('$1'))
-  .replace(/(['"].*?['"])/g, gray('$1')));
+  return c.white(string
+  .replace(/({%|{%-}|-%}|%}|{{|{{-|}}|-}}|<\/?|>)/g, c.cyan('$1'))
+  .replace(/(['"].*?['"])/g, c.gray('$1')));
 
 }
 
@@ -32,11 +30,7 @@ function tokens (string: string) {
  * Parse Shopify 422 error responses from failed requests.
  * Applies some sanity and normalization to the output.
  */
-export function Shopify (message: string | string[], value: string): {
-  line: number,
-  column: number,
-  output: string
-} {
+export function Shopify (message: string | string[], value: string): { line: number, column: number, output: string } {
 
   const output: string[] = [];
 
@@ -57,7 +51,7 @@ export function Shopify (message: string | string[], value: string): {
         // Obtain Line number
         if (lineIndex > -1 && numberIndex > -1) {
 
-          output.push(red.bold(text.slice(0, lineIndex + 2)));
+          output.push(c.red.bold(text.slice(0, lineIndex + 2)));
 
           line = Number(text.slice(numberIndex + 6, lineIndex));
           text = text.slice(lineIndex + 2);
@@ -76,15 +70,15 @@ export function Shopify (message: string | string[], value: string): {
 
             output.push(
               NWL,
-              `${blue(sanitize(line - 1))}  ${Tree.trim}`,
-              `${blue(sanitize(line))}  ${Tree.trim} ${tokens(doc[line - 1])}`
+              `${c.blue(c.sanitize(line - 1))}  ${c.Tree.trim}`,
+              `${c.blue(c.sanitize(line))}  ${c.Tree.trim} ${tokens(doc[line - 1])}`
             );
 
             if (isNaN(column)) {
               output.push(NWL);
             } else {
               output.push(
-                `> ${BAD} ${Tree.redTrim} ${WSP.repeat(column) + red.bold('^'.repeat(match[1].length))}`,
+                `> ${c.BAD} ${c.Tree.redTrim} ${WSP.repeat(column) + c.red.bold('^'.repeat(match[1].length))}`,
                 NWL
               );
             }
@@ -123,7 +117,7 @@ export function Shopify (message: string | string[], value: string): {
  */
 export function Format (input: string | string[], { type = 'info' }: { type?: 'error' | 'warn' | 'info'} = {}) {
 
-  const message = Create({ type });
+  const message = c.Create({ type });
   const lines = isArray(input) ? input : input.split(NWL);
   const color = type === 'error' ? 'red' : type === 'warn' ? 'yellow' : 'line';
 
@@ -160,29 +154,29 @@ export function Format (input: string | string[], { type = 'info' }: { type?: 'e
 export function Context (data: {
   stack: string | boolean;
   warning?: boolean;
-  message?: CreateClosure;
+  message?: c.CreateClosure;
   entries: {
     [name: string]: string | number
   }
 }) {
 
-  const space = ws(data.entries);
+  const space = c.eq(data.entries);
   const hasMessage = has('message', data);
 
   if (!has('warning', data)) data.warning = false;
 
   if (!hasMessage) {
     if (data.warning === false) {
-      data.message = Create({ type: 'error' }).NL;
+      data.message = c.Create({ type: 'error' }).NL;
     } else {
-      data.message = Create({ type: 'warn' }).NL;
+      data.message = c.Create({ type: 'warn' }).NL;
     }
   }
 
   // generate output
   for (const key in data.entries) {
 
-    const string = sanitize(data.entries[key]);
+    const string = c.sanitize(data.entries[key]);
 
     if (
       key === 'source' ||
@@ -190,11 +184,11 @@ export function Context (data: {
       key === 'input' ||
       key === 'file') {
 
-      data.message.Line(white(key) + COL + space(key) + TLD + underline(string), gray);
+      data.message.Line(c.white(key) + c.COL + space(key) + c.TLD + c.underline(string), c.gray);
 
     } else {
 
-      data.message.Line(white(key) + COL + space(key) + string, gray);
+      data.message.Line(c.white(key) + c.COL + space(key) + string, c.gray);
 
     }
 
@@ -206,7 +200,7 @@ export function Context (data: {
       $.errors.add(data.stack);
     }
 
-    data.message.Break(Suffix.stack);
+    data.message.Break(c.Suffix.stack);
   }
 
   return data.message.toLine();
@@ -228,7 +222,7 @@ export function Context (data: {
  * ```
  */
 export function Sample (code: string, {
-  line = Tree.line,
+  line = c.Tree.line,
   span = null
 }: {
   line?: LiteralUnion<'red' | 'yellow', string>,
@@ -239,9 +233,9 @@ export function Sample (code: string, {
 } = {}) {
 
   if (line === 'red') {
-    line = Tree.red;
+    line = c.Tree.red;
   } else if (line === 'yellow') {
-    line = Tree.yellow;
+    line = c.Tree.yellow;
   }
 
   if (span !== null) {
@@ -249,9 +243,9 @@ export function Sample (code: string, {
     const end = has('end', span) ? span.end : span.start + 1;
 
     return line + NWL + [
-      line + blue(`${span.start - 1}`) + COL,
-      line + blue(`${span.start}`) + COL + code,
-      line + blue(`${end}`) + COL
+      line + c.blue(`${span.start - 1}`) + c.COL,
+      line + c.blue(`${span.start}`) + c.COL + code,
+      line + c.blue(`${end}`) + c.COL
     ].join(NWL);
 
   }
@@ -271,7 +265,7 @@ export function Sample (code: string, {
  * │
  * ```
  */
-export function Multiline (input: string[] | string, { type = 'info', color = white }: {
+export function Multiline (input: string[] | string, { type = 'info', color = c.white }: {
 
   /**
    * Ansi Color
@@ -290,6 +284,6 @@ export function Multiline (input: string[] | string, { type = 'info', color = wh
 
   const line = type === 'error' ? 'red' : type === 'warn' ? 'yellow' : 'line';
 
-  return Create({ type }).Newline(line).Wrap(input, color).toLine();
+  return c.Create({ type }).Newline(line).Wrap(input, color).toLine();
 
 };

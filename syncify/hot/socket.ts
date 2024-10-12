@@ -2,10 +2,9 @@ import type { WSS } from 'types';
 import { uWS } from '@syncify/uws';
 import { HOT_SOCKET_TOPICS } from 'syncify:const';
 import { kill } from 'syncify:cli/exit';
-import { ARR, gray, neonCyan, pink } from '@syncify/ansi';
+import { ARR, gray, neonCyan, pink, Line } from '@syncify/ansi';
 import { $ } from 'syncify:state';
 import * as log from 'syncify:log';
-import * as tree from 'syncify:cli/tree';
 import { server } from 'syncify:hot/server';
 
 /**
@@ -40,7 +39,7 @@ export async function socket (): Promise<WSS> {
 
     if (token) {
 
-      log.out(tree.Line(`${neonCyan('socket')}  ${ARR}  ${gray('PORT')}  ${ARR} ${pink(`${$.hot.socket}`)}`));
+      log.out(Line(`${neonCyan('socket')}  ${ARR}  ${gray('PORT')}  ${ARR} ${pink(`${$.hot.socket}`)}`));
       log.nwl();
 
     } else {

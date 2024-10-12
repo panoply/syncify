@@ -48,8 +48,6 @@ export async function setPaths () {
         return [ path(fallback) ];
       }
 
-      let resolved: number = 0;
-
       if ('*' in files && '[name]' in files) {
 
         warn('Multiple fallback rename keys, paths will be merged', '"*" and "[name]"');
@@ -77,43 +75,36 @@ export async function setPaths () {
         }
       }
 
-      const global: [ string?, string[]? ] = [];
-      const rename: Array<[string, string[]]> = [];
+      const global: Map<string, Set<string>> = new Map();
+      const rename: Map<string, Set<string>> = new Map();
 
       for (const pattern in files) {
 
         if (isArray<string[]>(files[pattern])) {
 
-          const value: [ string, string[] ] = [
-            pattern,
-            files[pattern].map(p => {
-              const v = path(p);
-              $.watch.add(v);
-              return v;
-            })
-          ];
+          const model = (pattern === '*' || pattern === '[name]')
+            ? global.has(pattern)
+              ? global.get(pattern)
+              : global.set(pattern, new Set()).get(pattern)
+            : rename.has(pattern)
+              ? rename.get(pattern)
+              : rename.set(pattern, new Set()).get(pattern);
 
-          if (resolved === 0) resolved = value[1].length;
-
-          if (pattern === '*' || pattern === '[name]') {
-            global.push(...value);
-          } else {
-            rename.push(value);
+          for (let i = 0, s = files[pattern].length; i < s; i++) {
+            const glob = path(files[pattern][i]);
+            $.watch.add(glob);
+            model.add(glob);
           }
 
         } else if (isString(files)) {
 
-          const value: [ string, string[] ] = [ pattern, [ path(files[pattern]) ] ];
-
-          if (resolved === 0) resolved = value[1].length;
-
-          $.watch.add(value[1]);
-
-          if (pattern === '*' || pattern === '[name]') {
-            global.push(...value);
-          } else {
-            rename.push(value);
-          }
+          (pattern === '*' || pattern === '[name]')
+            ? global.has(pattern)
+              ? global.get(pattern).add(path(files[pattern]))
+              : global.set(pattern, new Set([ path(files[pattern]) ]))
+            : rename.has(pattern)
+              ? rename.get(pattern).add(path(files[pattern]))
+              : rename.set(pattern, new Set([ path(files[pattern]) ]));
 
         } else if (isNil(files[pattern])) {
 
@@ -127,23 +118,15 @@ export async function setPaths () {
         }
       }
 
-      if (resolved === 0) {
-        warn(`Unresolved path/s in "${key}"`, '{}');
-        return [ path(fallback) ];
-      }
-
-      $.paths[key].rename = [ [ anymatch(global[1]), global[0] ] ];
+      const entries = [ ...global.values() ].flatMap(globs => [ ...globs ]);
 
       for (const [ pattern, globs ] of rename) {
-
-        $.paths[key].rename.push([
-          anymatch([ ...global[1].map(p => p[0] !== '!' ? `!${p}` : p), ...globs ]),
-          pattern
-        ]);
-
+        const spread = [ ...globs.values() ];
+        entries.push(...spread);
+        $.paths[key].rename.push([ anymatch(spread), pattern ]);
       }
 
-      return global[1].concat(rename.flatMap((value) => value[1]));
+      return entries;
 
     } else {
 

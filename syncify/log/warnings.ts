@@ -3,12 +3,10 @@ import type { Warning } from 'postcss';
 import type { SourceSpan } from 'sass';
 import type { Message } from 'esbuild';
 import { log, warn } from 'syncify:native';
-import { glue, glueString, isNumber, plural, sanitize, has, isUndefined } from 'syncify:utils';
+import { glueString, isNumber, plural, has, isUndefined } from 'syncify:utils';
 import { Sample } from 'syncify:interpolate';
 import * as c from '@syncify/ansi';
-import { Create, LineYellow, Prefix, Suffix, Context } from 'syncify:cli/tree';
 import { $ } from 'syncify:state';
-import { Tree } from '@syncify/ansi';
 import { LiteralUnion } from 'type-fest';
 
 /**
@@ -45,7 +43,7 @@ export function schema (file: File, options: {
 }) {
 
   const stack = getStack('Shared Schema', file.input);
-  const output = Create({ type: 'warning' })
+  const output = c.Create({ type: 'warning' })
   .NL
   .Wrap(options.message, c.yellowBright)
   .NL
@@ -73,7 +71,7 @@ export const sass = (file: File) => (message: string, options: {
 }) => {
 
   const stack = getStack('sass', file.input);
-  const output = Create({ type: 'warning' }).NL.Wrap(message, c.yellowBright);
+  const output = c.Create({ type: 'warning' }).NL.Wrap(message, c.yellowBright);
 
   if (has('span', options)) {
 
@@ -87,15 +85,15 @@ export const sass = (file: File) => (message: string, options: {
 
     if (lines.length < 15) {
 
-      const space = sanitize(span.end.line).length;
+      const space = c.sanitize(span.end.line).length;
 
       let from = span.start.line + 1;
 
       for (const line of lines) {
-        const number = sanitize(from++);
+        const number = c.sanitize(from++);
         const same = space - number.length;
         const align = same === 0 ? NIL : WSP.repeat(same);
-        output.Trim(`   ${align + c.blue(number)} ${Tree.trim} ${line}`);
+        output.Trim(`   ${align + c.blue(number)} ${c.Tree.trim} ${line}`);
       }
 
     }
@@ -119,12 +117,12 @@ export const sass = (file: File) => (message: string, options: {
   if (!$.mode.build) {
 
     log(
-      LineYellow(
+      c.LineYellow(
         c.yellowBright(
-          Prefix(
+          c.Prefix(
             'warning'
-            , glueString(sanitize(stack.size), plural('warning', stack.size))
-          ) + Suffix.warning
+            , glueString(c.sanitize(stack.size), plural('warning', stack.size))
+          ) + c.Suffix.warning
         )
       )
     );
@@ -148,7 +146,7 @@ export function postcss (file: File, data: Warning) {
 
   const stack = getStack('postcss', file.input);
 
-  const output = glue(
+  const output = c.glue(
     Sample(
       data.node.toString(), {
         line: 'yellow',
@@ -162,7 +160,7 @@ export function postcss (file: File, data: Warning) {
       }
     )
     ,
-    Context(
+    c.Context(
       {
         stack: false,
         entries: {
