@@ -53,7 +53,7 @@ function create (columns: number | string, rows: number | string) {
  *
  * @see https://github.com/sindresorhus/term-size
  */
-export function size () {
+export function tsize () {
 
   if (stdout && stdout.columns && stdout.rows) return create(stdout.columns, stdout.rows);
   if (stderr && stderr.columns && stderr.rows) return create(stderr.columns, stderr.rows);
@@ -110,4 +110,5 @@ export function size () {
   }
 
   return create(80, 24);
+
 };

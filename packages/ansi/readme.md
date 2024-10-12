@@ -54,60 +54,115 @@ There are various symbols (characters) available as named exports. Symbols in th
 
 Character are `const` exports, they are output in `darkGray` by default.
 
-```
-|        PIP
-#        HSH
-+        PLS
--        MIN
-,        COM
-✓        CHK
-𐄂        BAD
-:        COL
-→        ARR
-▸        CHV
-⥂        ARL
-~        TLD
-—        DSH
+```js
+import {
+  PIP // |
+  HSH // #
+  PLS // +
+  MIN // -
+  COM // ,
+  CHK // ✓
+  BAD // 𐄂
+  COL // :
+  ARR // →
+  CHV // ▸
+  ARL // ⥂
+  TLD // ~
+  DSH // —
+} from '@syncify/ansi'
 ```
 
 ### Infix Wrappers
 
 Infix wrappers are `const` exports, they are output in `darkGray` by default.
 
-```
-(        LPR
-)        RPR
-{        LCB
-}        RCB
-[        LSB
-]        RSB
-<        LAN
->        RAN
+```js
+import {
+  LPR // (
+  RPR // )
+  LCB // {
+  RCB // }
+  LSB // [
+  RSB // ]
+  LAN // <
+  RAN // >
+} from '@syncify/ansi'
 ```
 
 ### Tree Characters
 
 Tree characters available on the `Tree` named export and are output in `darkGray` by default. Characters are also available in `red` and `yellow` colors.
 
+<!-- prettier-ignore-->
+```js
+import { Tree } from '@syncify/ansi';
+
+Tree.open         // ┌─
+Tree.stub         // ├
+Tree.dash         // ├─
+Tree.line         // │
+Tree.base         // └─
+Tree.next         // \n│
+Tree.after        // │\n
+Tree.wrap         // \n│\n
+
+Tree.indent.edge  // ├──┬─
+Tree.indent.line  // │  │
+Tree.indent.stub  // │  ├
+Tree.indent.dash  // │  ├─
+Tree.indent.base  // │  └─
+Tree.indent.fall  // ├──┐
 ```
-┌─       Tree.open
-├        Tree.stub
-├─       Tree.dash
-│        Tree.line
-└─       Tree.base
 
-\n│      Tree.next
-│\n      Tree.after
+# Tree Create
 
-\n│\n    Tree.wrap
+Log message generator instance which can be used to compose a complex output log.
 
-├──┐     Tree.indent.fall
-│  │     Tree.indent.line
-│  ├     Tree.indent.stub
-│  ├─    Tree.indent.dash
-│  └─    Tree.indent.base
+```js
+import { Create } from '@syncify/ansi';
 
-├──┬─    Tree.indent.edge
+const message = Create();
+
+message.BR;
+message.NL;
+message.Break();
+message.Context();
+message.Dash();
+message.End();
+message.Error();
+message.Get();
+message.Inline();
+message.Insert();
+message.Line();
+message.Newline();
+message.Pop();
+message.Remove();
+message.Ruler();
+message.Top();
+message.Trim();
+message.Warn();
+message.Wrap();
+message.toLine();
+message.toRaw();
+message.toString();
+```
+
+# Spinner
+
+Symbol Spinner utility which will persist a terminal animation.
+
+```js
+import { spinner } from '@syncify/ansi';
+
+spinner('loading', {
+  line: true,
+  action: {},
+  color: 'pink',
+  style: 'spinning'
+});
+
+spinner.update('');
+spinner.stop();
 ```
 
 # Progress
@@ -139,12 +194,16 @@ loading.stop()         // Stop progress
 loading.percent        // Returns loading percentage
 ```
 
-# Size
+# Terminal Size
 
 The module also exposes a helper utility for obtaining the developers terminal size and will return some information about the terminal dimensions.
 
 ```js
-import { size } from '@syncify/ansi';
+import { tsize } from '@syncify/ansi';
 
-const { wrap, cols, row } = size();
+const {
+  wrap, // number
+  cols, // number
+  row // number
+} = size();
 ```

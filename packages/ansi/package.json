@@ -1,14 +1,9 @@
 {
   "name": "@syncify/ansi",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "ANSI Colors, Symbols and TUI related terminal enchancements for Syncify.",
-  "type": "module",
-  "main": "../dist/index.js",
-  "module": "./dist/index.js",
-  "exports": {
-    "import": "./dist/index.js",
-    "types": "./types/index.d.ts"
-  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup --minify"
@@ -24,12 +19,14 @@
     "entry": ["src/index.ts"],
     "dts": true,
     "clean": true,
-    "platform": "node",
-    "format": "esm",
-    "noExternal": ["ansis"]
+    "bundle": true,
+    "noExternal": ["ansis", "clean-stack", "log-update", "wrap-ansi"]
   },
   "devDependencies": {
     "ansis": "^3.3.2",
-    "type-fest": "^4.26.1"
+    "clean-stack": "^5.2.0",
+    "log-update": "^6.1.0",
+    "type-fest": "^4.26.1",
+    "wrap-ansi": "^9.0.0"
   }
 }

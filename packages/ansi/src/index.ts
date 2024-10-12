@@ -1,6 +1,11 @@
 export * from './colors';
-export * from './progress';
-export * from './size';
+export * from './tsize';
 export * from './symbols';
 export * from './tree';
+export * from './progress';
+export * from './helpers';
+export * from './spinner';
+export { default as wrapAnsi } from 'wrap-ansi';
+export { default as cleanStack } from 'clean-stack';
+export { default as update } from 'log-update';
 export { Ansis } from 'ansis';
