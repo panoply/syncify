@@ -4,13 +4,13 @@ Basic level [Syncify](https://github.com/panoply/syncify) strap building the Sho
 
 ### Showcasing
 
-This strap demonstrates how Syncify can be used as a replacement for the Shopify CLI. There is nothing special happening in this example, it merely provides you a starting point with Dawn. Configuration is defined within the `package.json` file on the `syncify` key and is pre-configured for the following:
+This strap demonstrates how Syncify can be used as a replacement for the Shopify CLI. Consult the [syncify.config.js](/syncify.config.js) file overview of the logic.
 
-- Uses the `package.json` for configuration
-- Bundles JavaScript files
-- Bundles CSS files
-- Uses PostCSS, Autoprefixer and CleanCSS transform.
-- Applies terse minification to JavaScript files
+- Uses `syncify.config.js` file for configuration
+- Optionally Bundles JavaScript files
+- Optionally Bundles CSS files
+- Optionally Process CSS with PostCSS, Autoprefixer and CleanCSS.
+- Leverages sub-directories and renames
 
 # Instructions
 
