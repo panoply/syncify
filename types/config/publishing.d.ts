@@ -1,12 +1,37 @@
-export interface Publishing {
+export interface Branches {
   /**
-   * The port address to publish on - In most cases, you can leave
-   * this to the default, unless port `80` is occupied, in such
-   * situation, use a different port.
+   * Specify a list of git branches which Syncify will publish to.
    *
-   * @default 80
+   * @default 'production'
    */
-  tunnelPort?: number;
+  branches?: Record<string, string[]>;
+  /**
+   * Whether or not to bind `package.json` and `settings_schema.json`
+   * versions. When set to `true` the `settings_schema.json` value will
+   * be aligned with the `package.json` version.
+   *
+   * @default 'production'
+   */
+  binded?: string;
+  /**
+   * Glob list of theme files to track. Entries here will be synced
+   * and aligned with source (`input`) files. Syncify will only
+   * track data files by default.
+   *
+   * > If you wish to track all files then pass a single `*` asterisk.
+   *
+   * @default
+   * [
+   *   'config/*.json',
+   *   'locales/*.json',
+   *   'sections/*.json',
+   *   'templates/*.json'
+   * ]
+   */
+  track?: string[];
+}
+
+export interface Publishing {
   /**
    * Set the publishment role to use - This defaults to `unpublished`
    * which means theme publishes will not be made pushed live.
@@ -25,7 +50,7 @@ export interface Publishing {
    *
    * @default 'unpublished'
    */
-  publishRole?: 'main' | 'unpublished' | 'development';
+  role?: 'main' | 'unpublished' | 'development';
   /**
    * **NOT YET AVAILABLE**
    *
@@ -33,7 +58,7 @@ export interface Publishing {
    *
    * @default false
    */
-  bindVersion?: boolean;
+  branches?: string[]
   /**
    * Limit the amount of new theme publishments.
    *
