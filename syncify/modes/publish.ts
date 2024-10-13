@@ -1,12 +1,10 @@
-import type { Syncify } from 'types';
-import { uWS } from '@syncify/uws';
-import { delay } from 'rambdax';
+import type { Stores, Syncify } from 'types';
+import * as request from 'syncify:requests/publish';
 import { timer } from 'syncify:timer';
 import * as log from 'syncify:log';
 import { exporting } from 'syncify:modes/export';
-import { ARR, bold, gray, magentaBright, neonCyan, neonGreen } from '@syncify/ansi';
 import { $ } from 'syncify:state';
-import { existsSync, readFileSync } from 'fs-extra';
+import { isObject } from 'syncify:utils';
 
 export async function publish (cb?: Syncify) {
 
@@ -16,145 +14,34 @@ export async function publish (cb?: Syncify) {
 
   log.title('Publishing');
 
-  const app = uWS.App().get('/*', (response, request) => {
-
-    response.writeHeader('Access-Control-Allow-Origin', '*');
-    response.writeHeader('Cache-Control', 'public, max-age=0');
-
-    const uri = $.vc.dir + request.getUrl();
-
-    existsSync(uri)
-      ? response.end(readFileSync(uri))
-      : response.endWithoutBody();
-
-  }).listen($.publish.tunnelPort, (token) => {
-    if (!token) {
-      console.log('Failed to listen to port ' + $.publish.tunnelPort);
-    }
-  });
-
-  // const versions = statics($.vc.dir);
-  // const server = http.createServer((req, res) => versions(req, res, handler(req, res)));
-
-  // const onerror = (e: { code: 'EADDRINUSE' }) => {
-  //   if (e.code === 'EADDRINUSE') {
-  //     log.error('EADDRINUSE');
-  //     return null;
-  //   }
-  // };
-
-  // const onconnect = () => {
-  //   server.removeListener('error', onerror);
-  //   server.removeListener('connect', onconnect);
-  // };
-
-  // server.on('error', onerror);
-  // server.on('connect', onconnect);
-  // server.listen($.publish.tunnelPort);
-
-  await delay(500);
-
-  timer.start('ngrok');
-
-  // const url = await ngrok.connect({
-  //   addr: $.publish.tunnelPort,
-  //   onStatusChange (status) {
-  //     if (status === 'closed') {
-  //       log.write('disconnect', { prefix: 'ngrok' });
-  //     } else {
-  //       log.write(`${bold('connected')} PORT${COL}${$.publish.tunnelPort}`, {
-  //         prefix: 'ngrok',
-  //         suffix: timer.stop('ngrok')
-  //       });
-  //     }
-  //   }
-  // });
-
-  const src = `${$.vc.number}.zip`;
-
-  log.write(gray(src), { prefix: 'server' });
+  const hasThemes = $.sync.themes.length > 0;
 
   for (const store of $.sync.stores) {
 
-    timer.start(store.domain);
+    const { id } = await request.publish(store);
 
-    log.write(store.domain, { prefix: 'webshop', color: neonCyan });
-    log.write(`${bold('role')} ${ARR} ${$.publish.publishRole}`, { prefix: 'publish' });
-    log.write(bold(`v${$.vc.number}`), { prefix: 'version', color: magentaBright });
-    log.nwl();
+    if (hasThemes) {
 
-    await delay(1000);
+      const syncify = $.pkg.syncify;
 
-    log.spinner('uploading', {
-      style: 'spinning',
-      color: neonGreen
-    });
+      if (isObject<Stores>(syncify.stores)) {
 
-    await delay(2000);
+        if (store.domain.startsWith(syncify.stores.domain)) {
 
-    log.spinner.update('dispatched');
+          for (const theme in syncify.stores.themes) {
 
-    await delay(2000);
+            if (syncify.stores.themes[theme] === -1) {
+              syncify.stores.themes[theme] = id;
+            }
+          }
 
-    log.spinner.update('extracting');
+        }
 
-    await delay(2000);
+        // @ts-expect-error
+        await $.package.update({ syncify }).save();
 
-    log.spinner.update('processing');
-
-    // log.update.clear();
-
-    // const { id } = await request.publish(store, {
-    //   src,
-    //   name: `${$.vc.number}`,
-    //   role: $.publish.publishRole
-    // });
-
-    await delay(1000);
-
-    // log.action('neonGreen', 'status', bold('synced'), store.domain, timer.now(store.domain));
-    // log.nwl();
-
-    // await processing(id, store);
-
-    log.spinner.stop('done');
-
-    log.write(`${bold('published')} ${ARR} ${store.domain}`, {
-      prefix: 'status',
-      color: neonGreen,
-      suffix: timer.now(store.domain)
-    });
-
+      }
+    }
   }
 
-  app.close();
-
-  //  await ngrok.disconnect();
-
-  log.nwl();
-  log.group();
-  log.nwl();
-
-  await prompts([
-    {
-      name: 'action',
-      hint: ' ',
-      type: 'select',
-      message: 'Post-Publishing',
-      choices: [
-        {
-          title: 'Update Config',
-          value: 'config'
-        },
-        {
-          title: 'Publish Themes',
-          value: 'publish'
-        },
-        {
-          title: 'Delete Themes',
-          value: 'delete'
-        }
-      ]
-    }
-  ]);
 }
