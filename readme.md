@@ -2,7 +2,7 @@
 <p align="center">
 <a href="https://syncify.sh">
 <img src="https://raw.githubusercontent.com/panoply/syncify/3b7839da26b4355943c94ddf93f81e2f41a6a2bf/assets/logo-text.svg"
-width="160px">
+width="200px">
 </a>
 </p>
 <h1></h1>
@@ -11,15 +11,19 @@ The **essential** and **indispensable** toolkit for Shopify theme development, S
 
 ### Documentation
 
-Documentation lives on **[syncify.sh](https://syncify.sh)**
+Refer to **[syncify.sh](https://syncify.sh)** for documentation.
 
 ### Straps
 
-Visit the [Straps](https://github.com/SyncifyCLI) repository for usage examples and themes.
+Visit the **[straps](https://github.com/SyncifyCLI)** repository for usage examples and themes.
 
 ### Extension
 
-Use the [VSCode Liquid](https://github.com/panoply/vscode-liquid) extension for IDE enhancements.
+Use the **[VSCode Liquid](https://github.com/panoply/vscode-liquid)** extension for IDE enhancements.
+
+### Support
+
+Need help? Join [Shopify Developers](https://discord.gg/shopify-developers-597504637167468564) discord.
 
 # Installation
 
@@ -43,11 +47,11 @@ This project uses [pnpm](https://pnpm.js.org/en/cli/install). Fork the project, 
 
 ### Author
 
-Syncify was created by [Nίκος Σαβίδης](https://github.com/panoply).
+Syncify was created by [Nίκος Σαβίδης](https://github.com/panoply)
 
 ### Acknowledgements
 
-Special thanks to a couple of talented developers who have helped with Syncify. This project has been in the making for several years and if not for these individuals, I wouldn't of made it this far.
+Special thanks to a couple of talented developers who have helped with Syncify. This project has been in the making for several years and if not for these individuals, it wouldn't of made it this far.
 
 - [Kim Skinner](https://github.com/WolfGreyDev)
 - [David Warrington](https://ellodave.dev/)
