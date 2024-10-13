@@ -1,4 +1,5 @@
 import type { File, Resource, Theme } from 'types';
+import type { Progress } from '@syncify/ansi';
 import glob from 'fast-glob';
 import { relative } from 'node:path';
 import { readFile } from 'fs-extra';
@@ -8,14 +9,12 @@ import { outputFile } from 'syncify:process/files';
 import { delay } from 'rambdax';
 import { event } from 'syncify:native';
 import { byteSize, stringSize } from 'syncify:sizes';
-import { isFunction, toUpcase, glue } from 'syncify:utils';
+import { isFunction, toUpcase } from 'syncify:utils';
 import { AxiosResponse } from 'axios';
 import { onAsset } from 'syncify:plugins/hooks';
 import { throwError } from 'syncify:log/throws';
 import { Events } from 'syncify:requests/assets';
 import { timer } from 'syncify:timer';
-import { Prefix, Create, CreateClosure, Line, Break } from 'syncify:cli/tree';
-import { Progress, ARR } from '@syncify/ansi';
 import * as log from 'syncify:log';
 import * as error from 'syncify:errors';
 import * as c from '@syncify/ansi';
@@ -184,7 +183,7 @@ export async function upload (cb?: Syncify): Promise<void> {
    * Keeps the **duration** ticker running and prints
    * the log update to terminal.
    */
-  function logger (message: CreateClosure) {
+  function logger (message: c.CreateClosure) {
 
     const record = message.toRaw();
 
@@ -197,16 +196,16 @@ export async function upload (cb?: Syncify): Promise<void> {
 
     interval = setInterval(() => {
 
-      record[3] = Line(
+      record[3] = c.Line(
         c.gray(
-          Prefix(
+          c.Prefix(
             'Elapsed',
             c.whiteBright.bold(timer.now('upload'))
           )
         )
       ) + NWL;
 
-      log.update(glue(record));
+      log.update(c.glue(record));
 
     }, 100);
 
@@ -224,13 +223,13 @@ export async function upload (cb?: Syncify): Promise<void> {
     const key = `${theme.store}:${theme.target}`;
     const record = sync.get(key);
 
-    const message = Create()
+    const message = c.Create()
     .NL
     .Line(toUpcase(file.namespace), c.bold.whiteBright)
     .NL
-    .Line(Prefix('Elapsed', c.whiteBright.bold(timer.now('upload'))), c.gray)
-    .Line(Prefix('Duration', c.whiteBright(timer.stop(file.uuid))), c.gray)
-    .Line(Prefix('Size', c.whiteBright(stringSize(file.size))), c.gray)
+    .Line(c.Prefix('Elapsed', c.whiteBright.bold(timer.now('upload'))), c.gray)
+    .Line(c.Prefix('Duration', c.whiteBright(timer.stop(file.uuid))), c.gray)
+    .Line(c.Prefix('Size', c.whiteBright(stringSize(file.size))), c.gray)
     .Newline();
 
     if (item.status === Events.Success) {
@@ -278,13 +277,13 @@ export async function upload (cb?: Syncify): Promise<void> {
       const failures = c.bold(`${failed}`);
 
       message
-      .Line(`${c.bold(target.toUpperCase())}  ${ARR}  ${store}`, c.whiteBright)
+      .Line(`${c.bold(target.toUpperCase())}  ${c.ARR}  ${store}`, c.whiteBright)
       .NL
       .Line(processed)
       .NL
-      .Line(Prefix('uploaded', uploaded), c.whiteBright)
-      .Line(Prefix('retrying', retrying), retry > 0 ? c.orange : c.whiteBright)
-      .Line(Prefix('failures', failures), failed > 0 ? c.redBright : c.whiteBright)
+      .Line(c.Prefix('uploaded', uploaded), c.whiteBright)
+      .Line(c.Prefix('retrying', retrying), retry > 0 ? c.orange : c.whiteBright)
+      .Line(c.Prefix('failures', failures), failed > 0 ? c.redBright : c.whiteBright)
       .NL
       .Insert(progress.render())
       .Newline();
@@ -370,12 +369,12 @@ export async function upload (cb?: Syncify): Promise<void> {
       const uploaded = `${c.bold(`${success}`)} ${c.white('of')} ${c.bold(`${size}`)}`;
 
       log.out(
-        Create()
+        c.Create()
         .NL
-        .Line(`${name}  ${ARR}  ${theme.store}`)
+        .Line(`${name}  ${c.ARR}  ${theme.store}`)
         .NL
-        .Line(Prefix('uploaded', uploaded), c.neonGreen)
-        .Line(Prefix('failures', failures), c.redBright)
+        .Line(c.Prefix('uploaded', uploaded), c.neonGreen)
+        .Line(c.Prefix('failures', failures), c.redBright)
         .toString()
       );
 
@@ -400,7 +399,7 @@ export async function upload (cb?: Syncify): Promise<void> {
 
   await delay(500);
 
-  log.update(Break(c.neonGreen.bold('Uploaded Completed')));
+  log.update(c.Break(c.neonGreen.bold('Uploaded Completed')));
   log.group(false);
 
   process.exit(0);
