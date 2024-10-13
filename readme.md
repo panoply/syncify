@@ -22,7 +22,7 @@ For an integrated development experience in the editor, please consider using th
 
 **Need help?** Join the **[Shopify Developers Discord](https://discord.gg/shopify-developers-597504637167468564)** and ask your questions in the `#syncify` channel. Connect with other developers, maintainers, and contributors already using Syncify.
 
-> The Shopify Developers discord is independently ran online community where experienced developers interact and converse. No spam or bullshit is tolerated, just real discussions and great minds. Real discussions with folks who like banter, platform critiques and open dialogue.
+> The Shopify Developers discord is independently ran online community where experienced developers interact and converse. No spam or bullshit is tolerated, just real discussions, banter, platform critiques and open dialogue with great minds.
 
 # Installation
 
