@@ -9,14 +9,16 @@ width="200px">
 
 The **essential** and **indispensable** toolkit for Shopify theme development, Syncify exists as a superior alternative to the woefully inadequate Shopify CLI, bringing unmatched capabilities and flexibility that aligns with the nuanced needs of professional theme developers.
 
+### References
+
 - **[Syncify Documentation](https://syncify.sh)**
 - **[Syncify Straps](https://github.com/SyncifyCLI)**
 
-### IDE
+### Editor Integration
 
 For an integrated development experience in the editor, please consider using the **[VSCode Liquid](https://github.com/panoply/vscode-liquid)** extension which has built-in support for Syncify. VSCode Liquid exists as a superior alternative to the Shopify backed extension and is maintained and created by the same author of Syncify.
 
-### Getting Support
+# Support
 
 **Need help?** Join the **[Shopify Developers Discord](https://discord.gg/shopify-developers-597504637167468564)** and ask your questions in the `#syncify` channel. Connect with other developers, maintainers, and contributors already using Syncify.
 
