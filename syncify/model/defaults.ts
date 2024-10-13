@@ -1,5 +1,22 @@
 import type { Config } from 'types';
 
+// const c = {
+//   workflow: {
+//     prod: 'production',
+//     track: [],
+//     force: [],
+//     branches: {
+//       staging: [
+//         'pre-release'
+//       ],
+//       development: [
+//         'production',
+//         'development'
+//       ]
+//     }
+//   }
+// };
+
 /**
  * Default Configuration
  *
@@ -48,17 +65,35 @@ export const defaults = (): Config => ({
       terse: false
     }
   },
-  publish: {
-    bindVersion: false,
-    publishRole: 'unpublished',
-    themeLimit: 3,
-    tunnelPort: 80
-  },
   spawn: {
     build: null,
     watch: null
   },
-  hot: false,
+  hot: {
+    server: 3000,
+    socket: 8089,
+    method: 'hot',
+    strategy: 'hydrate',
+    label: 'visible',
+    previewBar: false,
+    loadEventJS: '',
+    chromeFlags: [
+      '--restore-last-session',
+      '--disable-gpu',
+      '--no-sandbox',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--disable-extensions',
+      '--disable-sync',
+      '--disable-password-manager',
+      '--disable-save-password-bubble',
+      '--disable-translate',
+      '--disable-features=TranslateUI',
+      '--disable-infobars',
+      '--disable-web-security',
+      '--test-type'
+    ]
+  },
   log: {
     clear: true,
     silent: false,
