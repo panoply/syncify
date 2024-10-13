@@ -4,17 +4,16 @@ import { join, relative } from 'node:path';
 import { delay } from 'rambdax';
 import { writeFileSync } from 'fs-extra';
 import { importFile } from 'syncify:process/files';
-import { Progress, ARR } from '@syncify/ansi';
 import { queue } from 'syncify:requests/queue';
 import { timer } from 'syncify:utils/timer';
 import { assign, event } from 'syncify:native';
-import { addSuffix, glue } from 'syncify:utils';
-import { Create, Prefix } from 'syncify:cli/tree';
+import { addSuffix } from 'syncify:utils';
 import * as request from 'syncify:requests/assets';
 import * as c from '@syncify/ansi';
 import * as log from 'syncify:log';
 
 import { $ } from 'syncify:state';
+import { Progress } from '@syncify/ansi';
 
 interface EventParams {
   /**
@@ -190,14 +189,14 @@ function getDoneLog (record: SyncRecord, output: string, time: string) {
   const failed = c.bold(`${record.failed}`);
   const target = c.bold(`${record.theme.target.toUpperCase()}`);
 
-  return Create()
-  .Line(Prefix(target, ARR), c.neonCyan)
+  return c.Create()
+  .Line(c.Prefix(target, c.ARR), c.neonCyan)
   .NL
   .Line(`completed in ${c.gray(time)}`)
   .NL
-  .Line(Prefix('synced', success), c.whiteBright)
-  .Line(Prefix('errors', failed), record.failed > 0 ? c.redBright : c.whiteBright)
-  .Line(Prefix('location', c.gray.underline(output)))
+  .Line(c.Prefix('synced', success), c.whiteBright)
+  .Line(c.Prefix('errors', failed), record.failed > 0 ? c.redBright : c.whiteBright)
+  .Line(c.Prefix('location', c.gray.underline(output)))
   .NL
   .Insert(record.progress.render())
   .Line
@@ -207,14 +206,14 @@ function getDoneLog (record: SyncRecord, output: string, time: string) {
 
 function getWaitLog (record: SyncRecord) {
 
-  return Create()
-  .Line(`${c.bold(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`, c.gray.dim)
+  return c.Create()
+  .Line(`${c.bold(record.theme.target.toUpperCase())}  ${c.ARR}  ${record.theme.store}`, c.gray.dim)
   .NL
   .Line(`${c.bold(addSuffix(record.number))} in queue`, c.magenta)
   .NL
-  .Line(Prefix('synced', `${c.bold('0')} ${c.white('of')} ${c.bold(`${record.size}`)}`), c.gray.dim)
-  .Line(Prefix('retry', c.bold('0')), c.gray.dim)
-  .Line(Prefix('errors', c.bold('0')), c.gray.dim)
+  .Line(c.Prefix('synced', `${c.bold('0')} ${c.white('of')} ${c.bold(`${record.size}`)}`), c.gray.dim)
+  .Line(c.Prefix('retry', c.bold('0')), c.gray.dim)
+  .Line(c.Prefix('errors', c.bold('0')), c.gray.dim)
   .NL
   .Insert(record.progress.render(c.gray.dim))
   .NL
@@ -254,12 +253,12 @@ export async function importing (cb?: Syncify): Promise<void> {
     const record = sync.get(key);
     const preview = `https://${theme.store}?preview_theme_id=${theme.id}`;
 
-    const prefix = Create()
+    const prefix = c.Create()
     .NL
-    .Line(Prefix('Duration', c.whiteBright(timer.now('import'))), c.gray)
-    .Line(Prefix('Transfers', c.whiteBright(`${transfers++}`)), c.gray)
-    .Line(Prefix('Syncing', c.pink(`${c.bold(theme.target)}  ${ARR}  ${theme.store}`)), c.gray)
-    .Line(Prefix('Preview', c.underline(preview)), c.gray)
+    .Line(c.Prefix('Duration', c.whiteBright(timer.now('import'))), c.gray)
+    .Line(c.Prefix('Transfers', c.whiteBright(`${transfers++}`)), c.gray)
+    .Line(c.Prefix('Syncing', c.pink(`${c.bold(theme.target)}  ${c.ARR}  ${theme.store}`)), c.gray)
+    .Line(c.Prefix('Preview', c.underline(preview)), c.gray)
     .Ruler();
 
     let processing: string = NIL;
@@ -325,16 +324,16 @@ export async function importing (cb?: Syncify): Promise<void> {
     const failed = c.bold(`${record.failed}`);
     const warnings = c.bold(`${record.warning}`);
 
-    const status = Create()
+    const status = c.Create()
     .NL
-    .Line(`${c.bold(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`, c.neonCyan)
+    .Line(`${c.bold(record.theme.target.toUpperCase())}  ${c.ARR}  ${record.theme.store}`, c.neonCyan)
     .NL
     .Line(processing)
     .NL
-    .Line(Prefix('synced', success), c.whiteBright)
-    .Line(Prefix('retry', retried), record.retry > 0 ? c.orange : c.whiteBright)
-    .Line(Prefix('warning', warnings), record.warning > 0 ? c.yellowBright : c.whiteBright)
-    .Line(Prefix('failed', failed), record.failed > 0 ? c.redBright : c.whiteBright)
+    .Line(c.Prefix('synced', success), c.whiteBright)
+    .Line(c.Prefix('retry', retried), record.retry > 0 ? c.orange : c.whiteBright)
+    .Line(c.Prefix('warning', warnings), record.warning > 0 ? c.yellowBright : c.whiteBright)
+    .Line(c.Prefix('failed', failed), record.failed > 0 ? c.redBright : c.whiteBright)
     .NL
     .Insert(record.progress.render())
     .NL
@@ -358,7 +357,7 @@ export async function importing (cb?: Syncify): Promise<void> {
       }
     }
 
-    log.update(glue(message));
+    log.update(c.glue(message));
 
   }
 
