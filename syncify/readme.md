@@ -28,11 +28,12 @@ Across the code base you'll notice the `$` named import. The `$` is a class inst
 
 ### Path Aliases
 
-The [`tsconfig.json`](/tsconfig.json) sets various path reference for local imports. This makes including modules much easier to across the workspace. Given there are a lot of files, referencing can be a tad painful, so aliases help alleviate some of this.
+The [`tsconfig.json`](/tsconfig.json) sets various path reference for local imports. This makes including modules much easier to access within the project. Given there are a lot of files, referencing can be a tad painful, so aliases help alleviate some of this, though at first glance it seems like straight fucking chaos.
+
+One of the main aspects to aliases is their syntactic structure, you'll notice that aliases linked internally are suffixed with a `syncify:` keyword. This attempts to make differentiation a tad easier.
 
 # Directories
 
-- [ansi](#ansi)
 - [cli](#cli)
 - [hot](#hot)
 - [log](#log)
@@ -46,19 +47,15 @@ The [`tsconfig.json`](/tsconfig.json) sets various path reference for local impo
 - [Transform](#transform)
 - [Utils](#utils)
 
-# [ansi](/ansi)
+# [cli](/syncify/cli)
 
-The `ansi` directory contains terminal related logic, specifically colors, symbols terminal and logic for logging. The **core** TUI (Terminal User Interface) aesthetic for Syncify is _typically_ composed using a chaining utility which will construct a tree-like log. You'll find most of the underlying references for terminal styling within this directory.
+The `cli` directory contains normalization logic for command line operations and various utilities or helper modules pertaining to CLI execution. Please see the [@syncify/ansi](/packages/ansi/) module within the packages directory, for additional functions around CLI and Console logging.
 
-# [cli](/cli)
+# [hot](/syncify/hot)
 
-The CLI directory contains normalization logic for command line operations and various utilities or helper modules pertaining to CLI execution. This directory and containing files differ from those found within [ansi](#ansi) in the sense that the `cli` directory is how trigger cli operations, whereas `ansi` is composition related.
+The `hot` directory contains HOT Reloading logic, this includes the relative [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) configuration. Please see the Please see the [@syncify/hot](/packages/hot/) module within the packages directory, for the client side injection script.
 
-# [hot](/hot)
-
-TODO
-
-# [log](/hot)
+# [log](/syncify/hot)
 
 The Log directory contains all console logging related logic. All loggers are made available using function export methods. Depending on the execution mode, different logging and loggers are used and this is what gives Syncify its beautiful TUI.
 
@@ -85,65 +82,42 @@ log.throws();
 log.spawn();
 ```
 
-# Model
+# [model](/syncify/model)
 
-TODO
+As mentioned above, this directory pertains to execution state. Files contained in this directory related to the data models in which Syncify operates.
 
-# [Hot](hot)
-
-The HOT directory contains the HOT Reloading logic. The [snippet](/snippet) file is generated in an isolate build process.
-
-# [Modes](modes)
+# [modes](/syncify/modes)
 
 The Modes directory is where you will find execution logic. For example, if Syncify is invoked in **watch** mode, you will find the handler in this directory.
 
-# [Options](options)
+# [options](/syncify/options)
 
 The options directory is probably the most import directory in the project as files within are responsible for constructing the runtime state (see [$](#overview)). Every configuration option available in a `syncify.config.ts` file will pass through a series of functions which will go about validating and applying state.
 
-Below is a list of each file and their pertaining use:
-
-| File                                 | Description                                                                            |
-| ------------------------------------ | -------------------------------------------------------------------------------------- |
-| [`define.ts`](options/define.ts)     | The entry point from which all files are digests                                       |
-| [`dirs.ts`](options/dirs.ts)         | Functions used for generating theme and base directories                               |
-| [`files.ts`](options/files.ts)       | Functions used for reading config files (i.e: `syncify.config.ts`, `package.json` etc) |
-| [`filters.ts`](options/filters.ts)   | Parses CLI `--filter` argv and constructs reference in `$.filters` model               |
-| [`hot.ts`](options/hot.ts)           | Constructs the HOT Reloading configuration and settings based on `syncify.config.ts`   |
-| [`json.ts`](options/json.ts)         | Constructs the JSON configuration and settings based on `syncify.config.ts`            |
-| [`modes.ts`](options/modes.ts)       | Parses CLI `mode` argv and constructs a reference in `$.modes`                         |
-| [`pages.ts`](options/pages.ts)       | Constructs the Pages configuration and settings based on `syncify.config.ts`           |
-| [`paths.ts`](options/paths.ts)       | Resolves and sets anymatch patterns based according to `syncify.config.ts` **paths**   |
-| [`scripts.ts`](options/scripts.ts)   | Constructs the **script** transform config based on `syncify.config.ts`                |
-| [`sections.ts`](options/sections.ts) | TODO                                                                                   |
-| [`snippets.ts`](options/snippets.ts) | TODO                                                                                   |
-| [`spawn.ts`](options/spawn.ts)       | TODO                                                                                   |
-| [`stores.ts`](options/stores.ts)     | TODO                                                                                   |
-| [`style.ts`](options/style.ts)       | TODO                                                                                   |
-| [`svg.ts`](options/svg.ts)           | TODO                                                                                   |
-| [`syver.ts`](options/syver.ts)       | TODO                                                                                   |
-| [`terser.ts`](options/terse.ts)      | TODO                                                                                   |
-
-# [Plugin](plugin)
+# [plugin](plugin)
 
 TODO
 
-# [process](process)
+# [/syncify/prompts](process)
 
-The Process directory contains files for the when we context is needed to be obtained. Say (for example), we are running in **Watch** mode and a file has been changed then it will more than likely pass through functions contained in the Process directory.
+The `prompts` directory is where the Terminal prompts and interactive CLI logic lives. It's here where operations that will accept input, provide choices and allow the user to run Syncify with more of a GUI like experience.
 
-# [Requests](requests)
+# [process](/syncify/process)
 
-TODO
+The `process` directory contains files for the when we context is needed to be obtained. Say (for example), we are running in **Watch** mode and a file has been changed then it will more than likely pass through functions contained in the Process directory.
+
+# [requests](/syncify/requests)
+
+The `requests` directory contains the Shopify API clients and interfacing logic. Currently, Syncify is querying the Shopify REST endpoints, with only minor migration to GraphQL endpoints. You'll also find the `require.ts` file within this directory, this is responsible for runtime external file handling of `.ts` or other extensions.
 
 # [Terser](terser)
 
 TODO
 
-# [Transform](transform)
+# [transform](/syncify/transform)
 
-TODO
+The `transform` directory is where the action happens. It's here where compiling, bundling and transpiled operation are handled. Almost all bundle processing of files will be passed through here.
 
-# [Utils](utils)
+# [utils](/syncify/utils)
 
-TODO
+The `utils` directory is a little bit of mess, mainly focused on sugars, helper utilities and general "utilities" live here. You'll notice that almost every single file in the Syncify codebase will reference a file within this directory.
