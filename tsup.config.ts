@@ -12,14 +12,13 @@ function importSchema () {
   const syncifySchema = join(packages, 'schema');
 
   const sections = readFileSync(join(liquifySchema, 'syncify/shared-schema.json'));
-  const env = readFileSync(join(liquifySchema, 'syncify/env.json'));
   const pkgjson = readFileSync(join(liquifySchema, 'syncify/package-json.json'));
 
   const config = readFileSync(join(liquifySchema, 'syncify.json'));
+
   writeFileSync(join(syncifySchema, 'syncify.json'), pkgjson);
   writeFileSync(join(syncifySchema, 'config.json'), config);
   writeFileSync(join(syncifySchema, 'sections.json'), sections);
-  writeFileSync(join(syncifySchema, 'env.json'), env);
 
 }
 
@@ -28,23 +27,20 @@ importSchema();
 const json = JSON.stringify;
 
 const noExternal = [
-  // Syncify Specific
-  '@syncify/ansi',
 
   // HOT Related
   'chrome-launcher',
 
+  '@syncify/ansi',
+
   // Others
   'anymatch',
-  'clean-stack',
-  'log-update',
   'p-map',
   'p-queue',
   'parse-json',
   'rambdax',
   'strip-json-comments',
   'tree-kill',
-  'wrap-ansi',
   'write-file-atomic'
 
 ];
@@ -69,6 +65,7 @@ const external = [
   'esbuild',
   'fast-glob',
   'figlet',
+  'form-data',
   'fs-extra',
   'gray-matter',
   'html-minifier-terser',
@@ -79,7 +76,6 @@ const external = [
   'scrollable-cli',
   'svg-sprite',
   'svgo',
-  // 'uWebSockets.js',
 
   // BUILD DEPS
   'eslint',
