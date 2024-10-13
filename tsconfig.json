@@ -13,21 +13,14 @@
     "types/internal/cli.d.ts",
     "types/internal/internal.d.ts",
   ],
-  "typeAcquisition": {
-    "enable": true,
-    "include": [
-      "node",
-    ]
-  },
   "compilerOptions": {
     "incremental": true,
     "target": "ESNext",
     "removeComments": true,
     "lib": [
       "ESNext",
-      "es2020",
     ],
-    "module": "ES6",
+    "module": "Preserve",
     "declaration": false,
     "preserveSymlinks": true,
     "allowSyntheticDefaultImports": true,
@@ -68,7 +61,7 @@
         "./syncify/utils/utils.ts"
       ],
       "syncify:interpolate": [
-        "syncify/cli/interpolate.ts"
+        "./syncify/cli/interpolate.ts"
       ],
       "syncify:log": [
         "./syncify/log/loggers.ts",
@@ -79,17 +72,11 @@
       /*
       /* ANSI
       /* -------------------------------------------- */
-      "syncify:ansi": [
-        "syncify/cli/tree.ts"
-      ],
       "syncify:colors": [
-        "syncify/cli/colors.ts"
+        "./syncify/cli/colors.ts"
       ],
       "syncify:codeframe": [
-        "syncify/cli/codeframe.ts"
-      ],
-      "syncify:symbol": [
-        "syncify/cli/symbol.ts"
+        "./syncify/cli/codeframe.ts"
       ],
       /*
       /* TRANSFORMS
@@ -149,7 +136,7 @@
         "./syncify/requests/*"
       ],
       "syncify:plugins/*": [
-        "syncify/plugins/*"
+        "./syncify/plugins/*"
       ],
       "syncify:hot/*": [
         "./syncify/hot/*"
@@ -163,6 +150,9 @@
       /* -------------------------------------------- */
       "syncify:utils/*": [
         "./syncify/utils/*",
+      ],
+      "syncify:native": [
+        "./syncify/utils/native.ts"
       ],
       "syncify:timer": [
         "./syncify/utils/timer.ts"
@@ -178,12 +168,6 @@
       ],
       "syncify:sizes": [
         "./syncify/utils/sizes.ts",
-      ],
-      "syncify:typeof": [
-        "./syncify/utils/typeof.ts",
-      ],
-      "syncify:native": [
-        "./syncify/utils/native.ts"
       ],
     }
   }
