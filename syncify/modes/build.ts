@@ -19,11 +19,10 @@ import { isUndefined, has, plural, isEmpty, isObject } from 'syncify:utils';
 import { timer } from 'syncify:timer';
 import { $ } from 'syncify:state';
 import { saveCache } from 'syncify:process/cache';
-import { Append, Create, Prefix } from 'syncify:cli/tree';
-import * as c from '@syncify/ansi';
-import * as log from 'syncify:log';
 import { HSH } from '@syncify/ansi';
 import { BUILD_GROUPS } from 'syncify:const';
+import * as c from '@syncify/ansi';
+import * as log from 'syncify:log';
 
 type Groups = (
   | 'styles'
@@ -96,8 +95,8 @@ export async function build (cb?: Syncify) {
   }
 
   const SVG: Set<string> = new Set();
-  const errors = Create({ type: 'error' });
-  const message = Create().Newline();
+  const errors = c.Create({ type: 'error' });
+  const message = c.Create().Newline();
   const report = getModel();
   const hasFilter = isEmpty($.filters) === false;
   const parse = parseFile($.paths, $.dirs.output);
@@ -238,7 +237,7 @@ export async function build (cb?: Syncify) {
     const count = c.bold(files < 10 ? ` ${files}` : `${files}`);
     const space = files === 1 ? WSR : WSP;
 
-    message.Line(Prefix(group, `${count} ${plural('file', files)}${space}${Append(record.time)}`));
+    message.Line(c.Prefix(group, `${count} ${plural('file', files)}${space}${c.Append(record.time)}`));
 
   }
 
@@ -261,13 +260,13 @@ export async function build (cb?: Syncify) {
     .NL
     .Dash('Completed', c.gray)
     .NL
-    .Line(Prefix('version', `${$.vc.number}`))
-    .Line(Prefix('processed', `${c.bold(`${report.stats.total}`)} files`))
-    .Line(Prefix('bundled', `${c.bold(`${report.stats.bundled}`)} files`))
-    .Line(Prefix('skipped', `${c.bold(`${report.stats.skipped}`)} files`))
-    .Line(Prefix('duration', timer.now('build')))
-    .Line(Prefix('warnings', c.bold(`${$.warnings.size}`)))
-    .Line(Prefix('errors', c.bold(`${report.stats.errors}`)));
+    .Line(c.Prefix('version', `${$.vc.number}`))
+    .Line(c.Prefix('processed', `${c.bold(`${report.stats.total}`)} files`))
+    .Line(c.Prefix('bundled', `${c.bold(`${report.stats.bundled}`)} files`))
+    .Line(c.Prefix('skipped', `${c.bold(`${report.stats.skipped}`)} files`))
+    .Line(c.Prefix('duration', timer.now('build')))
+    .Line(c.Prefix('warnings', c.bold(`${$.warnings.size}`)))
+    .Line(c.Prefix('errors', c.bold(`${report.stats.errors}`)));
 
     if ($.warnings.size > 0) {
 
