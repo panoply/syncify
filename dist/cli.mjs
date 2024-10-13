@@ -6974,14 +6974,11 @@ var $ = new class Bundle {
   });
   /**
    * Theme Publishing
+   *
+   * @deprecated
+   * This logic will change, do not use it.
    */
-  publish = object({
-    ngrok: null,
-    bindVersion: false,
-    publishRole: "unpublished",
-    themeLimit: 3,
-    tunnelPort: 80
-  });
+  publish = object();
   /**
    * Version Control
    *

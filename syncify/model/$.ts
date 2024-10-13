@@ -4,14 +4,14 @@ import type * as Type from 'types';
 import type { Commands } from 'types/internal';
 import type { ChildProcess } from 'node:child_process';
 import type PackageJson from '@npmcli/package-json';
-import { size } from '@syncify/ansi';
+import { tsize } from '@syncify/ansi';
 import { join } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
 import { PATH_KEYS } from 'syncify:const';
 import { defaults } from './defaults';
 import { processor } from './processor';
 import { plugins } from './plugins';
-import { object, merge } from 'syncify:utils';
+import { object, merge, pm } from 'syncify:utils';
 
 const paths = (): Type.PathBundle => {
 
@@ -71,12 +71,33 @@ export const $ = new class Bundle {
   private static watch: Type.WatchBundle = new Set() as unknown as Type.WatchBundle;
 
   /**
+   * Detects what package manager executed the process
+   *
+   * @default 'npm'
+   */
+  public pm: string = pm();
+
+  /**
    * The Syncify Module installation reference
    *
    * > This is temporary and will be removed in future versions as it exists
    * > for support with `--strap` command and applied to dependency key of package.json
    */
   public module: string = 'github:panoply/syncify#next';
+
+  /**
+   * The Syncify Github Repository
+   */
+  public github: {
+    /**
+     * The URL
+     */
+    url: string;
+    /**
+     * The current branch:
+     */
+    branch: string;
+  } = object({ url: 'https://github.com/panoply/syncify.git', branch: 'next' });
 
   /**
    * Process Child
@@ -205,14 +226,11 @@ export const $ = new class Bundle {
 
   /**
    * Theme Publishing
+   *
+   * @deprecated
+   * This logic will change, do not use it.
    */
-  public publish: Type.PublishBundle = object<Type.PublishBundle>({
-    ngrok: null,
-    bindVersion: false,
-    publishRole: 'unpublished',
-    themeLimit: 3,
-    tunnelPort: 80
-  });
+  public publish: Type.PublishBundle = object<Type.PublishBundle>();
 
   /**
    * Version Control
@@ -640,7 +658,7 @@ export const $ = new class Bundle {
   /**
    * The terminal rows and columns size
    */
-  get terminal (): { cols: number; rows: number; wrap?: number } { return size(); }
+  get terminal (): { cols: number; rows: number; wrap?: number } { return tsize(); }
 
 }();
 
