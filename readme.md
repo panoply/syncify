@@ -23,7 +23,7 @@ Use the **[VSCode Liquid](https://github.com/panoply/vscode-liquid)** extension 
 
 ### Support
 
-Need help? Join [Shopify Developers](https://discord.gg/shopify-developers-597504637167468564) discord.
+Need help? Join **[Shopify Developers](https://discord.gg/shopify-developers-597504637167468564)** discord.
 
 # Installation
 
