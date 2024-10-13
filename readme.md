@@ -11,6 +11,8 @@ The **essential** and **indispensable** toolkit for Shopify theme development, S
 
 ### References
 
+Refer to the documentation for usage and instructions. Refer to the straps collection from examples and themes.
+
 - **[Syncify Documentation](https://syncify.sh)**
 - **[Syncify Straps](https://github.com/SyncifyCLI)**
 
@@ -18,15 +20,9 @@ The **essential** and **indispensable** toolkit for Shopify theme development, S
 
 For an integrated development experience in the editor, please consider using the **[VSCode Liquid](https://github.com/panoply/vscode-liquid)** extension which has built-in support for Syncify. VSCode Liquid exists as a superior alternative to the Shopify backed extension and is maintained and created by the same author of Syncify.
 
-# Support
-
-**Need help?** Join the **[Shopify Developers Discord](https://discord.gg/shopify-developers-597504637167468564)** and ask your questions in the `#syncify` channel. Connect with other developers, maintainers, and contributors already using Syncify.
-
-> The Shopify Developers discord is independently ran online community where experienced developers interact and converse. No spam or bullshit is tolerated, just real discussions, banter, platform critiques and open dialogue with great minds.
-
 # Installation
 
-You can install Syncify as a devDependency of globally. Please consider using [pnpm](https://pnpm.js.org/en/cli/install) as your package manager for the best results and code happiness.
+You can install Syncify as a `devDependency` of globally, though on per-project development dependency is preferred. Please consider using [pnpm](https://pnpm.js.org/en/cli/install) as your package manager for a faster and better experience.
 
 ### Stable Release
 
@@ -38,7 +34,7 @@ pnpm add @syncify/cli -D
 
 ### Next Version
 
-If you prefer to live life on edge and would like to use the nightly version of Syncify you can install the [next](https://github.com/panoply/syncify/tree/next) branch.
+The next version release of Syncify can be installed via [next](https://github.com/panoply/syncify/tree/next) branch.
 
 ```bash
 pnpm add "github:panoply/syncify#next" -D
@@ -46,11 +42,17 @@ pnpm add "github:panoply/syncify#next" -D
 
 ### Unstable
 
-For those who like to live life on the edge, you can use the development version of Syncify by installing the [dev](https://github.com/panoply/syncify/tree/next) branch.
+The development version of Syncify is unstable but available via [dev](https://github.com/panoply/syncify/tree/next) branch.
 
 ```bash
 pnpm add "github:panoply/syncify#dev" -D
 ```
+
+# Getting Help?
+
+Join the **[Shopify Developers Discord](https://discord.gg/shopify-developers-597504637167468564)** and ask your questions in the `# syncify` channel. Connect with other developers, maintainers, and contributors already using Syncify in their projects or agency.
+
+> The Shopify Developers discord is independently ran online community where experienced developers interact and converse. No spam or bullshit is tolerated, just real discussions, banter, platform critiques and open dialogue with great minds.
 
 # Contributing
 
