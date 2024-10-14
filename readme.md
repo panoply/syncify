@@ -9,12 +9,11 @@ width="200px">
 
 The **essential** and **indispensable** toolkit for Shopify theme development, Syncify exists as a superior alternative to the woefully inadequate Shopify CLI, bringing unmatched capabilities and flexibility that aligns with the nuanced needs of professional theme developers.
 
-### References
+Documentation lives at: **[syncify.sh](https://syncify.sh)**
 
-Refer to the documentation for usage and instructions. Refer to the straps collection from examples and themes.
+### Examples and Themes
 
-- **[Syncify Documentation](https://syncify.sh)**
-- **[Syncify Straps](https://github.com/SyncifyCLI)**
+The [Syncify Straps](https://github.com/SyncifyCLI) github organization provides a collection of usage examples and starting point themes using Syncify. You can use the command line to generate new projects with the available straps. Refer to readme of each strap in the repositories.
 
 ### Editor Integration
 
@@ -50,9 +49,7 @@ pnpm add "github:panoply/syncify#dev" -D
 
 # Getting Help?
 
-Join the **[Shopify Developers Discord](https://discord.gg/shopify-developers-597504637167468564)** and ask your questions in the `# syncify` channel. Connect with other developers, maintainers, and contributors already using Syncify in their projects or agency.
-
-> The Shopify Developers discord is independently ran online community where experienced developers interact and converse. No spam or bullshit is tolerated, just real discussions, banter, platform critiques and open dialogue with great minds.
+Join the **[Shopify Developers Discord](https://discord.gg/shopify-developers-597504637167468564)** and ask your questions in the `# syncify` channel. Connect with other developers, maintainers, and contributors already using Syncify in their projects or within their agency.
 
 # Contributing
 

@@ -12,10 +12,10 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       '@syncify/turndown':
-        specifier: workspace:^
+        specifier: ^0.2.0
         version: link:packages/turndown
       '@syncify/uws':
-        specifier: workspace:^
+        specifier: ^0.1.1
         version: link:packages/uws
       adm-zip:
         specifier: ^0.5.16

@@ -89,8 +89,8 @@
   },
   "dependencies": {
     "@npmcli/package-json": "^6.0.1",
-    "@syncify/turndown": "workspace:^",
-    "@syncify/uws": "workspace:^",
+    "@syncify/turndown": "^0.2.0",
+    "@syncify/uws": "^0.1.1",
     "adm-zip": "^0.5.16",
     "axios": "^1.7.7",
     "cbor": "^9.0.2",
