@@ -22,6 +22,7 @@
     "format": [
       "cjs"
     ],
+    "silent": true,
     "target": "node20",
     "splitting": false,
     "platform": "node",

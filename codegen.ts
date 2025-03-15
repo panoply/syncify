@@ -1,101 +1,6 @@
-import type { Models } from './types/dts/codegen';
+import type { CodegenConfig } from '@graphql-codegen/cli';
+import type { SyncifyPluginConfig } from '@syncify/codegen';
 
-import fs from 'fs';
-import { readFile, writeFile } from 'fs/promises';
-
-import { CodegenConfig } from '@graphql-codegen/cli';
-import { format } from 'prettier';
-import ts from 'typescript';
-
-import { Create, gray } from '@syncify/ansi';
-
-const config = {
-  version: '2025-01',
-  schema: '.vscode/graph/schema.json',
-  output: './types/dts/graph.d.ts',
-  depths: 1,
-  export: <Models[]>[
-
-    // REQUIRED
-    // 'QueryRoot',
-    'DisplayableError',
-    'Maybe',
-    'Translation',
-
-    // ONLINE STORE
-    'OnlineStore',
-    'OnlineStoreTheme',
-    'OnlineStoreThemeConnection',
-    'OnlineStoreThemeEdge',
-    'OnlineStoreThemeFile',
-    'OnlineStoreThemeFileBody',
-    'OnlineStoreThemeFileBodyText',
-    'OnlineStoreThemeFileConnection',
-    'OnlineStoreThemeFileEdge',
-    'OnlineStoreThemeFileOperationResult',
-    'OnlineStoreThemeFileReadResult',
-    'OnlineStoreThemeFilesUpsertFileInput',
-    'OnlineStoreThemeFilesUserErrors',
-    'OnlineStoreThemeInput',
-    'MutationThemeFilesUpsertArgs',
-    'ThemeFilesUpsertPayload',
-    // 'ThemeFilesCopyPayload',
-
-    // THEME
-    'ThemeCreatePayload',
-    'ThemeCreateUserError',
-    'ThemeDeletePayload',
-    'ThemeDeleteUserError',
-    'ThemePublishPayload',
-    'ThemePublishUserError',
-
-    // PAGE
-    // 'Page',
-    // 'PageConnection',
-    // 'PageCreateInput',
-    // 'PageCreatePayload',
-    // 'PageCreateUserError',
-    // 'PageDeletePayload',
-    // 'PageDeleteUserError',
-    // 'PageUpdateInput',
-    // 'PageUpdatePayload',
-    // 'PageUpdateUserError',
-    // 'PageEdge',
-
-    // REDIRECTS
-    // 'UrlRedirect',
-    // 'UrlRedirectConnection',
-    // 'UrlRedirectCreatePayload',
-    // 'UrlRedirectDeletePayload',
-    // 'UrlRedirectEdge',
-    // 'UrlRedirectImportCreatePayload',
-    // 'UrlRedirectImportPreview',
-    // 'UrlRedirectImportSubmitPayload',
-    // 'UrlRedirectImportUserError',
-    // 'UrlRedirectInput',
-    // 'UrlRedirectUpdatePayload',
-    // 'UrlRedirectUserError',
-
-    // // NAVIGATION
-    // 'Menu',
-    // 'MenuConnection',
-    // 'MenuCreatePayload',
-    // 'MenuCreateUserError',
-    // 'MenuDeletePayload',
-    // 'MenuDeleteUserError',
-    // 'MenuEdge',
-    // 'MenuItem',
-    // 'MenuItemCreateInput',
-    // 'MenuItemUpdateInput',
-    // 'MenuUpdatePayload',
-    // 'MenuUpdateUserError',
-
-    // ACCESS SCOPES
-    'AccessScope',
-    'AppInstallation'
-  ]
-
-};
 const shouldIntrospect = process.argv.includes('--introspect');
 
 /**
@@ -108,28 +13,95 @@ const shouldIntrospect = process.argv.includes('--introspect');
  */
 export default <CodegenConfig>{
   schema: process.argv.includes('--introspect')
-    ? `https://shopify.dev/admin-graphql-direct-proxy/${config.version}`
-    : config.schema,
+    ? 'https://shopify.dev/admin-graphql-direct-proxy/2025-01'
+    : './.vscode/graphql/schema.json',
   generates: {
-    [config.output]: {
+    './types/dts/graph.d.ts': {
       plugins: [
-        '@graphql-codegen/typescript',
-        '@graphql-codegen/typescript-operations'
+        '@syncify/codegen'
       ],
-      config: {
-        onlyOperationTypes: false,
+      config: <SyncifyPluginConfig>{
+        pickTypes: <const>[
+
+          // ONLINE STORE
+          'OnlineStore',
+          'OnlineStoreTheme',
+          'OnlineStoreThemeConnection',
+          'OnlineStoreThemeEdge',
+          'OnlineStoreThemeFile',
+          'OnlineStoreThemeFileBody',
+          'OnlineStoreThemeFileBodyText',
+          'OnlineStoreThemeFileConnection',
+          'OnlineStoreThemeFileEdge',
+          'OnlineStoreThemeFileOperationResult',
+          'OnlineStoreThemeFileReadResult',
+          'OnlineStoreThemeFilesUpsertFileInput',
+          'OnlineStoreThemeFilesUserErrors',
+          'OnlineStoreThemeInput',
+
+          'ThemeCreatePayload',
+          'ThemeCreateUserError',
+          'ThemeFilesDeletePayload',
+          'ThemeDeleteUserError',
+          'ThemeFilesUpsertPayload',
+          'ThemeFilesCopyPayload',
+          'ThemePublishPayload',
+          'ThemePublishUserError',
+
+          // ACCESS SCOPES
+          'AccessScope',
+          'AppInstallation'
+          // PAGE
+          // 'Page',
+          // 'PageConnection',
+          // 'PageCreateInput',
+          // 'PageCreatePayload',
+          // 'PageCreateUserError',
+          // 'PageDeletePayload',
+          // 'PageDeleteUserError',
+          // 'PageUpdateInput',
+          // 'PageUpdatePayload',
+          // 'PageUpdateUserError',
+          // 'PageEdge',
+
+          // REDIRECTS
+          // 'UrlRedirect',
+          // 'UrlRedirectConnection',
+          // 'UrlRedirectCreatePayload',
+          // 'UrlRedirectDeletePayload',
+          // 'UrlRedirectEdge',
+          // 'UrlRedirectImportCreatePayload',
+          // 'UrlRedirectImportPreview',
+          // 'UrlRedirectImportSubmitPayload',
+          // 'UrlRedirectImportUserError',
+          // 'UrlRedirectInput',
+          // 'UrlRedirectUpdatePayload',
+          // 'UrlRedirectUserError',
+
+          // // NAVIGATION
+          // 'Menu',
+          // 'MenuConnection',
+          // 'MenuCreatePayload',
+          // 'MenuCreateUserError',
+          // 'MenuDeletePayload',
+          // 'MenuDeleteUserError',
+          // 'MenuEdge',
+          // 'MenuItem',
+          // 'MenuItemCreateInput',
+          // 'MenuItemUpdateInput',
+          // 'MenuUpdatePayload',
+          // 'MenuUpdateUserError',
+
+        ],
+        depthInclusion: 1,
         skipTypename: true,
         commentDescriptions: true
-      },
-      hooks: {
-        afterOneFileWrite: [
-          (filePath: string) => transformEnumsAndScalars(filePath)
-        ]
+
       }
     },
     ...(shouldIntrospect
       ? {
-        [config.schema]: {
+        './.vscode/graphql/schema.json': {
           plugins: [
             'introspection'
           ],

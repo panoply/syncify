@@ -56,6 +56,7 @@
     "@update": "pnpm -F @syncify/update",
     "@config": "pnpm -F @syncify/config",
     "@codeframe": "pnpm -F @syncify/codeframe",
+    "@codegen": "pnpm -F @syncify/codegen",
     "@glue": "pnpm -F @syncify/glue",
     "@hot": "pnpm -F @syncify/hot",
     "@ansi": "pnpm -F @syncify/ansi",
@@ -90,7 +91,6 @@
   "prettier": "@syncify/prettier-config",
   "dependencies": {
     "@parcel/watcher": "catalog:",
-    "@syncify/codegen": "workspace:^",
     "@syncify/json": "workspace:^",
     "@syncify/turndown": "workspace:^",
     "@syncify/uws": "workspace:^",
@@ -124,6 +124,7 @@
     "@syncify/acquire": "workspace:^",
     "@syncify/ansi": "workspace:^",
     "@syncify/codeframe": "workspace:^",
+    "@syncify/codegen": "workspace:^",
     "@syncify/config": "workspace:^",
     "@syncify/eslint-config": "workspace:^",
     "@syncify/glue": "workspace:^",

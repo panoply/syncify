@@ -53,6 +53,10 @@ pnpm @timer build
 task CODEFRAME @syncify/codeframe
 pnpm @codeframe build
 
+# CODEGEN
+task CODEGEN @syncify/codegen
+pnpm @codegen build
+
 # SYNCIFY CLI
 task SYNCIFY @syncify/cli
 pnpm @cli --minify
