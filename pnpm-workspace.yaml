@@ -1,5 +1,39 @@
 packages:
-  - "."
-  - "packages/configs/*"
-  - "packages/*"
-  - "examples/*"
+  - '.'
+  - 'docs'
+  - 'configs/*'
+  - 'packages/types'
+  - 'packages/config'
+  - 'packages/glue'
+  - 'packages/acquire'
+  - 'packages/kill'
+  - 'packages/update'
+  - 'packages/hot'
+  - 'packages/ansi'
+  - 'packages/codeframe'
+  - 'packages/codegen'
+  - 'packages/turndown'
+  - 'packages/schema'
+  - 'packages/uws'
+  - 'packages/timer'
+  - 'packages/tests'
+  - 'packages/json'
+  - 'examples/using-paths'
+  - 'examples/using-tailwind'
+catalog:
+  '@eslint/eslintrc': ^3.2.0
+  '@parcel/watcher': ^2.5.1
+  esbuild: v0.25.1
+  eslint: ^9.17.0
+  fs-extra: ^11.3.0
+  postcss: ^8.4.49
+  prettier: ^3.4.2
+  stylelint: ^16.12.0
+  svgo: ^3.3.2
+  tailwindcss: ^4.0.2
+  tsconfig-type: ^1.29.0
+  typescript: ^5.7.2
+  type-fest: ^4.30.0
+  tsup: ^8.3.0
+onlyBuiltDependencies:
+  - esbuild

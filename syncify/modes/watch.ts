@@ -1,135 +1,178 @@
-import type { ChokidorEvents, Syncify } from 'types';
-import { client } from 'syncify:requests/client';
-import { compile as liquid } from 'syncify:transform/liquid';
-import { compile as styles } from 'syncify:transform/style';
-import { compile as script } from 'syncify:transform/script';
-import { compile as asset } from 'syncify:transform/asset';
-import { compile as json } from 'syncify:transform/json';
-import { compile as pages } from 'syncify:transform/pages';
-import { compile as svgs } from 'syncify:transform/svg';
-import { compile as schema } from 'syncify:transform/schema';
-import { isUndefined } from 'syncify:utils';
-import { File, Type, Kind } from 'syncify:file';
-import { parseFile } from 'syncify:process/files';
-import * as log from 'syncify:log';
-import { $ } from 'syncify:state';
+import ParcelWatcher, { subscribe } from '@parcel/watcher';
+import pMap from 'p-map';
+
+import { log } from '~cli/log';
+import { stdin } from '~cli/stdin';
+import { event } from '~events';
+import { File, Kind, Type } from '~file';
+import { themeFilesDeleteMap } from '~http/theme';
+import { parse } from '~process/files';
+import { AssetTransform } from '~transform/asset';
+import { JsonTransform } from '~transform/json';
+import { LiquidTransform } from '~transform/liquid';
+import { PagesTransform } from '~transform/pages';
+import { SchemaTransform } from '~transform/schema';
+import { ScriptTransform } from '~transform/script';
+import { StyleTransform } from '~transform/style';
+import { SvgTransform } from '~transform/svg';
+import { getChunk, isObject, reduce } from '~utils';
+
+import { $, q } from '$';
 
 /**
- * Watch Function
- *
- * Sync in watch mode
+ * Watch Mode ~ `sy watch`
  */
-export function watch (callback: Syncify) {
+export function Watch () {
 
-  const request = client($.sync);
-  const parse = parseFile($.paths, $.dirs.output);
+  stdin.watch.listen();
+  event.on('watch', log.upsert);
+  $.running = true;
 
-  if ($.mode.hot) $.wss.connected();
+  subscribe($.dirs.input, (e, changes) => {
 
-  $.watch.on('all', onchange);
+    stdin.errors.isAttached && event.emit('stdin:dispose');
 
-  function onchange (event: ChokidorEvents, path: string) {
+    changes.length > 1 ? Bulk(changes) : Change(changes);
 
-    const file = parse(path);
+  }).then(({ unsubscribe }) => {
 
-    if (isUndefined(file)) return;
+    event.on('restart', (Define: () => Promise<void>) => {
 
-    if (file.base === $.file.base) return; // log.configChanges();
-    if (file.type !== Type.Spawn) log.changed(file);
+      unsubscribe().then(() => Define().then(Watch));
 
-    if (event === 'change' || event === 'add') {
+    });
 
-      handler(<File>file);
+  });
 
-    } else if (event === 'unlink') {
+};
 
-      /* -------------------------------------------- */
-      /* DELETED FILE                                 */
-      /* -------------------------------------------- */
+/**
+ * Change Handler
+ *
+ * Used during `watch` mode and handles single file changes.
+ */
+async function Change (changes: ParcelWatcher.Event[]) {
 
-      if (file.type === Type.Page) {
-        return request.pages('delete', file);
+  const [ change ] = changes;
+  const file = parse(change.path);
+
+  if (isObject(file) && file.input !== $.file.config) {
+
+    q.change.add(async () => {
+
+      log.changed(file);
+
+      if (change.type === 'delete') {
+
+        await themeFilesDeleteMap(file);
+
       } else {
-        return request.assets('delete', file);
-      }
-    }
 
-  };
-
-  async function handler (file: File) {
-
-    try {
-
-      /* -------------------------------------------- */
-      /* DISPATCH REQUEST IN TRANSFORM                */
-      /* -------------------------------------------- */
-
-      switch (file.type) {
-        case Type.Script:
-
-          return script(file, request.assets, callback);
-
-        case Type.Page:
-
-          return pages(file, callback);
-
-        case Type.Svg:
-
-          return svgs(file, request.assets, callback);
-
-        case Type.Asset:
-        case Type.Spawn:
-
-          return asset(file, request.assets, callback);
-
-        case Type.Schema:
-
-          return schema(file, request.assets, callback);
-
-        case Type.Style:
-
-          return styles(file, request.assets, callback);
-
-        case Type.Layout:
-        case Type.Snippet:
-
-          return liquid(file, request.assets, callback);
-
-        case Type.Section:
-
-          if (file.kind === Kind.JSON) {
-            return json(file, request.assets, callback);
-          } else {
-            return liquid(file, request.assets, callback);
-          }
-
-        case Type.Metaobject:
-        case Type.Template:
-
-          if (file.kind === Kind.JSON) {
-            return json(file, request.assets, callback);
-          } else {
-            return liquid(file, request.assets, callback);
-          }
-
-        case Type.Config:
-        case Type.Locale:
-
-          return json(file, request.assets, callback);
-
-        case Type.Metafield:
-
-          return json(file, request.metafields, callback);
+        await Transform(file);
 
       }
+    });
+  }
+}
 
-    } catch (e) {
+/**
+ * Bulk Handler
+ *
+ * Used during `watch` mode and handles bulk changes.
+ */
+async function Bulk <T extends { delete: File[], update: File[] }> (changes: ParcelWatcher.Event[]) {
 
-      console.error(e);
-      log.error(e);
+  if (!$.mode.bulk) $.mode.bulk = true;
 
-    }
+  const change = reduce<ParcelWatcher.Event, T>(changes, (state, { type, path }) => {
+
+    state[type === 'delete' ? 'delete' : 'update'].push(parse(path));
+
+    return state;
+
+  }, <T>{ delete: [], update: [] });
+
+  if (change.update.length > 0) {
+
+    $.bulk.files += change.update.length;
+    $.bulk.type = 'uploaded';
+
+    log.group('update').bulk();
+
+    await q.bulk.add(async () => await pMap(change.update, Transform));
+  }
+
+  if (change.delete.length > 0) {
+
+    $.bulk.files += change.delete.length;
+    $.bulk.type = 'deleted';
+
+    log.group('delete').bulk();
+
+    await q.bulk.add(async () => await pMap(getChunk(change.delete, 4), themeFilesDeleteMap));
+  }
+
+  await q.bulk.onIdle().then(() => log.bulk.complete());
+
+}
+
+/**
+ * Transform Dispatch
+ *
+ * Dispatch the file to its relative transform handler. This function can be called
+ * in isolation and expects a {@link File} type parameter. Errors will be handled
+ * in each respective transform operation.
+ */
+export async function Transform (file: File) {
+
+  switch (file.type) {
+
+    case Type.Schema:
+
+      return SchemaTransform(file);
+
+    case Type.Layout:
+    case Type.Snippet:
+    case Type.Section:
+    case Type.Block:
+
+      return LiquidTransform(file);
+
+    case Type.Template:
+    case Type.Metaobject:
+
+      return file.kind === Kind.JSON
+        ? JsonTransform(file)
+        : LiquidTransform(file);
+
+    case Type.Config:
+    case Type.Locale:
+    case Type.Group:
+    case Type.Metafield:
+
+      return JsonTransform(file);
+
+    case Type.Style:
+
+      return StyleTransform(file);
+
+    case Type.Script:
+
+      return ScriptTransform(file);
+
+    case Type.Svg:
+
+      return SvgTransform(file);
+
+    case Type.Page:
+
+      return PagesTransform(file);
+
+    case Type.Asset:
+    case Type.Spawn:
+
+      return AssetTransform(file);
 
   }
 
-};
+}

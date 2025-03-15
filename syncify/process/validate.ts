@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-vars */
-import { join, parse, relative } from 'pathe';
-import * as c from 'syncify:colors';
-import { $ } from 'syncify:state';
+import { join, parse, relative } from 'node:path';
+
 import { glob } from 'fast-glob';
-import prompts from 'prompts';
-import { throwError } from 'syncify:log/throws';
 import { Stats } from 'types';
-import * as log from 'syncify:log';
-import { DSH } from 'syncify:symbol';
+
+import * as c from '@syncify/ansi';
+
+import { log } from '~cli/log';
+import { throwError } from '~cli/throws';
+import { s } from '~utils';
+
+import { $ } from '$';
 
 export const enum Mismatch {
   /**
@@ -24,8 +27,8 @@ export async function hasTemplateMismatch (cwd: string): Promise<Mismatch | Set<
 
   const files = await glob('templates/*', { cwd, absolute: true });
 
-  const exclude: Set<string> = new Set();
-  const exists: Set<string> = new Set();
+  const exclude: Set<string> = s();
+  const exists: Set<string> = s();
 
   for (const file of files) {
 
@@ -186,7 +189,7 @@ export function hasMissingFiles (stats: Stats) {
       `There are no locale files ${c.neonCyan(relative($.cwd, $.dirs.output + '/locale') + '/*.json')}`,
       `Theme exports require at least ${c.bold('1')} of the following locale JSON files:`,
       '',
-      `${DSH} ${c.yellowBright('en.default.json')}`,
+      `${c.DSH} ${c.yellowBright('en.default.json')}`,
       ''
     ]);
 
@@ -198,8 +201,8 @@ export function hasMissingFiles (stats: Stats) {
       `There are no config files ${c.neonCyan(relative($.cwd, $.dirs.output + '/config') + '/*.json')}`,
       `Theme exports require at least ${c.bold('1')} of the following setting JSON files:`,
       '',
-      `${DSH} ${c.yellowBright('settings_schema.json')}`,
-      `${DSH} ${c.yellowBright('settings_data.json')}`,
+      `${c.DSH} ${c.yellowBright('settings_schema.json')}`,
+      `${c.DSH} ${c.yellowBright('settings_data.json')}`,
       ''
     ]);
 
@@ -211,15 +214,15 @@ export function hasMissingFiles (stats: Stats) {
       `There are no templates files ${c.neonCyan(relative($.cwd, $.dirs.output + '/templates') + '/**')}`,
       'Theme exports should include the below list of templates to exist:',
       '',
-      `${DSH} ${c.yellowBright('index.json')} or ${c.yellowBright('index.liquid')})`,
-      `${DSH} ${c.yellowBright('product.json')} or ${c.yellowBright('product.liquid')})`,
-      `${DSH} ${c.yellowBright('collection.json')} or ${c.yellowBright('collection.liquid')})`,
-      `${DSH} ${c.yellowBright('cart.json')} or ${c.yellowBright('cart.liquid')})`,
-      `${DSH} ${c.yellowBright('search.json')} or ${c.yellowBright('search.liquid')})`,
-      `${DSH} ${c.yellowBright('password.json')} or ${c.yellowBright('password.liquid')})`,
-      `${DSH} ${c.yellowBright('404.json')} or ${c.yellowBright('404.liquid')})`,
-      `${DSH} ${c.yellowBright('page.json')} or ${c.yellowBright('page.liquid')})`,
-      `${DSH} ${c.yellowBright('gift_card.json')} or ${c.yellowBright('gift_card.liquid')})`,
+      `${c.DSH} ${c.yellowBright('index.json')} or ${c.yellowBright('index.liquid')})`,
+      `${c.DSH} ${c.yellowBright('product.json')} or ${c.yellowBright('product.liquid')})`,
+      `${c.DSH} ${c.yellowBright('collection.json')} or ${c.yellowBright('collection.liquid')})`,
+      `${c.DSH} ${c.yellowBright('cart.json')} or ${c.yellowBright('cart.liquid')})`,
+      `${c.DSH} ${c.yellowBright('search.json')} or ${c.yellowBright('search.liquid')})`,
+      `${c.DSH} ${c.yellowBright('password.json')} or ${c.yellowBright('password.liquid')})`,
+      `${c.DSH} ${c.yellowBright('404.json')} or ${c.yellowBright('404.liquid')})`,
+      `${c.DSH} ${c.yellowBright('page.json')} or ${c.yellowBright('page.liquid')})`,
+      `${c.DSH} ${c.yellowBright('gift_card.json')} or ${c.yellowBright('gift_card.liquid')})`,
       ''
 
     ]);

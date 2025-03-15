@@ -1,41 +1,31 @@
 {
   "exclude": [
     "node_modules/**/*",
+    "straps",
     "dist",
     "tests",
-    "straps",
     "test",
-    "docs"
+    "docs",
   ],
   "include": [
-    "syncify/**/*.ts",
-    "types/*.d.ts",
-    "types/internal/cli.d.ts",
-    "types/internal/internal.d.ts"
+    "types/**/*",
+    "syncify/**/*",
   ],
-  "typeAcquisition": {
-    "enable": true,
-    "include": [
-      "node",
-    ]
-  },
   "compilerOptions": {
-    "incremental": true,
+    "incremental": false,
     "target": "ESNext",
     "removeComments": true,
     "lib": [
-      "ESNext",
-      "es2020",
-      "DOM"
+      "ESNext"
     ],
-    "module": "CommonJS",
+    "module": "Preserve",
     "declaration": false,
     "preserveSymlinks": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "ignoreDeprecations": "5.0",
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
     "noImplicitThis": false,
     "skipDefaultLibCheck": true,
     "noEmit": true,
@@ -45,143 +35,166 @@
     "baseUrl": ".",
     "paths": {
       /*
-      /* TYPE DECLARATIONS
+      /* SYNCIFY TYPES
       /* -------------------------------------------- */
       "types": [
         "./types/index.d.ts"
       ],
-      "types/internal": [
-        "./types/internal.d.ts"
+      "graph": [
+        "./types/graph.d.ts"
+      ],
+      "enquirer": [
+        "./types/dts/enquirer.d.ts"
+      ],
+      /*
+      /* STATE
+      /* -------------------------------------------- */
+      "cli": [
+        "./syncify/cli.ts"
+      ],
+      /*
+      /* STATE
+      /* -------------------------------------------- */
+      "$": [
+        "./syncify/model/$.ts"
+      ],
+      "modules": [
+        "./syncify/model/modules.ts"
+      ],
+      /*
+      /* HTTP
+      /* -------------------------------------------- */
+      "~http/*": [
+        "./syncify/http/*",
+      ],
+      "~http/access": [
+        "./syncify/http/access/index.ts",
+      ],
+      "~http/files": [
+        "./syncify/http/files/index.ts",
+      ],
+      "~http/theme": [
+        "./syncify/http/theme/index.ts",
       ],
       /*
       /* FILES
       /* -------------------------------------------- */
-      "syncify:state": [
-        "./syncify/model/$.ts"
-      ],
-      "syncify:file": [
+      "~file": [
         "./syncify/model/file.ts"
       ],
-      "syncify:const": [
-        "./syncify/const.ts"
+      "~const": [
+        "./syncify/utils/const.ts"
       ],
-      "syncify:utils": [
+      "~utils": [
         "./syncify/utils/utils.ts"
       ],
-      "syncify:interpolate": [
-        "syncify/cli/interpolate.ts"
+      "~interpolate": [
+        "./syncify/cli/interpolate.ts"
       ],
-      "syncify:log": [
-        "./syncify/log/loggers.ts",
+      "~log": [
+        "./syncify/cli/log.ts",
       ],
-      "syncify:errors": [
-        "./syncify/log/errors.ts",
+      "~errors": [
+        "./syncify/cli/errors.ts",
+      ],
+      "~events": [
+        "./syncify/utils/events.ts"
       ],
       /*
       /* ANSI
       /* -------------------------------------------- */
-      "syncify:ansi": [
-        "syncify/ansi/ansi.ts"
-      ],
-      "syncify:colors": [
-        "./syncify/ansi/colors.ts"
-      ],
-      "syncify:codeframe": [
-        "syncify/ansi/codeframe.ts"
-      ],
-      "syncify:symbol": [
-        "syncify/ansi/symbol.ts"
+      "~prompt": [
+        "./syncify/prompts/enquirer/index.ts"
       ],
       /*
       /* TRANSFORMS
       /* -------------------------------------------- */
-      "syncify:asset": [
+      "~asset": [
         "./syncify/transform/asset.ts"
       ],
-      "syncify:json": [
+      "~json": [
         "./syncify/transform/json.ts"
       ],
-      "syncify:liquid": [
+      "~liquid": [
         "./syncify/transform/liquid.ts"
       ],
-      "syncify:pages": [
+      "~pages": [
         "./syncify/transform/pages.ts.ts"
       ],
-      "syncify:schema": [
+      "~schema": [
         "./syncify/transform/schema.ts",
       ],
-      "syncify:script": [
+      "~script": [
         "./syncify/transform/script.ts",
       ],
-      "syncify:style": [
+      "~style": [
         "./syncify/transform/style.ts",
       ],
-      "syncify:svg": [
+      "~svg": [
         "./syncify/transform/svg.ts",
       ],
       /*
       /* DIRECTORIES
       /* -------------------------------------------- */
-      "syncify:process/*": [
+      "~process/*": [
         "./syncify/process/*"
       ],
-      "syncify:cli/*": [
-        "./syncify/cli/*"
-      ],
-      "syncify:prompts/*": [
+      "~prompts/*": [
         "./syncify/prompts/*"
       ],
-      "syncify:options/*": [
-        "./syncify/options/*"
-      ],
-      "syncify:transform/*": [
+      "~transform/*": [
         "./syncify/transform/*"
       ],
-      "syncify:modes/*": [
+      "~modes/*": [
         "./syncify/modes/*"
       ],
-      "syncify:resource/*": [
-        "./syncify/resource/*"
+      "~plugins/*": [
+        "./syncify/plugins/*"
       ],
-      "syncify:requests/*": [
-        "./syncify/requests/*"
-      ],
-      "syncify:plugins/*": [
-        "syncify/plugins/*"
-      ],
-      "syncify:hot/*": [
+      "~hot/*": [
         "./syncify/hot/*"
       ],
-      "syncify:log/*": [
-        "./syncify/log/*.ts",
-        "!./syncify/log/index.ts"
+      "~cli/*": [
+        "./syncify/cli/*.ts",
+      ],
+      "~help/*": [
+        "./syncify/cli/help/*.ts",
+      ],
+      /*
+      /* OPTIONS
+      /* -------------------------------------------- */
+      "~options/*": [
+        "./syncify/options/*.ts",
+      ],
+      "~define/*": [
+        "./syncify/options/define/*.ts",
+      ],
+      "~settings/*": [
+        "./syncify/options/settings/*.ts",
       ],
       /*
       /* UTILITIES
       /* -------------------------------------------- */
-      "syncify:utils/*": [
-        "./syncify/utils/*",
+      "~enums": [
+        "./syncify/utils/enum.ts",
       ],
-      "syncify:timer": [
-        "./syncify/utils/timer.ts"
+      "~utils/piper": [
+        "./syncify/utils/piper.ts",
       ],
-      "syncify:paths": [
+      "~utils/paths": [
         "./syncify/utils/paths.ts",
       ],
-      "syncify:object": [
+      "~utils/parsers": [
+        "./syncify/utils/parsers.ts",
+      ],
+      "~utils/object": [
         "./syncify/utils/object.ts",
       ],
-      "syncify:string": [
-        "./syncify/utils/string.ts",
+      "~utils/child": [
+        "./syncify/utils/child.ts",
       ],
-      "syncify:sizes": [
-        "./syncify/utils/sizes.ts",
-      ],
-      "syncify:typeof": [
-        "./syncify/utils/typeof.ts",
-      ],
-      "syncify:native": [
-        "./syncify/utils/native.ts"
+      "~utils/keychain": [
+        "./syncify/utils/keychain.ts",
       ],
     }
   }

@@ -1,31 +1,17 @@
-import type { Config, Resource, Syncify } from 'types';
-import { isObject, isString, isUndefined } from 'syncify:utils';
-import { run } from '.';
+import type { Config, Syncify } from 'types';
 
-/* -------------------------------------------- */
-/* REXPORT                                      */
-/* -------------------------------------------- */
+import { syncify } from '.';
 
-export { $ } from 'syncify:state';
+import { isObject, isString, isUndefined } from '~utils';
 
 /**
- * Define Config (named export)
+ * **NOT YET AVAILABLE**
  *
- * Used in `syncify.config.js` files and provides
- * type completions to the export.
- */
-export const defineConfig = (config: Config) => config;
-
-/* -------------------------------------------- */
-/* BIN EXECUTABLE                               */
-/* -------------------------------------------- */
-
-/**
  * Syncify API (default export)
  *
  * For usage in programs. The default export can be imported and used in projects.
  */
-function api (resource: Resource | Config, options?: Config) {
+function api (resource: Config, options?: Config) {
 
   if (isString(resource)) {
 
@@ -34,10 +20,9 @@ function api (resource: Resource | Config, options?: Config) {
       resource === 'build' ||
       resource === 'export' ||
       resource === 'import' ||
-      resource === 'upload' ||
-      resource === 'watch') {
+      resource === 'upload') {
 
-      return (cb: Syncify) => run({ cli: false, [resource]: true }, options, cb);
+      return (cb: Syncify) => syncify();
 
     } else {
 
@@ -63,22 +48,10 @@ function api (resource: Resource | Config, options?: Config) {
     }
 
     return {
-      watch: (cb: Syncify) => run({
-        cli: false,
-        watch: true
-      }, options, cb),
-      build: (cb: Syncify) => run({
-        cli: false,
-        build: true
-      }, options, cb),
-      download: (cb: Syncify) => run({
-        cli: false,
-        import: true
-      }, options, cb),
-      upload: (cb: Syncify) => run({
-        cli: false,
-        upload: true
-      }, options, cb)
+      watch: (cb: Syncify) => syncify(),
+      build: (cb: Syncify) => syncify(),
+      download: (cb: Syncify) => syncify(),
+      upload: (cb: Syncify) => syncify()
     };
   }
 

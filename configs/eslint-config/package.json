@@ -1,0 +1,25 @@
+{
+  "name": "@syncify/eslint-config",
+  "version": "0.1.1",
+  "access": "restricted",
+  "description": "Shared eslint config",
+  "main": "index.mjs",
+  "types": "index.d.ts",
+  "dependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsdoc": "^50.6.6",
+    "eslint-plugin-n": "^17.15.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^7.2.1"
+  },
+  "devDependencies": {
+    "eslint": "catalog:"
+  },
+  "peerDependencies": {
+    "eslint": "catalog:"
+  }
+}

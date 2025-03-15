@@ -1,0 +1,25 @@
+{
+  "name": "@syncify/prettier-config",
+  "version": "0.1.0",
+  "access": "restricted",
+  "description": "Shared prettier config",
+  "main": "prettier.cjs",
+  "prettier": "./prettier.cjs",
+  "license": "MIT",
+  "keywords": ["prettier", "prettierconfig", "config", "formatting"],
+  "scripts": {
+    "bump": "pnpm up @syncify/prettier-config -r",
+    "postversion": "pnpm bump"
+  },
+  "devDependencies": {
+    "prettier": "catalog:"
+  },
+  "peerDependencies": {
+    "prettier": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "prettier": {
+      "optional": true
+    }
+  }
+}

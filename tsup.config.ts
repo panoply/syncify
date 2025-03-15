@@ -1,139 +1,280 @@
-import { defineConfig } from 'tsup';
+import type { Plugin } from 'esbuild';
+import type { Options } from 'tsup';
+
+import { readFileSync, writeFileSync } from 'fs';
+import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { writeFileSync, readFileSync, copyFileSync } from 'fs';
+
+import gqlmin from 'gqlmin';
+import { defineConfig } from 'tsup';
+
 import * as pkg from './package.json';
+import * as cfg from './packages/config/package.json';
+import * as hot from './packages/hot/package.json';
 
 const cwd = process.cwd();
 const packages = join(cwd, 'packages');
+const json = JSON.stringify;
 
-function importSchema () {
+const schema = () => {
 
   const liquifySchema = join(cwd, 'node_modules', '@liquify/schema');
   const syncifySchema = join(packages, 'schema');
 
   const sections = readFileSync(join(liquifySchema, 'syncify/shared-schema.json'));
-  const env = readFileSync(join(liquifySchema, 'syncify/env.json'));
   const pkgjson = readFileSync(join(liquifySchema, 'syncify/package-json.json'));
 
   const config = readFileSync(join(liquifySchema, 'syncify.json'));
+
   writeFileSync(join(syncifySchema, 'syncify.json'), pkgjson);
   writeFileSync(join(syncifySchema, 'config.json'), config);
   writeFileSync(join(syncifySchema, 'sections.json'), sections);
-  writeFileSync(join(syncifySchema, 'env.json'), env);
 
-  copyFileSync(join(packages, 'hot', 'hot.js.liquid'), join(cwd, 'hot.js.liquid'));
+};
 
-}
+const gqlfile = (): Plugin => ({
+  name: 'gql-loader',
+  setup (build) {
+    build.onLoad({ filter: /\.gql$/ }, async ({ path }) => {
+      const source = await readFile(path, 'utf8');
+      return {
+        contents: `export default \`${gqlmin(source)}\`;`,
+        loader: 'ts'
+      };
+    });
+  }
+});
 
-importSchema();
+const gql = (): Plugin => ({
+  name: 'gql-minify-plugin',
+  setup (build) {
+    build.onLoad({ filter: /\.tsx?$/ }, async (args) => {
 
-const json = JSON.stringify;
+      const contents = await readFile(args.path, 'utf8');
+      const regex = /gql`([\s\S]*?)`/g;
+
+      let lastIndex = 0;
+      let newContent = '';
+      let match: RegExpExecArray | null;
+
+      while ((match = regex.exec(contents)) !== null) {
+
+        // Append content before the match
+        newContent += contents.slice(lastIndex, match.index);
+
+        // Minify the GraphQL query
+        const minify = gqlmin(match[1].trim());
+        newContent += `\`${minify}\``;
+        lastIndex = regex.lastIndex;
+      }
+
+      // Append any remaining content after the last match
+      newContent += contents.slice(lastIndex);
+
+      return {
+        contents: newContent,
+        loader: 'ts' // Changed to 'ts' for TypeScript files
+      };
+    });
+  }
+});
+
+const glue = (...input: string[]) => {
+  return input.join('\n') + '\n';
+};
+
+schema();
 
 const noExternal = [
 
-  'ansis',
+  // SYNCIFY PACKAGES
+  //
+  // Development dependencies included in build
+  //
+  '@syncify/ansi',
+  '@syncify/codeframe',
+  '@syncify/kill',
+  '@syncify/update',
+  '@syncify/config',
+  '@syncify/types',
+  '@syncify/glue',
+
+  // THIRD PARTIES
+  //
+  // Development Dependencies - Typically due to their minimal size or ESM distribution
+  //
   'anymatch',
-  'clean-stack',
-  'log-update',
-  'mergerino',
-  'minimist',
+  'dotenv',
   'p-map',
   'p-queue',
-  'parse-json',
-  'rambdax',
-  'strip-json-comments',
   'tree-kill',
-  'wrap-ansi',
-  'write-file-atomic'
-
+  'write-file-atomic',
+  'write-package'
 ];
 
 const external = [
-  // Syncify Specific
-  '@syncify/turndown',
 
-  // Third parties
-  'adm-zip',
-  'axios',
+  // SYNCIFY PACKAGES
+  //
+  // Required as dependencies
+  //
+  '@syncify/acquire',
+  '@syncify/json',
+  '@syncify/turndown',
+  '@syncify/uws',
+
+  // THIRD PARTIES
+  //
+  // Required as dependencies
+  //
+  '@parcel/watcher',
+  'xior',
   'cbor',
-  'chokidar',
-  'clean-css',
-  'cross-spawn',
-  'dotenv',
   'enquirer',
   'esbuild',
   'fast-glob',
-  'figlet',
-  'finalhandler',
   'fs-extra',
   'gray-matter',
   'html-minifier-terser',
-  'markdown-it',
-  'ngrok',
   'node-notifier',
-  'pathe',
+  'write-package',
+
+  // TRANSFORM SPECIFIC
+  //
+  // Included as dependencies and will be dynamically imported
+  //
+  'adm-zip',
+  'clean-css',
+  'sass-embedded',
+  'markdown-it',
   'postcss',
-  'prompts',
-  'scrollable-cli',
-  'serve-static',
-  'svg-sprite',
   'svgo',
-  'ws',
+  'js-yaml',
+  'smol-toml',
 
-  // BUILD DEPS
-  'ava',
-  'eslint',
-  'prettier',
-  'tsconfig-type',
-  'tsup',
-  'type-fest',
-  'typescript',
-
-  // PEER DEPS
-  'sass',
-  'sharp',
+  // PEER TRANSFORM SPECIFIC
+  //
+  // Included as optional peers and lazy imported
+  //
   'tailwindcss'
+
 ];
 
 const define = {
-
   // SYNCIFY VERSION
-
   VERSION: `"${pkg.version}"`,
-
+  // CONFIG VERSION
+  CONFIG_VERSION: `"${cfg.version}"`,
+  // HOT VERSION
+  HOT_VERSION: `"${hot.version}"`,
   // CHARACTER SUGAR INJECTIONS
-
   NIL: json(''),
   NWL: json('\n'),
   NLR: json('\n\n'),
   WSP: json(' '),
   WSR: json('  ')
-
 };
 
-export default defineConfig({
+const banner =
+`
+/**
+ * SYNCIFY CLI ~ v${pkg.version}
+ *
+ * E: n.savvidis@gmx.com
+ * X: @niksavvidis
+ * W: https://syncify.sh
+ *
+ * © 2025 Νικολας Σαββιδης / Nik Savvidis
+ *
+ * -----------------------------------------
+ *
+ * APACHE 2.0 LICENSE
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * THIS LICENSE MUST BE PRESENT IN ALL COPIES
+ */`;
+
+export const options: Options = {
   entry: [
-    'syncify/cli.ts',
-    'syncify/api.ts',
-    'syncify/index.ts'
+    './syncify/cli.ts',
+    './syncify/index.ts',
+    './syncify/api.ts'
   ],
+  dts: {
+    entry: {
+      index: './packages/types/index.d.ts'
+    },
+    resolve: true,
+    banner: glue(
+      '/// <reference path="../node_modules/@types/clean-css/index.d.ts" />',
+      '/// <reference path="../node_modules/svgo/lib/svgo.d.ts" />',
+      '/// <reference path="../node_modules/postcss/lib/postcss.d.ts" />',
+      '/// <reference path="../node_modules/tailwindcss/types/index.d.ts" />',
+      '/// <reference path="../node_modules/esbuild/lib/main.d.ts" />',
+      '/// <reference path="../node_modules/type-fest/index.d.ts" />'
+    )
+  },
   outDir: 'dist',
-  clean: [
-    'dist'
+  banner: {
+    js: banner
+  },
+  watch: [
+    './syncify/**/*',
+    './packages/acquire/package/*',
+    './packages/ansi/dist/*',
+    './packages/codeframe/dist/*',
+    './packages/config/dist/*',
+    './packages/json/dist/*',
+    './packages/kill/dist/*',
+    './packages/update/dist/*'
   ],
-  splitting: false,
-  treeshake: false,
-  cjsInterop: true,
-  format: [
-    'cjs',
-    'esm'
-  ],
-  shims: true,
+  clean: true,
+  shims: false,
+  target: 'es2020',
+  platform: 'node',
+  cjsInterop: false,
+  treeshake: true,
+  removeNodeProtocol: false,
+  sourcemap: false,
+  splitting: true,
+  outExtension: () => ({ js: '.js' }),
   noExternal,
   external,
   define,
+  keepNames: false,
+  format: 'cjs',
+  esbuildPlugins: [
+    // @ts-expect-error
+    gql(),
+    // @ts-expect-error
+    gqlfile()
+  ],
   esbuildOptions (options) {
-    options.mainFields = [ 'module', 'main' ];
+    options.target = 'es2020';
+    options.treeShaking = true;
     options.chunkNames = 'syncify';
+    options.legalComments = 'none';
+    options.supported = {
+      'async-await': true,
+      'dynamic-import': true,
+      'array-spread': true,
+      'rest-argument': true,
+      'optional-chain': false,
+      'unicode-escapes': false,
+      'template-literal': true,
+      'const-and-let': true,
+      'class-field': true,
+      'class-private-accessor': false,
+      'class-private-brand-check': false,
+      'class-private-field': false,
+      'class-private-method': false,
+      'class-private-static-accessor': false,
+      'class-private-static-field': false,
+      'class-private-static-method': false,
+      'class-static-blocks': true,
+      'class-static-field': true
+    };
   }
-});
+};
+
+export default defineConfig(options);

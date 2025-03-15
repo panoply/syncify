@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "graphql.vscode-graphql",
+    "graphql.vscode-graphql-syntax",
+    "vscode-icons-team.vscode-icons",
+    "mblet.highlight-regex",
+    "sissel.shopify-liquid",
+    "sissel.vscode-spx"
+  ],
+}

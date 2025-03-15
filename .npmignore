@@ -1,5 +1,7 @@
 # DIRECTORIES
 
+.vscode/
+straps/
 example/
 test/
 tests/
@@ -8,7 +10,6 @@ docs/
 plugins/
 src/
 versions/
-.vscode/
 demos/
 
 # DOT FILES
@@ -23,8 +24,13 @@ demos/
 
 # BUILD FILES
 
+build.sh
+eslint.config.js
+graphql.config.ts
 tsconfig.json
 tsup.config.ts
+pnpm-workspace.yaml
+pnpm-lock.yaml
 
 # MARKDOWN
 

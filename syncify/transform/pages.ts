@@ -1,22 +1,21 @@
 /* eslint-disable no-unused-vars */
-import type { Syncify, Requests, Store, PageFrontmatter, PageMetafield, WatchBundle, Resource } from 'types';
-import { isEmpty } from 'rambdax';
+import type { PageFrontmatter, PageMetafield, Requests, Resource } from 'types';
+
 import { readFile, writeFile } from 'fs-extra';
-import matter, { stringify } from 'gray-matter';
-import prompts from 'prompts';
-import markdown from 'markdown-it';
-import { Turndown, GithubFlavor } from '@syncify/turndown';
-import { File, Kind } from 'syncify:file';
-import { getPageMetafields } from 'syncify:process/metafields';
-import { lastPath } from 'syncify:utils/paths';
-import { isArray, isBoolean, isObject, isRegex, isUndefined, handleize, toUpcase, has } from 'syncify:utils';
-import { timer } from 'syncify:timer';
-import { getPageCache, saveCache, setPageCache } from 'syncify:process/cache';
-import * as c from 'syncify:colors';
-import * as pages from 'syncify:requests/pages';
-import * as log from 'syncify:log';
-import { $ } from 'syncify:state';
-import { ARR, CHV, TLD } from 'syncify:symbol';
+import { $import } from 'modules';
+
+import * as c from '@syncify/ansi';
+import { timer } from '@syncify/timer';
+import { GithubFlavor, Turndown } from '@syncify/turndown';
+
+import { log } from '~cli/log';
+import { File, Kind } from '~file';
+import { getPageCache, saveCache, setPageCache } from '~process/cache';
+import { getPageMetafields } from '~process/metafields';
+import { handleize, has, isArray, isBoolean, isEmpty, isObject, isRegex, isUndefined, merge, toUpcase } from '~utils';
+import { lastPath } from '~utils/paths';
+
+import { $ } from '$';
 
 enum PromptActions {
   /**
@@ -78,7 +77,7 @@ export function toMarkdown (content: string) {
  */
 export async function promptAction (store: Store): Promise<{
   /**
-   * Resumes the log and reopen log group
+   * Resumes the log and reopen $.log.group
    */
   resume: () => void;
   /**
@@ -139,7 +138,7 @@ async function selectPage (store: Store): Promise<number> {
 
   choices.push(
     {
-      title: tui.hr(20, false),
+      title: log.hline({ width: 20, newlines: false }),
       disabled: true,
       selected: false
     },
@@ -169,7 +168,7 @@ async function selectPage (store: Store): Promise<number> {
 
 async function promptOverwrite (remote: Resource.Page): Promise<{
   /**
-   * Resumes the log and reopen log group
+   * Resumes the log and reopen $.log.group
    */
   resume: () => void;
   /**
@@ -217,9 +216,9 @@ async function promptOverwrite (remote: Resource.Page): Promise<{
 
   if (prompt.action === PromptActions.View) {
 
-    log.nwl('');
+    log.nl('');
     log.out(remote.body_html);
-    log.nwl('');
+    log.nl('');
 
     const next = await prompts({
       type: 'select',
@@ -254,13 +253,9 @@ async function promptOverwrite (remote: Resource.Page): Promise<{
  */
 function getPayloadFromFrontmatter (file: File, data: PageFrontmatter): Requests.Page {
 
-  const payload: Resource.Page = {};
-
-  if (has('title', data)) {
-    payload.title = `${data.title}`;
-  } else {
-    payload.title = toUpcase(file.name.replace(/[._-]/g, ' '));
-  }
+  const payload: Resource.Page = {
+    title: has('title', data) ? data.title : toUpcase(file.name.replace(/[._-]/g, ' '))
+  };
 
   if (has('handle', data)) {
 
@@ -270,19 +265,19 @@ function getPayloadFromFrontmatter (file: File, data: PageFrontmatter): Requests
     if (/^[./]{1,2}/.test(handle)) {
       before = handle;
       handle = handle.replace(/^[./]{1,2}/, NIL);
-      log.warn(`handle ${CHV} ${before} ${ARR} ${handle}`, 'fixed start');
+      log.warn(`handle ${c.CHV} ${before} ${c.ARR} ${handle}`, 'fixed start');
     }
 
     if (/^pages\//.test(handle)) {
       before = handle;
       handle = handle.replace(/^pages\//, NIL);
-      log.warn(`handle ${CHV} ${before} ${ARR} ${handle}`, 'fixed sub-path');
+      log.warn(`handle ${c.CHV} ${before} ${c.ARR} ${handle}`, 'fixed sub-path');
     }
 
     if (/[_/]/.test(data.handle)) {
       before = handle;
       handle = handle.replace(/[_/]/g, '-');
-      log.warn(`handle ${CHV} ${before} ${ARR} ${handle}`, 'fixed invalid characters');
+      log.warn(`handle ${c.CHV} ${before} ${c.ARR} ${handle}`, 'fixed invalid characters');
     }
 
     payload.handle = handle;
@@ -305,7 +300,7 @@ function getPayloadFromFrontmatter (file: File, data: PageFrontmatter): Requests
     if (/\//.test(data.author)) {
       before = data.author;
       author = before.replace(/\//g, ' ');
-      log.warn(`author ${CHV} ${before} ${ARR} ${author}`, 'fixed invalid characters');
+      log.warn(`author ${c.CHV} ${before} ${c.ARR} ${author}`, 'fixed invalid characters');
     }
 
     payload.author = author;
@@ -320,7 +315,7 @@ function getPayloadFromFrontmatter (file: File, data: PageFrontmatter): Requests
     if (isBoolean(data.published)) {
       payload.published = data.published;
     } else {
-      log.warn(`published ${CHV} expected boolean, got ${typeof data.published}`, 'defaulted to false');
+      log.warn(`published ${c.CHV} expected boolean, got ${typeof data.published}`, 'defaulted to false');
       payload.published = false;
     }
 
@@ -368,7 +363,10 @@ function getPayloadFromFrontmatter (file: File, data: PageFrontmatter): Requests
 
 }
 
-export async function compile (file: File, _cb: Syncify) {
+export async function PagesTransform (file: File) {
+
+  await $import('gray-matter');
+  await $import('markdown-it');
 
   if ($.sync.stores.length > 1) {
     log.skipped(file, 'pages do not support multistore sync');
@@ -382,8 +380,8 @@ export async function compile (file: File, _cb: Syncify) {
     return null;
   }
 
-  const frontmatter = matter(read) as { data: PageFrontmatter; content: string; };
-  const { data, content } = { ...frontmatter };
+  const frontmatter = $import.matter(read) as { data: PageFrontmatter; content: string; };
+  const { data, content } = merge(frontmatter);
   const payload = getPayloadFromFrontmatter(file, data);
 
   if (isArray(payload.metafields) && !getPageMetafields(file, payload.metafields)) {
@@ -392,8 +390,8 @@ export async function compile (file: File, _cb: Syncify) {
 
   if (file.kind === Kind.Markdown) {
     timer.start();
-    payload.body_html = markdown($.page.export).render(content);
-    log.transform(`${c.bold('Markdown')} ${ARR} ${c.bold('HTML')} ${TLD} ${timer.stop()}`);
+    payload.body_html = $import.markdown($.page.export).render(content);
+    log.transform(`${c.bold('Markdown')} ${c.ARR} ${c.bold('HTML')} ${c.TLD} ${timer.stop()}`);
   } else {
     log.transform('HTML');
     payload.body_html = content;
@@ -407,7 +405,7 @@ export async function compile (file: File, _cb: Syncify) {
 
     log.invalid(file.relative, [
       `Multiple pages returned when matching on handle ${c.blue.bold(payload.handle)}`,
-      'Syncify is unsure of to handle this request and has cancelled the sync. Please',
+      'Syncify is unsure on how to handle this request and has cancelled the sync. Please',
       'check the provided handle in your webshop.'
     ]);
 
@@ -439,7 +437,7 @@ export async function compile (file: File, _cb: Syncify) {
         } else if (action === PromptActions.Create) {
 
           prompt.resume();
-          log.syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${c.gray(`${TLD} ${file.relative}`)}`);
+          log.syncing(`/pages/${payload.handle} ${c.ARR} ${payload.title} ${c.gray(`${c.TLD} ${file.relative}`)}`);
 
           return pages.create(store, payload);
 
@@ -453,7 +451,7 @@ export async function compile (file: File, _cb: Syncify) {
       } else if (prompt.action === PromptActions.Create) {
 
         prompt.resume();
-        log.syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${c.gray(`${TLD} ${file.relative}`)}`);
+        log.syncing(`/pages/${payload.handle} ${c.ARR} ${payload.title} ${c.gray(`${c.TLD} ${file.relative}`)}`);
 
         return pages.create(store, payload);
 
@@ -466,7 +464,7 @@ export async function compile (file: File, _cb: Syncify) {
 
   }
 
-  if ($.page.safeSync && isObject(remote)) {
+  if (isObject(remote)) {
 
     const online = new Date(remote.updated_at).getTime();
     const local = new Date(cached.updated_at).getTime();
@@ -484,7 +482,7 @@ export async function compile (file: File, _cb: Syncify) {
 
         if ($.page.language === 'markdown') {
           const markdown = toMarkdown(convert);
-          log.transform(`${file.name}.html ${ARR} ${file.base}`);
+          log.transform(`${file.name}.html ${c.ARR} ${file.base}`);
           convert = stringify('\n' + markdown, frontmatter.data);
         }
 
@@ -512,7 +510,7 @@ export async function compile (file: File, _cb: Syncify) {
 
   if ($.mode.build) return payload.body_html;
 
-  log.syncing(`/pages/${payload.handle} ${ARR} ${payload.title} ${c.gray(`${TLD} ${file.relative}`)}`);
+  log.syncing(`/pages/${payload.handle} ${c.ARR} ${payload.title} ${c.gray(`${c.TLD} ${file.relative}`)}`);
 
   const update = await pages.sync(store, file, payload);
 

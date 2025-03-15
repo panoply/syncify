@@ -1,6 +1,6 @@
 .search {
   position: relative;
-  width: 250px;
+  min-width: 250px;
 
   .keys {
     display: block;
@@ -35,28 +35,27 @@
     background-position: 8px center;
     background-size: 20px;
     width: 100%;
-    text-transform: uppercase;
+    font-weight: 400;
+    text-transform: initial;
     background-image: url(icon-search($white, 1.3));
-    transition:
-      width linear 100ms,
-      margin-left linear 100ms;
+    transition: width linear 200ms;
 
     &::placeholder {
       font-weight: 600;
       font-size: 0.7rem;
+      text-transform: uppercase;
       font-family: $font-family-heading;
     }
 
     &.is-active {
-      width: 400px;
-      margin-left: 150px;
+      width: 450px;
     }
 
-    &.is-results {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
-      border-bottom: none;
-    }
+    // &.is-results {
+    //   border-bottom-right-radius: 0;
+    //   border-bottom-left-radius: 0;
+    //   border-bottom: none;
+    // }
 
     &::placeholder {
       color: $white;
@@ -97,18 +96,47 @@
   }
 
   .search-list {
-    width: 400px;
+    position: absolute;
+    top: 65px;
+    width: 450px;
     max-height: 400px;
-    background-color: $body-bg;
+    background-color: $ebony;
     border: $border-color $border-width solid;
+    border-radius: 7px;
     overflow-y: scroll;
-    color: $white;
     margin: 0;
     padding: 0;
-    margin-left: -150px;
+
+    .w-icon {
+      width: 20px;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .icon-goto {
+      opacity: 0;
+    }
+
+    .icon-clown {
+      height: 70px;
+      width: 70px;
+      color: #505050;
+    }
 
     &.no-results {
-      height: 80px;
+      padding: 40px 0;
+
+      li:first-of-type {
+        background-color: $ebony;
+        border: none;
+
+        a {
+          color: $white;
+        }
+      }
 
       > li {
         display: flex;
@@ -125,52 +153,66 @@
     }
 
     li {
-      border-bottom: #39424b $border-width solid;
-      color: $white;
+      border: $border-color $border-width solid;
+      color: $body-color;
       list-style-type: none;
-      padding: 10px 5px;
-      font-size: 0.8rem;
+      padding: 10px 15px;
+      border-radius: 7px;
+      margin: 4px;
+      background-color: #1b1b1b;
 
       &:first-of-type {
-        border-top: none !important;
-      }
+        background-color: $body-bg;
 
-      &:last-of-type {
-        border-bottom: none !important;
-      }
-
-      a,
-      .result {
-        &:hover {
-          background-color: darken($code-bg, 2%);
-          cursor: pointer;
-          opacity: 1;
+        a {
           color: $white;
         }
+
+        .result strong {
+          text-decoration: underline;
+          color: $green;
+        }
       }
 
-      a > h5 {
-        font-size: 0.8rem;
-        color: #6eb2d3;
-        font-weight: 900;
-        margin-bottom: 10px;
-        padding: 5px;
+      &:hover {
+        transition: background-color 20ms linear 20ms;
+        background-color: $body-bg;
+        cursor: pointer;
+
+        .icon-goto {
+          opacity: 1;
+        }
+      }
+      // &:first-of-type {
+      //   border-top: none !important;
+      // }
+
+      // &:last-of-type {
+      //   border-bottom: none !important;
+      // }
+
+      a {
+        color: $body-color;
+      }
+
+      .arrow {
+        background-image: url(icon-right($body-color));
+        background-position: right center;
+        background-repeat: no-repeat;
+        background-size: 12px;
       }
 
       .result {
-        height: 55px;
-        border-radius: 3px;
-        padding: 9px;
-        margin: 8px 5px;
-        border: #39424b $border-width solid;
-        background-color: $code-bg;
+        width: 335px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        font-size: 0.85rem;
+        text-overflow: ellipsis;
 
-        > h6 {
-          font-size: 0.75rem;
-          margin-bottom: 10px;
-        }
-        span {
-          font-size: 0.75rem;
+        strong {
+          color: $white;
         }
       }
     }

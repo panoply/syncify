@@ -1,8 +1,8 @@
 {
+  "version": "1.0.0-alpha.1",
   "name": "@syncify/cli",
-  "description": "The next generation build tool for Shopify theme development.",
-  "version": "0.3.0-beta",
-  "license": "MIT",
+  "description": "The new generation build tool for Shopify theme development.",
+  "license": "Apache-2.0",
   "homepage": "https://github.com/panoply/syncify",
   "bugs": "https://github.com/panoply/syncify/issues",
   "repository": {
@@ -10,156 +10,159 @@
     "url": "git://github.com/panoply/syncify.git"
   },
   "author": {
-    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
+    "name": "Νικολας Σαββιδης",
     "url": "https://github.com/panoply",
     "email": "n.savvidis@gmx.com"
   },
   "files": [
     "dist",
-    "types",
-    "schema",
+    "scripts",
     "hot.js.liquid",
     "LICENCE",
-    "package.json",
-    "pnpm-lock.yaml"
+    "package.json"
   ],
   "keywords": [
     "cli",
     "command line",
-    "themekit",
     "syncify",
     "shopify",
     "shopify theme",
     "shopify node",
     "shopify theme",
     "shopify sync",
-    "shopify cli"
+    "shopify cli",
+    "themekit"
   ],
   "engines": {
-    "pnpm": ">=7",
-    "node": ">=14",
+    "pnpm": ">=9",
+    "node": ">=20",
     "vscode": "^1.22.0"
   },
   "bin": {
-    "syncify": "dist/cli.js",
-    "sy": "dist/cli.js"
+    "sy": "./dist/cli.js",
+    "syncify": "./dist/cli.js"
   },
-  "types": "./types/index.d.ts",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
-  },
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup --minify",
-    "syncify": "dist/cli.js"
+    "sy": "./bin/cli.js",
+    "dev": "pnpm tsup --watch",
+    "build": "pnpm --shell-mode \"./build.sh\"",
+    "@cli": "tsup",
+    "@utils": "pnpm -F @syncify/utils",
+    "@acquire": "pnpm -F @syncify/acquire",
+    "@kill": "pnpm -F @syncify/kill",
+    "@docs": "pnpm -F @syncify/docs",
+    "@update": "pnpm -F @syncify/update",
+    "@config": "pnpm -F @syncify/config",
+    "@codeframe": "pnpm -F @syncify/codeframe",
+    "@glue": "pnpm -F @syncify/glue",
+    "@hot": "pnpm -F @syncify/hot",
+    "@ansi": "pnpm -F @syncify/ansi",
+    "@turndown": "pnpm -F @syncify/turndown",
+    "@json": "pnpm -F @syncify/json",
+    "@timer": "pnpm -F @syncify/timer",
+    "@uws": "pnpm -F @syncify/uws",
+    "t:bulk-add": "tests --bulk-add snippets",
+    "t:bulk-remove": "tests --bulk-remove snippets",
+    "codegen": "graphql-codegen",
+    "introspect": "graphql-codegen --introspect",
+    "prepublishOnly": "cp assets/icon.png icon.png",
+    "postpublish": "rm -rf icon.png",
+    "publish:stable": "pnpm publish --tag latest",
+    "publish:next": "pnpm version prerelease --preid next && pnpm publish --tag next",
+    "publish:unstable": "pnpm version prerelease --preid unstable && pnpm publish --tag unstable",
+    "postinstall": "node scripts/postinstall.js",
+    "postversion": "node scripts/postversion.js"
   },
-  "prettier": "@syncify/prettier-config",
-  "eslintConfig": {
-    "extends": "@syncify/eslint-config",
-    "ignorePatterns": [
-      "docs",
-      "dist",
-      "**/theme",
-      "test/e2e/theme"
-    ],
-    "rules": {
-      "object-curly-newline": "off",
-      "no-import-assign": "off",
-      "no-new-func": "off",
-      "no-control-regex": "off",
-      "indent": [
-        "error",
-        2,
-        {
-          "MemberExpression": 0,
-          "SwitchCase": 1,
-          "CallExpression": {
-            "arguments": 1
-          }
-        }
-      ]
+  "ava": {
+    "typescript": {
+      "rewritePaths": {
+        "syncify/": "dist/tests/"
+      },
+      "compile": false
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "prettier": "@syncify/prettier-config",
   "dependencies": {
-    "@syncify/turndown": "^0.2.0",
-    "adm-zip": "^0.5.15",
-    "axios": "^1.7.3",
-    "cbor": "^9.0.2",
-    "chokidar": "^3.6.0",
+    "@parcel/watcher": "catalog:",
+    "@syncify/codegen": "workspace:^",
+    "@syncify/json": "workspace:^",
+    "@syncify/turndown": "workspace:^",
+    "@syncify/uws": "workspace:^",
+    "adm-zip": "^0.5.16",
+    "cbor": "^10.0.3",
     "clean-css": "^5.3.3",
-    "cross-spawn": "^7.0.3",
-    "dotenv": "^16.4.5",
     "enquirer": "^2.4.1",
-    "esbuild": "^0.23.0",
-    "fast-glob": "^3.3.2",
-    "finalhandler": "^1.2.0",
-    "fs-extra": "^11.2.0",
+    "esbuild": "catalog:",
+    "fast-glob": "^3.3.3",
+    "fs-extra": "catalog:",
     "gray-matter": "^4.0.3",
-    "html-minifier-terser": "7.2.0",
+    "html-minifier-terser": "^7.2.0",
+    "js-yaml": "^4.1.0",
     "markdown-it": "^14.1.0",
-    "ngrok": "5.0.0-beta.2",
     "node-notifier": "^10.0.1",
-    "pathe": "^1.1.2",
-    "postcss": "^8.4.41",
-    "postcss-load-config": "^6.0.1",
-    "prompts": "^2.4.2",
-    "serve-static": "^1.15.0",
-    "svg-sprite": "^2.0.4",
-    "svgo": "^3.3.2",
-    "ws": "^8.18.0"
+    "postcss": "^8.5.3",
+    "sass-embedded": "^1.85.1",
+    "smol-toml": "^1.3.1",
+    "svgo": "catalog:",
+    "xior": "^0.7.6"
   },
   "devDependencies": {
-    "@liquify/schema": "^0.9.5",
+    "@ava/typescript": "^5.0.0",
+    "@changesets/cli": "^2.28.1",
+    "@graphql-codegen/cli": "^5.0.5",
+    "@graphql-codegen/introspection": "^4.0.3",
+    "@graphql-codegen/typescript": "^4.1.5",
+    "@graphql-codegen/typescript-operations": "^4.5.1",
+    "@liquify/schema": "^0.9.10",
+    "@shopify/api-codegen-preset": "^1.1.5",
+    "@syncify/acquire": "workspace:^",
+    "@syncify/ansi": "workspace:^",
+    "@syncify/codeframe": "workspace:^",
+    "@syncify/config": "workspace:^",
     "@syncify/eslint-config": "workspace:^",
+    "@syncify/glue": "workspace:^",
+    "@syncify/kill": "workspace:^",
     "@syncify/prettier-config": "workspace:^",
-    "@types/finalhandler": "^1.2.3",
+    "@syncify/tests": "workspace:^",
+    "@syncify/timer": "workspace:^",
+    "@syncify/types": "workspace:^",
+    "@syncify/update": "workspace:^",
+    "@types/adm-zip": "^0.5.7",
     "@types/fs-extra": "^11.0.4",
-    "@types/mime-types": "^2.1.4",
-    "@types/minimist": "^1.2.5",
-    "@types/prompts": "^2.4.9",
-    "@types/serve-static": "^1.15.7",
-    "@types/svg-sprite": "^0.0.39",
-    "@types/ws": "^8.5.12",
-    "ansis": "^3.3.2",
+    "@types/html-minifier-terser": "^7.0.2",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.13.10",
+    "@types/node-notifier": "^8.0.5",
+    "@types/write-file-atomic": "^4.0.3",
     "anymatch": "^3.1.3",
-    "ava": "^6.1.3",
-    "clean-stack": "^5.2.0",
-    "eslint": "^9.9.0",
-    "log-update": "^6.1.0",
-    "mergerino": "^0.4.0",
-    "minimist": "^1.2.8",
-    "p-map": "^7.0.2",
-    "p-queue": "^8.0.1",
-    "parse-json": "^8.1.0",
-    "prettier": "^3.3.3",
-    "rambdax": "^11.1.1",
-    "sass": "^1.77.8",
-    "sharp": "^0.33.4",
-    "strip-json-comments": "^5.0.1",
-    "tailwindcss": "^3.4.9",
+    "ava": "^6.2.0",
+    "concurrently": "^9.1.2",
+    "dotenv": "^16.4.7",
+    "eslint": "catalog:",
+    "gqlmin": "^0.2.2",
+    "p-map": "^7.0.3",
+    "p-queue": "^8.1.0",
+    "prettier": "catalog:",
+    "stylelint": "catalog:",
+    "tailwindcss": "catalog:",
     "tree-kill": "^1.2.2",
-    "tsconfig-type": "^1.29.0",
-    "tsup": "^8.2.4",
-    "type-fest": "^4.24.0",
-    "typescript": "^5.5.4",
-    "wrap-ansi": "^9.0.0",
-    "write-file-atomic": "^5.0.1"
+    "tsconfig-type": "catalog:",
+    "tsup": "^8.3.0",
+    "type-fest": "catalog:",
+    "typescript": "catalog:",
+    "write-file-atomic": "^6.0.0",
+    "write-package": "^7.1.0"
   },
   "peerDependencies": {
-    "sass": "^1.69.4",
-    "sharp": "^0.32.5",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.4.15"
   },
   "peerDependenciesMeta": {
-    "sass": {
-      "optional": true
-    },
-    "sharp": {
-      "optional": true
-    },
     "tailwindcss": {
       "optional": true
     }

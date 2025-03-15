@@ -10,6 +10,7 @@
   left: 0px;
   width: 100%;
   z-index: 300;
+  align-items: center;
 
   &::before {
     left: 10%;
@@ -59,6 +60,11 @@
     width: 140px;
     height: 60px;
     color: $white;
+
+    @include media-breakpoint-down(sm) {
+      width: 110px;
+      height: 40px;
+    }
   }
 
   &-version {
@@ -74,11 +80,21 @@
     width: 25px;
     height: 25px;
     color: $body-color;
+
+    @include media-breakpoint-down(sm) {
+      width: 20px;
+      height: 20px;
+    }
   }
 
   .icon-github-text {
     width: 50px;
     height: 17px;
+
+    @include media-breakpoint-down(sm) {
+      width: 40px;
+      height: 18px;
+    }
   }
 
   .off {

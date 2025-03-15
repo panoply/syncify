@@ -75,6 +75,22 @@ ul {
   margin-bottom: 20px;
 }
 
+p + ul:not(.no-lst) {
+  margin-bottom: 20px;
+
+  li {
+    list-style-type: square;
+    margin-bottom: 5px;
+    margin-left: $spacer-5;
+    padding-left: $spacer-2;
+
+    &::marker {
+      color: $gray-500;
+      font-weight: bold;
+    }
+  }
+}
+
 p {
   a {
     color: $green;
@@ -109,6 +125,13 @@ table {
   }
 }
 
+h5 {
+  margin-top: $spacer-4 !important;
+  font-size: 1rem;
+  margin-bottom: $spacer-2;
+  color: #dddddd;
+}
+
 blockquote > p {
   > a > code {
     color: $papyrus-js-object;
@@ -134,11 +157,27 @@ blockquote > p {
   a {
     font-family: $font-family-heading;
     color: $link-color;
+    font-size: 0.725rem;
     border: $border-width $border-color solid;
     border-radius: 5px;
     padding: 10px 5px;
     text-align: center;
     background-color: $code-bg;
+    transition: border-color linear 400ms;
+
+    &:hover {
+      border-color: $green;
+
+      .next,
+      .prev {
+        color: $green;
+      }
+    }
+
+    small {
+      font-size: 10px !important;
+      margin-bottom: 3px;
+    }
 
     &.prev {
       padding: 5px 20px 5px 10px;
@@ -153,8 +192,8 @@ blockquote > p {
   }
 
   .icon {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
   }
 }
 
@@ -254,5 +293,192 @@ blockquote > p {
     &.opened {
       background-image: url(icon-minus($white));
     }
+  }
+}
+
+.page-404 {
+  overflow: hidden;
+}
+
+.logo-404 > svg {
+  width: 100px;
+  height: 50px;
+}
+
+.icon-output {
+  width: 40px;
+  height: 40px;
+}
+
+h1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  > code.language-typescript,
+  > code.language-bash {
+    float: right;
+    text-transform: initial;
+    border: none !important;
+    font-size: 1rem !important;
+  }
+}
+
+h1 {
+  > code {
+    text-transform: initial;
+    border: none !important;
+    font-size: 1rem !important;
+  }
+}
+
+h5 {
+  margin-bottom: 15px;
+  > code {
+    float: right;
+    text-transform: lowercase;
+    border: none !important;
+    font-size: 0.845rem !important;
+  }
+}
+
+.ph-440 .papyrus {
+  height: 450px;
+  border: none !important;
+}
+
+ol {
+  margin-top: $spacer-4;
+  margin-bottom: $spacer-4;
+  padding-left: $spacer-5;
+  margin-left: $spacer-1;
+  list-style-type: decimal;
+
+  li {
+    font-size: 1rem;
+    // font-family: $font-family-heading;
+    // text-transform: uppercase;
+    margin-bottom: $spacer-1;
+    color: $white;
+
+    &::marker {
+      color: $gray-500;
+      font-weight: bold;
+      font-family: $font-family-heading;
+      margin-right: $spacer-2;
+    }
+  }
+}
+
+ul.compare-list {
+  margin-top: $spacer-4;
+  margin-bottom: $spacer-4;
+
+  list-style-type: none;
+
+  li.check {
+    padding-left: $spacer-4;
+    background-position: center left;
+    background-size: 20px;
+    text-transform: initial;
+    background-repeat: no-repeat;
+    background-image: url(icon-check($green, 2));
+  }
+
+  li.cross {
+    padding-left: $spacer-4;
+    background-position: center left;
+    background-size: 20px;
+    text-transform: initial;
+    background-repeat: no-repeat;
+    background-image: url(icon-cross($red, 2));
+  }
+}
+
+.icon-brave,
+.icon-chrome,
+.icon-safari,
+.icon-firefox,
+.icon-edge {
+  width: 30px;
+  height: 30px;
+}
+
+.link-c {
+  color: #a4a4a4;
+}
+
+.version-example {
+  &.bd,
+  .bb {
+    border-color: #21252b !important;
+  }
+
+  .fs-sm {
+    font-size: 0.895rem !important;
+  }
+  h6 {
+    font-size: 0.875rem;
+    font-weight: 300;
+    margin-bottom: 5px;
+  }
+  .icon {
+    width: 25px;
+    height: 20px;
+    margin: 0 20px 2px 20px;
+    color: #a4a4a4;
+  }
+}
+
+.drawer-panel {
+  background-color: $body-bg !important;
+}
+.drawer-left {
+  width: 200px;
+}
+
+.opts > h1 > code {
+  font-size: 1rem !important;
+}
+.opts > p {
+  margin-left: 25px;
+}
+
+.terse-cb {
+  pre {
+    height: 100px !important;
+  }
+}
+
+.spx {
+  h1 {
+    display: inline;
+
+    a {
+      color: $cyan;
+      font-weight: 900;
+    }
+  }
+}
+
+.stash-cb {
+  pre {
+    font-size: 0.8rem;
+    height: 305px !important;
+  }
+}
+
+.stash-header {
+  code {
+    font-size: 0.9rem !important;
+    padding: 0;
+    border: none;
+    background: transparent !important;
+  }
+}
+.stash-next {
+  .icon-output {
+    width: 30px;
+    height: 30px;
   }
 }

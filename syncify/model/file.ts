@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
-import type { ParsedPath } from 'node:path';
 import type { FileKeys, FileResources } from 'types';
+
+import { parse } from 'node:path';
+
+import { assign } from '~utils';
 
 /* -------------------------------------------- */
 /* TYPES                                        */
@@ -12,8 +15,10 @@ import type { FileKeys, FileResources } from 'types';
 export const enum Type {
   Template = 1,
   Layout,
+  Block,
   Snippet,
   Section,
+  Group,
   Schema,
   Metaobject,
   Config,
@@ -26,7 +31,8 @@ export const enum Type {
   Asset,
   Metafield,
   Page,
-  Spawn
+  Spawn,
+  Syncify
 }
 
 /**
@@ -36,6 +42,7 @@ export const enum Type {
 export const enum Namespace {
   Sections = 'sections',
   Snippets = 'snippets',
+  Blocks = 'blocks',
   Layout = 'layout',
   Templates = 'templates',
   Customers = 'templates/customers',
@@ -45,7 +52,8 @@ export const enum Namespace {
   Assets = 'assets',
   Metafields = 'metafields',
   Pages = 'pages',
-  Schema = 'schema'
+  Schema = 'schema',
+  Syncify = 'syncify',
 }
 
 /**
@@ -77,13 +85,7 @@ export const enum Kind {
 
 export class File<T = any> {
 
-  constructor ({ base, dir, ext, name, root }: ParsedPath) {
-    this.base = base;
-    this.dir = dir;
-    this.ext = ext;
-    this.name = name;
-    this.root = root;
-  }
+  constructor (uri: string) { assign(this, parse(uri)); }
 
   /**
    * Configuration reference. This will hold a reference to additional data.
@@ -92,6 +94,14 @@ export class File<T = any> {
    * @default undefined // getter when required
    */
   readonly data: T = undefined;
+
+  /**
+   * File value is set in the final process cycle and will hold the file
+   * content after transforms conclude.
+   *
+   * @default ''
+   */
+  public value: string = NIL;
 
   /**
    * Hash reference of the file contents, used for diffing comparison, couples with
@@ -230,7 +240,7 @@ export class File<T = any> {
    */
   public kind: Kind;
   /**
-   * The chokidar passed path - this is full URI file path.
+   * The absolute passed path - this is full URI file path.
    *
    * @example
    *
@@ -253,7 +263,7 @@ export class File<T = any> {
   public output: string;
   /**
    * The file size in bytes before any augmentation is applied. This
-   * value will assigned post-context, typically in a transform.
+   * value will be assigned post-context, typically in a transform.
    *
    * @example
    *

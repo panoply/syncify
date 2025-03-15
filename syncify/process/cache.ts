@@ -1,95 +1,70 @@
-/* eslint-disable no-unused-vars */
+import type { Cache, Resource, SchemaTemplates, SettingsSchema } from 'types';
 
-import type { Cache, Commands, Resource } from 'types';
-import { hasPath, isEmpty } from 'rambdax';
-import { join } from 'pathe';
-import { existsSync, mkdirSync, readFileSync } from 'fs-extra';
-import Queue from 'p-queue';
+import { promisify } from 'node:util';
 import zlib from 'node:zlib';
+
 import cbor from 'cbor';
+import { readFile } from 'fs-extra';
 import writeFileAtomic from 'write-file-atomic';
-import { CACHE_REFS } from 'syncify:const';
-import { JSONTemplatesSchema, SettingsSchema } from 'types/internal';
-import { has } from 'syncify:utils';
-import { $ } from 'syncify:state';
-import { create } from 'syncify:native';
+
+import { throwError } from '~cli/throws';
+import { CACHE_FILES } from '~const';
+import { checksum, has, hasPath, isEmpty } from '~utils';
+
+import { $, q } from '$';
 
 /**
- * Cache Queue Instance
+ * Asynchronous Gunzip
  */
-const cq = new Queue();
+const gunzipAsync = promisify(zlib.gunzip);
+
+const gzipAsync = promisify(zlib.gzip);
 
 /**
  * Read Cache
  *
  * Reads a cache record from disk and applies decompression
  */
-function decode <T = any> (uri: string): T {
+export async function decode <T = any> (uri: string): Promise<T> {
 
-  const content = readFileSync(uri);
-  const gunzip = zlib.gunzipSync(content);
+  const content = await readFile(uri);
+  const gunzip = await gunzipAsync(content);
 
   return cbor.decode(gunzip);
 
-}
+};
 
 /**
  * Write Cache
  *
  * Saves a cache record to disk and applies compression
  */
-function save (uri: string, data: any) {
+export function save (uri: Cache.UriKeys, data?: any) {
 
   return async () => {
 
-    const encoded = await cbor.encodeAsync(data, {
-      omitUndefinedProperties: true,
-      canonical: true
-    });
+    if ($.file.project === null) {
 
-    const gzip = zlib.gzipSync(encoded);
+      throwError([
+        'Project cache has not been created'
+      ]);
+
+      return;
+    }
+
+    if (!/[/]/.test(uri)) {
+      uri = $.cache.uri[uri];
+      if (!data) data = $.cache[uri];
+    }
+
+    const encoded = await cbor.encodeAsync(data, { omitUndefinedProperties: true, canonical: true });
+    const gzip = await gzipAsync(encoded);
 
     gzip[9] = 0x03;
 
-    return writeFileAtomic(uri, gzip);
+    await writeFileAtomic(uri, gzip);
 
   };
-
-}
-
-/**
- * Setup Cache
- *
- * Called during the runtime define and is responsible
- * for setting up the cache references.
- */
-export async function getCache (cli: Commands) {
-
-  $.cache.uri = create(null);
-
-  const cachdir = join($.cwd, 'node_modules', '.cache');
-
-  if (!existsSync(cachdir)) mkdirSync(cachdir);
-
-  const root = join(cachdir, 'syncify');
-
-  if (!existsSync(root)) mkdirSync(root);
-
-  for (const file of CACHE_REFS) {
-
-    $.cache.uri[file] = join(root, `${file}.bin`);
-
-    if (existsSync($.cache.uri[file])) {
-      $.cache[file] = decode($.cache.uri[file]);
-    } else {
-      $.cache[file] = {};
-      cq.add(save($.cache.uri[file], $.cache[file]));
-    }
-  }
-
-  if (!has('hotSnippet', $.cache.build)) $.cache.build.hotSnippet = [];
-
-  if (cli.cache) return clearCache();
 
 }
 
@@ -97,20 +72,19 @@ export function clearCache (id: keyof Cache.Model = null) {
 
   if (id === null) {
 
-    for (const key of CACHE_REFS) {
+    for (const key of CACHE_FILES) {
       if (!isEmpty($.cache[key])) {
         $.cache[key] = {};
-        cq.add(save($.cache.uri[key], $.cache[key]));
+        q.cache.add(save($.cache.uri[key], $.cache[key]));
       }
     }
 
-    return cq.onIdle();
+    return q.cache.onIdle();
 
   }
 
   $.cache[id] = <any>{};
-
-  return cq.add(save($.cache.uri[id], $.cache[id]));
+  return q.cache.add(save($.cache.uri[id], $.cache[id]));
 
 }
 
@@ -119,32 +93,53 @@ export function clearCache (id: keyof Cache.Model = null) {
  */
 export function cacheDone () {
 
-  return cq.onIdle();
+  return q.cache.onIdle();
+
+}
+
+/**
+ * Run Checksum
+ *
+ * Compares and generates file checksums.
+ *
+ * > Return `true` when checksums match
+ * >
+ * > Return `false` when checksums do not match
+ */
+export function runChecksum (input: string, value: string): boolean {
+
+  const hash = checksum(value);
+
+  if (has(input, $.cache.checksum) && $.cache.checksum[input] === hash) return true;
+
+  $.cache.checksum[input] = hash;
+  q.cache.add(save($.cache.uri.checksum, $.cache.checksum));
+
+  return false;
 
 }
 
 /**
  * Save Cache
  *
- * Saves the cache to disk. Optionally pass a cache key
- * id to perform a specific cache save. If the param is omitted
- * or undefined all caches are updated.
+ * Saves the cache to disk. Optionally pass a cache key id to perform
+ * a specific cache save. If the param is omitted or undefined all caches are updated.
  */
 export function saveCache (id: Cache.Keys = null) {
 
   if (id === null) {
 
-    for (const key of CACHE_REFS) {
+    for (const key of CACHE_FILES) {
       if (!isEmpty($.cache[key])) {
-        cq.add(save($.cache.uri[key], $.cache[key]));
+        q.cache.add(save($.cache.uri[key], $.cache[key]));
       }
     }
 
-    return cq.onIdle();
+    return q.cache.onIdle();
 
   } else {
 
-    return cq.add(save($.cache.uri[id], $.cache[id]));
+    return q.cache.add(save($.cache.uri[id], $.cache[id]));
 
   }
 }
@@ -155,7 +150,9 @@ export function getSettingsCache (domain: string, themeId: number) {
     ? domain.slice(0, domain.indexOf('.myshopify.com')).toLowerCase()
     : domain.toLowerCase();
 
-  if (hasPath(`${store}.${themeId}`, $.cache.settings)) return $.cache.settings[store][themeId];
+  if (hasPath(`${store}.${themeId}`, $.cache.settings)) {
+    return $.cache.settings[store][themeId];
+  }
 
   if (!has(store, $.cache.settings)) {
     $.cache.settings[store] = { [themeId]: <SettingsSchema>{} };
@@ -163,7 +160,7 @@ export function getSettingsCache (domain: string, themeId: number) {
     $.cache.settings[store][themeId] = <SettingsSchema>{};
   }
 
-  cq.add(save($.cache.uri.settings, $.cache.settings));
+  q.cache.add(save($.cache.uri.settings, $.cache.settings));
 
   return $.cache.settings[store][themeId];
 
@@ -172,10 +169,12 @@ export function getSettingsCache (domain: string, themeId: number) {
 /**
  * Get Page Cache
  *
- * Returns a page resource from the cache, when no page cache exits
+ * Returns a page resource from the cache. When no page cache exits
  * for the provided parameters, the record is created and cache file
- * updates (via queue). Optionally pass in a page id to return a specific
- * page reference , if no page exists for that id an empty object is returned.
+ * updated (via queue).
+ *
+ * Optionally pass in a page id to return a specific page reference,
+ * if no page exists for that id an empty object is returned.
  */
 export function getPageCache (domain: string, pageId: number = NaN) {
 
@@ -195,7 +194,7 @@ export function getPageCache (domain: string, pageId: number = NaN) {
       $.cache.pages[store][pageId] = <Resource.Page>{};
     }
 
-    cq.add(save($.cache.uri.pages, $.cache.pages));
+    q.cache.add(save($.cache.uri.pages, $.cache.pages));
 
     return $.cache.pages[store][pageId];
 
@@ -203,7 +202,7 @@ export function getPageCache (domain: string, pageId: number = NaN) {
 
     if (!has(store, $.cache.pages)) {
       $.cache.pages[store] = {};
-      cq.add(save($.cache.uri.pages, $.cache.pages));
+      q.cache.add(save($.cache.uri.pages, $.cache.pages));
     }
 
   }
@@ -229,32 +228,96 @@ export function setPageCache (domain: string, data: Resource.Page) {
     $.cache.pages[store][data.id] = data;
   }
 
-  cq.add(save($.cache.uri.pages, $.cache.pages));
+  q.cache.add(save($.cache.uri.pages, $.cache.pages));
 
   return $.cache.pages[store][data.id];
 
 }
 
+/**
+ * Set Template Cache
+ *
+ * Create or update template resource cache and returns the template model.
+ */
+export function setTemplateCache (
+  domain: string,
+  themeId: number,
+  path: string,
+  data: SchemaTemplates
+) {
+
+  const store = domain.endsWith('.myshopify.com')
+    ? domain.slice(0, domain.indexOf('.myshopify.com')).toLowerCase()
+    : domain.toLowerCase();
+
+  if (!has(store, $.cache.templates)) {
+
+    $.cache.templates[store] = { [themeId]: { [path]: data } };
+
+  } else if (!has(`${themeId}`, $.cache.templates[store])) {
+
+    $.cache.templates[store][themeId] = { [path]: data };
+
+  } else {
+
+    $.cache.templates[store][themeId][path] = data;
+
+  }
+
+  q.cache.add(save($.cache.uri.templates, $.cache.templates));
+
+  return $.cache.templates[store][themeId][path];
+
+}
+
+/**
+ * Get Template Cache
+ *
+ * Returns the template cache model.
+ */
 export function getTemplateCache (domain: string, themeId: number, path: string) {
 
   const store = domain.endsWith('.myshopify.com')
     ? domain.slice(0, domain.indexOf('.myshopify.com')).toLowerCase()
     : domain.toLowerCase();
 
-  if (hasPath(`${store}.${themeId}.${path}`, $.cache.templates)) {
-    return $.cache.templates[store][themeId][path];
+  return hasPath(`${store}.${themeId}.${path}`, $.cache.templates)
+    ? $.cache.templates[store][themeId][path]
+    : setTemplateCache(domain, themeId, path, <SchemaTemplates>{});
+
+}
+
+/**
+ * Set Paths Cache
+ *
+ * Create or update the paths cache
+ */
+export function setPathCache (input: string, output: string) {
+
+  let update: string = null;
+
+  if (!has('paths', $.cache)) {
+    $.cache.paths = {};
   }
 
-  if (!has(store, $.cache.templates)) {
-    $.cache.templates[store] = { [themeId]: { [path]: <JSONTemplatesSchema>{} } };
-  } else if (!has(`${themeId}`, $.cache.templates[store])) {
-    $.cache.templates[store][themeId] = { [path]: <JSONTemplatesSchema>{} };
-  } else if (!has(path, $.cache.templates[store][themeId])) {
-    $.cache.templates[store][themeId][path] = <JSONTemplatesSchema>{};
+  if (!has(input, $.cache.paths)) {
+    update = $.cache.paths[input] = output;
   }
 
-  cq.add(save($.cache.uri.templates, $.cache.templates));
+  if ($.cache.paths[input] !== output) {
+    update = $.cache.paths[input] = output;
+  }
 
-  return $.cache.templates[store][themeId][path];
+  if (!has(output, $.cache.paths)) {
+    update = $.cache.paths[output] = input;
+  }
+
+  if ($.cache.paths[output] !== input) {
+    update = $.cache.paths[output] = input;
+  }
+
+  if (update) {
+    q.cache.add(save($.cache.uri.paths, $.cache.paths));
+  }
 
 }

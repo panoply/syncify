@@ -1,0 +1,40 @@
+{
+  "name": "@syncify/config",
+  "version": "0.0.5",
+  "description": "Project-level defineConfig utiltity for usage with global installations of Syncify",
+  "files": ["dist", "package.json", "LICENSE"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "dts": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup --minify"
+  },
+  "author": {
+    "name": "Νικολας Σαββιδης",
+    "url": "https://github.com/panoply/syncify",
+    "email": "n.savvidis@gmx.com"
+  },
+  "license": "Apache-2.0",
+  "tsup": {
+    "entry": ["./src/index.ts"],
+    "dts": {
+      "resolve": true
+    },
+    "format": ["cjs", "esm"],
+    "treeshake": true,
+    "target": "node20",
+    "splitting": true,
+    "platform": "node",
+    "clean": true,
+    "bundle": true
+  },
+  "dependencies": {
+    "@syncify/types": "workspace:^"
+  }
+}

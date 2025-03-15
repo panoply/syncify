@@ -1,21 +1,22 @@
 import spx from 'spx';
+
 import { Accordion } from './components/accordion';
 import { Drawer } from './components/drawer';
 import { Dropdown } from './components/dropdown';
+import { ScrollSpy } from './components/scrollspy';
 import { Search } from './components/search';
 import { Sidebar } from './components/sidebar';
-import { ScrollSpy } from './components/scrollspy';
 
-
-spx({
+export default spx({
   fragments: [
     'content',
-    'menu'
+    'menu',
+    'navbar'
   ],
   components: {
     Accordion,
-    Dropdown,
     Drawer,
+    Dropdown,
     Search,
     ScrollSpy,
     Sidebar
@@ -28,22 +29,4 @@ spx({
   progress: {
     bgColor: 'red'
   }
-})(function() {
-
-
-  document.addEventListener('mouseover', function (e) {
-    if(e.target instanceof HTMLElement) {
-      if(
-        e.target.classList.contains('token') && (
-          e.target.classList.contains('maybe-class-name') ||
-          e.target.classList.contains('property')
-        )) {
-
-        console.log(e.target.innerHTML)
-      }
-    }
-  });
-
 });
-
-

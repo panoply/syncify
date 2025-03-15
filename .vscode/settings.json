@@ -1,27 +1,22 @@
 {
-  "explorer.fileNesting.enabled": false,
   "npm.packageManager": "pnpm",
-  "files.associations": {
-    "*.scss.liquid": "scss",
-    "*.css.liquid": "css",
-    "*i18n.js.liquid": "javascript",
-    "*shop.js.liquid": "javascript",
-    "*config.js.liquid": "javascript"
-  },
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
     "**/.hg": true,
-    "**/CVS": true,
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
-    "**/node_modules": false,
-    // "**/node_modules/.syncify": false
-    //"**/example": true
+    "**/CVS": true,
+    "**/.ruby-lsp": true,
+    "**/.vscode": false,
+    "**/coverage": true,
+    "**/.idea": true,
+    "**/.bundle": true,
+    "**/node_modules": true
   },
-  "html.customData": [
-    ".vscode/icon.html-data.json"
-  ],
+  "files.associations": {
+    "*.json": "jsonc",
+  },
   "json.schemas": [
     {
       "fileMatch": [
@@ -31,59 +26,143 @@
     },
     {
       "fileMatch": [
-        "**/package.json"
+        "package.json"
       ],
       "url": "./.vscode/schema/syncify.json"
-    },
-    {
-      "fileMatch": [
-        "syncify.env.json"
-      ],
-      "url": "/schema/syncify.env.json"
     }
   ],
-  "highlight.regexes": {
-    "(\\$)([a-z:(]*\\b)": {
-      "regexFlags": "g",
-      "filterLanguageRegex": "typescript",
-      "decorations": [
+  "typescript.preferences.preferTypeOnlyAutoImports": true,
+  "typescript.preferences.quoteStyle": "single",
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "eslint.useFlatConfig": true,
+  "eslint.format.enable": true,
+  "eslint.onIgnoredFiles": "off",
+  "stylelint.packageManager": "pnpm",
+  "stylelint.enable": false,
+  "stylelint.validate": [
+    "scss",
+    "sass",
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.stylelint": "explicit"
+  },
+  "spx.files": [
+    "./docs/src/app/**/*.ts"
+  ],
+  "[liquid]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "sissel.shopify-liquid"
+  },
+  "codesnap.showWindowControls": false,
+  "codesnap.roundedCorners": true,
+  "highlight.regex.regexes": [
+    {
+      "name": "Path Aliases ~ Prefix",
+      "description": "Highlight to ~ character in path aliases",
+      "languageRegex": "\\b(typescript)\\b",
+      "regexes": [
         {
-          "color": "#ffbafc"
+          "regex": "\\s\\bfrom\\s'(\\~)[a-z]",
+          "regexFlag": "g",
+          "regexLimit": 25000,
+          "decorations": [
+            {
+              "index": 1,
+              "color": "#E91E63",
+            }
+          ],
         }
       ]
     },
-    "(?<=\\b(?:from) ')(\\.)(\/)(?=[a-z])": {
-      "regexFlags": "g",
-      "filterLanguageRegex": "typescript",
-      "decorations": [
+    {
+      "name": "TS Method Preserved Colours",
+      "description": "Ensures the methods that apply newlines remain highlighted",
+      "languageRegex": "\\b(typescript)\\b",
+      "regexes": [
         {
-          "color": "#F48FB1",
-          "fontStyle": "bold"
-        },
-        {
-          "color": "#E91E63",
-          "fontStyle": "bold"
-        },
+          "regex": "\\s+([A-Za-z]+)\\n+\\s*\\.",
+          "regexFlag": "g",
+          "regexLimit": 25000,
+          "decorations": [
+            {
+              "index": 1,
+              "color": "#9BDAFF",
+            }
+          ],
+        }
       ]
     },
-    "(?<=\\b(?:from) ')(syncify)(:)(.*?)(?=')": {
-      "regexFlags": "g",
-      "filterLanguageRegex": "typescript",
-      "decorations": [
+    {
+      "name": "TS Method Preserved Colours",
+      "description": "Ensures the methods that apply newlines remain highlighted",
+      "languageRegex": "\\b(typescript)\\b",
+      "regexes": [
         {
-          // "color": "#fcc06c",
-        },
+          "regex": "gql\\<([A-Za-z]+)\\.",
+          "regexFlag": "g",
+          "regexLimit": 25000,
+          "decorations": [
+            {
+              "index": 1,
+              "color": "#9BDAFF",
+            }
+          ],
+        }
+      ]
+    },
+    {
+      "name": "TS Destructuring",
+      "description": "Ensures the methods that apply newlines remain highlighted",
+      "languageRegex": "\\b(typescript)\\b",
+      "regexes": [
         {
-          "color": "#E91E63",
-          "fontStyle": "bold"
-        },
-        {
-          // "color": "#fcc06c",
-        },
+          "regex": "\\(\\(\\{\\n([\\s\\S]*?)\\}(\\s*,\\s*[a-zA-Z]+\\s*)?\\)\\s+\\=\\>",
+          "regexFlag": "g",
+          "regexLimit": 25000,
+          "regexes": [
+            {
+              "regex": "[,:]",
+              "regexFlag": "g",
+              "decorations": [
+                {
+                  "color": "#E91E63"
+                }
+              ]
+            }
+          ],
+          "decorations": [
+            {
+              "index": 1,
+              "color": "#FFAB40",
+            }
+          ],
+        }
       ]
     }
-  },
+  ],
   "vsicons.associations.files": [
+    {
+      "icon": "vscode",
+      "format": "svg",
+      "filename": true,
+      "extensions": [
+        "extensions.json"
+      ]
+    },
+    {
+      "icon": "svg",
+      "extensions": [
+        "svgo.config.js",
+        "svgo.config.cjs"
+      ],
+      "filename": true,
+      "format": "svg"
+    },
     {
       "icon": "svg",
       "extensions": [
@@ -117,28 +196,36 @@
       ],
       "filename": true,
       "format": "liquid"
+    },
+    {
+      "icon": "graphql",
+      "extensions": [
+        "graphql.config.yml",
+        "graphql.config.ts"
+      ],
+      "filename": true,
+      "format": "svg"
+    },
+    {
+      "icon": "graphql_config",
+      "filename": true,
+      "extensions": [
+        "graphql.codegen.ts"
+      ]
+    },
+    {
+      "icon": "eleventy",
+      "filename": true,
+      "extensions": [
+        ".eleventy.cjs"
+      ]
+    },
+    {
+      "icon": "netlify",
+      "filename": true,
+      "extensions": [
+        "_redirects"
+      ]
     }
-  ],
-  "cSpell.words": [
-    "adastra",
-    "gzipsize",
-    "imgmin",
-    "linkify",
-    "obfucss",
-    "pnpx",
-    "purgecss",
-    "Spriter",
-    "syver",
-    "tailwindcss"
-  ],
-  "[liquid]": {
-    "editor.formatOnSave": true
-  },
-  "liquid.config.method": "workspace",
-  "liquid.format.rules": {
-    "liquid": {
-      "indentAttribute": true,
-      "forceArgument": 3
-    }
-  }
+  ]
 }

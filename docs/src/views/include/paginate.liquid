@@ -1,70 +1,99 @@
-<section class="pt-4 pb-5 px-3">
-  {%- for item in navigation.menu -%}
+<section class="pt-4 pb-5 px-sm-3">
+  {%- if prev and next -%}
 
-    {%- assign menu_index = forloop.index -%}
-    {%- assign menu_last = forloop.last -%}
+    <div class="row jc-between mt-5 mb-3 navigators">
 
-    {%- for link in item.links -%}
+      <a
+        href="{{ prev.url | url }}"
+        class="col-auto btn prev tl px-3 px-sm-4 py-2  "
+        spx-scroll="0">
+        <small class="d-block fc-gray d-none">Previous</small>
+        {%- svg 'chevron-left', 'icon icon-left mr-1' -%}
+        {{- prev.title -}}
+      </a>
 
-      {%- liquid
-        #
-        # SKIP LINKS
-        #
-        unless link.url == page.url
-          continue
-        endunless
-        #
-        # PREV AND NEXT LINKS
-        #
-        if link.url == page.url
+      <a
+        class="col-auto btn next tr px-3 px-sm-4 py-2 ml-auto"
+        href="{{ next.url | url }}"
+        spx-scroll="0">
+        <small class="d-block fc-gray d-none">Next</small>
+        {{- next.title -}}
+        {%- svg 'chevron-right', 'icon icon-right ml-1' -%}
+      </a>
+
+    </div>
+
+  {%- else -%}
+
+    {%- for item in navigation.docs -%}
+
+      {%- assign menu_index = forloop.index -%}
+      {%- assign menu_last = forloop.last -%}
+
+      {%- for link in item.links -%}
+
+        {%- liquid
           #
-          # PREV LINK
+          # SKIP LINKS
           #
-          if forloop.first
-            assign prev_index = menu_index | minus: 2
-            assign prev = navigation.menu[prev_index].links | last
-          else
-            assign prev_link = forloop.index0 | minus: 1
-            assign prev = item.links[prev_link]
+          unless link.url == page.url
+            continue
+          endunless
+          #
+          # PREV AND NEXT LINKS
+          #
+          if link.url == page.url
+            #
+            # PREV LINK
+            #
+            if forloop.first
+              assign prev_index = menu_index | minus: 2
+              assign prev = navigation.docs[prev_index].links | last
+            else
+              assign prev_link = forloop.index0 | minus: 1
+              assign prev = item.links[prev_link]
+            endif
+            #
+            # NEXT LINK
+            #
+            if menu_last and forloop.last
+              assign next = navigation.docs[0].links | first
+            elsif forloop.last
+              assign next = navigation.docs[menu_index].links | first
+            else
+              assign next_index = forloop.index0 | plus: 1
+              assign next = item.links[next_index]
+            endif
+
           endif
-          #
-          # NEXT LINK
-          #
-          if menu_last and forloop.last
-            assign next = navigation.menu[0].links | first
-          elsif forloop.last
-            assign next = navigation.menu[menu_index].links | first
-          else
-            assign next_index = forloop.index0 | plus: 1
-            assign next = item.links[next_index]
-          endif
-        endif
-      -%}
+        -%}
 
-      <div class="row jc-between mt-5 mb-3 navigators">
+        <div class="row jc-between mt-5 mb-3 navigators">
+          {%- unless menu_index == 1 and forloop.index == 1 -%}
+            <a
+              href="{{ prev.url | url }}"
+              class="col-auto btn prev tl px-3 px-sm-4 py-2  "
+              spx-scroll="0">
+              <small class="d-block fc-gray d-none">Previous</small>
+              {%- svg 'chevron-left', 'icon icon-left mr-1' -%}
+              {{- prev.title -}}
+            </a>
+          {%- endunless -%}
 
-        {%- unless menu_index == 1 and forloop.index == 1 -%}
           <a
-            href="{{ prev.url | url }}"
-            class="col-auto btn prev"
+            class="col-auto btn next tr px-3 px-sm-4 py-2 ml-auto"
+            href="{{ next.url | url }}"
             spx-scroll="0">
-            {%- svg 'chevron-left', 'icon icon-left mr-2' -%}
-            {{- prev.title -}}
+            <small class="d-block fc-gray d-none">Next</small>
+            {{- next.title -}}
+            {%- svg 'chevron-right', 'icon icon-right ml-1' -%}
           </a>
-        {%- endunless -%}
 
-        <a
-          class="col-auto btn next ml-auto"
-          href="{{ next.url | url }}"
-          spx-scroll="0">
-          {{- next.title -}}
-          {%- svg 'chevron-right', 'icon icon-right ml-2' -%}
-        </a>
+        </div>
 
-      </div>
+        {%- break -%}
 
-      {%- break -%}
-
+      {%- endfor -%}
     {%- endfor -%}
-  {%- endfor -%}
+  {%- endif -%}
 </section>

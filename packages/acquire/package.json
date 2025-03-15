@@ -1,0 +1,36 @@
+{
+  "name": "@syncify/acquire",
+  "version": "0.0.5",
+  "access": "restricted",
+  "description": "File require and import helper with TS Transform support",
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "keywords": [
+    "syncify",
+    "config-file",
+    "bundle-require",
+    "acquire",
+    "build-file",
+    "import",
+    "esm",
+    "cjs",
+    "import config"
+  ],
+  "author": {
+    "name": "Νικολας Σαββιδης",
+    "url": "https://github.com/panoply/syncify",
+    "email": "n.savvidis@gmx.com"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "esbuild": "catalog:"
+  },
+  "peerDependencies": {
+    "esbuild": "catalog:"
+  }
+}

@@ -16,29 +16,39 @@
         spx-target="body">
         {%- svg 'logo-text', 'navbar-logo' -%}
       </a>
-      <span class="col-auto pl-0 fs-xs fc-white ff-heading upper mt-2 ">
+      <span class="col-auto pl-0 fs-xs fc-white ff-heading upper mt-2 d-none d-sm-unset ">
         <small class="navbar-version">version</small>
         {{- pkg.version -}}
       </span>
 
-      <div class="col-auto tr pl-5  mr-auto">
-        <ul class="list-pipe mb-0 navbar-menu">
+      <div class="col-auto tr pl-5 mr-auto d-none d-sm-unset">
+        <ul
+          class="list-pipe mb-0 navbar-menu"
+          id="menu">
           <li>
             <a
-              href="/documentation"
-              class="active">Docs</a>
+              href="{{ navigation.navbar.documentation.url }}"
+              spx-target="body"
+              {%- unless page.url contains '/releases/' -%}
+                class="active"
+              {%- endunless -%}>
+              {{- navigation.navbar.documentation.title -}}
+            </a>
           </li>
           <li>
-            <a href="/documentation">CLI</a>
+            <a
+              href="{{ navigation.navbar.releases.url }}"
+              spx-target="body"
+              {%- if page.url contains '/releases/' -%}
+                class="active"
+              {%- endif -%}>
+              {{- navigation.navbar.releases.title -}}
+            </a>
           </li>
-          <li class="pr-4">
-            <a href="/documentation">CONFIG</a>
-          </li>
-
         </ul>
       </div>
-      <div class="col-auto pl-3  ml-auto ">
-        <div class="row">
+      <div class="col-auto pl-sm-3 ml-auto">
+        <div class="row gx-3">
           <a
             target="_blank"
             href="{{ navigation.github.url }}"
@@ -62,7 +72,7 @@
           </a>
         </div>
       </div>
-      <div class="col-auto">
+      <div class="col-auto d-none d-sm-unset">
         {%- include 'include/search' -%}
       </div>
     </nav>

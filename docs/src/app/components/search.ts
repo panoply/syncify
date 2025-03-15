@@ -1,215 +1,236 @@
 /* eslint-disable no-use-before-define */
 
+import type { SearchContent, SearchHeading, SearchIndex, SearchPage } from '@e11ty/eleventy-plugin-search-index';
 import spx, { SPX } from 'spx';
-import Fuse from 'fuse.js';
+import { matchSorter } from 'match-sorter';
+import { glue } from '../utils';
 
-interface Results {
-  title: string;
-  content: string;
-  heading: string;
-  url: string;
-}
+export class Search extends spx.Component({
+  id: 'search',
+  state: {
+    active: Boolean,
+    query: String,
+    source: String
+  },
+  nodes: <const>[
+    'list',
+    'input'
+  ]
+}) {
 
-interface Result {
-  [heading: string]: {
-    header: string;
-    isHeader: boolean,
-    url: string;
-    items: string[]
-  }
-}
+  /**
+   * SPX Connect Lifecyle Method
+   */
+  public async connect () {
 
-export class Search extends spx.Component<typeof Search.define> {
-
-  static define = {
-    id: 'search',
-    state: {
-      active: Boolean,
-      query: String,
-      source: String
-    },
-    nodes: <const>[
-      'list',
-      'input'
-    ]
-  };
-
-  async connect () {
-
-    const list = await fetch(this.state.source);
-
-    this.list = await list.json();
-    this.fuse = new Fuse(this.list, {
-      keys: [
-        'title',
-        'heading',
-        'content'
-      ],
-      threshold: 0.1,
-      isCaseSensitive: false,
-      includeMatches: false
-    });
+    this.index = await this.getJSON();
 
   }
 
-  hide () {
+  /**
+   * Get search index
+   */
+  private async getJSON () {
 
-    removeEventListener('click', this.outsideClick);
+    return (await fetch(this.state.source)).json();
 
-    this.dom.listNode.classList.replace('d-block', 'd-none');
-    this.dom.inputNode.classList.remove('is-active', 'is-results');
+  }
+
+  private hide () {
+
+    document.removeEventListener('click', this.outsideClick);
+
+    this.listNode.classList.replace('d-block', 'd-none');
+    this.inputNode.classList.remove('is-active', 'is-results');
     this.state.active = false;
 
   }
 
+  inputOpen () {
+    if (!this.state.active) {
+      this.state.active = true;
+      document.addEventListener('click', this.outsideClick.bind(this));
+    }
+  }
+
   outsideClick (event: Event) {
 
-    if (this.dom.listNode !== event.target && this.dom.inputNode !== event.target) {
+    if (this.listNode !== event.target && this.inputNode !== event.target) {
+
       this.hide();
+
     }
 
   }
 
   onFocus () {
 
-    this.dom.inputNode.classList.add('is-active');
-
-    if (this.result.length > 0 && !this.dom.listNode.classList.contains('d-block')) {
-      setTimeout(() => this.dom.listNode.classList.replace('d-none', 'd-block'), 80);
-      this.dom.inputNode.classList.add('is-results');
+    if (!this.inputNode.classList.contains('is-active')) {
+      this.inputNode.classList.add('is-active');
     }
 
-    if (this.state.query.length <= 2) {
-      this.dom.inputNode.classList.remove('is-results');
-    } else {
-      this.dom.inputNode.classList.add('is-results');
-    }
+    setTimeout(() => {
+
+      if (this.result.length > 0 && !this.listNode.classList.contains('d-block')) {
+        this.listNode.classList.replace('d-none', 'd-block');
+        this.inputNode.classList.add('is-results');
+      }
+
+      if (this.state.query.length <= 2) {
+        this.inputNode.classList.remove('is-results');
+      } else {
+        this.inputNode.classList.add('is-results');
+      }
+
+    }, 300);
+
+    this.inputOpen();
+
+  }
+
+  item (content: SearchContent) {
+
+    return {
+      page: this.index.pages[content.pidx],
+      heading: this.index.heading[content.hidx],
+      content
+    };
 
   }
 
   onInput ({ target }: SPX.InputEvent<{}, HTMLInputElement>) {
 
-    this.state.query = target.value;
-    this.result = this.fuse.search(this.state.query, { limit: 10 });
+    const input = this.state.query = target.value.trim();
 
-    if (!this.state.active) {
-      this.dom.listNode.classList.replace('d-none', 'd-block');
-      this.state.active = true;
-      addEventListener('click', this.outsideClick.bind(this));
+    if (input.length > 1) {
+
+      this.result = matchSorter(this.index.content, input, this.match);
+
+      if (this.result.length === 0) {
+
+        this.listNode.innerHTML = '';
+        this.listNode.classList.add('no-results');
+        this.noResults.innerHTML = this.nothing;
+        this.listNode.appendChild(this.noResults);
+
+      } else {
+
+        const filter = this.result.sort((a, b) => a.sort - b.sort).map(content => this.item(content));
+
+        this.showList(input, filter);
+
+      }
+
+    } else {
+
+      if (input.length === 0) {
+        this.inputNode.classList.remove('is-results');
+        this.listNode.classList.replace('d-block', 'd-none');
+      }
+
+      return;
+
     }
 
-    if (this.state.query.length === 0) {
-
-      this.dom.inputNode.classList.remove('is-results');
-      this.dom.listNode.classList.replace('d-block', 'd-none');
-
-    } else if (!this.dom.listNode.classList.contains('d-block')) {
-
-      this.dom.listNode.classList.replace('d-none', 'd-block');
-
+    if (!this.listNode.classList.contains('d-block')) {
+      this.listNode.classList.replace('d-none', 'd-block');
     }
 
-    this.showList();
+    this.inputOpen();
 
   }
 
-  showList () {
+  sentence (text: string, match: RegExp) {
 
-    if (this.state.query.length < 1) {
-      this.dom.inputNode.classList.remove('is-results');
+    const R = 4;
+
+    const offset = text.search(match);
+
+    if (offset === 0) return text;
+
+    const before = text.slice(0, offset);
+
+    // Split the words before the match
+    const words = before.trim().split(/\s+/);
+
+    // Check for a full stop within the last 4 words
+    const dot = before.lastIndexOf('.', offset);
+
+    if (words.length >= R && dot !== -1 && dot >= before.length - R * words[words.length - 1].length) {
+      return text.slice(dot + 1).trim();
     } else {
-      this.dom.inputNode.classList.add('is-results');
+      return text.slice(offset).trim();
     }
 
-    const result: Result = {};
-    const match = new RegExp(`(${this.state.query})`, 'gi');
+  }
 
-    this.dom.listNode.innerHTML = '';
-    this.dom.listNode.classList.remove('no-results');
-    this.result.forEach(({ item }) => {
+  showList (query: string, result: Array<{
+    page: SearchPage;
+    heading: SearchHeading;
+    content: SearchContent;
+  }>) {
 
-      const content = item.content === ''
-        ? item.title
-        : item.content;
+    const match = new RegExp(`(${query})`, 'gi');
 
-      let offset = item.heading.search(match);
+    this.listNode.classList.contains('no-results') && this.listNode.classList.remove('no-results');
+    this.listNode.innerHTML = '';
 
-      let isHeader: boolean = true;
+    const nodes = result.map(({ content, page, heading }) => {
 
-      if (offset === -1) {
-        offset = content.search(match);
-        isHeader = false;
-      }
+      const sentence = content.type === 'heading' ? content.text : this.sentence(content.text, match);
+      const located = content.type === 'heading' ? page.title : this.index.content[heading.cidx[0]].text;
+      const node = document.createElement('li');
 
-      const slice = content.slice(offset);
+      node.innerHTML = glue(
+        `<a href="${heading.anchor}" class="d-flex ai-center">`,
+        '<div class="w-icon">',
+        '<svg class="icon">',
+        `<use xlink:href="#svg-search-${content.type}"></use>`,
+        '</svg>',
+        '</div>',
+        '<div class="px-3">',
+        '<div class="result">',
+        `${sentence.replace(match, '<strong>$1</strong>')}`,
+        '</div>',
+        '<div class="d-block upper ff-heading fw-bold fc-dark-gray fs-xs">',
+        `${located}`,
+        '</div>',
+        '</div>',
+        '<div class="w-icon">',
+        '<svg class="icon icon-goto">',
+        '<use xlink:href="#svg-search-goto"></use>',
+        '</svg>',
+        '</div>',
+        '</a>'
+      );
 
-      if (slice.trim().length > 0) {
+      return node;
 
-        const value = slice.trim().slice(0, 100);
-
-        if (value.length > 2) {
-
-          let header: string;
-
-          if (item.title !== item.heading && item.heading !== '' && !/[(:]/.test(item.heading)) {
-            header = item.heading;
-          } else {
-            header = '';
-          }
-
-          if (!(item.title in result)) {
-            result[item.title] = {
-              header,
-              isHeader: header !== '' ? isHeader : false,
-              url: item.url,
-              items: []
-            };
-          }
-
-          if (value.length > 50) {
-            result[item.title].items.push(
-              '<div class="result">',
-              '<span>',
-              value.replace(match, '<strong class="fc-blue">$1</strong>'),
-              '...',
-              '</span>',
-              '</div>'
-            );
-          }
-        }
-      }
     });
 
-    const items = Object.keys(result);
+    this.listNode.append(...nodes);
 
-    if (items.length === 0) {
-      const element = document.createElement('li');
-      element.innerHTML = '<h4 class="mb-0">No Results</h4>';
-      this.dom.listNode.classList.add('no-results');
-      this.dom.listNode.appendChild(element);
-    } else {
-      items.forEach(group => {
-
-        const record = result[group];
-        const element = document.createElement('li');
-
-        element.innerHTML = [
-          `<a href="${record.url}">`,
-          '<h5 class="row ai-center jc-between px-2">',
-          `<span class="col-auto">${record.isHeader ? record.header : group}</span>`,
-          `<span class="col-auto fc-dark-gray fs-xs">${record.isHeader ? group : record.header}</span>`,
-          '</h5>',
-          `${record.items.join('')}`,
-          '</a>'
-        ].join('');
-
-        this.dom.listNode.appendChild(element);
-      });
-    }
   }
 
-  public fuse: Fuse<Results>;
-  public list: Results[] = [];
-  public result: Array<{ item: Results; refIndex: number; }> = [];
+  get nothing () {
+    return glue(
+      '<div class="row jc-center">',
+      `<h4 class="col-12 tc mb-3">"<span class="fc-gray normal">${this.state.query}</span>"</h4>`,
+      '<h6 class="col-12 fs-xs tc mb-3 fc-white">',
+      'Nothing Found',
+      '</h6>',
+      '<div class="col-auto">',
+      '<svg class="icon icon-clown mx-auto">',
+      '<use xlink:href="#svg-clown"></use>',
+      '</svg>',
+      '</div>',
+      '</div>'
+    );
+  }
+
+  public index: SearchIndex;
+  public result: SearchContent[];
+  public match = { keys: [ { threshold: matchSorter.rankings.CONTAINS, key: 'text' } ] };
+  public noResults: HTMLLIElement = document.createElement('li');
 
 }

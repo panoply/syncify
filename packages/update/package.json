@@ -1,0 +1,46 @@
+{
+  "name": "@syncify/update",
+  "version": "0.0.3",
+  "description": "Version comparison and increment information for packages on the NPM Registry",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "dts": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup --minify"
+  },
+  "keywords": [
+    "syncify",
+    "version",
+    "semver",
+    "check-version",
+    "version-update",
+    "newer-version"
+  ],
+  "author": {
+    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
+    "url": "https://github.com/panoply",
+    "email": "n.savvidis@gmx.com"
+  },
+  "license": "Apache-2.0",
+  "tsup": {
+    "entry": ["./src/index.ts"],
+    "dts": true,
+    "format": ["cjs", "esm"],
+    "treeshake": true,
+    "target": "node20",
+    "splitting": true,
+    "platform": "node",
+    "clean": true,
+    "bundle": true,
+    "external": ["@syncify/kill"]
+  },
+  "dependencies": {
+    "@syncify/kill": "workspace:^"
+  }
+}

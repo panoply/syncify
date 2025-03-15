@@ -1,149 +1,78 @@
-import type { Syncify } from 'types';
-import http from 'node:http';
-import statics from 'serve-static';
-import handler from 'finalhandler';
-import ngrok from 'ngrok';
-import { delay } from 'rambdax';
-import { timer } from 'syncify:timer';
-import * as log from 'syncify:log';
-import { exporting } from 'syncify:modes/export';
-import { ARR, COL } from 'syncify:symbol';
-import { bold, gray, line, magentaBright, neonCyan, neonGreen, orange, whiteBright } from 'syncify:colors';
-import * as request from 'syncify:requests/themes';
-import { $ } from 'syncify:state';
-import prompts from 'prompts';
-import { processing } from 'syncify:requests/themes';
+import type { Stores } from 'types';
 
-export async function publish (cb?: Syncify) {
+import { setPkg } from '~options/define/package';
 
-  await exporting(cb);
+import { Create, gray } from '@syncify/ansi';
+import { kill } from '@syncify/kill';
+import { timer } from '@syncify/timer';
+
+import { log } from '~cli/log';
+import { event } from '~events';
+import { Pack } from '~modes/pack';
+// import themes from '~requests/themes';
+import { isObject } from '~utils';
+
+import { $ } from '$';
+
+export async function Publish () {
+
+  $.running = true;
+
+  await Pack();
 
   timer.start('publish');
 
-  log.title('Publishing');
+  const stdout = Create().Header('Publishing Theme');
+  const progress = log.progress(300);
 
-  const versions = statics($.vc.dir);
-  const server = http.createServer((req, res) => versions(req, res, handler(req, res)));
+  event.on('publish:progress', ({ task, step }) => {
 
-  const onerror = (e: { code: 'EADDRINUSE' }) => {
-    if (e.code === 'EADDRINUSE') {
-      log.error('EADDRINUSE');
-      return null;
-    }
-  };
+    progress.increment(step);
 
-  const onconnect = () => {
-    server.removeListener('error', onerror);
-    server.removeListener('connect', onconnect);
-  };
+    log.update(
+      stdout
+      .Header(task, gray)
+      .Insert(progress.render())
+      .toString()
+    );
 
-  server.on('error', onerror);
-  server.on('connect', onconnect);
-  server.listen($.publish.tunnelPort);
-
-  await delay(500);
-
-  timer.start('ngrok');
-
-  const url = await ngrok.connect({
-    addr: $.publish.tunnelPort,
-    onStatusChange (status) {
-      if (status === 'closed') {
-        log.write('disconnect', { prefix: 'ngrok' });
-      } else {
-        log.write(`${bold('connected')} PORT${COL}${$.publish.tunnelPort}`, {
-          prefix: 'ngrok',
-          suffix: timer.stop('ngrok')
-        });
-      }
-    }
   });
 
-  const src = `${url}/${$.vc.number}.zip`;
+  const hasThemes = $.target.length > 0;
 
-  log.write(gray(src), { prefix: 'server' });
+  for (const target of $.target) {
 
-  for (const store of $.sync.stores) {
+    const { id } = await request.publish(target.store);
 
-    timer.start(store.domain);
+    console.log(id);
 
-    log.write(store.domain, { prefix: 'webshop', color: neonCyan });
-    log.write(`${bold('role')} ${ARR} ${$.publish.publishRole}`, { prefix: 'publish' });
-    log.write(bold(`v${$.vc.number}`), { prefix: 'version', color: magentaBright });
-    log.nwl();
+    if (hasThemes) {
 
-    await delay(1000);
+      const syncify = $.pkg.syncify;
 
-    log.spinner('uploading', {
-      style: 'spinning',
-      color: neonGreen
-    });
+      if (isObject<Stores>(syncify.stores)) {
 
-    await delay(2000);
+        if (target.store.domain.startsWith(syncify.stores.domain)) {
 
-    log.spinner.update('dispatched');
+          for (const target in syncify.stores.themes) {
 
-    await delay(2000);
+            if (syncify.stores.themes[target] === -1) {
 
-    log.spinner.update('extracting');
+              syncify.stores.themes[target] = id;
 
-    await delay(2000);
+            }
+          }
 
-    log.spinner.update('processing');
+        }
 
-    // log.update.clear();
+        $.pkg.syncify = syncify;
 
-    // const { id } = await request.publish(store, {
-    //   src,
-    //   name: `${$.vc.number}`,
-    //   role: $.publish.publishRole
-    // });
+        await setPkg($.pkg);
 
-    await delay(1000);
-
-    // log.action('neonGreen', 'status', bold('synced'), store.domain, timer.now(store.domain));
-    // log.nwl();
-
-    // await processing(id, store);
-
-    log.spinner.stop('done');
-
-    log.write(`${bold('published')} ${ARR} ${store.domain}`, {
-      prefix: 'status',
-      color: neonGreen,
-      suffix: timer.now(store.domain)
-    });
-
+      }
+    }
   }
 
-  server.close();
+  kill.exit(0);
 
-  await ngrok.disconnect();
-
-  log.nwl();
-  log.group();
-  log.nwl();
-
-  await prompts([
-    {
-      name: 'action',
-      hint: ' ',
-      type: 'select',
-      message: 'Post-Publishing',
-      choices: [
-        {
-          title: 'Update Config',
-          value: 'config'
-        },
-        {
-          title: 'Publish Themes',
-          value: 'publish'
-        },
-        {
-          title: 'Delete Themes',
-          value: 'delete'
-        }
-      ]
-    }
-  ]);
 }

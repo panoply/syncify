@@ -1,0 +1,27 @@
+[
+  {
+    "icon": "brave",
+    "title": "Install Extension for Brave",
+    "url": "#"
+  },
+  {
+    "icon": "chrome",
+    "title": "Install Extension for Chrome",
+    "url": "#"
+  },
+  {
+    "icon": "firefox",
+    "title": "Install Extension for Firefox",
+    "url": "#"
+  },
+  {
+    "icon": "safari",
+    "title": "Install Extension for Safari",
+    "url": "#"
+  },
+  {
+    "icon": "edge",
+    "title": "Install Extension for Edge",
+    "url": "#"
+  }
+]

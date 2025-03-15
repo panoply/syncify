@@ -1,7 +1,26 @@
 import type { Config } from 'types';
 
+// const c = {
+//   workflow: {
+//     prod: 'production',
+//     track: [],
+//     force: [],
+//     branches: {
+//       staging: [
+//         'pre-release'
+//       ],
+//       development: [
+//         'production',
+//         'development'
+//       ]
+//     }
+//   }
+// };
+
 /**
  * Default Configuration
+ *
+ * **MODEL IS IMMUTABLE**
  *
  * This model is merged with the users config file settings and options.
  * This is reflective of the `syncify.config.js` or `syncify.json` file.
@@ -9,32 +28,13 @@ import type { Config } from 'types';
  * **Notes:**
  *
  * This model will assert defaults to be merged with the `$`, `transform` and `terser` models.
- * The defined settings will hold reference to the user defined options, the model is immutable.
+ * The defined settings will hold reference to the user defined options.
  */
 export const defaults = (): Config => ({
   input: 'source',
   output: 'theme',
-  import: 'import',
-  export: 'export',
   config: '.',
-  hot: false,
-  stores: null,
-  publish: {
-    bindVersion: false,
-    publishRole: 'unpublished',
-    themeLimit: 3,
-    tunnelPort: 80
-  },
-  spawn: {
-    build: null,
-    watch: null
-  },
-  log: {
-    clear: true,
-    silent: false,
-    stats: true,
-    warnings: true
-  },
+  editor: null,
   paths: {
     assets: 'assets/*',
     config: 'config/*.json',
@@ -43,41 +43,50 @@ export const defaults = (): Config => ({
     metafields: 'metafields/**/*.json',
     redirects: 'redirects.yaml',
     schema: 'schema/*.{schema,json}',
-    snippets: 'snippets/**/*.liquid',
-    metaobject: 'templates/metaobject/*',
-    sections: 'sections/**/*.{liquid,json}',
-    pages: 'pages/*',
     templates: 'templates/*',
-    customers: 'templates/customers/*'
-  },
-  views: {
-    sections: {
-      prefixDir: false,
-      separator: '-',
-      global: []
-    },
-    snippets: {
-      prefixDir: false,
-      separator: '-',
-      global: []
-    },
-    pages: {
-      author: '',
-      safeSync: true,
-      language: 'html',
-      suffixDir: false,
-      global: []
-    }
+    customers: 'templates/customers/*',
+    metaobject: 'templates/metaobject/*',
+    pages: 'pages/*',
+    snippets: 'snippets/**/*.liquid',
+    sections: 'sections/**/*.{liquid,json}',
+    blocks: 'blocks/*.liquid'
   },
   transform: {
     svg: null,
     style: null,
-    script: null
+    script: null,
+    json: {
+      crlf: false,
+      indent: 2,
+      useTab: false,
+      stripComments: false,
+      sortArrays: false,
+      sortObjects: false,
+      noSortList: [],
+      terse: false
+    },
+    liquid: {
+      terse: false
+    }
   },
-  terser: {
-    json: false,
-    markup: false,
-    liquid: false,
-    script: false
+  hot: {
+    server: 41001,
+    socket: 51001,
+    method: 'hot',
+    client: 'inject',
+    label: true,
+    eject: true,
+    layouts: [
+      'theme.liquid'
+    ],
+    flags: [
+      '--no-preview-bar'
+    ]
+  },
+  log: {
+    clear: true,
+    silent: false,
+    stats: true,
+    warnings: true
   }
 });

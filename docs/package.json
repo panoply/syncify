@@ -1,5 +1,5 @@
 {
-  "name": "syncify-website",
+  "name": "@syncify/docs",
   "version": "1.0.0",
   "private": true,
   "description": "Syncify documentation website",
@@ -7,9 +7,9 @@
     "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
     "url": "https://github.com/panoply"
   },
-  "license": "MIT",
+  "license": "CC BY-NC-ND 4.0",
   "scripts": {
-    "dev": "rm -rf public && concurrently \"pnpm run 11ty:watch\" \"pnpm run sass:watch\" \"pnpm tsup:watch\"",
+    "dev": "rm -rf public && conc -p \"{name}\" \"pnpm 11ty:watch\" \"pnpm sass:watch\" \"pnpm tsup:watch\"",
     "stage": "netlify dev -c \"eleventy --watch --serve --watch\" --targetPort 8080",
     "build": "rm -rf public && pnpm run 11ty:build && pnpm run sass:build && pnpm run postcss && pnpm run tsup:build",
     "postcss": "postcss public/style.css -r --no-map",
@@ -20,7 +20,7 @@
     "tsup:build": "tsup --minify --env.NODE_ENV production",
     "search:json": "tsup --env.NODE_ENV search",
     "sass:build": "sass ./src/sass/stylesheet.scss public/style.css --no-source-map",
-    "sass:watch": "sass ./src/sass/stylesheet.scss public/style.css --poll --watch"
+    "sass:watch": "sass ./src/sass/stylesheet.scss public/style.css -q --poll --watch"
   },
   "browserslist": [
     "defaults",
@@ -44,29 +44,28 @@
   "prettier": "@syncify/prettier-config",
   "dependencies": {
     "fuse.js": "^7.0.0",
+    "match-sorter": "^8.0.0",
     "qvp": "^0.3.2",
-    "relapse": "^0.9.0"
+    "relapse": "^0.9.1",
+    "spx": "0.0.1-rc.0"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^2.0.1",
+    "@11ty/eleventy": "^3.0.0",
     "@brixtol/bootstrap": "^1.7.5",
-    "@fullhuman/postcss-purgecss": "^6.0.0",
-    "@sissel/stylelint-config": "^1.2.4",
-    "@syncify/cli": "link:..",
+    "@fullhuman/postcss-purgecss": "^7.0.2",
+    "@syncify/eslint-config": "^0.1.1",
+    "@syncify/prettier-config": "^0.1.0",
+    "@syncify/stylelint-config": "^0.1.0",
     "autoprefixer": "^10.4.20",
-    "concurrently": "^8.2.2",
-    "cssnano": "^7.0.5",
-    "e11ty": "^0.0.4",
-    "gray-matter": "^4.0.3",
-    "markdown-it-anchor": "^9.0.1",
-    "markdown-it-attrs": "^4.2.0",
+    "concurrently": "^9.1.0",
+    "cssnano": "^7.0.6",
+    "e11ty": "^0.1.2",
     "markdown-it-container": "^4.0.0",
-    "marked": "^14.0.0",
-    "netlify-cli": "^17.34.2",
-    "papyrus": "^0.6.7",
-    "postcss": "^8.4.41",
+    "netlify-cli": "^17.38.1",
+    "papyrus": "^0.6.93",
+    "postcss": "^8.4.49",
     "postcss-cli": "^11.0.0",
-    "sass": "^1.77.8",
-    "tsup": "^8.2.4"
+    "sass": "^1.83.0",
+    "tsup": "^8.3.0"
   }
 }

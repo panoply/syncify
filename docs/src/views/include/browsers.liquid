@@ -1,0 +1,17 @@
+<div class="row jc-between my-5">
+  {%- for browser in browsers -%}
+    <div class="row ac-center my-2">
+      <div class="col-auto">
+        {%- assign class = browser.icon | prepend: 'icon-' -%}
+        {%- svg browser.icon  , class -%}
+      </div>
+      <div class="col">
+        <a
+          href="{{ browser.url }}"
+          class="fw-bolder link-c">
+          {{- browser.title -}}
+        </a>
+      </div>
+    </div>
+  {%- endfor -%}
+</div>

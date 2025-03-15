@@ -1,13 +1,25 @@
-/* eslint-disable no-template-curly-in-string */
 import type { Resource, Store } from 'types';
-import { list } from 'syncify:requests/themes';
-import { $ } from 'syncify:state';
-import * as log from 'syncify:log';
-import { isArray, ws } from 'syncify:utils';
-import { prompt } from 'enquirer';
-import { values } from 'syncify:native';
-import { ARR, TLD, Tree } from 'syncify:symbol';
-import { gray, lightGray, neonCyan, neonGreen, orange, red, reset, whiteBright, yellowBright } from 'syncify:colors';
+
+import { list } from 'syncify/terser/requests/themes';
+import { prompt } from 'syncify/types/dts/enquirer';
+
+import { ARR,
+  gray,
+  lightGray,
+  neonCyan,
+  neonGreen,
+  orange,
+  red,
+  reset,
+  TLD,
+  Tree,
+  whiteBright,
+  yellowBright
+} from '@syncify/ansi';
+
+import { eqWS, isArray, values } from '~utils';
+
+import { $ } from '$';
 
 interface Choice {
   name?: string
@@ -105,7 +117,7 @@ async function listThemes (store: Store) {
 
   const items = await list(store);
   const themes = items.filter(({ role }) => role !== 'demo');
-  const space = ws(themes, 'name');
+  const space = eqWS(themes, 'name');
   const choices = themes.map<Choice>((value) => {
 
     if (value.name.length > separator) separator = value.name.length;
@@ -264,7 +276,7 @@ async function listThemes (store: Store) {
 
 export async function listStores () {
 
-  const space = ws($.sync.stores, 'store');
+  const space = eqWS($.sync.stores, 'store');
   const choices = $.sync.stores.map((value) => {
     return {
       name: value.domain,

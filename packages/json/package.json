@@ -1,0 +1,77 @@
+{
+  "name": "@syncify/json",
+  "version": "0.1.1",
+  "access": "restricted",
+  "description": "Parser/evaluator for JSON files and embedded regions present within Shopify themes.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "dts": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./strip": {
+      "types": "./dist/strip.d.mts",
+      "dts": "./dist/strip.d.ts",
+      "import": "./dist/strip.mjs",
+      "require": "./dist/strip.js"
+    }
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "test": "ava",
+    "play": "ava --watch"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "json",
+    "json-format",
+    "json-diff",
+    "json-comments",
+    "json-parse",
+    "detect indent",
+    "json sorting",
+    "sorting",
+    "parse json",
+    "json stringify",
+    "syncify"
+  ],
+  "author": {
+    "name": "Νικολας Σαββιδης",
+    "url": "https://github.com/panoply/syncify",
+    "email": "n.savvidis@gmx.com"
+  },
+  "license": "Apache-2.0",
+  "tsup": {
+    "entry": [
+      "./src/index.ts",
+      "./src/strip.ts"
+    ],
+    "dts": true,
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "target": "node20",
+    "splitting": true,
+    "platform": "node",
+    "clean": true,
+    "bundle": true,
+    "external": [
+      "comment-json"
+    ],
+    "noExternal": [
+      "strip-json-comments"
+    ]
+  },
+  "devDependencies": {
+    "language-literals": "^0.0.2",
+    "strip-json-comments": "^5.0.1"
+  },
+  "dependencies": {
+    "comment-json": "^4.2.5"
+  }
+}

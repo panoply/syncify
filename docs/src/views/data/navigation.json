@@ -14,25 +14,85 @@
     "url": "https://discord.gg/shopify-developers-597504637167468564",
     "target": "_blank"
   },
-  "menu": [
+  "navbar": {
+    "documentation": {
+      "title": "Documentation",
+      "url": "/what-is-syncify/"
+    },
+    "releases": {
+      "title": "Releases",
+      "url": "/releases/latest/"
+    }
+  },
+  "releases": [
+    {
+      "title": "Releases",
+      "links": [
+        {
+          "title": "Latest",
+          "url": "/releases/latest/"
+        },
+        {
+          "title": "Next",
+          "url": "/releases/next/"
+        },
+        {
+          "title": "Unstable",
+          "url": "/releases/unstable/"
+        }
+      ]
+    },
+    {
+      "title": "1.x",
+      "links": [
+        {
+          "title": "v1.0.0-rc.1",
+          "url": "/releases/v1.0.0-rc.1/"
+        }
+      ]
+    },
+    {
+      "title": "0.x",
+      "links": [
+        {
+          "title": "v0.0.1-rc.2",
+          "url": "/releases/v0.0.1-rc.2/"
+        },
+        {
+          "title": "v0.0.1-rc.1",
+          "url": "/releases/v0.0.1-rc.1/"
+        }
+      ]
+    }
+  ],
+  "docs": [
     {
       "title": "Introduction",
       "links": [
         {
           "title": "What is Syncify?",
-          "url": "/what-is-syncify/"
+          "url": "/what-is-syncify/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "Quickstart",
+          "url": "/quickstart/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "Migration Guide",
+          "url": "/migration-guide/",
+          "navbar": "documentation"
         },
         {
           "title": "Getting Help",
-          "url": "/getting-help/"
+          "url": "/getting-help/",
+          "navbar": "documentation"
         },
         {
-          "title": "Examples",
-          "url": "/examples/"
-        },
-        {
-          "title": "Boycott Shopify CLI",
-          "url": "/examples/"
+          "title": "Syncify Straps",
+          "url": "/syncify-straps/",
+          "navbar": "documentation"
         }
       ]
     },
@@ -41,19 +101,23 @@
       "links": [
         {
           "title": "Installation",
-          "url": "/setup/installation/"
+          "url": "/setup/installation/",
+          "navbar": "documentation"
         },
         {
           "title": "Authentication",
-          "url": "/setup/authentication/"
+          "url": "/setup/authentication/",
+          "navbar": "documentation"
         },
         {
-          "title": "References",
-          "url": "/setup/references/"
+          "title": "Credentials",
+          "url": "/setup/credentials/",
+          "navbar": "documentation"
         },
         {
-          "title": "Checklist",
-          "url": "/setup/checklist/"
+          "title": "Targets",
+          "url": "/setup/targets/",
+          "navbar": "documentation"
         }
       ]
     },
@@ -61,80 +125,282 @@
       "title": "Usage",
       "links": [
         {
-          "title": "Syncify CLI",
-          "url": "/usage/syncify-cli/"
-        },
-        {
           "title": "Config Files",
-          "url": "/usage/config-files/"
+          "url": "/usage/config-files/",
+          "navbar": "documentation"
         },
         {
-          "title": "Modes",
-          "url": "/usage/syncify-cli/"
+          "title": "Syncify CLI",
+          "navbar": "documentation",
+          "links": [
+            {
+              "title": "Overview",
+              "url": "/usage/syncify-cli/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Modes",
+              "url": "/usage/modes/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Targeting",
+              "url": "/usage/targeting/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Alignment",
+              "url": "/usage/alignment/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Filtering",
+              "url": "/usage/filtering/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Environments",
+              "url": "/usage/environments/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Interfacing",
+              "url": "/usage/interfacing/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Prompts",
+              "url": "/usage/prompts/",
+              "navbar": "documentation"
+            }
+          ]
         },
         {
           "title": "Directory Structures",
-          "url": "/usage/directory-structures/"
-        },
-        {
-          "title": "Renaming Files",
-          "url": "/usage/renaming-files/"
+          "navbar": "documentation",
+          "links": [
+            {
+              "title": "Base Directories",
+              "url": "/usage/base-directories/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Path Definitions",
+              "url": "/usage/path-definitions/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Custom Structures",
+              "url": "/usage/custom-structures/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Renaming Files",
+              "url": "/usage/renaming-files/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Stash Directories",
+              "url": "/usage/stash-directories/",
+              "navbar": "documentation"
+            }
+          ]
         },
         {
           "title": "Transforms",
-          "url": "/usage/using-transforms/"
+          "navbar": "documentation",
+          "links": [
+            {
+              "title": "Overview",
+              "url": "/usage/transforms/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "JavaScript",
+              "url": "/usage/transforms/javascript/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "CSS",
+              "url": "/usage/transforms/css/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "JSON",
+              "url": "/usage/transforms/json/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "Liquid",
+              "url": "/usage/transforms/liquid/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "SVG",
+              "url": "/usage/transforms/svg/",
+              "navbar": "documentation"
+            }
+          ]
         },
         {
-          "title": "HOT Reloading",
-          "url": "/usage/using-transforms/"
+          "title": "Processors",
+          "url": "/usage/processors/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "Hot Reloading",
+          "url": "/usage/hot-reloading/",
+          "navbar": "documentation"
         },
         {
           "title": "Shared Schema",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/shared-schema/",
+          "navbar": "documentation"
         },
         {
           "title": "Markdown Pages",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/markdown-pages/",
+          "navbar": "documentation"
         },
         {
           "title": "Metafields",
-          "url": "/usage/using-transforms/"
-        },
-        {
-          "title": "Frontmatter",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/metafields/",
+          "navbar": "documentation"
         },
         {
           "title": "Terse Output",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/terse-output/",
+          "navbar": "documentation"
         },
         {
-          "title": "Remote Bindings",
-          "url": "/usage/using-transforms/"
+          "title": "Live Bindings",
+          "url": "/usage/remote-bindings/",
+          "navbar": "documentation"
         },
         {
           "title": "Multistore Support",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/multistore-support/",
+          "navbar": "documentation"
         },
         {
           "title": "Version Control",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/version-control/",
+          "navbar": "documentation"
         },
         {
-          "title": "Publishing Themes",
-          "url": "/usage/using-transforms/"
+          "title": "Git Integration",
+          "url": "/usage/git-integration/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "Navigation",
+          "url": "/usage/navigation/",
+          "navbar": "documentation"
         },
         {
           "title": "Redirects",
-          "url": "/usage/using-transforms/"
+          "url": "/usage/redirects/",
+          "navbar": "documentation"
+        }
+      ]
+    },
+    {
+      "title": "CLI",
+      "links": [
+        {
+          "title": "sy create",
+          "url": "/cli/sy-create/",
+          "navbar": "documentation"
         },
         {
-          "title": "Strap Generator",
-          "url": "/usage/syncify-cli/"
+          "title": "sy setup",
+          "url": "/cli/sy-setup/",
+          "navbar": "documentation"
         },
         {
-          "title": "Troubleshoot",
-          "url": "/usage/using-transforms/"
+          "title": "sy build",
+          "url": "/cli/sy-build/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy watch",
+          "url": "/cli/sy-watch/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy pull",
+          "url": "/cli/sy-pull/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy push",
+          "url": "/cli/sy-push/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy pack",
+          "url": "/cli/sy-pack/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy delete",
+          "url": "/cli/sy-delete/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy duplicate",
+          "url": "/cli/sy-duplicate/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy publish",
+          "url": "/cli/sy-publish/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy theme",
+          "url": "/cli/sy-theme/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy keychain",
+          "url": "/cli/sy-keychain/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy prune",
+          "url": "/cli/sy-prune/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy git",
+          "url": "/cli/sy-git/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy version",
+          "url": "/cli/sy-version/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy projects",
+          "url": "/cli/sy-projects/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy inspect",
+          "url": "/cli/sy-inspect/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy help",
+          "url": "/cli/sy-help/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "sy doctor",
+          "url": "/cli/sy-doctor/",
+          "navbar": "documentation"
         }
       ]
     },
@@ -142,38 +408,109 @@
       "title": "Options",
       "links": [
         {
-          "title": "Input",
-          "url": "/configuration/input/"
+          "title": "input",
+          "url": "/options/input/",
+          "navbar": "documentation"
         },
         {
-          "title": "Output",
-          "url": "/configuration/output/"
-        }
-      ]
-    },
-    {
-      "title": "CLI Commands",
-      "links": [
-        {
-          "title": "Modes",
-          "url": "/cli-commands/modes/"
-        }
-      ]
-    },
-    {
-      "title": "Integrate",
-      "links": [
-        {
-          "title": "CI Solution",
-          "url": "/integrate/ci-solution/"
+          "title": "output",
+          "url": "/options/output/",
+          "navbar": "documentation"
         },
         {
-          "title": "Github",
-          "url": "/integrate/git/"
+          "title": "config",
+          "url": "/options/config/",
+          "navbar": "documentation"
         },
         {
-          "title": "VSCode",
-          "url": "/integrate/vscode/"
+          "title": "paths",
+          "url": "/options/paths/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "hot",
+          "url": "/options/hot/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "clean",
+          "url": "/options/clean/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "git",
+          "url": "/options/paths/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "log",
+          "url": "/options/log/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "editor",
+          "url": "/options/editor/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "transform",
+          "links": [
+            {
+              "title": "script",
+              "url": "/options/transform/script/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "style",
+              "url": "/options/transform/style/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "svg",
+              "url": "/options/transform/svg/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "json",
+              "url": "/options/transform/json/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "liquid",
+              "url": "/options/transform/liquid/",
+              "navbar": "documentation"
+            }
+          ]
+        },
+        {
+          "title": "processor",
+          "links": [
+            {
+              "title": "esbuild",
+              "url": "/options/processors/esbuild/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sass",
+              "url": "/options/processors/sass/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "postcss",
+              "url": "/options/processors/postcss/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "tailwind",
+              "url": "/options/processors/tailwind/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "svgo",
+              "url": "/options/processors/svgo/",
+              "navbar": "documentation"
+            }
+          ]
         }
       ]
     }

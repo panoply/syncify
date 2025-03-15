@@ -1,14 +1,18 @@
 import type PostCSS from 'postcss';
 import type SASS from 'sass';
-import { join, relative } from 'pathe';
-import { File, StyleTransform, Syncify, Processors } from 'types';
+
+import { join, relative } from 'node:path';
+
 import { readFile, writeFile } from 'fs-extra';
-import { isNil } from 'rambdax';
-import { isFunction, isString, isUndefined, isBuffer, nl, wsr } from 'syncify:utils/native';
-import { byteSize, fileSize } from 'syncify:utils/utils';
-import * as timer from 'syncify:utils/timer';
-import { error, log, bold, warning } from 'syncify:log';
-import { $, cache, processor } from 'syncify:state';
+import { File, Processors, StyleTransform, Syncify } from 'types';
+
+import * as timer from '@syncify/timer';
+
+import { bold, error, log, warning } from '~cli/log';
+import { byteSize, fileSize, isNil } from '~utils';
+import { isBuffer, isFunction, isString, isUndefined, nl, wsr } from '~utils/native';
+
+import { $, cache, processor } from '$';
 
 /**
  * PostCSS Module

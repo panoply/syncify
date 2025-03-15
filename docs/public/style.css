@@ -359,20 +359,20 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
 }
 
 h1, .h1 {
-  font-size: calc(1.279rem + 0.348vw);
+  font-size: calc(1.268rem + 0.216vw);
 }
 @media (min-width: 1200px) {
   h1, .h1 {
-    font-size: 1.54rem;
+    font-size: 1.43rem;
   }
 }
 
 h2, .h2 {
-  font-size: calc(1.268rem + 0.216vw);
+  font-size: calc(1.257rem + 0.084vw);
 }
 @media (min-width: 1200px) {
   h2, .h2 {
-    font-size: 1.43rem;
+    font-size: 1.32rem;
   }
 }
 
@@ -389,7 +389,7 @@ h5, .h5 {
 }
 
 h6, .h6 {
-  font-size: 1.1rem;
+  font-size: 0.895rem;
 }
 
 p {
@@ -5600,7 +5600,7 @@ html.overlay {
   color: #fff;
   border-color: black;
   background-color: black;
-  box-shadow: 0 0 0 0.15rem rgba(38, 38, 38, 0.5);
+  box-shadow: 0 0 0 0.15rem rgba(38.25, 38.25, 38.25, 0.5);
 }
 .btn.bg-black:active, .btn.bg-black.active {
   color: #fff;
@@ -5608,7 +5608,7 @@ html.overlay {
   border-color: black;
 }
 .btn.bg-black:active:focus, .btn.bg-black.active:focus {
-  box-shadow: 0 0 0 0.15rem rgba(38, 38, 38, 0.5);
+  box-shadow: 0 0 0 0.15rem rgba(38.25, 38.25, 38.25, 0.5);
 }
 .btn.bg-black:disabled, .btn.bg-black.disabled {
   color: #fff;
@@ -5630,7 +5630,7 @@ html.overlay {
   color: #000;
   border-color: white;
   background-color: white;
-  box-shadow: 0 0 0 0.15rem rgba(217, 217, 217, 0.5);
+  box-shadow: 0 0 0 0.15rem rgba(216.75, 216.75, 216.75, 0.5);
 }
 .btn.bg-white:active, .btn.bg-white.active {
   color: #000;
@@ -5638,7 +5638,7 @@ html.overlay {
   border-color: white;
 }
 .btn.bg-white:active:focus, .btn.bg-white.active:focus {
-  box-shadow: 0 0 0 0.15rem rgba(217, 217, 217, 0.5);
+  box-shadow: 0 0 0 0.15rem rgba(216.75, 216.75, 216.75, 0.5);
 }
 .btn.bg-white:disabled, .btn.bg-white.disabled {
   color: #000;
@@ -5653,22 +5653,22 @@ html.overlay {
 }
 .btn.bg-gray:hover {
   color: #000;
-  background-color: #a7b3be;
-  border-color: #a2aebb;
+  background-color: rgb(167.45, 178.5, 190.4);
+  border-color: rgb(162.3, 174, 186.6);
 }
 .btn.bg-gray:focus {
   color: #000;
-  border-color: #a2aebb;
-  background-color: #a7b3be;
-  box-shadow: 0 0 0 0.15rem rgba(129, 140, 152, 0.5);
+  border-color: rgb(162.3, 174, 186.6);
+  background-color: rgb(167.45, 178.5, 190.4);
+  box-shadow: 0 0 0 0.15rem rgba(129.2, 140.25, 152.15, 0.5);
 }
 .btn.bg-gray:active, .btn.bg-gray.active {
   color: #000;
-  background-color: #adb7c2;
-  border-color: #a2aebb;
+  background-color: rgb(172.6, 183, 194.2);
+  border-color: rgb(162.3, 174, 186.6);
 }
 .btn.bg-gray:active:focus, .btn.bg-gray.active:focus {
-  box-shadow: 0 0 0 0.15rem rgba(129, 140, 152, 0.5);
+  box-shadow: 0 0 0 0.15rem rgba(129.2, 140.25, 152.15, 0.5);
 }
 .btn.bg-gray:disabled, .btn.bg-gray.disabled {
   color: #000;
@@ -5683,22 +5683,22 @@ html.overlay {
 }
 .btn.bg-red:hover {
   color: #fff;
-  background-color: #bb2d3b;
-  border-color: #b02a37;
+  background-color: rgb(187, 45.05, 58.65);
+  border-color: rgb(176, 42.4, 55.2);
 }
 .btn.bg-red:focus {
   color: #fff;
-  border-color: #b02a37;
-  background-color: #bb2d3b;
-  box-shadow: 0 0 0 0.15rem rgba(225, 83, 97, 0.5);
+  border-color: rgb(176, 42.4, 55.2);
+  background-color: rgb(187, 45.05, 58.65);
+  box-shadow: 0 0 0 0.15rem rgba(225.25, 83.3, 96.9, 0.5);
 }
 .btn.bg-red:active, .btn.bg-red.active {
   color: #fff;
-  background-color: #b02a37;
-  border-color: #a52834;
+  background-color: rgb(176, 42.4, 55.2);
+  border-color: rgb(165, 39.75, 51.75);
 }
 .btn.bg-red:active:focus, .btn.bg-red.active:focus {
-  box-shadow: 0 0 0 0.15rem rgba(225, 83, 97, 0.5);
+  box-shadow: 0 0 0 0.15rem rgba(225.25, 83.3, 96.9, 0.5);
 }
 .btn.bg-red:disabled, .btn.bg-red.disabled {
   color: #fff;
@@ -5713,22 +5713,22 @@ html.overlay {
 }
 .btn.bg-green:hover {
   color: #fff;
-  background-color: #157347;
-  border-color: #146c43;
+  background-color: rgb(21.25, 114.75, 71.4);
+  border-color: rgb(20, 108, 67.2);
 }
 .btn.bg-green:focus {
   color: #fff;
-  border-color: #146c43;
-  background-color: #157347;
-  box-shadow: 0 0 0 0.15rem rgba(60, 153, 110, 0.5);
+  border-color: rgb(20, 108, 67.2);
+  background-color: rgb(21.25, 114.75, 71.4);
+  box-shadow: 0 0 0 0.15rem rgba(59.5, 153, 109.65, 0.5);
 }
 .btn.bg-green:active, .btn.bg-green.active {
   color: #fff;
-  background-color: #146c43;
-  border-color: #13653f;
+  background-color: rgb(20, 108, 67.2);
+  border-color: rgb(18.75, 101.25, 63);
 }
 .btn.bg-green:active:focus, .btn.bg-green.active:focus {
-  box-shadow: 0 0 0 0.15rem rgba(60, 153, 110, 0.5);
+  box-shadow: 0 0 0 0.15rem rgba(59.5, 153, 109.65, 0.5);
 }
 .btn.bg-green:disabled, .btn.bg-green.disabled {
   color: #fff;
@@ -6418,7 +6418,7 @@ input.fm-input::file-selector-button {
 }
 textarea.fm-input:hover:not(:disabled):not([readonly])::file-selector-button,
 input.fm-input:hover:not(:disabled):not([readonly])::file-selector-button {
-  background-color: #ececec;
+  background-color: rgb(235.6, 235.6, 235.6);
 }
 
 textarea {
@@ -7955,6 +7955,8 @@ textarea.fm-input.is-invalid {
   --papyrus-bash-comment: #888;
   --papyrus-bash-punctuation: #888;
   --papyrus-bash-argument: #F48FB1;
+  --papyrus-bash-target: #FFF9A6;
+  --papyrus-bash-title: #338ec8;
   /* -------------------------------------------- */
   /* TREEVIEW                                     */
   /* -------------------------------------------- */
@@ -8838,46 +8840,72 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-bash .token.argument {
   color: var(--papyrus-bash-argument);
 }
+.language-bash .token.target {
+  color: var(--papyrus-bash-target);
+}
+.language-bash .token.title {
+  color: var(--papyrus-bash-title);
+}
 
 /* stylelint-disable color-hex-length */
 .language-markup .token.doctype-tag,
-.language-html .token.doctype-tag {
+.language-html .token.doctype-tag,
+.language-javascript .template-spx .token.string .token.doctype-tag,
+.language-typescript .template-spx .token.string .token.doctype-tag {
   color: var(--papyrus-html-doctype);
 }
 .language-markup .token.doctype .token.name,
-.language-html .token.doctype .token.name {
+.language-html .token.doctype .token.name,
+.language-javascript .template-spx .token.string .token.doctype .token.name,
+.language-typescript .template-spx .token.string .token.doctype .token.name {
   color: var(--papyrus-html-delimiter);
 }
 .language-markup .token.name,
-.language-html .token.name {
+.language-html .token.name,
+.language-javascript .template-spx .token.string .token.name,
+.language-typescript .template-spx .token.string .token.name {
   color: var(--papyrus-html-tag-name);
 }
 .language-markup .token.comment,
-.language-html .token.comment {
+.language-html .token.comment,
+.language-javascript .template-spx .token.string .token.comment,
+.language-typescript .template-spx .token.string .token.comment {
   color: var(--papyrus-html-comment);
 }
 .language-markup .token.punctuation,
-.language-html .token.punctuation {
+.language-html .token.punctuation,
+.language-javascript .template-spx .token.string .token.punctuation,
+.language-typescript .template-spx .token.string .token.punctuation {
   color: var(--papyrus-html-delimiter);
 }
 .language-markup .token.tag,
-.language-html .token.tag {
+.language-html .token.tag,
+.language-javascript .template-spx .token.string .token.tag,
+.language-typescript .template-spx .token.string .token.tag {
   color: var(--papyrus-html-tag-name);
 }
 .language-markup .token.attr-equals,
-.language-html .token.attr-equals {
+.language-html .token.attr-equals,
+.language-javascript .template-spx .token.string .token.attr-equals,
+.language-typescript .template-spx .token.string .token.attr-equals {
   color: var(--papyrus-html-equals);
 }
 .language-markup .token.spx-attr-name,
-.language-html .token.spx-attr-name {
+.language-html .token.spx-attr-name,
+.language-javascript .template-spx .token.string .token.spx-attr-name,
+.language-typescript .template-spx .token.string .token.spx-attr-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name,
-.language-html .token.attr-name {
+.language-html .token.attr-name,
+.language-javascript .template-spx .token.string .token.attr-name,
+.language-typescript .template-spx .token.string .token.attr-name {
   color: var(--papyrus-html-attr-name);
 }
 .language-markup .token.attr-name > .spx-name,
-.language-html .token.attr-name > .spx-name {
+.language-html .token.attr-name > .spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .spx-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name > .at-window-notation > .prefix,
@@ -8891,178 +8919,286 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-html .token.attr-name > .at-window-notation > .spx-name,
 .language-html .token.attr-name > .at-notation > .prefix,
 .language-html .token.attr-name > .at-notation > .window,
-.language-html .token.attr-name > .at-notation > .spx-name {
+.language-html .token.attr-name > .at-notation > .spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .prefix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .prefix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .prefix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .prefix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .spx-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name > .at-window-notation > .window,
 .language-markup .token.attr-name > .at-notation > .window,
 .language-html .token.attr-name > .at-window-notation > .window,
-.language-html .token.attr-name > .at-notation > .window {
+.language-html .token.attr-name > .at-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .window {
   color: var(--papyrus-spx-window);
 }
 .language-markup .token.attr-name > .at-window-notation > .symbol,
 .language-markup .token.attr-name > .at-notation > .symbol,
 .language-html .token.attr-name > .at-window-notation > .symbol,
-.language-html .token.attr-name > .at-notation > .symbol {
+.language-html .token.attr-name > .at-notation > .symbol,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .symbol,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .symbol,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .symbol,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .symbol {
   color: var(--papyrus-spx-symbol);
 }
 .language-markup .token.attr-name > .at-window-notation > .suffix,
 .language-markup .token.attr-name > .at-notation > .suffix,
 .language-html .token.attr-name > .at-window-notation > .suffix,
-.language-html .token.attr-name > .at-notation > .suffix {
+.language-html .token.attr-name > .at-notation > .suffix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .suffix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .suffix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .suffix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .suffix {
   color: var(--papyrus-spx-method);
 }
 .language-markup .token.attr-name > .ns-notation > .prefix, .language-markup .token.attr-name > .ns-notation.spx-name,
 .language-html .token.attr-name > .ns-notation > .prefix,
-.language-html .token.attr-name > .ns-notation.spx-name {
+.language-html .token.attr-name > .ns-notation.spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation > .prefix,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation.spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation > .prefix,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation.spx-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name > .ns-notation > .symbol,
-.language-html .token.attr-name > .ns-notation > .symbol {
+.language-html .token.attr-name > .ns-notation > .symbol,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation > .symbol,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation > .symbol {
   color: var(--papyrus-spx-symbol);
 }
 .language-markup .token.attr-name > .ns-notation > .suffix,
-.language-html .token.attr-name > .ns-notation > .suffix {
+.language-html .token.attr-name > .ns-notation > .suffix,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation > .suffix,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation > .suffix {
   color: var(--papyrus-spx-suffix);
 }
 .language-markup .token.spx-attr .attr-equals,
-.language-html .token.spx-attr .attr-equals {
+.language-html .token.spx-attr .attr-equals,
+.language-javascript .template-spx .token.string .token.spx-attr .attr-equals,
+.language-typescript .template-spx .token.string .token.spx-attr .attr-equals {
   color: var(--papyrus-html-equals);
 }
 .language-markup .token.spx-attr .punctuation,
-.language-html .token.spx-attr .punctuation {
+.language-html .token.spx-attr .punctuation,
+.language-javascript .template-spx .token.string .token.spx-attr .punctuation,
+.language-typescript .template-spx .token.string .token.spx-attr .punctuation {
   color: var(--papyrus-html-attr-value);
 }
 .language-markup .token.spx-attr .punctuation.attr-equals,
-.language-html .token.spx-attr .punctuation.attr-equals {
+.language-html .token.spx-attr .punctuation.attr-equals,
+.language-javascript .template-spx .token.string .token.spx-attr .punctuation.attr-equals,
+.language-typescript .template-spx .token.string .token.spx-attr .punctuation.attr-equals {
   color: var(--papyrus-html-equals);
 }
 .language-markup .token.spx-attr .component-name,
-.language-html .token.spx-attr .component-name {
+.language-html .token.spx-attr .component-name,
+.language-javascript .template-spx .token.string .token.spx-attr .component-name,
+.language-typescript .template-spx .token.string .token.spx-attr .component-name {
   color: var(--papyrus-spx-component-name);
 }
 .language-markup .token.spx-attr .component-name > .alias,
-.language-html .token.spx-attr .component-name > .alias {
+.language-html .token.spx-attr .component-name > .alias,
+.language-javascript .template-spx .token.string .token.spx-attr .component-name > .alias,
+.language-typescript .template-spx .token.string .token.spx-attr .component-name > .alias {
   color: var(--papyrus-spx-component-alias);
 }
 .language-markup .token.spx-attr .separtor,
-.language-html .token.spx-attr .separtor {
+.language-html .token.spx-attr .separtor,
+.language-javascript .template-spx .token.string .token.spx-attr .separtor,
+.language-typescript .template-spx .token.string .token.spx-attr .separtor {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr .event-key,
-.language-html .token.spx-attr .event-key {
+.language-html .token.spx-attr .event-key,
+.language-javascript .template-spx .token.string .token.spx-attr .event-key,
+.language-typescript .template-spx .token.string .token.spx-attr .event-key {
   color: var(--papyrus-spx-event-key);
 }
 .language-markup .token.spx-attr .event-method,
-.language-html .token.spx-attr .event-method {
+.language-html .token.spx-attr .event-method,
+.language-javascript .template-spx .token.string .token.spx-attr .event-method,
+.language-typescript .template-spx .token.string .token.spx-attr .event-method {
   color: var(--papyrus-spx-event-method);
 }
 .language-markup .token.spx-attr > .bind-notation > .token.key,
-.language-html .token.spx-attr > .bind-notation > .token.key {
+.language-html .token.spx-attr > .bind-notation > .token.key,
+.language-javascript .template-spx .token.string .token.spx-attr > .bind-notation > .token.key,
+.language-typescript .template-spx .token.string .token.spx-attr > .bind-notation > .token.key {
   color: var(--papyrus-spx-event-key);
 }
 .language-markup .token.spx-attr > .bind-notation > .token.dot,
-.language-html .token.spx-attr > .bind-notation > .token.dot {
+.language-html .token.spx-attr > .bind-notation > .token.dot,
+.language-javascript .template-spx .token.string .token.spx-attr > .bind-notation > .token.dot,
+.language-typescript .template-spx .token.string .token.spx-attr > .bind-notation > .token.dot {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr > .bind-notation > .token.val,
-.language-html .token.spx-attr > .bind-notation > .token.val {
+.language-html .token.spx-attr > .bind-notation > .token.val,
+.language-javascript .template-spx .token.string .token.spx-attr > .bind-notation > .token.val,
+.language-typescript .template-spx .token.string .token.spx-attr > .bind-notation > .token.val {
   color: var(--papyrus-spx-identifier);
 }
 .language-markup .token.spx-attr > .dot-notation > .token.key,
-.language-html .token.spx-attr > .dot-notation > .token.key {
+.language-html .token.spx-attr > .dot-notation > .token.key,
+.language-javascript .template-spx .token.string .token.spx-attr > .dot-notation > .token.key,
+.language-typescript .template-spx .token.string .token.spx-attr > .dot-notation > .token.key {
   color: var(--papyrus-spx-event-key);
 }
 .language-markup .token.spx-attr > .dot-notation > .token.dot,
-.language-html .token.spx-attr > .dot-notation > .token.dot {
+.language-html .token.spx-attr > .dot-notation > .token.dot,
+.language-javascript .template-spx .token.string .token.spx-attr > .dot-notation > .token.dot,
+.language-typescript .template-spx .token.string .token.spx-attr > .dot-notation > .token.dot {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr > .dot-notation > .token.val,
-.language-html .token.spx-attr > .dot-notation > .token.val {
+.language-html .token.spx-attr > .dot-notation > .token.val,
+.language-javascript .template-spx .token.string .token.spx-attr > .dot-notation > .token.val,
+.language-typescript .template-spx .token.string .token.spx-attr > .dot-notation > .token.val {
   color: var(--papyrus-spx-identifier);
 }
 .language-markup .token.spx-attr > .event-struct-on > .token.option,
 .language-markup .token.spx-attr > .event-struct > .token.option,
 .language-html .token.spx-attr > .event-struct-on > .token.option,
-.language-html .token.spx-attr > .event-struct > .token.option {
+.language-html .token.spx-attr > .event-struct > .token.option,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.option,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct > .token.option,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.option,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct > .token.option {
   color: var(--papyrus-spx-event-option);
 }
 .language-markup .token.spx-attr > .event-struct-on > .token.comma,
 .language-markup .token.spx-attr > .event-struct > .token.comma,
 .language-html .token.spx-attr > .event-struct-on > .token.comma,
-.language-html .token.spx-attr > .event-struct > .token.comma {
+.language-html .token.spx-attr > .event-struct > .token.comma,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.comma,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct > .token.comma,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.comma,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct > .token.comma {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr > .event-struct-on > .token.delim,
 .language-markup .token.spx-attr > .event-struct > .token.delim,
 .language-html .token.spx-attr > .event-struct-on > .token.delim,
-.language-html .token.spx-attr > .event-struct > .token.delim {
+.language-html .token.spx-attr > .event-struct > .token.delim,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.delim,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct > .token.delim,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.delim,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct > .token.delim {
   color: var(--papyrus-spx-delims);
 }
 .language-markup .token.attr-value,
-.language-html .token.attr-value {
+.language-html .token.attr-value,
+.language-javascript .template-spx .token.string .token.attr-value,
+.language-typescript .template-spx .token.string .token.attr-value {
   color: var(--papyrus-html-attr-value);
 }
 .language-markup .token.attr-value > .token.punctuation:not(.attr-equals),
-.language-html .token.attr-value > .token.punctuation:not(.attr-equals) {
+.language-html .token.attr-value > .token.punctuation:not(.attr-equals),
+.language-javascript .template-spx .token.string .token.attr-value > .token.punctuation:not(.attr-equals),
+.language-typescript .template-spx .token.string .token.attr-value > .token.punctuation:not(.attr-equals) {
   color: var(--papyrus-html-attr-value);
 }
 .language-markup .token.attr-value > .token.number, .language-markup .token.attr-value > .token.integer,
 .language-html .token.attr-value > .token.number,
-.language-html .token.attr-value > .token.integer {
+.language-html .token.attr-value > .token.integer,
+.language-javascript .template-spx .token.string .token.attr-value > .token.number,
+.language-javascript .template-spx .token.string .token.attr-value > .token.integer,
+.language-typescript .template-spx .token.string .token.attr-value > .token.number,
+.language-typescript .template-spx .token.string .token.attr-value > .token.integer {
   color: var(--papyrus-spx-number);
 }
 .language-markup .token.attr-value > .token.boolean,
-.language-html .token.attr-value > .token.boolean {
+.language-html .token.attr-value > .token.boolean,
+.language-javascript .template-spx .token.string .token.attr-value > .token.boolean,
+.language-typescript .template-spx .token.string .token.attr-value > .token.boolean {
   color: var(--papyrus-spx-boolean);
 }
 .language-markup .token.attr-value > .token.script > .token.keyword,
-.language-html .token.attr-value > .token.script > .token.keyword {
+.language-html .token.attr-value > .token.script > .token.keyword,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.keyword,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.keyword {
   color: var(--papyrus-js-keyword);
 }
 .language-markup .token.attr-value > .token.script > .token.punctuation,
-.language-html .token.attr-value > .token.script > .token.punctuation {
+.language-html .token.attr-value > .token.script > .token.punctuation,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation {
   color: var(--papyrus-spx-delims);
 }
 .language-markup .token.attr-value > .token.script > .token.punctuation-chars,
-.language-html .token.attr-value > .token.script > .token.punctuation-chars {
+.language-html .token.attr-value > .token.script > .token.punctuation-chars,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation-chars,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation-chars {
   color: var(--papyrus-js-special-chars);
 }
 .language-markup .token.attr-value > .token.script > .token.variable,
-.language-html .token.attr-value > .token.script > .token.variable {
+.language-html .token.attr-value > .token.script > .token.variable,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.variable,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.variable {
   color: var(--papyrus-js-variable);
 }
 .language-markup .token.attr-value > .token.script > .token.object,
-.language-html .token.attr-value > .token.script > .token.object {
+.language-html .token.attr-value > .token.script > .token.object,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.object,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.object {
   color: var(--papyrus-js-object);
 }
 .language-markup .token.attr-value > .token.script > .token.operator,
-.language-html .token.attr-value > .token.script > .token.operator {
+.language-html .token.attr-value > .token.script > .token.operator,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.operator,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.operator {
   color: var(--papyrus-js-operator);
 }
 .language-markup .token.attr-value > .token.script > .token.operation,
-.language-html .token.attr-value > .token.script > .token.operation {
+.language-html .token.attr-value > .token.script > .token.operation,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.operation,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.operation {
   color: var(--papyrus-js-operation);
 }
 .language-markup .token.attr-value > .token.script > .token.function-name,
-.language-html .token.attr-value > .token.script > .token.function-name {
+.language-html .token.attr-value > .token.script > .token.function-name,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.function-name,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.function-name {
   color: var(--papyrus-js-function-name);
 }
 .language-markup .token.attr-value > .token.script > .token.number,
-.language-html .token.attr-value > .token.script > .token.number {
+.language-html .token.attr-value > .token.script > .token.number,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.number,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.number {
   color: var(--papyrus-spx-number);
 }
 .language-markup .token.attr-value > .token.script > .token.literal-property, .language-markup .token.attr-value > .token.script > .token.property,
 .language-html .token.attr-value > .token.script > .token.literal-property,
-.language-html .token.attr-value > .token.script > .token.property {
+.language-html .token.attr-value > .token.script > .token.property,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.literal-property,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.property,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.literal-property,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.property {
   color: var(--papyrus-js-literal-property);
 }
 .language-markup .token.attr-value > .token.script > .token.semi,
-.language-html .token.attr-value > .token.script > .token.semi {
+.language-html .token.attr-value > .token.script > .token.semi,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.semi,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.semi {
   color: var(--papyrus-js-semi);
 }
 .language-markup .token.attr-value > .token.script > .token.boolean,
-.language-html .token.attr-value > .token.script > .token.boolean {
+.language-html .token.attr-value > .token.script > .token.boolean,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.boolean,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.boolean {
   color: var(--papyrus-spx-boolean);
 }
 
@@ -9231,7 +9367,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-js .token.this {
   color: var(--papyrus-js-this);
 }
-.language-javascript .token.module,
+.language-javascript .token.import-type, .language-javascript .token.module,
+.language-js .token.import-type,
 .language-js .token.module {
   color: var(--papyrus-js-module);
 }
@@ -9251,7 +9388,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-js .token.regex-flags {
   color: var(--papyrus-js-regex-flags);
 }
-.language-javascript .token.browser-objects,
+.language-javascript .token.spx-object, .language-javascript .token.browser-objects,
+.language-js .token.spx-object,
 .language-js .token.browser-objects {
   color: var(--papyrus-js-browser-objects);
 }
@@ -9259,6 +9397,10 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-js .token.literal-property,
 .language-js .token.property {
   color: var(--papyrus-js-literal-property);
+}
+.language-javascript .token.nil,
+.language-js .token.nil {
+  color: #912bff;
 }
 .language-javascript .token.string, .language-javascript .token.string-property,
 .language-js .token.string,
@@ -9276,6 +9418,11 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-javascript .token.bracket > .keyword,
 .language-js .token.bracket > .keyword {
   color: var(--papyrus-js-this);
+}
+.language-javascript .token.paren-brace-open, .language-javascript .token.paren-brace-close,
+.language-js .token.paren-brace-open,
+.language-js .token.paren-brace-close {
+  color: var(--papyrus-ts-bracket);
 }
 .language-javascript .token.sin,
 .language-js .token.sin {
@@ -9366,7 +9513,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-ts .token.class-name {
   color: var(--papyrus-ts-class-name);
 }
-.language-typescript .token.builtin,
+.language-typescript .token.spx-object, .language-typescript .token.builtin,
+.language-ts .token.spx-object,
 .language-ts .token.builtin {
   color: var(--papyrus-ts-function-name);
 }
@@ -9386,7 +9534,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-ts .token.semi {
   color: var(--papyrus-ts-semi);
 }
-.language-typescript .token.module,
+.language-typescript .token.import-type, .language-typescript .token.module,
+.language-ts .token.import-type,
 .language-ts .token.module {
   color: var(--papyrus-ts-module);
 }
@@ -9423,6 +9572,10 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-ts .token.type-constructors {
   color: var(--papyrus-ts-type-constructor);
 }
+.language-typescript .token.nil,
+.language-ts .token.nil {
+  color: #912bff;
+}
 .language-typescript .token.bracket > .punctuation,
 .language-ts .token.bracket > .punctuation {
   color: var(--papyrus-ts-bracket);
@@ -9430,6 +9583,11 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-typescript .token.bracket > .keyword,
 .language-ts .token.bracket > .keyword {
   color: var(--papyrus-ts-this);
+}
+.language-typescript .token.paren-brace-open, .language-typescript .token.paren-brace-close,
+.language-ts .token.paren-brace-open,
+.language-ts .token.paren-brace-close {
+  color: var(--papyrus-ts-bracket);
 }
 
 /* stylelint-disable color-hex-length */
@@ -9826,46 +9984,72 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-bash .token.argument {
   color: var(--papyrus-bash-argument);
 }
+.language-bash .token.target {
+  color: var(--papyrus-bash-target);
+}
+.language-bash .token.title {
+  color: var(--papyrus-bash-title);
+}
 
 /* stylelint-disable color-hex-length */
 .language-markup .token.doctype-tag,
-.language-html .token.doctype-tag {
+.language-html .token.doctype-tag,
+.language-javascript .template-spx .token.string .token.doctype-tag,
+.language-typescript .template-spx .token.string .token.doctype-tag {
   color: var(--papyrus-html-doctype);
 }
 .language-markup .token.doctype .token.name,
-.language-html .token.doctype .token.name {
+.language-html .token.doctype .token.name,
+.language-javascript .template-spx .token.string .token.doctype .token.name,
+.language-typescript .template-spx .token.string .token.doctype .token.name {
   color: var(--papyrus-html-delimiter);
 }
 .language-markup .token.name,
-.language-html .token.name {
+.language-html .token.name,
+.language-javascript .template-spx .token.string .token.name,
+.language-typescript .template-spx .token.string .token.name {
   color: var(--papyrus-html-tag-name);
 }
 .language-markup .token.comment,
-.language-html .token.comment {
+.language-html .token.comment,
+.language-javascript .template-spx .token.string .token.comment,
+.language-typescript .template-spx .token.string .token.comment {
   color: var(--papyrus-html-comment);
 }
 .language-markup .token.punctuation,
-.language-html .token.punctuation {
+.language-html .token.punctuation,
+.language-javascript .template-spx .token.string .token.punctuation,
+.language-typescript .template-spx .token.string .token.punctuation {
   color: var(--papyrus-html-delimiter);
 }
 .language-markup .token.tag,
-.language-html .token.tag {
+.language-html .token.tag,
+.language-javascript .template-spx .token.string .token.tag,
+.language-typescript .template-spx .token.string .token.tag {
   color: var(--papyrus-html-tag-name);
 }
 .language-markup .token.attr-equals,
-.language-html .token.attr-equals {
+.language-html .token.attr-equals,
+.language-javascript .template-spx .token.string .token.attr-equals,
+.language-typescript .template-spx .token.string .token.attr-equals {
   color: var(--papyrus-html-equals);
 }
 .language-markup .token.spx-attr-name,
-.language-html .token.spx-attr-name {
+.language-html .token.spx-attr-name,
+.language-javascript .template-spx .token.string .token.spx-attr-name,
+.language-typescript .template-spx .token.string .token.spx-attr-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name,
-.language-html .token.attr-name {
+.language-html .token.attr-name,
+.language-javascript .template-spx .token.string .token.attr-name,
+.language-typescript .template-spx .token.string .token.attr-name {
   color: var(--papyrus-html-attr-name);
 }
 .language-markup .token.attr-name > .spx-name,
-.language-html .token.attr-name > .spx-name {
+.language-html .token.attr-name > .spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .spx-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name > .at-window-notation > .prefix,
@@ -9879,178 +10063,286 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-html .token.attr-name > .at-window-notation > .spx-name,
 .language-html .token.attr-name > .at-notation > .prefix,
 .language-html .token.attr-name > .at-notation > .window,
-.language-html .token.attr-name > .at-notation > .spx-name {
+.language-html .token.attr-name > .at-notation > .spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .prefix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .prefix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .prefix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .prefix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .spx-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name > .at-window-notation > .window,
 .language-markup .token.attr-name > .at-notation > .window,
 .language-html .token.attr-name > .at-window-notation > .window,
-.language-html .token.attr-name > .at-notation > .window {
+.language-html .token.attr-name > .at-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .window,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .window {
   color: var(--papyrus-spx-window);
 }
 .language-markup .token.attr-name > .at-window-notation > .symbol,
 .language-markup .token.attr-name > .at-notation > .symbol,
 .language-html .token.attr-name > .at-window-notation > .symbol,
-.language-html .token.attr-name > .at-notation > .symbol {
+.language-html .token.attr-name > .at-notation > .symbol,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .symbol,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .symbol,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .symbol,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .symbol {
   color: var(--papyrus-spx-symbol);
 }
 .language-markup .token.attr-name > .at-window-notation > .suffix,
 .language-markup .token.attr-name > .at-notation > .suffix,
 .language-html .token.attr-name > .at-window-notation > .suffix,
-.language-html .token.attr-name > .at-notation > .suffix {
+.language-html .token.attr-name > .at-notation > .suffix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-window-notation > .suffix,
+.language-javascript .template-spx .token.string .token.attr-name > .at-notation > .suffix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-window-notation > .suffix,
+.language-typescript .template-spx .token.string .token.attr-name > .at-notation > .suffix {
   color: var(--papyrus-spx-method);
 }
 .language-markup .token.attr-name > .ns-notation > .prefix, .language-markup .token.attr-name > .ns-notation.spx-name,
 .language-html .token.attr-name > .ns-notation > .prefix,
-.language-html .token.attr-name > .ns-notation.spx-name {
+.language-html .token.attr-name > .ns-notation.spx-name,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation > .prefix,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation.spx-name,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation > .prefix,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation.spx-name {
   color: var(--papyrus-spx-attr-name);
 }
 .language-markup .token.attr-name > .ns-notation > .symbol,
-.language-html .token.attr-name > .ns-notation > .symbol {
+.language-html .token.attr-name > .ns-notation > .symbol,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation > .symbol,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation > .symbol {
   color: var(--papyrus-spx-symbol);
 }
 .language-markup .token.attr-name > .ns-notation > .suffix,
-.language-html .token.attr-name > .ns-notation > .suffix {
+.language-html .token.attr-name > .ns-notation > .suffix,
+.language-javascript .template-spx .token.string .token.attr-name > .ns-notation > .suffix,
+.language-typescript .template-spx .token.string .token.attr-name > .ns-notation > .suffix {
   color: var(--papyrus-spx-suffix);
 }
 .language-markup .token.spx-attr .attr-equals,
-.language-html .token.spx-attr .attr-equals {
+.language-html .token.spx-attr .attr-equals,
+.language-javascript .template-spx .token.string .token.spx-attr .attr-equals,
+.language-typescript .template-spx .token.string .token.spx-attr .attr-equals {
   color: var(--papyrus-html-equals);
 }
 .language-markup .token.spx-attr .punctuation,
-.language-html .token.spx-attr .punctuation {
+.language-html .token.spx-attr .punctuation,
+.language-javascript .template-spx .token.string .token.spx-attr .punctuation,
+.language-typescript .template-spx .token.string .token.spx-attr .punctuation {
   color: var(--papyrus-html-attr-value);
 }
 .language-markup .token.spx-attr .punctuation.attr-equals,
-.language-html .token.spx-attr .punctuation.attr-equals {
+.language-html .token.spx-attr .punctuation.attr-equals,
+.language-javascript .template-spx .token.string .token.spx-attr .punctuation.attr-equals,
+.language-typescript .template-spx .token.string .token.spx-attr .punctuation.attr-equals {
   color: var(--papyrus-html-equals);
 }
 .language-markup .token.spx-attr .component-name,
-.language-html .token.spx-attr .component-name {
+.language-html .token.spx-attr .component-name,
+.language-javascript .template-spx .token.string .token.spx-attr .component-name,
+.language-typescript .template-spx .token.string .token.spx-attr .component-name {
   color: var(--papyrus-spx-component-name);
 }
 .language-markup .token.spx-attr .component-name > .alias,
-.language-html .token.spx-attr .component-name > .alias {
+.language-html .token.spx-attr .component-name > .alias,
+.language-javascript .template-spx .token.string .token.spx-attr .component-name > .alias,
+.language-typescript .template-spx .token.string .token.spx-attr .component-name > .alias {
   color: var(--papyrus-spx-component-alias);
 }
 .language-markup .token.spx-attr .separtor,
-.language-html .token.spx-attr .separtor {
+.language-html .token.spx-attr .separtor,
+.language-javascript .template-spx .token.string .token.spx-attr .separtor,
+.language-typescript .template-spx .token.string .token.spx-attr .separtor {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr .event-key,
-.language-html .token.spx-attr .event-key {
+.language-html .token.spx-attr .event-key,
+.language-javascript .template-spx .token.string .token.spx-attr .event-key,
+.language-typescript .template-spx .token.string .token.spx-attr .event-key {
   color: var(--papyrus-spx-event-key);
 }
 .language-markup .token.spx-attr .event-method,
-.language-html .token.spx-attr .event-method {
+.language-html .token.spx-attr .event-method,
+.language-javascript .template-spx .token.string .token.spx-attr .event-method,
+.language-typescript .template-spx .token.string .token.spx-attr .event-method {
   color: var(--papyrus-spx-event-method);
 }
 .language-markup .token.spx-attr > .bind-notation > .token.key,
-.language-html .token.spx-attr > .bind-notation > .token.key {
+.language-html .token.spx-attr > .bind-notation > .token.key,
+.language-javascript .template-spx .token.string .token.spx-attr > .bind-notation > .token.key,
+.language-typescript .template-spx .token.string .token.spx-attr > .bind-notation > .token.key {
   color: var(--papyrus-spx-event-key);
 }
 .language-markup .token.spx-attr > .bind-notation > .token.dot,
-.language-html .token.spx-attr > .bind-notation > .token.dot {
+.language-html .token.spx-attr > .bind-notation > .token.dot,
+.language-javascript .template-spx .token.string .token.spx-attr > .bind-notation > .token.dot,
+.language-typescript .template-spx .token.string .token.spx-attr > .bind-notation > .token.dot {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr > .bind-notation > .token.val,
-.language-html .token.spx-attr > .bind-notation > .token.val {
+.language-html .token.spx-attr > .bind-notation > .token.val,
+.language-javascript .template-spx .token.string .token.spx-attr > .bind-notation > .token.val,
+.language-typescript .template-spx .token.string .token.spx-attr > .bind-notation > .token.val {
   color: var(--papyrus-spx-identifier);
 }
 .language-markup .token.spx-attr > .dot-notation > .token.key,
-.language-html .token.spx-attr > .dot-notation > .token.key {
+.language-html .token.spx-attr > .dot-notation > .token.key,
+.language-javascript .template-spx .token.string .token.spx-attr > .dot-notation > .token.key,
+.language-typescript .template-spx .token.string .token.spx-attr > .dot-notation > .token.key {
   color: var(--papyrus-spx-event-key);
 }
 .language-markup .token.spx-attr > .dot-notation > .token.dot,
-.language-html .token.spx-attr > .dot-notation > .token.dot {
+.language-html .token.spx-attr > .dot-notation > .token.dot,
+.language-javascript .template-spx .token.string .token.spx-attr > .dot-notation > .token.dot,
+.language-typescript .template-spx .token.string .token.spx-attr > .dot-notation > .token.dot {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr > .dot-notation > .token.val,
-.language-html .token.spx-attr > .dot-notation > .token.val {
+.language-html .token.spx-attr > .dot-notation > .token.val,
+.language-javascript .template-spx .token.string .token.spx-attr > .dot-notation > .token.val,
+.language-typescript .template-spx .token.string .token.spx-attr > .dot-notation > .token.val {
   color: var(--papyrus-spx-identifier);
 }
 .language-markup .token.spx-attr > .event-struct-on > .token.option,
 .language-markup .token.spx-attr > .event-struct > .token.option,
 .language-html .token.spx-attr > .event-struct-on > .token.option,
-.language-html .token.spx-attr > .event-struct > .token.option {
+.language-html .token.spx-attr > .event-struct > .token.option,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.option,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct > .token.option,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.option,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct > .token.option {
   color: var(--papyrus-spx-event-option);
 }
 .language-markup .token.spx-attr > .event-struct-on > .token.comma,
 .language-markup .token.spx-attr > .event-struct > .token.comma,
 .language-html .token.spx-attr > .event-struct-on > .token.comma,
-.language-html .token.spx-attr > .event-struct > .token.comma {
+.language-html .token.spx-attr > .event-struct > .token.comma,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.comma,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct > .token.comma,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.comma,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct > .token.comma {
   color: var(--papyrus-spx-punctuation);
 }
 .language-markup .token.spx-attr > .event-struct-on > .token.delim,
 .language-markup .token.spx-attr > .event-struct > .token.delim,
 .language-html .token.spx-attr > .event-struct-on > .token.delim,
-.language-html .token.spx-attr > .event-struct > .token.delim {
+.language-html .token.spx-attr > .event-struct > .token.delim,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.delim,
+.language-javascript .template-spx .token.string .token.spx-attr > .event-struct > .token.delim,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct-on > .token.delim,
+.language-typescript .template-spx .token.string .token.spx-attr > .event-struct > .token.delim {
   color: var(--papyrus-spx-delims);
 }
 .language-markup .token.attr-value,
-.language-html .token.attr-value {
+.language-html .token.attr-value,
+.language-javascript .template-spx .token.string .token.attr-value,
+.language-typescript .template-spx .token.string .token.attr-value {
   color: var(--papyrus-html-attr-value);
 }
 .language-markup .token.attr-value > .token.punctuation:not(.attr-equals),
-.language-html .token.attr-value > .token.punctuation:not(.attr-equals) {
+.language-html .token.attr-value > .token.punctuation:not(.attr-equals),
+.language-javascript .template-spx .token.string .token.attr-value > .token.punctuation:not(.attr-equals),
+.language-typescript .template-spx .token.string .token.attr-value > .token.punctuation:not(.attr-equals) {
   color: var(--papyrus-html-attr-value);
 }
 .language-markup .token.attr-value > .token.number, .language-markup .token.attr-value > .token.integer,
 .language-html .token.attr-value > .token.number,
-.language-html .token.attr-value > .token.integer {
+.language-html .token.attr-value > .token.integer,
+.language-javascript .template-spx .token.string .token.attr-value > .token.number,
+.language-javascript .template-spx .token.string .token.attr-value > .token.integer,
+.language-typescript .template-spx .token.string .token.attr-value > .token.number,
+.language-typescript .template-spx .token.string .token.attr-value > .token.integer {
   color: var(--papyrus-spx-number);
 }
 .language-markup .token.attr-value > .token.boolean,
-.language-html .token.attr-value > .token.boolean {
+.language-html .token.attr-value > .token.boolean,
+.language-javascript .template-spx .token.string .token.attr-value > .token.boolean,
+.language-typescript .template-spx .token.string .token.attr-value > .token.boolean {
   color: var(--papyrus-spx-boolean);
 }
 .language-markup .token.attr-value > .token.script > .token.keyword,
-.language-html .token.attr-value > .token.script > .token.keyword {
+.language-html .token.attr-value > .token.script > .token.keyword,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.keyword,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.keyword {
   color: var(--papyrus-js-keyword);
 }
 .language-markup .token.attr-value > .token.script > .token.punctuation,
-.language-html .token.attr-value > .token.script > .token.punctuation {
+.language-html .token.attr-value > .token.script > .token.punctuation,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation {
   color: var(--papyrus-spx-delims);
 }
 .language-markup .token.attr-value > .token.script > .token.punctuation-chars,
-.language-html .token.attr-value > .token.script > .token.punctuation-chars {
+.language-html .token.attr-value > .token.script > .token.punctuation-chars,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation-chars,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.punctuation-chars {
   color: var(--papyrus-js-special-chars);
 }
 .language-markup .token.attr-value > .token.script > .token.variable,
-.language-html .token.attr-value > .token.script > .token.variable {
+.language-html .token.attr-value > .token.script > .token.variable,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.variable,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.variable {
   color: var(--papyrus-js-variable);
 }
 .language-markup .token.attr-value > .token.script > .token.object,
-.language-html .token.attr-value > .token.script > .token.object {
+.language-html .token.attr-value > .token.script > .token.object,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.object,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.object {
   color: var(--papyrus-js-object);
 }
 .language-markup .token.attr-value > .token.script > .token.operator,
-.language-html .token.attr-value > .token.script > .token.operator {
+.language-html .token.attr-value > .token.script > .token.operator,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.operator,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.operator {
   color: var(--papyrus-js-operator);
 }
 .language-markup .token.attr-value > .token.script > .token.operation,
-.language-html .token.attr-value > .token.script > .token.operation {
+.language-html .token.attr-value > .token.script > .token.operation,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.operation,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.operation {
   color: var(--papyrus-js-operation);
 }
 .language-markup .token.attr-value > .token.script > .token.function-name,
-.language-html .token.attr-value > .token.script > .token.function-name {
+.language-html .token.attr-value > .token.script > .token.function-name,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.function-name,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.function-name {
   color: var(--papyrus-js-function-name);
 }
 .language-markup .token.attr-value > .token.script > .token.number,
-.language-html .token.attr-value > .token.script > .token.number {
+.language-html .token.attr-value > .token.script > .token.number,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.number,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.number {
   color: var(--papyrus-spx-number);
 }
 .language-markup .token.attr-value > .token.script > .token.literal-property, .language-markup .token.attr-value > .token.script > .token.property,
 .language-html .token.attr-value > .token.script > .token.literal-property,
-.language-html .token.attr-value > .token.script > .token.property {
+.language-html .token.attr-value > .token.script > .token.property,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.literal-property,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.property,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.literal-property,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.property {
   color: var(--papyrus-js-literal-property);
 }
 .language-markup .token.attr-value > .token.script > .token.semi,
-.language-html .token.attr-value > .token.script > .token.semi {
+.language-html .token.attr-value > .token.script > .token.semi,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.semi,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.semi {
   color: var(--papyrus-js-semi);
 }
 .language-markup .token.attr-value > .token.script > .token.boolean,
-.language-html .token.attr-value > .token.script > .token.boolean {
+.language-html .token.attr-value > .token.script > .token.boolean,
+.language-javascript .template-spx .token.string .token.attr-value > .token.script > .token.boolean,
+.language-typescript .template-spx .token.string .token.attr-value > .token.script > .token.boolean {
   color: var(--papyrus-spx-boolean);
 }
 
@@ -10219,7 +10511,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-js .token.this {
   color: var(--papyrus-js-this);
 }
-.language-javascript .token.module,
+.language-javascript .token.import-type, .language-javascript .token.module,
+.language-js .token.import-type,
 .language-js .token.module {
   color: var(--papyrus-js-module);
 }
@@ -10239,7 +10532,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-js .token.regex-flags {
   color: var(--papyrus-js-regex-flags);
 }
-.language-javascript .token.browser-objects,
+.language-javascript .token.spx-object, .language-javascript .token.browser-objects,
+.language-js .token.spx-object,
 .language-js .token.browser-objects {
   color: var(--papyrus-js-browser-objects);
 }
@@ -10247,6 +10541,10 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-js .token.literal-property,
 .language-js .token.property {
   color: var(--papyrus-js-literal-property);
+}
+.language-javascript .token.nil,
+.language-js .token.nil {
+  color: #912bff;
 }
 .language-javascript .token.string, .language-javascript .token.string-property,
 .language-js .token.string,
@@ -10264,6 +10562,11 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-javascript .token.bracket > .keyword,
 .language-js .token.bracket > .keyword {
   color: var(--papyrus-js-this);
+}
+.language-javascript .token.paren-brace-open, .language-javascript .token.paren-brace-close,
+.language-js .token.paren-brace-open,
+.language-js .token.paren-brace-close {
+  color: var(--papyrus-ts-bracket);
 }
 .language-javascript .token.sin,
 .language-js .token.sin {
@@ -10354,7 +10657,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-ts .token.class-name {
   color: var(--papyrus-ts-class-name);
 }
-.language-typescript .token.builtin,
+.language-typescript .token.spx-object, .language-typescript .token.builtin,
+.language-ts .token.spx-object,
 .language-ts .token.builtin {
   color: var(--papyrus-ts-function-name);
 }
@@ -10374,7 +10678,8 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-ts .token.semi {
   color: var(--papyrus-ts-semi);
 }
-.language-typescript .token.module,
+.language-typescript .token.import-type, .language-typescript .token.module,
+.language-ts .token.import-type,
 .language-ts .token.module {
   color: var(--papyrus-ts-module);
 }
@@ -10411,6 +10716,10 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-ts .token.type-constructors {
   color: var(--papyrus-ts-type-constructor);
 }
+.language-typescript .token.nil,
+.language-ts .token.nil {
+  color: #912bff;
+}
 .language-typescript .token.bracket > .punctuation,
 .language-ts .token.bracket > .punctuation {
   color: var(--papyrus-ts-bracket);
@@ -10418,6 +10727,11 @@ Original: https://github.com/dracula/visual-studio-code */
 .language-typescript .token.bracket > .keyword,
 .language-ts .token.bracket > .keyword {
   color: var(--papyrus-ts-this);
+}
+.language-typescript .token.paren-brace-open, .language-typescript .token.paren-brace-close,
+.language-ts .token.paren-brace-open,
+.language-ts .token.paren-brace-close {
+  color: var(--papyrus-ts-bracket);
 }
 
 /* stylelint-disable color-hex-length */
@@ -10728,7 +11042,7 @@ blockquote {
   background-repeat: no-repeat no-repeat;
   background-position: 25px center;
   background-size: 2.5%;
-  background-color: #121212;
+  background-color: #151615;
   border: 0.01rem #363d49 solid;
   border-radius: 0.5rem;
   position: relative;
@@ -10877,6 +11191,20 @@ ul {
   margin-bottom: 20px;
 }
 
+p + ul:not(.no-lst) {
+  margin-bottom: 20px;
+}
+p + ul:not(.no-lst) li {
+  list-style-type: square;
+  margin-bottom: 5px;
+  margin-left: 3rem;
+  padding-left: 0.5rem;
+}
+p + ul:not(.no-lst) li::marker {
+  color: #98a5b3;
+  font-weight: bold;
+}
+
 p a {
   color: #4ebb74;
   font-weight: 500;
@@ -10904,6 +11232,13 @@ table tr th {
   text-transform: none;
 }
 
+h5, .h5 {
+  margin-top: 1.5rem !important;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #dddddd;
+}
+
 blockquote > p > a > code {
   color: #8BD3FD;
 }
@@ -10924,11 +11259,24 @@ blockquote > p > code {
 .navigators a {
   font-family: "JetBrains Mono", monospace;
   color: #ffffff;
+  font-size: 0.725rem;
   border: 0.01rem #373b3e solid;
   border-radius: 5px;
   padding: 10px 5px;
   text-align: center;
   background-color: #121212;
+  transition: border-color linear 400ms;
+}
+.navigators a:hover {
+  border-color: #4ebb74;
+}
+.navigators a:hover .next,
+.navigators a:hover .prev {
+  color: #4ebb74;
+}
+.navigators a small {
+  font-size: 10px !important;
+  margin-bottom: 3px;
 }
 .navigators a.prev {
   padding: 5px 20px 5px 10px;
@@ -10940,8 +11288,8 @@ blockquote > p > code {
   color: #ffffff;
 }
 .navigators .icon {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
 }
 
 .drawer-backdrop {
@@ -11030,8 +11378,187 @@ blockquote > p > code {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23ffffff' stroke-width='1'%3e%3cpath d='M5 12h14'/%3e%3c/svg%3e");
 }
 
+.page-404 {
+  overflow: hidden;
+}
+
+.logo-404 > svg {
+  width: 100px;
+  height: 50px;
+}
+
+.icon-output {
+  width: 40px;
+  height: 40px;
+}
+
+h1, .h1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+h1 > code.language-typescript, .h1 > code.language-typescript,
+h1 > code.language-bash,
+.h1 > code.language-bash {
+  float: right;
+  text-transform: initial;
+  border: none !important;
+  font-size: 1rem !important;
+}
+
+h1 > code, .h1 > code {
+  text-transform: initial;
+  border: none !important;
+  font-size: 1rem !important;
+}
+
+h5, .h5 {
+  margin-bottom: 15px;
+}
+h5 > code, .h5 > code {
+  float: right;
+  text-transform: lowercase;
+  border: none !important;
+  font-size: 0.845rem !important;
+}
+
+.ph-440 .papyrus {
+  height: 450px;
+  border: none !important;
+}
+
+ol {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-left: 3rem;
+  margin-left: 0.25rem;
+  list-style-type: decimal;
+}
+ol li {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  color: #ffffff;
+}
+ol li::marker {
+  color: #98a5b3;
+  font-weight: bold;
+  font-family: "JetBrains Mono", monospace;
+  margin-right: 0.5rem;
+}
+
+ul.compare-list {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  list-style-type: none;
+}
+ul.compare-list li.check {
+  padding-left: 1.5rem;
+  background-position: center left;
+  background-size: 20px;
+  text-transform: initial;
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ebb74' stroke-width='2'%3e%3cpath d='M20 6 9 17l-5-5' /%3e%3c/svg%3e");
+}
+ul.compare-list li.cross {
+  padding-left: 1.5rem;
+  background-position: center left;
+  background-size: 20px;
+  text-transform: initial;
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23dc3545' stroke-width='2'%3e%3cpath d='M18 6 6 18M6 6l12 12'/%3e%3c/svg%3e");
+}
+
+.icon-brave,
+.icon-chrome,
+.icon-safari,
+.icon-firefox,
+.icon-edge {
+  width: 30px;
+  height: 30px;
+}
+
+.link-c {
+  color: #a4a4a4;
+}
+
+.version-example.bd,
+.version-example .bb {
+  border-color: #21252b !important;
+}
+.version-example .fs-sm {
+  font-size: 0.895rem !important;
+}
+.version-example h6, .version-example .h6 {
+  font-size: 0.875rem;
+  font-weight: 300;
+  margin-bottom: 5px;
+}
+.version-example .icon {
+  width: 25px;
+  height: 20px;
+  margin: 0 20px 2px 20px;
+  color: #a4a4a4;
+}
+
+.drawer-panel {
+  background-color: #121212 !important;
+}
+
+.drawer-left {
+  width: 200px;
+}
+
+.opts > h1 > code, .opts > .h1 > code {
+  font-size: 1rem !important;
+}
+
+.opts > p {
+  margin-left: 25px;
+}
+
+.terse-cb pre {
+  height: 100px !important;
+}
+
+.spx h1, .spx .h1 {
+  display: inline;
+}
+.spx h1 a, .spx .h1 a {
+  color: #7ef0ff;
+  font-weight: 900;
+}
+
+.stash-cb pre {
+  font-size: 0.8rem;
+  height: 305px !important;
+}
+
+.stash-header code {
+  font-size: 0.9rem !important;
+  padding: 0;
+  border: none;
+  background: transparent !important;
+}
+
+.stash-next .icon-output {
+  width: 30px;
+  height: 30px;
+}
+
 .papyrus-editor::-webkit-scrollbar-thumb:horizontal {
   height: 0 !important;
+}
+
+.language-bash .token.title {
+  font-family: "JetBrains Mono", monospace;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #54627d;
+  line-height: 35px;
+  letter-spacing: 0.02rem;
+}
+.language-bash .token.title .token.punctuation {
+  color: #121212;
 }
 
 :not(pre) > code {
@@ -11107,6 +11634,47 @@ h2 .language-typescript, .h2 .language-typescript {
   font-size: 0.65em;
 }
 
+h2, .h2 {
+  text-transform: none;
+  font-size: 1.21rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+h2 .language-bash, .h2 .language-bash {
+  font-size: 1.1rem;
+  padding: 0 !important;
+  border: none !important;
+  color: #fff;
+  width: 100%;
+  display: block;
+  padding-bottom: 1px !important;
+  border-radius: 0;
+}
+h2 + p, .h2 + p {
+  margin-top: 0;
+  margin-left: 24px;
+}
+
+h1 > code, .h1 > code {
+  font-size: 1.15rem !important;
+  font-weight: 600;
+  padding: 0;
+}
+
+:not(pre, h2, .h2, h3, .h3) > code[class*=language-] {
+  word-wrap: break-word;
+  padding: 0.1rem 0.1rem 0.2rem 0.1rem;
+  margin: 0rem;
+  border-radius: 0.2rem;
+  letter-spacing: 0.0235rem;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: #ffffff;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  text-shadow: none;
+  border: 0;
+}
+
 .navbar {
   position: fixed;
   z-index: 300;
@@ -11119,6 +11687,7 @@ h2 .language-typescript, .h2 .language-typescript {
   left: 0px;
   width: 100%;
   z-index: 300;
+  align-items: center;
 }
 .navbar::before {
   left: 10%;
@@ -11166,6 +11735,12 @@ h2 .language-typescript, .h2 .language-typescript {
   height: 60px;
   color: #ffffff;
 }
+@media (max-width: 575.98px) {
+  .navbar-logo {
+    width: 110px;
+    height: 40px;
+  }
+}
 .navbar-version {
   font-size: 0.5rem;
   letter-spacing: 0.05rem;
@@ -11179,9 +11754,21 @@ h2 .language-typescript, .h2 .language-typescript {
   height: 25px;
   color: #a4a4a4;
 }
+@media (max-width: 575.98px) {
+  .navbar .icon {
+    width: 20px;
+    height: 20px;
+  }
+}
 .navbar .icon-github-text {
   width: 50px;
   height: 17px;
+}
+@media (max-width: 575.98px) {
+  .navbar .icon-github-text {
+    width: 40px;
+    height: 18px;
+  }
 }
 .navbar .off {
   color: #ffffff;
@@ -11244,7 +11831,7 @@ h2 .language-typescript, .h2 .language-typescript {
 
 .search {
   position: relative;
-  width: 250px;
+  min-width: 250px;
 }
 .search .keys {
   display: block;
@@ -11277,23 +11864,19 @@ h2 .language-typescript, .h2 .language-typescript {
   background-position: 8px center;
   background-size: 20px;
   width: 100%;
-  text-transform: uppercase;
+  font-weight: 400;
+  text-transform: initial;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-linejoin='round' stroke-linecap='round' stroke-width='1.3' viewBox='0 0 24 24'%3e%3cpath d='M14.0355 14.0355 20 20m-4.5-9.5c0 2.7614-2.2386 5-5 5-2.76142 0-5-2.2386-5-5 0-2.76142 2.23858-5 5-5 2.7614 0 5 2.23858 5 5Z'/%3e%3c/svg%3e");
-  transition: width linear 100ms, margin-left linear 100ms;
+  transition: width linear 200ms;
 }
 .search input.fm-input::placeholder {
   font-weight: 600;
   font-size: 0.7rem;
+  text-transform: uppercase;
   font-family: "JetBrains Mono", monospace;
 }
 .search input.fm-input.is-active {
-  width: 400px;
-  margin-left: 150px;
-}
-.search input.fm-input.is-results {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  border-bottom: none;
+  width: 450px;
 }
 .search input.fm-input::placeholder {
   color: #ffffff;
@@ -11326,18 +11909,41 @@ h2 .language-typescript, .h2 .language-typescript {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2398a5b3' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm-3 5-6 6m0-6 6 6'/%3e%3c/svg%3e");
 }
 .search .search-list {
-  width: 400px;
+  position: absolute;
+  top: 65px;
+  width: 450px;
   max-height: 400px;
-  background-color: #121212;
+  background-color: #2e2e2f;
   border: #373b3e 0.01rem solid;
+  border-radius: 7px;
   overflow-y: scroll;
-  color: #ffffff;
   margin: 0;
   padding: 0;
-  margin-left: -150px;
+}
+.search .search-list .w-icon {
+  width: 20px;
+}
+.search .search-list .icon {
+  width: 18px;
+  height: 18px;
+}
+.search .search-list .icon-goto {
+  opacity: 0;
+}
+.search .search-list .icon-clown {
+  height: 70px;
+  width: 70px;
+  color: #505050;
 }
 .search .search-list.no-results {
-  height: 80px;
+  padding: 40px 0;
+}
+.search .search-list.no-results li:first-of-type {
+  background-color: #2e2e2f;
+  border: none;
+}
+.search .search-list.no-results li:first-of-type a {
+  color: #ffffff;
 }
 .search .search-list.no-results > li {
   display: flex;
@@ -11351,84 +11957,84 @@ h2 .language-typescript, .h2 .language-typescript {
   font-size: 1rem;
 }
 .search .search-list li {
-  border-bottom: #39424b 0.01rem solid;
-  color: #ffffff;
+  border: #373b3e 0.01rem solid;
+  color: #a4a4a4;
   list-style-type: none;
-  padding: 10px 5px;
-  font-size: 0.8rem;
+  padding: 10px 15px;
+  border-radius: 7px;
+  margin: 4px;
+  background-color: #1b1b1b;
 }
 .search .search-list li:first-of-type {
-  border-top: none !important;
-}
-.search .search-list li:last-of-type {
-  border-bottom: none !important;
-}
-.search .search-list li a:hover,
-.search .search-list li .result:hover {
-  background-color: #0d0d0d;
-  cursor: pointer;
-  opacity: 1;
-  color: #ffffff;
-}
-.search .search-list li a > h5, .search .search-list li a > .h5 {
-  font-size: 0.8rem;
-  color: #6eb2d3;
-  font-weight: 900;
-  margin-bottom: 10px;
-  padding: 5px;
-}
-.search .search-list li .result {
-  height: 55px;
-  border-radius: 3px;
-  padding: 9px;
-  margin: 8px 5px;
-  border: #39424b 0.01rem solid;
   background-color: #121212;
 }
-.search .search-list li .result > h6, .search .search-list li .result > .h6 {
-  font-size: 0.75rem;
-  margin-bottom: 10px;
+.search .search-list li:first-of-type a {
+  color: #ffffff;
 }
-.search .search-list li .result span {
-  font-size: 0.75rem;
+.search .search-list li:first-of-type .result strong {
+  text-decoration: underline;
+  color: #4ebb74;
+}
+.search .search-list li:hover {
+  transition: background-color 20ms linear 20ms;
+  background-color: #121212;
+  cursor: pointer;
+}
+.search .search-list li:hover .icon-goto {
+  opacity: 1;
+}
+.search .search-list li a {
+  color: #a4a4a4;
+}
+.search .search-list li .arrow {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23a4a4a4' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M9 18l6-6-6-6'/%3e%3c/svg%3e");
+  background-position: right center;
+  background-repeat: no-repeat;
+  background-size: 12px;
+}
+.search .search-list li .result {
+  width: 335px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  font-size: 0.85rem;
+  text-overflow: ellipsis;
+}
+.search .search-list li .result strong {
+  color: #ffffff;
+}
+
+.sidebar-scroll {
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 100px;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  direction: rtl;
+  width: 1px;
+  height: var(--papyrus-scrollbar-width);
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: var(--papyrus-scrollbar-track);
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: var(--papyrus-scrollbar-thumb);
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--papyrus-scrollbar-thumb-hover);
+}
+.sidebar-scroll::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .sidebar {
-  height: 100%;
   background-color: inherit;
-  overflow-y: scroll;
-}
-.sidebar::-webkit-scrollbar {
-  display: none;
-  width: var(--papyrus-scrollbar-width);
-  height: var(--papyrus-scrollbar-width);
-}
-.sidebar::-webkit-scrollbar-corner, .sidebar::-webkit-scrollbar-track {
-  background: var(--papyrus-code-bg);
-  border-radius: var(--papyrus-code-border-radius);
-}
-.sidebar::-webkit-scrollbar-thumb:vertical {
-  border-top: var(--papyrus-scrollbar-padding) solid var(--papyrus-code-bg);
-  border-bottom: var(--papyrus-scrollbar-padding) solid var(--papyrus-code-bg);
-  border-top-right-radius: var(--papyrus-code-border-radius);
-  border-bottom-right-radius: var(--papyrus-code-border-radius);
-}
-.sidebar::-webkit-scrollbar-thumb:horizontal {
-  display: none;
-  border-right: var(--papyrus-scrollbar-padding) solid var(--papyrus-code-bg);
-  border-left: var(--papyrus-scrollbar-padding) solid var(--papyrus-code-bg);
-  border-bottom-right-radius: var(--papyrus-code-border-radius);
-  border-bottom-left-radius: var(--papyrus-code-border-radius);
-}
-.sidebar::-webkit-scrollbar-thumb {
-  background: var(--papyrus-scrollbar-thumb);
-}
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: var(--papyrus-scrollbar-thumb-hover);
 }
 @media (min-width: 768px) {
   .sidebar {
     top: 65px;
+    bottom: 0;
     width: 250px;
     left: auto;
     transform: translateX(0);
@@ -11438,15 +12044,21 @@ h2 .language-typescript, .h2 .language-typescript {
   }
 }
 .sidebar-menu {
-  width: 100%;
+  position: relative;
+  display: block;
 }
-.sidebar-menu .child-links,
-.sidebar-menu .menu-link {
+@media (max-width: 575.98px) {
+  .sidebar-menu {
+    margin: 0 auto;
+  }
+}
+.sidebar-menu .menu-links,
+.sidebar-menu .submenu,
+.sidebar-menu .menu {
   display: flex;
   align-items: center;
   color: #a4a4a4;
   font-weight: bolder;
-  font-size: 0.85rem;
   font-family: "JetBrains Mono", monospace;
   color: #a4a4a4;
   text-transform: uppercase;
@@ -11454,74 +12066,106 @@ h2 .language-typescript, .h2 .language-typescript {
   border: none;
   margin: 0;
   width: 100%;
-  padding: 10px 0 10px 5px;
-  background-color: transparent;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23a4a4a4' stroke-width='1'%3e%3cpath d='M12 5v14M5 12h14'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 2px center;
   background-size: 18px;
+  background-color: transparent;
+  background-repeat: no-repeat;
 }
-.sidebar-menu .child-links:hover,
-.sidebar-menu .menu-link:hover {
-  color: #ffffff;
+.sidebar-menu .menu-links.opened, .sidebar-menu .menu-links.active,
+.sidebar-menu .submenu.opened,
+.sidebar-menu .submenu.active,
+.sidebar-menu .menu.opened,
+.sidebar-menu .menu.active {
+  color: #4ebb74;
 }
-.sidebar-menu .child-links[aria-expanded=true],
-.sidebar-menu .menu-link[aria-expanded=true] {
+.sidebar-menu .menu {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23a4a4a4' stroke-width='1'%3e%3cpath d='M12 5v14M5 12h14'/%3e%3c/svg%3e");
+  background-position: right 2px center;
+  padding: 5px 0 5px 5px;
+  font-size: 0.85rem;
+}
+.sidebar-menu .menu[aria-expanded=true] {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23ffffff' stroke-width='1'%3e%3cpath d='M5 12h14'/%3e%3c/svg%3e");
-  color: #ffffff;
-  font-weight: 600;
 }
-.sidebar-menu .list {
-  margin-left: 5px;
+.sidebar-menu .menu-links,
+.sidebar-menu .submenu {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23a4a4a4' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M9 18l6-6-6-6'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  font-size: 1rem;
+  font-weight: 300;
+  color: #a4a4a4;
+  font-family: Proxima Nova, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  text-transform: none;
+  margin: 0 0 0 5px;
 }
-.sidebar-menu .list > li {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 25px;
+.sidebar-menu .menu-links:first-of-type,
+.sidebar-menu .submenu:first-of-type {
+  padding-top: 7px;
 }
-.sidebar-menu .list > li:first-of-type {
-  margin-top: 10px;
+.sidebar-menu .menu-links:last-of-type,
+.sidebar-menu .submenu:last-of-type {
+  padding-bottom: 7px;
 }
-.sidebar-menu .list > li:last-of-type {
-  margin-bottom: 10px;
+.sidebar-menu .menu-links[aria-expanded=true],
+.sidebar-menu .submenu[aria-expanded=true] {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
 }
-.sidebar-menu .list > li > a {
-  margin: 0;
+.sidebar .submenu-list > li:first-of-type {
+  padding-top: 7px;
+}
+.sidebar .submenu-list > li:last-of-type {
+  padding-bottom: 7px;
+}
+.sidebar .menu-links {
+  padding: 0;
+  margin: 0 0 0 10px;
   font-size: 1rem;
   color: #a4a4a4;
 }
-.sidebar-menu .list > li > a:hover {
+.sidebar .menu-links:hover {
   color: #ffffff;
 }
-.sidebar-menu .list > li > a.active {
+.sidebar .menu-links.active {
   color: #4ebb74;
   font-weight: 600;
 }
-.sidebar-menu .list > li > a[aria-expanded=true], .sidebar-menu .list > li > a[aria-expanded=false] {
-  background-repeat: no-repeat;
-  background-position: right 0 center;
-  background-size: 15px;
+.sidebar .submenu-list,
+.sidebar .menu-list {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
 }
-.sidebar-menu .list > li > a[aria-expanded=true] {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23ffffff' stroke-width='1'%3e%3cpath d='M5 12h14'/%3e%3c/svg%3e");
+.sidebar .submenu-list > li,
+.sidebar .menu-list > li {
+  margin: 0;
 }
-.sidebar-menu .list > li > a[aria-expanded=false] {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23ffffff' stroke-width='1'%3e%3cpath d='M12 5v14M5 12h14'/%3e%3c/svg%3e");
+.sidebar .submenu-list > li:first-of-type,
+.sidebar .menu-list > li:first-of-type {
+  margin-top: 0px;
 }
-.sidebar-menu .list > li > a + .child-list {
-  max-height: fit-content;
-  margin-left: 2px;
-  border-left: 0.01rem solid #373b3e;
+.sidebar .submenu-list > li:last-of-type,
+.sidebar .menu-list > li:last-of-type {
+  margin-bottom: 0px;
 }
-.sidebar-menu .list > li > a + .child-list > li {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+.sidebar .submenu-list > li > a,
+.sidebar .menu-list > li > a {
+  margin: 0 0 0 10px;
+  font-size: 1rem;
+  color: #a4a4a4;
 }
-.sidebar-menu .list > li > a + .child-list > li > a {
-  margin-bottom: 4px;
-  font-size: 1rem !important;
+.sidebar .submenu-list > li > a:hover,
+.sidebar .menu-list > li > a:hover {
+  color: #ffffff;
+}
+.sidebar .submenu-list > li > a.active,
+.sidebar .menu-list > li > a.active {
+  color: #4ebb74;
+  font-weight: 600;
+}
+.sidebar .menu-list > li:first-of-type {
+  margin-top: 7px;
+}
+.sidebar .menu-list > li:last-of-type {
+  margin-bottom: 7px;
 }
 
 .hidden {
@@ -11531,36 +12175,6 @@ h2 .language-typescript, .h2 .language-typescript {
 @media (max-width: 767.98px) {
   .hero h5, .hero .h5 {
     font-size: 1.0395rem;
-  }
-}
-@keyframes move {
-  0% {
-    opacity: 0;
-    left: -200%;
-  }
-  10% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 0;
-  }
-  100% {
-    left: 200%;
-  }
-}
-@keyframes move-right {
-  0% {
-    opacity: 0;
-    right: -20%;
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    right: 150%;
   }
 }
 .hero-github a {
@@ -11636,6 +12250,11 @@ h2 .language-typescript, .h2 .language-typescript {
   text-align: center;
 }
 
+.goto-docs {
+  max-width: 180px;
+  min-height: 100px;
+}
+
 .goto-link {
   font-family: "JetBrains Mono", monospace;
   font-size: 0.745rem;
@@ -11643,13 +12262,20 @@ h2 .language-typescript, .h2 .language-typescript {
   color: #ffffff;
   border: 0.01rem #373b3e solid;
   border-radius: 5px;
-  padding: 10px 0;
+  padding: 10px 20px;
   text-align: center;
+  max-width: 150px;
   background-color: #121212;
 }
 .goto-link:hover {
-  color: #ffffff;
   background-color: #121212;
+}
+
+.pleb {
+  font-size: 11px;
+}
+.pleb:hover {
+  color: #ffffff !important;
 }
 
 .find input {

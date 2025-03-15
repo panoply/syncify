@@ -6,12 +6,6 @@ import type { ProcessorsBundle } from 'types';
  * This model is the default options for the transform processors.
  */
 export const processor = (): ProcessorsBundle => ({
-  json: {
-    indent: 2,
-    useTab: false,
-    crlf: false,
-    exclude: null
-  },
   tailwind: {
     installed: false,
     loaded: false,
@@ -32,6 +26,7 @@ export const processor = (): ProcessorsBundle => ({
     }
   },
   esbuild: {
+    tsconfig: undefined,
     bundle: true,
     format: 'esm',
     globalName: undefined,
@@ -45,37 +40,9 @@ export const processor = (): ProcessorsBundle => ({
     logLevel: 'silent',
     plugins: []
   },
-  sharp: {
-    installed: false,
-    required: false,
-    loaded: false,
-    file: false,
-    config: {}
-  },
   postcss: {
     file: false,
     config: []
-  },
-  sprite: {
-    mode: {
-      inline: true,
-      symbol: {
-        example: false
-      }
-    },
-    shape: {
-      transform: [ 'svgo' ],
-      id: {
-        generator: 'svg-%s'
-      }
-    },
-    svg: {
-      xmlDeclaration: false,
-      doctypeDeclaration: false,
-      dimensionAttributes: false,
-      namespaceClassnames: false,
-      namespaceIDs: false
-    }
   },
   svgo: {
     multipass: true,
@@ -84,7 +51,14 @@ export const processor = (): ProcessorsBundle => ({
       pretty: true
     },
     plugins: [
-      'preset-default'
+      {
+        name: 'preset-default',
+        params: {
+          overrides: {
+            removeViewBox: false
+          }
+        }
+      }
     ]
   }
 });

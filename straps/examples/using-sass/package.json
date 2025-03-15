@@ -1,0 +1,22 @@
+{
+  "name": "@syncify/using-sass",
+  "version": "0.1.0",
+  "description": "Syncify example usage with SASS transforms",
+  "private": true,
+  "license": "MIT",
+  "syncify": {
+    "stores": {
+      "domain": "syncify",
+      "themes": {
+        "dusk": 137588506865
+      }
+    }
+  },
+  "devDependencies": {
+    "@syncify/cli": "workspace:0.0.1-rc.1",
+    "sass": "^1.78.0"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  }
+}

@@ -1,7 +1,9 @@
 import prompts from 'prompts';
-import * as pages from '../requests/pages';
-import * as metafields from '../requests/metafields';
-import { $ } from 'syncify:state';
+
+import * as metafields from '../transform/terser/requests/metafields';
+import * as pages from '../transform/terser/requests/pages';
+
+import { $ } from '$';
 
 export async function resource () {
 

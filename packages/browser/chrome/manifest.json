@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Syncify",
+  "version": "1.0",
+  "description": "Syncify CLI extension for Shopify development ehancements and HOT Reloading",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "webRequest",
+    "storage",
+    "tabs",
+    "webNavigation"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_icon": {
+      "128": "images/icon-inactive-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "128": "images/icon-inactive-128.png"
+  }
+}

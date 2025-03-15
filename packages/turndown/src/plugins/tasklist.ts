@@ -9,7 +9,7 @@ export function taskListItems (turndownService: TurndownService) {
         : false;
     },
     replacement (_content, node) {
-      const { checked } = node;
+      const { checked } = node as HTMLInputElement;
       return checked ? '[x] ' : '[ ] ';
     }
   });

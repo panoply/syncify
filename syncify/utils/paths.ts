@@ -1,14 +1,14 @@
-import { last } from 'rambdax';
-import { join, dirname, resolve } from 'pathe';
-import { COL } from 'syncify:symbol';
-import { yellowBright } from 'syncify:colors';
-import { throwError } from 'syncify:log/throws';
-import { isArray } from 'syncify:utils';
+import { basename, dirname, join, resolve } from 'node:path';
+
+import { COL, yellowBright } from '@syncify/ansi';
+
+import { throwError } from '~cli/throws';
+import { isArray } from '~utils';
 
 /**
  * Generate File Path
  */
-export default function fileUrl (filePath: string) {
+export function fileUrl (filePath: string) {
 
   let path: string;
 
@@ -32,11 +32,7 @@ export default function fileUrl (filePath: string) {
  */
 export function globPath <T extends string | string[]> (path: T): T {
 
-  return isArray(path)
-    ? path.filter(uri => /\*/.test(uri)) as T
-    : /\*/.test(path)
-      ? path
-      : null;
+  return isArray(path) ? path.filter(uri => /\*/.test(uri)) as T : /\*/.test(path) ? path : null;
 
 }
 
@@ -44,7 +40,7 @@ export function globPath <T extends string | string[]> (path: T): T {
  * Last Path
  *
  * Will return the portion of a URI path. If
- * the path does not not contain forward slashes it
+ *  the path does not not contain forward slashes it
  * returns the passed string.
  *
  * @example
@@ -98,7 +94,7 @@ export function parentPath (path: string | string[]) {
  * Normalize path
  *
  * Resolve CWD to a path definition. Returns a function type
- * who accepts a string or array of strings. Paths will include
+ * that accepts a string or array of strings. Paths will include
  * the directory `input` folder name.
  *
  * When passing a `cwd` then input path will check `startsWith`
@@ -118,14 +114,15 @@ export function parentPath (path: string | string[]) {
 export function normalPath (input: string, cwd = null) {
 
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
+  const source = new RegExp(`^\\.?\\/?${basename(input)}\\/`);
 
   /**
    * Prepends the provided input to the path and
    * returns a correctly formed uri.
    */
-  return function prepend (path: string | string[]) {
+  return function prepend (path: any) {
 
-    if (isArray(path)) return path.map(prepend);
+    if (Array.isArray(path)) return path.map(prepend);
 
     const ignore = path.charCodeAt(0) === 33;
 
@@ -140,10 +137,16 @@ export function normalPath (input: string, cwd = null) {
     }
 
     if (cwd !== null) {
+
       const exists = join(cwd, path);
       return (ignore ? '!' : '') + (exists.startsWith(input) ? exists : join(input, path));
+
     } else {
-      return (ignore ? '!' : '') + join(input, path);
+
+      // We need to remove occurences where input matches base input dir, eg:
+      // source/dir/file > dir/file
+      // This is because the "input" value already represents full resolution.
+      return (ignore ? '!' : '') + join(input, source.test(path) ? path.replace(source, NIL) : path);
     }
 
   };
@@ -186,7 +189,7 @@ export const basePath = (cwd: string) => (path: string) => {
     } else {
       throwError(
         `Directory path is invalid at${COL} ${yellowBright(`"${path}"`)}`,
-        [ 'Ensure that path you are resolving is correctly formed' ]
+        [ 'Ensure that the path you attempting to resolve is correctly formed' ]
       );
     }
 
@@ -202,14 +205,14 @@ export const basePath = (cwd: string) => (path: string) => {
   }
 
   // path directory is valid, eg: path
-  // dirs cannot reference sub directorys, eg: path/sub
+  // dirs cannot reference sub directories, eg: path/sub
   if (/^[a-zA-Z0-9_-]+/.test(path)) {
     path = join(cwd, path);
-    return last(path).charCodeAt(0) === 47 ? path : path + '/';
+    return path[path.length - 1].charCodeAt(0) === 47 ? path : path + '/';
   } else {
     throwError(
       `Directory path is invalid at${COL} ${yellowBright(`"${path}"`)}`,
-      [ 'Ensure that path you are resolving is correctly formed' ]
+      [ 'Ensure that the path you attempting to resolve is correctly formed' ]
     );
   }
 };

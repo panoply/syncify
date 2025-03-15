@@ -11,10 +11,17 @@ test/cases/*
 test/e2e/custom/dist
 .tmp
 dump.rdb
-docs/
 tests/
+!packages/tests
 packages/**/dist
 straps/dusk-advanced/theme
+examples/using-paths/theme
+
+# DOCS
+#########################################
+
+.netlify
+docs/public/*
 
 lib-cov
 *.seed
@@ -42,8 +49,6 @@ nbproject
 .shopifysync.json
 example
 package
-theme
-yarn.lock
 versions
 
 

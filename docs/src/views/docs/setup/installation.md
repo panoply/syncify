@@ -10,7 +10,9 @@ anchors:
 
 # Installation
 
-Syncify is distributed as both an ESM and CJS module. It is recommended that you install as a development dependency in your project opposed to installing globally. Please consider choosing and adopting [pnpm](https://pnpm.js.org/en/cli/install) as your package manager for most optimal usage.
+Syncify is distributed as a CommonJS (CJS) module but is compatible with ECMAScript Module (ESM) environments since it operates as a CLI binary-based tool. You have the option to install Syncify either on a per-project basis or globally, with global installation being the recommended and preferred method.
+
+Syncify requires users to have both [Node](https://nodejs.org/) (v20 or higher) and [Git](https://git-scm.com/) (v2.2 or higher) installed on their system. While Syncify is compatible with various package managers, for the optimal experience, it's advisable to consider using [pnpm](https://pnpm.js.org/en/cli/install).
 
 :::: grid row mt-5
 ::: grid col-12 col-md-6 pr-4 mb-5
@@ -18,7 +20,7 @@ Syncify is distributed as both an ESM and CJS module. It is recommended that you
 #### PNPM
 
 ```bash
-$ pnpm add @syncify/cli -D
+$ pnpm add @syncify/cli -g
 ```
 
 :::
@@ -27,7 +29,7 @@ $ pnpm add @syncify/cli -D
 #### NPM
 
 ```bash
-$ npm i @syncify/cli --save-dev
+$ npm i @syncify/cli -g
 ```
 
 :::
@@ -36,7 +38,7 @@ $ npm i @syncify/cli --save-dev
 #### YARN
 
 ```bash
-$ yarn add @syncify/cli --dev
+$ yarn add @syncify/cli -g
 ```
 
 :::
@@ -45,7 +47,7 @@ $ yarn add @syncify/cli --dev
 #### BUN
 
 ```bash
-$ bun add @syncify/cli --dev
+$ bun add @syncify/cli -g
 ```
 
 :::
@@ -53,21 +55,39 @@ $ bun add @syncify/cli --dev
 
 ---
 
+# Browser Extensions
+
+Syncify offers browser extensions in Chrome, Brave, Firefox, Edge and Safari. Extensions are designed to enhance development experiences with the tool. It is **highly recommend** that developers install the Syncify extensions in their preferred browser(s) as it will significantly improve functionality and usage, particularly during **HOT Reload** processes.
+
+Syncify can function without its extensions, but doing so incurs a slight performance cost due to additional runtime checks and slower interface interactions. When paired with the official companion extensions, Syncify performance is enhanced, resulting in reduced latency and optimized resource use.
+
+### Syncify Extension
+
+Install the official Syncify extension into the browser you use for development.
+
+{% include 'browsers' %}
+
+---
+
 # Schema Stores
 
 Syncify provides JSON Schema Store references for usage in JSON files that contain a `$schema` property or within text editors like [VSCode](https://code.visualstudio.com/) which support external schema store association. The JSON Schema store is helpful for users who prefer `.json` configurations or are setting config options within their `package.json` file via the `syncify` config key.
 
+##### Package `package.json`
+
 ```bash
-# Usage within env.syncify.json
-https://unpkg.com/@syncify/schema/env.json
-
-# Usage within package.json
 https://unpkg.com/@syncify/schema/pkg.json
+```
 
-# Usage within syncify.config.json
+##### Config File `syncify.config.json`
+
+```bash
 https://unpkg.com/@syncify/schema/config.json
+```
 
-# Usage within *.schema files
+##### Sections `*.schema`
+
+```bash
 https://unpkg.com/@syncify/schema/sections.json
 ```
 
@@ -82,14 +102,6 @@ Developers using the **VSCode** text editor can enable the JSON Schema within th
     {
       "fileMatch": ["**/package.json"],
       "url": "https://unpkg.com/@syncify/schema/pkg.json"
-    },
-    {
-      "fileMatch": ["syncify.env.json"],
-      "url": "https://unpkg.com/@syncify/schema/env.json"
-    },
-    {
-      "fileMatch": ["syncify.env.json"],
-      "url": "https://unpkg.com/@syncify/schema/config.json"
     },
     {
       "fileMatch": ["**/*.schema"],

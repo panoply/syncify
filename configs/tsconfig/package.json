@@ -1,0 +1,12 @@
+{
+  "name": "@syncify/tsconfig",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "files": ["./browser.json", "./node.json"],
+  "author": {
+    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
+    "url": "https://github.com/panoply",
+    "email": "n.savvidis@gmx.com"
+  }
+}

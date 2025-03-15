@@ -1,27 +1,29 @@
-import type { Syncify, Requests, Theme, Resource, File } from 'types';
 import type { AxiosResponse } from 'axios';
-import { join, relative } from 'pathe';
-import { delay } from 'rambdax';
-import { writeFileSync } from 'fs-extra';
-import { importFile } from 'syncify:process/files';
-import { Progress } from 'syncify:cli/progress';
-import { queue } from 'syncify:requests/queue';
-import { timer } from 'syncify:utils/timer';
-import { assign, event } from 'syncify:native';
-import { addSuffix, glue } from 'syncify:utils';
-import { Create, Prefix } from 'syncify:ansi';
-import { ARR } from 'syncify:symbol';
-import * as request from 'syncify:requests/assets';
-import * as c from 'syncify:colors';
-import * as log from 'syncify:log';
+import type { Requests, Resource, Theme } from 'types';
+import type { File } from '~file';
 
-import { $ } from 'syncify:state';
+import { join, relative } from 'node:path';
+
+import { writeFileSync } from 'fs-extra';
+
+import { Progress } from '@syncify/ansi';
+import * as _ from '@syncify/ansi';
+import { glue } from '@syncify/glue';
+import { timer } from '@syncify/timer';
+
+import { log } from '~cli/log';
+import { event } from '~events';
+import { http } from '~http/client';
+import { importFile } from '~process/files';
+import { addSuffix, assign, delay, m, s } from '~utils';
+
+import { $ } from '$';
 
 interface EventParams {
   /**
    * The response status
    */
-  status: request.Events;
+  status: Events;
   /**
    * The Theme request model
    */
@@ -140,20 +142,19 @@ type SyncModel = Map<string, SyncRecord>
  */
 async function getModel () {
 
-  const sync: SyncModel = new Map();
+  const sync: SyncModel = m();
 
   /**
    * Indentation Width used for CLI logging
    */
   let width: number = 0;
 
-  for (const theme of $.sync.themes) {
+  for (const theme of $.target) {
 
     if (theme.target.length > width) width = theme.target.length;
 
-    const store = $.sync.stores[theme.sidx];
     const key: string = `${theme.store}:${theme.target}`;
-    const { assets } = await request.get<'LIST'>(theme, store.client);
+    // const { assets } = await request.get<'LIST'>(theme, theme.store.client);
 
     if (!sync.has(key)) {
 
@@ -171,9 +172,9 @@ async function getModel () {
         get files () { return assets; },
         get theme () { return theme; },
         errors: {
-          local: new Map(),
-          remote: new Map(),
-          retry: new Set()
+          local: m(),
+          remote: m(),
+          retry: s()
         }
       });
 
@@ -187,18 +188,18 @@ async function getModel () {
 
 function getDoneLog (record: SyncRecord, output: string, time: string) {
 
-  const success = `${c.bold(`${record.success}`)} ${c.white('of')} ${c.bold(`${record.size}`)}`;
-  const failed = c.bold(`${record.failed}`);
-  const target = c.bold(`${record.theme.target.toUpperCase()}`);
+  const success = `${_.bold(`${record.success}`)} ${_.white('of')} ${_.bold(`${record.size}`)}`;
+  const failed = _.bold(`${record.failed}`);
+  const target = _.bold(`${record.theme.target.toUpperCase()}`);
 
-  return Create()
-  .Line(Prefix(target, ARR), c.neonCyan)
+  return _.Create()
+  .Line(_.Prefix(target, _.ARR), _.neonCyan)
   .NL
-  .Line(`completed in ${c.gray(time)}`)
+  .Line(`completed in ${_.gray(time)}`)
   .NL
-  .Line(Prefix('synced', success), c.whiteBright)
-  .Line(Prefix('errors', failed), record.failed > 0 ? c.redBright : c.whiteBright)
-  .Line(Prefix('location', c.gray.underline(output)))
+  .Line(_.Prefix('synced', success), _.whiteBright)
+  .Line(_.Prefix('errors', failed), record.failed > 0 ? _.redBright : _.whiteBright)
+  .Line(_.Prefix('location', _.gray.underline(output)))
   .NL
   .Insert(record.progress.render())
   .Line
@@ -208,22 +209,24 @@ function getDoneLog (record: SyncRecord, output: string, time: string) {
 
 function getWaitLog (record: SyncRecord) {
 
-  return Create()
-  .Line(`${c.bold(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`, c.gray.dim)
+  return _.Create()
+  .Line(`${_.bold(record.theme.target.toUpperCase())}  ${_.ARR}  ${record.theme.store}`, _.gray.dim)
   .NL
-  .Line(`${c.bold(addSuffix(record.number))} in queue`, c.magenta)
+  .Line(`${_.bold(addSuffix(record.number))} in queue`, _.magenta)
   .NL
-  .Line(Prefix('synced', `${c.bold('0')} ${c.white('of')} ${c.bold(`${record.size}`)}`), c.gray.dim)
-  .Line(Prefix('retry', c.bold('0')), c.gray.dim)
-  .Line(Prefix('errors', c.bold('0')), c.gray.dim)
+  .Line(_.Prefix('synced', `${_.bold('0')} ${_.white('of')} ${_.bold(`${record.size}`)}`), _.gray.dim)
+  .Line(_.Prefix('retry', _.bold('0')), _.gray.dim)
+  .Line(_.Prefix('errors', _.bold('0')), _.gray.dim)
   .NL
-  .Insert(record.progress.render(c.gray.dim))
+  .Insert(record.progress.render(_.gray.dim))
   .NL
   .toString();
 
 }
 
-export async function importing (cb?: Syncify): Promise<void> {
+export async function Import (): Promise<void> {
+
+  $.running = true;
 
   let remaining: number = 0;
   let transfers: number = 0;
@@ -255,17 +258,17 @@ export async function importing (cb?: Syncify): Promise<void> {
     const record = sync.get(key);
     const preview = `https://${theme.store}?preview_theme_id=${theme.id}`;
 
-    const prefix = Create()
+    const prefix = _.Create()
     .NL
-    .Line(Prefix('Duration', c.whiteBright(timer.now('import'))), c.gray)
-    .Line(Prefix('Transfers', c.whiteBright(`${transfers++}`)), c.gray)
-    .Line(Prefix('Syncing', c.pink(`${c.bold(theme.target)}  ${ARR}  ${theme.store}`)), c.gray)
-    .Line(Prefix('Preview', c.underline(preview)), c.gray)
+    .Line(_.Prefix('Duration', _.whiteBright(timer.now('import'))), _.gray)
+    .Line(_.Prefix('Transfers', _.whiteBright(`${transfers++}`)), _.gray)
+    .Line(_.Prefix('Syncing', _.pink(`${_.bold(theme.target)}  ${_.ARR}  ${theme.store}`)), _.gray)
+    .Line(_.Prefix('Preview', _.underline(preview)), _.gray)
     .Ruler();
 
     let processing: string = NIL;
 
-    if (item.status === request.Events.Empty) {
+    if (item.status === Events.Empty) {
 
       writeFileSync(file.output, '');
 
@@ -273,9 +276,9 @@ export async function importing (cb?: Syncify): Promise<void> {
       record.transfers += 1;
       record.progress.increment(1);
 
-      processing = c.yellowBright(file.key);
+      processing = _.yellowBright(file.key);
 
-    } else if (item.status === request.Events.Success) {
+    } else if (item.status === Events.Success) {
 
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -290,18 +293,18 @@ export async function importing (cb?: Syncify): Promise<void> {
 
       writeFileSync(file.output, buffer);
 
-      processing = c.neonGreen(file.key);
+      processing = _.neonGreen(file.key);
 
-    } else if (item.status === request.Events.Retry) {
+    } else if (item.status === Events.Retry) {
 
       if (!record.errors.retry.has(file.output)) {
         record.retry += 1;
         record.errors.retry.add(file.output);
       }
 
-      processing = c.orange(file.key);
+      processing = _.orange(file.key);
 
-    } else if (item.status === request.Events.Failed) {
+    } else if (item.status === Events.Failed) {
 
       if (record.errors.retry.has(file.output)) {
         record.retry -= 1;
@@ -317,25 +320,25 @@ export async function importing (cb?: Syncify): Promise<void> {
 
       }
 
-      processing = c.redBright(file.key);
+      processing = _.redBright(file.key);
 
     }
 
-    const success = `${c.bold(`${record.success}`)} ${c.white('of')} ${c.bold(`${record.size}`)}`;
-    const retried = c.bold(`${record.retry}`);
-    const failed = c.bold(`${record.failed}`);
-    const warnings = c.bold(`${record.warning}`);
+    const success = `${_.bold(`${record.success}`)} ${_.white('of')} ${_.bold(`${record.size}`)}`;
+    const retried = _.bold(`${record.retry}`);
+    const failed = _.bold(`${record.failed}`);
+    const warnings = _.bold(`${record.warning}`);
 
-    const status = Create()
+    const status = _.Create()
     .NL
-    .Line(`${c.bold(record.theme.target.toUpperCase())}  ${ARR}  ${record.theme.store}`, c.neonCyan)
+    .Line(`${_.bold(record.theme.target.toUpperCase())}  ${_.ARR}  ${record.theme.store}`, _.neonCyan)
     .NL
     .Line(processing)
     .NL
-    .Line(Prefix('synced', success), c.whiteBright)
-    .Line(Prefix('retry', retried), record.retry > 0 ? c.orange : c.whiteBright)
-    .Line(Prefix('warning', warnings), record.warning > 0 ? c.yellowBright : c.whiteBright)
-    .Line(Prefix('failed', failed), record.failed > 0 ? c.redBright : c.whiteBright)
+    .Line(_.Prefix('synced', success), _.whiteBright)
+    .Line(_.Prefix('retry', retried), record.retry > 0 ? _.orange : _.whiteBright)
+    .Line(_.Prefix('warning', warnings), record.warning > 0 ? _.yellowBright : _.whiteBright)
+    .Line(_.Prefix('failed', failed), record.failed > 0 ? _.redBright : _.whiteBright)
     .NL
     .Insert(record.progress.render())
     .NL
@@ -390,11 +393,11 @@ export async function importing (cb?: Syncify): Promise<void> {
         }
       }, $.sync.stores[record.theme.sidx].client);
 
-      await queue.add(() => request.sync(record.theme, file, payload));
+      await http.queue.add(() => request.sync(record.theme, file, payload));
 
     }
 
-    await queue.onIdle();
+    await http.queue.onIdle();
 
     remaining = remaining - 1;
 
@@ -419,8 +422,8 @@ export async function importing (cb?: Syncify): Promise<void> {
 
       // for (const [ path, ref ] of errors.remote) {
 
-      //   log.nwl();
-      //   log.write(c.redBright.bold(`ERROR ${errno++}`));
+      //   log.nl();
+      //   log.write(_.redBright.bold(`ERROR ${errno++}`));
 
       // }
 

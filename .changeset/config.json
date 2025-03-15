@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.4/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [["@syncify/config", "@syncify/types"]],
+  "linked": [],
+  "access": "restricted",
+  "baseBranch": "master",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@syncify/docs",
+    "@syncify/json",
+    "@syncify/eslint-config",
+    "@syncify/prettier-config",
+    "@syncify/stylelint-config",
+    "@syncify/tsconfig",
+    "@syncify/cli",
+    "@syncify/acquire",
+    "@syncify/ansi",
+    "@syncify/hot",
+    "@syncify/kill",
+    "@syncify/schema",
+    "@syncify/timer",
+    "@syncify/turndown",
+    "@syncify/update",
+    "@syncify/uws"
+  ]
+}

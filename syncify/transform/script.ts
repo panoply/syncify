@@ -1,47 +1,51 @@
-import type { Syncify, ClientParam, ScriptBundle } from 'types';
-import { writeFile } from 'fs-extra';
+import type { ScriptBundle } from 'types';
+
+import { basename, join, relative } from 'node:path';
+
 import esbuild, { Metafile } from 'esbuild';
-import { basename, join, relative } from 'pathe';
-import { isType } from 'rambdax';
-import { File } from 'syncify:file';
-import { timer } from 'syncify:timer';
-import { bold } from 'syncify:colors';
-import * as log from 'syncify:log';
-import * as error from 'syncify:errors';
-import * as warn from 'syncify:log/warnings';
-import { stringSize, byteSize, sizeDiff } from 'syncify:sizes';
-import { pNext, isBuffer, has } from 'syncify:utils';
-import { $ } from 'syncify:state';
+import { writeFile } from 'fs-extra';
+import pMap from 'p-map';
+
+import { ARR, bold } from '@syncify/ansi';
+import { glue } from '@syncify/glue';
+import { timer } from '@syncify/timer';
+
+import { log } from '~cli/log';
+import { warn } from '~cli/warnings';
+import { error } from '~errors';
+import { File } from '~file';
+import { themeFilesUpsertMap } from '~http/theme';
+import { byteSize, has, inProp, isEmpty, pNext, sizeDiff, stringSize } from '~utils';
+
+import { $, q } from '$';
 
 /**
  * ESBuild Metafile
  *
  * A sub-build process used at runtime to collect all import paths.
  */
-export async function esbuildBundle (config: ScriptBundle): Promise<void> {
+export async function esbuildBundle (bundle: ScriptBundle): Promise<void> {
 
-  config.watch.clear();
+  bundle.watch.clear();
 
-  const result = await esbuild.build(config.esbuild);
-
+  const result = await esbuild.build(bundle.esbuild);
   if ($.mode.terse && $.mode.build) {
-
-    config.size = byteSize(result.outputFiles[0].text);
-
+    bundle.size = byteSize(result.outputFiles[0].text);
   }
 
   if ($.mode.watch) {
-    await getWatchPaths(config, result.metafile.inputs);
+    await getWatchPaths(bundle, result.metafile.inputs);
   } else {
-    if (!config.watch.has(config.input)) config.watch.add(config.input);
-    if (!$.watch.has(config.input)) $.watch.add(config.input);
+    if (!bundle.watch.has(bundle.input)) {
+      bundle.watch.add(bundle.input);
+    }
   }
 }
 
-async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) {
+async function getWatchPaths (bundle: ScriptBundle, inputs: Metafile['inputs']) {
 
   const store: string[] = [];
-  const { cwd, watch, mode } = $;
+  const { cwd, mode } = $;
 
   for (const file in inputs) {
 
@@ -49,10 +53,8 @@ async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) 
 
     const path = join(cwd, file);
 
-    if (!config.watch.has(path)) config.watch.add(path);
-    if (!watch.has(path)) watch.add(path);
+    if (!bundle.watch.has(path)) bundle.watch.add(path);
     if (mode.watch) store.push(path);
-
   }
 
   if (mode.watch) {
@@ -61,19 +63,11 @@ async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) 
     // We execute this check in the next event loop to ensure
     // that it does not impact performance.
     await pNext().then(() => {
-
-      for (const path of config.watch) {
-
+      for (const path of bundle.watch) {
         if (path.indexOf('/node_modules/') > -1) continue;
-        if (config.watchCustom !== null && config.watchCustom(path)) continue;
-
-        if (!has(path.slice(cwd.length + 1), inputs)) {
-          config.watch.delete(path);
-          watch.unwatch(path);
-        }
-
+        if (bundle.watchCustom !== null && bundle.watchCustom(path)) continue;
+        if (!has(path.slice(cwd.length + 1), inputs)) bundle.watch.delete(path);
       }
-
     });
 
   }
@@ -82,37 +76,8 @@ async function getWatchPaths (config: ScriptBundle, inputs: Metafile['inputs']) 
 export function createSnippet (string: string, attrs: string[]) {
 
   return attrs.length > 0
-    ? `<script ${attrs.join(' ')}>${string}</script>`
+    ? `<script ${glue.ws(attrs)}>${string}</script>`
     : `<script>${string}</script>`;
-
-};
-
-function runHook (hook: Syncify) {
-
-  if (!isType('Function', hook)) return false;
-
-  return function (file: File, content: string) {
-
-    const update = hook.apply({ ...file }, content);
-
-    if (update === false) {
-      log.write('cancelled');
-      return null;
-    }
-
-    if (isType('String', update)) {
-      log.write('augment');
-      return update;
-    }
-
-    if (isBuffer(update)) {
-      log.write('augment');
-      return update.toString();
-    }
-
-    return content;
-
-  };
 
 };
 
@@ -121,156 +86,108 @@ function runHook (hook: Syncify) {
  *
  * Used for Script transformations.
  */
-export async function compile <T extends ScriptBundle> (file: File<T[]>, sync: ClientParam<T>, hooks: Syncify) {
+export async function ScriptTransform <T extends ScriptBundle> (file: File<T[]>) {
 
   if (!file.data) return;
 
-  if ($.mode.watch) timer.start();
-  if ($.mode.hot) timer.start(file.uuid);
+  const { hot, watch, terse, bulk, build } = $.mode;
 
-  const hook = runHook(hooks);
-  const trigger = file.data.length;
+  if (watch) timer.start();
+  if (hot) timer.start(file.uuid);
 
-  for (const config of file.data) {
+  const files = await pMap(file.data, async bundle => {
 
-    const {
-      key,
-      input,
-      output,
-      snippet,
-      attrs,
-      esbuild: { format } } = config;
+    const { key, input, output, snippet, attrs, esbuild: { format } } = bundle;
+    const { metafile, outputFiles, warnings } = await esbuild.build(bundle.esbuild);
 
-    try {
+    if (file.data.length > 1) {
+      log.nl().write(relative($.cwd, input));
+    }
 
-      const {
-        metafile,
-        outputFiles,
-        warnings } = await esbuild.build(config.esbuild);
+    if ($.mode.watch) {
+      await getWatchPaths(bundle, metafile.inputs);
+    }
 
-      if (trigger > 1) {
-        log.nwl();
-        log.write(relative($.cwd, input));
-      }
+    if (warnings.length > 0) {
+      warn.esbuild(warnings);
+    }
 
-      if ($.mode.watch) {
-        await getWatchPaths(config, metafile.inputs);
-      }
+    for (const { text, path } of outputFiles) {
 
-      if (warnings.length > 0) warn.esbuild(warnings);
+      if (path.endsWith('.map')) {
 
-      for (const { text, path } of outputFiles) {
+        const map = join($.dirs.sourcemaps.scripts, `${file.base}.map`);
 
-        if (path.endsWith('.map')) {
+        q.tasks.add(() => writeFile(map, text).catch(
+          error.write('Error writing JavaScript Source Map to cache', {
+            output: $.dirs.sourcemaps.scripts,
+            source: file.relative
+          })
+        ));
 
-          const map = join($.dirs.sourcemaps.scripts, `${file.base}.map`);
+      } else {
 
-          writeFile(map, text).catch(
-            error.write('Error writing JavaScript Source Map to cache', {
-              file: relative($.cwd, map),
+        if (terse) {
+          if (isNaN(bundle.size)) {
+            log.transform(file.kind, `${bold(format.toUpperCase())} bundle`);
+            log.minified(stringSize(text));
+          } else {
+            const size = sizeDiff(text, bundle.size);
+            log.transform(`${bold(format.toUpperCase())} bundle ${ARR} ${bold(stringSize(text))}`);
+            log.minified(null, size.before, size.after, size.saved);
+          }
+        } else {
+          log.transform(`${bold(format.toUpperCase())} bundle ${ARR} ${bold(stringSize(text))}`);
+        }
+
+        if (snippet) {
+
+          bundle.value = createSnippet(text, attrs);
+
+          await writeFile(output, bundle.value).catch(
+            error.write('Error writing inline <script> snippet', {
               source: file.relative
             })
           );
 
+          log.exported('script', 'snippet');
+
         } else {
 
-          if ($.mode.terse) {
+          bundle.value = text;
 
-            if (isNaN(config.size)) {
-
-              log.transform(file.kind, `${bold(format.toUpperCase())} bundle`);
-              log.minified(stringSize(text));
-
-            } else {
-
-              const { before, after, saved } = sizeDiff(text, config.size);
-              log.transform(`${bold(format.toUpperCase())} bundle → ${bold(stringSize(text))}`);
-              log.minified(null, before, after, saved);
-
-            }
-
-          } else {
-            log.transform(`${bold(format.toUpperCase())} bundle → ${bold(stringSize(text))}`);
-          }
-
-          let content: string;
-
-          if (snippet) {
-
-            content = createSnippet(text, attrs);
-
-            if (hook) {
-              content = hook(file, content);
-              if (content === null) continue;
-            }
-
-            await writeFile(output, content).catch(
-              error.write('Error writing inline <script> snippet', {
-                file: file.relative
-              })
-            );
-
-            log.exported('script', 'snippet');
-
-          } else {
-
-            content = text;
-
-            if (hook) {
-              content = hook(file, content);
-              if (content === null) continue;
-            }
-
-            await writeFile(output, content).catch(
-              error.write('Error writing JavaScript asset', {
-                file: file.relative
-              })
-            );
-
-          }
-
-          if ($.mode.hot) {
-
-            log.syncing(key, { hot: true });
-
-            $.wss.script(file.uuid, basename(key));
-
-            await sync('put', config as any, content);
-
-          } else if (!$.mode.build) {
-
-            log.syncing(key);
-
-            await sync('put', config as any, content);
-
-          }
+          await writeFile(output, bundle.value).catch(
+            error.write('Error writing JavaScript asset', {
+              source: file.relative
+            })
+          );
 
         }
 
-      };
-
-    } catch (e) {
-
-      if (has('errors', e)) {
-
-        timer.clear();
-
-        log.error(file.relative, {
-          notify: {
-            title: 'JavaScript Error',
-            message: `Transform failed for ${file.base}`
-          }
-        });
-
-        $.errors.add(input);
-        e.errors.forEach(error.esbuild);
+        if (bulk === false || build === false) {
+          log.syncing(key, { hot });
+          hot && $.wss.script(file.uuid, basename(key));
+        }
 
       }
 
+    };
+
+    return bundle as unknown as File<T>;
+
+  }).catch(issue => {
+
+    if (inProp('errors', issue)) {
+      timer.clear();
+      error.esbuild(file, issue.errors);
     }
 
-  }
+  });
 
-  if (trigger > 1) log.nwl();
+  if (files && isEmpty(files) === false && build === false) {
+
+    await themeFilesUpsertMap(files);
+
+  }
 
 };

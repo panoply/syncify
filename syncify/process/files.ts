@@ -1,13 +1,95 @@
-/* eslint-disable no-unused-vars */
-import type { PathBundle } from 'types';
-import { join, parse, relative, basename } from 'pathe';
-import { schema, script, section, snippet, style, svg } from 'syncify:process/context';
-import { lastPath } from 'syncify:utils/paths';
-import { uuid } from 'syncify:utils';
-import { assign } from 'syncify:native';
-import { File, Kind, Type, Namespace } from 'syncify:file';
-import { Partial } from 'rambdax';
-import { $ } from 'syncify:state';
+import { basename, join, relative } from 'node:path';
+
+import { setPathCache } from './cache';
+
+import { File, Kind, Namespace, Type } from '~file';
+import { schema, script, section, snippet, style, svg } from '~process/context';
+import { merge, uuid } from '~utils';
+import { lastPath } from '~utils/paths';
+
+import { $ } from '$';
+
+/*
+
+┌─ Syncify ~ 03:59:26
+│
+│  v1.0.0-alpha.1 ~ latest
+│
+├─ Theme
+│  ├─ layouts    →   1 file  ~ 1ms
+│  ├─ templates  →  19 files ~ 5ms
+│  ├─ sections   →   5 files ~ 2ms
+│  │  └─ schema  →   6 files ~ 1ms
+│  ├─ snippets   →   6 files ~ 1ms
+│  │  ├─ script  →   1 files ~ 1ms
+│  │  └─ svg     →   6 files ~ 1ms
+│  ├─ locales    →   2 files ~ 1ms
+│  ├─ configs    →   2 files ~ 1ms
+│  └─ assets     →   0 files ~ 0ms
+│     ├─ svgs
+│     ├─ styles
+│     └─ scripts
+│
+├─ Theme
+│  │
+│  ├─ svgs       →   1 file  ~ 19ms
+│  ├─ styles     →   1 file  ~ 104ms
+│  └─ scripts    →   1 file  ~ 3ms
+│
+├─ Completed
+│
+│  version    →  0.1.0
+│  processed  →  38 files
+│  bundled    →  36 files
+│  skipped    →  2 files
+│  duration   →  158ms
+│  warnings   →  0
+│  errors     →  0
+│
+└─ Syncify ~ 03:59:26
+
+*/
+
+/**
+ * File Kind Media
+ *
+ * Returns a grouping reference name according to file extensio
+ *
+ * @param ext The file extension
+ */
+export function fileMediaKind (ext: string) {
+
+  // Remove the . if passed
+  if (ext.charCodeAt(0) === 46) ext = ext.slice(1);
+
+  switch (ext) {
+    case 'webm':
+    case 'mpg':
+    case 'mp2':
+    case 'mpeg':
+    case 'mpe':
+    case 'mpv':
+    case 'ogg':
+    case 'm4p':
+    case 'm4v':
+    case 'avi':
+    case 'wmv':
+    case 'mov':
+    case 'qt':
+    case 'flv':
+    case 'swf':
+    case 'avchd': return 'video';
+
+    case 'm4a':
+    case '3gp':
+    case '3g2':
+    case 'aiff':
+    case 'amr':
+    case 'mp3':
+    case 'wav': return 'audio';
+  }
+
+};
 
 /**
  * File Kind
@@ -83,6 +165,7 @@ export function renameFile ({ name, dir, ext, namespace }: File, rename: string)
   let newName = rename;
 
   if (/\[dir\]/.test(newName)) newName = newName.replace(/\[dir\]/g, dir);
+  if (/\[name\]/.test(newName)) newName = newName.replace(/\[name\]/g, name);
   if (/\[file\]/.test(newName)) newName = newName.replace(/\[file\]/g, name);
   if (/\[ext\]/.test(newName)) newName = newName.replace(/\[ext\]/g, ext);
 
@@ -91,9 +174,7 @@ export function renameFile ({ name, dir, ext, namespace }: File, rename: string)
 
   // validate the rename extension
   if (!rename.endsWith('.[ext]') || !rename.endsWith(ext)) {
-    return /\.[a-z]+$/.test(rename)
-      ? newName
-      : newName + ext;
+    return /\.[a-z]+$/.test(rename) ? newName : newName + ext;
   }
 
   return newName;
@@ -112,11 +193,7 @@ export function setFile (file: File, input: string, output: string) {
 
   file.size = NaN;
 
-  return function <T extends unknown> (
-    namespace: Namespace,
-    type: Type,
-    kind?: Kind | -1
-  ): File<T> {
+  return function <T extends unknown> (namespace: Namespace, type: Type, kind?: Kind | -1): File<T> {
 
     let key: string;
 
@@ -128,7 +205,15 @@ export function setFile (file: File, input: string, output: string) {
       output = join(output, key);
     }
 
-    if (kind === -1) input = $.cache.paths[input];
+    if (kind === -1) {
+
+      input = $.cache.paths[output];
+
+    } else {
+
+      setPathCache(input, output);
+
+    }
 
     file.uuid = uuid();
     file.type = type;
@@ -137,7 +222,7 @@ export function setFile (file: File, input: string, output: string) {
     file.kind = kind as Kind;
     file.input = input;
     file.output = output;
-    file.relative = relative($.cwd, input);
+    file.relative = input ? relative($.cwd, input) : $.cwd;
 
     return file;
 
@@ -154,27 +239,63 @@ export function setFile (file: File, input: string, output: string) {
  * @param input The file path which is being processed
  * @param output The output base directory path
  */
-export function setImportFile (parsedFile: Partial<File>, output: string) {
+export function setImportFile (file: Partial<File>, output: string) {
 
-  const file = <File>parsedFile;
+  return (key: string, namespace: Namespace): File => merge(<File>file, {
+    key,
+    namespace,
+    output,
+    uuid: uuid(),
+    kind: getFileKind(file.ext),
+    relative: relative($.cwd, output)
+  });
 
-  return (key: string, namespace: Namespace): File => {
-
-    return assign({}, file, {
-      uuid: uuid(),
-      key,
-      namespace,
-      output,
-      kind: getFileKind(file.ext),
-      relative: relative($.cwd, output)
-    });
-
-  };
 }
 
-export function parseFileQuick <T> (path: string): File<T> {
+export function parseProcessorConfigs (path: string, namespace: string) {
 
-  return <File<T>> parseFile($.paths, $.dirs.output)(path);
+  const file = new File(path);
+
+  file.namespace = <any>namespace;
+  file.input = path;
+  file.relative = relative($.cwd, file.input);
+
+  switch (file.ext) {
+    case '.ts':
+      file.kind = Kind.TypeScript;
+      break;
+    case '.js':
+    case '.mjs':
+    case '.cjs':
+      file.kind = Kind.JavaScript;
+      break;
+  }
+
+  return file;
+
+}
+
+export function parseSyncifyConfig (path: string) {
+
+  const file = new File(path);
+
+  file.namespace = Namespace.Syncify;
+  file.input = path;
+  file.type = Type.Syncify;
+  file.relative = relative($.cwd, file.input);
+
+  switch (file.ext) {
+    case '.ts':
+      file.kind = Kind.TypeScript;
+      break;
+    case '.js':
+    case '.mjs':
+    case '.cjs':
+      file.kind = Kind.JavaScript;
+      break;
+  }
+
+  return file;
 
 }
 
@@ -187,124 +308,120 @@ export function parseFileQuick <T> (path: string): File<T> {
  * @param paths The Anymatch tester
  * @param output The output base directory path
  */
-export function parseFile (paths: PathBundle, output: string) {
+export function parse (path: string) {
 
-  return function fn (path: string) {
+  const { paths } = $;
+  const file = new File(path);
+  const define = setFile(file, path, $.dirs.output);
 
-    const file = new File(parse(path));
-    const define = setFile(file, path, output);
-
-    if (file.ext === '.liquid') {
-
-      if (paths.sections.match(path)) {
-        return section(define(Namespace.Sections, Type.Section, Kind.Liquid));
-      } else if (paths.snippets.match(path)) {
-        return snippet(define(Namespace.Snippets, Type.Snippet, Kind.Liquid));
-      } else if (paths.layout.match(path)) {
-        return define(Namespace.Layout, Type.Layout, Kind.Liquid);
-      } else if (paths.templates.match(path)) {
-        return define(Namespace.Templates, Type.Template, Kind.Liquid);
-      } else if (paths.customers.match(path)) {
-        return define(Namespace.Customers, Type.Template, Kind.Liquid);
-      } else if (paths.metaobject.match(path)) {
-        return define(Namespace.Metaobject, Type.Template, Kind.Liquid);
-      } else if (paths.transforms.has(path)) {
-        if (paths.transforms.get(path) === Type.Style) {
-          return style(define(Namespace.Snippets, Type.Style, Kind.CSS));
-        }
-      }
-
-    } else if (file.ext === '.schema' && paths.schema.match(path)) {
-
-      return schema(fn, define(Namespace.Schema, Type.Schema, Kind.JSON));
-
-    } else if (file.ext === '.json') {
-
-      if (paths.metafields.match(path)) {
-        return define(Namespace.Metafields, Type.Metafield, Kind.JSON);
-      } else if (paths.sections.match(path)) {
-        return section(define(Namespace.Sections, Type.Section, Kind.JSON));
-      } else if (paths.templates.match(path)) {
-        return define(Namespace.Templates, Type.Template, Kind.JSON);
-      } else if (paths.config.match(path)) {
-        return define(Namespace.Config, Type.Config, Kind.JSON);
-      } else if (paths.locales.match(path)) {
-        return define(Namespace.Locales, Type.Locale, Kind.JSON);
-      } else if (paths.customers.match(path)) {
-        return define(Namespace.Customers, Type.Template, Kind.JSON);
-      } else if (paths.metaobject.match(path)) {
-        return define(Namespace.Metaobject, Type.Template, Kind.JSON);
-      } else if (paths.schema.match(path)) {
-        return schema(fn, define(Namespace.Schema, Type.Schema, Kind.JSON));
-      }
-
+  if (file.ext === '.liquid') {
+    if (paths.sections.match(path)) {
+      return section(define(Namespace.Sections, Type.Section, Kind.Liquid));
+    } else if (paths.snippets.match(path)) {
+      return snippet(define(Namespace.Snippets, Type.Snippet, Kind.Liquid));
+    } else if (paths.layout.match(path)) {
+      return define(Namespace.Layout, Type.Layout, Kind.Liquid);
+    } else if (paths.templates.match(path)) {
+      return define(Namespace.Templates, Type.Template, Kind.Liquid);
+    } else if (paths.customers.match(path)) {
+      return define(Namespace.Customers, Type.Template, Kind.Liquid);
+    } else if (paths.metaobject.match(path)) {
+      return define(Namespace.Metaobject, Type.Template, Kind.Liquid);
+    } else if (paths.transforms.get(path) === Type.Style) {
+      return style(define(Namespace.Snippets, Type.Style, Kind.CSS));
     }
+  } else if (file.ext === '.schema' && paths.schema.match(path)) {
+
+    return schema(parse, define(Namespace.Schema, Type.Schema, Kind.JSON));
+
+  } else if (file.ext === '.json') {
+    if (paths.metafields.match(path)) {
+      return define(Namespace.Metafields, Type.Metafield, Kind.JSON);
+    } else if (paths.sections.match(path)) {
+      return define(Namespace.Sections, Type.Group, Kind.JSON);
+    } else if (paths.templates.match(path)) {
+      return define(Namespace.Templates, Type.Template, Kind.JSON);
+    } else if (paths.config.match(path)) {
+      return define(Namespace.Config, Type.Config, Kind.JSON);
+    } else if (paths.locales.match(path)) {
+      return define(Namespace.Locales, Type.Locale, Kind.JSON);
+    } else if (paths.customers.match(path)) {
+      return define(Namespace.Customers, Type.Template, Kind.JSON);
+    } else if (paths.metaobject.match(path)) {
+      return define(Namespace.Metaobject, Type.Metaobject, Kind.JSON);
+    } else if (paths.schema.match(path)) {
+      return schema(parse, define(Namespace.Schema, Type.Schema, Kind.JSON));
+    }
+
+  }
+
+  if (paths.assets.match(path)) {
 
     switch (file.ext) {
       case '.js':
       case '.mjs':
-        return script(define(Namespace.Assets, Type.Script, Kind.JavaScript));
-      case '.ts':
-        return script(define(Namespace.Assets, Type.Script, Kind.TypeScript));
-      case '.tsx':
-        return script(define(Namespace.Assets, Type.Script, Kind.TSX));
-      case '.jsx':
-        return script(define(Namespace.Assets, Type.Script, Kind.JSX));
+        return define(Namespace.Assets, Type.Asset, Kind.JavaScript);
+      case '.json':
+        return define(Namespace.Assets, Type.Asset, Kind.JSON);
       case '.svg':
-        return svg(define(Namespace.Assets, Type.Svg, Kind.SVG));
+        return define(Namespace.Assets, Type.Asset, Kind.SVG);
       case '.css':
-        return style(define(Namespace.Assets, Type.Style, Kind.CSS));
-      case '.scss':
-        return style(define(Namespace.Assets, Type.Style, Kind.SCSS));
-      case '.sass':
-        return style(define(Namespace.Assets, Type.Style, Kind.SASS));
-      case '.md':
-        return define(Namespace.Pages, Type.Page, Kind.Markdown);
-      case '.html':
-        return define(Namespace.Pages, Type.Page, Kind.HTML);
+        return define(Namespace.Assets, Type.Asset, Kind.CSS);
+      case '.ico':
+      case '.jpg':
+      case '.png':
+      case '.gif':
+      case '.webp':
+      case '.pjpg':
+        return define(Namespace.Assets, Type.Asset, Kind.Image);
+      case '.mov':
+      case '.mp4':
+      case '.webm':
+      case '.ogg':
+        return define(Namespace.Assets, Type.Asset, Kind.Video);
+      case '.pdf':
+        return define(Namespace.Assets, Type.Asset, Kind.PDF);
+      case '.eot':
+      case '.ttf':
+      case '.woff':
+      case '.woff2':
+        return define(Namespace.Assets, Type.Asset, Kind.Font);
+      default:
+        return define(Namespace.Assets, Type.Asset, Kind.Unknown);
     }
 
-    if (paths.assets.match(path)) {
+  }
 
-      if ($.spawn.invoked) return define(Namespace.Assets, Type.Spawn);
+  switch (file.ext) {
+    case '.js':
+    case '.mjs':
+      return script(define(Namespace.Assets, Type.Script, Kind.JavaScript));
+    case '.ts':
+      return script(define(Namespace.Assets, Type.Script, Kind.TypeScript));
+    case '.tsx':
+      return script(define(Namespace.Assets, Type.Script, Kind.TSX));
+    case '.jsx':
+      return script(define(Namespace.Assets, Type.Script, Kind.JSX));
+    case '.svg':
+      return svg(define(Namespace.Assets, Type.Svg, Kind.SVG));
+    case '.css':
+      return style(define(Namespace.Assets, Type.Style, Kind.CSS));
+    case '.scss':
+      return style(define(Namespace.Assets, Type.Style, Kind.SCSS));
+    case '.sass':
+      return style(define(Namespace.Assets, Type.Style, Kind.SASS));
+    case '.md':
+      return define(Namespace.Pages, Type.Page, Kind.Markdown);
+    case '.html':
+      return define(Namespace.Pages, Type.Page, Kind.HTML);
+  }
 
-      switch (file.ext) {
-        case '.json':
-          return define(Namespace.Assets, Type.Asset, Kind.JSON);
-        case '.svg':
-          return define(Namespace.Assets, Type.Asset, Kind.SVG);
-        case '.css':
-          return define(Namespace.Assets, Type.Asset, Kind.CSS);
-        case '.ico':
-        case '.jpg':
-        case '.png':
-        case '.gif':
-        case '.webp':
-        case '.pjpg':
-          return define(Namespace.Assets, Type.Asset, Kind.Image);
-        case '.mov':
-        case '.mp4':
-        case '.webm':
-        case '.ogg':
-          return define(Namespace.Assets, Type.Asset, Kind.Video);
-        case '.pdf':
-          return define(Namespace.Assets, Type.Asset, Kind.PDF);
-        case '.eot':
-        case '.ttf':
-        case '.woff':
-        case '.woff2':
-          return define(Namespace.Assets, Type.Asset, Kind.Font);
-      }
+  return undefined;
 
-    }
-
-    return undefined;
-
-  };
 };
 
 /**
- * Import theme directory outputs used in _download_ mode to
+ * Import theme directory$.dirs used in _download_ mode to
  * write theme files to the intended sub directories.
  *
  * @param output The import directory base path
@@ -312,7 +429,7 @@ export function parseFile (paths: PathBundle, output: string) {
 export function importFile (key: string, outputPath: string): File {
 
   const path = join(outputPath, key);
-  const file = new File(parse(path));
+  const file = new File(path);
   const define = setImportFile(file, path);
 
   if (key.startsWith('sections/')) {
@@ -339,19 +456,30 @@ export function importFile (key: string, outputPath: string): File {
 
 export const outputFile = (output: string) => (path: string) => {
 
-  const file = new File(parse(path));
-  const merge = setFile(file, path, output);
+  const file = new File(path);
+  const define = setFile(file, path, output);
 
   switch (basename(file.dir)) {
-    case 'sections': return merge(Namespace.Sections, Type.Section, -1);
-    case 'snippets': return merge(Namespace.Snippets, Type.Snippet, -1);
-    case 'layout': return merge(Namespace.Layout, Type.Layout);
-    case 'templates': return merge(Namespace.Templates, Type.Template, -1);
-    case 'customers': return merge(Namespace.Customers, Type.Template, -1);
-    case 'metaobject': return merge(Namespace.Metaobject, Type.Template, -1);
-    case 'config': return merge(Namespace.Config, Type.Config, -1);
-    case 'locales': return merge(Namespace.Locales, Type.Locale, -1);
-    case 'assets': return merge(Namespace.Assets, Type.Asset, -1);
+    case 'sections':
+      return define(Namespace.Sections, Type.Section, -1);
+    case 'blocks':
+      return define(Namespace.Blocks, Type.Block, -1);
+    case 'snippets':
+      return define(Namespace.Snippets, Type.Snippet, -1);
+    case 'layout':
+      return define(Namespace.Layout, Type.Layout);
+    case 'templates':
+      return define(Namespace.Templates, Type.Template, -1);
+    case 'customers':
+      return define(Namespace.Customers, Type.Template, -1);
+    case 'metaobject':
+      return define(Namespace.Metaobject, Type.Template, -1);
+    case 'config':
+      return define(Namespace.Config, Type.Config, -1);
+    case 'locales':
+      return define(Namespace.Locales, Type.Locale, -1);
+    case 'assets':
+      return define(Namespace.Assets, Type.Asset, -1);
   }
 
 };

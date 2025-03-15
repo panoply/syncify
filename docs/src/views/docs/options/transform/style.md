@@ -12,9 +12,33 @@ anchors:
 
 The `style` transform option simplifies the process of bundling CSS, SCSS, or SASS by integrating compilers such as **Dart SASS**, **PostCSS**, and **Tailwind**. This feature offers developers a familiar configuration control, mirroring what you might set up manually, but with added ease.
 
-# Options
+#### Strap Examples
 
-{% include 'include/options', options: transforms.Style %}
+Get started using one the example straps for a real-world implementation reference.
+
+:::: grid row
+::: grid col-4
+
+```bash
+$ sy create using-postcss
+```
+
+:::
+::: grid col-4
+
+```bash
+$ sy create using-tailwind
+```
+
+:::
+::: grid col-4
+
+```bash
+$ sy create using-sass
+```
+
+:::
+::::
 
 ---
 

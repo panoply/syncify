@@ -1,30 +1,21 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable prefer-const */
 import type { ChildProcess } from 'node:child_process';
-import * as Type from 'types';
-import { argv } from 'node:process';
-import merge from 'mergerino';
-import { size } from 'syncify:cli/size';
-import { PATH_KEYS } from 'syncify:const';
-import { terser } from './terser';
+import type * as Type from 'types';
+import type { File } from '~file';
+
+import { homedir, platform } from 'node:os';
+import { join } from 'node:path';
+import { cwd } from 'node:process';
+
+import { tsize } from '@syncify/ansi';
+
 import { defaults } from './defaults';
-import { processor } from './processor';
+import { Stores, Targets } from './extends';
 import { plugins } from './plugins';
-import { object } from 'syncify:utils';
+import { processor } from './processor';
 
-function paths (): Type.PathBundle {
+import { checksum, m, merge, o, paths, pm, s } from '~utils';
 
-  const state = object<Type.PathBundle>();
-
-  for (const path of PATH_KEYS) {
-    state[path] = object<Type.PathsRef>({ input: null, match: null });
-  }
-
-  state.transforms = new Map();
-
-  return state;
-
-};
+export { q } from './queue';
 
 /**
  * Bundle State Configuration
@@ -37,17 +28,12 @@ export const $ = new class Bundle {
   /**
    * The users configuration settings merged with defaults
    */
-  private static defaults: Type.Config = defaults();
+  private static config: Type.Config = defaults();
 
   /**
    * Plugins
    */
   private static plugins: Type.Plugins = plugins();
-
-  /**
-   * The terse minification configuration settings
-   */
-  private static terser: Type.TerserConfig = terser();
 
   /**
    * The processors configuration settings
@@ -56,23 +42,185 @@ export const $ = new class Bundle {
 
   /**
    * The parsed contents of `package.json` file
+   *
+   * > When `null` there is no `package.json` file present in the project.
    */
-  private static package: Type.PKG = object();
+  private static package: Type.PKG = null;
+
+  /**
+   * The package manager used
+   */
+  private static pm: string = null;
 
   /**
    * Cache interface
    */
-  private static cache: Type.Cache.Model = object();
+  private static cache: Type.Cache.Model = o();
 
   /**
-   * Chokidar watch instance
+   * The user platform OS
    */
-  private static watch: Type.WatchBundle = new Set() as unknown as Type.WatchBundle;
+  public readonly platform: NodeJS.Platform = platform();
+
+  /**
+   * The Syncify Github Repository
+   */
+  public readonly github: string = 'https://github.com/panoply/syncify.git';
+
+  /**
+   * The version of Syncify running
+   */
+  public readonly version: string = VERSION;
+
+  /**
+   * **READY AT RUNTIME**
+   *
+   * Home or temporary directory if home fails
+   *
+   * @example
+   * '/Users/sissel/.syncify'
+   */
+  public readonly home: string = join(homedir(), '.syncify');
+
+  /**
+   * The provided command passed on the CLI.
+   *
+   * > The references sliced[2] copy of `process.argv`
+   */
+  public argv: string[];
+
+  /**
+   * The path to node.js binary
+   */
+  public node: string;
+
+  /**
+   * The path to the script binary being run
+   */
+  public bin: string;
+
+  /**
+   * Model representing the shopify stores
+   */
+  public stores: Stores = new Stores();
+
+  /**
+   * Model representing the shopify themes
+   * Each theme can access their associated {@link Stores}
+   */
+  public target: Targets = new Targets();
+
+  /**
+   * Cache copy of the invoked commands in which syncify was started.
+   * By default, this structure will assign `target` and `filter` entries
+   * only, as they are parsed and handled in their own respective define
+   * operations.
+   */
+  public cmd: Type.CommandValues = o({
+    target: [],
+    filter: [],
+    batch: 16
+  });
+
+  /**
+   * Whether or not synicfy is running.
+    */
+  public running: boolean = false;
+
+  /**
+   * Event Name emitter reference
+   */
+  public event: string = null;
+
+  /**
+   * **READY AT RUNTIME**
+   *
+   * The current working directory
+   *
+   * @example
+   * '/Users/sissel/projects/site-name'
+   */
+  public cwd: string = cwd();
+
+  /**
+   * **READY AT RUNTIME**
+   *
+   * Encoded checksum of the CWD
+   *
+   * @example
+   * 'eb4e712f2f3970b7'
+   */
+  public hash: string = checksum(this.cwd);
+
+  /**
+   * **READY AT RUNTIME**
+   *
+   * Root directory base
+   *
+   * @example
+    * '/Users/sissel/.syncify/eb4e712f2f3970b7'
+    */
+  public root: string = join(this.home, this.hash);
+
+  /**
+   * Base directory path references. These are fully resolved absolute URI
+   * paths pointing to all base directory locations, included cached locations.
+   */
+  public dirs: Type.Dirs = o<Type.Dirs>({
+    module: null,
+    input: null,
+    output: null,
+    config: this.cwd,
+    hot: join(this.root, 'hot'),
+    cache: join(this.root, 'cache'),
+    temp: join(this.root, 'temp'),
+    versions: join(this.root, 'versions'),
+    sourcemaps: {
+      root: join(this.root, 'sourcemaps'),
+      scripts: join(this.root, 'sourcemaps', 'scripts'),
+      styles: join(this.root, 'sourcemaps', 'styles')
+    }
+  });
+
+  /**
+   * Configuration file path resolutions for `syncify.config` and `package.json`
+   * and other required files.
+   */
+  public file: Type.Files = o<Type.Files>({
+    keychain: join(this.home, '.keychain'),
+    pkg: join(this.cwd, 'package.json'),
+    notifier: join(this.home, 'icon.png'),
+    project: null,
+    tsconfig: null,
+    targets: null,
+    env: null,
+    config: null,
+    githook: null
+  });
+
+  /**
+   * Global keychain for store access tokens stored in home
+   */
+  public keychain: Record<string, { [tokenName: string]: Type.Keychain }> = null;
+
+  /**
+   * The project store which references the parsed cache project file. This reference
+   * is a `Proxy` type and will apply atomic writes to the project cache file.
+   * The data this reference holds lives in the root project location of the users OS.
+   *
+   * > This will be `null` and populated at runtime in one of the first operations to occur.
+   */
+  public project: Type.Project = null;
+
+  /**
+   * The installation binary being used
+   */
+  public using: 'global' | 'local' = null;
 
   /**
    * Process Child
    */
-  public process: ChildProcess;
+  public process: ChildProcess = null;
 
   /**
    * Whether or not to restart process
@@ -80,12 +228,9 @@ export const $ = new class Bundle {
   public restart: boolean = false;
 
   /**
-   * Cached reference of the CLI commands passed
-   */
-  public cli: Type.Commands = object();
-
-  /**
-   * Websockets HOT reloading
+   * Websockets HOT reloading instance
+   *
+   * @default null
    */
   public wss: Type.WSS = null;
 
@@ -94,49 +239,30 @@ export const $ = new class Bundle {
    *
    * @default null
    */
-  public stats: Type.Stats = object();
+  public stats: Type.Stats = o();
 
   /**
    * CLI provided filters
    *
    * @default null
    */
-  public filters: Type.Filters = object();
+  public filters: Type.Filters = o();
 
   /**
-   * Cache copy of the invoked commands in which syncify was started
+   * Error store, holds reference to errors. Map key is {@link File}
+   * and values are an array list of string error messages.
    *
-   * @default null
+   * @default Map<File, string>
    */
-  public commands: Type.Commands = object();
+  public errors: Map<File, string[]> = m();
 
   /**
-   * The version defined in the package.json
-   *
-   * @default null
-   */
-  public version: string = VERSION;
-
-  /**
-   * The current working directory
-   *
-   * @default null
-   */
-  public cwd: string = null;
-
-  /**
-   * The provided command passed on the CLI.
-   *
-   * @default null
-   */
-  public argv: string = argv.slice(2).join(WSP);
-
-  /**
-   * Error store, holds reference to errors
+   * Error stack store. Used in some instances where stack-trace is
+   * required and reference is to exist. Stacks are temporary.
    *
    * @default Set<string>
    */
-  public errors: Set<string> = new Set();
+  public stacks: Set<string> = s();
 
   /**
    * Error store, holds reference to errors
@@ -147,46 +273,49 @@ export const $ = new class Bundle {
    * @default
    * {}
    */
-  public warnings: Type.Warnings = new Map();
+  public warnings: Type.Warnings = m();
 
   /**
-   * Theme Publishing
-   */
-  public publish: Type.PublishBundle = object<Type.PublishBundle>({
-    ngrok: null,
-    bindVersion: false,
-    publishRole: 'unpublished',
-    themeLimit: 3,
-    tunnelPort: 80
-  });
-
-  /**
-   * Version Control
+   * Directory structure paths.
    *
-   * @default
-   * {
-   *  dir: null,
-   *  number: null,
-   *  zip: null,
-   *  patch: 0,
-   *  major: 0,
-   *  minor: 0,
-   *  update: null
-   * }
+   * Includes a special `transforms` Map reference for transform related files
+   * which may potentially be using an extension that would lead to it being identified
+   * as a different file type. This occurs when (for example) a snippet generated transform
+   * is set as an output.
+   *
+   * >**NOTE**
+   * >
+   * > The `transform` option will point to resolved file names and the values for each entry
+   * > will equal an enum `Type` number. The following transforms are identifiable:
+   *
+   * - `7` > `Type.Style`
+   * - `8` > `Type.Script`
+   * - `9` > `Type.SVG`
    */
-  public vc: Type.VC = object<Type.VC>({
-    dir: null,
-    number: null,
-    zip: null,
-    patch: 0,
-    major: 0,
-    minor: 0,
-    update: null
+  public paths: Type.PathBundle = paths();
+
+  /**
+   * Stash Import paths
+   *
+   * Used in `pull` modes and assigns the locations to files that are unresolvable.
+   * This will only be assigned and populated in certain modes.
+   */
+  public stash: Type.PathStash = o<Type.PathStash>({
+    assets: null,
+    blocks: null,
+    config: null,
+    customers: null,
+    layout: null,
+    locales: null,
+    metaobject: null,
+    sections: null,
+    snippets: null,
+    templates: null
   });
 
   /**
    * Execution options which describe the invocation and operation
-   * instructions which Syncify was initialised.
+   * instructions Syncify was initialised.
    *
    * @default
    * {
@@ -197,80 +326,97 @@ export const $ = new class Bundle {
    *  vars: {}
    * }
    */
-  public env: Type.Env = object<Type.Env>({
-    cli: false,
-    tree: false,
+  public env: Type.Env = o<Type.Env>({
     dev: true,
+    cli: false,
+    tree: true, // TODO - REMOVE THIS
     prod: false,
     ready: false,
     sync: 0,
-    file: null,
-    vars: {}
+    vars: null
+  });
+
+  public git: any = {};
+
+  /**
+   * Version Control settings
+   */
+  public vc: Type.VersionControl = o<Type.VersionControl>({
+    cache: null,
+    source: 1,
+    dir: null,
+    number: null,
+    zip: null,
+    patch: 0,
+    major: 0,
+    minor: 0,
+    update: null
   });
 
   /**
    * Hot reload mode options - Use the `mode.hot` reference to
    * determine whether or not HOT reloading is enabled.
-   *
-   * @default
-   * {
-   *  inject: true,
-   *  server: 3000,
-   *  socket: 8089,
-   *  method: 'hot',
-   *  scroll: 'preserved',
-   *  layouts: [ 'theme.liquid' ],
-   *  label: 'visible',
-   *  renderer: '{% render \'hot.js\', server: 3000, socket: 8089 %}',
-   *  snippet: null,
-   *  output: null,
-   *  alive: {}
-   * }
    */
-  public hot: Type.HOTBundle = object<Type.HOTBundle>({
-    inject: true,
-    server: 3000,
-    socket: 8089,
-    history: false,
+  public hot: Type.HOTBundle = o<Type.HOTBundle>({
+    source: null,
+    route: null,
+    ready: false,
+    server: 41001,
+    socket: 51001,
+    label: true,
+    eject: true,
     method: 'hot',
-    strategy: 'hydrate',
-    scroll: 'preserved',
-    layouts: [ 'theme.liquid' ],
-    label: 'visible',
-    snippet: null,
-    output: null,
-    alive: {},
-    renderer: '{% render \'hot.js\'' + [
-      ''
-      , 'server: 3000'
-      , 'socket: 8089'
-      , 'strategy: "hydrate"'
-      , 'scroll: "preserved"'
-      , 'label: "visible"'
-      , 'history: false'
-      , 'method: "hot"'
-    ].join(', ') + ' %}'
-
+    client: 'inject',
+    alias: {},
+    layouts: [
+      'theme.liquid'
+    ],
+    version: o({
+      source: null,
+      remote: null,
+      local: HOT_VERSION
+    }),
+    flags: o({
+      'no-preview-bar': true,
+      'no-checkout-preloads': false,
+      'no-perfkit': false,
+      'no-trekkie': false,
+      'no-shopify-features': false,
+      'no-web-pixels-manager': false
+    }),
+    cache: o({
+      root: null,
+      snippet: null,
+      layouts: []
+    }),
+    alive: o({
+      snippet: false,
+      layouts: o()
+    })
   });
 
   /**
-   * Log State
+   * Log state and console references
    */
-  public log: Type.LogBundle = object<Type.LogBundle>({
+  public log: Type.LogBundle = o<Type.LogBundle>({
     idle: false,
     group: 'Syncify',
+    mode: null,
     title: NIL,
     uri: NIL,
-    listen: null,
-    thrown: null,
-    queue: new Set(),
-    changes: object(),
-    config: object<Type.Logger>({
-      clear: true,
-      silent: false,
-      stats: true,
-      warnings: true
-    })
+    queue: s(),
+    changes: m<string, number>()
+  });
+
+  /**
+   * Bulk batch model - used when performing bulk operations in `watch` mode.
+   */
+  public bulk: Type.Bulk = o<Type.Bulk>({
+    id: null,
+    group: NIL,
+    files: 0,
+    type: null,
+    synced: s()
   });
 
   /**
@@ -278,117 +424,49 @@ export const $ = new class Bundle {
    *
    * @default false // all modes are false by default
    */
-  public mode: Type.Modes = object<Type.Modes>({
+  public mode: Type.Modes = o<Type.Modes>({
+    _: null,
+    align: false,
+    bind: false,
     build: false,
-    interactive: false,
-    dev: true,
-    prod: false,
-    strap: false,
-    watch: false,
     clean: false,
-    cache: false,
-    setup: false,
-    upload: false,
-    import: false,
-    metafields: false,
-    terse: false,
-    hot: false,
-    pages: false,
-    pull: false,
+    debug: false,
+    bulk: false,
+    create: false,
+    doctor: false,
+    dev: false,
+    pack: false,
     force: false,
-    views: false,
+    git: false,
+    help: false,
+    hot: false,
+    projects: false,
+    inspect: false,
+    keychain: false,
+    main: false,
+    metafields: false,
+    pages: false,
+    prod: false,
+    prompt: false,
+    prune: false,
+    publish: false,
+    pull: false,
+    push: false,
+    stash: false,
+    redirects: false,
+    liquid: false,
+    json: false,
     script: false,
-    image: false,
     style: false,
     svg: false,
-    redirects: false,
-    export: false,
-    release: false,
-    publish: false,
-    themes: false
-  });
-
-  /**
-   * The configuration file name resolution
-   *
-   * @default
-   * {
-   *  base: null,
-   *  ext: null,
-   *  path: null,
-   *  relative: null
-   *  type: null
-   * }
-   */
-  public file: Type.ConfigFile = object<Type.ConfigFile>({
-    base: null,
-    path: null,
-    relative: null
-  });
-
-  /**
-   * Files store - Holds a `Set` reference to all files
-   */
-  public files: Map<string, Set<string>> = new Map();
-
-  /**
-   * Base directory path references
-   */
-  public dirs: Type.Dirs = object<Type.Dirs>();
-
-  /**
-   * Passed commands that may be of importance in the transform or build processes.
-   *
-   * @default
-   * {
-   *   config: null,
-   *   delete: null,
-   *   filter: null,
-   *   input: null,
-   *   output: null
-   * }
-   */
-  public cmd: Type.CommandBundle = object<Type.CommandBundle>({
-    config: null,
-    delete: null,
-    filter: null,
-    input: null,
-    output: null
-  });
-
-  /**
-   * The available stores as per configuration in `package.json` file
-   *
-   * @default
-   * {
-   *   themes: [],
-   *   stores: []
-   * }
-   */
-  public stores: Type.Stores[] = [];
-
-  /**
-   * The sync clients. Multiple stores and themes can run concurrently.
-   *
-   * @default
-   * {
-   *   themes: [],
-   *   stores: []
-   * }
-   */
-  public sync: Type.Sync = object<Type.Sync>({
-    themes: [],
-    stores: []
-  });
-
-  /**
-   * Spawn related configuration operations
-   */
-  public spawn: Type.Spawn = object<Type.Spawn>({
-    paths: new Set(),
-    streams: new Map(),
-    invoked: false,
-    commands: object()
+    init: false,
+    setup: false,
+    suggest: false,
+    terse: false,
+    link: false,
+    unpublished: false,
+    version: false,
+    watch: false
   });
 
   /**
@@ -404,104 +482,18 @@ export const $ = new class Bundle {
    *   global: null
    * }
    */
-  public section: Type.SectionBundle = object<Type.SectionBundle>({
-    prefixDir: false,
-    separator: '-',
-    global: null,
-    baseDir: new Set(),
+  public section: Type.SectionBundle = o<Type.SectionBundle>({
     schema: null,
-    shared: new Map()
+    shared: m(),
+    template: o()
   });
-
-  /**
-   * Snippet sub-directory configuration
-   *
-   * @todo
-   * Allow anymatch global patterns
-   *
-   * @default
-   * {
-   *   prefixDir: false,
-   *   separator: '-',
-   *   global: null
-   * }
-   */
-  public snippet: Type.SnippetBundle = object<Type.SnippetBundle>({
-    prefixDir: false,
-    separator: '-',
-    global: null,
-    baseDir: new Set()
-  });
-
-  /**
-   * Directory structure paths.
-   *
-   * Includes a special `transforms` Map reference for transform related files
-   * which may potentially be using an extension that would lead to it being identified
-   * as a different file type. This occurs when (for example) snippet generated transforms
-   * are inferred. The `transform` option will point to resolved file names and the values
-   * for each entry will equal an enum `Type` number. The following transforms are identifiable:
-   *
-   * - `7` > `Type.Style`
-   * - `8` > `Type.Script`
-   * - `9` > `Type.SVG`
-   */
-  public paths: Type.PathBundle = paths();
 
   /**
    * Page transforms
    *
-   * @default
-   * {
-   *  export: {
-   *    quotes: '“”‘’',
-   *    html: true,
-   *    linkify: false,
-   *    typographer: false,
-   *    xhtmlOut: false,
-   *    breaks: true,
-   *    langPrefix: 'language-'
-   *  },
-   *  import: {
-   *    codeBlockStyle: 'fenced',
-   *    emDelimiter: '_',
-   *    fence: '```',
-   *    headingStyle: 'atx',
-   *    hr: '---',
-   *    linkReferenceStyle: 'full',
-   *    linkStyle: 'inlined',
-   *    strongDelimiter: '**',
-   *    bulletListMarker: '-'
-   *  }
-   *}
+   * Populated during the setPages options generation
    */
-  public page: Type.PageBundle = object<Type.PageBundle>({
-    safeSync: true,
-    author: '',
-    global: null,
-    suffixDir: false,
-    language: 'html',
-    export: object<Type.Markdown.Export>({
-      quotes: '“”‘’',
-      html: true,
-      linkify: false,
-      typographer: false,
-      xhtmlOut: false,
-      breaks: true,
-      langPrefix: 'language-'
-    }),
-    import: object<Type.Markdown.Import>({
-      codeBlockStyle: 'fenced',
-      emDelimiter: '_',
-      fence: '```',
-      headingStyle: 'atx',
-      hr: '---',
-      linkReferenceStyle: 'full',
-      linkStyle: 'inlined',
-      strongDelimiter: '**',
-      bulletListMarker: '-'
-    })
-  });
+  public page: Type.PageBundle = null;
 
   /**
    * Script transforms
@@ -509,80 +501,118 @@ export const $ = new class Bundle {
    * @default []
    */
   public script: Type.ScriptBundle[] = [];
+
   /**
    * Style tranforms
    *
    * @default []
    */
   public style: Type.StyleBundle[] = [];
+
   /**
    * SVG transforms
    *
    * @default []
    */
   public svg: Type.SVGBundle[] = [];
+
   /**
-   * Image transforms
+   * Liquid Transforms
+   *
+   * @default []
    */
-  public image: any;
-  /**
-   * Terser Minification Options
-   */
-  public terse: Type.TerserBundle = object<Type.TerserBundle>({
-    /**
-     * Terse JSON Minification
-     *
-     * @default false
-     */
-    json: false,
-    /**
-     * Terse Liquid minification
-     */
-    liquid: false,
-    /**
-     * Terse Markup (HTML) minification
-     */
-    markup: false,
-    /**
-      * **NOTE YET AVAILABLE**
-      *
-      * Terse Style (CSS) Minification
-      */
-    style: false,
-    /**
-      * Terse Script (JS/TS) Minification
-      */
-    script: false
+  public liquid: Type.LiquidBundle = o({
+    terse: {
+      enabled: false,
+      exclude: null,
+      liquid: {
+        minifySchema: true
+      },
+      markup: {
+
+        // EXPOSED
+        //
+        minifyCSS: true,
+        minifyJS: true,
+        collapseWhitespace: true,
+        removeComments: true,
+
+        // OVERRIDES
+        //
+        caseSensitive: false,
+        collapseBooleanAttributes: false,
+        collapseInlineTagWhitespace: false,
+        conservativeCollapse: false,
+        keepClosingSlash: false,
+        noNewlinesBeforeTagClose: false,
+        preventAttributesEscaping: false,
+        removeEmptyAttributes: false,
+        removeEmptyElements: false,
+        removeOptionalTags: false,
+        removeRedundantAttributes: false,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: false,
+        continueOnParseError: true,
+        trimCustomFragments: false,
+        ignoreCustomFragments: [
+          /(?<=\bstyle\b=["']\s?)[\s\S]*?(?="[\s\n>]?)/,
+          /<style[\s\S]*?<\/style>/,
+          /<script[\s\S]*?<\/script>/,
+          /{%[\s\S]*?%}/
+        ]
+
+      }
+    }
   });
 
   /**
-   * Holds an instance of FSWatcher. Chokidar is leveraged in for watching,
-   * and this value exposes the instance and it can be used anywhere in the
-   * module. In addition, the main Chokidar is extended to support `.has()`
+   * Liquid Transforms
    *
-   * @default null // defaults to null unless watch mode is invoked
+   * @default []
    */
-  get watch () { return Bundle.watch; }
+  public json: Type.JSONBundle = o({
+    crlf: false,
+    cache: null,
+    stripComments: false,
+    exclude: null,
+    indent: 2,
+    useTab: false,
+    sortObjects: false,
+    sortArrays: [],
+    noSortList: [],
+    options: {
+      indentSize: 2,
+      useTab: false,
+      crlf: false,
+      arrays: false,
+      objects: false,
+      removeComments: false,
+      exclude: []
+    },
+    terse: {
+      enabled: false,
+      exclude: null,
+      options: {
+        assets: true,
+        config: true,
+        locales: true,
+        metafields: true,
+        metaobject: true,
+        groups: true,
+        templates: true
+      }
+    }
+  });
+
   /**
-   * Set the FSWatch instance reference
-   */
-  set watch (instance: Type.WatchBundle) { Bundle.watch = instance; }
-  /**
-  * Merged terse minification configuration
+  * Returns the {@link Bundle.cache} static model
   */
   get cache () { return Bundle.cache; }
   /**
-    * Merged terse minification configuration
-    */
-  set cache (cache: Type.Cache.Model) { Bundle.cache = cache; }
-  /**
-  * Merged terse minification configuration
-  */
-  get terser () { return Bundle.terser; }
-  /**
-    * Merged terse minification configuration
-    */
-  set terser (options: Type.TerserConfig) { Bundle.terser = merge(Bundle.terser, options); }
+   * Returns the {@link Bundle.cache.checksum} static model
+   */
+  get checksum () { return Bundle.cache.checksum; }
   /**
    * Processor Configurations
    */
@@ -590,19 +620,27 @@ export const $ = new class Bundle {
   /**
    * Merge users configuration with default
    */
-  set config (data: Type.Config) { Bundle.defaults = merge(Bundle.defaults, data); }
+  set config (data: Type.Config) { Bundle.config = merge(Bundle.config, data); }
   /**
    * Returns the merged configuration of users syncify configuration with defaults
    */
-  get config () { return Bundle.defaults; }
-  /**
-   * Merge the `package.json` contents
-   */
-  set pkg (data: Type.PKG) { Bundle.package = data; }
+  get config () { return Bundle.config; }
   /**
    * Returns the `package.json` contents
    */
-  get pkg (): Type.PKG { return Bundle.package; }
+  get pkg (): Type.PKG { return <Type.PKG>Bundle.package; }
+  /**
+   * Set the `package.json` contents
+   */
+  set pkg (pkg) { Bundle.package = pkg; }
+  /**
+   * Returns the `package.json` contents
+   */
+  get pm (): string { return Bundle.pm === null ? pm() : Bundle.pm; }
+  /**
+   * Set the `package.json` contents
+   */
+  set pm (manager) { Bundle.pm = manager; }
   /**
    * Plugins
    */
@@ -610,7 +648,7 @@ export const $ = new class Bundle {
   /**
    * The terminal rows and columns size
    */
-  get terminal (): { cols: number; rows: number; wrap?: number } { return size(); }
+  get terminal (): { cols: number; rows: number; wrap?: number } { return tsize(); }
 
 }();
 

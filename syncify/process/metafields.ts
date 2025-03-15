@@ -1,7 +1,10 @@
-import type { PageMetafield, File } from 'types';
-import { has } from 'rambdax';
-import * as c from 'syncify:colors';
-import * as log from 'syncify:log';
+import type { PageMetafield } from 'types';
+import type { File } from '~file';
+
+import * as c from '@syncify/ansi';
+
+import { log } from '~cli/log';
+import { has } from '~utils';
 
 /**
  * Check Metafield Type
@@ -35,8 +38,7 @@ function checkMetafieldType (type: string): boolean {
 /**
  * Checks Page metafields
  *
- * Throws when a property is missing that will
- * otherwise be required
+ * Throws when a property is missing that will otherwise be required
  */
 export function getPageMetafields (file: File, metafields: PageMetafield[]): boolean {
 
@@ -54,7 +56,7 @@ export function getPageMetafields (file: File, metafields: PageMetafield[]): boo
 
         log.invalid(file.relative, [
           `Missing ${c.blue.bold(prop)} property key value in a ${c.yellowBright.bold('metafields')}`,
-          'value of page frontmatter. Frontmatter metafields require you provide the following keys:',
+          'value in frontmatter. Frontmatter metafields require you provide the following keys:',
           '',
           `${c.gray('-')} ${c.white('key')}`,
           `${c.gray('-')} ${c.white('type')}`,
@@ -75,7 +77,7 @@ export function getPageMetafields (file: File, metafields: PageMetafield[]): boo
         if (!checkMetafieldType(type)) {
 
           log.invalid(file.relative, [
-            `Invalid type ${c.blue.bold(type)} provided in a page frontmatter ${c.yellowBright.bold('metafields')}`,
+            `Invalid type ${c.blue.bold(type)} provided in frontmatter ${c.yellowBright.bold('metafields')}`,
             `value. Frontmatter metafields ${c.bold('must')} be one of following types:`,
             '',
 

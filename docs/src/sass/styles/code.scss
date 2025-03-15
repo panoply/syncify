@@ -4,6 +4,21 @@
   }
 }
 
+.language-bash {
+  .token.title {
+    font-family: $font-family-heading;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #54627d;
+    line-height: 35px;
+    letter-spacing: 0.02rem;
+
+    .token.punctuation {
+      color: $body-bg;
+    }
+  }
+}
+
 :not(pre) > code {
   word-wrap: break-word;
   padding: 0.12rem 0.45rem 0.21rem 0.45rem;
@@ -84,4 +99,52 @@ h2 {
   .language-typescript {
     font-size: 0.65em;
   }
+}
+
+h2 {
+  text-transform: none;
+  font-size: $h3-font-size;
+  font-weight: 600;
+  margin-bottom: 8px;
+
+  .language-bash {
+    font-size: 1.1rem;
+
+    padding: 0 !important;
+    border: none !important;
+    color: #fff;
+
+    width: 100%;
+    display: block;
+    padding-bottom: 1px !important;
+
+    border-radius: 0;
+    // border-bottom: $border-width solid #363d49 !important;
+  }
+
+  + p {
+    margin-top: 0;
+    margin-left: 24px;
+  }
+}
+
+h1 > code {
+  font-size: 1.15rem !important;
+  font-weight: 600;
+  padding: 0;
+}
+
+:not(pre, h2, h3) > code[class*='language-'] {
+  word-wrap: break-word;
+  padding: 0.1rem 0.1rem 0.2rem 0.1rem;
+  margin: 0rem;
+  border-radius: 0.2rem;
+  letter-spacing: 0.0235rem;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: $white;
+  font-family: $font-family-code;
+  text-shadow: none;
+  border: 0;
+  //-webkit-font-smoothing: subpixel-antialiased;
 }

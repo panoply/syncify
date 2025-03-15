@@ -1,0 +1,35 @@
+{
+  "name": "@syncify/glue",
+  "version": "0.0.1",
+  "access": "restricted",
+  "description": "Join utility providing sugars for joining strings",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "dts": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup --minify"
+  },
+  "author": {
+    "name": "Νικολας Σαββιδης",
+    "url": "https://github.com/panoply/syncify",
+    "email": "n.savvidis@gmx.com"
+  },
+  "license": "Apache-2.0",
+  "tsup": {
+    "entry": ["./src/index.ts"],
+    "dts": true,
+    "format": ["cjs", "esm"],
+    "treeshake": true,
+    "target": "node20",
+    "splitting": true,
+    "platform": "node",
+    "clean": true,
+    "bundle": true
+  }
+}

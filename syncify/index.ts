@@ -1,155 +1,86 @@
-import { argv } from 'node:process';
-import { has } from 'rambdax';
-import { Commands, Syncify, Config } from 'types';
-import { exception, rejection, signal } from './cli/emitters';
-import { upload } from './modes/upload';
-import { build } from './modes/build';
-import { watch } from './modes/watch';
-import { themes } from './modes/themes';
-import { importing } from './modes/import';
-import { exporting } from './modes/export';
-import { publish } from './modes/publish';
-import { server } from './hot/server';
-import { stdin } from 'syncify:log/stdin';
-import { $ } from 'syncify:state';
-// import { resource } from 'modes/resource';
-// import { readConfig } from 'config/config';
-import { help } from 'syncify:log/help';
-import * as log from 'syncify:log';
-import { define } from './options/define';
-import { isString } from 'syncify:utils';
-import { setup } from 'syncify:modes/setup';
-import { strap } from 'syncify:modes/strap';
+import { internalError } from '~cli/throws';
+import { Build } from '~modes/build';
+import { Init } from '~modes/init';
+import { Pack } from '~modes/pack';
+import { Publish } from '~modes/publish';
+import { Pull } from '~modes/pull';
+import { Push } from '~modes/push';
+import { Watch } from '~modes/watch';
+import { Configure } from '~options/configure';
+import { Create } from '~prompts/create';
+import { Keychain } from '~prompts/keychain';
+import { Link } from '~prompts/link';
+import { Projects } from '~prompts/projects';
+
+import { $ } from '$';
 
 /* -------------------------------------------- */
 /* RE-EXPORTS                                   */
 /* -------------------------------------------- */
 
-export * from './api';
+export { defineConfig, env } from '@syncify/config';
 
 /**
- * ENV Utilities
+ * Syncify Initialise
  *
- * Helper utility for checking environment variables
- * and returning some other data references
+ * The callback execution for both the CLI and API runtime.
+ * This function is what initializes Syncify. It sets the runtime
+ * state and dispatches to the runtime mode.
  */
-export const env = {
-  get dev () {
-    return process.env.SYNCIFY_ENV === 'dev';
-  },
-  get terse () {
-    return $.cli.terse;
-  },
-  get prod () {
-    return process.env.SYNCIFY_ENV === 'prod';
-  },
-  get watch () {
-    return process.env.SYNCIFY_WATCH === 'true';
-  }
-};
+export async function syncify () {
 
-/**
- * Run Syncify
- *
- * Determines how Syncify was initialized.
- * It will dispatch and construct the correct
- * configuration model accordingly.
- */
-export async function run (options: Commands, config?: Config, callback?: Syncify) {
+  await Configure().then(() => {
 
-  /* -------------------------------------------- */
-  /* LAUNCH SYNCIFY                               */
-  /* -------------------------------------------- */
+    if ($.mode.init) {
 
-  if (has('_', options)) options._ = options._.slice(1);
+      Init();
 
-  /* -------------------------------------------- */
-  /* HELP                                         */
-  /* -------------------------------------------- */
+    } else if ($.mode.link) {
 
-  if (argv.slice(2).length === 0 ||
-    options.help === 'examples' || (
-    isString(options.help) &&
-    options.help.length === 0)) return help(options);
+      Link();
 
-  /* -------------------------------------------- */
-  /* DEFINE OPTIONS                               */
-  /* -------------------------------------------- */
+    } else if ($.mode.create) {
 
-  await define(options, config);
+      Create();
 
-  /* -------------------------------------------- */
-  /* THEMES                                       */
-  /* -------------------------------------------- */
+    } else if ($.mode.projects) {
 
-  if ($.mode.setup) return setup();
-  if ($.mode.strap) return strap();
-  if ($.mode.themes) return themes();
+      Projects();
 
-  /* -------------------------------------------- */
-  /* STDIN                                        */
-  /* -------------------------------------------- */
+    } else if ($.mode.keychain) {
 
-  process.stdin.on('data', stdin);
+      Keychain();
 
-  /* -------------------------------------------- */
-  /* PROCESS LISTENERS                            */
-  /* -------------------------------------------- */
+    } else {
 
-  // process.on('SIGINT', signal);
-  // process.on('unhandledRejection', rejection);
-  // process.on('uncaughtException', exception);
-  // process.on('rejectionHandled', rejection);
+      if ($.mode.build) {
 
-  if ($.mode.hot) await server();
+        Build();
 
-  /* -------------------------------------------- */
-  /* EXECUTE MODE                                 */
-  /* -------------------------------------------- */
+      } else if ($.mode.watch) {
 
-  try {
+        Watch();
 
-    $.env.ready = true;
+      } else if ($.mode.push) {
 
-    if ($.mode.build && $.mode.export === false) {
+        Push();
 
-      return build(callback);
+      } else if ($.mode.pull) {
 
-    } else if ($.mode.watch) {
+        Pull();
 
-      return watch(callback);
+      } else if ($.mode.pack) {
 
-    } else if ($.mode.upload) {
+        Pack();
 
-      return upload(callback);
+      } else if ($.mode.publish) {
 
-    } else if ($.mode.import) {
+        Publish();
 
-      return importing(callback);
-
-    } else if ($.mode.export && $.mode.publish === false) {
-
-      return exporting(callback);
-
-    } else if ($.mode.publish) {
-
-      return publish(callback);
-
-    } else if ($.mode.interactive) {
-
-      return console.log('TODO: --interactive is not yet supported');
-
-    } else if ($.mode.metafields) {
-
-      return console.log('TODO: --metafields is not yet supported');
+      }
 
     }
 
-  } catch (e) {
+  }).catch(internalError);
 
-    console.log(e);
-
-    // log.throws(e);
-
-  }
 };

@@ -1,0 +1,33 @@
+.sy__hot-label {
+  all: initial;
+  position: fixed;
+  display: flex;
+  color: #e4e4e4;
+  z-index: 2147483647;
+  font-family: system-ui;
+  font-weight: 600;
+  text-align: center;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 11px;
+  user-select: none;
+  transition: border 0.5s ease;
+}
+
+.sy__hot-label-inner {
+  all: initial;
+  cursor: move;
+  padding: 7px 14px 8px 32px;
+  border: 0;
+  border-radius: 6px;
+  color: inherit;
+  font-weight: 600;
+  font-size: inherit;
+  font-family: inherit;
+  background-color: #000;
+  transition: border-radius 0.5s ease;
+  background-position: 11px center;
+  background-size: 12px;
+  background-repeat: no-repeat;
+  will-change: border-radius;
+}

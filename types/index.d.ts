@@ -1,113 +1,44 @@
-import type { Config } from './config';
-import type { Syncify as syncify } from './api';
-import type { Bundle } from '../syncify/model/$';
+/* -------------------------------------------- */
+/* INTERNAL TYPES                               */
+/* -------------------------------------------- */
+
+export type * from './dts/$';
+export type * from './dts/cache';
+export type * from './dts/commands';
+export type * from './dts/enquirer';
+export type * from './dts/env';
+export type * from './dts/errors';
+export type * from './dts/file';
+export type * from './dts/http';
+export type * from './dts/loggers';
+export type * from './dts/merge';
+export type * from './dts/modes';
+export type * from './dts/modules';
+export type * from './dts/queue';
+export type * from './dts/package';
+export type * from './dts/pages';
+export type * from './dts/paths';
+export type * from './dts/plugin';
+export type * from './dts/reports';
+export type * from './dts/requests';
+export type * from './dts/schema';
+export type * from './dts/script';
+export type * from './dts/sections';
+export type * from './dts/style';
+export type * from './dts/svg';
+export type * from './dts/terser';
+export type * from './dts/transform';
+export type * from './dts/utilities';
+export type * from './dts/graph';
+
+/* -------------------------------------------- */
+/* PUBLIC TYPES                                 */
+/* -------------------------------------------- */
+
+export type * from '@syncify/types';
+
+/* -------------------------------------------- */
+/* MODULE TYPES                                 */
+/* -------------------------------------------- */
 
 export type { Tsconfig } from 'tsconfig-type';
-export type { FileKeys } from './$/file';
-
-export type * from './api';
-export type * from './cli';
-export type * from './shared';
-
-/* CONFIG ------------------------------------- */
-
-export type * from './config';
-export type * from './config/views';
-export type * from './config/terser';
-
-/* STATE -------------------------------------- */
-
-export type * from './$/cache';
-export type * from './$/filters';
-export type * from './$/errors';
-export type * from './$/requests';
-export type * from './$/file';
-export type * from './$';
-export type * from './$/plugin';
-export type * from './$/hot';
-
-/* TRANSFORM ---------------------------------- */
-
-export type * from './transform/pages';
-export type * from './transform/image';
-export type * from './transform/json';
-export type * from './transform/script';
-export type * from './transform/style';
-export type * from './transform/svg';
-
-/**
- * **Environment**
- *
- * Exposes the execution environment
- *
- * ---
- *
- * @example
- *
-* import { env } from '@syncify/cli';
-*
-* console.log(env.dev) // true unless prod
-*
-*/
-export declare const env: {
-  /**
-   * Whether or not Syncify is running in developer mode, e.g: `--dev`
-   */
-  dev: boolean;
-  /**
-   * Whether or not Syncify is running in production mode, e.g: `--prod`
-   */
-  prod: boolean;
-  /**
-   * Whether or not Syncify is running in watch mode, e.g: `-w, --watch`
-   */
-  watch: boolean;
-  /**
-   * Whether or not Syncify is running in terse mode, e.g: `--terse`
-   */
-  terse: boolean;
-};
-
-/**
- * **State Bundle**
- *
- * Exposes the the execution bundle `$` model.
- *
- * ---
- *
- * @example
- *
- * import { $ } from '@syncify/cli';
- *
- * console.log($)
- *
- */
-export declare const $: Bundle;
-
-/**
- * **Define Config:**
- *
- * Provide to the default export in your `syncify.config.js` file.
- *
- * ---
- *
- * **Supported Files:**
- *
- * - syncify.config.ts
- * - syncify.config.js
- * - syncify.config.mjs
- * - syncify.config.cjs
- *
- * ---
- *
- * @example
- *
- * import { defineConfig } from '@syncify/cli';
- *
- * export default defineConfig({
- *   //...
- * });
- *
- */
-export declare function defineConfig<T>(config: Config<T>): void;
-export default syncify;

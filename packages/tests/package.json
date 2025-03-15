@@ -1,0 +1,32 @@
+{
+  "name": "@syncify/tests",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Internal module for testing Syncify CLI",
+  "main": "./dist/index.js",
+  "bin": {
+    "tests": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup --minify"
+  },
+  "author": {
+    "name": "Νικολας Σαββιδης",
+    "url": "https://github.com/panoply/syncify",
+    "email": "n.savvidis@gmx.com"
+  },
+  "license": "Apache-2.0",
+  "tsup": {
+    "entry": [
+      "./src/index.ts"
+    ],
+    "dts": false,
+    "clean": false,
+    "treeshake": false,
+    "bundle": true
+  },
+  "dependencies": {
+    "ansis": "^3.9.0"
+  }
+}

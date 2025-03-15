@@ -1,95 +1,51 @@
-import type SASS from 'sass';
-import type { Config as TailwindConfig } from 'tailwindcss';
-import type { Syncify, SASSConfig, StyleBundle, ClientParam } from 'types';
-import { basename, join, relative } from 'pathe';
+import type postcss from 'postcss';
+import type { SASSConfig, StyleBundle } from 'types';
+
+import { basename, join, relative } from 'node:path';
+
 import { readFile, writeFile } from 'fs-extra';
-import { timer } from 'syncify:timer';
-import { byteSize, sizeDiff } from 'syncify:sizes';
-import * as u from 'syncify:utils';
-import * as log from 'syncify:log';
-import * as error from 'syncify:errors';
-import * as warn from 'syncify:log/warnings';
-import { File, Kind } from 'syncify:file';
-import { bold } from 'syncify:colors';
-import postcss, { PluginCreator } from 'postcss';
-import { toBuffer } from 'syncify:utils/native';
-import { $ } from 'syncify:state';
-import { parseFileQuick } from 'syncify:process/files';
+import { $import } from 'modules';
 
-/**
- * SASS Dart module
- */
-export let sass: typeof SASS = null;
+import { bold } from '@syncify/ansi';
+import { glue } from '@syncify/glue';
+import { timer } from '@syncify/timer';
 
-/**
- * TailwindCSS module
- */
-export let tailwind: PluginCreator<Partial<TailwindConfig>> = null;
+import { log } from '~cli/log';
+import { warn } from '~cli/warnings';
+import { error } from '~errors';
+import { File, Kind } from '~file';
+import { themeFilesUpsertMap } from '~http/theme';
+import { runChecksum } from '~process/cache';
+import { parse } from '~process/files';
+import * as u from '~utils';
 
-/**
- * Load PostCSS / SASS
- *
- * Dynamically imports PostCSS and SASS. Assigns the modules to
- * lettings `sass` or `postcss`. This allows users to optionally
- * include modules in the build.
- */
-export async function load (id: 'tailwind' | 'sass') {
-
-  if (id === 'sass') {
-    sass = require('sass');
-    return u.isNil(sass) === false;
-  }
-
-  if (id === 'tailwind') {
-    tailwind = require('tailwindcss');
-    return u.isNil(tailwind) === false;
-  }
-
-};
+import { $ } from '$';
 
 /* -------------------------------------------- */
 /* TRANSFORMS                                   */
 /* -------------------------------------------- */
 
-function write (file: File<StyleBundle>, sync: ClientParam<StyleBundle>, cb: Syncify) {
+function write <T extends StyleBundle> (file: File<T>, { noUpsert = false } = {}) {
 
-  const scope = u.isFunction(cb) ? { ...file } : false;
-
-  return async function (data: string) {
+  return async (data: string) => {
 
     if (u.isNil(data)) return null;
 
-    let content: string;
+    runChecksum(file.input, data);
 
-    if (scope !== false) {
+    writeFile(file.output, data).catch(error.write('Error writing stylesheet to output', {
+      input: file.relative,
+      output: relative($.cwd, file.output)
+    }));
 
-      const update = cb.apply({ ...file }, toBuffer(data));
-
-      if (u.isUndefined(update) || update === false) {
-        content = data;
-      } else if (u.isString(update) || u.isBuffer(update)) {
-        content = u.sanitize(update);
-      }
-    } else {
-      content = data;
-    }
-
-    $.cache.checksum[file.input] = u.checksum(content);
-
-    writeFile(file.output, content).catch(
-      error.write('Error writing stylesheet to output', {
-        input: file.relative,
-        output: relative($.cwd, file.output)
-      })
-    );
-
-    const size = sizeDiff(data, file.size);
+    file.value = data;
+    const size = u.sizeDiff(file.value, file.size);
 
     if (size.isSmaller) {
       if (file.kind === Kind.SCSS || file.kind === Kind.SASS || file.kind === Kind.Tailwind) {
         log.transform(file.kind, bold('CSS'), size.before, timer.stop(file.uuid));
       } else {
-        log.transform('CSS', size.before, `gzip ${size.gzip}`);
+        log.transform('CSS', size.before, `brotli ${size.brotli}`);
       }
     } else {
       if (file.kind === Kind.Tailwind) {
@@ -107,44 +63,51 @@ function write (file: File<StyleBundle>, sync: ClientParam<StyleBundle>, cb: Syn
       log.syncing(file.key);
     }
 
-    if (sync === null) {
-      return content;
-    } else {
-      await sync('put', file, content);
+    if ($.mode.watch && !noUpsert) {
+
+      await themeFilesUpsertMap(file);
+
+      if (!$.mode.build) {
+        if ($.warnings.size > 0) {
+          const size = warn.count();
+          log.warn(`${bold(size)} Compiler ${u.plur('Warning', size)}`, `Press ${bold('v')} to view all warning/s`);
+        }
+      }
+
     }
+
+    return file.value;
 
   };
 };
 
 async function sassProcess (file: File) {
 
-  const { data } = file;
+  if (u.isUndefined(file.data) || (u.isBoolean(file.data.sass) && file.data.sass === false)) {
 
-  if ((u.isBoolean(data.sass) && data.sass === false)) {
     return readStyleFile(file);
+
   }
 
-  if (u.isUndefined(data)) return readStyleFile(file);
-
-  const options: SASSConfig = u.isObject(data.sass)
-    ? u.merge($.processor.sass.config, data.sass)
+  const options: SASSConfig = u.isObject(file.data.sass)
+    ? u.merge($.processor.sass.config, file.data.sass)
     : $.processor.sass.config;
 
   if (file.ext === '.scss' || file.ext === '.sass') {
 
-    if ($.mode.watch) timer.start();
+    $.mode.watch && timer.start();
 
     try {
 
-      const { css, sourceMap } = sass.compile(data.input, {
+      const { css, sourceMap } = await $import.sass.compileAsync(file.data.input, {
         loadPaths: options.include,
-        sourceMapIncludeSources: data.postcss,
+        sourceMapIncludeSources: file.data.postcss,
         sourceMap: options.sourcemap,
         style: options.style,
         alertColor: false,
         alertAscii: false,
         quietDeps: options.quietDeps,
-        charset: data.snippet === false,
+        charset: file.data.snippet === false,
         logger: {
           debug: msg => console.log('DEBUG', msg),
           warn: warn.sass(file)
@@ -165,7 +128,7 @@ async function sassProcess (file: File) {
 
       log.process('SASS Dart', timer.stop());
 
-      file.size = byteSize(css);
+      file.size = u.byteSize(css);
 
       return {
         css,
@@ -180,8 +143,8 @@ async function sassProcess (file: File) {
 
         log.error(file.relative, {
           notify: {
-            title: 'SCSS Transform Error',
-            message: `SASS Dart failed to process ${file.base}`
+            title: `Error in ${file.base}`,
+            message: 'SASS style transform failed, SCSS was not complied.'
           }
         });
 
@@ -199,44 +162,66 @@ async function sassProcess (file: File) {
 
 };
 
-export async function tailwindParse (file: File, queue: [File, string][]) {
+/**
+ * Index `[0]` is the view file which triggers the change
+ */
+export async function tailwindParse (file: File) {
+
+  const files: File[] = [];
 
   for (const map in $.processor.tailwind.map) {
+
     if ($.processor.tailwind.map[map].has(file.input)) {
 
-      const item = parseFileQuick($.style[map].input);
+      const file = parse<StyleBundle>($.style[map].input);
 
-      if (u.isUndefined(item)) continue;
+      if (u.isUndefined(file)) continue;
 
-      timer.start(item.uuid);
+      timer.start(file.uuid);
 
-      item.kind = Kind.Tailwind;
+      file.kind = Kind.Tailwind;
+      file.value = await tailwindProcess(file, { noUpsert: true });
 
-      const style = await tailwindProcess(item);
+      if (u.isString(file.value)) {
 
-      if (u.isString(style)) queue.push([ item, style ]);
+        files.push(file);
 
+      }
     }
   }
 
-  return queue;
+  files.push(file);
+  files.length > 1
+    ? log.syncing(`${files.length} files processed`, { hot: $.mode.hot })
+    : log.syncing(files[0].key, { hot: $.mode.hot });
+
+  return files;
+
 }
 
 /**
  * Tailwind Processor
  *
- * An isolated tailwind transform used in `content[]` triggers
- * from views.
+ * An isolated tailwind transform used in `content[]` triggered from views.
  */
-export async function tailwindProcess (file: File<StyleBundle>) {
+export async function tailwindProcess (file: File<StyleBundle>, upsert: { noUpsert: boolean }) {
 
   if ($.mode.hot) timer.start(file.uuid);
 
-  const output = write(file, null, null);
+  const output = write(file, upsert);
   const read = await readStyleFile(file);
   const post = await postcssProcess(file, read.css, read.map);
 
   if (post === null) return null;
+
+  file.hash = u.checksum(post);
+
+  if ($.checksum[file.input] === file.hash) {
+    log.skipped(file, 'no changes');
+    return null;
+  }
+
+  $.checksum[file.input] = file.hash;
 
   if (file.data.snippet) {
     return output(createSnippet(post, file.data.attrs));
@@ -250,13 +235,10 @@ export async function readStyleFile (file: File<StyleBundle>) {
 
   try {
 
-    const css = await readFile(file.input);
-    file.size = byteSize(css);
+    const css = await readFile(file.input, 'utf8');
+    file.size = u.byteSize(css);
 
-    return {
-      css: css.toString(),
-      map: null
-    };
+    return { css, map: null };
 
   } catch (e) {
 
@@ -269,7 +251,7 @@ export async function readStyleFile (file: File<StyleBundle>) {
       }
     });
 
-    error.throws(e, {
+    error.throw(e, {
       source: file.relative,
       transform: 'style'
     });
@@ -290,14 +272,14 @@ export async function postcssProcess (file: File<StyleBundle>, css: string, map:
   const { data } = file;
   const isTWCSS = u.isBoolean(data.tailwind) === false;
   const plugins: postcss.AcceptedPlugin[] = isTWCSS && data.tailwind
-    ? [ tailwind(data.tailwind) as postcss.AcceptedPlugin ].concat(data.postcss)
+    ? [ $import.tailwind(data.tailwind) ].concat(data.postcss)
     : data.postcss;
 
   try {
 
     if ($.mode.watch && file.kind !== Kind.Tailwind) timer.start();
 
-    const result = await postcss(plugins).process(css, {
+    const result = await $import.postcss(plugins).process(css, {
       from: data.rename,
       to: data.rename,
       map: map ? {
@@ -329,8 +311,8 @@ export async function postcssProcess (file: File<StyleBundle>, css: string, map:
 
       log.error(file.relative, {
         notify: {
-          title: 'PostCSS Transform Error',
-          message: `PostCSS failed to process ${file.base}`
+          title: `Error in ${file.base}`,
+          message: 'PostCSS Transform Error, file failed to process'
         }
       });
 
@@ -350,7 +332,7 @@ export async function postcssProcess (file: File<StyleBundle>, css: string, map:
 export function createSnippet (string: string, attrs: string[]) {
 
   return attrs.length > 0
-    ? `<style ${attrs.join(' ')}>${string}</style>`
+    ? `<style ${glue.ws(attrs)}>${string}</style>`
     : `<style>${string}</style>`;
 
 };
@@ -358,27 +340,30 @@ export function createSnippet (string: string, attrs: string[]) {
 /**
  * SASS and PostCSS Compiler
  */
-export async function compile <T extends StyleBundle> (file: File<StyleBundle>, sync: ClientParam<T>, cb: Syncify) {
+export async function StyleTransform (file: File<StyleBundle>) {
 
   if ($.mode.watch) timer.start();
   if ($.mode.hot) timer.start(file.uuid);
 
-  const output = write(file, sync, cb);
+  const output = write(file);
 
   try {
+
+    if (u.isUndefined(file.data)) return readStyleFile(file);
 
     const out = await sassProcess(file);
 
     if (out === null) return null;
 
-    if (u.isNil(postcss) || (!file.data.postcss && !file.data.snippet)) {
+    if (u.isNil($import.postcss) || u.isUndefined(file.data) || (
+      !file.data.postcss &&
+      !file.data.snippet)) {
       return output(out.css);
     }
 
     if (file.data.postcss) {
 
       const post = await postcssProcess(file, out.css, out.map);
-
       if (post === null) return null;
 
       if (file.data.snippet) {
@@ -388,7 +373,9 @@ export async function compile <T extends StyleBundle> (file: File<StyleBundle>, 
       }
     }
 
-    return file.data.snippet ? output(createSnippet(out.css, file.data.attrs)) : output(out.css);
+    return file.data.snippet
+      ? output(createSnippet(out.css, file.data.attrs))
+      : output(out.css);
 
   } catch (e) {
 

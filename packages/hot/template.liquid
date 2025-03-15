@@ -1,0 +1,11 @@
+{%- liquid
+  # !! SYNCIFY HOT CLIENT - DO NOT EDIT FILE !!
+  # inject@version
+  # inject@options
+  echo '<style id="syncify-hot-style">'
+  if no-preview-bar
+    echo 'iframe#preview-bar-iframe {display:none!important;}'
+  endif
+  # inject@label
+  echo '</style>'
+-%}

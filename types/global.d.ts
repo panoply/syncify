@@ -11,9 +11,25 @@ declare global {
   // file for replacements.
 
   /**
+   * GraphQL query function which is replaced by ESBuild
+   */
+  const gql: (value: any) => any;
+  /**
    * The `package.json` version entry.
    */
   const VERSION: string;
+  /**
+   * The `@syncify/hot` version entry.
+   */
+  const HOT_VERSION: string;
+  /**
+   * The `@syncify/hot` alias define
+   */
+  const HOT_ALIAS: string;
+  /**
+   * The `@syncify/config` version entry.
+   */
+  const CONFIG_VERSION: string;
   /**
    * Empty String, e.g: `''`
    */

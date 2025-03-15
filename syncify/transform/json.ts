@@ -1,67 +1,45 @@
-import type { Syncify } from 'types';
-import { isNil } from 'rambdax';
+import type { ArrayPromptOptions } from 'types';
+
+import { join } from 'node:path';
+
 import { readFile, writeFile } from 'fs-extra';
-import parseJSON, { JSONError } from 'parse-json';
-import { File, Type } from 'syncify:file';
-import { timer } from 'syncify:timer';
-import { byteSize, byteConvert, sizeDiff } from 'syncify:sizes';
-import { find } from 'syncify:requests/assets';
-import * as log from 'syncify:log';
-import * as error from 'syncify:errors';
-import * as u from 'syncify:utils';
-import { $ } from 'syncify:state';
-import { queue } from 'syncify:requests/client';
-import { tailwindParse } from 'syncify:style';
+
+import { evaluate, ParseEvaluate, stringify } from '@syncify/json';
+import { timer } from '@syncify/timer';
+
+import { log } from '~cli/log';
+import { error } from '~errors';
+import { File, Type } from '~file';
+import { themeFilesGet, themeFilesUpsertMap } from '~http/theme';
+import { runChecksum } from '~process/cache';
+import { prompt } from '~prompt';
+import { theme } from '~prompts/enquirer';
+import { tailwindParse } from '~style';
+import * as u from '~utils';
+
+import { $, q } from '$';
 
 /**
- * Parse JSON
- *
  * Parses a string into valid JSON
  */
-export function parse (file: File, data: string): any {
+export function parseJson (file: File, actual: string, expected?: string) {
 
   try {
 
-    return parseJSON(data);
+    return expected
+      ? evaluate(actual, expected, $.json.options)
+      : evaluate(actual, $.json.options);
 
   } catch (e) {
 
     log.error(file.relative, {
       notify: {
-        title: 'JSON Error',
-        message: `Error when parsing ${file.base}`
+        title: `Error in ${file.base}`,
+        message: 'JSON Parse error occurred due to invalid syntax'
       }
     });
 
-    if (e instanceof JSONError) {
-
-      error.json(e, file);
-
-    }
-
-    return null;
-
-  }
-
-};
-
-/**
- * Minify JSON
- *
- * Metafields are trimmed of whitespace
- * and comments. Syncify allows JSON with
- * comments be provided, this function strips
- * them and will push a minified to the store.
- */
-export function minifyJSON (data: string, space = 0): any {
-
-  try {
-
-    return JSON.stringify(data, null, space);
-
-  } catch (e) {
-
-    console.log(e);
+    error.json(e, file, 'JSON Parse Error');
 
     return null;
 
@@ -76,33 +54,178 @@ export function minifyJSON (data: string, space = 0): any {
  * passed in file and contents. We do not publish
  * metafield file types to output directory.
  */
-export async function jsonCompile (file: File, data: string, space = 0) {
+export async function jsonCompile (file: File, json: string | ParseEvaluate) {
 
-  const minified = minifyJSON(data, space);
+  const { parsed, string } = u.isString(json) ? parseJson(file, json) : json;
+  const indent = $.json.terse.enabled ? indentSize(file.type) : $.json.indent;
+  const output = indent === 0 ? stringify(parsed, {
+    removeComments: true,
+    indentSize: 0,
+    arrays: $.json.options.arrays,
+    objects: $.json.options.objects,
+    exclude: $.json.options.exclude
+  }) : string;
 
-  if (isNil(minified)) {
+  if (u.isNil(output)) {
     if ($.mode.watch) timer.stop();
-    return data;
+    return output;
   }
 
-  if (space === 0) {
-    const size = sizeDiff(minified, file.size);
-    log.minified('JSON', size.before, size.after, size.saved);
+  if (indent === 0) {
+    const { before, after, saved } = u.sizeDiff(output, file.size);
+    log.minified('JSON', before, after, saved);
   } else {
-    log.transform('JSON', file.namespace, byteConvert(file.size), timer.now());
+    log.transform('JSON', file.namespace, u.byteConvert(file.size), timer.now());
   }
 
-  if (file.type === Type.Metafield) return minified;
+  if (file.type === Type.Metafield) return output;
 
-  writeFile(file.output, minified).catch(
+  writeFile(file.output, output).catch(
     error.write('Error writing JSON', {
-      file: file.relative
+      file: file.input
     })
   );
 
-  return minified;
+  return output;
 
 };
+
+/**
+ * Checks remote versions before carrying out sync operation.
+ * Looks for a mismatch based on checksum hash.
+ */
+async function jsonCompare (file: File, local: string) {
+
+  const json: ParseEvaluate[] = [];
+
+  for (const theme of $.target) {
+
+    const remote = await themeFilesGet(file.key, theme);
+
+    if (remote.file !== null) {
+
+      const data = parseJson(file, local, remote.file.body.content);
+
+      if (data === null) return null;
+
+      json.push(data);
+
+    }
+  }
+
+  if (json.length > 0) {
+
+    log.error(file.key, {
+      suffix: 'version mismatch',
+      notify: {
+        title: 'Version Mismatch',
+        message: `Local and remote versions do not align on ${file.key}`
+      }
+    });
+
+    log.nl();
+
+    const { action } = await prompt<{ action: string }>(<ArrayPromptOptions>{
+      name: 'action',
+      type: 'select',
+      multiple: false,
+      message: 'action',
+      theme,
+      choices: [
+        {
+          name: 'open',
+          hint: 'View the remote version in your editor'
+        },
+        {
+          name: 'push',
+          hint: 'Replaces the remote version with local version'
+        },
+        {
+          name: 'pull',
+          hint: 'Replaces the local version with the remote version'
+        },
+        {
+          name: 'stash',
+          hint: 'Stash the remote version and push the local version'
+        },
+        {
+          name: 'cancel',
+          hint: 'Cancel the sync operation'
+        }
+      ]
+    });
+
+    if (action === 'open') {
+
+      const uri = join($.dirs.temp, file.key);
+
+      await writeFile(uri, json[0].string);
+
+      u.openInEditor(uri);
+
+      return null;
+
+    } else if (action === 'push') {
+
+      return json[0].string;
+
+    } else if (action === 'pull') {
+
+      // TODO - Handle multiple-theme/store writes
+
+      await writeFile(file.input, json[0].string);
+
+      return null;
+
+    }
+
+  }
+
+  return json[0].string;
+
+}
+
+function indentSize (type: Type) {
+
+  const { options } = $.json.terse;
+
+  switch (type) {
+    case Type.Group:
+      if (options.groups) return 0;
+      break;
+    case Type.Asset:
+      if (options.assets) return 0;
+      break;
+    case Type.Locale:
+      if (options.locales) return 0;
+      break;
+    case Type.Template:
+      if (options.templates) return 0;
+      break;
+    case Type.Config:
+      if (options.config) return 0;
+      break;
+    case Type.Metafield:
+      if (options.metafields) return 0;
+      break;
+    case Type.Metaobject:
+      if (options.metaobject) return 0;
+      break;
+  }
+
+  return $.json.useTab
+    ? '\t'.repeat(Math.floor($.json.indent / 2))
+    : $.json.indent;
+
+}
+
+const isDiff = (type: Type) => (
+  type === Type.Config ||
+  type === Type.Template ||
+  type === Type.Metaobject ||
+  type === Type.Locale ||
+  type === Type.Group
+);
 
 /**
  * Read JSON
@@ -111,111 +234,61 @@ export async function jsonCompile (file: File, data: string, space = 0) {
  * cb that one can optionally execute
  * from within scripts.
  */
-export async function compile (file: File, sync: any, cb: Syncify): Promise<string> {
+export async function JsonTransform (file: File): Promise<string> {
 
-  if ($.mode.watch) timer.start();
+  $.mode.watch && timer.start();
 
-  const json = await readFile(file.input).catch(
+  const read = await readFile(file.input, 'utf8').catch(
     error.write('Error reading JSON file', {
-      file: file.relative
+      input: file.input,
+      output: file.output
     })
   );
 
-  if (u.isBuffer(json)) {
+  if (!u.isString(read)) return;
 
-    const read = json.toString();
+  const local = read.trim();
 
-    file.size = byteSize(read);
+  file.size = u.byteSize(local);
 
-    if (read.trim().length === 0) {
-      log.skipped(file, 'empty file');
-      return null;
-    }
+  if (local.length === 0) return log.skipped(file, 'empty file');
 
-    if (file.type === Type.Config && file.name === 'settings_data') {
-      for (const theme of $.sync.themes) {
+  if ($.mode.build === false && isDiff(file.type)) {
+    file.value = await jsonCompare(file, local);
+  } else {
+    file.value = await jsonCompile(file, local);
+  }
 
-        const settings_data = await find('config/settings_data.json', theme);
+  if ($.mode.build) return file.value;
 
-        if (settings_data) {
+  if (runChecksum(file.input, file.value)) {
 
-          // JSON.parse(settings_data);
-          // TODO
+    log.skipped(file.key, 'no changes');
 
-        }
-      }
+    await themeFilesUpsertMap(file);
 
-    }
+  } else {
 
-    const data = parse(file, read);
+    if (file.type !== Type.Style && $.processor.tailwind.map !== null) {
 
-    if (data === null) return null;
-
-    if (u.isEmpty(data)) {
-      log.skipped(file, 'empty file');
-      return null;
-    }
-
-    let space: number = $.processor.json.indent;
-
-    if ($.mode.terse) {
-      if (file.type === Type.Asset) {
-        if ($.terser.json.assets) space = 0;
-      } else if (file.type === Type.Locale) {
-        if ($.terser.json.locales) space = 0;
-      } else if (file.type === Type.Template) {
-        if ($.terser.json.templates) space = 0;
-      } else if (file.type === Type.Metafield) {
-        if ($.terser.json.metafields) space = 0;
-      } else if (file.type === Type.Metaobject) {
-        if ($.terser.json.metaobject) space = 0;
-      } else if (file.type === Type.Section) {
-        if ($.terser.json.groups) space = 0;
-      } else if (file.type === Type.Config) {
-        if ($.terser.json.config) space = 0;
-      }
-    }
-
-    let content: string;
-
-    if (u.isFunction(cb)) {
-
-      const update = cb.apply({ ...file }, data);
-
-      if (u.isUndefined(update)) {
-        content = await jsonCompile(file, data, space);
-      } else if (u.isArray(update) || u.isObject(update)) {
-        content = await jsonCompile(file, u.sanitize(update), space);
-      } else if (u.isString(update)) {
-        content = await jsonCompile(file, parse(file, update), space);
-      } else if (u.isBuffer(update)) {
-        content = await jsonCompile(file, parse(file, update.toString()), space);
-      }
-    } else {
-
-      content = await jsonCompile(file, data, space);
-    }
-
-    $.cache.checksum[file.input] = u.checksum(content);
-
-    if ($.processor.tailwind.map !== null && file.type !== Type.Style) {
-
-      const request = await tailwindParse(file, [ [ file, content ] ]);
-
-      for (const req of request) {
-        await sync('put', req[0], req[1]);
-        log.syncing(req[0].key);
-      }
+      await tailwindParse(file).then(themeFilesUpsertMap);
 
     } else {
 
       log.syncing(file.key);
-      await sync('put', file, content);
+
+      await themeFilesUpsertMap(file);
+
     }
 
-    if ($.mode.hot) {
-      await queue.onIdle().then(() => $.wss.replace());
+    if ($.mode.hot && $.mode.bulk === false) {
+
+      await q.http.onIdle().then(() => $.wss.replace());
+
     }
+
+    return file.value;
 
   }
+
 };

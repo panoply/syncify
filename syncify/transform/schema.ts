@@ -8,22 +8,25 @@ import type {
   SettingsSingleton,
   SettingsSpread,
   SharedSchema
-} from 'types/internal';
-import type { ClientParam, Syncify } from 'types';
-import pMap from 'p-map';
+} from 'types';
+
 import { readFile } from 'fs-extra';
-import parseJSON, { JSONError } from 'parse-json';
-import { defineProperty, toArray } from 'syncify:native';
-import * as log from 'syncify:log';
-import * as warn from 'syncify:log/warnings';
-import * as error from 'syncify:errors';
-import { queue } from 'syncify:requests/queue';
-import { File, Type } from 'syncify:file';
-import { $ } from 'syncify:state';
-import { hasProp, plural, has, isArray, isObject, glue, checksum } from 'syncify:utils';
-import { bold } from 'syncify:colors';
-import { minifySchema } from '../terser/liquid';
-import { ARR } from 'syncify:symbol';
+import pMap from 'p-map';
+
+import { ARR, bold } from '@syncify/ansi';
+import { glue } from '@syncify/glue';
+import { parse } from '@syncify/json';
+
+import { minifySchema } from './terser/liquid';
+
+import { log } from '~cli/log';
+import { warn } from '~cli/warnings';
+import { error } from '~errors';
+import { File, Type } from '~file';
+import { themeFilesUpsertMap } from '~http/theme';
+import { checksum, defineProperty, has, hasProp, isArray, isObject, plur, toArray } from '~utils';
+
+import { $, q } from '$';
 
 export function HasSchemaTag (content: string) {
 
@@ -68,8 +71,7 @@ export async function ExtractSchema (file: File): Promise<[
   after?: string,
 ]> {
 
-  const read = await readFile(file.input);
-  const content = read.toString();
+  const content = await readFile(file.input, 'utf-8');
   const open = content.search(/{%-?\s*schema/);
 
   if (open < 0) return [ content, null, null ];
@@ -83,8 +85,8 @@ export async function ExtractSchema (file: File): Promise<[
     log.error('Missing {% endschema %} tag in file.', {
       suffix: file.relative,
       notify: {
-        title: 'Invalid Syntax',
-        message: 'Missing {% endschema %} tag in file.'
+        title: `Error in ${file.base}`,
+        message: 'Liquid schema tag in section is missing an endschema token'
       }
     });
 
@@ -94,7 +96,7 @@ export async function ExtractSchema (file: File): Promise<[
 
   try {
 
-    const schema = parseJSON(content.slice(begin, ender)) as unknown as SchemaSectionTag;
+    const schema = parse<SchemaSectionTag>(content.slice(begin, ender));
 
     return [
       content.slice(0, begin),
@@ -106,14 +108,12 @@ export async function ExtractSchema (file: File): Promise<[
 
     log.error(file.relative, {
       notify: {
-        title: 'JSON Error',
-        message: `Error when parsing ${file.base} in ExtractSchema`
+        title: `Error in ${file.base}`,
+        message: 'JSON Parse error occurred in the section schema tag'
       }
     });
 
-    if (e instanceof JSONError) {
-      error.json(e, file);
-    }
+    error.json(e, file);
 
     return null;
 
@@ -305,7 +305,7 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
       if (block.type === '@app') {
         blocks.push(block);
-        continue
+        continue;
       }
 
       block.settings = [];
@@ -434,7 +434,7 @@ async function ParseSharedSchema (file: File) {
       return null;
     }
 
-    const schema = parseJSON(data.toString()) as unknown as SharedSchema;
+    const schema = parse<SharedSchema>(data.toString());
 
     if (has('$schema', schema)) delete schema.$schema;
     if (has('$description', schema)) delete schema.$description;
@@ -452,23 +452,18 @@ async function ParseSharedSchema (file: File) {
       }
     }
 
-    return $.section.shared.set(file.name, {
-      uri: file.input,
-      schema: schema as any
-    }).get(file.name);
+    return $.section.shared.set(file.name, { uri: file.input, schema }).get(file.name);
 
   } catch (e) {
 
     log.error(file.relative, {
       notify: {
-        title: 'JSON Error',
-        message: `Error when parsing ${file.base}`
+        title: `Error in ${file.base}`,
+        message: 'JSON Syntax error in shared schema file'
       }
     });
 
-    if (e instanceof JSONError) {
-      error.json(e, file);
-    }
+    error.json(e, file);
 
     return null;
 
@@ -482,7 +477,7 @@ async function ParseSharedSchema (file: File) {
  * Returns re-generated section files with the applied shared
  * schema injects.
  */
-export async function CreateSection (file: File<SchemaSectionTag>) {
+export async function CreateSection <T extends SchemaSectionTag> (file: File<T>) {
 
   const read = await ExtractSchema(file);
 
@@ -502,26 +497,33 @@ export async function CreateSection (file: File<SchemaSectionTag>) {
     schema.blocks = InjectBlocks(file, schema.blocks);
   }
 
-  return glue(
-    before.trimEnd(),
-    NWL,
-    minifySchema(schema),
-    NWL,
-    after.trimStart()
-  );
+  return glue(before.trimEnd(), NWL, minifySchema(schema), NWL, after.trimStart());
+
+}
+
+async function getSchemaFiles (sections: File<SchemaSectionTag>[]) {
+
+  for (let i = 0, s = sections.length; i < s; i++) {
+
+    sections[i].value = await CreateSection(sections[i]);
+
+  }
+
+  return sections;
+
 }
 
 /**
  * Shared Schema Files
  */
-export async function compile (file: File, sync: ClientParam<any>, cb: Syncify) {
+export async function SchemaTransform (file: File) {
 
   const shared = await ParseSharedSchema(file);
 
   if (shared === null) return null;
 
-  const files = toArray($.cache.schema[shared.uri]);
-  const sections = await pMap<string, File<SchemaSectionTag>>(files, p => {
+  const schemas = toArray($.cache.schema[shared.uri]);
+  const sections = await pMap<string, File<SchemaSectionTag>>(schemas, p => {
     return defineProperty(file.data(p), 'data', {
       get () {
         return $.cache.sections[p];
@@ -529,29 +531,25 @@ export async function compile (file: File, sync: ClientParam<any>, cb: Syncify) 
     });
   });
 
-  log.process('Shared Schema', `${sections.length} ${plural('section', sections.length)}`);
+  log.process('Shared Schema', `${sections.length} ${plur('section', sections.length)}`);
 
-  for (const section of sections) {
+  const files = await getSchemaFiles(sections);
 
-    const value = await CreateSection(section);
-
-    log.syncing(section.key);
-
-    await sync('put', section, value);
-
-    if ($.mode.hot) {
-
-      if (file.type === Type.Section) {
-
-        $.wss.section(section.name);
-
-      } else if (section.type !== Type.Script && section.type !== Type.Style) {
-
-        await queue.onIdle().then(() => $.wss.replace());
-
-      }
-    }
-
+  if (files.length > 1) {
+    log.syncing(`${files.length} files`);
+  } else {
+    log.syncing(files[0].key);
   }
 
+  await themeFilesUpsertMap(files);
+
+  if ($.mode.hot && $.mode.bulk === false) {
+    for (const section of files) {
+      if (file.type === Type.Section) {
+        $.wss.section(section.name);
+      } else if (section.type !== Type.Script && section.type !== Type.Style) {
+        await q.http.onIdle().then(() => $.wss.replace());
+      }
+    }
+  }
 };

@@ -1,28 +1,28 @@
 {
   "name": "@syncify/turndown",
-  "version": "0.2.0",
+  "version": "0.2.1",
+  "access": "restricted",
   "description": "Hard forked variation of Turndown for usage within Syncify",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup --minify"
   },
-  "keywords": [],
+  "keywords": ["turndown", "syncify"],
   "author": {
-    "name": "ΝΙΚΟΛΑΣ ΣΑΒΒΙΔΗΣ",
-    "url": "https://github.com/panoply",
+    "name": "Νικολας Σαββιδης",
+    "url": "https://github.com/panoply/syncify",
     "email": "n.savvidis@gmx.com"
   },
-  "license": "MIT",
+  "license": "(MIT OR Apache-2.0)",
   "tsup": {
-    "entry": ["src/index.ts"],
+    "entry": ["./src/index.ts"],
     "dts": true
   },
   "dependencies": {
     "turndown": "^7.2.0"
   },
   "devDependencies": {
-    "@syncify/tsconfig": "workspace:^",
     "@types/turndown": "^5.0.5"
   }
 }

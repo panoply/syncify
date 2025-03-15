@@ -1,13 +1,12 @@
-import type { ClientParam, Syncify } from 'types';
 import { readFile, writeFile } from 'fs-extra';
-import { isType } from 'rambdax';
-import { AssetRequest } from 'syncify:requests/client';
-import { File, Kind, Type } from 'syncify:file';
-import { isFunction, isBuffer, isUndefined, isEmptyString } from 'syncify:utils';
-import * as log from 'syncify:log';
-import * as error from 'syncify:errors';
-import { $ } from 'syncify:state';
-import { basename } from 'pathe';
+
+import { log } from '~cli/log';
+import { error } from '~errors';
+import { File, Kind } from '~file';
+import { themeFilesUpsertMap } from '~http/theme';
+import { isEmptyString, isString } from '~utils';
+
+import { $ } from '$';
 
 /* -------------------------------------------- */
 /* EXPORTED FUNCTION                            */
@@ -19,90 +18,58 @@ import { basename } from 'pathe';
  * Catches spawned generated files and determines whether
  * the file should be written or just fall through.
  */
-function passthrough (file: File, sync: ClientParam<AssetRequest>) {
+async function passthrough (file: File) {
 
-  const { type, relative, kind, key, output } = file;
+  await writeFile(file.output, file.value).catch(
+    error.write('Error writing asset to output directory', {
+      input: file.input,
+      output: file.output
+    })
+  );
 
-  return async function (data: string) {
+  if ($.mode.hot) {
 
-    if (type !== Type.Spawn) {
+    log.syncing(file.key, { hot: $.mode.hot });
 
-      if ($.mode.watch) {
-
-        // Remove non-spawn references from watch mode
-        // this will prevent infinite loops from occuring.
-        //
-        $.watch.unwatch(output);
-
-      }
-
-      await writeFile(output, data).catch(
-        error.write('Error writing asset to output directory', {
-          file: relative,
-          source: relative
-        })
-      );
-
-    };
-
-    if ($.mode.hot) {
-
-      log.syncing(key, { hot: true });
-
-      if (kind === Kind.JavaScript) {
-        $.wss.script(file.uuid, basename(key));
-      } else if (kind === Kind.CSS) {
-        $.wss.stylesheet(file.uuid, basename(key));
-      }
+    if (file.kind === Kind.JavaScript) {
+      $.wss.script(file.uuid, file.base);
+    } else if (file.kind === Kind.CSS) {
+      $.wss.stylesheet(file.uuid, file.base);
     }
+  }
 
-    if ($.env.sync !== 0 && $.mode.build === false) {
+  if ($.mode.build === false) {
 
-      await sync('put', file, data);
+    await themeFilesUpsertMap(file);
 
-    }
+  }
 
-  };
 };
 
 /**
  * Assets Pass Through
  *
- * Applies a copy operation for files marked as
- * assets. No transformation will apply.
+ * Applies a copy operation for files marked as assets. No transformation will apply.
  */
-export async function compile (file: File, sync: ClientParam<AssetRequest>, cb: Syncify) {
+export async function AssetTransform (file: File) {
 
-  const copy = passthrough(file, sync);
-  const data = await readFile(file.input).catch(
+  const value = await readFile(file.input, 'utf8').catch(
     error.write('Error reading asset file', {
-      file: file.relative,
-      source: file.relative
+      input: file.input,
+      output: file.output
     })
   );
 
-  if (data) {
+  if (isString(value)) {
 
-    const value = data.toString();
+    file.value = value;
 
     if (isEmptyString(value)) {
       if ($.mode.watch) log.skipped(file, 'empty file');
       return null;
     }
 
-    if (!isFunction(cb)) return copy(value);
-
-    const update = cb.apply({ ...file }, value);
-
-    if (isUndefined(update) || update === false) {
-      return copy(value);
-    } else if (isType(update)) {
-      return copy(update);
-    } else if (isBuffer(update)) {
-      return copy(update.toString());
-    }
-
-    await copy(value);
+    await passthrough(file);
 
   }
 

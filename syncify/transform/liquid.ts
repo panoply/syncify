@@ -1,18 +1,20 @@
-import type { ClientParam, Syncify } from 'types';
-import { minify } from 'html-minifier-terser';
-import { relative } from 'pathe';
+import { relative } from 'node:path';
+
 import { readFile, writeFile } from 'fs-extra';
-import { File, Type } from 'syncify:file';
-import { queue } from 'syncify:requests/client';
-import { hasSnippet, inject, removeRender } from 'syncify:hot/inject';
-import { byteConvert, byteSize, sizeDiff } from 'syncify:sizes';
-import { timer } from 'syncify:timer';
-import * as log from 'syncify:log';
-import * as error from 'syncify:errors';
-import { CreateSection } from 'syncify:schema';
-import { checksum, isBuffer, isFunction, isString, isUndefined, isNil, toUpcase } from 'syncify:utils';
-import { tailwindParse } from 'syncify:style';
-import { $ } from 'syncify:state';
+import { $import } from 'modules';
+
+import { timer } from '@syncify/timer';
+
+import { log } from '~cli/log';
+import { error } from '~errors';
+import { File, Type } from '~file';
+import { injectRenderSnippet } from '~hot/snippet';
+import { themeFilesUpsertMap } from '~http/theme';
+import { CreateSection } from '~schema';
+import { tailwindParse } from '~style';
+import * as util from '~utils';
+
+import { $, q } from '$';
 
 /* -------------------------------------------- */
 /* REGEX EXPRESSIONS                            */
@@ -50,7 +52,7 @@ const ScriptJsonWhitespace = /[^,:'"a-zA-Z0-9=] +[^'"a-zA-Z0-9=}{]/g;
  */
 function removeComments (content: string) {
 
-  return $.terser.liquid.removeComments ? content
+  return $.liquid.terse.markup.removeComments ? content
   .replace(LiquidBlockComments, NIL)
   .replace(LiquidLineComments, NIL) : content;
 
@@ -76,7 +78,7 @@ function minifyLiquidTag (content: string) {
  */
 function minifySchema (file: File, content: string) {
 
-  if (!$.terser.liquid.minifySchema) return removeComments(content);
+  if (!$.liquid.terse.liquid.minifySchema) return removeComments(content);
 
   const open = content.search(/{%-?\s*schema/);
 
@@ -110,7 +112,7 @@ function minifySchema (file: File, content: string) {
  */
 function removeDashes (content: string) {
 
-  if (!$.terser.liquid.stripDashes) return content;
+  if (!$.liquid.terse.liquid.stripTrims) return content;
 
   return content;
 
@@ -126,14 +128,20 @@ async function htmlMinify (file: File, content: string) {
 
   try {
 
-    const htmlmin = await minify(content, $.terser.markup);
+    const htmlmin = await $import.terser.minify(content, $.liquid.terse.markup);
 
     return htmlmin;
 
   } catch (e) {
 
-    log.invalid(file.relative);
-    console.error(e);
+    log.error(file.relative, {
+      notify: {
+        title: 'Parse Error',
+        message: `Terse minification error in ${file.base}`
+      }
+    });
+
+    error.terser(file, e);
 
     return null;
 
@@ -147,13 +155,7 @@ async function htmlMinify (file: File, content: string) {
  * Applies minification and handles `.liquid` files.
  * Determines what action should take place.
  */
-const transform = (file: File) => async (data: string) => {
-
-  if (file.type === Type.Layout && $.mode.hot) {
-    if (hasSnippet(data) === false) {
-      data = inject(data);
-    }
-  }
+async function transform (file: File, data: string) {
 
   if (!$.mode.terse) {
 
@@ -164,7 +166,12 @@ const transform = (file: File) => async (data: string) => {
       })
     );
 
-    log.transform(file.kind, toUpcase(file.namespace), byteConvert(file.size), timer.now());
+    log.transform(
+      util.toUpcase(file.namespace),
+      file.kind,
+      util.byteConvert(file.size),
+      timer.now()
+    );
 
     return data;
 
@@ -201,7 +208,7 @@ const transform = (file: File) => async (data: string) => {
 
   log.process('HTML Terser', timer.now());
 
-  if (isNil(htmlmin)) {
+  if (util.isNil(htmlmin)) {
 
     writeFile(file.output, data).catch(
       error.write('Error writing liquid file to output', {
@@ -217,10 +224,10 @@ const transform = (file: File) => async (data: string) => {
 
   writeFile(file.output, postmin);
 
-  const size = sizeDiff(data, file.size);
+  const size = util.sizeDiff(data, file.size);
 
   if (size.isSmaller) {
-    log.transform(`${file.namespace} ${size.before} → gzip ${size.gzip}`);
+    log.transform(`${file.namespace} ${size.before} → brotli ${size.brotli}`);
   } else {
     log.minified('Liquid', size.before, size.after, size.saved);
   }
@@ -229,81 +236,52 @@ const transform = (file: File) => async (data: string) => {
 
 };
 
-/**
- * Minifier
- *
- * Compiles file content and applies minification
- * returning the base64 processed string.
- */
-export async function compile (file: File, sync: ClientParam<File>, cb: Syncify) {
+export async function LiquidTransform (file: File) {
 
   if ($.mode.watch) timer.start();
 
-  const read = await readFile(file.input);
+  let input = await readFile(file.input, 'utf8');
 
-  let input = read.toString();
+  if ($.mode.hot && $.hot.layouts.includes(file.base)) {
 
-  if ($.mode.build) {
-    if (file.namespace === 'layout') {
-      if (hasSnippet(input)) {
-        input = removeRender(input);
-      }
-    }
+    input = injectRenderSnippet(input);
+
   }
 
   if (file.type === Type.Section) {
-    const section = await CreateSection(file);
-    if (section === null) return null;
-    input = section;
+    input = await CreateSection(file);
+    if (input === null) return null;
   }
 
-  file.size = byteSize(input);
+  file.size = util.byteSize(input);
+  file.value = await transform(file, input);
 
-  const edit = transform(file);
+  if ($.mode.build) return file.value;
+  if (file.type !== Type.Style && $.processor.tailwind.map !== null) {
 
-  let content: string;
-
-  if (isFunction(cb)) {
-
-    const update = cb.apply({ ...file }, input);
-
-    if (isUndefined(update) || update === false) {
-      content = await edit(input);
-    } else if (isString(update)) {
-      content = await edit(update);
-    } else if (isBuffer(update)) {
-      content = await edit(update.toString());
-    }
-
-  } else {
-    content = await edit(input);
-  }
-
-  $.cache.checksum[file.input] = checksum(content);
-
-  if ($.processor.tailwind.map !== null && file.type !== Type.Style) {
-
-    const request = await tailwindParse(file, [ [ file, content ] ]);
-
-    for (const req of request) {
-      await sync('put', req[0], req[1]);
-      log.syncing(req[0].key);
-    }
+    await tailwindParse(file).then(themeFilesUpsertMap);
 
   } else {
 
-    log.syncing(file.key);
+    log.syncing(`${file.key}`, { hot: $.mode.hot });
 
-    await sync('put', file, content);
+    await themeFilesUpsertMap(file);
 
   }
 
-  if ($.mode.hot) {
+  if ($.mode.hot && $.mode.bulk === false) {
     if (file.type === Type.Section) {
+
+      $.wss.alias(JSON.stringify($.hot.alias));
       $.wss.section(file.name);
+
     } else {
-      await queue.onIdle().then(() => $.wss.replace());
+
+      await q.http.onIdle().then(() => $.wss.replace());
+
     }
   }
+
+  return file.value;
 
 };

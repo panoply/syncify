@@ -1,0 +1,530 @@
+import type { AccessScopes, Choice, Keychain, LiteralString } from 'types';
+
+import { join } from 'node:path';
+import { chdir } from 'node:process';
+
+import { existsSync, pathExists, readJSONSync, rm } from 'fs-extra';
+import writeFile from 'write-file-atomic';
+
+import * as _ from '@syncify/ansi';
+import { glue } from '@syncify/glue';
+
+import { credentials } from './credentials';
+
+import { log } from '~cli/log';
+import * as throws from '~cli/throws';
+import { STRAP_EXAMPLES, STRAP_THEMES } from '~const';
+import { createCaches } from '~options/define/caches';
+import { getPkg, setPkg } from '~options/define/package';
+import { createProject } from '~options/define/project';
+import { cancel, intercept, labels, prompt, theme } from '~prompt';
+import { assign, checksum, delay, has, hasPath } from '~utils';
+import { execAsync } from '~utils/child';
+
+import { $ } from '$';
+
+interface CreatePrompt {
+  /** The name of the strap */
+  template: string;
+  /** The Resolved URI of project */
+  projectPath: string;
+  /** The cache root path */
+  cacheRootPath: string;
+  /** The strap group to choose from */
+  strap: LiteralString<'themes' | 'examples'>;
+  /** The hashed checksum of the project */
+  checksum: string;
+  /** The github respository for cloning */
+  repository: string;
+  /** The project name to use */
+  name: string;
+  /** Whether or not overwrite is to apply - Only if directory name exists */
+  overwrite: boolean;
+  /** The package manager selection */
+  pm: string;
+  /** The syncify credentials model */
+  credentials: {
+    env: string;
+    store: string;
+    password: string;
+    domain: string;
+    token: string;
+    version: string;
+    keychain: boolean;
+    selected: number;
+    scopes: Record<AccessScopes, boolean>
+  }
+}
+
+export async function Create () {
+
+  /**
+   * Set of starting point straps available within https://github.com/SyncifyStraps
+   */
+  const straps = new Set([
+    // THEMES
+    ...STRAP_THEMES.map(([ name ]) => name),
+    // EXAMPLES
+    ...STRAP_EXAMPLES.map(([ name ]) => name)
+  ]);
+
+  // Read keychain File
+  $.keychain = readJSONSync($.file.keychain);
+
+  /** CLI Argv */
+  const select = $.argv.length > 1 ? $.argv[1] : null;
+
+  /** TUI Tree */
+  const tui = _.Create()
+  .Newline()
+  .Wrap(
+    _.gray
+    , 'Hello Hacker 👋' + NLR
+    , 'This command prompt can be used to jump start a new project. Choose one of the open source themes'
+    , 'or usage examples available. Alternatively, you can import a theme from a store and Syncify will'
+    , 'strap it for you.'
+  );
+
+  /** Prompt Model */
+  const state: CreatePrompt = {
+    template: null,
+    strap: null,
+    repository: null,
+    projectPath: null,
+    cacheRootPath: null,
+    checksum: null,
+    name: null,
+    pm: null,
+    overwrite: false,
+    credentials: null
+  };
+
+  /** Prompt Labels */
+  const label = labels({
+    padding: 3,
+    prompts: <const>[
+      'Strap Source',
+      'Choose Strap',
+      'Project Name',
+      'Credentials',
+      'Installation',
+      'Overwrite'
+    ]
+  });
+
+  /* PRE-SELECT STRAP --------------------------- */
+
+  if (straps.has(select)) {
+    state.template = select;
+    state.repository = `https://github.com/syncifycli/${select}.git`;
+  }
+
+  /* GREETING ----------------------------------- */
+
+  // Log Greeting and clear the TUI stack
+  //
+  tui.Newline().toLog({
+    clear: true,
+    trim: true
+  });
+
+  /* -------------------------------------------- */
+  /* BEGIN PROMPTS                                */
+  /* -------------------------------------------- */
+
+  if (state.template === null) {
+    state.strap = await PromptSelectStap();
+    state.template = await PromptChooseTemplate();
+    state.repository = `https://github.com/syncifycli/${state.template}.git`;
+  }
+
+  state.name = await PromptEnterProjectName();
+  state.projectPath = join($.cwd, state.name);
+  state.checksum = checksum(state.projectPath);
+  state.cacheRootPath = join($.home, state.checksum);
+
+  /* -------------------------------------------- */
+  /* CREDENTIALS                                  */
+  /* -------------------------------------------- */
+
+  const pkguri = join(state.projectPath, 'package.json');
+  const access = await credentials({ greeting: false, keychain: true });
+
+  // Clone the strap from and add into project
+  await CreateStrap();
+
+  /* CHANGE DIRECTORY --------------------------- */
+
+  chdir(state.name);
+
+  // Refactor the strap package.json
+  await CreatePackage();
+
+  // at this point we have created the project
+  // lets now install any dependencies and set things up
+  // first let's grag the package manager if we don't have it.
+
+  if ($.pm === '?') {
+    $.pm = await PromptPackageManager();
+  }
+
+  /* INSTALL PROJECT DEPS ----------------------- */
+
+  await InstallDependencies();
+
+  /* CREATE CACHE STORES ------------------------ */
+
+  await CreateCache();
+
+  /* BUILD THEME -------------------------------- */
+
+  // log.spinner.update('Building Theme');
+
+  // await execAsync('sy -b');
+
+  /* PUBLISH THEME ------------------------------ */
+
+  tui
+  .Header(`${_.CHK} Project ${_.neonGreen.bold(state.name)} Created`, _.bold.white)
+  .Wrap(`You can now ${_.cyan(`cd ${state.name}`)} into the directory and start hacking.`, _.gray)
+  .Newline()
+  .End($.log.group)
+  .toLog({ clear: true });
+
+  // }
+
+  // async function PromptImportTheme () {
+
+  //   const resolve = await prompt<{ strap: string }>({
+  //     theme,
+  //     message: label.ImportTheme,
+  //     type: 'select',
+  //     name: 'strap',
+  //     choices: [
+  //       {
+  //         name: 'import',
+  //         message: 'Import',
+  //         hint: '       Import theme from a store'
+  //       },
+  //       {
+  //         name: 'git',
+  //         message: 'Repository',
+  //         hint: '     One of the usage examples'
+  //       }
+  //     ]
+  //   }).catch(cancel);
+
+  //   return resolve.strap;
+
+  // }
+
+  /* -------------------------------------------- */
+  /* PROMPTS                                      */
+  /* -------------------------------------------- */
+
+  /**
+   * `1` Select Strap
+   *
+   * Prompt choices for selecting theme or example strap
+   */
+  async function PromptSelectStap () {
+
+    const resolve = await prompt<{ strap: string }>({
+      theme,
+      message: label.StrapSource,
+      type: 'select',
+      name: 'strap',
+      choices: [
+        {
+          name: 'themes',
+          message: 'Themes',
+          hint: '       Boilerplate theme straps'
+        },
+        {
+          name: 'examples',
+          message: 'Examples',
+          hint: '     One of the usage examples'
+        }
+      ]
+    }).catch(cancel);
+
+    return resolve.strap;
+
+  }
+
+  /**
+   * `2` Choose Template
+   *
+   * Dependening on the the strap selection
+   */
+  async function PromptChooseTemplate () {
+
+    /** Returns the strap boilerplates */
+    const boilers = (strap: string) => (strap === 'themes' ? STRAP_THEMES : STRAP_EXAMPLES);
+
+    const resolve = await prompt<{ template: string }>({
+      theme,
+      type: 'select',
+      name: 'template',
+      message: label.ChooseStrap,
+      choices: boilers(state.strap).map(([ name, hint, disabled = false ]) => (
+        <Choice>{
+          name,
+          hint,
+          disabled
+        }))
+    }).catch(cancel);
+
+    return resolve.template;
+
+  }
+
+  /**
+   * `3` Project Name
+   *
+   * Prompt Input for entering a project name which will be used as directory name
+   */
+  async function PromptEnterProjectName () {
+
+    const dispose = intercept();
+    const resolve = await prompt<{ name: string}>({
+      theme,
+      message: label.ProjectName,
+      type: 'input',
+      name: 'name',
+      hint: 'This will be the name of the project directory',
+      validate (value: string) {
+
+        this.state.symbols.pointer = NIL;
+
+        if (value.length === 0) {
+
+          return _.Multiline(
+            _.red.bold('REQUIRED')
+            , NWL
+            , 'You must provide a directory name for your project.'
+            , 'Keep it simple, lowercase and no special characters.'
+          );
+
+        } else if (!/[A-Za-z0-9_+-]+/.test(value)) {
+
+          return _.Multiline(
+            _.red.bold('INVALID NAME')
+            , NWL
+            , 'The project directy name is invalid or contains bad characters.'
+            , `Names must match the following pattern${_.COL} ${_.cyan('[A-Za-z0-9_+-]+')}`
+          );
+
+        } else if (existsSync(join($.cwd, value))) {
+
+          return _.Multiline(
+            _.red.bold('INVALID DIRECTORY')
+            , NWL
+            , 'Directory already exists in this location, please use a different name.'
+            , 'Alternatively, run the command from a different folder/path.'
+          );
+
+        }
+
+        return true;
+
+      }
+    }).catch(cancel);
+
+    dispose();
+
+    return resolve.name;
+
+  }
+
+  /**
+   * `4` Package Manager
+   *
+   * Prompts user to choose the package manager they will be using to install strap dependencies.
+   */
+  async function PromptPackageManager () {
+
+    const resolve = await prompt<{ pm: string }>({
+      theme,
+      message: label.Installation,
+      type: 'select',
+      name: 'pm',
+      choices: [
+        {
+          name: 'pnpm',
+          message: 'pnpm'
+        },
+        {
+          name: 'npm',
+          message: 'npm'
+        },
+        {
+          name: 'yarn',
+          message: 'yarn'
+        },
+        {
+          name: 'bun',
+          message: 'bun'
+        }
+      ]
+    }).catch(cancel);
+
+    return resolve.pm;
+
+  }
+
+  /* -------------------------------------------- */
+  /* UTILITIES                                    */
+  /* -------------------------------------------- */
+
+  /**
+   * Executes package manager installation
+   */
+  async function InstallDependencies () {
+
+    log.spinner('Installing Dependencies', {
+      style: 'spinning',
+      color: _.neonGreen
+    });
+
+    await execAsync(`${$.pm} install`);
+    await delay();
+
+    log.spinner.stop();
+
+  }
+
+  /**
+   * Creates and updates the straps `package.json` file of the strap.
+   */
+  async function CreatePackage () {
+
+    if (!(await pathExists(pkguri))) {
+
+      log.spinner.stop();
+
+      throw throws.enoentError({
+        type: 'file',
+        path: pkguri,
+        task: glue.ws($.argv),
+        message: [
+          `The strap does not contain a ${_.cyan('package.json')} file.`,
+          'If you are using a pre-release version of Syncify, this will be addressed',
+          'upon official release. Please choose another strap.'
+        ]
+      });
+
+    }
+
+    const pkg = await getPkg(state.projectPath);
+
+    pkg.name = state.name;
+    pkg.syncify.stores = {};
+
+    $.project.themeVersion = pkg.version;
+
+    if (hasPath('devDependencies.@syncify/config', pkg)) {
+
+      $.project.configVersion = pkg.devDependencies['@syncify/config'];
+
+    }
+
+    await setPkg(pkg, state.projectPath);
+
+    log.spinner.stop();
+
+  }
+
+  /**
+   * Creates the selected strap by cloning from github. Removes the `.git` directory.
+   */
+  async function CreateStrap () {
+
+    log.spinner('Cloning Strap', {
+      style: 'spinning',
+      color: _.neonGreen
+    });
+
+    await execAsync(`git clone --depth 1 ${state.repository} ${state.name}`);
+
+    await delay(); // Ensure clone has finished
+
+    await rm(join(state.projectPath, '.git'), { recursive: true, force: true });
+
+  }
+
+  /**
+   * Internal operation for creating the cache references in the `.syncify` directory.
+   */
+  async function CreateCache () {
+
+    $.project.dir = state.projectPath;
+    $.project.name = state.name;
+    $.project.credentials = access.method === 'env' ? 'env' : 'kc';
+    $.project.createdAt = Date.now();
+
+    await createCaches(state.checksum);
+    await createProject(join(state.cacheRootPath, state.name));
+
+    /* CREATE CREDENTIALS ------------------------- */
+
+    if (access.method === 'keychain') {
+
+      await SaveKeychain();
+
+    } else {
+
+      await writeFile(join(state.projectPath, '.env'), access.env);
+
+    }
+
+  }
+
+  /**
+   * Saves keychain token references.
+   */
+  async function SaveKeychain () {
+
+    if (has(access.domain, $.keychain)) {
+
+      if (has(access.name, $.keychain[access.domain])) {
+
+        const kc = $.keychain[access.domain][access.name];
+
+        kc.updated = access.updated;
+        kc.projects.includes(state.checksum) || kc.projects.push(state.checksum);
+
+      } else {
+
+        assign($.keychain[access.domain], {
+          [access.name]: <Keychain>{
+            name: access.name,
+            created: access.created,
+            updated: access.updated,
+            projects: [ state.checksum ],
+            token: access.token
+          }
+        });
+
+      }
+
+    } else {
+
+      $.keychain[access.domain] = {
+        [access.name]: <Keychain>{
+          name: access.name,
+          created: access.created,
+          updated: access.updated,
+          projects: [ state.checksum ],
+          token: access.token
+        }
+      };
+
+    }
+
+    await writeFile($.file.keychain, JSON.stringify($.keychain));
+    await writeFile(join(state.cacheRootPath, '.env'), access.env);
+
+  }
+
+}

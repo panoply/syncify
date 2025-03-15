@@ -1,0 +1,18 @@
+[submodule "straps/themes/dusk"]
+	path = straps/themes/dusk
+	url = https://github.com/syncifycli/dusk.git
+[submodule "straps/themes/dawn"]
+	path = straps/themes/dawn
+	url = https://github.com/syncifycli/dawn.git
+[submodule "straps/examples/using-paths"]
+	path = straps/examples/using-paths
+	url = https://github.com/syncifycli/using-paths.git
+[submodule "straps/examples/using-schema"]
+	path = straps/examples/using-schema
+	url = https://github.com/syncifycli/using-schema.git
+[submodule "straps/examples/using-tailwind"]
+	path = straps/examples/using-tailwind
+	url = https://github.com/syncifycli/using-tailwind.git
+[submodule "straps/examples/using-rename"]
+	path = straps/examples/using-rename
+	url = https://github.com/syncifycli/using-rename.git

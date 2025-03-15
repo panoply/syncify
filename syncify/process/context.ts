@@ -1,31 +1,37 @@
-import { File, ScriptBundle, SVGBundle, StyleBundle } from 'types';
-import { join, dirname, basename } from 'pathe';
-import { defineProperty } from 'syncify:native';
-import { isRegex, isUndefined } from 'syncify:utils';
-import { $ } from 'syncify:state';
-import { lastPath, parentPath } from 'syncify:utils/paths';
+import { basename, dirname, join } from 'node:path';
+
+import { ScriptBundle, StyleBundle, SVGBundle } from 'types';
+
+import { log } from '~cli/log';
+import { File, Namespace, Type } from '~file';
+import { renameFileParse } from '~options/utils';
+import { defineProperty, isUndefined } from '~utils';
+import { parentPath } from '~utils/paths';
+
+import { $ } from '$';
 
 /**
- * Script Context
+ * SVG Context
  *
- * Locate the entry and apply context to the script change
+ * Locate the entry and apply context to the SVG change
  */
 export function svg (file: File<SVGBundle>) {
 
   const config = $.svg.filter(context => {
-
     if (context.input.has(file.input)) return true;
     if (!context.match(file.input)) return false;
-
     context.input.add(file.input);
     return true;
-
   });
 
   if (isUndefined(config)) return file;
 
   // Assign the bundle configuration to a "data" getter
-  defineProperty(file, 'data', { get () { return config; } });
+  defineProperty(file, 'data', {
+    get () {
+      return config;
+    }
+  });
 
   return file;
 
@@ -40,7 +46,10 @@ export function style (file: File<StyleBundle>) {
 
   const config = $.style.find(x => x.watch(file.input));
 
-  if (isUndefined(config)) return file;
+  if (isUndefined(config)) {
+    file.type = Type.Asset;
+    return file;
+  }
 
   // Assign the bundle configuration to a "data" getter
   defineProperty(file, 'data', {
@@ -50,7 +59,7 @@ export function style (file: File<StyleBundle>) {
   });
 
   if (config.snippet) {
-    file.namespace = 'snippets';
+    file.namespace = Namespace.Snippets;
     file.key = join('snippets', config.rename);
   } else {
     file.key = join('assets', config.rename);
@@ -92,39 +101,39 @@ export function script (file: File<ScriptBundle[]>) {
 
 };
 
-/**
- * Augment the file configuration to accept
- * metafield types.
- */
-export function schema (fn: (path: string) => File, file: File) {
+export function schema (parse: (path: string) => File, file: File) {
 
   // Assign the bundle configuration to a "data" getter
-  defineProperty(file, 'data', { get () { return fn; } });
+  defineProperty(file, 'data', { get () { return parse; } });
 
   return file;
 
 };
 
 /**
- * Augment the file configuration to accept
- * metafield types.
+ * Section Rename
+ *
+ * Applies rename to section files.
  */
 export function section (file: File) {
 
-  if ($.section.prefixDir) {
+  if ($.paths.sections.rename.length > 0) {
 
-    if (file.base.endsWith('-group.json')) return file;
-    if (isRegex($.section.global) && $.section.global.test(file.input)) return file;
+    const path = file.input;
+    const find = $.paths.sections.rename.find(([ match ]) => match(path));
 
-    const last = lastPath(file.input);
+    if (isUndefined(find)) return file;
 
-    if ($.section.baseDir.has(last)) return file;
+    const oldName = file.base;
+    const rename = renameFileParse(file.input, find[1]);
 
-    const rename = lastPath(file.input) + $.section.separator + file.base;
+    file.name = rename.name;
+    file.ext = rename.ext;
+    file.base = rename.base;
+    file.key = join(file.namespace, rename.base);
+    file.output = join(dirname(file.output), rename.base);
 
-    file.name = rename;
-    file.key = join(file.namespace, rename);
-    file.output = join(dirname(file.output), rename);
+    log.rename(oldName, file.base);
 
   }
 
@@ -133,24 +142,29 @@ export function section (file: File) {
 };
 
 /**
- * Augment the file configuration to accept
- * metafield types.
+ * Snippet Rename
+ *
+ * Applies rename to snippet files.
  */
 export function snippet (file: File) {
 
-  if ($.snippet.prefixDir) {
+  if ($.paths.snippets.rename.length > 0) {
 
-    if (isRegex($.snippet.global) && $.snippet.global.test(file.input)) return file;
+    const path = file.input;
+    const find = $.paths.snippets.rename.find(([ match ]) => match(path));
 
-    const last = lastPath(file.input);
+    if (isUndefined(find)) return file;
 
-    if ($.snippet.baseDir.has(last)) return file;
+    const oldName = file.base;
+    const rename = renameFileParse(file.input, find[1]);
 
-    const rename = last + $.snippet.separator + file.base;
+    file.name = rename.name;
+    file.ext = rename.ext;
+    file.base = rename.base;
+    file.key = join(file.namespace, rename.base);
+    file.output = join(dirname(file.output), rename.base);
 
-    file.name = rename;
-    file.key = join(file.namespace, rename);
-    file.output = join(dirname(file.output), rename);
+    log.rename(oldName, file.base);
 
   }
 
