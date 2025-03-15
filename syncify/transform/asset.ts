@@ -3,7 +3,7 @@ import { readFile, writeFile } from 'fs-extra';
 import { log } from '~cli/log';
 import { error } from '~errors';
 import { File, Kind } from '~file';
-import { themeFilesUpsertMap } from '~http/theme';
+import { themeFilesUpsertMap } from '~http/themeFiles';
 import { isEmptyString, isString } from '~utils';
 
 import { $ } from '$';

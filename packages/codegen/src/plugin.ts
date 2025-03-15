@@ -105,7 +105,8 @@ const DEFAULT_TYPES = [
   'DisplayableError',
   'PageInfo',
   'UserError',
-  'Node'
+  'Node',
+  'Maybe'
 ];
 
 // Scalar type mappings

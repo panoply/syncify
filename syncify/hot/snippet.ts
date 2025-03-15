@@ -1,17 +1,17 @@
+import type { OnlineStoreThemeFilesUpsertFileInput, Theme } from 'types';
+
 import { basename, join } from 'node:path';
 
 import { readFileSync, writeFile } from 'fs-extra';
-import { Theme, type ThemeFiles } from 'types';
 
 import { glue } from '@syncify/glue';
 
 import { wss } from './socket';
 
-import { runtime } from '~cli/runtime';
 import { warnOption } from '~cli/throws';
 import { HOT_SNIPPET_KEY, REGEX_HOT_SNIPPET } from '~const';
 import { event } from '~events';
-import { themeFilesList, themeFilesUpsert } from '~http/theme';
+import { themeFilesList, themeFilesUpsert } from '~http/themeFiles';
 import { forEach, forMap, isString, m } from '~utils';
 
 import { $, q } from '$';
@@ -145,7 +145,7 @@ export function removeSnippetFromRemote () {
  */
 export function removeSnippetInjections () {
 
-  const request = forMap<string, ThemeFiles.UpsertFiles>(key => ({
+  const request = forMap<string, OnlineStoreThemeFilesUpsertFileInput>(key => ({
     filename: `layout/${basename(key)}`,
     body: {
       type: 'TEXT',
@@ -196,7 +196,7 @@ export async function snippet (theme: Theme) {
       }
 
       const match = m<string, string>(files.map(file => [ file.filename, file.body.content ]));
-      const upsert = forMap<string, ThemeFiles.UpsertFiles>(filename => {
+      const upsert = forMap<string, OnlineStoreThemeFilesUpsertFileInput>(filename => {
 
         if (filename === HOT_SNIPPET_KEY) {
 

@@ -18,7 +18,7 @@ import { stdin } from '~cli/stdin';
 import { throwError } from '~cli/throws';
 import { error } from '~errors';
 import { event } from '~events';
-import { themeFilesUpsertMap, type Upsert } from '~http/theme';
+import { themeFilesUpsertMap, type Upsert } from '~http/themeFiles';
 import { outputFile, parse } from '~process/files';
 import { byteSize, delay, eqWS, forEach, getChunk, m, NooP, s, stringSize } from '~utils';
 

@@ -1,23 +1,19 @@
 import type { File } from '~file';
 
-import { dirname, join, relative } from 'node:path';
+import { join } from 'node:path';
 
-import axios from 'axios';
-import { ensureDirSync, ensureFile, pathExists, readFile, writeFile, writeFileSync, writeJSONSync } from 'fs-extra';
-import pMap from 'p-map';
+import { pathExists, readFile, writeFile } from 'fs-extra';
 
 import * as _ from '@syncify/ansi';
-import { equality, evaluate, format, stringify, type EvaluateOptions } from '@syncify/json';
+import { evaluate } from '@syncify/json';
 import { timer } from '@syncify/timer';
 
 import { runtime } from '~cli/runtime';
-import { PULL_ALIGN } from '~const';
 import { error } from '~errors';
 import { event } from '~events';
-import { themeFiles, themeFilesGlob, themeFilesList } from '~http/theme';
-import { log } from '~log';
-import { outputFile, parse } from '~process/files';
-import { checksum, delay, forEach, getChunk, m, values } from '~utils';
+import { themeFilesList, themeFilesMap } from '~http/themeFiles';
+import { outputFile } from '~process/files';
+import { delay, getChunk, m } from '~utils';
 
 import { $, q } from '$';
 
@@ -171,7 +167,7 @@ interface State {
   /**
    * File exists in remote but not local
    */
-  files: Pull.Model;
+  files: any;
 }
 
 export async function Pull () {
@@ -191,11 +187,11 @@ export async function Pull () {
   .Newline()
   .Template({ id: 'progress' });
 
-  const remote = await themeFiles($.target.default, n => write.Spinner(`${n} Files`));
-  const progress = _.progress(remote.count, { prepend: null, clearOnComplete: false });
+  const remote = await themeFilesMap($.target.default, n => write.Spinner(`${n} Files`));
+  const progress = _.progress(remote.total, { prepend: null, clearOnComplete: false });
   const state: State = {
     count: 0,
-    get total () { return remote.count; },
+    get total () { return remote.total; },
     get files () { return remote.files; }
   };
 

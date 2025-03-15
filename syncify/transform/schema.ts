@@ -23,7 +23,7 @@ import { log } from '~cli/log';
 import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File, Type } from '~file';
-import { themeFilesUpsertMap } from '~http/theme';
+import { themeFilesUpsertMap } from '~http/themeFiles';
 import { checksum, defineProperty, has, hasProp, isArray, isObject, plur, toArray } from '~utils';
 
 import { $, q } from '$';

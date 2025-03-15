@@ -1,14 +1,14 @@
-import type { Graph, Store } from 'types';
+import type * as Type from 'types';
 
 import { basename } from 'node:path';
 
 import { http } from '~http/client';
 
-export function themesList (store: Store) {
+export function themesList (store: Type.Store) {
 
-  return new Promise<StoreThemes.Nodes[]>((resolve, reject) => {
+  return new Promise<Type.OnlineStoreTheme[]>((resolve, reject) => {
 
-    http(store.name).request<Graph.ThemeListQuery>({
+    http(store.name).request<Type.QueryThemes>({
       data: gql`
         query ThemeList {
           themes(first: 100) {
@@ -32,7 +32,7 @@ export function themesList (store: Store) {
       }
     }) => {
 
-      resolve(nodes.map(theme => ({ ...theme, id: +basename(theme.id) })));
+      resolve(nodes.map(theme => ({ ...theme, id: basename(theme.id) })));
 
     }).catch(failed => {
 

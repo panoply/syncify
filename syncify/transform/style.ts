@@ -14,7 +14,7 @@ import { log } from '~cli/log';
 import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File, Kind } from '~file';
-import { themeFilesUpsertMap } from '~http/theme';
+import { themeFilesUpsertMap } from '~http/themeFiles';
 import { runChecksum } from '~process/cache';
 import { parse } from '~process/files';
 import * as u from '~utils';
@@ -173,7 +173,7 @@ export async function tailwindParse (file: File) {
 
     if ($.processor.tailwind.map[map].has(file.input)) {
 
-      const file = parse<StyleBundle>($.style[map].input);
+      const file = parse($.style[map].input);
 
       if (u.isUndefined(file)) continue;
 

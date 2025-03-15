@@ -14,7 +14,7 @@ import { log } from '~cli/log';
 import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File } from '~file';
-import { themeFilesUpsertMap } from '~http/theme';
+import { themeFilesUpsertMap } from '~http/themeFiles';
 import { byteSize, has, inProp, isEmpty, pNext, sizeDiff, stringSize } from '~utils';
 
 import { $, q } from '$';

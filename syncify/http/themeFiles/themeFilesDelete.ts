@@ -1,10 +1,16 @@
 import type * as Type from 'types';
+import type { File } from '~file';
+
+import pMap from 'p-map';
 
 import { error } from '~errors';
+import { event } from '~events';
 import { http } from '~http/client';
 import { OnlineStoreThemeFilesUserErrors } from '~http/enums';
 import { graph, params } from '~http/utils';
-import { forMap } from '~utils';
+import { forMap, isArray } from '~utils';
+
+import { $, q } from '$';
 
 declare namespace Delete {
 
@@ -106,7 +112,7 @@ export function themeFilesDelete (...input: Delete.Arguments) {
 
   return new Promise<Delete.Resolve>((resolve, reject) => {
 
-    http(target.store.name).request<Type>({
+    http(target.store.name).request<Type.MutationThemeFilesDelete>({
       data: {
         query: gql`
           mutation ThemeFilesDelete($gid: ID!, $query: [String!]!) {
@@ -140,7 +146,7 @@ export function themeFilesDelete (...input: Delete.Arguments) {
             filename: userError.filename,
             code: userError.code.replace(/_/g, WSP),
             summary: OnlineStoreThemeFilesUserErrors(userError.code),
-            graph: 'OnlineStoreThemeFileOperationResult',
+            graph: 'MutationThemeFilesDelete',
             file: files.find(file => file.key === userError.filename) || null
           }), userErrors)
 
@@ -148,7 +154,7 @@ export function themeFilesDelete (...input: Delete.Arguments) {
       );
 
     })
-    .catch((e: RequestError) => {
+    .catch(e => {
 
       e.target = target;
       e.files = files;
@@ -159,3 +165,30 @@ export function themeFilesDelete (...input: Delete.Arguments) {
 
   });
 }
+
+/**
+ * The main theme files delete handler. Files are mapped and queued. The request will use
+ * the {@link $.target} entries and iterate over all theme targets. This function is used
+ * mostly in watch mode, whereas {@link themeFilesDelete} can be used for direct upserts.
+ */
+export async function themeFilesDeleteMap (file: File | File[]) {
+
+  const files = isArray(file) ? file : [ file ];
+
+  await q.http.add(async () => {
+
+    try {
+
+      const targets = await pMap($.target, target => themeFilesDelete(files, target));
+
+      event.each(targets);
+
+    } catch (e) {
+
+      error.request(e);
+
+    }
+
+  });
+
+};

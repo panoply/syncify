@@ -13,7 +13,7 @@ import { timer } from '@syncify/timer';
 import { log } from '~cli/log';
 import { error } from '~errors';
 import { File, Kind, Namespace } from '~file';
-import { themeFilesUpsertMap } from '~http/theme';
+import { themeFilesUpsertMap } from '~http/themeFiles';
 import { renameFile } from '~process/files';
 import { assign, byteSize, plur, sizeDiff, toArray } from '~utils';
 

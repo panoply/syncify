@@ -5,7 +5,7 @@ import { log } from '~cli/log';
 import { stdin } from '~cli/stdin';
 import { event } from '~events';
 import { File, Kind, Type } from '~file';
-import { themeFilesDeleteMap } from '~http/theme';
+import { themeFilesDeleteMap } from '~http/themeFiles';
 import { parse } from '~process/files';
 import { AssetTransform } from '~transform/asset';
 import { JsonTransform } from '~transform/json';

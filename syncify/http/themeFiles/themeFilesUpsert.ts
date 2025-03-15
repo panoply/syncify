@@ -12,7 +12,7 @@ import { forMap, isArray } from '~utils';
 
 import { $, q } from '$';
 
-declare namespace Upsert {
+export declare namespace Upsert {
 
   export type Arguments = [
     /**
@@ -183,7 +183,7 @@ export function themeFilesUpsert (...input: Upsert.Arguments) {
 
   return new Promise<Upsert.Resolve>((resolve, reject) => {
 
-    http(target.store.name).request<{ themeFilesUpsert: Type.ThemeFilesUpsertPayload }>({
+    http(target.store.name).request<Type.MutationThemeFilesUpsert>({
       data: {
         query: gql`
           mutation ThemeFilesUpsert($query: [OnlineStoreThemeFilesUpsertFileInput!]!, $gid: ID!) {

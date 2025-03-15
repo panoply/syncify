@@ -9,7 +9,7 @@ import { log } from '~cli/log';
 import { error } from '~errors';
 import { File, Type } from '~file';
 import { injectRenderSnippet } from '~hot/snippet';
-import { themeFilesUpsertMap } from '~http/theme';
+import { themeFilesUpsertMap } from '~http/themeFiles';
 import { CreateSection } from '~schema';
 import { tailwindParse } from '~style';
 import * as util from '~utils';

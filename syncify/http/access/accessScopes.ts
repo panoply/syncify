@@ -1,4 +1,4 @@
-import type { Graph } from 'types';
+import type * as Type from 'types';
 
 import { XiorError } from 'xior';
 
@@ -11,9 +11,9 @@ import { http } from '~http/client';
  */
 export function accessScopeList (domain: string, token: string) {
 
-  return new Promise((resolve, reject) => {
+  return new Promise<Type.AccessScope[]>((resolve) => {
 
-    http.request<Graph.AccessScopeListQuery>(domain, token)({
+    http.request<Type.QueryCurrentAppInstallation>(domain, token)({
       data: gql`
         query AccessScopeList {
           currentAppInstallation {

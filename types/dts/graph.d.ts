@@ -4,7 +4,7 @@
  */
 export type DisplayableError = {
   /** The path to the input field that caused the error. */
-  field?: any;
+  field?: Array<string>;
   /** The error message. */
   message: string;
 };
@@ -15,20 +15,20 @@ export type DisplayableError = {
  */
 export type PageInfo = {
   /** The cursor corresponding to the last node in edges. */
-  endCursor?: any;
+  endCursor?: string;
   /** Whether there are more pages to fetch following the current page. */
   hasNextPage: boolean;
   /** Whether there are any pages prior to the current page. */
   hasPreviousPage: boolean;
   /** The cursor corresponding to the first node in edges. */
-  startCursor?: any;
+  startCursor?: string;
 };
 
 /** Represents an error in the input of a mutation.
  */
 export type UserError = DisplayableError & {
   /** The path to the input field that caused the error. */
-  field?: any;
+  field?: Array<string>;
   /** The error message. */
   message: string;
 };
@@ -57,7 +57,7 @@ export type OnlineStoreTheme = HasPublishedTranslations &
     /** The date and time when the theme was created. */
     createdAt: string;
     /** The files in the theme. */
-    files?: any;
+    files?: OnlineStoreThemeFileConnection;
     /** A globally-unique ID. */
     id: string;
     /** The name of the theme, set by the merchant. */
@@ -71,7 +71,7 @@ export type OnlineStoreTheme = HasPublishedTranslations &
     /** The role of the theme. */
     role: any;
     /** The theme store ID. */
-    themeStoreId?: any;
+    themeStoreId?: number;
     /** The published translations associated with the resource. */
     translations: Array<Translation>;
     /** The date and time when the theme was last updated. */
@@ -104,7 +104,7 @@ export type OnlineStoreThemeFile = {
   /** The body of the theme file. */
   body: OnlineStoreThemeFileBody;
   /** The md5 digest of the theme file for data integrity. */
-  checksumMd5?: any;
+  checksumMd5?: string;
   /** The content type of the theme file. */
   contentType: string;
   /** The date and time when the theme file was created. */
@@ -184,9 +184,9 @@ export type OnlineStoreThemeFilesUserErrors = DisplayableError & {
   /** The error code. */
   code?: any;
   /** The path to the input field that caused the error. */
-  field?: any;
+  field?: Array<string>;
   /** The filename of the theme file. */
-  filename?: any;
+  filename?: string;
   /** The error message. */
   message: string;
 };
@@ -198,12 +198,47 @@ export type OnlineStoreThemeInput = {
   name?: any;
 };
 
+/** Return type for `themeFilesUpsert` mutation.
+ */
+export type MutationThemeFilesUpsert = {
+  themeFilesUpsert: {
+    /** The theme files write job triggered by the mutation. */
+    job?: Job;
+    /** The resulting theme files. */
+    upsertedThemeFiles?: Array<OnlineStoreThemeFileOperationResult>;
+    /** The list of errors that occurred from executing the mutation. */
+    userErrors: Array<OnlineStoreThemeFilesUserErrors>;
+  };
+};
+
+/** Return type for `themeFilesCopy` mutation.
+ */
+export type MutationThemeFilesCopy = {
+  themeFilesCopy: {
+    /** The resulting theme files. */
+    copiedThemeFiles?: Array<OnlineStoreThemeFileOperationResult>;
+    /** The list of errors that occurred from executing the mutation. */
+    userErrors: Array<OnlineStoreThemeFilesUserErrors>;
+  };
+};
+
+/** Return type for `themeFilesDelete` mutation.
+ */
+export type MutationThemeFilesDelete = {
+  themeFilesDelete: {
+    /** The resulting theme files. */
+    deletedThemeFiles?: Array<OnlineStoreThemeFileOperationResult>;
+    /** The list of errors that occurred from executing the mutation. */
+    userErrors: Array<OnlineStoreThemeFilesUserErrors>;
+  };
+};
+
 /** Return type for `themeCreate` mutation.
  */
 export type MutationThemeCreate = {
   themeCreate: {
     /** The theme that was created. */
-    theme?: any;
+    theme?: OnlineStoreTheme;
     /** The list of errors that occurred from executing the mutation. */
     userErrors: Array<ThemeCreateUserError>;
   };
@@ -215,20 +250,9 @@ export type ThemeCreateUserError = DisplayableError & {
   /** The error code. */
   code?: any;
   /** The path to the input field that caused the error. */
-  field?: any;
+  field?: Array<string>;
   /** The error message. */
   message: string;
-};
-
-/** Return type for `themeFilesDelete` mutation.
- */
-export type MutationThemeFilesDelete = {
-  themeFilesDelete: {
-    /** The resulting theme files. */
-    deletedThemeFiles?: any;
-    /** The list of errors that occurred from executing the mutation. */
-    userErrors: Array<OnlineStoreThemeFilesUserErrors>;
-  };
 };
 
 /** An error that occurs during the execution of `ThemeDelete`.
@@ -237,33 +261,9 @@ export type ThemeDeleteUserError = DisplayableError & {
   /** The error code. */
   code?: any;
   /** The path to the input field that caused the error. */
-  field?: any;
+  field?: Array<string>;
   /** The error message. */
   message: string;
-};
-
-/** Return type for `themeFilesUpsert` mutation.
- */
-export type MutationThemeFilesUpsert = {
-  themeFilesUpsert: {
-    /** The theme files write job triggered by the mutation. */
-    job?: any;
-    /** The resulting theme files. */
-    upsertedThemeFiles?: any;
-    /** The list of errors that occurred from executing the mutation. */
-    userErrors: Array<OnlineStoreThemeFilesUserErrors>;
-  };
-};
-
-/** Return type for `themeFilesCopy` mutation.
- */
-export type MutationThemeFilesCopy = {
-  themeFilesCopy: {
-    /** The resulting theme files. */
-    copiedThemeFiles?: any;
-    /** The list of errors that occurred from executing the mutation. */
-    userErrors: Array<OnlineStoreThemeFilesUserErrors>;
-  };
 };
 
 /** Return type for `themePublish` mutation.
@@ -271,7 +271,7 @@ export type MutationThemeFilesCopy = {
 export type MutationThemePublish = {
   themePublish: {
     /** The theme that was published. */
-    theme?: any;
+    theme?: OnlineStoreTheme;
     /** The list of errors that occurred from executing the mutation. */
     userErrors: Array<ThemePublishUserError>;
   };
@@ -283,7 +283,7 @@ export type ThemePublishUserError = DisplayableError & {
   /** The error code. */
   code?: any;
   /** The path to the input field that caused the error. */
-  field?: any;
+  field?: Array<string>;
   /** The error message. */
   message: string;
 };
@@ -313,7 +313,7 @@ export type AppInstallation = HasMetafields &
      * Channel associated with the installed application.
      * @deprecated Use `publication` instead.
      */
-    channel?: any;
+    channel?: Channel;
     /** Credits that can be used towards future app purchases. */
     credits: AppCreditConnection;
     /** A globally-unique ID. */
@@ -325,7 +325,7 @@ export type AppInstallation = HasMetafields &
      * including its `namespace` and `key`, that's associated with a Shopify resource
      * for the purposes of adding and storing additional information.
      */
-    metafield?: any;
+    metafield?: Metafield;
     /**
      * A list of [custom fields](https://shopify.dev/docs/apps/build/custom-data)
      * that a merchant associates with a Shopify resource.
@@ -334,7 +334,7 @@ export type AppInstallation = HasMetafields &
     /** One-time purchases to a shop. */
     oneTimePurchases: AppPurchaseOneTimeConnection;
     /** The publication associated with the installed application. */
-    publication?: any;
+    publication?: Publication;
     /** The records that track the externally-captured revenue for the app. The records are used for revenue attribution purposes. */
     revenueAttributionRecords: AppRevenueAttributionRecordConnection;
     /**
@@ -343,8 +343,207 @@ export type AppInstallation = HasMetafields &
      */
     subscriptions: Array<AppSubscription>;
     /** The URL to uninstall the application. */
-    uninstallUrl?: any;
+    uninstallUrl?: string;
   };
+
+/** A page on the Online Store.
+ */
+export type Page = HasEvents &
+  HasMetafieldDefinitions &
+  HasMetafields &
+  HasPublishedTranslations &
+  Navigable &
+  Node & {
+    /** The text content of the page, complete with HTML markup. */
+    body: string;
+    /** The first 150 characters of the page body. If the page body contains more than 150 characters, additional characters are truncated by ellipses. */
+    bodySummary: string;
+    /** The date and time (ISO 8601 format) of the page creation. */
+    createdAt: string;
+    /** A default [cursor](https://shopify.dev/api/usage/pagination-graphql) that returns the single next record, sorted ascending by ID. */
+    defaultCursor: string;
+    /** The paginated list of events associated with the host subject. */
+    events: EventConnection;
+    /**
+     * A unique, human-friendly string for the page.
+     * In themes, the Liquid templating language refers to a page by its handle.
+     */
+    handle: string;
+    /** A globally-unique ID. */
+    id: string;
+    /** Whether or not the page is visible. */
+    isPublished: boolean;
+    /**
+     * A [custom field](https://shopify.dev/docs/apps/build/custom-data),
+     * including its `namespace` and `key`, that's associated with a Shopify resource
+     * for the purposes of adding and storing additional information.
+     */
+    metafield?: Metafield;
+    /**
+     * List of metafield definitions.
+     * @deprecated This field will be removed in a future version. Use the root `metafieldDefinitions` field instead.
+     */
+    metafieldDefinitions: MetafieldDefinitionConnection;
+    /**
+     * A list of [custom fields](https://shopify.dev/docs/apps/build/custom-data)
+     * that a merchant associates with a Shopify resource.
+     */
+    metafields: MetafieldConnection;
+    /**
+     * The date and time (ISO 8601 format) when the page became or will become visible.
+     * Returns null when the page isn't visible.
+     */
+    publishedAt?: string;
+    /** The suffix of the template that's used to render the page. */
+    templateSuffix?: string;
+    /** Title of the page. */
+    title: string;
+    /** The published translations associated with the resource. */
+    translations: Array<Translation>;
+    /** The date and time (ISO 8601 format) of the latest page update. */
+    updatedAt: string;
+  };
+
+/** An auto-generated type for paginating through multiple Pages.
+ */
+export type PageConnection = {
+  /** The connection between the node and its parent. Each edge contains a minimum of the edge's cursor and the node. */
+  edges: Array<PageEdge>;
+  /** A list of nodes that are contained in PageEdge. You can fetch data about an individual node, or you can follow the edges to fetch data about a collection of related nodes. At each node, you specify the fields that you want to retrieve. */
+  nodes: Array<Page>;
+  /** An object that’s used to retrieve [cursor information](https://shopify.dev/api/usage/pagination-graphql) about the current page. */
+  pageInfo: PageInfo;
+};
+
+/** The input fields to create a page.
+ */
+export type PageCreateInput = {
+  /** The text content of the page, complete with HTML markup. */
+  body?: any;
+  /**
+   * A unique, human-friendly string for the page. If no handle is specified, a handle will be generated automatically from the page title.
+   * In themes, the Liquid templating language refers to a page by its handle.
+   */
+  handle?: any;
+  /** Whether or not the page should be visible. Defaults to `true` if no publish date is specified. */
+  isPublished?: any;
+  /** The input fields to create or update a metafield. */
+  metafields?: any;
+  /** The date and time (ISO 8601 format) when the page should become visible. */
+  publishDate?: any;
+  /**
+   * The suffix of the template that's used to render the page.
+   * If the value is an empty string or `null`, then the default page template is used.
+   */
+  templateSuffix?: any;
+  /** The title of the page. */
+  title: string;
+};
+
+/** Return type for `pageCreate` mutation.
+ */
+export type MutationPageCreate = {
+  pageCreate: {
+    /** The page that was created. */
+    page?: Page;
+    /** The list of errors that occurred from executing the mutation. */
+    userErrors: Array<PageCreateUserError>;
+  };
+};
+
+/** An error that occurs during the execution of `PageCreate`.
+ */
+export type PageCreateUserError = DisplayableError & {
+  /** The error code. */
+  code?: any;
+  /** The path to the input field that caused the error. */
+  field?: Array<string>;
+  /** The error message. */
+  message: string;
+};
+
+/** Return type for `pageDelete` mutation.
+ */
+export type MutationPageDelete = {
+  pageDelete: {
+    /** The ID of the deleted page. */
+    deletedPageId?: string;
+    /** The list of errors that occurred from executing the mutation. */
+    userErrors: Array<PageDeleteUserError>;
+  };
+};
+
+/** An error that occurs during the execution of `PageDelete`.
+ */
+export type PageDeleteUserError = DisplayableError & {
+  /** The error code. */
+  code?: any;
+  /** The path to the input field that caused the error. */
+  field?: Array<string>;
+  /** The error message. */
+  message: string;
+};
+
+/** The input fields to update a page.
+ */
+export type PageUpdateInput = {
+  /** The text content of the page, complete with HTML markup. */
+  body?: any;
+  /**
+   * A unique, human-friendly string for the page. If no handle is specified, a handle will be generated automatically from the page title.
+   * In themes, the Liquid templating language refers to a page by its handle.
+   */
+  handle?: any;
+  /** Whether or not the page should be visible. Defaults to `true` if no publish date is specified. */
+  isPublished?: any;
+  /** The input fields to create or update a metafield. */
+  metafields?: any;
+  /** The date and time (ISO 8601 format) when the page should become visible. */
+  publishDate?: any;
+  /**
+   * Whether a redirect is required after a new handle has been provided.
+   * If `true`, then the old handle is redirected to the new one automatically.
+   */
+  redirectNewHandle?: any;
+  /**
+   * The suffix of the template that's used to render the page.
+   * If the value is an empty string or `null`, then the default page template is used.
+   */
+  templateSuffix?: any;
+  /** The title of the page. */
+  title?: any;
+};
+
+/** Return type for `pageUpdate` mutation.
+ */
+export type MutationPageUpdate = {
+  pageUpdate: {
+    /** The page that was updated. */
+    page?: Page;
+    /** The list of errors that occurred from executing the mutation. */
+    userErrors: Array<PageUpdateUserError>;
+  };
+};
+
+/** An error that occurs during the execution of `PageUpdate`.
+ */
+export type PageUpdateUserError = DisplayableError & {
+  /** The error code. */
+  code?: any;
+  /** The path to the input field that caused the error. */
+  field?: Array<string>;
+  /** The error message. */
+  message: string;
+};
+
+/** An auto-generated type which holds one Page and a cursor during pagination.
+ */
+export type PageEdge = {
+  /** The position of each node in an array, used in [pagination](https://shopify.dev/api/usage/pagination-graphql). */
+  cursor: string;
+  /** The item at the end of PageEdge. */
+  node: Page;
+};
 
 /** Storefront password information.
  */
@@ -372,9 +571,9 @@ export type Translation = {
   /** Whether the original content has changed since this translation was updated. */
   outdated: boolean;
   /** The date and time when the translation was updated. */
-  updatedAt?: any;
+  updatedAt?: string;
   /** Translation value. */
-  value?: any;
+  value?: string;
 };
 
 /** Represents the base64 encoded body of a theme file.
@@ -419,7 +618,7 @@ export type HasMetafields = {
    * including its `namespace` and `key`, that's associated with a Shopify resource
    * for the purposes of adding and storing additional information.
    */
-  metafield?: any;
+  metafield?: Metafield;
   /**
    * A list of [custom fields](https://shopify.dev/docs/apps/build/custom-data)
    * that a merchant associates with a Shopify resource.
@@ -433,7 +632,7 @@ export type AppSubscription = Node & {
   /** The date and time when the app subscription was created. */
   createdAt: string;
   /** The date and time when the current app subscription period ends. Returns `null` if the subscription isn't active. */
-  currentPeriodEnd?: any;
+  currentPeriodEnd?: string;
   /** A globally-unique ID. */
   id: string;
   /** The plans attached to the app subscription. */
@@ -467,17 +666,17 @@ export type App = Node & {
   /** A unique application API identifier. */
   apiKey: string;
   /** App store page URL of the app. */
-  appStoreAppUrl?: any;
+  appStoreAppUrl?: string;
   /** App store page URL of the developer who created the app. */
-  appStoreDeveloperUrl?: any;
+  appStoreDeveloperUrl?: string;
   /** All requestable access scopes available to the app. */
   availableAccessScopes: Array<AccessScope>;
   /** Banner image for the app. */
   banner: any;
   /** Description of the app. */
-  description?: any;
+  description?: string;
   /** The name of the app developer. */
-  developerName?: any;
+  developerName?: string;
   /** The type of app developer. */
   developerType: any;
   /**
@@ -494,18 +693,18 @@ export type App = Node & {
   /** Feedback from this app about the store. */
   feedback?: any;
   /** Handle of the app. */
-  handle?: any;
+  handle?: string;
   /** Icon that represents the app. */
   icon: any;
   /** A globally-unique ID. */
   id: string;
   /** Webpage where you can install the app. */
-  installUrl?: any;
+  installUrl?: string;
   /**
    * Corresponding AppInstallation for this shop and App.
    * Returns null if the App is not installed.
    */
-  installation?: any;
+  installation?: AppInstallation;
   /** Whether the app is the [post purchase](https://shopify.dev/apps/checkout/post-purchase) app in use. */
   isPostPurchaseAppInUse: boolean;
   /**
@@ -523,11 +722,11 @@ export type App = Node & {
   /** Whether the app was previously installed on the current shop. */
   previouslyInstalled: boolean;
   /** Detailed information about the app pricing. */
-  pricingDetails?: any;
+  pricingDetails?: string;
   /** Summary of the app pricing details. */
   pricingDetailsSummary: string;
   /** Link to app privacy policy. */
-  privacyPolicyUrl?: any;
+  privacyPolicyUrl?: string;
   /** The public category for the app. */
   publicCategory: any;
   /** Whether the app is published to the Shopify App Store. */
@@ -549,7 +748,7 @@ export type App = Node & {
    * Webpage where you can uninstall the app.
    * @deprecated Use AppInstallation.uninstallUrl instead
    */
-  uninstallUrl?: any;
+  uninstallUrl?: string;
   /** The webhook API version for the app. */
   webhookApiVersion: string;
 };
@@ -586,7 +785,7 @@ export type Channel = Node & {
    * @deprecated Use [AppInstallation.launchUrl](
    *           https://shopify.dev/api/admin-graphql/current/objects/AppInstallation#field-appinstallation-launchurl) instead.
    */
-  overviewPath?: any;
+  overviewPath?: string;
   /**
    * The product publications for the products published to the channel.
    * @deprecated Use `productPublicationsV3` instead.
@@ -626,7 +825,7 @@ export type Metafield = Node & {
   /** The metafield definition that the metafield belongs to, if any. */
   definition?: any;
   /** The description of the metafield. */
-  description?: any;
+  description?: string;
   /** A globally-unique ID. */
   id: string;
   /** The data stored in the metafield in JSON format. */
@@ -722,6 +921,94 @@ export type AppRevenueAttributionRecordConnection = {
   nodes: Array<any>;
   /** An object that’s used to retrieve [cursor information](https://shopify.dev/api/usage/pagination-graphql) about the current page. */
   pageInfo: PageInfo;
+};
+
+/** Represents an object that has a list of events.
+ */
+export type HasEvents = {
+  /** The paginated list of events associated with the host subject. */
+  events: EventConnection;
+};
+
+/** Resources that metafield definitions can be applied to.
+ */
+export type HasMetafieldDefinitions = {
+  /**
+   * List of metafield definitions.
+   * @deprecated This field will be removed in a future version. Use the root `metafieldDefinitions` field instead.
+   */
+  metafieldDefinitions: MetafieldDefinitionConnection;
+};
+
+/** A default cursor that you can use in queries to paginate your results. Each edge in a connection can
+ * return a cursor, which is a reference to the edge's position in the connection. You can use an edge's cursor as
+ * the starting point to retrieve the nodes before or after it in a connection.
+ *
+ * To learn more about using cursor-based pagination, refer to
+ * [Paginating results with GraphQL](https://shopify.dev/api/usage/pagination-graphql).
+ */
+export type Navigable = {
+  /** A default [cursor](https://shopify.dev/api/usage/pagination-graphql) that returns the single next record, sorted ascending by ID. */
+  defaultCursor: string;
+};
+
+/** An auto-generated type for paginating through multiple Events.
+ */
+export type EventConnection = {
+  /** The connection between the node and its parent. Each edge contains a minimum of the edge's cursor and the node. */
+  edges: Array<any>;
+  /** A list of nodes that are contained in EventEdge. You can fetch data about an individual node, or you can follow the edges to fetch data about a collection of related nodes. At each node, you specify the fields that you want to retrieve. */
+  nodes: Array<any>;
+  /** An object that’s used to retrieve [cursor information](https://shopify.dev/api/usage/pagination-graphql) about the current page. */
+  pageInfo: PageInfo;
+};
+
+/** An auto-generated type for paginating through multiple MetafieldDefinitions.
+ */
+export type MetafieldDefinitionConnection = {
+  /** The connection between the node and its parent. Each edge contains a minimum of the edge's cursor and the node. */
+  edges: Array<any>;
+  /** A list of nodes that are contained in MetafieldDefinitionEdge. You can fetch data about an individual node, or you can follow the edges to fetch data about a collection of related nodes. At each node, you specify the fields that you want to retrieve. */
+  nodes: Array<any>;
+  /** An object that’s used to retrieve [cursor information](https://shopify.dev/api/usage/pagination-graphql) about the current page. */
+  pageInfo: PageInfo;
+};
+
+/** The input fields to use to create or update a metafield through a mutation on the owning resource.
+ * An alternative way to create or update a metafield is by using the
+ * [metafieldsSet](https://shopify.dev/api/admin-graphql/latest/mutations/metafieldsSet) mutation.
+ */
+export type MetafieldInput = {
+  /** The unique ID of the metafield. Using `owner_id`, `namespace`, and `key` is preferred for creating and updating. */
+  id?: any;
+  /**
+   * The unique identifier for a metafield within its namespace.
+   *
+   * Required when creating a metafield, but optional when updating. Used to help identify the metafield when
+   * updating, but can't be updated itself.
+   *
+   * Must be 2-64 characters long and can contain alphanumeric, hyphen, and underscore characters.
+   */
+  key?: any;
+  /**
+   * The container for a group of metafields that the metafield is or will be associated with. Used in tandem with
+   * `key` to lookup a metafield on a resource, preventing conflicts with other metafields with the same `key`.
+   *
+   * Required when creating a metafield, but optional when updating. Used to help identify the metafield when
+   * updating, but can't be updated itself.
+   *
+   * Must be 3-255 characters long and can contain alphanumeric, hyphen, and underscore characters.
+   */
+  namespace?: any;
+  /**
+   * The type of data that is stored in the metafield.
+   * Refer to the list of [supported types](https://shopify.dev/apps/metafields/types).
+   *
+   * Required when creating or updating a metafield without a definition.
+   */
+  type?: any;
+  /** The data stored in the metafield. Always stored as a string, regardless of the metafield's type. */
+  value?: any;
 };
 
 /** List of abandoned checkouts. Includes checkouts that were recovered after being abandoned.
@@ -1361,7 +1648,7 @@ export type QueryEvent = {
 /** The paginated list of events associated with the store.
  */
 export type QueryEvents = {
-  events: any;
+  events: EventConnection;
 };
 
 /** Count of events. Limited to a maximum of 10000.
@@ -1601,7 +1888,7 @@ export type QueryMetafieldDefinitionTypes = {
 /** Returns a list of metafield definitions.
  */
 export type QueryMetafieldDefinitions = {
-  metafieldDefinitions: any;
+  metafieldDefinitions: MetafieldDefinitionConnection;
 };
 
 /** Retrieves a metaobject by ID.
@@ -1668,7 +1955,7 @@ export type QueryNode = {
  * [Relay specification](https://relay.dev/docs/guides/graphql-server-specification/#object-identification).
  */
 export type QueryNodes = {
-  nodes: Array<any>;
+  nodes: Array<Node>;
 };
 
 /** The shop's online store channel.
@@ -1710,13 +1997,13 @@ export type QueryOrdersCount = {
 /** Returns a Page resource by ID.
  */
 export type QueryPage = {
-  page: any;
+  page: Page;
 };
 
 /** List of the shop's pages.
  */
 export type QueryPages = {
-  pages: any;
+  pages: PageConnection;
 };
 
 /** Count of pages.

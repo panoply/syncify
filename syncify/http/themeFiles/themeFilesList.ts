@@ -1,10 +1,15 @@
+import type { Merge } from 'type-fest';
 import type * as Type from 'types';
 
 import { error } from '~errors';
 import { http } from '~http/client';
+import { OnlineStoreThemeFileReadResult } from '~http/enums';
 import { graph, params, type RequestError } from '~http/utils';
+import { forMap } from '~utils';
 
 declare namespace List {
+
+  export type Node = Merge<Type.OnlineStoreThemeFile, { body: Type.OnlineStoreThemeFileBodyText }>
 
   export type Arguments = [
     /**
@@ -43,7 +48,7 @@ declare namespace List {
     /**
      * The variables for the upsert operation
      */
-    query: Type.OnlineStoreThemeFilesUpsertFileInput[];
+    query: string[];
     /**
      * Reference to the current theme/store target
      */
@@ -74,7 +79,7 @@ declare namespace List {
     /**
      * The filename of the theme file.
      */
-    filename: string | File;
+    filename: string;
     /**
      * The Error code enum description
      */
@@ -87,9 +92,9 @@ declare namespace List {
 
   export interface Resolve {
     /**
-     * The graphql `upsertedThemeFiles` response
+     * The graphql `OnlineStoreThemeFile` response
      */
-    synced: Array<{ filename: string }>;
+    files: List.Node[];
     /**
      * The graphql `userErrors`
      */
@@ -110,11 +115,11 @@ export function themeFilesList (...input: List.Arguments) {
 
     let after = null;
     let hasNextPage = true;
-    let files: Type.OnlineStoreThemeFile[] = [];
-    let errors: Type.OnlineStoreThemeFile[] = [];
+    let files: List.Node[] = [];
+    let errors: List.Reject[] = [];
 
     while (hasNextPage) {
-      await http(target.store.name).request<Graph.QueryTheme>({
+      await http(target.store.name).request<Type.QueryTheme>({
         data: {
           query: gql`
             query ThemeFilesList($gid: ID!, $query: [String!]! $after: String) {
@@ -156,10 +161,20 @@ export function themeFilesList (...input: List.Arguments) {
 
         hasNextPage = pageInfo.hasNextPage;
         after = pageInfo.endCursor;
-        files = files.concat(nodes);
+        files = files.concat(nodes as List.Node[]);
 
         if (onNext) onNext(files.length);
-        if (userErrors.length > 0) errors = errors.concat(userErrors.map(getErrors));
+
+        if (userErrors.length > 0) {
+
+          errors = errors.concat(forMap(({ filename, code }) => ({
+            filename,
+            code: code.replace(/_/g, WSP),
+            graph: 'QueryOnlineStoreThemeFile',
+            message: OnlineStoreThemeFileReadResult(code)
+          }), userErrors));
+
+        }
 
       }).catch(e => {
 

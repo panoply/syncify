@@ -10,7 +10,7 @@ import { timer } from '@syncify/timer';
 import { log } from '~cli/log';
 import { error } from '~errors';
 import { File, Type } from '~file';
-import { themeFilesGet, themeFilesUpsertMap } from '~http/theme';
+import { themeFilesGet, themeFilesUpsertMap } from '~http/themeFiles';
 import { runChecksum } from '~process/cache';
 import { prompt } from '~prompt';
 import { theme } from '~prompts/enquirer';

@@ -944,7 +944,7 @@ var require_parse = __commonJS({
     var syntaxError = (type2, char) => {
       return `Missing ${type2}: "${char}" - use "\\\\${char}" to match literal characters`;
     };
-    var parse11 = (input, options) => {
+    var parse10 = (input, options) => {
       if (typeof input !== "string") {
         throw new TypeError("Expected a string");
       }
@@ -1093,7 +1093,7 @@ var require_parse = __commonJS({
             output = token.close = `)$))${extglobStar}`;
           }
           if (token.inner.includes("*") && (rest = remaining()) && /^\.[^\\/.]+$/.test(rest)) {
-            const expression = parse11(rest, { ...options, fastpaths: false }).output;
+            const expression = parse10(rest, { ...options, fastpaths: false }).output;
             output = token.close = `)${expression})${extglobStar})`;
           }
           if (token.prev.type === "bos") {
@@ -1618,7 +1618,7 @@ var require_parse = __commonJS({
       }
       return state;
     };
-    parse11.fastpaths = (input, options) => {
+    parse10.fastpaths = (input, options) => {
       const opts = { ...options };
       const max = typeof opts.maxLength === "number" ? Math.min(MAX_LENGTH, opts.maxLength) : MAX_LENGTH;
       const len = input.length;
@@ -1684,7 +1684,7 @@ var require_parse = __commonJS({
       }
       return source;
     };
-    module.exports = parse11;
+    module.exports = parse10;
   }
 });
 
@@ -1693,7 +1693,7 @@ var require_picomatch = __commonJS({
   "node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/picomatch.js"(exports, module) {
     var path5 = __require("path");
     var scan = require_scan();
-    var parse11 = require_parse();
+    var parse10 = require_parse();
     var utils = require_utils();
     var constants = require_constants();
     var isObject2 = (val) => val && typeof val === "object" && !Array.isArray(val);
@@ -1758,11 +1758,11 @@ var require_picomatch = __commonJS({
         return { isMatch: false, output: "" };
       }
       const opts = options || {};
-      const format2 = opts.format || (posix ? utils.toPosixSlashes : null);
+      const format = opts.format || (posix ? utils.toPosixSlashes : null);
       let match = input === glob9;
-      let output = match && format2 ? format2(input) : input;
+      let output = match && format ? format(input) : input;
       if (match === false) {
-        output = format2 ? format2(input) : input;
+        output = format ? format(input) : input;
         match = output === glob9;
       }
       if (match === false || opts.capture === true) {
@@ -1781,7 +1781,7 @@ var require_picomatch = __commonJS({
     picomatch.isMatch = (str, patterns, options) => picomatch(patterns, options)(str);
     picomatch.parse = (pattern, options) => {
       if (Array.isArray(pattern)) return pattern.map((p) => picomatch.parse(p, options));
-      return parse11(pattern, { ...options, fastpaths: false });
+      return parse10(pattern, { ...options, fastpaths: false });
     };
     picomatch.scan = (input, options) => scan(input, options);
     picomatch.compileRe = (state, options, returnOutput = false, returnState = false) => {
@@ -1807,10 +1807,10 @@ var require_picomatch = __commonJS({
       }
       let parsed = { negated: false, fastpaths: true };
       if (options.fastpaths !== false && (input[0] === "." || input[0] === "*")) {
-        parsed.output = parse11.fastpaths(input, options);
+        parsed.output = parse10.fastpaths(input, options);
       }
       if (!parsed.output) {
-        parsed = parse11(input, options);
+        parsed = parse10(input, options);
       }
       return picomatch.compileRe(parsed, options, returnOutput, returnState);
     };
@@ -2303,7 +2303,7 @@ var require_cjs = __commonJS({
 var require_lib = __commonJS({
   "node_modules/.pnpm/write-file-atomic@6.0.0/node_modules/write-file-atomic/lib/index.js"(exports, module) {
     module.exports = writeFile13;
-    module.exports.sync = writeFileSync2;
+    module.exports.sync = writeFileSync;
     module.exports._getTmpname = getTmpname;
     module.exports._cleanupOnExit = cleanupOnExit;
     var fs2 = __require("fs");
@@ -2443,7 +2443,7 @@ var require_lib = __commonJS({
       }
       return promise;
     }
-    function writeFileSync2(filename, data, options) {
+    function writeFileSync(filename, data, options) {
       if (typeof options === "string") {
         options = { encoding: options };
       } else if (!options) {
@@ -2526,7 +2526,7 @@ var require_lib = __commonJS({
 var require_lib2 = __commonJS({
   "node_modules/.pnpm/write-file-atomic@5.0.1/node_modules/write-file-atomic/lib/index.js"(exports, module) {
     module.exports = writeFile13;
-    module.exports.sync = writeFileSync2;
+    module.exports.sync = writeFileSync;
     module.exports._getTmpname = getTmpname;
     module.exports._cleanupOnExit = cleanupOnExit;
     var fs2 = __require("fs");
@@ -2666,7 +2666,7 @@ var require_lib2 = __commonJS({
       }
       return promise;
     }
-    function writeFileSync2(filename, data, options) {
+    function writeFileSync(filename, data, options) {
       if (typeof options === "string") {
         options = { encoding: options };
       } else if (!options) {
@@ -3652,7 +3652,7 @@ var require_semver = __commonJS({
 var require_parse2 = __commonJS({
   "node_modules/.pnpm/semver@7.7.1/node_modules/semver/functions/parse.js"(exports, module) {
     var SemVer = require_semver();
-    var parse11 = (version, options, throwErrors = false) => {
+    var parse10 = (version, options, throwErrors = false) => {
       if (version instanceof SemVer) {
         return version;
       }
@@ -3665,16 +3665,16 @@ var require_parse2 = __commonJS({
         throw er2;
       }
     };
-    module.exports = parse11;
+    module.exports = parse10;
   }
 });
 
 // node_modules/.pnpm/semver@7.7.1/node_modules/semver/functions/valid.js
 var require_valid = __commonJS({
   "node_modules/.pnpm/semver@7.7.1/node_modules/semver/functions/valid.js"(exports, module) {
-    var parse11 = require_parse2();
+    var parse10 = require_parse2();
     var valid = (version, options) => {
-      const v3 = parse11(version, options);
+      const v3 = parse10(version, options);
       return v3 ? v3.version : null;
     };
     module.exports = valid;
@@ -3684,9 +3684,9 @@ var require_valid = __commonJS({
 // node_modules/.pnpm/semver@7.7.1/node_modules/semver/functions/clean.js
 var require_clean = __commonJS({
   "node_modules/.pnpm/semver@7.7.1/node_modules/semver/functions/clean.js"(exports, module) {
-    var parse11 = require_parse2();
+    var parse10 = require_parse2();
     var clean = (version, options) => {
-      const s2 = parse11(version.trim().replace(/^[=v]+/, ""), options);
+      const s2 = parse10(version.trim().replace(/^[=v]+/, ""), options);
       return s2 ? s2.version : null;
     };
     module.exports = clean;
@@ -4677,9 +4677,9 @@ var require_parse3 = __commonJS({
 var require_spdx_expression_parse = __commonJS({
   "node_modules/.pnpm/spdx-expression-parse@3.0.1/node_modules/spdx-expression-parse/index.js"(exports, module) {
     var scan = require_scan2();
-    var parse11 = require_parse3();
+    var parse10 = require_parse3();
     module.exports = function(source) {
-      return parse11(scan(source));
+      return parse10(scan(source));
     };
   }
 });
@@ -4687,11 +4687,11 @@ var require_spdx_expression_parse = __commonJS({
 // node_modules/.pnpm/spdx-correct@3.2.0/node_modules/spdx-correct/index.js
 var require_spdx_correct = __commonJS({
   "node_modules/.pnpm/spdx-correct@3.2.0/node_modules/spdx-correct/index.js"(exports, module) {
-    var parse11 = require_spdx_expression_parse();
+    var parse10 = require_spdx_expression_parse();
     var spdxLicenseIds = require_spdx_license_ids();
     function valid(string) {
       try {
-        parse11(string);
+        parse10(string);
         return true;
       } catch (error2) {
         return false;
@@ -5020,7 +5020,7 @@ var require_spdx_correct = __commonJS({
 // node_modules/.pnpm/validate-npm-package-license@3.0.4/node_modules/validate-npm-package-license/index.js
 var require_validate_npm_package_license = __commonJS({
   "node_modules/.pnpm/validate-npm-package-license@3.0.4/node_modules/validate-npm-package-license/index.js"(exports, module) {
-    var parse11 = require_spdx_expression_parse();
+    var parse10 = require_spdx_expression_parse();
     var correct = require_spdx_correct();
     var genericWarning = 'license should be a valid SPDX license expression (without "LicenseRef"), "UNLICENSED", or "SEE LICENSE IN <filename>"';
     var fileReferenceRE = /^SEE LICEN[CS]E IN (.+)$/;
@@ -5038,7 +5038,7 @@ var require_validate_npm_package_license = __commonJS({
     module.exports = function(argument) {
       var ast;
       try {
-        ast = parse11(argument);
+        ast = parse10(argument);
       } catch (e2) {
         var match;
         if (argument === "UNLICENSED" || argument === "UNLICENCED") {
@@ -7672,7 +7672,7 @@ var require_main = __commonJS({
     var packageJson = require_package();
     var version = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
-    function parse11(src) {
+    function parse10(src) {
       const obj = {};
       let lines = src.toString();
       lines = lines.replace(/\r\n?/mg, "\n");
@@ -7915,7 +7915,7 @@ var require_main = __commonJS({
       _parseVault,
       config,
       decrypt,
-      parse: parse11,
+      parse: parse10,
       populate
     };
     module.exports.configDotenv = DotenvModule.configDotenv;
@@ -14504,29 +14504,6 @@ http.client = o();
 http.tokens = o();
 http.VERSION = "2025-01";
 
-// syncify/http/enums.ts
-var OnlineStoreThemeFileReadResult = (code) => ({
-  BAD_REQUEST: "Operation was malformed or invalid.",
-  CONFLICT: "Operation faced a conflict with the current state of the file.",
-  ERROR: "Operation encountered an error.",
-  NOT_FOUND: "Operation file could not be found.",
-  SUCCESS: "Operation was successful.",
-  TIMEOUT: "Operation timed out.",
-  UNPROCESSABLE_ENTITY: "Operation could not be processed due to issues with input data.",
-  _: null
-})[code || "__UNKNOWN__"];
-var OnlineStoreThemeFilesUserErrors = (code) => ({
-  ACCESS_DENIED: "Access denied.",
-  DUPLICATE_FILE_INPUT: "There are files with the same filename.",
-  ERROR: "Error.",
-  FILE_VALIDATION_ERROR: "The file is invalid.",
-  LESS_THAN_OR_EQUAL_TO: "The input value should be less than or equal to the maximum value allowed.",
-  NOT_FOUND: "The record with the ID used as the input value couldn't be found.",
-  THEME_FILES_CONFLICT: "There are theme files with conflicts.",
-  THEME_LIMITED_PLAN: "This action is not available on your current plan. Please upgrade to access theme editing features.",
-  _: null
-})[code || "_"];
-
 // syncify/http/utils.ts
 function graph(object, path5, reject) {
   if (!isObject(object)) return reject(Object.assign(object, { isGraphError: true }));
@@ -14712,21 +14689,12 @@ params.upsert = function(parameters) {
   };
 };
 
-// syncify/http/theme/files.ts
-function getErrors({ filename, code }) {
-  return {
-    filename,
-    code: code.replace(/_/g, " "),
-    graph: "OnlineStoreThemeFile",
-    message: OnlineStoreThemeFileReadResult(code)
-  };
-}
-function themeFiles(target, callback = null) {
+// syncify/http/themeFiles/themeFilesMap.ts
+function themeFilesMap(target, callback = null) {
   return new Promise((resolve2, reject) => (async () => {
     let after = null;
     let hasNextPage = true;
-    let count = 0;
-    const files = {};
+    const files = { files: {}, total: 0 };
     while (hasNextPage) {
       await http(target.store.name).request({
         data: {
@@ -14738,10 +14706,10 @@ function themeFiles(target, callback = null) {
         }
       }).then((response) => {
         const { nodes, pageInfo } = graph(response.data, "theme.files", reject);
+        files.total += nodes.length;
         hasNextPage = pageInfo.hasNextPage;
         after = pageInfo.endCursor;
-        count += nodes.length;
-        callback && callback(count);
+        callback && callback(files.total);
         forEach(({ filename }) => {
           const directory = filename.slice(0, filename.lastIndexOf("/"));
           has(directory, files) ? files[directory].push(filename) : files[directory] = [filename];
@@ -14753,11 +14721,84 @@ function themeFiles(target, callback = null) {
         hasNextPage = false;
       });
     }
-    resolve2({ count, files });
+    resolve2(files);
   })());
 }
-function themeFilesUpsert(...input) {
+
+// syncify/http/enums.ts
+var OnlineStoreThemeFileReadResult = (code) => ({
+  BAD_REQUEST: "Operation was malformed or invalid.",
+  CONFLICT: "Operation faced a conflict with the current state of the file.",
+  ERROR: "Operation encountered an error.",
+  NOT_FOUND: "Operation file could not be found.",
+  SUCCESS: "Operation was successful.",
+  TIMEOUT: "Operation timed out.",
+  UNPROCESSABLE_ENTITY: "Operation could not be processed due to issues with input data.",
+  _: null
+})[code || "__UNKNOWN__"];
+var OnlineStoreThemeFilesUserErrors = (code) => ({
+  ACCESS_DENIED: "Access denied.",
+  DUPLICATE_FILE_INPUT: "There are files with the same filename.",
+  ERROR: "Error.",
+  FILE_VALIDATION_ERROR: "The file is invalid.",
+  LESS_THAN_OR_EQUAL_TO: "The input value should be less than or equal to the maximum value allowed.",
+  NOT_FOUND: "The record with the ID used as the input value couldn't be found.",
+  THEME_FILES_CONFLICT: "There are theme files with conflicts.",
+  THEME_LIMITED_PLAN: "This action is not available on your current plan. Please upgrade to access theme editing features.",
+  _: null
+})[code || "_"];
+
+// syncify/http/themeFiles/themeFilesDelete.ts
+function themeFilesDelete(...input) {
   const { query, target, files, onError } = params(input);
+  return new Promise((resolve2, reject) => {
+    http(target.store.name).request({
+      data: {
+        query: `mutation ThemeFilesDelete($gid:ID!,$query:[String!]!){themeFilesDelete(themeId:$gid,files:$query){deletedThemeFiles{filename}userErrors{message filename code}}}`,
+        variables: {
+          gid: target.gid,
+          query
+        }
+      }
+    }).then((response) => {
+      const { deletedThemeFiles, userErrors } = graph(response.data, "themeFilesDelete", reject);
+      resolve2(
+        {
+          target,
+          synced: deletedThemeFiles,
+          errors: forMap((userError) => ({
+            message: userError.message,
+            filename: userError.filename,
+            code: userError.code.replace(/_/g, " "),
+            summary: OnlineStoreThemeFilesUserErrors(userError.code),
+            graph: "MutationThemeFilesDelete",
+            file: files.find((file) => file.key === userError.filename) || null
+          }), userErrors)
+        }
+      );
+    }).catch((e2) => {
+      e2.target = target;
+      e2.files = files;
+      e2.graph = "OnlineStoreThemeFileOperationResult";
+      onError ? onError(e2) : reject(e2);
+    });
+  });
+}
+async function themeFilesDeleteMap(file) {
+  const files = isArray(file) ? file : [file];
+  await q2.http.add(async () => {
+    try {
+      const targets = await pMap($.target, (target) => themeFilesDelete(files, target));
+      event.each(targets);
+    } catch (e2) {
+      error.request(e2);
+    }
+  });
+}
+
+// syncify/http/themeFiles/themeFilesUpsert.ts
+function themeFilesUpsert(...input) {
+  const { query, target, files, onError } = params.upsert(input);
   return new Promise((resolve2, reject) => {
     http(target.store.name).request({
       data: {
@@ -14773,15 +14814,14 @@ function themeFilesUpsert(...input) {
         {
           target,
           synced: upsertedThemeFiles,
-          errors: userErrors.length > 0 ? userErrors.map((userError) => ({
+          errors: forMap((userError) => ({
             message: userError.message,
             filename: userError.filename,
             code: userError.code.replace(/_/g, " "),
-            field: userError.field,
             graph: "OnlineStoreThemeFilesUpsertFileInput",
             summary: OnlineStoreThemeFilesUserErrors(userError.code),
             file: files.find((file) => file.key === userError.filename) || null
-          })) : []
+          }), userErrors)
         }
       );
     }).catch((e2) => {
@@ -14792,6 +14832,19 @@ function themeFilesUpsert(...input) {
     });
   });
 }
+async function themeFilesUpsertMap(file) {
+  const files = isArray(file) ? file : [file];
+  await q2.http.add(async () => {
+    try {
+      const targets = await pMap($.target, (target) => themeFilesUpsert(files, target));
+      event.each(targets);
+    } catch (e2) {
+      error.request(e2);
+    }
+  });
+}
+
+// syncify/http/themeFiles/themeFilesList.ts
 function themeFilesList(...input) {
   const { query, target, onError, onNext } = params(input);
   return new Promise((resolve2, reject) => (async () => {
@@ -14815,7 +14868,14 @@ function themeFilesList(...input) {
         after = pageInfo.endCursor;
         files = files.concat(nodes);
         if (onNext) onNext(files.length);
-        if (userErrors.length > 0) errors = errors.concat(userErrors.map(getErrors));
+        if (userErrors.length > 0) {
+          errors = errors.concat(forMap(({ filename, code }) => ({
+            filename,
+            code: code.replace(/_/g, " "),
+            graph: "QueryOnlineStoreThemeFile",
+            message: OnlineStoreThemeFileReadResult(code)
+          }), userErrors));
+        }
       }).catch((e2) => {
         e2.target = target;
         e2.files = files;
@@ -14839,12 +14899,14 @@ function themeFilesList(...input) {
     );
   })());
 }
+
+// syncify/http/themeFiles/themeFilesGet.ts
 function themeFilesGet(...input) {
   const { query, target, files, onError } = params(input);
   return new Promise((resolve2, reject) => {
     http(target.store.name).request({
       data: {
-        query: `query ThemeFilesGet($gid:ID!,$query:[String!]!){theme(id:$gid){files(filenames:$query){userErrors{code filename},nodes{filename,size,createdAt,updatedAt,body{...on OnlineStoreThemeFileBodyText{content}}},}}}`,
+        query: `query ThemeFilesGet($gid:ID!,$query:[String!]!){theme(id:$gid){files(filenames:$query){userErrors{code filename},nodes{filename,size,createdAt,updatedAt,body{...on OnlineStoreThemeFileBodyText{content}}}}}}`,
         variables: {
           gid: target.gid,
           query
@@ -14857,76 +14919,41 @@ function themeFilesGet(...input) {
           get target() {
             return target;
           },
-          get file() {
-            return nodes.length === 1 ? nodes[0] : null;
-          },
-          get errors() {
-            return userErrors.length > 0 ? userErrors.map(getErrors) : [];
-          }
+          file: nodes.length === 1 ? nodes[0] : null,
+          errors: forMap(({ filename, code }) => ({
+            filename,
+            code: code.replace(/_/g, " "),
+            graph: "QueryOnlineStoreThemeFile",
+            message: OnlineStoreThemeFileReadResult(code)
+          }), userErrors)
         }
       );
     }).catch((e2) => {
       e2.target = target;
       e2.files = files;
-      e2.graph = "OnlineStoreThemeFile";
+      e2.graph = "QueryOnlineStoreThemeFile";
       onError ? onError(e2) : error.request(e2);
     });
   });
 }
-function themeFilesDelete(...input) {
-  const { query, target, files, onError } = params(input);
+function themesList(store) {
   return new Promise((resolve2, reject) => {
-    http(target.store.name).request({
+    http(store.name).request({
+      data: `query ThemeList{themes(first:100){nodes{id createdAt name prefix role themeStoreId updatedAt}}}`
+    }).then(({
       data: {
-        query: `mutation ThemeFilesDelete($gid:ID!,$query:[String!]!){themeFilesDelete(themeId:$gid,files:$query){deletedThemeFiles{filename}userErrors{message,filename,code}}}`,
-        variables: {
-          gid: target.gid,
-          query
+        themes: {
+          nodes
         }
       }
-    }).then((response) => {
-      const { deletedThemeFiles, userErrors } = graph(response.data, "themeFilesDelete", reject);
-      resolve2(
-        {
-          target,
-          synced: deletedThemeFiles,
-          errors: userErrors.length > 0 ? userErrors.map((userError) => ({
-            ...userError,
-            code: userError.code.replace(/_/g, " "),
-            summary: OnlineStoreThemeFilesUserErrors(userError.code),
-            graph: "OnlineStoreThemeFileOperationResult",
-            file: files.find((file) => file.key === userError.filename) || null
-          })) : []
-        }
-      );
-    }).catch((e2) => {
-      e2.target = target;
-      e2.files = files;
-      e2.graph = "OnlineStoreThemeFileOperationResult";
-      onError ? onError(e2) : reject(e2);
+    }) => {
+      resolve2(nodes.map((theme2) => ({ ...theme2, id: path2.basename(theme2.id) })));
+    }).catch((failed) => {
+      const e2 = {};
+      e2.failed = failed;
+      e2.store = store;
+      reject(e2);
     });
-  });
-}
-async function themeFilesUpsertMap(file, callback) {
-  const files = isArray(file) ? file : [file];
-  await q2.http.add(async () => {
-    try {
-      const targets = await pMap($.target, (target) => themeFilesUpsert(files, target));
-      event.each(targets);
-    } catch (e2) {
-      error.request(e2);
-    }
-  });
-}
-async function themeFilesDeleteMap(file) {
-  const files = isArray(file) ? file : [file];
-  await q2.http.add(async () => {
-    try {
-      const targets = await pMap($.target, (target) => themeFilesDelete(files, target));
-      event.each(targets);
-    } catch (e2) {
-      error.request(e2);
-    }
   });
 }
 
@@ -15728,9 +15755,9 @@ function script(file) {
   } });
   return file;
 }
-function schema(parse11, file) {
+function schema(parse10, file) {
   defineProperty(file, "data", { get() {
-    return parse11;
+    return parse10;
   } });
   return file;
 }
@@ -16903,8 +16930,8 @@ function minifySchema2(file, content) {
     const start = content.slice(begin);
     const ender = begin + start.search(/{%-?\s*endschema/);
     if (ender > -1) {
-      const parse11 = JSON.parse(content.slice(begin, ender));
-      const minified = JSON.stringify(parse11, null, 0);
+      const parse10 = JSON.parse(content.slice(begin, ender));
+      const minified = JSON.stringify(parse10, null, 0);
       const schema2 = content.slice(0, begin) + minified + content.slice(ender);
       return removeComments(schema2);
     }
@@ -17048,7 +17075,7 @@ async function ScriptTransform(file) {
   if (watch) import_timer8.timer.start();
   if (hot) import_timer8.timer.start(file.uuid);
   const files = await pMap(file.data, async (bundle) => {
-    const { key, input, output, snippet: snippet3, attrs, esbuild: { format: format2 } } = bundle;
+    const { key, input, output, snippet: snippet3, attrs, esbuild: { format } } = bundle;
     const { metafile, outputFiles, warnings: warnings2 } = await esbuild__default.default.build(bundle.esbuild);
     if (file.data.length > 1) {
       log.nl().write(path2.relative($.cwd, input));
@@ -17071,15 +17098,15 @@ async function ScriptTransform(file) {
       } else {
         if (terse) {
           if (isNaN(bundle.size)) {
-            log.transform(file.kind, `${y(format2.toUpperCase())} bundle`);
+            log.transform(file.kind, `${y(format.toUpperCase())} bundle`);
             log.minified(stringSize(text));
           } else {
             const size = sizeDiff(text, bundle.size);
-            log.transform(`${y(format2.toUpperCase())} bundle ${K} ${y(stringSize(text))}`);
+            log.transform(`${y(format.toUpperCase())} bundle ${K} ${y(stringSize(text))}`);
             log.minified(null, size.before, size.after, size.saved);
           }
         } else {
-          log.transform(`${y(format2.toUpperCase())} bundle ${K} ${y(stringSize(text))}`);
+          log.transform(`${y(format.toUpperCase())} bundle ${K} ${y(stringSize(text))}`);
         }
         if (snippet3) {
           bundle.value = createSnippet2(text, attrs);
@@ -17890,8 +17917,8 @@ var actions = {
 function defaultMetaDataUpdater(previousMeta, metaMeta) {
   return metaMeta;
 }
-function defaultFilterValues(values3, meta) {
-  return values3.filter((value) => value !== void 0);
+function defaultFilterValues(values2, meta) {
+  return values2.filter((value) => value !== void 0);
 }
 var ObjectType;
 (function(ObjectType2) {
@@ -17979,11 +18006,11 @@ function isRecord(value) {
   }
   return true;
 }
-function mergeRecords$1(values3, utils, meta) {
+function mergeRecords$1(values2, utils, meta) {
   const result = {};
-  for (const key of getKeys(values3)) {
+  for (const key of getKeys(values2)) {
     const propValues = [];
-    for (const value of values3) {
+    for (const value of values2) {
       if (objectHasProperty(value, key)) {
         propValues.push(value[key]);
       }
@@ -17993,7 +18020,7 @@ function mergeRecords$1(values3, utils, meta) {
     }
     const updatedMeta = utils.metaDataUpdater(meta, {
       key,
-      parents: values3
+      parents: values2
     });
     const propertyResult = mergeUnknowns(propValues, utils, updatedMeta);
     if (propertyResult === actions.skip) {
@@ -18012,17 +18039,17 @@ function mergeRecords$1(values3, utils, meta) {
   }
   return result;
 }
-function mergeArrays$1(values3) {
-  return values3.flat();
+function mergeArrays$1(values2) {
+  return values2.flat();
 }
-function mergeSets$1(values3) {
-  return new Set(getIterableOfIterables(values3));
+function mergeSets$1(values2) {
+  return new Set(getIterableOfIterables(values2));
 }
-function mergeMaps$1(values3) {
-  return new Map(getIterableOfIterables(values3));
+function mergeMaps$1(values2) {
+  return new Map(getIterableOfIterables(values2));
 }
-function mergeOthers$1(values3) {
-  return values3.at(-1);
+function mergeOthers$1(values2) {
+  return values2.at(-1);
 }
 var mergeFunctions = {
   mergeRecords: mergeRecords$1,
@@ -18055,9 +18082,9 @@ function getUtils(options, customizedDeepmerge) {
     actions
   };
 }
-function mergeUnknowns(values3, utils, meta) {
+function mergeUnknowns(values2, utils, meta) {
   var _a14;
-  const filteredValues = ((_a14 = utils.filterValues) == null ? void 0 : _a14.call(utils, values3, meta)) ?? values3;
+  const filteredValues = ((_a14 = utils.filterValues) == null ? void 0 : _a14.call(utils, values2, meta)) ?? values2;
   if (filteredValues.length === 0) {
     return void 0;
   }
@@ -18091,38 +18118,38 @@ function mergeUnknowns(values3, utils, meta) {
     }
   }
 }
-function mergeRecords(values3, utils, meta) {
-  const result = utils.mergeFunctions.mergeRecords(values3, utils, meta);
+function mergeRecords(values2, utils, meta) {
+  const result = utils.mergeFunctions.mergeRecords(values2, utils, meta);
   if (result === actions.defaultMerge || utils.useImplicitDefaultMerging && result === void 0 && utils.mergeFunctions.mergeRecords !== utils.defaultMergeFunctions.mergeRecords) {
-    return utils.defaultMergeFunctions.mergeRecords(values3, utils, meta);
+    return utils.defaultMergeFunctions.mergeRecords(values2, utils, meta);
   }
   return result;
 }
-function mergeArrays(values3, utils, meta) {
-  const result = utils.mergeFunctions.mergeArrays(values3, utils, meta);
+function mergeArrays(values2, utils, meta) {
+  const result = utils.mergeFunctions.mergeArrays(values2, utils, meta);
   if (result === actions.defaultMerge || utils.useImplicitDefaultMerging && result === void 0 && utils.mergeFunctions.mergeArrays !== utils.defaultMergeFunctions.mergeArrays) {
-    return utils.defaultMergeFunctions.mergeArrays(values3);
+    return utils.defaultMergeFunctions.mergeArrays(values2);
   }
   return result;
 }
-function mergeSets(values3, utils, meta) {
-  const result = utils.mergeFunctions.mergeSets(values3, utils, meta);
+function mergeSets(values2, utils, meta) {
+  const result = utils.mergeFunctions.mergeSets(values2, utils, meta);
   if (result === actions.defaultMerge || utils.useImplicitDefaultMerging && result === void 0 && utils.mergeFunctions.mergeSets !== utils.defaultMergeFunctions.mergeSets) {
-    return utils.defaultMergeFunctions.mergeSets(values3);
+    return utils.defaultMergeFunctions.mergeSets(values2);
   }
   return result;
 }
-function mergeMaps(values3, utils, meta) {
-  const result = utils.mergeFunctions.mergeMaps(values3, utils, meta);
+function mergeMaps(values2, utils, meta) {
+  const result = utils.mergeFunctions.mergeMaps(values2, utils, meta);
   if (result === actions.defaultMerge || utils.useImplicitDefaultMerging && result === void 0 && utils.mergeFunctions.mergeMaps !== utils.defaultMergeFunctions.mergeMaps) {
-    return utils.defaultMergeFunctions.mergeMaps(values3);
+    return utils.defaultMergeFunctions.mergeMaps(values2);
   }
   return result;
 }
-function mergeOthers(values3, utils, meta) {
-  const result = utils.mergeFunctions.mergeOthers(values3, utils, meta);
+function mergeOthers(values2, utils, meta) {
+  const result = utils.mergeFunctions.mergeOthers(values2, utils, meta);
   if (result === actions.defaultMerge || utils.useImplicitDefaultMerging && result === void 0 && utils.mergeFunctions.mergeOthers !== utils.defaultMergeFunctions.mergeOthers) {
-    return utils.defaultMergeFunctions.mergeOthers(values3);
+    return utils.defaultMergeFunctions.mergeOthers(values2);
   }
   return result;
 }
@@ -18482,12 +18509,12 @@ async function Pull() {
   import_timer13.timer.start("pull");
   if ($.mode.align) return runAlignment(pt());
   const write2 = pt().Line($.target.default.store.domain, y).Newline().Spinner("0 Files", { style: "spinning", color: Bi }).Template({ prefix: true, id: "elapsed", color: Y }).Template({ prefix: true, id: "download", color: Y }).Newline().Template({ id: "progress" });
-  const remote = await themeFiles($.target.default, (n) => write2.Spinner(`${n} Files`));
-  const progress = uo(remote.count, { prepend: null, clearOnComplete: false });
+  const remote = await themeFilesMap($.target.default, (n) => write2.Spinner(`${n} Files`));
+  const progress = uo(remote.total, { prepend: null, clearOnComplete: false });
   const state = {
     count: 0,
     get total() {
-      return remote.count;
+      return remote.total;
     },
     get files() {
       return remote.files;
@@ -19039,12 +19066,12 @@ function setLogInterval(state) {
 }
 async function setBatchUpserts(state) {
   const { write: write2 } = state;
-  const parse11 = outputFile($.dirs.output);
+  const parse10 = outputFile($.dirs.output);
   const batches = [];
   write2.Spinner(`${state.files.length} Files`);
   for (let i = 0, s2 = state.files.length; i < s2; i++) {
     const path5 = state.files[i];
-    const file = parse11(path5);
+    const file = parse10(path5);
     try {
       file.value = await fsExtra.readFile(file.output, "utf8");
       file.size = byteSize(file.value);
@@ -21948,7 +21975,7 @@ var import_write_file_atomic4 = __toESM(require_lib());
 
 // syncify/http/access/accessScopes.ts
 function accessScopeList(domain, token) {
-  return new Promise((resolve2, reject) => {
+  return new Promise((resolve2) => {
     http.request(domain, token)({
       data: `query AccessScopeList{currentAppInstallation{accessScopes{description handle}}}`
     }).then(({ data: { currentAppInstallation } }) => {
@@ -22504,26 +22531,6 @@ async function Create() {
     await (0, import_write_file_atomic4.default)($.file.keychain, JSON.stringify($.keychain));
     await (0, import_write_file_atomic4.default)(path2.join(state.cacheRootPath, ".env"), access.env);
   }
-}
-function themesList(store) {
-  return new Promise((resolve2, reject) => {
-    http(store.name).request({
-      data: `query ThemeList{themes(first:100){nodes{id createdAt name prefix role themeStoreId updatedAt}}}`
-    }).then(({
-      data: {
-        themes: {
-          nodes
-        }
-      }
-    }) => {
-      resolve2(nodes.map((theme2) => ({ ...theme2, id: +path2.basename(theme2.id) })));
-    }).catch((failed) => {
-      const e2 = {};
-      e2.failed = failed;
-      e2.store = store;
-      reject(e2);
-    });
-  });
 }
 
 // syncify/prompts/link.ts

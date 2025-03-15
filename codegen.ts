@@ -21,9 +21,10 @@ export default <CodegenConfig>{
         '@syncify/codegen'
       ],
       config: <SyncifyPluginConfig>{
+        depthInclusion: 1,
         pickTypes: <const>[
 
-          // ONLINE STORE
+          // ONLINE STORE THEME
           'OnlineStore',
           'OnlineStoreTheme',
           'OnlineStoreThemeConnection',
@@ -39,30 +40,34 @@ export default <CodegenConfig>{
           'OnlineStoreThemeFilesUserErrors',
           'OnlineStoreThemeInput',
 
-          'ThemeCreatePayload',
-          'ThemeCreateUserError',
-          'ThemeFilesDeletePayload',
-          'ThemeDeleteUserError',
+          // THEME FILE MUTATIONS
           'ThemeFilesUpsertPayload',
           'ThemeFilesCopyPayload',
+          'ThemeFilesDeletePayload',
+
+          // STORE THEMES
+          'ThemeCreatePayload',
+          'ThemeCreateUserError',
+          'ThemeDeleteUserError',
           'ThemePublishPayload',
           'ThemePublishUserError',
 
           // ACCESS SCOPES
           'AccessScope',
-          'AppInstallation'
+          'AppInstallation',
+
           // PAGE
-          // 'Page',
-          // 'PageConnection',
-          // 'PageCreateInput',
-          // 'PageCreatePayload',
-          // 'PageCreateUserError',
-          // 'PageDeletePayload',
-          // 'PageDeleteUserError',
-          // 'PageUpdateInput',
-          // 'PageUpdatePayload',
-          // 'PageUpdateUserError',
-          // 'PageEdge',
+          'Page',
+          'PageConnection',
+          'PageCreateInput',
+          'PageCreatePayload',
+          'PageCreateUserError',
+          'PageDeletePayload',
+          'PageDeleteUserError',
+          'PageUpdateInput',
+          'PageUpdatePayload',
+          'PageUpdateUserError',
+          'PageEdge'
 
           // REDIRECTS
           // 'UrlRedirect',
@@ -78,7 +83,7 @@ export default <CodegenConfig>{
           // 'UrlRedirectUpdatePayload',
           // 'UrlRedirectUserError',
 
-          // // NAVIGATION
+          // // // NAVIGATION
           // 'Menu',
           // 'MenuConnection',
           // 'MenuCreatePayload',
@@ -90,13 +95,11 @@ export default <CodegenConfig>{
           // 'MenuItemCreateInput',
           // 'MenuItemUpdateInput',
           // 'MenuUpdatePayload',
-          // 'MenuUpdateUserError',
+          // 'MenuUpdateUserError'
 
         ],
-        depthInclusion: 1,
         skipTypename: true,
         commentDescriptions: true
-
       }
     },
     ...(shouldIntrospect
