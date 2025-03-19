@@ -19,6 +19,7 @@ import { throwError } from '~cli/throws';
 import { error } from '~errors';
 import { event } from '~events';
 import { themeFilesUpsertMap, type Upsert } from '~http/themeFiles';
+import { log } from '~log';
 import { outputFile, parse } from '~process/files';
 import { byteSize, delay, eqWS, forEach, getChunk, m, NooP, s, stringSize } from '~utils';
 
@@ -75,7 +76,7 @@ export interface State {
   /**
    * The TUI instance used for logging
    */
-  write: _.TUIInstance;
+  write: _.Tui;
   /**
    * Transfer maps
    */
@@ -205,11 +206,10 @@ function setLogInterval (state: State) {
  */
 async function setBatchUpserts (state: State) {
 
-  const { write } = state;
   const parse = outputFile($.dirs.output);
   const batches: File[] = [];
 
-  write.Spinner(`${state.files.length} Files`);
+  log.spinner(`${state.files.length} Files`);
 
   for (let i = 0, s = state.files.length; i < s; i++) {
 
@@ -218,7 +218,7 @@ async function setBatchUpserts (state: State) {
 
     try {
 
-      file.value = await readFile(file.output, 'utf8');
+      file.value = await readFile(file.output, 'utf-8');
       file.size = byteSize(file.value);
 
       state.transfer.set(file.key, file.size);
@@ -240,7 +240,9 @@ async function setBatchUpserts (state: State) {
   await delay();
 
   timer.start('batch');
+  log.spinner.stop();
 
+  // write.Stop();
   // Lets begin the uploads, splitting up into batches
   //
   for (const batch of getChunk(batches, $.cmd.batch)) {
@@ -272,8 +274,7 @@ function onUpsert (state: State) {
     record.success += upsert.synced.length;
 
     // Update the templates
-    write
-    .Stop()
+    state.write
     .Update('version', $.vc.number)
     .Update('elapsed', _.capture.numbers(timer.now('upload'), _.bold))
     .Update('uploads', `${_.bold(record.success)} of ${_.bold(state.files.length)}`)
@@ -505,11 +506,11 @@ export async function Push (): Promise<void> {
 
   $.running = true;
 
+  log.spinner('0 Files');
+
   timer.start('upload');
 
   const write = _.Create()
-  .Newline()
-  .Spinner('0 Files')
   .Template({ prefix: true, id: 'version', color: _.bold })
   .Template({ prefix: true, id: 'elapsed', color: _.whiteBright })
   .Template({ prefix: true, id: 'uploads', color: _.whiteBright })

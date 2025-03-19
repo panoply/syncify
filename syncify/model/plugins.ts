@@ -7,6 +7,7 @@ import type { Plugins } from 'types';
  * stored in relative Map and invoked at different cycles.
  */
 export const plugins = (): Plugins => ({
+  onDefine: [],
   onBuild: [],
   onChange: [],
   onReload: [],

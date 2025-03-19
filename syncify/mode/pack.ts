@@ -8,9 +8,9 @@ import { timer } from '@syncify/timer';
 
 import { log } from '~cli/log';
 import { THEME_DIRS } from '~const';
-import { setPkgVersion } from '~options/define/package';
 import { error } from '~errors';
-import { Build } from '~modes/build';
+import { Build } from '~mode/build';
+import { setPkgVersion } from '~options/define/package';
 import { saveCache } from '~process/cache';
 import { hasTemplateMismatch, isEmptyOutputDir, Mismatch } from '~process/validate';
 import { byteSize, stringSize, toBuffer } from '~utils';

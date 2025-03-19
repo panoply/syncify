@@ -8,7 +8,7 @@ const IMPORT_MAP: ImportMap = o({
   'smol-toml': 'toml',
   'js-yaml': 'yaml',
   'svgo': 'svgo',
-  'tailwindcss': 'tailwind',
+  '@tailwindcss/postcss': 'tailwind',
   'postcss': 'postcss',
   'sass-embedded': 'sass',
   'clean-css': 'cleancss',

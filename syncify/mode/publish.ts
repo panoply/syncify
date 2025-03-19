@@ -1,14 +1,13 @@
 import type { Stores } from 'types';
 
-import { setPkg } from '~options/define/package';
-
 import { Create, gray } from '@syncify/ansi';
 import { kill } from '@syncify/kill';
 import { timer } from '@syncify/timer';
 
 import { log } from '~cli/log';
 import { event } from '~events';
-import { Pack } from '~modes/pack';
+import { Pack } from '~mode/pack';
+import { setPkg } from '~options/define/package';
 // import themes from '~requests/themes';
 import { isObject } from '~utils';
 
