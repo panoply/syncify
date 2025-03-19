@@ -8,6 +8,7 @@ import * as sample_4 from './samples/shopify/sample-4.mjs';
 import * as sample_5 from './samples/shopify/sample-5.mjs';
 import * as sample_6 from './samples/shopify/sample-6.mjs';
 import * as sample_7 from './samples/shopify/sample-7.mjs';
+import * as sample_8 from './samples/shopify/sample-8.mjs';
 
 test(sample_1.test, t => {
 
@@ -85,6 +86,15 @@ test(sample_6.test, t => {
 test(sample_7.test, t => {
 
   const frame = codeframe.shopify(sample_7.source, sample_7.message);
+
+  t.log(frame);
+  t.pass();
+
+});
+
+test(sample_8.test, t => {
+
+  const frame = codeframe(sample_8.source);
 
   t.log(frame);
   t.pass();
