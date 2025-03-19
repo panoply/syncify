@@ -10,8 +10,8 @@ next:
   title: 'Modes'
 anchors:
   - Syncify CLI
-  - Command List
   - Binaries
+  - Command List
   - Generators
 ---
 
@@ -22,6 +22,30 @@ Syncify is engineered as a Command Line Interface (CLI) tool, presenting a Termi
 The CLI leverages information from your project's `package.json`, which needs to reside in the root directory. Given its integration with Shopify, Syncify also requires a `.env` file with your store's credentials (find setup instructions at [authentication](/setup/authentication/)).
 
 > This guide aims to introduce you to Syncify's basic command line operations, and help you understand how to execute different tasks and carry out operations for your local machine to your remote Shopify store and theme.
+
+---
+
+# Binaries
+
+The CLI can be installed globally or locally depending on your preference. If installed globally, the `sy` (or `syncify`) binary becomes universally accessible from any project directory on your device. For those opting for project-specific installations, it is recommended that your provide `{json} "script":{}` shortcuts for your package manager to access the Syncify executable binary, for example:
+
+### Global Install
+
+Those who have opted for a global installation do not need to add a script shortcut. One of the benefits of using a global installation is that Syncify will perform periodic checks for version updates and notifies you when an update is available. In localized installations, this feature will not apply.
+
+### Local Install
+
+For those opting for project-specific installations, it is recommended that your provide `{json} "script":{}` shortcuts for your package manager to access the Syncify executable binary, for example:
+
+```json
+{
+  "scripts": {
+    "sy": "syncify" // Adding the executable to our package.json scripts
+  }
+}
+```
+
+> Developers are encouraged to use a global installation and avoid local project-level installs. The global binary makes your life easier and prevents excessive HD size.
 
 ---
 
@@ -68,7 +92,7 @@ Operations:
   --terse                     # Enables terse minification, will be enabled when running prod
   --clean                     # Removes all output files, use before bundling or watching
   --merge                     # Merges remote versions and current local source (input)
-  --align                     # Performs subset .json file merging with remote versions
+  --align                     # Performs subset json file merging with remote versions
   --prune                     # Resets local store, recommended to run every so often
   --bind                      # Polls remote sources during watch mode and updates local version
   --silent                    # Silence the logger, omit only errors
@@ -83,24 +107,6 @@ Miscellaneous:
 ```
 
 {% endraw %}
-
----
-
-# Binaries
-
-The CLI can be installed globally or locally depending on your preference. If installed globally, the `sy` (or `syncify`) binary becomes universally accessible from any project directory on your device. For those opting for project-specific installations, it is recommended that your provide `{json} "script":{}` shortcuts for your package manager to access the Syncify executable binary, for example:
-
-##### package.json
-
-```json
-{
-  "scripts": {
-    "sy": "syncify" // Adding the executable to our package.json scripts
-  }
-}
-```
-
-Those who have opted for a global installation do not need to add a script shortcut. One of the benefits of using a global installation is that Syncify will perform periodic checks for version updates and notifies you when an update is available. In localized installations, this feature will not apply.
 
 ---
 

@@ -11533,6 +11533,28 @@ ul.compare-list li.cross {
   height: 305px !important;
 }
 
+.stash-height > * {
+  height: 470px;
+}
+.stash-height pre {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: none !important;
+}
+
+.stash-bd {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 0.5em !important;
+  border-bottom-right-radius: 0.5em !important;
+}
+.stash-bd > p {
+  margin-left: 0;
+}
+
+.stash-header {
+  width: 410px;
+}
 .stash-header code {
   font-size: 0.9rem !important;
   padding: 0;
@@ -11543,6 +11565,10 @@ ul.compare-list li.cross {
 .stash-next .icon-output {
   width: 30px;
   height: 30px;
+}
+
+.targets-height pre {
+  height: 370px;
 }
 
 .papyrus-editor::-webkit-scrollbar-thumb:horizontal {

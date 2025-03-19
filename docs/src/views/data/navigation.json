@@ -130,6 +130,11 @@
           "navbar": "documentation"
         },
         {
+          "title": "Directory Structures",
+          "url": "/usage/directory-structures/",
+          "navbar": "documentation"
+        },
+        {
           "title": "Syncify CLI",
           "navbar": "documentation",
           "links": [
@@ -171,37 +176,6 @@
             {
               "title": "Prompts",
               "url": "/usage/prompts/",
-              "navbar": "documentation"
-            }
-          ]
-        },
-        {
-          "title": "Directory Structures",
-          "navbar": "documentation",
-          "links": [
-            {
-              "title": "Base Directories",
-              "url": "/usage/base-directories/",
-              "navbar": "documentation"
-            },
-            {
-              "title": "Path Definitions",
-              "url": "/usage/path-definitions/",
-              "navbar": "documentation"
-            },
-            {
-              "title": "Custom Structures",
-              "url": "/usage/custom-structures/",
-              "navbar": "documentation"
-            },
-            {
-              "title": "Renaming Files",
-              "url": "/usage/renaming-files/",
-              "navbar": "documentation"
-            },
-            {
-              "title": "Stash Directories",
-              "url": "/usage/stash-directories/",
               "navbar": "documentation"
             }
           ]
