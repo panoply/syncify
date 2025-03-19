@@ -28,27 +28,84 @@ import { checksum, defineProperty, has, hasProp, isArray, isObject, plur, toArra
 
 import { $, q } from '$';
 
-export function HasSchemaTag (content: string) {
+const SCHEMA_REGEX = /{%-?\s*schema/;
 
-  const open = content.search(/{%-?\s*schema/);
+/**
+ * Find the last {% endcomment %} and check that {% schema %}
+ * is not contained within. We skip over it in such cases to
+ * ensure we are not capturing commented out schema tags in sections.
+ */
+function SkipSchemaWithinComments (content: string) {
 
-  if (open > -1) {
+  const length = content.length;
 
-    const before = content.slice(0, open);
-    const comm = before.match(/{%-?\s*comment\s*-?%}/g);
+  let searchFrom = 0;
 
-    if (comm !== null) {
-      const last = before.slice(before.lastIndexOf(comm.pop()));
-      const endcomm = last.search(/{%-?\s*endcomment\s*-?%}/);
-      return endcomm > -1;
+  do {
+
+    searchFrom = content.indexOf('endcomment', searchFrom);
+
+    if (searchFrom === -1) return 0;
+    const from = content.lastIndexOf('{%', searchFrom) + 2;
+    if (from > -1) {
+      const to = content.indexOf('%}', searchFrom + 10);
+      if (from > -1 && /-?endcomment-?/.test(content.slice(from, to).trim())) return to + 2;
     }
 
-    return true;
+  } while (searchFrom < length);
 
+  return 0;
+
+}
+
+/**
+ * We need to obtain the line number of the {% schema %} tag,
+ * for situations were syntax errors are apparent. We need to
+ * offset the actual line numbers reported by `@syncify/json`
+ * codeframes, this ensure reports are accurate.
+ */
+function GetSchemaTagLine (content: string) {
+
+  return content.split('\n').length - 1;
+
+}
+
+/**
+ * Partial parse to obtain Schema tag indices in a Liquid document.
+ * This is used in the runtime definition operations, and also during
+ * extraction (below). If `null` is returned, schema tag could not be
+ * obtained. The extraction function will perform error reporting.
+ */
+export function GetSchemaIndices (content: string): {
+  /**
+   * The index up until `^{% schema %}`
+   */
+  start: number;
+  /**
+   * The starting point of the schema JSON `{% schema %}^`
+   */
+  begin: number;
+  /**
+   * The ending point of the schema JSON `^{% endschema %}`
+   */
+  ender: number;
+} {
+
+  if (!SCHEMA_REGEX.test(content)) return null;
+
+  const fromIndex = SkipSchemaWithinComments(content);
+
+  let start: number = -1;
+
+  if (fromIndex > -1) {
+    start = fromIndex + content.slice(fromIndex).search(SCHEMA_REGEX);
+    if (start < 0) return null;
   }
 
-  return false;
+  const begin = content.indexOf('%}', start) + 2;
+  const ender = begin + content.slice(begin).search(/{%-?\s*endschema/);
 
+  return { start, begin, ender };
 }
 
 /**
@@ -72,13 +129,13 @@ export async function ExtractSchema (file: File): Promise<[
 ]> {
 
   const content = await readFile(file.input, 'utf-8');
-  const open = content.search(/{%-?\s*schema/);
+  const indices = GetSchemaIndices(content);
 
-  if (open < 0) return [ content, null, null ];
+  console.log(indices);
 
-  const begin = content.indexOf('%}', open + 2) + 2;
-  const start = content.slice(begin);
-  const ender = begin + start.search(/{%-?\s*endschema/);
+  if (indices === null) return [ content, null, null ];
+
+  const { start, begin, ender } = indices;
 
   if (ender < 0) {
 
@@ -99,12 +156,12 @@ export async function ExtractSchema (file: File): Promise<[
     const schema = parse<SchemaSectionTag>(content.slice(begin, ender));
 
     return [
-      content.slice(0, begin),
+      content.slice(0, start),
       schema,
       content.slice(ender)
     ];
 
-  } catch (e) {
+  } catch (err) {
 
     log.error(file.relative, {
       notify: {
@@ -113,11 +170,13 @@ export async function ExtractSchema (file: File): Promise<[
       }
     });
 
-    error.json(e, file);
+    err.source = content;
+    error.json(err, file, GetSchemaTagLine(content.slice(0, begin)));
 
     return null;
 
   }
+
 }
 
 /**
@@ -474,8 +533,7 @@ async function ParseSharedSchema (file: File) {
 /**
  * Create Section
  *
- * Returns re-generated section files with the applied shared
- * schema injects.
+ * Returns re-generated section files with the applied shared schema injects.
  */
 export async function CreateSection <T extends SchemaSectionTag> (file: File<T>) {
 

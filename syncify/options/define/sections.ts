@@ -10,6 +10,7 @@ import { JSONError, parse } from '@syncify/json';
 import { log } from '~cli/log';
 import { throwError, warnOption } from '~cli/throws';
 import { error } from '~errors';
+import { GetSchemaIndices } from '~schema';
 import { checksum, defineProperty, has, hasProp, isArray, isObject, s } from '~utils';
 
 import { $ } from '$';
@@ -29,7 +30,11 @@ export async function setSectionOptions () {
     await setSharedSchema();
     await setSchemaJson();
 
-    defineProperty($.section, 'schema', { get () { return $.cache.schema; } });
+    defineProperty($.section, 'schema', {
+      get () {
+        return $.cache.schema;
+      }
+    });
 
   }
 
@@ -124,24 +129,16 @@ async function setSchemaJson () {
     $.cache.checksum[file] = hash;
 
     const data = read.toString();
-    const open = data.search(/{%-?\s*schema/);
+    const indices = GetSchemaIndices(data);
 
-    if (open < 0) continue;
-
-    // TODO: Ensure schema blocks within comments are ignored
-
-    const begin = data.indexOf('%}', open + 2) + 2;
-    const start = data.slice(begin);
-    const ender = begin + start.search(/{%-?\s*endschema/);
-
-    if (ender < 0) {
+    if (indices === null) {
       warn('Liquid Parse Error', relative($.cwd, file));
       continue;
     }
 
     try {
 
-      const schema = parse<SchemaSectionTag>(data.slice(begin, ender));
+      const schema = parse<SchemaSectionTag>(data.slice(indices.begin, indices.ender));
       const schemaProp = hasProp(schema);
 
       if (schemaProp('settings')) {
