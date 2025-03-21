@@ -12,12 +12,12 @@ import * as _ from '@syncify/ansi';
 import { codeframe } from '@syncify/codeframe';
 import { glue } from '@syncify/glue';
 
-import { console } from '~cli/console';
+import { stderr } from '~console';
 import { forEach, has, isNumber, isObject, m, s } from '~utils';
 
 import { $ } from '$';
 
-export function warn (...message: string[]) { forEach(line => console.stderr.prefix(NIL).write(line), message); };
+export function warn (...message: string[]) { forEach(line => stderr.write(line), message); };
 
 /**
  * Returns warning count total
