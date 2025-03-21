@@ -1,6 +1,6 @@
 import type { Processors, SASSConfig, StyleBundle, StyleTransform, TailwindConfig } from 'types';
 
-import { extname, join } from 'node:path';
+import { extname, join, relative } from 'node:path';
 
 import anymatch from 'anymatch';
 import glob from 'fast-glob';
@@ -60,12 +60,12 @@ async function getExternalModules () {
     $.processor.postcss.config = postcss.config;
   }
 
-  $.processor.tailwind.installed = getModules($.pkg, 'tailwindcss');
+  $.processor.tailwind.installed = getModules($.pkg, '@tailwindcss/postcss');
 
   // Load Tailwind module
   if ($.processor.tailwind.installed) {
 
-    await $import('tailwindcss');
+    await $import('@tailwindcss/postcss');
 
     const tw = await readConfigFile<TailwindConfig>(
       join($.dirs.config, 'tailwind.config'),
@@ -193,7 +193,7 @@ export async function setStyleConfig () {
     if (has('tailwind')) {
 
       if (!$.processor.tailwind.installed) {
-        missingDependency('tailwindcss');
+        missingDependency('@tailwindcss/postcss');
       }
 
       const override = u.isObject(style.tailwind);
@@ -209,11 +209,12 @@ export async function setStyleConfig () {
         if (u.isArray(tw.content) && u.isEmpty(tw.content)) {
           tw.content = [
             join(
-              $.dirs.input,
+              relative($.cwd, $.dirs.input),
               '**',
-              '*.{js,ts,jsx,tsx,vue,svelte,liquid,json,schema}'
+              '*.{css,js,ts,jsx,tsx,vue,svelte,liquid,json,schema}'
             )
           ];
+
         }
 
         u.defineProperty(bundle, 'tailwind', {
