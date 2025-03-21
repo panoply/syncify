@@ -111,7 +111,7 @@ const timer = new class Timer {
    *
    * Supports following formats:
    *
-   * - Microseconds: `10ms`
+   * - Microseconds: `10μs`
    * - Miliseconds: `10ms`
    * - Seconds and Miliseconds: `2s 45ms`
    * - Minutes, Seconds and Miliseconds: `2m 35sec 33ms`
