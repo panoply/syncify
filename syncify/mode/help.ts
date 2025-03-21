@@ -28,19 +28,13 @@ export function Help (mode: Type.Modes) {
 
     Version();
 
+  } else if (isNull(mode._)) {
+
+    Default();
+
   } else {
 
-    const target = mode._;
-
-    if (isNull(target)) {
-
-      Default();
-
-    } else {
-
-      Modes(target);
-
-    }
+    Modes(mode._);
 
   }
 
