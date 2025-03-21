@@ -2,7 +2,7 @@ import { basename, join } from 'node:path';
 
 import { copyFileSync, existsSync, mkdirSync } from 'fs-extra';
 
-import { cyan, neonCyan } from '@syncify/ansi';
+import { cyan } from '@syncify/ansi';
 
 import { runtime } from '~cli/runtime';
 import { invalidError, throwError, typeError, unknownError, warnOption } from '~cli/throws';
@@ -21,11 +21,6 @@ import { $ } from '$';
 export async function setHotReloads () {
 
   if (($.mode.watch === false && $.mode.hot === false) || $.running === true) return;
-
-  runtime.log.Spinner('HOT Reloads', {
-    color: neonCyan,
-    style: 'spinning'
-  });
 
   const warn = warnOption('HOT Reloads');
 
@@ -157,7 +152,6 @@ export async function setHotReloads () {
       } else if (prop === 'layouts') {
 
         if (isArray($.config.hot[prop])) {
-
           $.hot[prop] = []; // clear the defaults
 
           for (const layout of $.config.hot[prop]) {
@@ -220,6 +214,7 @@ export async function setHotReloads () {
   const from = join($.dirs.module, HOT_SNIPPET);
 
   if (!existsSync(from)) {
+
     return throwError([
       'Failed to obtain the source HOT Snippet injection file.',
       'This is required and should be located within the Syncify',
@@ -228,6 +223,7 @@ export async function setHotReloads () {
       'Please submit an issue to: https://github.com/panoply/syncify',
       'You can also try to re-install Syncify and trying again.'
     ]);
+
   }
 
   $.hot.source = join($.root, HOT_SOURCE);
@@ -239,11 +235,8 @@ export async function setHotReloads () {
   } else {
 
     if ($.project.hotVersion !== HOT_VERSION) {
-
       copyFileSync(join($.dirs.module, HOT_SNIPPET), $.hot.source);
-
       $.project.hotVersion = HOT_VERSION;
-
     }
 
   }
