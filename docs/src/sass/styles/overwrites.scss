@@ -66,6 +66,15 @@ h5 {
   font-family: $font-family-other;
 }
 
+h1.vs {
+  justify-content: start;
+  > span {
+    padding: 0 10px;
+    font-size: $h3-font-size;
+    color: #818b96;
+  }
+}
+
 hr {
   margin: 40px 0 !important;
   padding: 0 20px;

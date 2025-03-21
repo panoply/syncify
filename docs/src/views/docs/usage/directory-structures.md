@@ -8,35 +8,46 @@ anchors:
   - 'Path Defintions'
   - 'Custom Structures'
   - 'Renaming Files'
-  - 'Stash Directories'
+  - 'Stash References'
 ---
 
 # Directory Structures
 
 Syncify requires you to define custom **base** directory paths that point to theme files. The values you provide will refer to a directory name that is relative to the root of your project. You **cannot** define multi-level directories (e.g: `some/dir`) or reverse paths (e.g: `../dir`). You can pass these references within a syncify configuration file or via the CLI.
 
-```treeview
-/
-├── source/             # The main directory where all source files are contained
-├── theme/              # The distribution directory where source themes are written
-└── .env                 # Where store admin api tokens and other secrets exist
+:::: grid row ai-center dir-each mb-5
+::: grid col-8
+
+<!-- prettier-ignore -->
+```js
+import { defineConfig } from '@syncify/config';
+
+export default defineConfig({
+  input: 'source',  // Default input directory
+  output: 'theme'   // Default output directory
+})
 ```
 
----
+:::
+::: grid px-0 col-auto stash-next
 
-# Input → Output
+{% svg 'arrow-right', 'icon-output'%}
 
-Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can always be rebuilt from input. If you are coming from the Shopify CLI, it is important to understand that flat structures are not viable.
+:::
+::: grid col fs-sm
 
 ```treeview
 /
-├── source/    # The input directory which contains the theme source files
-└── theme/     # The output directory which Syncify generates that shopify understands
+├── source/
+├── theme/
+├── .env
+└── syncify.cofig.ts
 ```
 
-Single directory structures are not a viable approach when building modern and performant Shopify themes. Client-side (front-end) development is not SaaS specific and thus, with the proper tooling, Shopify theme development does not require one to adhere to the imposed approach of Shopify Dawn (via Shopify CLI). The argument for multi-directory architecture rests upon the millions of projects which isolate source → distribution variations and appropriate such logic.
+:::
+::::
 
-> If you have become accustomed to working from a single directory structure (i.e: Shopify CLI) it is important that you understand the difference between the **input** and **output** directory approach.
+Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can always be rebuilt from input. If you are coming from the Shopify CLI, it is important to understand that flat structures are not possible in Syncify and all projects must adhere to **input** ➔ **output** architecture.
 
 ---
 
@@ -288,9 +299,13 @@ The pattern `'card-[name]'` dynamically renames files by adding the prefix `card
 
 ---
 
-# Stash Directories
+# Stash References
 
-Syncify’s **input** ➔ **output** framework offers developers flexibility, but complex theme structures can disrupt predictability. Stash directories provide a fallback solution for placing files. Unlike custom path patterns that may complicate [pull](/cli/sy-pull/) operations with guesswork, stash directories hint at locations and double as fallback or override points. This keeps imports in a chosen spot, allowing developers to manage import paths efficiently while maintaining control over output destinations during Syncify's CLI execution.
+Stash references are write locations used in projects with custom structures and complex globs patterns. The **input** ➔ **output** approach of Syncify offers developers flexibility, but there are nuances when we execute [pull](/cli/sy-pull/) operations. In a flat structure, file placement is predictable and intuitive: snippets land in the `snippets/` directory, sections in the `sections/` directory, and so on—there’s no room for ambiguity or deviation. With Syncify, however, the freedom to create custom nested theme structures introduces complexity. Mapping files to their intended locations becomes less straightforward, as the directory layout varies depending on the developers preferences.
+
+### Usage
+
+By default, Syncify will attempt to automatically pinpoint write destinates within your **input** (source) directories using pre-existing glob patterns provided in to configuration. In most cases, your path entries will be enough for Syncify to determine a valid write location, but if your project uses complex or file specific patterns, then it is recommended that you provide stash references.
 
 ##### Configuration `syncify.config.ts`
 
@@ -408,5 +423,31 @@ source/
 ::::
 
 # TODO
+
+---
+
+<h1 class="vs"> Hierarchical <span>VS</span> Flat Structures</h1>
+
+One key constraint in Shopify CLI theme development is its strict flat directory structure, emphasizing predictable file organization. Flat structures suit Shopify themes well due to their simplicity, ease of navigation, and consistency, which simplifies collaboration by removing guesswork when multiple developers handle a theme. However, while practical, this flat structure limits extensibility and scalability, crucial for complex or growing storefronts.
+
+Syncify projects enforce a hierarchical **input** ➔ **output** base structure. Developers can mimic flat structures within **input** directories, but the organization of files and folders remains unpredictable, left to the developer or team's discretion. The hierarchical structure might intimidate developers used to the Shopify CLI's flat approach, particularly newcomers to alternative setups. Yet, for modern, high-performance Shopify themes, flat structures falter, growing unwieldy as complexity increases. Syncify's hierarchical design supports expanding theme needs, boosting scalability by letting developers freely organize their projects.
+
+> The Shopify CLI’s flat structure mandate is intentional, mirroring storefront theme architecture. Its lack of custom structure support stems from inherent limitations in the CLI tool itself.
+
+### Limitations
+
+While it’s straightforward to critique the Shopify CLI’s rigid flat structure mandate for theme development, the hierarchical (custom) structures offered by Syncify come with their own set of challenges. Despite these shortcomings, Syncify strives to address each potential issue with minimally invasive workarounds, ensuring flexibility without overwhelming complexity.
+
+One notable limitation of the hierarchical approach is the difficulty in pinpointing location context. This can complicate certain tasks, such as downloading files from a theme using `sy pull` commands. To mitigate this, Syncify offers solutions like [Stash References](#stash-references), which provide a clear method to handle such cases and maintain control over file organization.The hierarchical approach, while powerful, isn’t flawless. It trades some of the flat structure’s simplicity for greater flexibility, which can occasionally feel like a double-edged sword. Still, when compared holistically, the hierarchical model imposes fewer overall constraints.
+
+The last notable limitation the developers should consider is the longevity, in the shape transitioning a Syncify theme back to a Shopify CLI workflow, or vice versa. This does require significant restructuring, as the tools prioritize different paradigms. Developers must weigh this trade-off: The robust, customizable environment with Syncify versus the Shopify CLI's standardized, predictable simplicity, and general shit-show. For those committed to Syncify, the need for compatibility with Shopify CLI fades, as Syncify delivers a comprehensive, standalone alternative.
+
+> Syncify provides several workarounds to ensure that any percieved limitations do overshadow the benefits. Beyond pinpointing location context, hierarchical structures are largely adaptable.
+
+### Compatibility
+
+The compatibility of themes developed with Syncify versus those built using the Shopify CLI hinges heavily on your chosen project structure, with differences rooted in the fundamental contrast between hierarchical and flat architectures. These structural disparities often render Syncify-developed themes incompatible with their Shopify CLI counterparts, creating a clear divide in workflow and output.
+
+While Syncify offers the flexibility to generate a flat-structure theme if desired, this output is distinct from its source code, which remains hierarchically organized. The generated flat structure might resemble a Shopify CLI theme superficially, but the underlying development process and file management differ significantly. More critically, Syncify isn't designed merely as an alternative tool, it is built to fully replace the Shopify CLI for theme development. This intentional shift means Syncify handles all operations and tasks related to theme structures, from file organization to deployment all within its own ecosystem. As a result, it can seamlessly manage both hierarchical and flat outputs without relying on the Shopify CLI. This replacement approach eliminates dependency on the Shopify CLI entirely, offering a self-contained solution for developers. For instance, tasks like theme previews, uploads, or asset management, which typically require Shopify CLI commands, are fully supported with Syncify.
 
 ---

@@ -11182,6 +11182,15 @@ h5, .h5 {
   font-family: "JetBrains Mono", monospace;
 }
 
+h1.vs, .vs.h1 {
+  justify-content: start;
+}
+h1.vs > span, .vs.h1 > span {
+  padding: 0 10px;
+  font-size: 1.21rem;
+  color: #818b96;
+}
+
 hr {
   margin: 40px 0 !important;
   padding: 0 20px;
