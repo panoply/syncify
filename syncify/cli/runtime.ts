@@ -1,5 +1,3 @@
-import type { Theme } from 'types';
-
 import { relative } from 'node:path';
 
 import * as _ from '@syncify/ansi';
@@ -7,8 +5,8 @@ import { glue } from '@syncify/glue';
 import { timer } from '@syncify/timer';
 import update from '@syncify/update';
 
-import { log } from '~cli/log';
 import { warnings } from '~cli/throws';
+import { log } from '~log';
 import { eqWS, isEmpty, keys, plur, toUpcase } from '~utils';
 
 import { $ } from '$';
@@ -23,8 +21,6 @@ export function runtime () {
   timer.start('runtime'); // Begin startup timer
 
 };
-
-runtime.log = _.Create();
 
 /**
  * Startup logging will print `argv` and if terminal width is too small
@@ -64,7 +60,8 @@ runtime.startup = function () {
 
   } else {
 
-    runtime.log
+    log.runtime
+    .Break()
     .Top('Syncify')
     .Newline()
     .Template(_.white.dim(`v${$.version}`), { id: 'v' })
@@ -78,15 +75,12 @@ runtime.startup = function () {
       );
     })
     .Newline()
-    .toLog({ clear: true });
+    .toWrite();
 
     update('@syncify/cli', $.version).then(version => {
       if (version !== false) {
         const latest = `${_.neonGreen(`${_.bold(version.registry)} (available)`)}`;
-        runtime.log
-        .Update('v', `${_.red.dim($.version)} ${_.ARL} ${latest}`)
-        .toUpdate()
-        .done();
+        log.runtime.Update('v', `${_.red.dim($.version)} ${_.ARL} ${latest}`);
       }
     });
 
@@ -102,14 +96,12 @@ runtime.startup = function () {
  */
 runtime.time = () => {
 
-  if ($.mode.build || $.running) return;
+  if ($.running) return;
 
-  runtime.log
-  .Line(`${_.NXT} Runtime ~ ${timer.stop('runtime')}`, _.gray.dim)
-  .toLog({
-    clear: true,
-    trim: true
-  });
+  log.runtime
+  .Prepend(`${_.NXT} Runtime ~ ${timer.stop('runtime')}`, _.gray.dim)
+  .toWrite({ trim: true })
+  .Reset();
 
 };
 
@@ -155,7 +147,9 @@ runtime.modes = function () {
         tui.Line(` ${_.TLD} ${group}${_.COL}${space(group)}${join}`, _.neonCyan);
       }
 
-      tui.Newline().toLog({ clear: true });
+      tui
+      .Newline()
+      .toLog({ clear: true });
 
     }
 
@@ -180,12 +174,49 @@ runtime.stores = function () {
 
   if (!$.mode.watch) return;
 
-  getThemeURLS($.target, 'editor');
-  getThemeURLS($.target, 'preview');
+  for (const url of [ 'editor', 'preview' ]) {
 
-  runtime.log
-  .Newline()
-  .toLog({ clear: true });
+    const width = $.target.reduce<{ store: number; theme: number }>((size, { target, store }) => {
+      if (store.name.length > size.store) size.store = store.name.length;
+      if (target.length > size.theme) size.theme = target.length;
+      return size;
+    }, {
+      store: 0,
+      theme: 0
+    });
+
+    log.runtime
+    .Line(plur(toUpcase(url), $.target.length) + _.COL, _.bold.white)
+    .Each($.target, function ({ target, store, editor, preview }) {
+      this.Line(
+        glue.ws(
+          WSP,
+          _.TLD,
+          _.pink(store.name),
+          _.WSP.repeat(width.store - store.name.length),
+          _.ARR,
+          _.pink.bold(target),
+          _.WSP.repeat(width.theme - target.length),
+          _.ARR,
+          _.WSP,
+          _.gray.underline(editor || preview)
+        )
+      );
+    }).True(url === 'editor', tui => tui.Newline());
+
+  }
+
+  log.runtime.NL.toWrite();
+
+  if ($.mode.hot) {
+    if ($.mode.align) {
+      log.runtime.Spinner(`remote ${_.ARL} local merges`, { color: _.whiteBright });
+    } else {
+      log.runtime.Spinner('configuring HOT Reloads', { color: _.whiteBright });
+    }
+  } else if ($.mode.align) {
+    log.runtime.Spinner(`remote ${_.ARL} local merges`, { color: _.whiteBright });
+  }
 
 };
 
@@ -201,22 +232,24 @@ runtime.stores = function () {
  */
 runtime.hot = ({ isError = false } = {}) => {
 
-  runtime.log.Stop('Reloads' + _.COL, _.whiteBright.bold);
+  log.runtime.Stop();
 
   if (isError) {
 
-    runtime.log
+    log
+    .runtime
+    .Line('Reloads' + _.COL, _.whiteBright.bold)
     .Line(`  ${_.BAD} ${_.redBright('server')}  ${_.ARR}  ${_.redBright('FAILED')}`)
-    .Append(`  ${_.BAD} ${_.redBright('socket')}  ${_.ARR}  ${_.redBright('FAILED')}`)
-    .toLog({ clear: true });
+    .Line(`  ${_.BAD} ${_.redBright('socket')}  ${_.ARR}  ${_.redBright('FAILED')}`);
 
   } else {
 
-    runtime.log
+    log
+    .runtime
+    .Line('Reloads' + _.COL, _.whiteBright.bold)
     .Line(`  ${_.TLD} ${_.neonMagenta('method')}  ${_.ARR}  ${_.neonMagenta.bold(`${$.hot.method.toUpperCase()}`)}`)
     .Line(`  ${_.TLD} ${_.neonMagenta('server')}  ${_.ARR}  ${_.neonMagenta(`${$.hot.server}`)}`)
-    .Append(`  ${_.TLD} ${_.neonMagenta('socket')}  ${_.ARR}  ${_.neonMagenta(`${$.hot.socket}`)}`)
-    .toLog({ clear: true });
+    .Line(`  ${_.TLD} ${_.neonMagenta('socket')}  ${_.ARR}  ${_.neonMagenta(`${$.hot.socket}`)}`);
 
   }
 
@@ -243,7 +276,8 @@ runtime.warnings = () => {
 
   if (amount === 0) return;
 
-  runtime.log
+  log
+  .runtime
   .Tree('warning')
   .Line(`${amount} ${plur('Runtime Warning', amount)}`, _.bold);
 
@@ -253,59 +287,25 @@ runtime.warnings = () => {
 
     if (item.length > 0) {
 
-      item.length === amount
-        ? runtime.log.Line(`${key} ${plur('Warning', item.length)}${_.COL}`, _.bold)
-        : runtime.log.Prepend(`${item.length} ${key} ${plur('Warning', item.length)}`, _.bold);
+      const condition = item.length === amount;
 
-      runtime.log.Each(item, function (message) {
+      log
+      .runtime
+      .True(condition, tui => tui.Line(`${key} ${plur('Warning', item.length)}${_.COL}`, _.bold))
+      .False(condition, tui => tui.Prepend(`${item.length} ${key} ${plur('Warning', item.length)}`, _.bold))
+      .Each(item, function (message) {
+
         this.Line(`  𐄂 ${message}`, _.yellowBright);
+
       });
 
     }
   }
 
-  runtime.log
+  log
+  .runtime
   .Tree('info')
   .Newline()
   .toLog({ clear: true });
 
 };
-
-/**
- * Theme Previews
- *
- * Generates the theme previews/targets runtime list
- */
-export function getThemeURLS (themes: Theme[], url: 'preview' | 'editor') {
-
-  const editor = url === 'editor';
-  const width = themes.reduce<{ store: number; theme: number }>((size, { target, store }) => {
-    if (store.name.length > size.store) size.store = store.name.length;
-    if (target.length > size.theme) size.theme = target.length;
-    return size;
-  }, { store: 0, theme: 0 });
-
-  runtime.log
-  .Line(plur(toUpcase(url), themes.length) + _.COL, _.bold.white)
-  .Each(themes, function ({ target, store, editor, preview }) {
-
-    this.Line(
-      glue.ws(
-        WSP,
-        _.TLD,
-        _.pink(store.name),
-        _.WSP.repeat(width.store - store.name.length),
-        _.ARR,
-        _.WSP,
-        _.pink.bold(target),
-        _.WSP.repeat(width.theme - target.length),
-        _.ARR,
-        _.WSP,
-        _.gray.underline(editor || preview)
-      )
-    );
-
-  })
-  .True(editor, tui => tui.Newline());
-
-}
