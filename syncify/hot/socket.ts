@@ -60,33 +60,21 @@ export const wss = function wss () {
   ws.publish('connected', 'connected');
 
   ws.listen($.hot.socket, (token) => {
-
     listener = token;
-
     event.emit('hot:socket');
-
-    if (token === false) {
-      log.error('Websocket connection failed', { suffix: 'HOT' });
-    }
-
+    token === false && log.error('Websocket connection failed', { suffix: 'HOT' });
   });
 
   event.on('hot:socket', () => {
-
     $.wss.alias(JSON.stringify($.hot.alias));
-
   });
 
   event.on('hot:failed', () => {
-
     ws.close();
     app.close();
     uWS.us_listen_socket_close(listener);
-
     prexit.hooks.delete('hot:eject');
-
     runtime.hot({ isError: true });
-
   });
 
   if ($.hot.eject) {
