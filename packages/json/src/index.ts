@@ -41,19 +41,30 @@ const jsonOptions = <T>(opts: any = {}): T => Object.assign({
 }, opts);
 
 export const evaluate = (...params: EvaluateParams) => {
-  const actual = params.shift() as string;
+
+  let actual = params.shift() as string;
   const options = params.pop() as EvaluateOptions;
-  const expected = params.length > 0 ? params[0] : false;
+  let expected = params.length > 0 ? params[0] : false;
   const jsonOpts: EvaluateOptions = jsonOptions<EvaluateOptions>(options);
 
   let aParse: unknown;
   let bParse: unknown;
 
   try {
+
+    if (typeof actual === 'string') {
+      if (actual.trim() === '') actual = '{}' as string;
+    } else {
+      actual = '{}' as string;
+    }
+
     aParse = CJSON.parse(actual, null, jsonOpts.removeComments);
+
   } catch (error) {
+
     const message = getMessage(error);
     const position = getPosition(actual, error);
+
     throw new JSONError(`${message} on line number ${position.line}`, {
       line: position.line,
       column: position.column,
@@ -63,11 +74,22 @@ export const evaluate = (...params: EvaluateParams) => {
   }
 
   if (expected !== false) {
+
     try {
+
+      if (typeof expected === 'string') {
+        if (expected.trim() === '') expected = '{}' as string;
+      } else {
+        expected = '{}' as string;
+      }
+
       bParse = CJSON.parse(expected, null, jsonOpts.removeComments);
+
     } catch (error) {
+
       const message = getMessage(error);
       const position = getPosition(expected, error);
+
       throw new JSONError(`${message} on line number ${position.line}`, {
         line: position.line,
         column: position.column,
@@ -83,6 +105,7 @@ export const evaluate = (...params: EvaluateParams) => {
   const aHash = checksum(aString);
 
   if (expected !== false) {
+
     const bSort = sort(bParse, jsonOpts); // Use flat options
     const bString = toJsonString(CJSON.stringify(bSort, null, indent), jsonOpts.crlf);
     const bHash = checksum(bString);
