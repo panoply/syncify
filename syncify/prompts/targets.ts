@@ -1,4 +1,5 @@
-import type { Choice, Fields, LiteralString, PromiseString, SnippetPromptOptions, Stores, Targets, Theme, Themes } from 'types';
+import type { Stores, Targets } from 'syncify/model/extends';
+import type { Choice, Fields, LiteralString, PromiseString, SnippetPromptOptions } from 'types';
 
 import { $import } from 'modules';
 
@@ -6,7 +7,7 @@ import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 
 import { log } from '~cli/log';
-import { themesList } from '~http/theme';
+import { themesList } from '~http/themeFiles';
 import { cancel, intercept, prompt, render, theme } from '~prompt';
 import { eqWS, isArray, keys, values } from '~utils';
 
@@ -25,7 +26,9 @@ function JsonTemplate (store: string) {
     insert: (theme: { name: string; id: number }) => {
       template += `      "\${${theme.name}}": ${_.white(theme.id)},${NWL}`;
     },
-    output: () => template.replace(/,\n$/, '\n') + glue.nl('    }', '  }', '}'),
+    output: () => {
+      return template.replace(/,\n$/, '\n') + glue.nl('    }', '  }', '}');
+    },
     string: (input: string) => {
       const trim = input.trim();
       return trim.slice(trim.indexOf('{')).trim();
@@ -82,16 +85,14 @@ export async function PromptTargetFileTemplate ({
 }: {
   store: Stores,
   targets: Targets,
-  method: LiteralString<
-    | 'package.json'
-    | 'store.toml'
-    | 'store.yaml'
-  >
+  method: LiteralString<'package.json' | 'store.toml' | 'store.yaml'>
 }) {
 
   const template = method === 'package.json'
     ? JsonTemplate(store.name)
-    : method === 'store.toml' ? TomlTemplate(store.name) : YamlTemplate(store.name);
+    : method === 'store.toml'
+      ? TomlTemplate(store.name)
+      : YamlTemplate(store.name);
 
   const fields: Fields[] = [];
 
@@ -107,14 +108,16 @@ export async function PromptTargetFileTemplate ({
         if (field && field.name === theme.name) {
           if (/[A-Z]/.test(value)) {
             return _.reset.redBright('  Target name must be lowercase');
-          } else if (/[0-9]/.test(value)) {
+          }
+          if (/[0-9]/.test(value)) {
             return _.reset.redBright('  Target name cannot contain numbers');
-          } else if (/[ ]/.test(value)) {
+          }
+          if (/[ ]/.test(value)) {
             return _.reset.redBright('  Target name cannot contain spaces');
-          } else if (/-/.test(value)) {
+          }
+          if (/-/.test(value)) {
             return _.reset.redBright('  Target name cannot contain dashes');
           }
-
         }
 
         return true;
@@ -145,10 +148,10 @@ export async function PromptTargetFileTemplate ({
     template: template.output(),
     format () {
 
-      if (this.state.submitted === true) {
-        if (this.state.completed !== 100) {
-          return _.neonGreen(`${this.state.completed}% completed`);
-        }
+      if (this.state.submitted === true && this.state.completed !== 100) {
+
+        return _.neonGreen(`${this.state.completed}% completed`);
+
       }
 
       return `${_.ARR}  ${_.gray(`${this.state.completed}% completed`)}`;
@@ -179,19 +182,19 @@ export async function PromptSelectThemes (method: LiteralString<
 
   if (stores.length > 1) {
 
-    for (const name of stores) {
+    for (const { target, uid } of $.target) {
 
-      selected[name] = await PromptEachStore($.target.get(name));
+      selected[target] = await PromptEachStore($.target.get(uid));
 
     }
 
   } else {
 
-    const targets = await PromptEachStore($.targets[stores[0]]);
+    const targets = await PromptEachStore($.stores.default);
 
     return PromptTargetFileTemplate({
+      store: $.stores.default,
       method,
-      store: $.targets[stores[0]],
       targets
     });
 
@@ -204,7 +207,7 @@ export async function PromptSelectThemes (method: LiteralString<
       style: 'brielle'
     });
 
-    const items = await list(store);
+    const items = await themesList(store);
     const themes = items
     .filter(({ role }) => role !== 'demo')
     .sort((a, b) => (a.role === 'main' ? -1 : b.role === 'main' ? 1 : 0));
@@ -260,23 +263,21 @@ export async function PromptSelectThemes (method: LiteralString<
 /**
  * Prompt selection for the target file storage method to be used.
  */
-export async function PromptStorage (message?: string[]): PromiseString<
-  | 'package.json'
-  | 'theme.toml'
-  | 'theme.yaml'
-> {
+export async function PromptStorage (message?: string[]): PromiseString<'package.json' | 'store.toml' | 'store.yaml'> {
 
   !message || log(_.Create({ type: 'warning' }).Wrap(message, _.yellowBright.bold).toLine());
 
-  const resolve = await prompt({
+  const resolve: { storage: LiteralString<'package.json' | 'store.toml' | 'store.yaml'> } = await prompt<{
+    storage: string
+  }>({
     theme,
     message: 'Target Storage',
     name: 'storage',
     type: 'select',
     choices: [
       { name: 'package.json' },
-      { name: 'theme.toml' },
-      { name: 'theme.yaml' }
+      { name: 'store.toml' },
+      { name: 'store.yaml' }
     ]
   }).catch(cancel);
 
@@ -288,7 +289,7 @@ export async function PromptThemeTargets (message?: string[]): PromiseString<'se
 
   !message || log(_.Create({ type: 'warning' }).Wrap(message, _.yellowBright.bold).toLine());
 
-  const resolve = await prompt({
+  const resolve: { theme: LiteralString<'select' | 'create'> } = await prompt<{ theme: string }>({
     theme,
     message: 'Theme Targets',
     name: 'theme',
