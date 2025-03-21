@@ -1,3 +1,5 @@
+/* eslint-disable new-cap */
+
 import { basename, join, relative } from 'node:path';
 
 import { glob } from 'fast-glob';
@@ -56,7 +58,7 @@ export async function Pack (): Promise<void> {
 
   }
 
-  const zip = new $import.AdmZip();
+  const zip = new $import.admzip();
 
   for (const dir of THEME_DIRS) {
 
