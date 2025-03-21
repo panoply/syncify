@@ -1,5 +1,4 @@
-import type { Progress } from '@syncify/ansi';
-import type { Store, Target } from 'types';
+import type { PushMode } from 'types';
 import type { File } from '~file';
 
 import { relative } from 'node:path';
@@ -19,95 +18,10 @@ import { throwError } from '~cli/throws';
 import { error } from '~errors';
 import { event } from '~events';
 import { themeFilesUpsertMap, type Upsert } from '~http/themeFiles';
-import { log } from '~log';
 import { outputFile, parse } from '~process/files';
 import { byteSize, delay, eqWS, forEach, getChunk, m, NooP, s, stringSize } from '~utils';
 
 import { $, q } from '$';
-
-interface Synced {
-  /**
-   * Progress bar instance
-   */
-  progress: Progress;
-  /**
-   * Interval timer
-   */
-  interval: NodeJS.Timeout
-  /**
-   * Interval timer
-   */
-  ws: string
-  /**
-   * Count
-   */
-  total: number;
-  /**
-   * The theme request modal
-   */
-  target: Target;
-  /**
-   * The amount of bytes transferred
-   */
-  transfer: number;
-  /**
-   * The number of successful transfers
-   */
-  success: number;
-}
-
-export interface State {
-  /**
-   * The kb transferred
-   */
-  kb: number;
-  /**
-   * The amount of files globbed
-   */
-  files: string[];
-  /**
-   * The file stream
-   */
-  stream: string[];
-  /**
-   * Completed
-   */
-  completed: Synced[]
-  /**
-   * The TUI instance used for logging
-   */
-  write: _.Tui;
-  /**
-   * Transfer maps
-   */
-  transfer: Map<string, number>;
-  /**
-   * Interval timer
-   */
-  interval: NodeJS.Timeout
-  /**
-   * The parsed files
-   */
-  parsed: Map<string, File>;
-  /**
-   * Set of stores in the push operation.
-   */
-  stores: Set<Store>;
-  /**
-   * Push records populated in event callback
-   */
-  synced: Map<Target, Synced>;
-  /**
-   * Warning TUI Model
-   */
-  warnings: Map<File, _.Tui>;
-  /**
-   * Remote Errors
-   *
-   * Entries in this map are request failures incurred during transfer
-   */
-  errors: Map<string, _.Tui>;
-}
 
 /**
  * Generates the push state model. This will maintain references used for the mass upsert
@@ -124,7 +38,7 @@ function setState (write: _.Tui, files: string[]) {
     ]);
   }
 
-  const state: State = {
+  const state: PushMode.State = {
     kb: 0,
     files: files.sort(),
     stream: [],
@@ -182,7 +96,7 @@ function setState (write: _.Tui, files: string[]) {
 /**
  * Keeps the **duration** ticker running and prints the log update to terminal.
  */
-function setLogInterval (state: State) {
+function setLogInterval (state: PushMode.State) {
 
   if (state.interval !== null) {
     clearInterval(state.interval);
@@ -204,12 +118,10 @@ function setLogInterval (state: State) {
  * Create file upsert chunks based on `--batch` and valdate files. This function will
  * also perform that file upserts. The `onUpsert` will receive handled files.
  */
-async function setBatchUpserts (state: State) {
+async function setBatchUpserts (state: PushMode.State) {
 
   const parse = outputFile($.dirs.output);
   const batches: File[] = [];
-
-  log.spinner(`${state.files.length} Files`);
 
   for (let i = 0, s = state.files.length; i < s; i++) {
 
@@ -223,8 +135,11 @@ async function setBatchUpserts (state: State) {
 
       state.transfer.set(file.key, file.size);
       state.parsed.set(file.key, file);
+      state.write.Spinner(`${i + 1} Files`);
 
       batches.push(file);
+
+      await delay(5); // Delay 5ms per read operation
 
     } catch (e) {
 
@@ -237,12 +152,8 @@ async function setBatchUpserts (state: State) {
 
   }
 
-  await delay();
-
   timer.start('batch');
-  log.spinner.stop();
 
-  // write.Stop();
   // Lets begin the uploads, splitting up into batches
   //
   for (const batch of getChunk(batches, $.cmd.batch)) {
@@ -257,11 +168,12 @@ async function setBatchUpserts (state: State) {
  * Upload reporting which fires in the event emitter during `sy push`
  * operations. See the {@link upsert} sync function which handles the bulk.
  */
-function onUpsert (state: State) {
-
-  const { write } = state;
+function onUpsert (state: PushMode.State) {
 
   return (upsert: Upsert.Resolve) => {
+
+    // stop the spinner on first emit
+    if (state.stream.length === 0) state.write.Stop();
 
     const record = state.synced.get(upsert.target);
 
@@ -291,7 +203,7 @@ function onUpsert (state: State) {
 
       record.progress.increment(upsert.errors.length);
 
-      write
+      state.write
       .Update('errors', _.redBright.bold($.errors.size))
       .Update(`${record.target.uid}:progress`, record.progress.render());
 
@@ -335,7 +247,7 @@ function onUpsert (state: State) {
   };
 }
 
-async function Complete (state: State) {
+async function Complete (state: PushMode.State) {
 
   await q.http.onIdle();
 
@@ -343,14 +255,13 @@ async function Complete (state: State) {
 
   state.write
   .Each($.target, ({ store }) => state.write.Remove('version', Infinity))
-  .toUpdate({ clear: true })
-  .clear();
+  .toUpdate({ clear: true });
 
   if ($.errors.size > 0) return Debug(state);
 
 }
 
-function Debug (state: State) {
+function Debug (state: PushMode.State) {
 
   const debug: {
     error: Array<[File, _.Tui]>;
@@ -506,11 +417,10 @@ export async function Push (): Promise<void> {
 
   $.running = true;
 
-  log.spinner('0 Files');
-
   timer.start('upload');
 
   const write = _.Create()
+  .Spinner('0 Files')
   .Template({ prefix: true, id: 'version', color: _.bold })
   .Template({ prefix: true, id: 'elapsed', color: _.whiteBright })
   .Template({ prefix: true, id: 'uploads', color: _.whiteBright })
