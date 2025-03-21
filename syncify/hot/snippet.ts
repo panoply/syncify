@@ -172,8 +172,8 @@ export function removeSnippetInjections () {
  * request client instances.
  *
  * The function performs a non-blocking asynchronous operation which
- * will call {@link request.find} look return the `snippets/hot.js.liquid` file
- * contents along with all layout file contents, as per `hot.layouts[]` config.
+ * will look return the `snippets/hot.js.liquid` file contents along with
+ * all layout file contents, as per `hot.layouts[]` config.
  *
  * The {@link $.hot.alive} and {@link $.hot.version.remote} references will
  * be updated and the contents of each file will be assigned to this functions
@@ -186,7 +186,7 @@ export async function snippet (theme: Theme) {
 
   const input = [ HOT_SNIPPET_KEY, ...$.hot.layouts.map(layout => `layout/${layout}`) ];
 
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
 
     themeFilesList({ input, onError: reject }).then(({ files, errors }) => {
 
@@ -247,7 +247,7 @@ export async function snippet (theme: Theme) {
       themeFilesUpsert({ input: upsert, onError: reject }).then(() => {
 
         if ($.mode.align) {
-          event.once('alignment', () => resolve('hot:active'));
+          resolve('hot:active');
         } else {
           resolve('hot:active');
         }
@@ -257,5 +257,7 @@ export async function snippet (theme: Theme) {
     });
 
   }).then(wss);
+
+  await promise;
 
 };
