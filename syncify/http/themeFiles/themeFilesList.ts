@@ -7,7 +7,7 @@ import { OnlineStoreThemeFileReadResult } from '~http/enums';
 import { graph, params, type RequestError } from '~http/utils';
 import { forMap } from '~utils';
 
-declare namespace List {
+export declare namespace List {
 
   export type Node = Merge<Type.OnlineStoreThemeFile, { body: Type.OnlineStoreThemeFileBodyText }>
 

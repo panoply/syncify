@@ -179,7 +179,7 @@ export declare namespace Upsert {
  */
 export function themeFilesUpsert (...input: Upsert.Arguments) {
 
-  const { query, target, files, onError } = params.upsert<Upsert.Parameters>(input);
+  const { query, target, files, onError } = params.upsert(input);
 
   return new Promise<Upsert.Resolve>((resolve, reject) => {
 

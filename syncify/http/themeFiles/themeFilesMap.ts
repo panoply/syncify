@@ -139,9 +139,9 @@ export function themeFilesMap (target: Type.Target, callback: (count: number) =>
 
           const directory = filename.slice(0, filename.lastIndexOf('/'));
 
-          has(directory, files)
-            ? files[directory].push(filename)
-            : files[directory] = [ filename ];
+          has(directory, files.files)
+            ? files.files[directory].push(filename)
+            : files.files[directory] = [ filename ];
 
         }, nodes);
 
