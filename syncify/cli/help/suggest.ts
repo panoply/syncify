@@ -11,8 +11,10 @@ export function Suggest () {
 
   _.Create()
   .Top(`Syncify ${_.CHV} Error`, false)
-  .Header(VERSION, _.bold)
-  .Error('Please provide a command line argument', _.bold.redBright)
+  .Header(VERSION, _.gray)
+  .Error('MISSING COMMAND ' + _.BAD, _.bold.redBright)
+  .Newline('red')
+  .Error('Please provide a command line argument', _.redBright)
   .Header(`USAGE${_.COL}`, _.bold)
   .Line(` $ sy <${_.magenta('mode')}>`)
   .Line(` $ sy <${_.magenta('mode')}> --flags`)
@@ -20,11 +22,11 @@ export function Suggest () {
   .Line(` $ sy <${_.magenta('mode')}> [options] --flags`)
   .Header(`HELP${_.COL}`, _.bold)
   .Line(' $ sy help')
-  .Line(` $ sy help <${_.magenta('mode')}>`)
-  .Line(` $ sy help <${_.magenta('flag')}>`)
-  .Newline()
+  .Line(` $ sy <${_.magenta('mode')}> --help`)
+  .NL
   .End(`Syncify ${_.CHV} Error`, false)
-  .Break()
-  .toLog(highlight);
+  .BR
+  .toLog(highlight)
+  .Break();
 
 }
