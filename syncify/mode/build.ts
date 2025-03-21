@@ -1,5 +1,5 @@
 import type { Merge } from 'type-fest';
-import type { BuildModeReport, BuildReport, Syncify } from 'types';
+import type { BuildModeReport, BuildReport } from 'types';
 
 import anymatch from 'anymatch';
 import glob from 'fast-glob';
@@ -144,10 +144,10 @@ function getLogs () {
 
   const write = _.Create()
   .Prefix('version', `  ${$.vc.number}`, _.bold)
-  .Template({ id: 'version', prefix: true })
   .Template({ id: 'processed', prefix: true })
   .Template({ id: 'bundled', prefix: true })
   .Template({ id: 'skipped', prefix: true })
+  .toUpdate()
   .Template({ id: 'duration', prefix: true })
   .Template({ id: 'warnings', prefix: true })
   .Template({ id: 'errors', prefix: true })
@@ -175,6 +175,8 @@ function getLogs () {
     .Update('duration', `  ${_.capture.numbers(timer.now('build'), _.bold)}`)
     .Update('warnings', `  ${_.bold(`${$.warnings.size}`)}`)
     .Update('errors', `  ${_.bold(`${report.stats.errors}`)}`)
+    .toUpdate()
+
   };
 
 }
@@ -182,21 +184,20 @@ function getLogs () {
 /**
  * Build Function
  *
- * Triggers a compile of the project. Build mode will filter
- * and process each file group within a project in a sequential manner.
- * Upload will not be invoked until the build has completed.
+ * Builds the theme project. Build mode will filter and process each file group
+ * within a project in a sequential manner. Upload will not be invoked until the build has completed.
  */
-export async function Build (cb?: Syncify) {
+export async function Build () {
 
   $.running = true;
 
   timer.start('build');
 
+  const { write, update } = getLogs();
   const stderr = _.Create({ type: 'error' });
   const hasFilter = isEmpty($.filters) === false;
   const globs = await glob('**', { absolute: true, cwd: $.dirs.input });
   const report = getModel(globs);
-  const { write, update } = getLogs();
 
   update(report);
 
@@ -283,9 +284,7 @@ export async function Build (cb?: Syncify) {
     const count = before + _.bold(files < 10 ? ` ${files}` : `${files}`);
     const space = files === 1 ? WSR : WSP;
 
-    update(report)
-    .Update(group, `${count} ${plur('file', files)}${space}${_.Append(record.time)}`)
-    .toUpdate();
+    update(report).Update(group, `${count} ${plur('file', files)}${space}${_.Append(record.time)}`);
 
   }
 
@@ -305,12 +304,11 @@ export async function Build (cb?: Syncify) {
 
     write
     .Update('build', 'Build')
-    .toUpdate();
-
-    write
-    .Newline()
-    .Template('Caching', { id: 'cache', dash: true, color: _.gray })
-    .Newline()
+    .NL
+    .Dash('Caching', _.gray)
+    .NL
+    .toUpdate({ clear: true, trim: true })
+    .Stop()
     .Spinner('Saving Cache', { color: _.neonCyan, style: 'spinning' });
 
     await saveCache();
@@ -318,7 +316,7 @@ export async function Build (cb?: Syncify) {
     write
     .Stop()
     .Update('cache', 'Cached')
-    .Header(`${$.dirs.cache}`, _.gray)
+    .Append(`${$.dirs.cache}`, _.gray)
     .toUpdate();
 
     if ($.warnings.size > 0) {
@@ -344,18 +342,14 @@ export async function Build (cb?: Syncify) {
           write
           .Warn(`${_.bold('WARNING')} ${_.HSH}${_.bold(`${count}`)}`, _.yellowBright)
           .Newline('yellow')
-          .Warn(group, _.yellowBright);
-
-          for (const warn of warnings) {
-
-            write.Insert(warn).Break();
-
-          }
+          .Warn(group, _.yellowBright)
+          .Each(toArray(warnings), function (item) {
+            this.Insert(item).Break();
+          });
         }
       }
 
-      write.toUpdate();
-      write.Newline();
+      write.toUpdate().Newline();
 
     } else {
 
@@ -365,7 +359,7 @@ export async function Build (cb?: Syncify) {
 
     write
     .End($.log.group)
-    .Break()
+    .BR
     .toUpdate();
 
     kill.exit(0);
