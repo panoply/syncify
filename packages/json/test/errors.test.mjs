@@ -79,6 +79,7 @@ test('error - line and columns', t => {
 
   } catch (e) {
 
+    t.log(e);
     t.is(e.line, 12);
     t.is(e.column, 28);
 
