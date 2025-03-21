@@ -75,15 +75,16 @@ export async function Create () {
   const select = $.argv.length > 1 ? $.argv[1] : null;
 
   /** TUI Tree */
-  const tui = _.Create()
-  .Newline()
+  const write = _.Create()
   .Wrap(
-    _.gray
-    , 'Hello Hacker 👋' + NLR
-    , 'This command prompt can be used to jump start a new project. Choose one of the open source themes'
-    , 'or usage examples available. Alternatively, you can import a theme from a store and Syncify will'
-    , 'strap it for you.'
-  );
+    _.gray,
+    'Hello Hacker 👋' + NLR,
+    'This command prompt can be used to jump start a new project. Choose one of the open source themes',
+    'or usage examples available. Alternatively, you can import a theme from a store and Syncify will',
+    'strap it for you.'
+  )
+  .Newline()
+  .toLog({ clear: true });
 
   /** Prompt Model */
   const state: CreatePrompt = {
@@ -121,13 +122,6 @@ export async function Create () {
 
   /* GREETING ----------------------------------- */
 
-  // Log Greeting and clear the TUI stack
-  //
-  tui.Newline().toLog({
-    clear: true,
-    trim: true
-  });
-
   /* -------------------------------------------- */
   /* BEGIN PROMPTS                                */
   /* -------------------------------------------- */
@@ -163,60 +157,29 @@ export async function Create () {
   // at this point we have created the project
   // lets now install any dependencies and set things up
   // first let's grag the package manager if we don't have it.
-
   if ($.pm === '?') {
+
     $.pm = await PromptPackageManager();
+
   }
-
-  /* INSTALL PROJECT DEPS ----------------------- */
-
-  await InstallDependencies();
 
   /* CREATE CACHE STORES ------------------------ */
 
   await CreateCache();
 
-  /* BUILD THEME -------------------------------- */
+  /* INSTALL PROJECT DEPS ----------------------- */
 
-  // log.spinner.update('Building Theme');
-
-  // await execAsync('sy -b');
+  await InstallDependencies();
 
   /* PUBLISH THEME ------------------------------ */
 
-  tui
+  write
   .Header(`${_.CHK} Project ${_.neonGreen.bold(state.name)} Created`, _.bold.white)
   .Wrap(`You can now ${_.cyan(`cd ${state.name}`)} into the directory and start hacking.`, _.gray)
   .Newline()
   .End($.log.group)
-  .toLog({ clear: true });
-
-  // }
-
-  // async function PromptImportTheme () {
-
-  //   const resolve = await prompt<{ strap: string }>({
-  //     theme,
-  //     message: label.ImportTheme,
-  //     type: 'select',
-  //     name: 'strap',
-  //     choices: [
-  //       {
-  //         name: 'import',
-  //         message: 'Import',
-  //         hint: '       Import theme from a store'
-  //       },
-  //       {
-  //         name: 'git',
-  //         message: 'Repository',
-  //         hint: '     One of the usage examples'
-  //       }
-  //     ]
-  //   }).catch(cancel);
-
-  //   return resolve.strap;
-
-  // }
+  .toLog({ clear: true })
+  .Break();
 
   /* -------------------------------------------- */
   /* PROMPTS                                      */
@@ -300,28 +263,28 @@ export async function Create () {
         if (value.length === 0) {
 
           return _.Multiline(
-            _.red.bold('REQUIRED')
-            , NWL
-            , 'You must provide a directory name for your project.'
-            , 'Keep it simple, lowercase and no special characters.'
+            _.red.bold('REQUIRED'),
+            NWL,
+            'You must provide a directory name for your project.',
+            'Keep it simple, lowercase and no special characters or whitespace.'
           );
 
-        } else if (!/[A-Za-z0-9_+-]+/.test(value)) {
+        } else if (!/^[A-Za-z0-9_+-]+$/.test(value)) {
 
           return _.Multiline(
-            _.red.bold('INVALID NAME')
-            , NWL
-            , 'The project directy name is invalid or contains bad characters.'
-            , `Names must match the following pattern${_.COL} ${_.cyan('[A-Za-z0-9_+-]+')}`
+            _.red.bold('INVALID NAME'),
+            NWL,
+            'The project directory name is invalid or contains bad characters.',
+            `Names must match the following pattern${_.COL} ${_.cyan('[A-Za-z0-9_+-]+')}`
           );
 
         } else if (existsSync(join($.cwd, value))) {
 
           return _.Multiline(
-            _.red.bold('INVALID DIRECTORY')
-            , NWL
-            , 'Directory already exists in this location, please use a different name.'
-            , 'Alternatively, run the command from a different folder/path.'
+            _.red.bold('INVALID DIRECTORY'),
+            NWL,
+            'Directory already exists in this location, please use a different name.',
+            'Alternatively, run the command from a different folder/path.'
           );
 
         }
@@ -446,9 +409,7 @@ export async function Create () {
     });
 
     await execAsync(`git clone --depth 1 ${state.repository} ${state.name}`);
-
     await delay(); // Ensure clone has finished
-
     await rm(join(state.projectPath, '.git'), { recursive: true, force: true });
 
   }
