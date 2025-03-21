@@ -91,6 +91,11 @@ const PREFIX_EXTRA = ' ';
 const PREFIX_SPACE = PREFIX_LIMIT + PREFIX_EXTRA.length;
 
 /**
+ * Regular Expression for timer suffix
+ */
+const TIME_SUFFIX = /\d+[μmsec]{1,3}$/;
+
+/**
  * ANSI Prefix
  *
  * Equally distributes whitespace following the `prefix` parameter.
@@ -117,10 +122,11 @@ const PREFIX_SPACE = PREFIX_LIMIT + PREFIX_EXTRA.length;
  * ```
  * ---
  *
- * **Passing 2 `suffix` parameters**
+ * **Passing 2 `suffix` parameters (applies append is timer)**
  *
  * ```bash
  * │ prefix  »  action → suffix
+ * │ prefix  »  action ~ append
  * ```
  *
  * ---
@@ -153,6 +159,7 @@ export function Prefix (name: Prefixes, ...suffix: [
   const length = suffix.length;
 
   if (length > 0) {
+
     if (length === 1) {
 
       // name  →  handle
@@ -161,7 +168,10 @@ export function Prefix (name: Prefixes, ...suffix: [
     } else if (length === 2) {
 
       // name  →  handle → joiner
-      return glue.ws(prefix, suffix[0], ARR, suffix[1]);
+      // name  →  handle ~ append
+      return TIME_SUFFIX.test(strip(suffix[1]))
+        ? glue.ws(prefix, suffix[0], Append(suffix[1]))
+        : glue.ws(prefix, suffix[0], ARR, suffix[1]);
 
     } else if (length === 3) {
 
