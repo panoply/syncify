@@ -41,13 +41,29 @@ interface Alignment {
   skipped: File[];
 }
 
+/**
+ * Perform Alignment
+ *
+ * Executes pull on a subset of remote ~ local files. This function
+ * can be triggered in isolation using the `--align` flag and will
+ * carry-out diffing, syncing only changed files.
+ */
 export async function runAlignment () {
 
   if (!$.mode.align) return;
 
+  const state: Alignment = {
+    count: 0,
+    total: 0,
+    create: m(),
+    update: m(),
+    skipped: []
+  };
+
   await q.cache.onIdle();
 
   const output = outputFile($.dirs.output);
+
   const list = await themeFilesList({
     target: $.target.default,
     input: [
@@ -60,13 +76,7 @@ export async function runAlignment () {
     ]
   });
 
-  const state: Alignment = {
-    count: 0,
-    total: list.files.length,
-    create: m(),
-    update: m(),
-    skipped: []
-  };
+  state.total = list.files.length;
 
   const print = (filename: string) => glue.nl(
     `${++state.count} of ${state.total} files`,
@@ -92,7 +102,7 @@ export async function runAlignment () {
 
     if (file.input) {
 
-      const read = await readFile(file.input, 'utf8');
+      const read = await readFile(file.input, 'utf-8');
       const json = evaluate(read, body.content, $.json.options);
 
       if (json.change) {
@@ -100,7 +110,11 @@ export async function runAlignment () {
         file.value = json.string;
         state.update.set(filename, file);
 
-        await writeFile(file.input, file.value).then(() => state.update.set(filename, file)).catch(
+        await writeFile(file.input, file.value).then(() => {
+
+          state.update.set(filename, file);
+
+        }).catch(
           error.write(
             'Error writing file during alignment', {
               input: file.input,
@@ -121,7 +135,11 @@ export async function runAlignment () {
       file.value = format(body.content, $.json.options);
 
       await ensureDir($.stash[stashDir]);
-      await writeFile(file.input, file.value).then(() => align.create.set(filename, file)).catch(
+      await writeFile(file.input, file.value).then(() => {
+
+        state.create.set(filename, file);
+
+      }).catch(
         error.write(
           'Error writing file during alignment', {
             input: file.input,
@@ -205,9 +223,9 @@ export async function Pull () {
       state.write
       .Update('elapsed', _.capture.numbers(timer.now('pull'), _.bold))
       .Update('pulled', `${_.bold(state.count)} of ${_.bold(state.total)}`)
-      .Update('created', `${_.bold(state.files.create.length)}`)
-      .Update('updated', `${_.bold(state.files.update.length)}`)
-      .Update('stashed', `${_.bold(state.files.stash.length)}`)
+      .Update('created', _.bold(state.files.create.length))
+      .Update('updated', _.bold(state.files.update.length))
+      .Update('stashed', _.bold(state.files.stash.length))
       .Update('progress', state.progress.render())
       .toUpdate();
 
@@ -257,13 +275,11 @@ export async function Pull () {
         const splitDir = item.filename.split('/');
         const fileName = splitDir.pop();
         const stashDir = splitDir.length > 1 ? splitDir.pop() : splitDir[0];
-        const file: File<List.Node> = output(item.filename);
+        const file: File = output(item.filename);
 
-        if (file.ext === '.json') {
-          file.value = format(item.body.content, $.json.options);
-        } else {
-          file.value = item.body.content;
-        }
+        file.value = file.ext === '.json'
+          ? format(item.body.content, $.json.options)
+          : item.body.content;
 
         if (file.input) {
 
@@ -278,6 +294,7 @@ export async function Pull () {
           file.input = join($.stash[stashDir], fileName);
 
           state.files.stash.push(file);
+
           // await ensureDir($.stash[stashDir]);
           // await writeFile(file.input, file.value).then(() => align.create.set(filename, file)).catch(
           //   error.write(
