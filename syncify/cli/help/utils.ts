@@ -32,9 +32,10 @@ export function describe (message: string) {
 export function highlight (input: string) {
 
   return input
-  .replace(/([${},<>])/g, _.gray('$1'))
-  .replace(/\s(-{1,2})(?=[a-zA-Z])/g, _.gray(' $1'))
-  .replace(/(\[options\])/g, `${_.LSB}options${_.RSB}`);
+  .replace(/([${}<>])/g, _.gray('$1'))
+  .replace(/(,)(?= -)/g, _.gray('$1'))
+  .replace(/(\[options\])/g, `${_.LSB}options${_.RSB}`)
+  .replace(/(?<= )(-|--)(?=[a-zA-Z]+)/g, _.gray('$1'));
 
 };
 
