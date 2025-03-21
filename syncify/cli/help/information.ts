@@ -12,6 +12,7 @@ export function Inspect () {
   log.clear();
 
   _.Create()
+  .BR
   .Top('Inspect')
   .Header(`${_.white.bold('@syncify/cli')}`)
   .Line(`${_.gray('VERSION')}${_.COL}  v${_.whiteBright(VERSION)}`)
@@ -32,7 +33,8 @@ export function Inspect () {
   .NL
   .End('Inspect')
   .BR
-  .toLog();
+  .toLog()
+  .Break();
 
 }
 
@@ -41,13 +43,15 @@ export function Version () {
   log.clear();
 
   _.Create()
-  .Top('Version')
-  .NL
-  .Line(`${_.whiteBright('@syncify/cli')} ${_.ARR} ${_.whiteBright('v' + VERSION)}`)
-  .Line(`${_.whiteBright('@syncify/hot')} ${_.ARR} ${_.whiteBright('v' + HOT_VERSION)}`)
-  .NL
-  .End('Version')
   .BR
-  .toLog();
+  .Top('Versions', false)
+  .NL
+  .Line(`${_.whiteBright('@syncify/cli')}  ${_.ARR}  ${_.whiteBright('v' + VERSION)}`)
+  .Line(`${_.whiteBright('@syncify/hot')}  ${_.ARR}  ${_.whiteBright('v' + HOT_VERSION)}`)
+  .NL
+  .End('Versions', false)
+  .BR
+  .toLog()
+  .Break();
 
 }
