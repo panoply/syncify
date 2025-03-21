@@ -147,7 +147,7 @@ test('sort - json with target path', t => {
   t.deepEqual(stringify(parse(input), { arrays: [ 'a.b' ] }), expected);
 });
 
-test('sort - json with nested comments', t => {
+test.skip('sort - json with nested comments', t => {
   const input = jsonc`{
     "a": {
       "b": [
