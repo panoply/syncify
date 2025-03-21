@@ -7,14 +7,14 @@ import type { EvaluateOptions } from '@syncify/json';
 import type { Directories, HOT, JSONTerse, JSONTransform, LiquidTerse } from '@syncify/types';
 import type { uWS } from '@syncify/uws';
 import type { Tester } from 'anymatch';
-import type { AxiosRequestConfig } from 'axios';
+import type { XiorRequestConfig } from 'xior';
 // FILE SYSTEM
 import type { LogModes } from '~enums';
 
 /**
  * Axios Request configs
  */
-export type Clients = Record<string, AxiosRequestConfig>;
+export type Clients = Record<string, XiorRequestConfig>;
 
 /**
  * Store Model

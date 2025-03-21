@@ -21,7 +21,7 @@ export type PathsRef = {
    *
    * @default null
    */
-  config: string;
+  config: string[];
   /**
    * Anymatch tester of all resolved paths which determine to which theme directory
    * the path belongs.

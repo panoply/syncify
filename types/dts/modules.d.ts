@@ -29,7 +29,7 @@ export interface ImportMap {
   'smol-toml': 'toml';
   'js-yaml': 'yaml';
   'svgo': 'svgo';
-  'tailwindcss': 'tailwind';
+  '@tailwindcss/postcss': 'tailwind';
   'postcss': 'postcss';
   'sass-embedded':'sass';
   'clean-css': 'cleancss';
@@ -46,7 +46,7 @@ export type Dependencies =
  | 'gray-matter'
  | 'html-minifier-terser'
  | 'svgo'
- | 'tailwindcss'
+ | '@tailwindcss/postcss'
  | 'postcss'
  | 'sass-embedded'
  | 'clean-css'

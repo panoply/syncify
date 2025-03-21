@@ -192,17 +192,24 @@ export interface ParseCommand {
    */
   mode: CommandModes;
   /**
-   * Positional argument hint which define what positionals are accepted.
+   * Positional argument accepted by the command.
    *
    * @default undefined
+   * @example
+   * 'sy build scripts' // build accepts positional
    */
-  accepts?: string[]
+  accepts?: string[];
   /**
    * The configuration object passed to nodes `ParseArgs`
    */
   flags?: CommandFlags[];
   /**
-   * Alias or equivalent flag expression that does the same thing
+   * Alias or equivalent flag expression that does the same thing.
+   * Some modes can be actived via flags
+   *
+   * @example
+   * // sy build can also be a flag in certain modes
+   * 'sy watch --build'
    */
   alias?: CommandFlags[]
 }

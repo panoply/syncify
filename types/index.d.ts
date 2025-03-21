@@ -18,6 +18,7 @@ export type * from './dts/queue';
 export type * from './dts/package';
 export type * from './dts/pages';
 export type * from './dts/paths';
+export type * from './dts/push';
 export type * from './dts/plugin';
 export type * from './dts/reports';
 export type * from './dts/requests';

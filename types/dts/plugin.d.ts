@@ -31,7 +31,7 @@ export interface PluginHooks {
    * Executes at runtime in the final define cycle. Changes to configuration
    * file will trigger this callback again.
    */
-  onLoad?: (this: PluginScope, config: Config) => void;
+  onDefine?: (this: PluginScope, config: Config) => void;
   /**
    * Executes before a transform begins when running `build` mode.
    */
@@ -92,6 +92,13 @@ export interface PluginHooks {
 /* -------------------------------------------- */
 
 export interface Plugins {
+  /**
+   * Plugins executing onBuild
+   */
+  onDefine: [
+    pluginName: string,
+    pluginHook: PluginHooks['onDefine']
+  ][]
   /**
    * Plugins executing onBuild
    */
