@@ -1,5 +1,5 @@
 import type { Get, PascalCase } from 'type-fest';
-import type { DotPaths, MultipleTopLevelPatch, PathBundle, PathsRef } from 'types';
+import type { DotPaths, LiteralString, MultipleTopLevelPatch, PathBundle, PathsRef } from 'types';
 
 import { exec, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -591,7 +591,7 @@ export function includes (a: string, list?: any[]) {
  * @param prop The object property to check
  * @param object The object
  */
-export function hasPath <T, P extends DotPaths<T>> (path: P, param: T) {
+export function hasPath <T, P extends DotPaths<T>> (path: LiteralString<P>, param: T) {
 
   if (isNil(param)) return false;
   if (isObject(param) === false) return false;
@@ -1188,6 +1188,74 @@ export function addSuffix (number: number): string {
     ? 'st'
     : (a === 2 && b !== 12) ? 'nd' : (a === 3 && b !== 13) ? 'rd' : 'th'
   );
+
+}
+
+/**
+ * **constructTree**
+ *
+ * Construct an array tree from a list of path strings.
+ */
+export function constructTree (paths: string[]): Array<{
+  /**
+   * The base directory name
+   *
+   * @example
+   * 'icons'
+   */
+  name: string;
+ /**
+   * The path from which we will construct
+   *
+   * @example
+   * 'source/assets/icons'
+   */
+  path: string;
+  /**
+   * The tree character sequence
+   *
+   * @example
+   * '    └─ '
+   */
+  tree: string;
+}> {
+
+  const result = [];
+  const tree = {};
+
+  // Build tree structure
+  paths.forEach(path => {
+    let current = tree;
+    path.split('/').forEach(segment => {
+      current[segment] = current[segment] || {};
+      current = current[segment];
+    });
+  });
+
+  // Generate objects with correct tree lines
+  function buildLines (object: any, prefix = '', parentPath = '') {
+
+    const entries = Object.entries(object).sort();
+
+    entries.forEach(([ key, value ], i) => {
+
+      const isLast = i === entries.length - 1;
+      const currentPath = parentPath ? `${parentPath}/${key}` : key;
+      const treeLine = `${prefix}${isLast ? '└─' : '├─'}`;
+
+      result.push({
+        name: key,
+        path: currentPath + '/*',
+        tree: treeLine
+      });
+
+      buildLines(value, prefix + (isLast ? '  ' : '│ '), currentPath);
+
+    });
+  }
+
+  buildLines(tree);
+  return result;
 
 }
 
