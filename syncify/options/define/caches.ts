@@ -90,9 +90,8 @@ export async function createCaches (hash?: string) {
   for (const file of CACHE_FILES) {
 
     const path = join($.dirs.cache, file);
-    const alive = await pathExists(path);
 
-    if (alive !== true) {
+    if (await pathExists(path)) {
 
       await save(path, {})();
 
