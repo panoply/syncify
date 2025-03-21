@@ -1,6 +1,5 @@
 import type * as Type from 'types';
-
-import { XiorError } from 'xior';
+import type { XiorError, XiorResponse } from 'xior';
 
 import { http } from '~http/client';
 
@@ -11,33 +10,32 @@ import { http } from '~http/client';
  */
 export function accessScopeList (domain: string, token: string) {
 
-  return new Promise<Type.AccessScope[]>((resolve) => {
+  return new Promise<{ scopes: Type.AccessScope[]; error: XiorResponse<{ errors: string }> }>((resolve) => {
 
     http.request<Type.QueryCurrentAppInstallation>(domain, token)({
-      data: gql`
-        query AccessScopeList {
-          currentAppInstallation {
-            accessScopes {
-              description
-              handle
+      data: {
+        query: gql`
+          query AccessScopeList {
+            currentAppInstallation {
+              accessScopes {
+                description
+                handle
+              }
             }
           }
-        }
-      `
+        `
+      }
+
     }).then(({ data: { currentAppInstallation } }) => {
 
-      resolve(currentAppInstallation.accessScopes);
+      resolve({ scopes: currentAppInstallation.accessScopes, error: null });
 
-    }).catch((failed: XiorError) => {
+    }).catch((error: XiorError) => {
 
-      accessScopeList.error = failed;
-
-      return false;
+      resolve({ scopes: [], error: error.response });
 
     });
 
   });
 
 };
-
-accessScopeList.error = null;
