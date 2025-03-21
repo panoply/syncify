@@ -14,6 +14,7 @@ command(
         'json'
       ],
       flags: [
+        'help',
         'input',
         'output',
         'config',
@@ -29,6 +30,7 @@ command(
       mode: 'watch',
       accepts: null,
       flags: [
+        'help',
         'hot',
         'bind',
         'align',
@@ -48,6 +50,7 @@ command(
       mode: 'pack',
       accepts: null,
       flags: [
+        'help',
         'output',
         'config',
         'clean',
@@ -73,6 +76,7 @@ command(
       mode: 'push',
       accepts: null,
       flags: [
+        'help',
         'input',
         'config',
         'target',
@@ -86,6 +90,7 @@ command(
       mode: 'pull',
       accepts: null,
       flags: [
+        'help',
         'output',
         'config',
         'target',
@@ -119,6 +124,7 @@ command(
       accepts: null,
       alias: [ 'version' ],
       flags: [
+        'help',
         'patch',
         'minor',
         'major'
@@ -126,6 +132,9 @@ command(
     },
     {
       mode: 'create',
+      flags: [
+        'help'
+      ],
       accepts: [
         'dawn',
         'dusk',
@@ -140,6 +149,9 @@ command(
     },
     {
       mode: 'keychain',
+      flags: [
+        'help'
+      ],
       accepts: [
         'create',
         'update',
@@ -160,6 +172,7 @@ command(
         'pull',
         'create',
         'inspect',
+        'projects',
         // TODO
         'export',
         'import',
@@ -167,7 +180,6 @@ command(
         'publish',
         'version',
         'keychain',
-        'projects',
         'theme',
         'git',
         'setup',
@@ -181,7 +193,10 @@ command(
     },
     {
       mode: 'projects',
-      accepts: null
+      accepts: null,
+      flags: [
+        'help'
+      ]
     },
     {
       mode: 'link',
