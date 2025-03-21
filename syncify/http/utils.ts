@@ -1,5 +1,5 @@
 import type { Get } from 'type-fest';
-import type { DotPaths, Graph, GraphqlError, Theme } from 'types';
+import type { DotPaths, GraphqlError, OnlineStoreThemeFilesUpsertFileInput, Theme } from 'types';
 import type { XiorError } from 'xior';
 import type { File } from '~file';
 
@@ -276,11 +276,11 @@ export function params <T, E = RequestError> (parameters: any): {
  * spread and return an array list of relevent values that are to be used
  * on the Graph query and the response.
  */
-params.upsert = function <T, E = RequestError> (parameters: any): {
-  query: Graph.OnlineStoreThemeFilesUpsertFileInput[],
+params.upsert = function (parameters: any): {
+  query: OnlineStoreThemeFilesUpsertFileInput[],
   target: Theme,
   files: File[],
-  onError: (errors: E) => void,
+  onError: (errors: any) => void,
   onNext: (count: number) => void
 } {
 
@@ -340,7 +340,7 @@ params.upsert = function <T, E = RequestError> (parameters: any): {
             files = query.input;
 
             // when we receive a File[] array, it is an upsert
-            query = forMap<File, OnlineStore.ThemeFilesUpsertFileInput>(({
+            query = forMap<File, OnlineStoreThemeFilesUpsertFileInput>(({
               key,
               value
             }) => ({
@@ -416,7 +416,7 @@ params.upsert = function <T, E = RequestError> (parameters: any): {
         files = query;
 
         // when we receive a File[] array, it is an upsert
-        query = forMap<File, Graph.OnlineStoreThemeFilesUpsertFileInput>(({ key, value }) => ({
+        query = forMap<File, OnlineStoreThemeFilesUpsertFileInput>(({ key, value }) => ({
           filename: key,
           body: {
             type: 'TEXT',
