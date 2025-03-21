@@ -145,7 +145,7 @@ export async function getConfigFile (): Promise<Config> {
 
     } catch (e) {
 
-      error.generic(e);
+      throw error.acquire(e);
 
     }
 
