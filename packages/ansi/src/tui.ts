@@ -4,20 +4,79 @@
 
 import type { IssueContext, Prefixes } from './write';
 import type { Ansis } from 'ansis';
-import type { Writable } from 'node:stream';
 import type { LiteralUnion } from 'type-fest';
+
+import { Console } from 'node:console';
+import process from 'node:process';
 
 import update, { createLogUpdate } from 'log-update';
 
 import { glue } from '@syncify/glue';
 
-import { NIL, NWL } from './characters';
-import { lightGray, neonMagenta, redBright, strip, white, whiteBright, yellowBright } from './colors';
+import { NIL, NWL, WSP } from './characters';
+import { gray, lightGray, neonMagenta, neonTeal, redBright, white, whiteBright, yellowBright } from './colors';
 import { Spinner } from './spinner';
 import { DSH } from './symbols';
 import { Tree } from './tree';
 import { tsize } from './tsize';
-import { Context, End, Multiline, Prefix, Top, Wrap } from './write';
+import { Context, Dash, End, Header, Line, Multiline, Prefix, Top, Wrap } from './write';
+
+/* -------------------------------------------- */
+/* CONSOLE                                      */
+/* -------------------------------------------- */
+
+export class Log extends Console {
+
+  static get stdout () { return process.stdout; }
+  static get stderr () { return process.stderr; }
+  static update: typeof update = createLogUpdate(Log.stdout);
+
+  constructor () {
+    super(Log.stdout, Log.stderr);
+  }
+
+  write (message: string) {
+    Log.stdout.write(message);
+  }
+
+  info (message: string, color = whiteBright): void {
+    Log.stdout.write(Line(color(message.trim())) + '\n');
+  }
+
+  dash (message: string, color = whiteBright) {
+    Log.stdout.write(Dash(color(message)) + '\n');
+  }
+
+  error (message: string): void {
+    Log.stderr.write(Tree.red + redBright(message.trim()) + '\n');
+  }
+
+  warn (message: string): void {
+    Log.stderr.write(Tree.yellow + yellowBright(message.trim()) + '\n');
+  }
+
+  header (message: string, color = whiteBright) {
+    Log.stdout.write(Header(color(message.trim())) + '\n');
+    return this;
+  }
+
+  wrap (...input: (string[] | string | Ansis)[]) {
+    const color = <Ansis>(typeof input[input.length - 1] === 'function' ? input.pop() : gray);
+    Log.stdout.write(Wrap(input as string[], { color, firstLineTree: false }) + '\n');
+    return this;
+  }
+
+  tree (type?: LiteralUnion<'red' | 'yellow', string>) {
+    Log.stdout.write((type === 'red' ? Tree.redTrim : type === 'yellow' ? Tree.yellowTrim : Tree.trim) + '\n');
+    return this;
+  }
+
+  break () {
+    Log.stdout.write('\n\n');
+    return this;
+  }
+
+};
 
 /* -------------------------------------------- */
 /* MESSAGE GENERATOR                            */
@@ -41,6 +100,13 @@ export interface toString {
    */
   prune?: string | string[];
   /**
+   * Applies a slice of the current stack. The stack is preserved with
+   * only the entries starting from the provided index being logged.
+   *
+   * @default 0
+   */
+  from?: number;
+  /**
    * Whether or not to disable final `trimEnd()` on the stack entry.
    *
    * - `default: true` when `toString()`
@@ -54,11 +120,6 @@ export interface toString {
    */
   color?: Ansis;
 }
-
-/**
- * The Return Type of `Create()`
- */
-export type TUIInstance = ReturnType<typeof Create>
 
 export interface TUIOptions {
   /**
@@ -85,36 +146,6 @@ export interface TUIOptions {
    * @deprecated Use stack instead.
    */
   text?: string[];
-  /**
-   * Custom stream for logging `stdout`
-   *
-   * ```js
-   * import { Create } from '@syncify/ansi'
-   * import { Writable } from 'node:stream';
-   *
-   * class CustomWrite extends Writable {}
-   *
-   * Create({ stdout: new CustomWrite() })
-   * ```
-   *
-   * @default null
-   */
-  stdout?: Writable;
-  /**
-   * Custom stream for logging `stdout`
-   *
-   * ```js
-   * import { Create } from '@syncify/ansi'
-   * import { Writable } from 'node:stream';
-   *
-   * class CustomWrite extends Writable {}
-   *
-   * Create({ stderr: new CustomWrite() })
-   * ```
-   *
-   * @default null
-   */
-  stderr?: Writable;
 }
 
 interface TUISpinner {
@@ -139,13 +170,25 @@ interface TUISpinner {
    *
    * @default 'brielle'
    */
-  style: 'brielle' | 'spinning';
+  style: 'brielle' | 'spinning' | 'material';
   /**
    * Ansi Colour
    *
    * @default neonMagenta
    */
   color: Ansis;
+  /**
+   * The log update method to use on spinner update.
+   *
+   * > `clear` (default)
+   * >
+   * > Uses `this.update.clear()` by default
+   *
+   * > `done`
+   * >
+   * > Uses `this.update.done()` when `toUpdate()` was issued on instance.
+   */
+  stopOn: 'clear' | 'done'
 }
 type toStringParam = (
   | [ toString? ]
@@ -209,11 +252,14 @@ interface TemplateOptions<ID = string> {
 }
 
 interface TemplatePrivate extends TemplateOptions {
-  id: string;
+  /**
+   * The stack index
+   */
   index: number;
+  /**
+   * Label
+   */
   label: string;
-  prefix: boolean;
-  dash: boolean;
   /**
    * When `hidden` is `true` this will hold the message to be inserted
    */
@@ -242,66 +288,6 @@ export class Tui<Templates extends string = string> {
   static store: Map<string, Tui> = new Map();
 
   /**
-   * Custom stream for logging `stdout`
-   *
-   * Custom streams should be assigned at first possible chance. They are a
-   * static reference, for example:
-   *
-   * ```js
-   * import { Tui } from '@syncify/ansi'
-   * import { Writable } from 'node:stream';
-   *
-   * class CustomWrite extends Writable {}
-   *
-   * Tui.stdout = new CustomWrite()
-   * ```
-   *
-   * Though they can also be defined on a per-creation basis.
-   *
-   * ```js
-   * import { Create } from '@syncify/ansi'
-   * import { Writable } from 'node:stream';
-   *
-   * class CustomWrite extends Writable {}
-   *
-   * Create({ stdout: new CustomWrite() })
-   * ```
-   *
-   * @default null
-   */
-  static stdout: Writable = null;
-
-  /**
-   * Custom stream for logging `stderr`
-   *
-   * Custom streams should be assigned at first possible chance. They are a
-   * static reference, for example:
-   *
-   * ```js
-   * import { Tui } from '@syncify/ansi'
-   * import { Writable } from 'node:stream';
-   *
-   * class CustomWrite extends Writable {}
-   *
-   * Tui.stderr = new CustomWrite()
-   * ```
-   *
-   * Though they can also be defined on a per-creation basis.
-   *
-   * ```js
-   * import { Create } from '@syncify/ansi'
-   * import { Writable } from 'node:stream';
-   *
-   * class CustomWrite extends Writable {}
-   *
-   * Create({ stderr: new CustomWrite() })
-   * ```
-   *
-   * @default null
-   */
-  static stderr: Writable = null;
-
-  /**
    * CLI Spinner instance
    */
   private spin: TUISpinner = {
@@ -309,8 +295,9 @@ export class Tui<Templates extends string = string> {
     index: NaN,
     label: NIL,
     color: neonMagenta,
-    style: 'brielle',
-    interval: null
+    style: 'spinning',
+    interval: null,
+    stopOn: 'clear'
   };
 
   /**
@@ -380,11 +367,6 @@ export class Tui<Templates extends string = string> {
   private tree: boolean = true;
 
   /**
-   * The log-update instance
-   */
-  private update: typeof update = null;
-
-  /**
    * Optionally provide an existing structure to build from.
    *
    * @default []
@@ -392,13 +374,29 @@ export class Tui<Templates extends string = string> {
   private stack?: string[];
 
   /**
+   * Lambda functions
+   */
+  private lamdas?: Map<string, (this: this, tui: this) => any> = new Map();
+
+  /**
+   * Write index reference
+   */
+  private writes?: number = 0;
+
+  /**
    * Optional data store
    */
   public data?: any;
 
-  constructor (options?: TUIOptions & {
-    id?: string
-  }) {
+  /**
+   * The log-update instance
+   */
+  private get update (): typeof update { return Log.update; };
+
+  /**
+   * Constructor
+   */
+  constructor (options?: TUIOptions & { id?: string }) {
 
     if (typeof options === 'object') {
 
@@ -407,27 +405,15 @@ export class Tui<Templates extends string = string> {
       this.type = 'type' in options ? options.type : 'info';
       this.stack = 'stack' in options ? options.stack : [];
 
-      if ('stderr' in options) {
-        Tui.stderr = options.stderr;
-        this.update = createLogUpdate.call(this, Tui.stderr);
-      }
-
-      if ('stdout' in options) {
-        Tui.stdout = options.stdout;
-        this.update = createLogUpdate.call(this, Tui.stdout);
-      }
-
       if (this.tree) {
         if (this.type === 'error') {
           this.line = Tree.red;
           this.trim = Tree.redTrim;
           this.dash = Tree.redDash;
-          this.update ||= createLogUpdate.call(this, process.stderr);
         } else if (this.type === 'warning') {
           this.line = Tree.yellow;
           this.trim = Tree.yellowTrim;
           this.dash = Tree.yellowDash;
-          this.update ||= createLogUpdate.call(this, process.stderr);
         } else {
           this.line = Tree.line;
           this.trim = Tree.trim;
@@ -448,8 +434,6 @@ export class Tui<Templates extends string = string> {
       this.stack = [];
 
     }
-
-    this.update ||= createLogUpdate.call(this, process.stdout);
 
   }
 
@@ -504,17 +488,9 @@ export class Tui<Templates extends string = string> {
     const output = this.toString(options, callback);
 
     if (this.type === 'error' || this.type === 'warning') {
-      if (Tui.stderr === null) {
-        process.stderr.write(output);
-      } else {
-        Tui.stderr.write(output);
-      }
+      Log.stderr.write(output);
     } else {
-      if (Tui.stdout === null) {
-        process.stdout.write(output);
-      } else {
-        Tui.stdout.write(output);
-      }
+      Log.stdout.write(output);
     }
 
     return this;
@@ -524,12 +500,15 @@ export class Tui<Templates extends string = string> {
   /**
    * Write Output
    *
-   * Accepts a callback function and applies `toString()`
+   * Can be called multiple times, keeps track of stack index for each
+   * call and prints from the last known index. This method is different
+   * from `.toLog()` and `.toUpdate()` in the sense that stack is persisted
+   * and only new stack entries print.
    *
    * ```js
    * {
-   *   clear: false,     // stack will NOT clear when calling toLog()
-   *   trim: false,      // trim will NOT apply when calling toLog()
+   *   clear: false,     // stack will NOT clear when calling toWrite()
+   *   trim: false,      // trim will NOT apply when calling toWrite()
    *   color: undefined
    * }
    * ```
@@ -539,19 +518,44 @@ export class Tui<Templates extends string = string> {
    * ```js
    * import * as _ from '@syncify/ansi'
    *
-   * // Calling no parameter
-   * _.Create().Line('foo').Line('bar').toLog()
+   * const write = _.Create();
    *
-   * // Passing a callback function
-   * _.Create().Line('foo').Line('bar').toLog((message) => {})
+   * // Stack: ['│ foo']
+   * write
+   * .Line('foo')
+   * .toWrite() // Logs: │ foo\n
    *
-   * // Passing options with callback function
-   * _.Create().Line('foo').Line('bar').toLog({ clear: true },(message) => {})
+   * // Stack: ['│ foo\n', '│ bar\n']
+   * write
+   * .Line('bar')
+   * .toWrite() // Logs: │ bar\n
+   *
+   * // Stack: ['│ foo\n', '│ bar\n', '│ baz\n']
+   * write
+   * .Line('baz')
+   * .toWrite() // Logs: │ bar\n
    * ```
    */
-  toWrite (fn: (...input: string[]) => any) {
+  toWrite (params?: Omit<toString, 'from'>) {
 
-    return fn(this.toString());
+    const options = Object.assign({
+      clear: false,
+      trim: false,
+      color: undefined,
+      from: this.writes
+    }, params);
+
+    const output = this.toString(options);
+
+    if (this.type === 'error' || this.type === 'warning') {
+      Log.stderr.write(output);
+    } else {
+      Log.stdout.write(output);
+    }
+
+    this.writes = this.index + 1;
+
+    return this;
 
   }
 
@@ -635,15 +639,19 @@ export class Tui<Templates extends string = string> {
    * _.Create().Line('foo').toUpdate().clear()
    * ```
    */
-  toUpdate (options?: { clear?: boolean, trim?: boolean }) {
+  toUpdate (options?: {
+    clear?: boolean,
+    trim?: boolean,
+  }) {
 
-    if (options === null) return this.update;
+    if (options === null) return this;
 
     const output = this.toString({ clear: false, trim: false, ...options });
 
+    this.spin.stopOn = 'done';
     this.update(output);
 
-    return this.update;
+    return this;
 
   }
 
@@ -670,6 +678,7 @@ export class Tui<Templates extends string = string> {
     const options: toString = {
       clear: true,
       trim: true,
+      from: 0,
       color: undefined
     };
 
@@ -688,38 +697,44 @@ export class Tui<Templates extends string = string> {
       }
     }
 
-    if (options.trim) {
-      this.stack[this.stack.length - 1] = this.stack[this.stack.length - 1].trimEnd();
-    }
+    if (options.trim) this.stack[this.index] = this.stack[this.index].trimEnd();
+
+    const stack = options.from > 0 ? this.stack.slice(options.from) : this.stack;
 
     let output: string;
 
     if (options.color) {
-      output = options.color(glue(this.stack));
+      output = options.color(glue(stack));
     } else if (this.type === 'info') {
-      output = white(glue(this.stack));
+      output = white(glue(stack));
     } else if (this.type === 'error') {
-      output = redBright(glue(this.stack));
+      output = redBright(glue(stack));
     } else if (this.type === 'warning') {
-      output = yellowBright(glue(this.stack));
+      output = yellowBright(glue(stack));
     } else {
-      output = glue(this.stack);
+      output = glue(stack);
     }
 
     if (options.clear === true) {
+
       this.Reset();
+
     } else if (Array.isArray(options.clear)) {
+
       for (const clear of options.clear) {
         if (this.track.has(clear)) {
           const track = this.track.get(clear);
           this.stack[track.index] = '';
         }
       }
+
     } else if (typeof options.clear === 'string') {
+
       if (this.track.has(options.clear)) {
         const track = this.track.get(options.clear);
         this.stack[track.index] = '';
       }
+
     }
 
     return callback === null ? output : callback(output);
@@ -732,11 +747,37 @@ export class Tui<Templates extends string = string> {
    * Returns the current structure being built.
    *
    * @example
-   * _.toRaw() => ['│ foo', '│ bar', '│ baz']
+   * _.toStack() => ['│ foo', '│ bar', '│ baz']
    */
   toStack () {
 
     return this.stack;
+
+  }
+
+  /**
+   * Function Lambda
+   *
+   * Tracks a function callback and fires on every call.
+   *
+   * @example
+   * _.Lambda('foo', () => console.label('hello'))
+   *
+   * _.Lambda('foo')
+   */
+  Lambda (id: string, callback?: (this: Tui, tui: Tui) => void) {
+
+    if (typeof callback === 'function') {
+      this.lamdas.set(id, callback);
+    } else if (this.lamdas.has(id)) {
+      if (callback === null) {
+        this.lamdas.delete(id);
+      } else {
+        this.lamdas.get(id).call(this, this);
+      }
+    }
+
+    return this;
 
   }
 
@@ -757,14 +798,43 @@ export class Tui<Templates extends string = string> {
    * True Conditional
    *
    * If parameter 1 is `truthy`, parameter to will trigger.
+   *
+   * @example
+   * _.True(foo === false, function(tui) {
+   *
+   *   // context is parameter
+   *   tui.Line('Hello World')
+   *
+   *   // this binding applies
+   *   this.Line('Hello World')
+   * })
    */
   True (condition: any, callback: (this: Tui, tui?: Tui) => void) {
 
-    if (condition) {
+    if (condition) callback.call(this, this);
 
-      callback.call(this, this);
+    return this;
 
-    }
+  }
+
+  /**
+   * False Conditional
+   *
+   * If parameter 1 is `falsy`, parameter to will trigger.
+   *
+   * @example
+   * _.False(foo === false, function(tui) {
+   *
+   *   // context is parameter
+   *   tui.Line('Hello World')
+   *
+   *   // this binding applies
+   *   this.Line('Hello World')
+   * })
+   */
+  False (condition: any, callback: (this: Tui, tui?: Tui) => void) {
+
+    if (!condition) callback.call(this, this);
 
     return this;
 
@@ -824,6 +894,7 @@ export class Tui<Templates extends string = string> {
 
     this.stack = [];
     this.track.clear();
+    this.writes = 0;
 
     if (this.id !== null && Tui.store.has(this.id)) Tui.store.delete(this.id);
 
@@ -837,6 +908,22 @@ export class Tui<Templates extends string = string> {
   get isEmpty () {
 
     return this.stack.length > 0;
+
+  }
+
+  /**
+   * is Endline
+   *
+   * Whether or not the last item in the stack ends with a newline character
+   */
+  get isEndline () {
+
+    if (this.stack.length > 0) {
+      const last = this.Get();
+      return last[last.length - 1] === '\n';
+    }
+
+    return false;
 
   }
 
@@ -886,27 +973,33 @@ export class Tui<Templates extends string = string> {
       index: this.stack.length
     }, message ? input[1] : input[0]);
 
+    if (typeof options.prefix === 'string') {
+      options.label = options.prefix;
+      options.prefix = true;
+    }
+
     if (message !== null) {
       const write = Array.isArray(message) ? message : [ message ];
       if (options.hidden) {
         options.message = write;
         this.stack.push('');
       } else {
-
-        this.stack.push(Multiline(write, {
-          color: options.color,
-          line: options.dash ? this.dash : this.line
-        }) + NWL);
-
+        if (options.prefix) {
+          this.stack.push(
+            Prefix(
+              typeof options.label === 'string' ? options.label : options.id,
+              options.color ? options.color(glue(write)) : glue(write)
+            ) + NWL
+          );
+        } else {
+          this.stack.push(Multiline(write, {
+            color: options.color,
+            line: options.dash ? this.dash : this.line
+          }) + NWL);
+        }
       }
-
     } else {
       this.stack.push('');
-    }
-
-    if (typeof options.prefix === 'string') {
-      options.label = options.prefix;
-      options.prefix = true;
     }
 
     if (options.id !== null) {
@@ -1010,19 +1103,19 @@ export class Tui<Templates extends string = string> {
    */
   Spinner (message: string, options?: { style?: 'spinning' | 'brielle', color?: Ansis }) {
 
-    if (typeof options === 'object') {
-      options = Object.assign({ style: 'brielle', color: neonMagenta }, {
-        color: this.spin.color,
-        style: this.spin.style
-      }, options);
-    } else {
-      options = Object.assign({ style: 'brielle', color: neonMagenta }, {
-        color: this.spin.color,
-        style: this.spin.style
-      });
-    }
+    options = Object.assign({
+      style: 'spinning',
+      color: neonTeal
+    }, {
+      color: this.spin.color,
+      style: this.spin.style
+    }, options);
 
     if (this.spin.active === false) {
+
+      if (this.spin.stopOn === 'done') {
+        this.update.clear();
+      }
 
       let frame: number = 0;
 
@@ -1032,29 +1125,21 @@ export class Tui<Templates extends string = string> {
       const frames = spin.frames;
       const size = frames.length;
 
+      this.spin.index = this.stack.push('') - 1;
       this.spin.color = options.color;
       this.spin.label = message;
       this.spin.active = true;
-      this.spin.index = this.stack.push(
-        this.line + this.spin.color(`${frames[frame = ++frame % size]} ${this.spin.label}`) + '\n'
-      ) - 1;
-
+      this.update(this.line + gray.dim('...'));
       this.spin.interval = setInterval(() => {
 
-        if (!this.spin.active) {
-          this.Stop();
-          return;
+        if (this.spin.active) {
+          this.update(glue(
+            this.line,
+            this.spin.color(frames[++frame % size] + WSP + this.spin.label),
+            NWL
+          ));
         }
-
-        this.stack[this.spin.index] = (
-          this.line + this.spin.color(`${frames[frame = ++frame % size]} ${this.spin.label}`) + '\n'
-        );
-
-        this.toUpdate();
-
       }, spin.interval);
-
-      this.toUpdate();
 
     } else {
 
@@ -1076,21 +1161,24 @@ export class Tui<Templates extends string = string> {
    */
   Stop (update?: string, color?: Ansis) {
 
+    if (this.spin.interval !== null) {
+      clearInterval(this.spin.interval);
+    }
+
     if (this.spin.active === false) {
-      if (update) this.Line(update, color);
+      this.update.done();
       return this;
     }
 
-    clearInterval(this.spin.interval);
-
-    update ? this.Replace(this.spin.index, update, color) : this.Remove(this.spin.index);
-
+    this.update.clear();
     this.spin.active = false;
     this.spin.interval = null;
-    this.spin.index = NaN;
 
-    this.toUpdate({ trim: true });
-    this.Pop();
+    this
+    .True(this.writes > 0, () => this.Remove(this.spin.index, Infinity))
+    .True(update, () => this.Line(update, color));
+
+    this.spin.index = NaN;
 
     return this;
 
@@ -1441,17 +1529,12 @@ export class Tui<Templates extends string = string> {
       let input: string = this.trim + '\n';
 
       if (color) {
-
         if (this.tree) {
           if (color === 'yellow') {
             input = Tree.yellowTrim + '\n';
           } else if (color === 'red') {
             input = Tree.redTrim + '\n';
           }
-        }
-
-        if (color === '') {
-          input = '\n';
         }
       }
 
