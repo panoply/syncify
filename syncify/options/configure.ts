@@ -30,8 +30,7 @@ import { setVersion } from './settings/versioning';
 
 import { runtime } from '~cli/runtime';
 import { setStdin } from '~cli/stdin';
-import { runAlignment } from '~modes/pull';
-import { piper } from '~utils/piper';
+import { runAlignment } from '~mode/pull';
 
 import { $ } from '$';
 
@@ -45,58 +44,53 @@ import { $ } from '$';
  */
 export async function Configure () {
 
-  return piper(
+  project();
 
-    project
+  if ($.mode.create || $.mode.projects) return;
 
-  ).stop($.mode.create || $.mode.projects)(
+  await getPkg();
+  await getEnv();
+  await getCaches();
+  await getTargets();
+  await getConfig();
+  await getEditor();
 
-    getPkg,
-    getEnv,
-    getCaches,
-    getTargets,
-    getConfig,
-    getEditor
+  if ($.mode.init || $.mode.keychain) return;
 
-  ).stop($.mode.init || $.mode.keychain)(
+  await setBaseDirs();
+  await setTargets();
 
-    setBaseDirs,
-    setTargets,
-    setFilters
+  setFilters();
 
-  ).stop($.mode.link)(
+  if ($.mode.link) return;
 
-    setProcessors,
-    setPublishConfig,
-    setThemeDirs,
-    setImportDirs,
-    setPaths,
-    setVersion,
-    setJsonOptions,
-    setLiquidOptions,
-    setPlugins,
-    setStdin
+  setProcessors();
 
-  ).stop($.mode.pull || $.mode.push)([
+  await setPublishConfig();
+  await setThemeDirs();
+  await setImportDirs();
+  await setPaths();
 
-    setSectionOptions,
-    setScriptOptions,
-    setSvgOptions,
-    setStyleConfig,
-    setTemplates
+  setVersion();
+  setJsonOptions();
+  setLiquidOptions();
+  setPlugins();
+  setStdin();
 
-  ]).next($.mode.align)(
+  if ($.mode.pull || $.mode.push) return;
 
-    runAlignment
+  await setSectionOptions();
+  await setScriptOptions();
 
-  ).next($.mode.hot)(
+  setSvgOptions();
 
-    setHotReloads
+  await setStyleConfig();
+  await setTemplates();
 
-  ).next($.mode.watch)(
+  if ($.mode.align) await runAlignment();
 
-    runtime.time
+  if ($.mode.hot) await setHotReloads();
 
-  );
+  if ($.mode.watch) runtime.time();
 
 };
