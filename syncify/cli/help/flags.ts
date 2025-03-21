@@ -27,7 +27,7 @@ export function examples () {
     $ sy build
 
     ${_.gray('Build theme with terse minification')}:
-    $ sy uild --terse
+    $ sy build --terse
 
     ${_.gray('Build theme and clean')}:
     $ sy build --clean --terse
