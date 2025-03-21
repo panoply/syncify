@@ -7,7 +7,6 @@ import { readJsonSync } from 'fs-extra';
 
 import * as _ from '@syncify/ansi';
 
-import { log } from '~cli/log';
 import { cancel, labels, prompt } from '~prompt';
 import { theme } from '~prompts/enquirer';
 import { eqWS, prettyDate } from '~utils';
@@ -66,9 +65,6 @@ async function GetProjectNames (dirs: string[]) {
 
 export async function Projects () {
 
-  /** TUI Tree */
-  const write = _.Create({ type: 'info' });
-
   /** Prompt Labels */
   const label = labels({
     padding: 0,
@@ -82,17 +78,16 @@ export async function Projects () {
 
   if (directories.length === 0) return;
 
+  const write = _.Create();
   const files = await GetProjectNames(directories);
-  const count = directories.length === 1 ? 'is 1 project' : `are ${directories.length} projects`;
+  const count = directories.length === 1
+    ? `is ${_.bold('1')} project`
+    : `are ${_.bold(directories.length)} projects`;
 
-  /** Prompt Greeting */
-  const greeting = write.Wrap(
+  write.Wrap(
     _.gray
-    , 'Syncify Projects 🛠️' + NLR
     , `There ${count} using Syncify on this device. Select the project you wish to inspect or configure.`
-  );
-
-  greeting.NL.toWrite(log);
+  ).Newline().toLog({ clear: true });
 
   const select = await PromptProjects();
 
@@ -102,6 +97,7 @@ export async function Projects () {
 
   const file = files[select];
   const project = files[select].project;
+  const auth = project.credentials === 'env' ? '.env' : 'keychain';
 
   write
   .NL
@@ -111,21 +107,14 @@ export async function Projects () {
   .Line(` ${_.gray('CACHE')}${_.COL}             ${_.whiteBright(file.uri)}`)
   .Line(` ${_.gray('CACHE EXPIRY')}${_.COL}      ${_.whiteBright(prettyDate(project.expires))}`)
   .Line(` ${_.gray('LAST RUN')}${_.COL}          ${_.whiteBright(prettyDate(project.lastRunAt))}`)
-  .Line(` ${_.gray('CREATED AT')}${_.COL}        ${_.whiteBright(prettyDate(project.createdAt))}`);
-
-  if (project.credentials === 'env') {
-    write.Line(` ${_.gray('CREDENTIALS')}${_.COL}       ${_.whiteBright('.env')}`);
-  } else {
-    write.Line(` ${_.gray('CREDENTIALS')}${_.COL}       ${_.whiteBright('keychain')}`);
-  }
-
-  write
+  .Line(` ${_.gray('CREATED AT')}${_.COL}        ${_.whiteBright(prettyDate(project.createdAt))}`)
+  .Line(` ${_.gray('CREDENTIALS')}${_.COL}       ${_.whiteBright(auth)}`)
   .Line(` ${_.gray('SYNCIFY VERSION')}${_.COL}   v${_.whiteBright(project.syncifyVersion)}`)
   .Line(` ${_.gray('HOT VERSION')}${_.COL}       v${_.whiteBright(project.hotVersion)}`)
   .NL
   .End('Syncify')
   .Break()
-  .toWrite(log);
+  .toLog();
 
   async function PromptProjects (): Promise<number> {
 
@@ -134,19 +123,17 @@ export async function Projects () {
       padding: 1
     });
 
-    const choices = files.map<Choice>(({ name, hash }, value) => ({
-      name,
-      value,
-      message: name,
-      hint: spacing(name) + hash
-    }));
-
     const resolve = await prompt<{ project: [string, number ]}>({
       theme,
       message: label.Project,
       name: 'project',
       type: 'select',
-      choices,
+      choices: files.map<Choice>(({ name, project }, value) => ({
+        name,
+        value,
+        message: name,
+        hint: spacing(name) + project.dir
+      })),
       result (name: string) {
         return Object.entries(this.map([ name ]))[0][1];
       }
