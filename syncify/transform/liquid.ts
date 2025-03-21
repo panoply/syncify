@@ -263,7 +263,7 @@ export async function LiquidTransform (file: File) {
 
   } else {
 
-    log.syncing(`${file.key}`, { hot: $.mode.hot });
+    log.syncing(file.key, { hot: $.mode.hot });
 
     await themeFilesUpsertMap(file);
 
