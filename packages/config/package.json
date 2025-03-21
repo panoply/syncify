@@ -1,8 +1,12 @@
 {
   "name": "@syncify/config",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Project-level defineConfig utiltity for usage with global installations of Syncify",
-  "files": ["dist", "package.json", "LICENSE"],
+  "files": [
+    "dist",
+    "package.json",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
@@ -22,11 +26,16 @@
   },
   "license": "Apache-2.0",
   "tsup": {
-    "entry": ["./src/index.ts"],
+    "entry": [
+      "./src/index.ts"
+    ],
     "dts": {
       "resolve": true
     },
-    "format": ["cjs", "esm"],
+    "format": [
+      "cjs",
+      "esm"
+    ],
     "treeshake": true,
     "target": "node20",
     "splitting": true,
