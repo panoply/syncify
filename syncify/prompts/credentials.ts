@@ -5,9 +5,9 @@ import { readFileSync } from 'fs-extra';
 import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 
-import { accessScopeList, storeExists } from '~http/access';
+import { accessScopeList, accessStore } from '~http/access';
 import { cancel, intercept, labels, prompt, theme } from '~prompt';
-import { eqWS, has, isBoolean, isEmpty, keys, prettyDate } from '~utils';
+import { eqWS, has, isEmpty, isNil, keys, prettyDate } from '~utils';
 
 import { $ } from '$';
 
@@ -94,12 +94,10 @@ export async function credentials (options: {
 
     tui.Newline().Wrap(
       _.gray
-
       , 'Hello Hacker 👋' + NLR
       , `Projects require Shopify API Authorization tokens. Store them in a ${_.cyan('.env')} file`
       , 'on a per project basis, or for a more secure, file-free option, use the Syncify keychain.'
       , 'The keychain bcrypts tokens on your system and auto-loads them on-demand during development.'
-
     ).Newline().toLog({ clear: true });
 
   }
@@ -299,9 +297,7 @@ export async function credentials (options: {
 
         return valid === 1
           ? _.neonGreen(`${value}.myshopify.com`)
-          : valid === 3
-            ? _.red(`${value}`) + _.gray('.myshopify.com')
-            : value + _.gray('.myshopify.com');
+          : (valid === 3 ? _.red(`${value}`) : value) + _.gray('.myshopify.com');
 
       },
       async validate (value: string) {
@@ -313,9 +309,9 @@ export async function credentials (options: {
           valid = 3;
 
           return _.Multiline(
-            _.red.bold('MISSING STORE NAME')
-            , NWL
-            , `Please enter the ${_.cyan('myshopify.com')} store domain name.`
+            _.red.bold('MISSING STORE NAME'),
+            NWL,
+            `Please enter the ${_.cyan('myshopify.com')} store domain name.`
           );
 
         } else if (value.length < 3) {
@@ -323,10 +319,10 @@ export async function credentials (options: {
           valid = 3;
 
           return _.Multiline(
-            _.red.bold('INVALID STORE NAME')
-            , NWL
-            , `Store name must be more than ${_.cyan('3')} characters long.`
-            , 'Shopify does support short-name store domains.'
+            _.red.bold('INVALID STORE NAME'),
+            NWL,
+            `Store name must be more than ${_.cyan('3')} characters long.`,
+            'Shopify does support short-name store domains.'
           );
 
         } else if (has(value, $.stores)) {
@@ -334,30 +330,30 @@ export async function credentials (options: {
           valid = 3;
 
           return _.Multiline(
-            _.red.bold('INVALID STORE NAME')
-            , NWL
-            , 'There is an existing project connected to this domain.'
-            , 'You cannot overwrite existing credentials in the keychain.'
+            _.red.bold('INVALID STORE NAME'),
+            NWL,
+            'There is an existing project connected to this domain.',
+            'You cannot overwrite existing credentials in the keychain.'
           );
 
         }
 
-        const { exists, error } = await storeExists(value);
+        const { exists, error } = await accessStore(value);
 
         if (exists === false) {
 
-          const context = error.status === 404
+          const context = error.response.status === 404
             ? `Store "${_.cyan(`${value}.myshopify.com`)}" does not exist on the Shopify platform.`
             : `Connection failed to interface with ${_.red.bold(`${value}.myshopify.com`)} store.`;
 
           valid = 3;
 
           return _.Multiline(
-            _.red.bold(`ERROR ${_.CHV} STORE NOT FOUND`)
-            , NWL
-            , error.message.replace(/(\d+)/, _.red.bold('$1')) + '.'
-            , context
-            , 'Please check the correct store name has been provided.'
+            _.red.bold(`ERROR ${_.CHV} STORE NOT FOUND`),
+            NWL,
+            error.message.replace(/(\d+)/, _.red.bold('$1')) + '.',
+            context,
+            'Please check the correct store name has been provided.'
           );
 
         }
@@ -393,31 +389,40 @@ export async function credentials (options: {
         if (value.length === 0) {
 
           return _.Multiline(
-            _.red.bold('REQUIRED')
-            , NWL
-            , 'You must provide an API Token'
+            _.red.bold('REQUIRED'),
+            NWL,
+            'You must provide an API Token'
           );
 
         } else if (value.length < 10) {
 
           return _.Multiline(
-            _.red.bold('INVALID TOKEN')
-            , NWL
-            , 'The API Access token you provided is far too short to be valid.'
-            , 'Tokens have a minimum length, please check the token and try again.'
+            _.red.bold('INVALID TOKEN'),
+            NWL,
+            'The API Access token you provided is far too short to be valid.',
+            'Tokens have a minimum length, please check the token and try again.'
+          );
+
+        } else if (/^[a-zA-Z0-9_]+$/.test(value)) {
+
+          return _.Multiline(
+            _.red.bold('BAD TOKEN'),
+            NWL,
+            'The API Access token you provided contains invalid characters.',
+            `Shopify tokens must match the following pattern${_.COL} ${_.cyan('^[a-zA-Z0-9_]+$')}`
           );
 
         }
 
-        const scopes = await accessScopeList(state.domain, value);
+        const { scopes, error } = await accessScopeList(state.domain, value);
 
-        if (isBoolean(scopes)) {
+        if (!isNil(error)) {
 
           return _.Multiline(
-            _.red.bold(`ERROR ${accessScopeList.error.status}`)
-            , NWL
-            , accessScopeList.error.message
-            , 'Please check the API Access Token is active and try again.'
+            _.red.bold(`ERROR ${error.status}`),
+            NWL,
+            error.data.errors || error.statusText,
+            'Please check the API Access Token is active and try again.'
           );
 
         } else {
