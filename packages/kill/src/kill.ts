@@ -121,11 +121,8 @@ kill.exit = function (code: number = 0) {
   }
 
   const done = () => {
-
     if (kill.hooks.size > 0) kill.hooks.clear();
-
     process.exit(code);
-
   };
 
   const wait: Promise<any>[] = [];
