@@ -1,11 +1,9 @@
-/* eslint-disable no-unused-vars */
-
 import type { Ansis } from 'ansis';
 import type { Merge } from 'type-fest';
 
 import update from 'log-update';
 
-import { bold, neonGreen, neonTeal, pink } from './colors';
+import { bold, neonGreen, pink } from './colors';
 import { Header, Prefix } from './write';
 
 type SpinnerStyles = 'brielle' | 'arrows' | 'spinning'
@@ -285,6 +283,15 @@ export function Spinner () {
 }
 
 Spinner.loaders = {
+  dots: {
+    interval: 100,
+    frames: [
+      '.',
+      '..',
+      '...',
+      '....'
+    ]
+  },
   arrows: {
     interval: 120,
     frames: [
