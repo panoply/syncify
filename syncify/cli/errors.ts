@@ -1,3 +1,4 @@
+import type { AcquireError } from '@syncify/acquire';
 import type { JSONError } from '@syncify/json';
 import type { Message } from 'esbuild';
 import type { CssSyntaxError } from 'postcss';
@@ -5,11 +6,11 @@ import type { Exception } from 'sass-embedded';
 import type { Merge } from 'type-fest';
 import type { ScriptBundle } from 'types';
 import type { File } from '~file';
-import type { Upsert } from '~http/theme';
+import type { Upsert } from '~http/themeFiles';
 import type { RequestError } from '~http/utils';
 
 import { readFileSync } from 'node:fs';
-import { basename, relative } from 'node:path';
+import { relative } from 'node:path';
 
 import { $import } from 'modules';
 
@@ -17,9 +18,9 @@ import * as _ from '@syncify/ansi';
 import { codeframe } from '@syncify/codeframe';
 import { kill } from '@syncify/kill';
 
-import { stderr } from '~cli/console';
 import { log } from '~cli/log';
 import { stdin } from '~cli/stdin';
+import { stderr } from '~console';
 import { Type } from '~file';
 import { forEach, has, isString, plur } from '~utils';
 
@@ -31,13 +32,17 @@ import { $ } from '$';
  * Calling `error` will omit `Tree.Line` prefixing and behave in a mostly
  * native manner, with the exception that `string` input is expected.
  */
-export function error (...message: string[]) { forEach(line => stderr.prefix(NIL).write(line), message); };
+export function error (...message: string[]) {
 
-error.upsert = (failed: Upsert.Errors[]) => {
+  forEach(line => stderr.write(line), message);
+
+};
+
+error.upsert = (failed: Upsert.Reject[]) => {
 
   const isWatch = $.mode.bulk || $.mode.push;
   const record: { [filename: string]: number } = {};
-  const errors: Merge<Omit<Upsert.Errors, 'message' | 'filename'>, { messages: string[] }>[] = [];
+  const errors: Merge<Omit<Upsert.Reject, 'message' | 'filename'>, { messages: string[] }>[] = [];
   const write = _.Create({ type: 'error' });
 
   for (const { code, file, message, summary, graph } of failed) {
@@ -74,7 +79,7 @@ error.upsert = (failed: Upsert.Errors[]) => {
 
         write
         .Wrap(cf.details, _.redBright)
-        .Newline()
+        .NL
         .Insert(cf.frame, _.gray)
         .Context({
           entries: {
@@ -99,7 +104,7 @@ error.upsert = (failed: Upsert.Errors[]) => {
 
         if (issue.length === 1) {
           write
-          .Newline()
+          .NL
           .Unshift(`Type ${_.bold('i')} and press ${_.bold('enter')} to view all file erros`, _.gray);
         }
 
@@ -140,7 +145,7 @@ error.upsert = (failed: Upsert.Errors[]) => {
 
             write
             .Context(context)
-            .Newline()
+            .NL
             .toString(issue.push);
 
           }
@@ -163,7 +168,7 @@ error.upsert = (failed: Upsert.Errors[]) => {
       issue.push(
         write
         .Context(context)
-        .Newline()
+        .NL
         .toString()
       );
 
@@ -236,7 +241,7 @@ error.graph = (e: RequestError) => {
   });
 
   write
-  .Newline()
+  .NL
   .End($.log.group)
   .Break()
   .toLog();
@@ -269,14 +274,12 @@ error.request = (e: RequestError) => {
       stack: e.stack,
       cleanStack: true,
       entries: {
-        code: e.code,
-        status: e.status,
         name: e.name,
         graph: e.graph,
         detail: 'POSSIBLY INTERNAL'
       }
     })
-    .Newline()
+    .NL
     .End($.log.group)
     .Break()
     .toLog();
@@ -294,12 +297,12 @@ error.request = (e: RequestError) => {
     .Wrap(e.message)
     .Context({
       entries: {
-        code: e.code,
-        status: e.status,
+        cause: e.cause,
+        status: e.response.status,
         graph: e.name
       }
     })
-    .Newline()
+    .NL
     .toLog({ clear: true });
 
   }
@@ -327,14 +330,13 @@ error.toml = (file: string, e: any) => {
     .replace(/(\^)/, '$1' + WSP + _.Tree.line);
 
     _.Create({ type: 'error' })
-    .Line(`TOML Error on Line ${e.line}`, _.bold)
-    .Newline()
+    .Append(`TOML Error on Line ${e.line}`, _.bold)
     .Wrap(e.message.replace(e.codeblock, '').trim())
-    .Newline()
+    .NL
     .Wrap(code)
-    .Newline()
+    .NL
     .Context(context)
-    .Newline()
+    .NL
     .toLog({ clear: true });
 
   }
@@ -372,10 +374,10 @@ error.throw = (e: any, entries: { [name: string]: string | number }) => {
 error.write = (message: string, context: {[name: string]: string,}) => (e: NodeJS.ErrnoException) => {
 
   _.Create({ type: 'error' })
-  .Newline()
+  .NL
   .Wrap(e.message)
   .Context({ stack: e.stack, entries: { ...context, code: e.code, name: e.name, details: message } })
-  .Newline()
+  .NL
   .toLog({ clear: true });
 
 };
@@ -388,7 +390,7 @@ error.read = (details: string, entries: { [name: string]: string }) => {
     .Create({ type: 'error' })
     .Header('FILE ERROR')
     .Wrap(e.message)
-    .Newline()
+    .NL
     .Context({
       stack: e.stack,
       entries: {
@@ -403,26 +405,51 @@ error.read = (details: string, entries: { [name: string]: string }) => {
   };
 };
 
-error.json = (e: JSONError, file: string | Partial<File>, details: string = 'JSON Parse Error' + _.COL) => {
+error.json = (
+  err: JSONError,
+  file: string | Partial<File>,
+  ...contexts: [ string?, number? ] | [ number?, string? ]
+) => {
 
-  const frame = codeframe(e.source, {
+  let details: string = 'JSON Parse Error';
+  let lineOffset: number = 0;
+  let message: string;
+
+  if (contexts.length > 0) {
+    if (typeof contexts[0] === 'string') details = contexts[0];
+    if (typeof contexts[0] === 'number') lineOffset = contexts[0];
+    if (contexts.length > 1) {
+      if (typeof contexts[1] === 'string') details = contexts[1];
+      if (typeof contexts[1] === 'number') lineOffset = contexts[1];
+    }
+  }
+
+  const frame = codeframe(err.source, {
     language: 'json',
     start: {
-      line: e.line,
-      column: e.column
+      line: err.line + lineOffset,
+      column: err.column
     }
   });
 
+  if (lineOffset > 0) {
+    message = err.message
+    .replace(/(line number:?|line:?) (\d+)/i, `$1 ${err.line + lineOffset}`)
+    .replace(/Line \d+:\s+/, NIL);
+  } else {
+    message = err.message.replace(/Line \d+:\s+/, NIL);
+  }
+
   _.Create({ type: 'error' })
   .Prepend(details, _.bold)
-  .Wrap(_.capture.numbers(e.message.replace(/Line \d+:\s+/, NIL), _.bold), _.redBright)
-  .Newline()
+  .Wrap(_.capture.numbers(message, _.bold), _.redBright)
+  .NL
   .Insert(frame)
   .Context({
     entries: {
-      line: e.line,
-      column: e.column,
-      input: isString(file) ? relative($.cwd, basename(file)) : file.relative,
+      line: err.line + lineOffset,
+      column: err.column,
+      input: isString(file) ? relative($.cwd, file) : file.relative,
       processor: _.neonMagenta('JSON')
     }
   })
@@ -434,7 +461,7 @@ error.sass = (file: File, e: Exception) => {
 
   const entries: Record<string, any> = {};
   const write = _.Create({ type: 'error' })
-  .Newline()
+  .NL
   .Wrap(e.sassMessage, _.red.bold)
   .Newline();
 
@@ -465,7 +492,7 @@ error.sass = (file: File, e: Exception) => {
   entries.processor = _.neonMagenta('SASS Dart');
 
   write
-  .Newline()
+  .NL
   .Context({ entries })
   .toLog();
 
@@ -476,14 +503,14 @@ error.terser = (file: File, e: Error) => {
   _.Create({ type: 'error' })
   .Header('Terse minification error')
   .Wrap(e.message, _.red.bold)
-  .Newline()
+  .NL
   .Context({
     entries: {
       input: file.input,
       cause: e.cause as string,
       processor: _.neonMagenta('html-minifier-terser')
     }
-  }).NL.toWrite(error);
+  }).NL.toLog();
 
 };
 
@@ -539,7 +566,7 @@ error.esbuild = <T extends ScriptBundle>(file: File | File<T[]>, errors: Message
 
       write
       .Wrap(text, _.redBright)
-      .Newline()
+      .NL
       .Context(context)
       .Newline();
 
@@ -556,7 +583,7 @@ error.esbuild = <T extends ScriptBundle>(file: File | File<T[]>, errors: Message
 
       write
       .Wrap(`${text} on line ${location.line}`, _.redBright)
-      .Newline()
+      .NL
       .Insert(frame)
       .Context({
         entries: {
@@ -574,9 +601,9 @@ error.esbuild = <T extends ScriptBundle>(file: File | File<T[]>, errors: Message
       write
       .Mark('legend')
       .Tree('info')
-      .Newline()
+      .NL
       .Dash(stdin.ansi.legend.e, _.gray)
-      .Newline()
+      .NL
       .End(stdin.ansi.footer, false);
     }
 
@@ -616,24 +643,27 @@ error.postcss = (file: File, e: CssSyntaxError) => {
   };
 
   _.Create({ type: 'error' })
-  .Newline()
+  .NL
   .Wrap(`${e.name}${_.COL} ${e.reason}`, _.red.bold)
-  .Newline()
-  .Multiline(e.showSourceCode(true))
-  .Context(context)
+  .NL
+  .Wrap(e.details)
   .toLog();
 
 };
 
-error.generic = (e: any) => {
+error.acquire = (e: AcquireError) => {
 
   _.Create({ type: 'error' })
+  .Append(e.type.toUpperCase(), _.bold.red)
+  .True(e.summary, tui => tui.Header(e.summary, _.bold.red))
   .Wrap(e.message, _.redBright)
-  .True(e.stack, tui => tui.Context(e.context))
+  .Context({ entries: { ...e.context } })
+  .Tree('info')
+  .NL
   .End('Error')
   .Break()
-  .toLog();
+  .toLog({ clear: true });
 
-  kill.exit(0);
+  kill.exit(1);
 
 };
