@@ -316,7 +316,7 @@ export async function postcssProcess (file: File<StyleBundle>, css: string, map:
         }
       });
 
-      error.postcss(file, e);
+      console.log(e);
 
     }
 
