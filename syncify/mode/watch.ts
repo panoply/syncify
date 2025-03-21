@@ -25,7 +25,9 @@ import { $, q } from '$';
 export function Watch () {
 
   stdin.watch.listen();
+
   event.on('watch', log.upsert);
+
   $.running = true;
 
   subscribe($.dirs.input, (e, changes) => {
@@ -141,9 +143,7 @@ export async function Transform (file: File) {
     case Type.Template:
     case Type.Metaobject:
 
-      return file.kind === Kind.JSON
-        ? JsonTransform(file)
-        : LiquidTransform(file);
+      return file.kind === Kind.JSON ? JsonTransform(file) : LiquidTransform(file);
 
     case Type.Config:
     case Type.Locale:
