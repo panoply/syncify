@@ -1,5 +1,5 @@
-import type { AxiosResponse } from 'axios';
 import type { Requests, Resource, Theme } from 'types';
+import type { XiorResponse } from 'xior';
 import type { File } from '~file';
 
 import { join, relative } from 'node:path';
@@ -39,7 +39,7 @@ interface EventParams {
   /**
    * The Axios Response Error (only if error)
    */
-  get error (): AxiosResponse
+  get error (): XiorResponse
 }
 
 interface SyncRecord {
