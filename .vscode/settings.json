@@ -98,8 +98,8 @@
       ]
     },
     {
-      "name": "TS Method Preserved Colours",
-      "description": "Ensures the methods that apply newlines remain highlighted",
+      "name": "TS Generic Type for gql",
+      "description": "Applies to the gql<Type> Literal",
       "languageRegex": "\\b(typescript)\\b",
       "regexes": [
         {
