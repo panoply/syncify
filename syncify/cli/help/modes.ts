@@ -1,4 +1,7 @@
 import * as _ from '@syncify/ansi';
+import { kill } from '@syncify/kill';
+
+import { description } from './descriptions';
 
 import { COMMAND_MODES, STRAP_EXAMPLES, STRAP_THEMES } from '~const';
 import { describe, highlight } from '~help/utils';
@@ -42,7 +45,7 @@ export function Modes (mode: string) {
   tui
   .Newline()
   .End(`Syncify ${_.CHV} Error`, false)
-  .Break()
+  .BR
   .toLog(highlight);
 
 };
@@ -52,8 +55,13 @@ export function Modes (mode: string) {
  */
 Modes.push = () => {
 
+  const info = description('push');
+
   _.Create()
+  .BR
   .Top(`help ${_.TLD} sy push`, false)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
   .Header(`COMMANDS${_.COL}`, _.bold)
   .Line(' $ sy push')
   .Line(' $ sy push --flags')
@@ -64,8 +72,10 @@ Modes.push = () => {
   .Line(` --batch <number>      ${describe('Upsert batch limits (default 10)')}`)
   .Newline()
   .End(`help ${_.TLD} sy push`, false)
-  .Break()
+  .BR
   .toLog(highlight);
+
+  kill.exit(0);
 
 };
 
@@ -74,22 +84,28 @@ Modes.push = () => {
  */
 Modes.pull = () => {
 
+  const info = description('pull');
+
   _.Create()
+  .BR
   .Top(`help ${_.TLD} sy pull`, false)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
   .Header(`COMMANDS${_.COL}`, _.bold)
   .Line(' $ sy pull')
   .Line(' $ sy pull --flags')
   .Header(`FLAGS${_.COL}`, _.bold)
-  .Line(` --filter, -F          ${describe('filter specific files/directories')}`)
+  .Line(` --filter, -F          ${describe('Filter specific files/directories')}`)
   .Line(` --target, -T          ${describe('Target a theme or store')}`)
   .Line(` --merge               ${describe(`Merges local ${_.ARL} remote theme`)}`)
   .Line(` --align               ${describe(`Align local ${_.ARL} remote theme JSON files`)}`)
   .Line(` --force               ${describe('Skips diffing and force overwrites')}`)
   .Line(` --output, -o          ${describe('Controls where theme file/s are written')}`)
   .Line(` --batch <number>      ${describe('Upsert batch limits (default 10)')}`)
-  .Newline()
+  .Line(` --help                ${describe('Show this screen')}`)
+  .NL
   .End(`help ${_.TLD} sy push`, false)
-  .Break()
+  .BR
   .toLog(highlight);
 
 };
@@ -99,22 +115,29 @@ Modes.pull = () => {
  */
 Modes.watch = () => {
 
+  const info = description('watch');
+
   _.Create()
+  .BR
   .Top(`help ${_.TLD} sy watch`, false)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
   .Header(`COMMANDS${_.COL}`, _.bold)
   .Line(' $ sy watch')
   .Line(' $ sy watch --flags')
   .Header(`FLAGS${_.COL}`, _.bold)
-  .Line(` --target, -T         ${describe('Target a theme or store')}`)
-  .Line(` --filter, -F          ${describe('filter specific files/directories')}`)
-  .Line(` --hot                ${describe('Activates HOT Reloading')}`)
-  .Line(` --align              ${describe('Align local theme JSON files before watching')}`)
-  .Line(` --bind               ${describe('Activates 2 way bindings')}`)
-  .Line(` --terse              ${describe('Terse minification')}`)
-  .Line(` --dev                ${describe('Development build mode (default)')}`)
-  .Line(` --prod               ${describe('Production build mode')}`)
-  .Newline()
+  .Line(` --target, -T    ${describe('Target a theme or store')}`)
+  .Line(` --filter, -F    ${describe('Filter specific files/directories')}`)
+  .Line(` --hot           ${describe('Activates HOT Reloading')}`)
+  .Line(` --align         ${describe('Align local theme JSON files before watching')}`)
+  .Line(` --bind          ${describe('Activates 2 way bindings')}`)
+  .Line(` --terse         ${describe('Terse minification')}`)
+  .Line(` --dev           ${describe('Development build mode (default)')}`)
+  .Line(` --prod          ${describe('Production build mode')}`)
+  .Line(` --help          ${describe('Show this screen')}`)
+  .NL
   .End(`help ${_.TLD} sy watch`, false)
+  .BR
   .toLog(highlight);
 
 };
@@ -124,15 +147,18 @@ Modes.watch = () => {
  */
 Modes.inspect = () => {
 
+  const info = description('watch');
+
   _.Create()
+  .BR
   .Top(`help ${_.TLD} sy inspect`, false)
-  .Header(`DESCRIPTION${_.COL}`, _.bold)
-  .Wrap('Prints information about project/s and your syncify installation.', _.gray)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
   .Header(`COMMANDS${_.COL}`, _.bold)
   .Line(' $ sy inspect')
-  .Newline()
+  .NL
   .End(`help ${_.TLD} sy inspect`, false)
-  .Break()
+  .BR
   .toLog(highlight);
 
 };
@@ -142,16 +168,13 @@ Modes.inspect = () => {
  */
 Modes.create = () => {
 
-  const description = [
-    'The create command is an interactive command prompt. You can (optionally)',
-    'provide a strap name option to skip choice selection. Options with strikethrough',
-    'are either deprecated or not yet available for use.'
-  ];
+  const info = description('build');
 
   const message = _.Create()
+  .BR
   .Top(`help ${_.TLD} sy create`, false)
-  .Header(`DESCRIPTION${_.COL}`, _.bold)
-  .Wrap(description, _.gray)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
   .Header(`COMMANDS${_.COL}`, _.bold)
   .Line(' $ sy create')
   .Line(` $ sy create ${_.Encase('AN', 'strap')}`)
@@ -168,9 +191,31 @@ Modes.create = () => {
   }, straps);
 
   message
-  .Newline()
+  .NL
   .End(`help ${_.TLD} sy push`, false)
-  .Break()
+  .BR
+  .toLog(highlight);
+
+};
+
+/**
+ * `sy help projects`
+ */
+Modes.projects = () => {
+
+  const info = description('projects');
+
+  _.Create()
+  .BR
+  .Top(`help ${_.TLD} sy projects`, false)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
+  .Header(`COMMANDS${_.COL}`, _.bold)
+  .Line(' $ sy projects')
+  .Line(` $ sy projects ${_.Encase('AN', _.magenta('name'))}`)
+  .NL
+  .End(`help ${_.TLD} sy push`, false)
+  .BR
   .toLog(highlight);
 
 };
@@ -180,8 +225,13 @@ Modes.create = () => {
  */
 Modes.build = () => {
 
+  const info = description('build');
+
   _.Create()
+  .BR
   .Top(`help ${_.TLD} sy build`, false)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
   .Header(`COMMANDS${_.COL}`, _.bold)
   .Line(' $ sy build')
   .Line(' $ sy build --flags')
@@ -197,8 +247,10 @@ Modes.build = () => {
   .Line(` --terse                 ${describe('Terse minification')}`)
   .Line(` --dev                   ${describe('Development build mode (default)')}`)
   .Line(` --prod                  ${describe('Production build mode')}`)
-  .Newline()
+  .Line(` --help                  ${describe('Show this screen')}`)
+  .NL
   .End(`help ${_.TLD} sy build`, false)
+  .BR
   .toLog(highlight);
 
 };
