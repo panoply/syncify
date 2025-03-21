@@ -133,7 +133,7 @@ export function section (file: File) {
     file.key = join(file.namespace, rename.base);
     file.output = join(dirname(file.output), rename.base);
 
-    log.rename(oldName, file.base);
+    if ($.mode.watch) log.rename(oldName, file.base);
 
   }
 
@@ -164,7 +164,7 @@ export function snippet (file: File) {
     file.key = join(file.namespace, rename.base);
     file.output = join(dirname(file.output), rename.base);
 
-    log.rename(oldName, file.base);
+    if ($.mode.watch) log.rename(oldName, file.base);
 
   }
 
