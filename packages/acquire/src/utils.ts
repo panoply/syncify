@@ -91,12 +91,10 @@ export function CJSorESM (file: string, type?: string): 'esm' | 'cjs' {
  */
 export async function $import <T = any> (input: string, { format }: { format: 'esm' | 'cjs' }): Promise<T> {
 
-  const path = input.startsWith('file:') ? input : pathToFileURL(input).href;
-
   if (format === 'esm') {
 
     // For ES modules, use dynamic import which returns a promise
-    return import(path);
+    return import(pathToFileURL(input).href);
 
   } else if (format === 'cjs') {
 

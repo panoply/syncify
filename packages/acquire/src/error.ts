@@ -1,13 +1,13 @@
 export class AcquireError extends Error {
 
   /**
-   * The original error
-   */
-  original: any;
-  /**
-   * The type of error
+   * The error type
    */
   type: string;
+  /**
+   * The error summary, will be used as heading
+   */
+  summary: string;
   /**
    * The error message
    */
@@ -15,29 +15,31 @@ export class AcquireError extends Error {
   /**
    * Entries, with additional information
    */
-  entries: Record<string, any>;
+  context: Record<string, any>;
   /**
    * The stack trace
    */
   stack: string;
 
-  constructor (message: string, context: {
-    type: string;
-    entries: { [name: string]: any; }
-    error: any
-  }) {
+  constructor (error: any, entries: { [name: string]: any; } = {}) {
 
-    super(message);
+    super(error);
 
-    this.name = this.constructor.name;
-    this.original = context.error;
-    this.type = context.type;
-    this.entries = context.entries;
+    const message = error.message.split('\n');
+
+    if (error?.code) {
+      this.summary = 'SYNCIFY CONFIG ERROR';
+      this.message = message[0];
+      this.context = { code: error.code.replace(/_/g, ' '), ...entries };
+    } else {
+      this.message = message[0];
+      this.context = entries;
+    }
+
+    this.type = error.name.replace(/(?<=[a-z])([A-Z])/g, ' $1') || 'Unknown Error';
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, AcquireError);
-    } else {
-      this.stack = (new Error(message)).stack;
     }
 
   }

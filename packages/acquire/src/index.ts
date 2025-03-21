@@ -1,7 +1,7 @@
 import type { AcquireOptions } from './types';
-import type { BuildContext } from 'esbuild';
+import type { BuildContext, Message } from 'esbuild';
 
-import fs from 'fs';
+import fs, { existsSync } from 'fs';
 import { basename } from 'path';
 
 import { build, BuildOptions, BuildResult, context } from 'esbuild';
@@ -14,6 +14,7 @@ import { $import, CJSorESM, outfile } from './utils';
 
 export { $import, $require } from './utils';
 export { $tsconfig };
+export { AcquireError };
 
 export function acquire<T = any> (options: AcquireOptions): Promise<T> {
 
@@ -24,12 +25,8 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
 
     if (!REGEX_EXTJS.test(options.file)) {
       throw new AcquireError('Invalid javascript file', {
-        type: 'file',
-        error: null,
-        entries: {
-          file: options.file,
-          details: 'The file extension must be: mjs, cjs, ts or js'
-        }
+        file: options.file,
+        details: 'The file extension must be: mjs, cjs, ts or js'
       });
     }
 
@@ -80,7 +77,7 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
     /* COMPILE                                      */
     /* -------------------------------------------- */
 
-    return compile().catch(reject);
+    compile().catch(reject);
 
     /* -------------------------------------------- */
     /* FUNCTIONS                                    */
@@ -100,13 +97,16 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
           setup (context) {
             let count = 0;
             context.onEnd(async result => {
+
               if (count++ === 0) {
-                result.errors.length > 0
-                  ? errors(result)
-                  : resolve(await bundle(result));
+                if (result.errors.length > 0) {
+                  errors(result.errors);
+                } else {
+                  resolve(await bundle(result));
+                }
               } else {
                 result.errors.length > 0
-                  ? errors(result)
+                  ? errors(result.errors)
                   : options.onRebuild(await bundle(result));
               }
             });
@@ -136,7 +136,7 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
      */
     async function unlink (path: string) {
 
-      if (!options.preserve) {
+      if (!options.preserve && existsSync(path)) {
 
         await fs.promises.unlink(path); // Remove the outfile after executed
 
@@ -149,9 +149,9 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
      *
      * Triggers `options.error` callback (if defined) and return `null` on resolution
      */
-    function errors (result: BuildResult) {
+    function errors (result: Message[]) {
 
-      return onError ? options.onError(result.errors) : null;
+      return onError ? options.onError(result) : null;
 
     }
 
@@ -172,13 +172,8 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
         await unlink(output);
 
         throw new AcquireError('No output files', {
-          type: 'build',
-          error: null,
-          entries: {
-            file: options.file,
-            output,
-            details: 'ESBuild executed the build but failed to return output'
-          }
+          file: options.file,
+          details: 'ESBuild executed the build but failed to return output'
         });
 
       }
@@ -193,6 +188,15 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
 
         $module = await $import(output, { format });
 
+      } catch (e) {
+
+        await unlink(output);
+
+        throw new AcquireError(e, {
+          file: options.file,
+          details: 'Import failed following acquire build'
+        });
+
       } finally {
 
         await unlink(output);
@@ -200,12 +204,16 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
       }
 
       if (onWarning && result.warnings.length > 0) {
+
         options.onWarning(result.warnings);
+
       }
 
-      return name
+      const returns = name
         ? name in $module ? $module[name] : $module.default || $module
         : $module.default || $module;
+
+      return returns;
 
     };
 
