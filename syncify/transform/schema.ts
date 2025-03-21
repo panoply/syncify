@@ -131,8 +131,6 @@ export async function ExtractSchema (file: File): Promise<[
   const content = await readFile(file.input, 'utf-8');
   const indices = GetSchemaIndices(content);
 
-  console.log(indices);
-
   if (indices === null) return [ content, null, null ];
 
   const { start, begin, ender } = indices;
