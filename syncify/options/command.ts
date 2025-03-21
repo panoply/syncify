@@ -10,10 +10,9 @@ import { glue } from '@syncify/glue';
 import { log } from '~cli/log';
 import { runtime } from '~cli/runtime';
 import { throwCommand } from '~cli/throws';
-import { DIST_PATH } from '~const';
 import { LogModes } from '~enums';
 import { event } from '~events';
-import { Help } from '~modes/help';
+import { Help } from '~mode/help';
 import { assign, forKeys, includes, isNull, NooP, o } from '~utils';
 
 import { $ } from '$';
@@ -62,8 +61,10 @@ function parse (cmd: ParseCommand[]): [ ParseCommand, ReturnType<typeof parseArg
   // print help is missing command
   //
   if (argv.length === 2) {
+
     $.mode.suggest = true;
     return fallback;
+
   } else {
 
     const find = argv[2];
@@ -79,7 +80,6 @@ function parse (cmd: ParseCommand[]): [ ParseCommand, ReturnType<typeof parseArg
         return fallback;
       case '-h':
       case '--help':
-
         $.mode.help = true;
         fallback[0].mode = 'help';
         return fallback;
@@ -128,14 +128,12 @@ function parse (cmd: ParseCommand[]): [ ParseCommand, ReturnType<typeof parseArg
 
     try {
 
-      const args = parseArgs(
-        {
-          args: argv,
-          allowPositionals: true,
-          tokens: true,
-          options
-        }
-      );
+      const args = parseArgs({
+        args: argv,
+        allowPositionals: true,
+        tokens: true,
+        options
+      });
 
       return [ mode, args ];
 
@@ -240,13 +238,9 @@ function positional (cmd: ParseCommand, tokens: string[]) {
   function parseKeychain () {
 
     if (cmd.accepts.includes(tokens[0])) {
-
       $.mode._ = tokens[0];
-
       return true;
-
     } else {
-
       throwCommand([
         `Invalid ${bold('keychain')} argument "${bold(tokens[0])}" ${TLD}`,
         `Must be one of the following${COL}` + NLR,
@@ -254,7 +248,6 @@ function positional (cmd: ParseCommand, tokens: string[]) {
       ]);
 
       return false;
-
     }
 
   }
@@ -284,7 +277,7 @@ export function command (commands: ParseCommand[]): any {
   }
 
   const [ node, bin ] = argv;
-  const position = positional(cmd, flags.positionals.slice(3));
+  const position = flags.positionals ? positional(cmd, flags.positionals.slice(3)) : false;
 
   event.mode(cmd.mode);
 
@@ -292,7 +285,7 @@ export function command (commands: ParseCommand[]): any {
   $.node = node;
   $.bin = bin;
   $.argv = argv.slice(2);
-  $.dirs.module = bin.slice(0, bin.lastIndexOf(DIST_PATH) + 12);
+  $.dirs.module = bin.slice(0, bin.indexOf('dist/'));
   $.using = $.dirs.module.startsWith(join($.cwd, 'node_modules')) ? 'local' : 'global';
   $.terminal.wrap = Math.round($.terminal.cols - ($.terminal.cols / 3));
   $.mode[cmd.mode] = true;
@@ -344,6 +337,12 @@ export function command (commands: ParseCommand[]): any {
   // Activate modes from flags
   //
   forKeys(mode => mode in $.mode ? $.mode[mode] = true : null, flags.values);
+
+  if ($.mode.help) {
+    $.mode._ = cmd.mode;
+    Help($.mode);
+    return NooP;
+  }
 
   // Environment Variables
   //
