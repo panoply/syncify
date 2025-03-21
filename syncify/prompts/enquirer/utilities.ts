@@ -1,9 +1,9 @@
 import type { PascalCase } from 'type-fest';
-import type { Choice } from 'types';
+import type { PromptTheme } from 'types';
 
 import { stdout } from 'node:process';
 
-import { bold, COL, gray, neonGreen, neonRouge, NextLine, red, redBright, Tree, whiteBright, yellowBright } from '@syncify/ansi';
+import { bold, COL, gray, neonGreen, neonRouge, red, redBright, Tree, whiteBright, yellowBright } from '@syncify/ansi';
 import { kill } from '@syncify/kill';
 
 import { log } from '~cli/log';
@@ -12,8 +12,8 @@ import { eqWS, o, toPascalCase } from '~utils';
 /**
  * Prompt Theming
  */
-export const theme = {
-  pointer (choice: Choice, index: number): string {
+export const theme: PromptTheme = {
+  pointer (choice, index): string {
     const line = this.state.index === index ? Tree.dash : Tree.line;
     return index === 0 ? Tree.trim + NWL + line : line;
   },
@@ -45,10 +45,8 @@ export const theme = {
 export function cancel () {
 
   kill(() => {
-
-    log(NextLine(neonRouge('PROCESS EXIT WITH CODE 0')));
-    log.ender('Prompt Exit', { clear: false }).nl('');
-
+    log.nl().line('PROCESS EXIT WITH CODE 0', neonRouge);
+    log.ender('Prompt Exit', { clear: false });
   });
 
   kill.exit(0);
@@ -96,7 +94,6 @@ export function labels <T extends ReadonlyArray<string>> ({
  *
  * The incosistencies occur upon validation operations of prompts.
  * String chunks and modified only when stdout contains `Error` keyword.
- *
  *
  * @returns
  * Returns a disposable curry which will revert interception and
