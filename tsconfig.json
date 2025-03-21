@@ -58,6 +58,9 @@
       "$": [
         "./syncify/model/$.ts"
       ],
+      "~console": [
+        "./syncify/model/console.ts"
+      ],
       "modules": [
         "./syncify/model/modules.ts"
       ],
@@ -145,8 +148,8 @@
       "~transform/*": [
         "./syncify/transform/*"
       ],
-      "~modes/*": [
-        "./syncify/modes/*"
+      "~mode/*": [
+        "./syncify/mode/*"
       ],
       "~plugins/*": [
         "./syncify/plugins/*"
