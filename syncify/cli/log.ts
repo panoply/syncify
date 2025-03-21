@@ -1,6 +1,6 @@
-import type { LiteralString, LogMinifiedParams, Store, Theme, ThemeFiles, VC } from 'types';
+import type * as Type from 'types';
 import type { File } from '~file';
-import type { Upsert } from '~http/theme';
+import type { Upsert } from '~http/themeFiles';
 
 import notifier from 'node-notifier';
 
@@ -9,20 +9,16 @@ import { glue } from '@syncify/glue';
 import { timer } from '@syncify/timer';
 
 import { bulk } from '~cli/bulk';
-import { console } from '~cli/console';
 import { stdin } from '~cli/stdin';
+import { console } from '~console';
 import { error } from '~errors';
 import {
   addSuffix,
   forEach,
   getTime,
   hasProp,
-  isArray,
   isEmpty,
-  isFunction,
-  isObject,
   isString,
-  last,
   plur,
   toUpcase
 } from '~utils';
@@ -64,87 +60,21 @@ import { $, q } from '$';
  * native manner, with the exception that `string` input is expected.
  */
 function log (...message: string[]): typeof log {
-  forEach(line => console.stdout.prefix(NIL).write(line), message);
+
+  forEach(line => console.write(line), message);
+
   return log;
+
 };
 
-log.renamed = <[string?]>[];
+log.runtime = _.TUI('runtime');
 log.progress = _.progress;
 log.update = _.update;
 log.spinner = _.Spinner();
 log.line = console.info;
+log.header = console.header;
 log.bulk = bulk;
-
-/**
- * Log Begin
- *
- * @example
- *
- * // { timestamp: true }
- * '\n┌─ Label ~ 01:59:20'
- * '\n│'
- *
- * // { timestamp: false }
- * '\n┌─ Label'
- * '\n│'
- */
-log.begin = function (message: string, {
-  timestamp = true,
-  clear = true,
-  group = false
-} = {}) {
-
-  if (clear) log.clear();
-  if (group) $.log.group = message;
-
-  log(_.Top(message, timestamp) + _.Tree.next);
-
-};
-
-/**
- * Log Ender
- *
- * @example
- *
- * // { timestamp: true }
- * '│\n'
- * '└─ input ~ 01:59:20 \n'
- *
- * // { timestamp: false }
- * '│\n'
- * '└─ input\n
- */
-log.ender = function (message?: string, { timestamp = true, clear = true } = {}): typeof log {
-
-  if (!message) message = $.log.group;
-  if (clear) log.clear();
-
-  log(_.Tree.trim + NWL + _.End(message));
-
-  return this;
-
-};
-
-/**
- * Log Wrap
- *
- * @example
- *
- * '│\n'
- * '│ lorem ipsum\n'
- * '│ lorem ipsum\n'
- * '│\n'
- */
-log.wrap = (...message: [ string, _.Ansis? ] | [ ...Array<string | _.Ansis> ]) => {
-
-  if (isFunction(last(message))) {
-    const color = <_.Ansis>message.pop();
-    console.info(_.Wrap(<string[]>message, { color, firstLineTree: false }));
-  } else {
-    console.info(_.Wrap(<string[]>message, { firstLineTree: false }));
-  }
-
-};
+log.wrap = console.wrap;
 
 /**
  * Log Horizonal Line
@@ -184,127 +114,6 @@ log.hline = (options: { width?: number, newlines?: boolean } = {}) => {
 };
 
 /**
- * Log Write
- *
- * A custom log message for non-dedicated log methods
- *
- * @example
- *
- * '│ lorem ipsum'             // Settings omitted
- * '│ lorem ipsum ~ 10ms'      // Settings with prefix
- */
-log.write = (message: string, {
-  color = null,
-  type = null,
-  prefix = null,
-  suffix = null
-}:{
-    /**
-     * The color of the message
-     *
-     * @default whiteBright
-     */
-    color?: _.Ansis;
-    /**
-     * The type of message - The message `color` will reflect
-     * if unspecific, meaning if `type` is `warning` text is yellow,
-     * if `type` is `error` text is red.
-     *
-     * @default null
-     */
-    type?: 'warning' | 'error'
-    /**
-     * Whether or not to apply an prepend prefix.
-     *
-     * @default null
-     */
-    prefix?: string;
-    /**
-     * Whether or not to apply an append suffix.
-     *
-     * @default null
-     */
-    suffix?: string;
-  } = {}) => {
-
-  if (type === 'error') {
-    if (prefix === null) {
-      error(
-        glue.ws(
-          _.LineRed(color ? color(message) : _.redBright(message)),
-          _.Append(suffix)
-        )
-      );
-    } else {
-      error(
-        _.LineRed(
-          (color || _.redBright)(
-            _.Prefix(
-              prefix
-              , glue.ws(
-                message,
-                _.Append(suffix)
-              )
-            )
-          )
-        )
-      );
-    }
-  } else if (type === 'warning') {
-    if (prefix === null) {
-      console.info(
-        _.LineYellow(
-          glue.ws(
-            color ? color(message) : _.yellowBright(message),
-            _.Append(suffix)
-          )
-        )
-      );
-    } else {
-      console.info(
-        _.LineYellow(
-          (color || _.yellowBright)(
-            _.Prefix(
-              prefix
-              , glue.ws(
-                message,
-                _.Append(suffix)
-              )
-            )
-          )
-        )
-      );
-    }
-  } else {
-    if (prefix === null) {
-      console.info(
-        _.Line(
-          glue.ws(
-            color ? color(message) : _.whiteBright(message),
-            _.Append(suffix)
-          )
-        )
-      );
-    } else {
-      console.info(
-        _.Line(
-          (color || _.whiteBright)(
-            _.Prefix(
-              prefix
-              , glue.ws(
-                message,
-                _.Append(suffix)
-              )
-            )
-          )
-        )
-      );
-    }
-  }
-
-};
-
-/**
  * TUI Newline
  *
  * Inserts a newline _trunk_ character. Optionally pass an empty string (i.e, `''`) to insert
@@ -312,27 +121,17 @@ log.write = (message: string, {
  *
  * `│`
  */
-log.nl = function (this: typeof log, entry?: LiteralString<'red' | 'yellow'>) {
-
-  entry === NIL ? console.nl() : console.ln(entry);
-
+log.nl = function (this: typeof log, entry?: Type.LiteralString<'red' | 'yellow'>) {
+  entry === NIL ? console.break() : console.tree(entry);
   return this;
-
 };
 
 /**
  * TUI Clear
  *
- * Clears the console messages. Optionally pass a `boolean` value of `true`
- * to override the syncify `log.config` option.
+ * Clears the console messages.
  */
-log.clear = (force = false) => {
-
-  if (force === false && $.config.log.clear === false) return;
-
-  log(_.clear);
-
-};
+log.clear = (clear = true) => clear ? log(_.clear) : log;
 
 /**
  * New Group
@@ -348,7 +147,7 @@ log.group = function (this: typeof log, name?: string | boolean) {
   if ($.config.log.silent || $.env.tree === false) return;
 
   if ($.mode.bulk) {
-    name = `Bulk ${_.CHV} ${toUpcase(name as string)}`;
+    name = glue('Bulk', _.CHV, toUpcase(name as string));
     if ($.log.group === name) return this;
     $.log.group = name;
   }
@@ -379,13 +178,15 @@ log.task = (name?: string, timestamp = true) => {
 
   if (isString(name)) {
 
-    log(_.Dash(glue.ws(_.gray(name), timestamp ? _.Append(getTime()) : NIL)));
+    console.dash(
+      glue.ws(_.gray(name), timestamp ? _.Append(getTime()) : NIL)
+    );
 
   } else {
-
-    log.clear();
-    log(_.Tree.after + _.Dash(glue.ws(_.gray($.log.group), _.Append(getTime()))));
-
+    log.clear()(
+      _.Tree.trim,
+      _.Dash(glue.ws(_.gray($.log.group), _.Append(getTime())))
+    );
   }
 
 };
@@ -405,42 +206,14 @@ log.process = (label: string, ...message: [ string, string? ]) => {
 
   if ($.mode.pack || $.mode.build || $.config.log.silent) return;
 
-  const print = _.Prefix(
-    'process',
-    message.length === 2 ? (
-      glue.ws(
-        _.bold(label)
-        , _.CHV
-        , message[0]
-        , _.Append(message[1])
-      )
-    ) : (
-      glue.ws(
-        _.bold(label),
-        _.Append(message[0])
-      )
+  console.info(
+    _.Prefix(
+      'process',
+      message.length === 2
+        ? glue.ws(_.bold(label), _.CHV, message[0], _.Append(message[1]))
+        : glue.ws(_.bold(label), _.Append(message[0]))
     )
   );
-
-  console.info(_.whiteBright(print));
-
-};
-
-/**
- * Log Deleted - `blueBright`
- *
- * @example
- *
-* '│ deleted → dir/filename.ext → theme ~ store.myshopify.com'
-*/
-log.deleted = (file: string, theme: Theme) => {
-
-  const message = $.mode.bulk
-    ? _.Prefix('deleted', file)
-    : _.Prefix('deleted', file, theme.target, theme.store.domain);
-
-  console.info(_.blueBright(message));
-
 };
 
 /**
@@ -451,90 +224,11 @@ log.deleted = (file: string, theme: Theme) => {
  * '│ uploaded → theme → store.myshopify.com ~ 500ms'
  * '│ uploaded → dir/file.liquid → theme → store.myshopify.com ~ 500ms'
  */
-log.upload = (theme: Theme, input?: string | string[] | ThemeFiles.UpsertFiles[]) => {
-
-  if ($.config.log.silent) return;
-
-  if ($.mode.watch) {
-
-    if (input) {
-      if (isArray(input)) {
-        if (input.length > 0) {
-          if (isString(input[0])) {
-            forEach<string>(file => log.upload(theme, file), input as string[]);
-          } else {
-            forEach(({ filename }) => log.upload(theme, filename), input as ThemeFiles.UpsertFiles[]);
-          }
-        }
-      } else {
-
-        console.info(
-          _.neonGreen(
-            _.Prefix(
-              'uploaded'
-              , input
-              , theme.target
-              , theme.store.name
-              , timer.stop()
-            )
-          )
-        );
-
-      }
-
-    } else {
-
-      $.log.queue.add([ theme.target, theme.store.domain, timer.stop() ]);
-
-      if ($.log.idle) return;
-
-      $.log.idle = true;
-
-      q.http.onIdle().then(() => {
-
-        for (const [ target, store, ctime ] of $.log.queue) {
-
-          console.info(
-            _.neonGreen(
-              _.Prefix(
-                'uploaded'
-                , _.bold(target)
-                , store
-                , ctime
-              )
-            )
-          );
-
-        }
-
-        $.log.queue.clear();
-        $.log.idle = false;
-
-      });
-
-    }
-
-  } else {
-
-    console.info(
-      _.neonGreen(
-        _.Prefix(
-          'uploaded'
-          , _.bold(theme.target)
-          , theme.store.domain
-          , timer.stop()
-        )
-      )
-    );
-
-  }
-};
-
 log.upsert = (upsert: Upsert.Resolve) => {
 
-  if ($.mode.bulk) {
+  const { target, store } = upsert.target;
 
-    const { target, store } = upsert.target;
+  if ($.mode.bulk) {
 
     forEach(({ filename }) => {
 
@@ -558,26 +252,13 @@ log.upsert = (upsert: Upsert.Resolve) => {
   } else {
 
     forEach(({ filename }) => {
-
       console.info(
-        _.neonGreen(
-          _.Prefix(
-            'uploaded'
-            , _.bold(upsert.target.target)
-            , upsert.target.store.name
-            , filename
-            , timer.stop()
-          )
-        )
+        _.Prefix('uploaded', _.bold(target), store.name, filename, timer.stop()),
+        _.neonGreen
       );
-
     }, upsert.synced);
 
-    if (upsert.errors.length > 0) {
-
-      error.upsert(upsert.errors);
-
-    }
+    upsert.errors.length > 0 && error.upsert(upsert.errors);
 
   }
 
@@ -626,7 +307,7 @@ log.changed = (file: File) => {
 
     if ($.log.title !== file.namespace) $.log.title = file.namespace;
 
-  } else if ($.config.log.clear) {
+  } else {
 
     log.group(name);
 
@@ -635,15 +316,9 @@ log.changed = (file: File) => {
   // Update the current records
   if ($.log.uri !== file.input) $.log.uri = file.input;
 
-  log(
-    _.Line(
-      _.neonCyan(
-        _.Prefix(
-          'changed',
-          `${file.relative} ${_.Append(`${change} ${plur('change', change)}`)}`
-        )
-      )
-    )
+  console.info(
+    _.Prefix('changed', `${file.relative} ${_.Append(`${change} ${plur('change', change)}`)}`),
+    _.neonCyan
   );
 
 };
@@ -662,19 +337,11 @@ log.changed = (file: File) => {
  */
 log.syncing = (path: string, { hot = false } = {}) => {
 
-  if (
-    $.mode.pack ||
-    $.mode.bulk ||
-    $.mode.build ||
-    $.mode.debug ||
-    $.config.log.silent) return;
+  if ($.mode.pack || $.mode.bulk || $.mode.build || $.mode.debug || $.config.log.silent) return;
 
   if ($.warnings.has(path)) {
-
     const { size } = $.warnings.get(path);
-
     log.warn(`${_.bold(size)} ${plur('warning', size)}`, _.Suffix.warning);
-
   }
 
   console.info(
@@ -705,45 +372,6 @@ log.syncing = (path: string, { hot = false } = {}) => {
 };
 
 /**
- * Log Prompt - `blueBright`
- *
- * This is curried and will close the $.log.group. Calling
- * the return function will opens the $.log.group. In addition
- * an optional `notify` message can be provided which will
- * trigger a notification when defined
- *
- * @example
- *
- * '│ prompt → Command is required'
- * '│'
- * '└─ Name ~ 01:59:20'
- *
- * 'Select an option'
- *
- * '>'
- *
- * '┌─ Name ~ 01:59:20'
- */
-log.prompt = (message: string, notify?: notifier.Notification) => {
-
-  // close previous group
-
-  console.info(
-    _.Line(
-      _.orange(
-        _.Prefix('prompt', message)
-      )
-    ),
-    _.End($.log.group)
-  );
-
-  if (isObject(notify)) notifier.notify(notify).notify();
-
-  return () => console.info(_.Top($.log.group));
-
-};
-
-/**
  * Log Resource - `neonGreen`
  *
  * Identical to `upload` but accepts a `store` parameter and requires
@@ -753,7 +381,7 @@ log.prompt = (message: string, notify?: notifier.Notification) => {
  *
  * '│ uploaded → page → store.myshopify.com ~ 500ms'
  */
-log.resource = (type: string, store: Store) => {
+log.resource = (type: string, store: Type.Store) => {
 
   if ($.mode.watch) {
 
@@ -828,11 +456,7 @@ log.resource = (type: string, store: Store) => {
  */
 log.invalid = (path: string, message?: string | string[]) => {
 
-  error(
-    _.red(
-      _.Prefix('invalid', path)
-    )
-  );
+  console.error(_.Prefix('invalid', path));
 
   notifier.notify(
     {
@@ -845,12 +469,7 @@ log.invalid = (path: string, message?: string | string[]) => {
   ).notify();
 
   if (message) {
-    error(
-      _.Wrap(
-        ...message,
-        { line: 'red', color: _.redBright }
-      )
-    );
+    console.error(_.Wrap(...message, { line: 'red', color: _.redBright }));
   }
 
 };
@@ -885,41 +504,12 @@ log.error = (input: string, { suffix = null, notify = null }: {
 
   const message = _.capture.numbers(input, _.bold);
 
-  error(
-    _.LineRed(
-      _.redBright(
-        _.Prefix(
-          'failed',
-          suffix ? `${message} ${_.Append(suffix)}` : message
-        )
-      )
-    )
-  );
+  console.error(_.Prefix('failed', suffix ? `${message} ${_.Append(suffix)}` : message));
 
   if (notify !== null) {
     notify.contentImage = $.file.notifier;
     notifier.notify(notify).notify();
   }
-
-};
-
-/**
- * Log Warning `yellowBright`
- *
- * @example
- *
- * '│ warning → message ~ suffix
- */
-log.warn = (message: string, suffix?: string) => {
-
-  console.warn(
-    _.yellowBright(
-      _.Prefix(
-        'warnings',
-        suffix ? `${message} ${_.Append(suffix)}` : `${message}`
-      )
-    )
-  );
 
 };
 
@@ -960,21 +550,14 @@ log.warn = (message: string, suffix?: string) => {
  * // log.transform(File, 'one', 'two', 'three)
  * '│ transform » dir/file.ext → one → two ~ three'
  */
-log.transform = (label: string | File, ...suffix: [ string?, string?, string? ]) => {
-
-  if ($.mode.build || $.mode.bulk || $.mode.debug) return;
-
-  console.info(
-    _.whiteBright(
-      _.Prefix(
-        'transform',
-        _.bold(label),
-        ...suffix
-      )
-    )
-  );
-
-};
+log.transform = (label: string | File, ...suffix: [ string?, string?, string? ]) => (
+  $.mode.build ||
+  $.mode.bulk ||
+  $.mode.debug
+) || console.info(
+  _.Prefix('transform', _.bold(label), ...suffix),
+  _.whiteBright
+);
 
 /**
  * Log Minified - `whiteBright`
@@ -984,60 +567,52 @@ log.transform = (label: string | File, ...suffix: [ string?, string?, string? ])
 * '│ minified → CSS → 200kb ⥂ 120kb ~ saved 80kb'  // Passing kind
 * '│ minified → 200kb ⥂ 120kb ~ saved 80kb'        // Omitting kind
 */
-log.minified = (...p: LogMinifiedParams) => {
-
-  if (
-    $.mode.pack ||
-    $.mode.bulk ||
-    $.mode.build ||
-    $.config.log.silent) return;
-
-  const message = p.length === 1 ? (
-    _.whiteBright(
-      _.Prefix(
-        'minified',
-        _.bold(p[0])
-      )
-    )
-  ) : p.length === 4 ? (
-    _.whiteBright(
-      _.Prefix(
-        'minified',
-        `${_.bold(p[0])} ${_.ARR} ${p[1]} ${_.ARL} ${p[2]} ${_.Append(`saved ${p[3]}`)}`
-      )
-    )
-  ) : (
-    _.whiteBright(
-      _.Prefix(
-        'minified',
-        `${_.bold(p[0])} ${_.ARL} ${p[1]} ${_.CHV} saved ${p[2]} ${_.Append(timer.now())}`
-      )
-    )
-  );
-
-  console.info(message);
-
-};
+log.minified = (...p: Type.LogMinifiedParams) => (
+  $.mode.pack ||
+  $.mode.bulk ||
+  $.mode.build
+) || console.info(
+  _.Prefix('minified', _.bold(p.shift()), ...p.slice(0, -1), `saved ${p.pop()}`),
+  _.whiteBright
+);
 
 /**
- * Log Zipped `whiteBright`
+ * Log Begin
  *
  * @example
  *
- * '│ zipped → ZIP 1.5mb ~ source/dir/file.ext'
- */
-log.zipped = (size: string, path: string) => {
+* // { timestamp: true }
+* '\n┌─ Label ~ 01:59:20'
+* '\n│'
+*
+* // { timestamp: false }
+* '\n┌─ Label'
+* '\n│'
+*/
+log.begin = (message: string, { timestamp = true, clear = true, group = false } = {}) => log.clear(clear)(
+  _.NWL,
+  _.Top(group ? $.log.group = message : message, timestamp),
+  _.Tree.next + _.NWL
+);
 
-  console.info(
-    _.whiteBright(
-      _.Prefix(
-        'zipped',
-        `${_.bold('ZIP')} ${size} ${_.Append(path)}`
-      )
-    )
-  );
-
-};
+/**
+* Log Ender
+*
+* @example
+*
+* // { timestamp: true }
+* '│\n'
+* '└─ input ~ 01:59:20 \n'
+*
+* // { timestamp: false }
+* '│\n'
+* '└─ input\n
+*/
+log.ender = (message?: string, { timestamp = true, clear = true } = {}) => log.clear(clear)(
+  _.Tree.trim + NWL,
+  _.End(message || $.log.group, timestamp),
+  _.NLR
+);
 
 /**
  * Log Skipped - `gray`
@@ -1046,22 +621,38 @@ log.zipped = (size: string, path: string) => {
  *
  * '│ skipped → dir/file.ext ~ reason'
  */
-log.skipped = (file: File | string, reason: string) => {
+log.skipped = (file: File | string, reason: string) => (
+  $.mode.pack ||
+  $.mode.build ||
+  $.mode.bulk
+) || console.info(
+  _.Prefix('skipped', `${isString(file) ? file : file.key} ${_.Append(reason)}`),
+  _.gray
+);
 
-  if ($.mode.pack || $.mode.build || $.mode.bulk) return null;
+/**
+ * Log Deleted - `blueBright`
+ *
+ * @example
+ *
+* '│ deleted → dir/filename.ext → theme ~ store.myshopify.com'
+*/
+log.deleted = (file: string, theme: Type.Theme) => console.info(
+  _.Prefix('deleted', file, ...[ $.mode.bulk ? (theme.target, theme.store.domain) : undefined ]),
+  _.blueBright
+);
 
-  console.info(
-    _.gray(
-      _.Prefix(
-        'skipped',
-        `${isString(file) ? file : file.key} ${_.Append(reason)}`
-      )
-    )
-  );
-
-  return null;
-
-};
+/**
+ * Log Zipped `whiteBright`
+ *
+ * @example
+ *
+* '│ zipped → ZIP 1.5mb ~ source/dir/file.ext'
+*/
+log.zipped = (size: string, path: string) => console.info(
+  _.Prefix('zipped', `${_.bold('ZIP')} ${size} ${_.Append(path)}`),
+  _.whiteBright
+);
 
 /**
  * Log Ignored - `yellowBright`
@@ -1070,30 +661,10 @@ log.skipped = (file: File | string, reason: string) => {
  *
  * '│ ignored → dir/file.ext'
  */
-log.ignored = (path: string) => {
-
-  console.info(
-    _.yellowBright(
-      _.Prefix('ignored', path)
-    )
-  );
-
-};
-
-/**
- * Log Title
- *
- * @example
- *
- * '│'
- * '│ Title'
- * '│'
- */
-log.header = (label: string, color: _.Ansis = _.whiteBright.bold) => {
-
-  log(_.Header(color(label)));
-
-};
+log.ignored = (path: string) => console.info(
+  _.Prefix('ignored', path),
+  _.yellowBright
+);
 
 /**
  * Log File Rename - `whiteBright`
@@ -1102,40 +673,39 @@ log.header = (label: string, color: _.Ansis = _.whiteBright.bold) => {
  *
  * '│ rename → old-name.liquid ⥂ new-name.liquid'
  */
-log.rename = (from: string, to: string) => {
+log.rename = (from: string, to: string) => (
+  $.running === false ||
+  $.mode.watch
+) || console.info(
+  _.Prefix('renamed', _.bold(from), _.bold(to)),
+  _.whiteBright
+);
 
-  log.renamed.push(
-    _.whiteBright(
-      _.Prefix(
-        'renamed',
-        `${_.bold(from)} ${_.ARL} ${_.bold(to)}`
-      )
-    )
-  );
-
-};
+/**
+ * Log Warning `yellowBright`
+ *
+ * @example
+ *
+* '│ warning → message ~ suffix
+*/
+log.warn = (message: string, suffix?: string) => console.info(
+  _.Prefix('warnings', suffix ? `${message} ${_.Append(suffix)}` : `${message}`),
+  _.yellowBright
+);
 
 /**
  * Log HOT Reload - `neonRouge`
  *
- * Pass an optional timer `id`
+ * > Pass an optional timer `id` reference
  *
  * @example
  *
  * '│ reloaded → HOT RELOAD ~ 500ms'
  */
-log.hot = (id?: string) => {
-
-  console.info(
-    _.neonRouge(
-      _.Prefix(
-        'reloaded',
-        `${_.bold('HOT RELOAD')} ${_.Append(timer.now(id))}`
-      )
-    )
-  );
-
-};
+log.hot = (id?: string) => console.info(
+  _.Prefix('reloaded', _.bold('HOT RELOAD'), timer.now(id)),
+  _.neonRouge
+);
 
 /**
  * Log Exported - `teal`
@@ -1144,20 +714,10 @@ log.hot = (id?: string) => {
  *
  * '│ exported → script ⥂ snippet'
  */
-log.exported = (from: string, to: string) => {
-
-  if ($.mode.build) return;
-
-  console.info(
-    _.teal(
-      _.Prefix(
-        'exported',
-        `${_.bold(from)} ${_.ARL} ${_.bold(to)}`
-      )
-    )
-  );
-
-};
+log.exported = (from: string, to: string) => console.info(
+  _.Prefix('exported', _.bold(from), _.bold(to)),
+  _.teal
+);
 
 /**
  * Log Retrying - `orange`
@@ -1166,59 +726,33 @@ log.exported = (from: string, to: string) => {
  *
  * '│ retrying → dir/file.ext → theme ~ store.myshopify.com'
  */
-log.retrying = (file: string, theme: Theme) => {
-
-  console.info(
-    _.orange(
-      _.Prefix(
-        'retrying',
-        file,
-        theme.target,
-        theme.store.domain
-      )
-    )
-  );
-
-};
+log.retrying = (file: string, theme: Type.Theme) => console.info(
+  _.Prefix('retrying', file, theme.target, theme.store.domain),
+  _.orange
+);
 
 /**
  * Log Reloaded - `whiteBright`
  *
  * @example
  *
- * '│ reloaded → dir/file.ext ~ 500ms'
+ * '│ reloaded » dir/file.ext ~ 500ms'
  */
-log.reloaded = (path: string, time: string) => {
-
-  console.info(
-    _.whiteBright(
-      _.Prefix(
-        'reloaded',
-        `${path} ${_.Append(time)}`
-      )
-    )
-  );
-
-};
+log.reloaded = (path: string, time: string) => console.info(
+  _.Prefix('reloaded', path, time),
+  _.whiteBright
+);
 
 /**
  * Log Version Control `whiteBright`
  *
  * @example
  *
- * '│ warning → message ~ append text
+ * '│ version » v1.2.0 → v1.3.0 ~ bump'
  */
-log.version = (vc: VC, type: string) => {
-
-  console.info(
-    _.whiteBright(
-      _.Prefix(
-        'version',
-        `${_.bold(vc.number)} ${_.ARL} ${_.bold(vc.update.number)} ${_.Append(type)}`
-      )
-    )
-  );
-
-};
+log.version = (version: Type.VersionControl, action: string) => console.info(
+  _.Prefix('version', _.bold(version.number), _.bold(version.update.number), action),
+  _.whiteBright
+);
 
 export { log };
