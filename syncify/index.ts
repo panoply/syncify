@@ -1,11 +1,11 @@
 import { internalError } from '~cli/throws';
-import { Build } from '~modes/build';
-import { Init } from '~modes/init';
-import { Pack } from '~modes/pack';
-import { Publish } from '~modes/publish';
-import { Pull } from '~modes/pull';
-import { Push } from '~modes/push';
-import { Watch } from '~modes/watch';
+import { Build } from '~mode/build';
+import { Init } from '~mode/init';
+import { Pack } from '~mode/pack';
+import { Publish } from '~mode/publish';
+import { Pull } from '~mode/pull';
+import { Push } from '~mode/push';
+import { Watch } from '~mode/watch';
 import { Configure } from '~options/configure';
 import { Create } from '~prompts/create';
 import { Keychain } from '~prompts/keychain';
@@ -51,33 +51,29 @@ export async function syncify () {
 
       Keychain();
 
-    } else {
+    } else if ($.mode.build) {
 
-      if ($.mode.build) {
+      Build();
 
-        Build();
+    } else if ($.mode.watch) {
 
-      } else if ($.mode.watch) {
+      Watch();
 
-        Watch();
+    } else if ($.mode.push) {
 
-      } else if ($.mode.push) {
+      Push();
 
-        Push();
+    } else if ($.mode.pull) {
 
-      } else if ($.mode.pull) {
+      Pull();
 
-        Pull();
+    } else if ($.mode.pack) {
 
-      } else if ($.mode.pack) {
+      Pack();
 
-        Pack();
+    } else if ($.mode.publish) {
 
-      } else if ($.mode.publish) {
-
-        Publish();
-
-      }
+      Publish();
 
     }
 
