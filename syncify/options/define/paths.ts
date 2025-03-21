@@ -12,7 +12,7 @@ import { throwError, typeError, warnOption } from '~cli/throws';
 import { PATH_KEYS, THEME_KEYS } from '~const';
 import { setPathCache } from '~process/cache';
 import { parse } from '~process/files';
-import { isArray, isEmpty, isNil, isNumber, isObject, isString, m, s, toArray } from '~utils';
+import { defineProperty, isArray, isEmpty, isNil, isNumber, isObject, isString, m, s, toArray } from '~utils';
 import { normalPath } from '~utils/paths';
 
 import { $, q } from '$';
@@ -291,6 +291,7 @@ export async function setPaths () {
     }
 
     $.paths[key].match = anymatch(paths);
+    $.paths[key].config = paths;
 
     const globs = await glob.async(paths, { cwd: $.cwd });
 
