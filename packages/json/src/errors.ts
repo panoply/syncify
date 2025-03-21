@@ -24,8 +24,7 @@ export class JSONError extends Error {
 }
 
 /**
- * Obtains the line number and column number from
- * errors thrown by JSON Comments.
+ * Obtains the line number and column number from errors thrown by JSON Comments.
  */
 export const getPosition = (json: string, error: any) => {
 
@@ -59,9 +58,18 @@ export const getPosition = (json: string, error: any) => {
  */
 export const getMessage = (error: any) => {
 
-  if ('description' in error) return error.message;
-  if ('message' in error) return error.message;
+  let message = '';
 
-  return '';
+  if ('description' in error) {
+    message = error.message;
+  } else if ('message' in error) {
+    message = error.message;
+  }
+
+  /* -------------------------------------------- */
+  /* ENHANCE MESSAGE                              */
+  /* -------------------------------------------- */
+
+  return message;
 
 };
