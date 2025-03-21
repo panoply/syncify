@@ -4,9 +4,8 @@ import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 import { kill } from '@syncify/kill';
 
-import { runtime } from './runtime';
-
 import { error } from '~errors';
+import { log } from '~log';
 import { has, isString, isUndefined, keys, o, type } from '~utils';
 
 import { $ } from '$';
@@ -398,6 +397,8 @@ export function enoentError ({
  * Throws an error when an invalid config option was provided.
  */
 export function missingDependency (deps: string | string[]) {
+
+  log.runtime.Stop();
 
   const tui = _.Create({ type: 'error' })
   .Line('DEPENDENCY ERROR', _.bold)
@@ -878,7 +879,7 @@ export function errorRuntime (e: any, options: {
   if (has('code', e)) options.entries.code = e.code;
   if (has('name', e)) options.entries.name = e.name;
 
-  runtime.log
+  log.runtime
   .Tree('error')
   .Header('ERROR', _.bold.red)
   .Wrap(options.message, _.redBright)
@@ -892,7 +893,7 @@ export function errorRuntime (e: any, options: {
   .Newline()
   .End($.log.group)
   .Break()
-  .toLog({ clear: true });
+  .toWrite({ clear: true });
 
   $.running ? kill.exit(0) : process.exit(0);
 
