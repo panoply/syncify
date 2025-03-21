@@ -25,9 +25,10 @@ export function http (domain: string, token?: string): XiorInstance {
     http.tokens[domain] = token;
     http.client[domain] = xior.create({
       baseURL: `https://${domain}.myshopify.com/admin/api/${http.VERSION}`,
-      method: 'POST',
       url: 'graphql.json',
       responseType: 'json',
+      // @ts-ignore
+      method: 'POST',
       headers: {
         'X-Shopify-Access-Token': http.tokens[domain],
         'Content-Type': 'application/json'
@@ -59,10 +60,11 @@ export function http (domain: string, token?: string): XiorInstance {
 http.request = <T>(domain: string, token?: string) => {
 
   const client = xior.create({
-    baseURL: `https://${domain}.myshopify.com/admin/api/${http.GQL_VERSION}`,
-    method: 'POST',
+    baseURL: `https://${domain}.myshopify.com/admin/api/${http.VERSION}`,
     url: 'graphql.json',
     responseType: 'json',
+    // @ts-ignore
+    method: 'POST',
     headers: token ? {
       'X-Shopify-Access-Token': token,
       'Content-Type': 'application/json'
@@ -76,7 +78,7 @@ http.request = <T>(domain: string, token?: string) => {
     error => Promise.reject(error)
   );
 
-  return client.request<T>;
+  return (data: any) => client.request<T>(data);
 
 };
 
