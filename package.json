@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-unstable.0",
   "name": "@syncify/cli",
   "description": "The new generation build tool for Shopify theme development.",
   "license": "Apache-2.0",
