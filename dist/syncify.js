@@ -19978,9 +19978,9 @@ async function runAlignment() {
         state.skipped.push(file);
       }
     } else {
-      file.input = path2.join($.stash[stashDir], fileName);
+      file.input = path2.join($.paths[stashDir].stash, fileName);
       file.value = json.format(body.content, $.json.options);
-      await fsExtra.ensureDir($.stash[stashDir]);
+      await fsExtra.ensureDir($.paths[stashDir].stash);
       await fsExtra.writeFile(file.input, file.value).then(() => {
         state.create.set(filename, file);
       }).catch(
@@ -20051,7 +20051,7 @@ async function Pull() {
             state.files.create.push(file);
           }
         } else {
-          file.input = path2.join($.stash[stashDir], fileName);
+          file.input = path2.join($.paths[stashDir].stash, fileName);
           state.files.stash.push(file);
         }
       }

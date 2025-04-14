@@ -71,8 +71,8 @@
     "prepublishOnly": "cp assets/icon.png icon.png",
     "postpublish": "rm -rf icon.png",
     "publish:stable": "pnpm publish --tag latest",
-    "publish:next": "pnpm version prerelease --preid next && pnpm publish --tag next",
-    "publish:unstable": "pnpm version prerelease --preid unstable && pnpm publish --tag unstable",
+    "publish:next": "pnpm version prerelease --preid next && pnpm publish --tag next --no-git-checks",
+    "publish:unstable": "pnpm version prerelease --no-git-checks --preid unstable && pnpm publish --tag unstable",
     "postinstall": "node scripts/postinstall.js",
     "postversion": "node scripts/postversion.js"
   },

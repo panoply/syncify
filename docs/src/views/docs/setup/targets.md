@@ -11,11 +11,13 @@ anchors:
 
 # Targets
 
-All Syncify projects require target references. These are entries that define the stores and themes your project engages with. This information can be specified in an external file or within your `package.json` under the syncify → stores key. Targets are used by Syncify to establish remote context for theme syncing, management, deployment, and resource related operations. If you have configured credentials and granted authentication access as outlined in the [authentication](/setup/authentication/) and [credentials](/setup/credentials/) sections, you can go ahead and define targets in one of the following files:
+All Syncify projects require target references. These are entries that define the stores and themes your project engages with. This information can be specified in an external file or within your `package.json` under the syncify → stores key.
 
 - `{yaml} package.json` <small class="fs-sm fc-gray pl-1">← &nbsp;&nbsp;recommended</small>
 - `{yaml} store.yaml`
 - `{yaml} store.toml`
+
+Targets are used by Syncify to establish remote context for theme syncing, management, deployment, and resource related operations. If you have configured credentials and granted authentication access as outlined in the [authentication](/setup/authentication/) and [credentials](/setup/credentials/) sections, you can go ahead and define targets in one of the following files:
 
 ---
 

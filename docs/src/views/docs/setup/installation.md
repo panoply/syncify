@@ -55,20 +55,6 @@ $ bun add @syncify/cli -g
 
 ---
 
-# Browser Extensions
-
-Syncify offers browser extensions in Chrome, Brave, Firefox, Edge and Safari. Extensions are designed to enhance development experiences with the tool. It is **highly recommend** that developers install the Syncify extensions in their preferred browser(s) as it will significantly improve functionality and usage, particularly during **HOT Reload** processes.
-
-Syncify can function without its extensions, but doing so incurs a slight performance cost due to additional runtime checks and slower interface interactions. When paired with the official companion extensions, Syncify performance is enhanced, resulting in reduced latency and optimized resource use.
-
-### Syncify Extension
-
-Install the official Syncify extension into the browser you use for development.
-
-{% include 'browsers' %}
-
----
-
 # Schema Stores
 
 Syncify provides JSON Schema Store references for usage in JSON files that contain a `$schema` property or within text editors like [VSCode](https://code.visualstudio.com/) which support external schema store association. The JSON Schema store is helpful for users who prefer `.json` configurations or are setting config options within their `package.json` file via the `syncify` config key.

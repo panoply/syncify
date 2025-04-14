@@ -142,40 +142,9 @@ export default defineConfig({
 
 # Custom Structures
 
-Sticking to the default structure isn’t ideal with Syncify. Instead, you’re encouraged to craft an input (theme) structure that fits your project, aligns with your workflow, and reflects your preferences. The `paths` option empowers you to define a tailored setup, giving you control over how your theme is organized. Below is a basic example of how to create a customized structure using `paths`, showcasing the flexibility to adapt the layout to your specific needs
+Sticking to the default structure isn’t ideal with Syncify. Instead, you’re encouraged to craft an input (theme) structure that fits your project, aligns with your workflow, and reflects your preferences. The `paths` option empowers you to define a tailored setup, giving you control over how your theme is organized. Below is a basic example of how to create a customized structure using `paths`, showcasing the flexibility to adapt the layout to your specific needs.
 
-:
-
-```treeview
-| -
-```
-
-:
-:
-
-```js
-s.foo();
-```
-
-:
-
-<div>
-
-</div>
-<div>
-</div>
-
-: s`div`(
-:: s`div`(
-::: s`div`(
-:::: s`div`(
-
-:::: )
-::: )
-:: )
-: )
-
-:::: row ai-stretch dir-each my-5
+:::: grid row ai-stretch dir-each my-5
 ::: grid col fs-sm
 
 ```treeview
@@ -484,10 +453,6 @@ source/
 One key constraint in Shopify CLI theme development is its strict flat directory structure, emphasizing predictable file organization. Flat structures suit Shopify themes well due to their simplicity, ease of navigation, and consistency, which simplifies collaboration by removing guesswork when multiple developers handle a theme. However, while practical, this flat structure limits extensibility and scalability, crucial for complex or growing storefronts.
 
 Syncify projects enforce a hierarchical **input** ➔ **output** base structure. Developers can mimic flat structures within **input** directories, but the organization of files and folders remains unpredictable, left to the developer or team's discretion. The hierarchical structure might intimidate developers used to the Shopify CLI's flat approach, particularly newcomers to alternative setups. Yet, for modern, high-performance Shopify themes, flat structures falter, growing unwieldy as complexity increases. Syncify's hierarchical design supports expanding theme needs, boosting scalability by letting developers freely organize their projects.
-
-> The Shopify CLI’s flat structure mandate is intentional, mirroring storefront theme architecture. Its lack of custom structure support stems from inherent limitations in the CLI tool itself.
-
-# Something `{ts} { foo: string }`
 
 ### Limitations
 

@@ -5,7 +5,7 @@ permalink: '/what-is-syncify/index.html'
 anchors:
   - 'What is Syncify?'
   - 'Why Use Syncify?'
-  - 'Development for Developers'
+  - 'Core Principle'
   - 'How to use Syncify?'
 ---
 
@@ -41,7 +41,7 @@ If you need a tool that tackles modern e-commerce complexities with performance-
 
 ---
 
-# Development for Developers
+# Core Principle
 
 Syncify is built around a core principle: theme development should stay in the hands of skilled developers, not left open to unchecked edits. While merchants might adjust themes via the Shopify editor or customizer, changes could also come from other sources—like a less experienced collaborator or an external tool—potentially undermining your work. Syncify counters this by embedding context and complexity that only you, the developer, fully grasp, making it harder for merchants to replace you without losing that critical insight. This ensures theme longevity and positions you as an invaluable maintainer, fostering a dynamic where your expertise is both respected and relied upon.
 

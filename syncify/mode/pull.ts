@@ -131,10 +131,10 @@ export async function runAlignment () {
 
     } else {
 
-      file.input = join($.stash[stashDir], fileName);
+      file.input = join($.paths[stashDir].stash, fileName);
       file.value = format(body.content, $.json.options);
 
-      await ensureDir($.stash[stashDir]);
+      await ensureDir($.paths[stashDir].stash);
       await writeFile(file.input, file.value).then(() => {
 
         state.create.set(filename, file);
@@ -291,7 +291,7 @@ export async function Pull () {
 
         } else {
 
-          file.input = join($.stash[stashDir], fileName);
+          file.input = join($.paths[stashDir].stash, fileName);
 
           state.files.stash.push(file);
 
