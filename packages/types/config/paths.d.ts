@@ -1,20 +1,13 @@
-import type { LiteralUnion } from 'type-fest';
+export type StashType = string | number;
 
-export interface StashIndex {
- /**
-   * If there are multiple glob paths defined, and you'd like to cherry-pick
-   * a specific entry, provide its index here.
-   *
-   * @default 0
-   */
-  index?: number;
+/**
+ * Stash Reference
+ */
+export type Stash = {
   /**
    * Set a stash import location for remote `pull` operations. Files which cannot
-   * be mapped to existing local path relative to your `input` will be written to
-   * a provided stash destination.
-   *
-   * When no stash reference is defined, Syncify will determine output
-   * location based on the path resolutions.
+   * be mapped to an existing project-level path location (relative to your `input`)
+   * will be written the provided stash destination defined here.
    *
    * > `*`
    * >
@@ -33,28 +26,23 @@ export interface StashIndex {
    * You can optionally provide a sub-directory path.
    *
    */
-  stash: LiteralUnion<'*', string> | true | number;
+  stash: StashType;
 }
 
-export interface StashWithIndex extends StashIndex {
-  /**
-   * If there are multiple glob paths defined, and you'd like to cherry-pick
-   * a specific entry, provide its index here.
-   *
-   * @default 0
-   */
-  index?: number;
-}
+/**
+ * String or Array of strings
+ */
+export type Path = string | string[];
 
-export type CustomStash = StashIndex | StashWithIndex
-export type PathsGlob = string | string[];
-export type PathsStash = [ ...globs: string[], stash: CustomStash ]
-export type PathsType = PathsGlob | PathsStash;
+/**
+ * Union join of accepted Path patterns
+ */
+export type Pattern = Path | [ ...globs: string[], stash: Stash ];
 
 /**
  * Section and Snippet Rename Paths
  */
-export interface RenamePaths<T = PathsType> {
+export type Rename = {
   /**
    * Uses the filename as per the source, idenitical behaviour as that of `[name]`.
    *
@@ -82,7 +70,7 @@ export interface RenamePaths<T = PathsType> {
    *   }
    * }
    */
-  '*'?: T;
+  '*'?: Pattern;
   /**
    * Use the filename as per the source. Passing `[name]` only will result in fallback
    * behaviour, as that of `'*'`.
@@ -114,55 +102,58 @@ export interface RenamePaths<T = PathsType> {
    *   }
    * }
    */
-  '[name]'?: T;
+  '[name]'?: Pattern;
   /**
    * Prefix directory name and suffix filename in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout-header.liquid'
    */
-  '[dir]-[name]'?: T;
+  '[dir]-[name]'?: Pattern;
   /**
    * Prefix directory name and suffix filename in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout_header.liquid'
    */
-  '[dir]_[name]'?: T;
+  '[dir]_[name]'?: Pattern;
   /**
    * Prefix filename and suffix directory in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header-layout.liquid'
    */
-  '[name]-[dir]'?: T;
+  '[name]-[dir]'?: Pattern;
   /**
    * Prefix filename and suffix directory in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header_layout.liquid'
    */
-  '[name]_[dir]'?: T;
+  '[name]_[dir]'?: Pattern;
 }
 
-export interface RenameSnippets<T = PathsType> {
+/**
+ * Snippet Renames accept `.` separated values
+ */
+export type RenameSnippets = Rename & {
   /**
    * Prefix filename and suffix directory with `.` dot separator.
    *
    * @example
    * 'layout/header.liquid' > 'header.layout.liquid'
    */
-  '[name].[dir]'?: T;
+  '[name].[dir]'?: Pattern;
   /**
    * Prefix directory and suffix filename with `.` dot separator.
    *
    * @example
    * 'layout/header.liquid' > 'layout.header.liquid'
    */
-  '[dir].[name]'?: T;
+  '[dir].[name]'?: Pattern;
 }
 
-export interface Paths<T = PathsType> {
+export type Paths = {
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as snippets.
    *
@@ -205,7 +196,7 @@ export interface Paths<T = PathsType> {
    *   }
    * }
    */
-  snippets?: T | Record<string, T> | RenamePaths<T>;
+  snippets?: Pattern | RenameSnippets
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as sections.
    *
@@ -259,87 +250,113 @@ export interface Paths<T = PathsType> {
    *   ]
    * }
    */
-  sections?: T | Record<string, T> | RenamePaths<T>;
+  sections?: Pattern | Rename;
   /**
    * A glob string or glob array of files to be uploaded as blocks
    *
    * @default 'source/blocks/*.{liquid}'
    */
-  blocks?: T;
+  blocks?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as templates.
    *
    * @default 'source/templates/*.{liquid,json}'
    */
-  templates?: T;
+  templates?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded asas metaobject templates
    *
    * @default 'source/templates/metaobject/*.{liquid,json}'
    */
-  metaobject?: T;
+  metaobject?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as template/customers
    *
    * @default 'source/templates/customers/*.{liquid,json}'
    */
-  customers?: T;
+  customers?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as assets
    *
    * @default 'source/assets/*'
    */
-  assets?: T;
+  assets?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as layouts
    *
    * @default 'source/layout/*.liquid'
    */
-  layout?: T;
+  layout?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as configs, i.e, `settings_schema.json`
    *
    * @default 'source/config/.json'
    */
-  config?: T;
+  config?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as config, i.e, `en.default.json`
    *
    * @default 'source/locales/*.json'
    */
-  locales?: T;
+  locales?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as **shared schema** `.json` or `.schema` files.
    *
-   * @default 'source/schema/*.{json,schema}'
+   * @default 'source/+/schema/*.{json,schema}'
    */
-  schema?: PathsGlob;
+  schema?: Path;
   /**
    * **NOT YET AVAILABLE**
    *
-   * > **This option will be available in later versions**
+   * **This option will be available in later versions**
    *
    * ---
    *
    * The resolved `metafields` directory path
    *
-   * @default 'source/metafields/'
+   * @default 'source/+/metafields/**'
    */
-  metafields?: PathsGlob;
-  /**
-   * A glob string or glob array string to be uploaded, published and controlled as `pages`
-   *
-   * @default 'source/pages/*.{md,html}'
-   */
-  pages?: T;
+  metafields?: Path;
   /**
    * **NOT YET AVAILABLE**
    *
-   * > **This option will be available in later versions**
+   * **This option will be available in later versions**
    *
-   * ---
+   * A glob string or glob array string to be uploaded, published and controlled as `pages`
    *
-   * @default 'redirects.yaml'
+   * @default 'source/+/pages/*.{md,html}'
    */
-  redirects?: `${string}.${'yaml' | 'yml'}`;
+  pages?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/blogs/*'
+   */
+  blogs?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/menus/*.json'
+   */
+  navigation?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/policies/*.{html,md}'
+   */
+  policies?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/files/**'
+   */
+  files?: Path;
 }

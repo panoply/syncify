@@ -1,4 +1,4 @@
-<div class="sidebar-scroll pr-3 br">
+<div class="sidebar-scroll px-3 pr-md-3 w-100 br">
   <nav
     class="sidebar-menu mt-4 mb-2 sticky"
     spx-component="sidebar"
@@ -55,7 +55,7 @@
           type="button"
           {%- if parent_expand -%}
             aria-expanded="true"
-            class="menu active"
+            class="menu"
           {%- else -%}
             class="menu"
           {%- endif -%}>
@@ -91,7 +91,7 @@
                       type="button"
                       {%- if parent_expand and selected == child.title -%}
                         aria-expanded="true"
-                        class="menu-links py-0 active"
+                        class="menu-links py-0"
                       {%- else -%}
                         class="menu-links py-0"
                       {%- endif -%}>

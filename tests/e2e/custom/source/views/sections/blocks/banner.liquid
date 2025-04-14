@@ -1,0 +1,385 @@
+{%- capture class -%}
+  mt-{{ section.settings.mt }}
+  mb-{{ section.settings.mb }}
+  py-{{ section.settings.py }}
+  px-{{ section.settings.px }}
+{%- endcapture -%}
+
+<div
+  class="col {{ class }}"
+  style="background-color:{{- section.settings.bg | default: 'transparent' -}};">
+  {% for block in section.blocks %}
+
+    {% if block.type == 'content' %}
+
+      <div
+        class="{{ block.settings.ta }}"
+        style="
+          color:{{- block.settings.fc | default: 'inherit' -}};
+          font-size:{{- block.settings.fs -}}px;
+          letter-spacing:{{- block.settings.ls -}}px;
+          font-weight:{{- block.settings.fw -}};
+        ">
+
+        {{ block.settings.value }}
+
+      </div>
+
+    {% elsif block.type == 'heading' %}
+
+      <h1 class="h{{ block.settings.fs }} {{ block.settings.ta }}">
+        {{ block.settings.title }}
+      </h1>
+
+    {% elsif block.type == 'button' %}
+
+      {% if block.settings.btn != blank %}
+
+        <a
+          href="{{ block.settings.url }}"
+          class="
+          {%- if block.settings.btn_radius and block.settings.btn_shadow -%}
+            btn btn-line btn-radius btn-shadow mt-{{ block.settings.btn_mt }}
+          {%- elsif block.settings.btn_shadow -%}
+            btn btn-line btn-shadow mt-{{ block.settings.btn_mt }}
+          {%- elsif block.settings.btn_radius -%}
+            btn btn-line btn-radius mt-{{ block.settings.btn_mt }}
+          {%- else -%}
+            btn btn-line mt-{{ block.settings.btn_mt }}
+          {%- endif -%}
+          "
+          style="
+            color:{{ block.settings.btn_fc | default: 'inherit' }};
+            background-color:{{ block.settings.btn_bg | default: 'inherit' }};
+            font-weight:{{ block.settings.btn_fw | default: 'inherit' }};
+            font-size:{{ block.settings.btn_fs | default: 'inherit' }}px;
+            height:{{ block.settings.btn_height }}px;
+            max-width:{{ block.settings.btn_width }}px;
+          ">
+          {{ block.settings.btn }}
+        </a>
+
+      {% endif %}
+
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Text Banner",
+  "tag": "section",
+  "class": "row g-0 jc-center ai-center",
+  "blocks": [
+    {
+      "name": "Heading",
+      "type": "heading",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Text Banner",
+          "info": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tc",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "fc"
+        },
+        {
+          "type": "range",
+          "id": "fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 600,
+          "step": 100,
+          "default": 300
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "type": "content",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Text Content",
+          "info": "Content text block"
+        },
+        {
+          "type": "richtext",
+          "id": "value",
+          "label": "Content"
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tc",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "fc"
+        },
+        {
+          "type": "range",
+          "id": "fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "ls",
+          "label": "Letter Spacing",
+          "min": 0.1,
+          "max": 3,
+          "step": 0.1,
+          "default": 0.5,
+          "unit": "px"
+        }
+      ]
+    },
+    {
+      "name": "Button",
+      "type": "button",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Button",
+          "info": "Add a button to text banner"
+        },
+        {
+          "type": "text",
+          "id": "btn",
+          "label": "Label"
+        },
+        {
+          "type": "url",
+          "id": "btn_url",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "label": "Text Colour",
+          "id": "btn_fc"
+        },
+        {
+          "type": "color",
+          "label": "Button Background",
+          "id": "btn_bg"
+        },
+        {
+          "type": "checkbox",
+          "id": "btn_shadow",
+          "label": "Button Shadow",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "btn_radius",
+          "label": "Button Radius",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "btn_width",
+          "label": "Button Width",
+          "min": 10,
+          "max": 250,
+          "step": 5,
+          "default": 100,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "btn_height",
+          "label": "Button Height",
+          "min": 10,
+          "max": 100,
+          "step": 1,
+          "default": 25
+        },
+        {
+          "type": "range",
+          "id": "btn_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 30,
+          "step": 0.5,
+          "default": 15,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "btn_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 600,
+          "step": 100,
+          "default": 300
+        },
+        {
+          "type": "range",
+          "id": "btn_mt",
+          "label": "Margin Top",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 3
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Link",
+      "info": "Make the text banner a link or CTA reference"
+    },
+    {
+      "type": "url",
+      "id": "href",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "label": "Trigger",
+      "info": "Control the link trigger point",
+      "id": "href_trigger",
+      "options": [
+        {
+          "value": "block",
+          "label": "Block"
+        },
+        {
+          "value": "text",
+          "label": "Text"
+        },
+        {
+          "value": "buttons",
+          "label": "Buttons"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Margins",
+      "info": "Applies gutter margins to the outer structure"
+    },
+    {
+      "type": "range",
+      "id": "mt",
+      "label": "Margin Top",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mb",
+      "label": "Margin Bottom",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Padding",
+      "info": "Applies gutter padding to the inner structure"
+    },
+    {
+      "type": "range",
+      "id": "px",
+      "label": "Padding X",
+      "info": "Spacing applied to the left and right sides",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "py",
+      "label": "Padding Y",
+      "info": "Spacing applied to the top and bottom of the block",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Customize the banner background"
+    },
+    {
+      "type": "color",
+      "label": "Background Colour",
+      "id": "bg"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Text Banner",
+      "category": "text"
+    }
+  ]
+}
+{% endschema %}

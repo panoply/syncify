@@ -1,8 +1,8 @@
-/* eslint-disable no-use-before-define */
-
 import type { SearchContent, SearchHeading, SearchIndex, SearchPage } from '@e11ty/eleventy-plugin-search-index';
-import spx, { SPX } from 'spx';
+
 import { matchSorter } from 'match-sorter';
+import spx, { SPX } from 'spx';
+
 import { glue } from '../utils';
 
 export class Search extends spx.Component({
@@ -10,13 +10,18 @@ export class Search extends spx.Component({
   state: {
     active: Boolean,
     query: String,
-    source: String
+    source: String,
+    index: Number
   },
   nodes: <const>[
     'list',
     'input'
   ]
 }) {
+
+  get selected (): HTMLElement {
+    return this.listNode[this.state.index];
+  }
 
   /**
    * SPX Connect Lifecyle Method
@@ -35,6 +40,13 @@ export class Search extends spx.Component({
     return (await fetch(this.state.source)).json();
 
   }
+
+  /** Keypress event via `spx@window:keypress` */
+  public onKeyboard (event: SPX.KeyboardEvent) {
+
+    console.log(event);
+
+  };
 
   private hide () {
 
@@ -229,7 +241,7 @@ export class Search extends spx.Component({
   }
 
   public index: SearchIndex;
-  public result: SearchContent[];
+  public result: SearchContent[] = [];
   public match = { keys: [ { threshold: matchSorter.rankings.CONTAINS, key: 'text' } ] };
   public noResults: HTMLLIElement = document.createElement('li');
 

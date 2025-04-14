@@ -1,7 +1,7 @@
 /**
  * JSON File Minification
  */
-export interface JSONTerse {
+export type JSONTerse = {
   /**
    * Minify `.json` files writing to `theme/assets`
    *
@@ -52,7 +52,7 @@ export interface JSONTerse {
   exclude?: string[]
 }
 
-export interface JSONTransform {
+export type JSONTransform = {
   /**
    * If line termination should be Windows (CRLF) format.
    * Unix (LF) format is the default.

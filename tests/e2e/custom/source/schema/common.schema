@@ -1,0 +1,26 @@
+{
+  "images": {
+    "$description": ["Desktop and Mobile images"],
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "img_desktop",
+        "label": "Image Desktop"
+      },
+      {
+        "type": "image_picker",
+        "id": "img_mobile",
+        "label": "Image Mobile"
+      }
+    ]
+  },
+  "font_weight": {
+    "type": "range",
+    "id": "headline_fw",
+    "label": "Font Weight",
+    "min": 100,
+    "max": 900,
+    "step": 100,
+    "default": 500
+  }
+}

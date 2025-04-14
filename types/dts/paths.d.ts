@@ -2,207 +2,163 @@
 /* PATHS                                        */
 /* -------------------------------------------- */
 
-import type { LiteralString } from './utilities';
-import type { Paths, RenamePaths } from '@syncify/types';
 import type { Tester } from 'anymatch';
-import type { Merge } from 'type-fest';
 
-export type PathsBundle = Merge<Paths<Tester>, { transforms?: Map<string, 7 | 8 | 9> }>;
-
-export type PathsRef = {
+/**
+ * Internal structure for project paths
+ */
+export type PathConfig = {
   /**
-   * Set of all resolved paths;
+   * Holds a hard Set reference containing all resolved file uri paths
    *
    * @default null
    */
   input: Set<string>;
   /**
-   * A copy of the user define paths
+   * An expanded copy of the user define paths
    *
    * @default null
    */
   config: string[];
   /**
-   * Anymatch tester of all resolved paths which determine to which theme directory
-   * the path belongs.
+   * Anymatch tester of all resolved paths.
    *
    * @default null
    */
   match: Tester;
+  /**
+   * The input stash location where remote files pulled from store are written.
+   *
+   * @default null
+   */
+  stash: string;
  /**
    * Match rename paths, this array will map to a rename pattern.
    *
-   * - `[0]` ~ _anymatch tester function_
-   * - `[1]` ~ _rename pattern being used_
-   *
    * @default []
-   *
-   * @example
-   * {
-   *   rename: [
-   *    [ anymatch(), '[name]', false],
-   *    [ anymatch(), '[dir]-[name]', true]
-   *   ]
-   * }
    */
-  rename: Array<[
+  rename: Array<{
+    /**
+     * An anymatch tester function
+     */
     match: Tester,
-    pattern: LiteralString<keyof RenamePaths>
-  ]>
+    /**
+     * The rename pattern
+     *
+     * @example
+     * '[name]'
+     * '[dir]-[name]'
+     * // etc etc
+     */
+    pattern: string;
+  }>
 };
 
-export interface PathBundle {
+export type PathsPlus = {
   /**
-   * Resolved match and path references uploaded as assets
+   * The resolved blogs directory path
    *
-   * @default 'source/assets'
+   * @default 'source/+/schema/*'
    */
-  assets?: PathsRef
+  blogs?: PathConfig;
   /**
-   * Resolved match and path references uploaded as snippets
+   * The resolved shared schema file paths
    *
-   * @default 'source/snippets'
+   * @default 'source/+/schema/*.{schema,json}'
    */
-  snippets?: PathsRef
-  /**
-   * Resolved match and path references uploaded as sections
-   *
-   * @default 'source/sections'
-   */
-  sections?: PathsRef
-  /**
-   * Resolved match and path references uploaded as layouts
-   *
-   * @default 'source/layout'
-   */
-  layout?: PathsRef
-  /**
-   * Resolved match and path references uploaded as templates
-   *
-   * @default 'source/templates'
-   */
-  templates?: PathsRef
-  /**
-   * Resolved match and path references uploaded as template/metaobject
-   *
-   * @default 'source/templates/metaobjects'
-   */
-  metaobject?: PathsRef
-  /**
-   * Resolved match and path references uploaded as blocks
-   *
-   * @default 'source/blocks'
-   */
-  blocks?: PathsRef
-  /**
-   * Resolved match and path references uploaded as template/customers
-   *
-   * @default 'source/templates/customers'
-   */
-  customers?: PathsRef
-  /**
-   * Resolved match and path references uploaded as configs
-   *
-   * @default 'source/config'
-   */
-  config?: PathsRef
-  /**
-   * Resolved match and path references uploaded as locales
-   *
-   * @default 'source/locales'
-   */
-  locales?: PathsRef
+  schema?: PathConfig;
   /**
    * The resolved `metafields` directory path
    *
-   * @default 'source/metafields'
+   * @default 'source/+/metafields/**'
    */
-  metafields?: PathsRef
-  /**
-   * The resolved shared `schema` paths
-   *
-   * @default 'source/schema'
-   */
-  schema?: PathsRef;
+  metafields?: PathConfig;
   /**
    * The resolved `pages` directory path
    *
-   * @default 'source/pages'
+   * @default 'source/+/navigation/*.json'
    */
-  pages?: PathsRef
+  navigation?: PathConfig;
   /**
-   * The resolved `redirects` yaml file
+   * The resolved `pages` directory path
    *
-   * @default 'redirects.yaml'
+   * @default 'source/+/pages/*'
    */
-  redirects?: PathsRef
+  pages?: PathConfig;
   /**
-   * Special Transforms reference
+   * The resolved `pages` directory path
    *
-   * @default 'source/assets'
+   * @default 'source/+/policies/*.{html,md}'
    */
-  transforms?: Map<string, 9 | 10 | 11>
+  policies?: PathConfig;
+  /**
+   * The resolved `files` directory path
+   *
+   * @default 'source/+/files/**'
+   */
+  files?: PathConfig;
 }
 
-export interface PathStash {
+export type PathsBundle = PathsPlus & {
   /**
    * Resolved match and path references uploaded as assets
    *
    * @default 'source/assets'
    */
-  assets?: string
-  /**
-   * Resolved match and path references uploaded as snippets
-   *
-   * @default 'source/snippets'
-   */
-  snippets?: string
-  /**
-   * Resolved match and path references uploaded as sections
-   *
-   * @default 'source/sections'
-   */
-  sections?: string
-  /**
-   * Resolved match and path references uploaded as layouts
-   *
-   * @default 'source/layout'
-   */
-  layout?: string
-  /**
-   * Resolved match and path references uploaded as templates
-   *
-   * @default 'source/templates'
-   */
-  templates?: string
-  /**
-   * Resolved match and path references uploaded as template/metaobject
-   *
-   * @default 'source/templates/metaobjects'
-   */
-  metaobject?: string
+  assets?: PathConfig;
   /**
    * Resolved match and path references uploaded as blocks
    *
    * @default 'source/blocks'
    */
-  blocks?: string
-  /**
-   * Resolved match and path references uploaded as template/customers
-   *
-   * @default 'source/templates/customers'
-   */
-  customers?: string
+  blocks?: PathConfig
   /**
    * Resolved match and path references uploaded as configs
    *
    * @default 'source/config'
    */
-  config?: string
+  config?: PathConfig
+  /**
+   * Resolved match and path references uploaded as snippets
+   *
+   * @default 'source/snippets'
+   */
+  snippets?: PathConfig
+  /**
+   * Resolved match and path references uploaded as sections
+   *
+   * @default 'source/sections'
+   */
+  sections?: PathConfig;
+  /**
+   * Resolved match and path references uploaded as layouts
+   *
+   * @default 'source/layout'
+   */
+  layout?: PathConfig;
   /**
    * Resolved match and path references uploaded as locales
    *
    * @default 'source/locales'
    */
-  locales?: string
+  locales?: PathConfig
+  /**
+   * Resolved match and path references uploaded as template/metaobject
+   *
+   * @default 'source/templates/metaobjects'
+   */
+  metaobject?: PathConfig
+  /**
+   * Resolved match and path references uploaded as template/customers
+   *
+   * @default 'source/templates/customers'
+   */
+  customers?: PathConfig
+ /**
+   * Resolved match and path references uploaded as templates
+   *
+   * @default 'source/templates'
+   */
+  templates?: PathConfig
+
 }

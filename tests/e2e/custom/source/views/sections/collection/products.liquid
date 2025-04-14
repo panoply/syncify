@@ -1,0 +1,323 @@
+{% liquid
+
+  assign year = 'now' | date: '%y'
+
+  capture grid
+    echo 'col-' | append: section.settings.mobile
+    echo ' col-sm-' | append: section.settings.tablet
+    echo ' col-md-' | append: section.settings.mobile
+    echo ' col-lg-' | append: section.settings.mobile
+    echo ' col-xl-' | append: section.settings.desktop
+  endcapture
+
+  # PRIVATE SALE
+  if request.path contains "private-sale"
+    assign private_sale = true
+  else
+    assign private_sale = false
+  endif
+
+  if collection.metafields.data.gender.value contains "Women"
+    assign navigation = linklists.womens-collection
+  elsif collection.metafields.data.gender.value contains "Men"
+    assign navigation = linklists.mens-collection
+  elsif collection.metafields.data.gender.value contains "Unisex"
+    assign navigation = linklists.extra-collection
+  endif
+
+  capture current_season
+    echo 'now' | date: '%y' | prepend: settings.season
+  endcapture
+
+  if collection.metafields.data.group.value contains "Sustainable"
+    assign sustainable = true
+  else
+    assign sustainable = false
+  endif
+%}
+<div class="col-md-6 col-xl-4 d-none d-md-unset">
+  <div
+    class="row jc-start pl-5 sticky"
+    spx-component="sticky"
+    spx-sticky:offset="43">
+
+    {% if private_sale %}
+      <h1
+        class="italic lower mt-5 mb-2"
+        style="font-size: 2em;">
+        {{ collection.metafields.data.display_name.value }}
+      </h1>
+      <h1 class="italic lower mb-4 tl fc-dark-gray">
+        private sale
+      </h1>
+      <p class="w-75 mb-5">
+        We invite you to shop these selected Fall / Winter 24 editions at 25% discount. This is an exclusive offer made
+        available to subscribers of our weekly newsletter.
+      </p>
+      <h1 class="fs-xl fw-bold italic lower mb-3">
+        Conditions
+      </h1>
+      <ul class="list-dash">
+        <li>You cannot combine discount codes.</li>
+        <li>Offer is not valid on previous purchases</li>
+        <li>Items are final sale with exchanges eligible.</li>
+        <li>Access available till 1st December, 2024.</li>
+      </ul>
+
+    {% else %}
+
+      <h1
+        class="italic lower mt-5 mb-4"
+        style="font-size: 2rem;">
+        {{ collection.metafields.data.display_name.value }}
+      </h1>
+
+      <p class="fs-sm w-75 mb-3 tj d-none">
+        {{ collection.description }}
+      </p>
+      <div class="col-auto p-5 pl-0 h-100">
+        <ul class="upper fs-sm">
+          <li class="fs-xl fw-bold italic lower mb-3">
+            {{ 'words.collection' | t }}
+          </li>
+          {% for link in navigation.links %}
+
+            {% if link.links != blank %}
+              <li class="fs-xl fw-bold italic lower mt-5 mb-3">
+                {{ link.title }}
+              </li>
+              {% for childlink in link.links %}
+                <li class="li-mb linklist-link {% if childlink.active %}active{% endif %}">
+                  <a
+                    href="{{ childlink.url }}"
+                    spx-position="y:0">
+                    {{ childlink.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            {% else %}
+              <li class="li-mb">
+                <a
+                  href="{{ link.url }}"
+                  class="linklist-link {% if link.active %}active{% endif %}"
+                  spx-position="y:0">
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<div class="col pl-md-0">
+  <div class="row gx-4 p-3 px-sm-2 py-4 mt-md-4">
+
+    {% paginate collection.products by section.settings.per_page %}
+
+      {% for product in collection.products %}
+
+        {% render 'product' with product
+          , grid: grid
+          , variants: product.metafields.data.variants.value
+          , private_sale: private_sale
+          , current_season: current_season
+        %}
+      {% endfor %}
+
+      {% if paginate.pages > 1 %}
+        {% render 'paginate', paginate: paginate, anchor: '' %}
+      {% endif %}
+
+    {% endpaginate %}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Collection Products",
+  "tag": "section",
+  "class": "row flex jc-start ac-center mx-2",
+  "templates": ["collection"],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Pagination",
+      "info": "Products to show per page"
+    },
+    {
+      "type": "number",
+      "id": "per_page",
+      "label": "Products (Per Page)",
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "Swap Hover",
+      "info": "Customize image swap effect in pointer (non~touch) devices"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_swap",
+      "label": "Hover",
+      "default": true,
+      "info": "Enable Image Swap"
+    },
+    {
+      "type": "number",
+      "id": "swap",
+      "label": "Show Image",
+      "default": 1,
+      "placeholder": "The Zero based index of the image to show"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Customize the grid layout and structure of collections"
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "label": "Gutter",
+      "info": "Spacing and padding between products",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mobile",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 6,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "tablet",
+      "label": "Tablet",
+      "info": "Screens in large tablet",
+      "min": 4,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "desktop",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Heading",
+      "type": "heading",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Generates a heading to be rendered within the sidebar"
+        },
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Generates a heading to be rendered within the sidebar"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Provide a custom title"
+        },
+        {
+          "type": "select",
+          "id": "tt",
+          "label": "Text Transform",
+          "default": "italic",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "upper",
+              "label": "Uppercase"
+            },
+            {
+              "value": "italic",
+              "label": "Italic"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "heading_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 400
+        },
+        {
+          "type": "color",
+          "id": "fc",
+          "label": "Font Color",
+          "default": "#141413"
+        },
+        {
+          "type": "header",
+          "content": "Spacing",
+          "info": "Control the Y gutter margin spacing"
+        },
+        {
+          "type": "range",
+          "id": "mt",
+          "label": "Margin Top",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "mb",
+          "label": "Margin Bottom",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        }
+      ]
+    },
+    {
+      "name": "Paragraph",
+      "type": "paragraph",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "content",
+          "label": "Content"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

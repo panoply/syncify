@@ -30,10 +30,39 @@ Before going ahead with the quickstart, please ensure you have all the following
 If you haven't already installed Syncify, proceed with a global installation. Although installing Syncify on a per-project basis is an option, global installation is generally preferred. This approach avoids the need to prefix the binary with your package manager each time you use them. For the purpose of this quickstart guide, we will install Syncify globally:
 
 :::: grid row mt-5
-::: grid col-12 col-md-5 fs-sm
+::: grid col-12 col-md-6 pr-4 mb-5
+
+#### PNPM
 
 ```bash
-$ pnpm add @syncify/cli@latest -g
+$ pnpm add @syncify/cli -g
+```
+
+:::
+::: grid col-12 col-md-6 pl-4 mb-5
+
+#### NPM
+
+```bash
+$ npm i @syncify/cli -g
+```
+
+:::
+::: grid col-12 col-md-6 pr-4
+
+#### YARN
+
+```bash
+$ yarn add @syncify/cli -g
+```
+
+:::
+::: grid col-12 col-md-6 pl-4
+
+#### BUN
+
+```bash
+$ bun add @syncify/cli -g
 ```
 
 :::
@@ -41,7 +70,7 @@ $ pnpm add @syncify/cli@latest -g
 
 ---
 
-# Authorize
+# Authorization
 
 Syncify needs access to your Shopify store(s). You can grant this access either on a per-project basis using a `.env` file, or through the [Syncify Keychain](/usage/keychain/). If you wish to set up store access at a later stage, you can skip ahead to the [Initialize](#initialize) step below. For this quickstart walkthrough, we'll use the keychain approach. This method securely stores and encrypts access tokens for your stores on your device, allowing reuse across multiple projects.
 

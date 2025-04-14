@@ -1,0 +1,274 @@
+{% liquid
+  if section.settings.text_size == 6
+    assign text_size = section.settings.text_size | prepend: "h"
+  else
+    assign text_size = 6 | minus: section.settings.text_size | prepend: "h"
+  endif
+%}
+
+<div class="row jc-center py-{{ section.settings.gutter }}">
+  {% for block in section.blocks %}
+
+    {% liquid
+      capture gutter
+        if forloop.first
+          echo section.settings.gutter | prepend: "pr-"
+        elsif forloop.last
+          echo section.settings.gutter | prepend: "pl-"
+        else
+          echo section.settings.gutter | prepend: "px-"
+        endif
+      endcapture
+    %}
+
+    <div class="col-12 col-md pb-{{ section.settings.gutter }} pb-md-0 {{ gutter }}">
+
+      <div class="content">
+        <div
+          class="overlay p-3"
+          style="background-color: rgba(0, 0, 0, {{ section.settings.overlay }});">
+          <a
+            href="/collections/{{- block.settings.collection }}"
+            title="{{ block.settings.title }}"
+            class="{{ section.settings.align }} {{ text_size }} my-0"
+            style="color: {{ section.settings.text_color }};">
+            {% if section.settings.type == "text-button" %}
+              <span
+                class="{{ section.settings.type }}"
+                style="background-color: {{ section.settings.button_color }};">
+                {{ block.settings.title }}
+              </span>
+            {% else %}
+              {{ block.settings.title }}
+            {% endif %}
+          </a>
+        </div>
+        <div class="aspect-ratio">
+          {% if block.settings.image != blank %}
+            <img
+              data-src="{{ block.settings.image | format: 'pjpg' | img_url: '1024x' -}}"
+              alt="{{ block.settings.image.alt }}"
+              class="img-fluid">
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'img-fluid' }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Collection list",
+  "tag": "section",
+  "class": "collection-list",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Style",
+      "info": "Customize a block list of collections"
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "label": "Gutter",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "overlay",
+      "label": "Overlay",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0,
+      "info": "Use an overlay to better distinguish text"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Align",
+      "default": "jc-center ai-end",
+      "options": [
+        {
+          "value": "jc-start ai-start",
+          "label": "Top Left"
+        },
+        {
+          "value": "jc-center ai-start",
+          "label": "Top Center"
+        },
+        {
+          "value": "jc-end ai-start",
+          "label": "Top Right"
+        },
+        {
+          "value": "jc-start ai-center",
+          "label": "Middle Left"
+        },
+        {
+          "value": "jc-center ai-center",
+          "label": "Middle Center"
+        },
+        {
+          "value": "jc-end ai-center",
+          "label": "Middle Right"
+        },
+        {
+          "value": "jc-start ai-end",
+          "label": "Bottom Left"
+        },
+        {
+          "value": "jc-center ai-end",
+          "label": "Bottom Center"
+        },
+        {
+          "value": "jc-end ai-end",
+          "label": "Bottom Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Caption",
+      "info": "Customize the text caption to be displayed on each collection image block"
+    },
+    {
+      "type": "radio",
+      "id": "type",
+      "label": "Text Type",
+      "default": "text-normal",
+      "options": [
+        {
+          "value": "text-normal",
+          "label": "Normal"
+        },
+        {
+          "value": "text-button",
+          "label": "Button"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text Size",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "color",
+      "label": "Text Colour",
+      "id": "text_color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "label": "Button Colour",
+      "id": "button_color",
+      "info": "Only applicable when Text Type is \"Button\", otherwise the preset is ignored.",
+      "default": "#111111"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_gender",
+      "name": {
+        "en": "Collection Gender"
+      },
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "collection",
+          "id": "url_men",
+          "label": "URL"
+        },
+        {
+          "type": "collection",
+          "id": "url_women",
+          "label": "URL"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    },
+    {
+      "type": "collection_links",
+      "name": {
+        "en": "Collection Item"
+      },
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "id": "collection",
+          "type": "collection",
+          "label": {
+            "en": "Collection",
+            "de": "Kategorie",
+            "fr": "Collection"
+          }
+        },
+        {
+          "type": "checkbox",
+          "id": "gender_popup",
+          "default": false,
+          "label": "Gender Popup",
+          "info": "Should a gender popup overlay be applied onClick?"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection List",
+      "category": "Collection",
+      "settings": {
+        "align": "jc-center ai-end"
+      },
+      "blocks": [
+        {
+          "type": "collection_links",
+          "settings": {
+            "title": "Collection Name"
+          }
+        },
+        {
+          "type": "collection_links",
+          "settings": {
+            "title": "Collection Name"
+          }
+        },
+        {
+          "type": "collection_links",
+          "settings": {
+            "title": "Collection Name"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

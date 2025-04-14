@@ -1,4 +1,12 @@
-import type { RenamePaths } from '@syncify/types';
+import type {
+  RenamePaths,
+  ScriptTransform,
+  ScriptTransformer,
+  StyleTransform,
+  StyleTransformer,
+  SVGTransform,
+  SVGTransformer
+} from '@syncify/types';
 import type { Tester } from 'anymatch';
 import type { LiteralUnion } from 'type-fest';
 
@@ -161,6 +169,19 @@ export namespace Input {
 
 export namespace Transform {
 
+  export type R =
+    | ScriptTransform
+    | ScriptTransform[]
+    | StyleTransform
+    | StyleTransform[]
+    | SVGTransform
+    | SVGTransform[]
+
+  export type Param =
+  | ScriptTransformer
+  | StyleTransformer
+  | SVGTransformer
+
   /**
    * **INTERNAL USE**
    *
@@ -213,11 +234,6 @@ export namespace Transform {
      */
     flatten?: boolean;
     /**
-     * Whether or not the input should be added to the bundle _watch_ `Set<string>` reference.
-     * When `true` the resolved globs are added to `$.watch` model.
-     */
-    addWatch?: boolean;
-    /**
      * Whether or not snippet assertion should be applied. When `true`, the retuning value
      * will include a `snippet` boolean property to signal whether or not the transform output
      * should export as a snippet.
@@ -239,7 +255,7 @@ export namespace Transform {
      * ]
      *
      */
-    assertSnippet?: boolean;
+    snippet?: boolean;
   }
 
   /**
@@ -268,9 +284,9 @@ export namespace Transform {
    * The return type will use a "Multiple Config" structure
    * that holds resolved URI paths and normalized definitions.
    *
-   * This value will be used to create to Bundle config in each
-   * transform (or related) option define operation. In some cases
-   * the returning value will persist throughout the Syncify instance.
+   * This value will be used to create the Bundle config in each
+   * transform (or related) options. In some cases the returning value
+   * will persist throughout the Syncify instance.
    */
   export interface Resolved {
     /**

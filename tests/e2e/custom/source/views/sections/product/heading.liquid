@@ -1,0 +1,197 @@
+{% liquid
+
+  # CURRENCY SYMBOL
+  capture currency_symbol
+    if cart.currency.iso_code != shop.currency.iso_code and cart.currency.symbol contains '.'
+      echo cart.currency.symbol | remove: '.'
+    else
+      echo cart.currency.symbol
+    endif
+  endcapture
+
+  # CURRENCY CODE
+  capture currency_code
+    echo ' '
+    echo cart.currency.iso_code
+  endcapture
+
+  # PRODUCT PRICE
+  capture product_price
+    echo product.price | money_without_trailing_zeros | remove: currency_symbol
+    echo currency_code
+  endcapture
+
+  # PRIVATE SALE
+  if request.path contains "private-sale" and product.tags contains "Private Sale"
+    assign private_sale = true
+    assign percent_off = product.metafields.data.discount | floor
+  endif
+
+  # COMPARE AT PRICE
+  if private_sale != true and product.compare_at_price_max > product.price
+    assign compare_at_price = true
+  endif
+
+  if compare_at_price
+    capture compared_price
+      echo product.compare_at_price | money_without_trailing_zeros | remove: currency_symbol
+      echo currency_code
+    endcapture
+  endif
+%}
+
+{% # PRODUCT TITLE %}
+
+<div class="col-auto">
+  <h4 class="mb-2">
+    {{ product.metafields.data.product_name.value }}
+  </h4>
+</div>
+
+{% # PRODUCT PRICE %}
+
+<div
+  itemprop="price"
+  class="col-auto tr rel"
+  content="{{ current_variant.price | divided_by: 100 }}">
+
+  {% if compare_at_price %}
+
+    <h4>
+      <s class="price">{{ compared_price }}</s>
+      <span class="fs-xs fc-dark-gray pr-1 upper d-unset d-md-none">{{ 'words.sale' | t }}</span>
+      <span class="price od-first od-md-last ml-md-3">{{ product_price }}</span>
+    </h4>
+
+  {% elsif private_sale %}
+
+    {% liquid
+
+      # AMOUNT TO REMOVE FROM PRICE
+      assign subtract = product.price | divided_by: 100 | times: product.metafields.data.discount
+
+      # DISCOUNTED PRODUCT PRICE
+      capture discount_price
+        echo product.price | minus: subtract | money_without_trailing_zeros | remove: currency_symbol
+        echo currency_code
+      endcapture
+    %}
+
+    <h4 class="m-0">
+
+      {% if compare_at_price %}
+
+        <s class="price fs-sm fw-lighter d-block">{{ compared_price }}</s>
+        <s class="price">{{ product_price }}</s>
+        <span class="price ml-3">{{ discount_price }}</span>
+
+      {% else %}
+
+        <s class="price fc-dark-gray d-inline mr-3">{{ product_price }}</s>
+        <span class="price d-inline">{{ discount_price }}</span>
+
+      {% endif %}
+
+    </h4>
+
+  {% else %}
+
+    <h4 class="price m-0">
+      {{ product_price }}
+    </h4>
+
+  {% endif %}
+
+  <span class="fs-xs upper percent-off">
+
+    {% if private_sale %}
+
+      {% # PRIVATE SALE - DISCOUNT PERCENTAGE %}
+
+      {% if percent_off != blank %}
+        {{ 'pricing.off_html' | t: percent: percent_off }}
+      {% endif %}
+
+    {% elsif compare_at_price and section.settings.show_discount_percentage %}
+
+      {% liquid
+        capture discount_label
+          echo 'pricing.discount' | t
+        endcapture
+      %}
+
+      {{ product.compare_at_price
+        | minus: product.price
+        | times: 100.0
+        | divided_by: product.compare_at_price
+        | round: 0.1
+        | append: discount_label }}
+
+    {% endif %}
+  </span>
+
+  <div class="col-auto">
+
+    <div
+      class="hidden fs-xs upper tr"
+      spx-node="purchase.offer">
+
+      {% # RENDER SHIPPING + RETURNS %}
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Title Text and Pricing",
+  "tag": "section",
+  "class": "row jc-between ai-sm-center g-0 px-3 pt-4 px-md-5 pt-md-5 od-1 od-md-first",
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Product Heading",
+      "info": "Controls how the product name, variant, and price should be displayed"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection",
+      "label": "Show Collection",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Discount / Sale Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price_comparison",
+      "label": "Show Comparison",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_discount_percentage",
+      "label": "Show Percentage",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Shipping / Returns"
+    },
+    {
+      "type": "checkbox",
+      "id": "free_shipping",
+      "label": "Free Shipping",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "free_returns",
+      "label": "Free Returns",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,25 @@
+{
+  "name": "custom",
+  "version": "0.1.0",
+  "description": "Syncify example usage with custom paths",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "@syncify/config": "^0.0.6",
+    "@tailwindcss/postcss": "^4.0.14",
+    "autoprefixer": "^10.4.21",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:"
+  },
+  "syncify": {
+    "stores": {
+      "syncify": {
+        "dev": 137200533745,
+        "dawn": 136656060657
+      },
+      "boefje": {
+        "dev": 45530021946
+      }
+    }
+  }
+}

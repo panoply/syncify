@@ -1,0 +1,573 @@
+{% capture grid %}
+  col-{{ section.settings.sm }}
+  col-lg-{{ section.settings.md }}
+  col-xl-{{ section.settings.lg }}
+  py-{{ section.settings.py }}
+  {% if section.settings.bd %}
+
+  {% else %}
+
+  {% endif %}
+{% endcapture %}
+
+<div class="{{ grid }} bt px-2 bx pr-4">
+  <div class="row {{ section.settings.jc }} px-3 py-4 fw-bold fs-sm upper">
+    {% for block in section.blocks %}
+      {% if block.type == 'country' %}
+        <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+          <img
+            src="{{ localization.country | image_url: width: 32 }}"
+            class="mr-2"
+            style="width: 18px;">
+          {{ localization.country.name }}
+        </div>
+      {% elsif block.type == 'shipping_times' %}
+        <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+          {{ localization.country.market.metafields.shipping.time | append: ' DAYS' }}
+        </div>
+      {% elsif block.type == 'shipping_price' %}
+        <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+          {{ localization.country.market.metafields.shipping.price | metafield_text | remove: cart.currency.symbol }}
+        </div>
+      {% elsif block.type == 'return_price' %}
+        <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+          {% if localization.country.market.metafields.return.price.value > 0 %}
+            {{ localization.country.market.metafields.return.price | metafield_text | remove: cart.currency.symbol }}
+          {% else %}
+            <span class="fs-xs">RETURN AT OWN COST</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="{{ grid }} bb mb-{{ section.settings.mb }} px-0">
+  <accordion
+    class="accordion bd-0"
+    data-controller="accordion"
+    data-accordion-persist-value="false">
+
+    <button class="accordion-btn fs-sm bx py-2 px-3 fw-light">
+      WORLD WIDE RATES
+    </button>
+
+    <div
+      class="accordion-fold bx"
+      data-controller="locale"
+      data-locale-type-value="rates">
+
+      {% if section.blocks.size > 0 %}
+
+        {% if section.settings.search %}
+          <input
+            type="search"
+            class="fm-input fm-lined px-3 accordion-btn "
+            data-action="locale#onInput"
+            placeholder="SEARCH">
+        {% endif %}
+
+        <div class="row {{ section.settings.jc }} px-3 py-2 fw-bold fs-sm upper">
+
+          {% for block in section.blocks %}
+            {% if block.type == 'country' %}
+              <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                {{ block.settings.label }}
+              </div>
+            {% elsif block.type == 'shipping_times' %}
+              <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                {{ block.settings.label }}
+              </div>
+            {% elsif block.type == 'shipping_price' %}
+              <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                {{ block.settings.label }}
+              </div>
+            {% elsif block.type == 'return_price' %}
+              <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                {{ block.settings.label }}
+              </div>
+            {% endif %}
+          {% endfor %}
+
+        </div>
+
+        <div class="table-scroll px-3 pb-3" data-locale-target="countries">
+
+          {% for country in localization.available_countries %}
+
+            {% assign field = country.market.metafields %}
+
+            <div
+              id="{{ country.name | downcase }}"
+              class="row {{ section.settings.jc }} px-1 py-1 fs-sm upper"
+              {% if field.domain.subfolder != "/" %}
+                data-sort-first="{% increment first %}"
+              {% elsif field.zone.european_union %}
+                data-sort-second="{% increment second %}"
+              {% endif %}>
+
+              {% for block in section.blocks %}
+                {% if block.type == 'country' %}
+                  <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                    {% if block.settings.flag %}
+                      <img
+                        src="{{ country | image_url: width: 32 }}"
+                        class="mr-2"
+                        style="width: {{ block.settings.flag_width }}px;">
+                    {% endif %}
+                    {{ country.name }}
+                  </div>
+                {% elsif block.type == 'shipping_times' %}
+                  <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                    {{ field.shipping.time | append: ' DAYS' }}
+                  </div>
+                {% elsif block.type == 'shipping_price' %}
+                  <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                    {{ field.shipping.price | metafield_text }}
+                  </div>
+                {% elsif block.type == 'return_price' %}
+                  <div class="col-{{ block.settings.col | replace: '0', 'auto' }} {{ block.settings.ta }}">
+                    {% if field.return.price.value > 0 %}
+                      {{ field.return.price | metafield_text }}
+                    {% else %}
+                      <span style="font-size: 0.525rem;">RETURN AT OWN COST</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+
+            </div>
+
+          {% endfor %}
+
+        </div>
+      {% endif %}
+    </div>
+  </accordion>
+</div>
+{% schema %}
+{
+  "name": "Rates Table",
+  "tag": "section",
+  "class": "row mb-3 pr-5",
+  "presets": [
+    {
+      "name": "Rates Table"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Localized",
+      "info": "Whether or not to use the localized accordion logic. The settings here allow for better aesthetics when showcasing rates."
+    },
+    {
+      "type": "checkbox",
+      "id": "localized",
+      "label": "Localized Accordion",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Zones",
+      "info": "Control the zones to be displayed in the table. Zones are defined in the [markets](https://brixtol.myshopify.com/admin/settings/markets) metafield options"
+    },
+    {
+      "type": "select",
+      "id": "europe",
+      "label": "Eurozone",
+      "default": "continent",
+      "info": "Determine the E.U zone. Choosing Europe will include all countries of the continent. Choosing European Union will only include E.U member countries.",
+      "options": [
+        {
+          "value": "continent",
+          "label": "Europe"
+        },
+        {
+          "value": "union",
+          "label": "European Union"
+        },
+        {
+          "value": "non_eu",
+          "label": "Non E.U"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "asia",
+      "label": "Asia",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "north_america",
+      "label": "North America",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "south_america",
+      "label": "South America",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "central_america",
+      "label": "Central America",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "oceania",
+      "label": "Oceania",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "africa",
+      "label": "Africa",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Search",
+      "info": "Whether or not the enable search completions"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search Placeholder",
+      "default": "Search Country"
+    },
+    {
+      "type": "checkbox",
+      "id": "search",
+      "label": "Search",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Grid",
+      "info": "Grid configuration to be applied"
+    },
+    {
+      "type": "checkbox",
+      "id": "bd",
+      "label": "Border",
+      "info": "Whether or not the render a border around the table",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "jc",
+      "label": "Column Alignment",
+      "default": "jc-between",
+      "options": [
+        {
+          "value": "jc-start",
+          "label": "Start"
+        },
+        {
+          "value": "jc-between",
+          "label": "Between"
+        },
+        {
+          "value": "jc-around",
+          "label": "Around"
+        },
+        {
+          "value": "jc-center",
+          "label": "Center"
+        },
+        {
+          "value": "jc-end",
+          "label": "End"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "sm",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "Tablet",
+      "info": "Screens in large tablet",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "lg",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "header",
+      "content": "Spacing",
+      "info": "Gutters and spacing applied to the grid"
+    },
+    {
+      "type": "range",
+      "id": "py",
+      "label": "Gutter Y",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "px",
+      "label": "Gutter X",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mb",
+      "label": "Margin Bottom",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Country",
+      "type": "country",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Properties",
+          "info": "Control the metafield property columns and grid structure."
+        },
+        {
+          "type": "range",
+          "id": "flag_width",
+          "label": "Flag Width",
+          "info": "The size of the SVG flag",
+          "min": 10,
+          "max": 100,
+          "step": 1,
+          "default": 18
+        },
+        {
+          "type": "checkbox",
+          "id": "flag",
+          "label": "Flag",
+          "default": true,
+          "info": "Whether or not to show the country flag SVG"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "The column name",
+          "default": "Country"
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tl",
+          "info": "The record alignment",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "col",
+          "label": "Column",
+          "info": "Column size",
+          "min": 0,
+          "max": 6,
+          "step": 1,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Shipping Times",
+      "type": "shipping_times",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Shipping Times",
+          "info": "Control the metafield property columns and grid structure."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "The column name",
+          "default": "Country"
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tl",
+          "info": "The record alignment",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "col",
+          "label": "Column",
+          "info": "Column size (0 value will auto size)",
+          "min": 0,
+          "max": 6,
+          "step": 1,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Shipping Price",
+      "type": "shipping_price",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Shipping Price",
+          "info": "Control the metafield property columns for Shipping Price."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "The column name",
+          "default": "Price"
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tl",
+          "info": "The record alignment",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "col",
+          "label": "Column",
+          "info": "Column size (0 value will auto size)",
+          "min": 0,
+          "max": 6,
+          "step": 1,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "Return Price",
+      "type": "return_price",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Shipping Price",
+          "info": "Control the metafield property columns for Shipping Price."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "The column name",
+          "default": "Price"
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tl",
+          "info": "The record alignment",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "col",
+          "label": "Column",
+          "info": "Column size (0 value will auto size)",
+          "min": 0,
+          "max": 6,
+          "step": 1,
+          "default": 0
+        }
+      ]
+    }
+  ]
+
+}
+{% endschema %}

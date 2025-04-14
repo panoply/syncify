@@ -32,7 +32,7 @@ export type { VC } from './config/vc';
 export type { Git } from './config/git';
 export type { Directories } from './config/directories';
 export type { Logger } from './config/logger';
-export type { CustomStash, Paths, RenamePaths } from './config/paths';
+export type { Paths, Pattern, Rename, Stash } from './config/paths';
 export type { Publishing } from './config/publishing';
 export type { Transforms } from './config/transform';
 export type { Processors } from './config/processor';
@@ -54,6 +54,7 @@ export interface Config extends Directories {
   editor?: LiteralUnion<
     | 'vscode'
     | 'sublime'
+    | 'cursor'
     | 'atom'
     | 'webstorm'
     | 'intellij'

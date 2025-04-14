@@ -1,13 +1,12 @@
-import papyrus from 'papyrus'
-import spx from 'spx';
+import papyrus from 'papyrus';
 import qvp from 'qvp';
+import spx from 'spx';
 
 /* -------------------------------------------- */
 /* CLASS                                        */
 /* -------------------------------------------- */
 
 export class Hovers extends spx.Component<typeof Hovers.define> {
-
 
   static define = {
     state: {
@@ -21,7 +20,7 @@ export class Hovers extends spx.Component<typeof Hovers.define> {
 
   onmount () {
 
-   papyrus.list().forEach
+    papyrus.list().forEach;
 
   }
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import relapse from 'relapse';
 import spx, { SPX } from 'spx';
 
@@ -71,7 +70,7 @@ export class Dropdown extends spx.Component({
 
     this.state.collapse = 'opened';
     this.view.classList.add('is-open');
-    this.buttonNode.classList.remove('selected');
+    this.buttonNode.removeClass('selected');
 
     if (this.hasAccordion) this.inViewport();
 

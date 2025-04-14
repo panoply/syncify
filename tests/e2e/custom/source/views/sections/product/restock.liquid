@@ -1,0 +1,202 @@
+<div class="row jc-center my-4 g-0">
+  <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-7 {{ section.settings.ta }}">
+    {{ section.settings.banner }}
+  </div>
+</div>
+<div class="row jc-center my-md-4 g-0">
+
+  <form
+    method="post"
+    accept-charset="UTF-8"
+    class="col-11 col-sm-10 col-md-8 col-xl-6"
+    spx-component="form"
+    spx-form:customer="true"
+    spx-form:klaviyo="{{ section.settings.klaviyo_list }}"
+    spx-form:success="{{ section.settings.success }}"
+    spx-form:type="notification:instock"
+    spx@submit="form.onSubmit">
+
+    <div
+      class="col-11 col-sm-10 m-auto"
+      style="height: 80px;">
+
+      {% if section.settings.klaviyo_list != nil %}
+        <input
+          type="hidden"
+          name="g"
+          value="{{ section.settings.klaviyo_list }}">
+      {% endif %}
+
+      {% if section.settings.visits %}
+        <input
+          id="user_visits"
+          type="hidden"
+          name="user_visits"
+          value="{{ section.settings.visits }}">
+      {% endif %}
+
+      {% if section.settings.locale %}
+        <input
+          id="user_locale"
+          type="hidden"
+          name="user_locale"
+          value="{{ section.settings.locale }}">
+      {% endif %}
+
+      {% if section.settings.product %}
+        <input
+          id="product_name"
+          type="hidden"
+          name="product_name"
+          value="{{ product.title }}">
+        <input
+          id="product_title"
+          type="hidden"
+          name="product_title"
+          value="{{ product.title | split: '–' | first }}">
+        <input
+          type="hidden"
+          name="$product_variant"
+          value="{{ product.title | split: '–' | last | strip }}">
+      {% endif %}
+
+      {% if section.settings.product_id %}
+        <input
+          id="product_id"
+          type="hidden"
+          name="product_id"
+          value="{{ product.id }}">
+      {% endif %}
+
+      {% if section.settings.collection %}
+        <input
+          id="product_id"
+          type="hidden"
+          name="collection"
+          value="{{ product.vendor }}">
+      {% endif %}
+
+      {% if section.settings.gender %}
+        <input
+          id="gender"
+          type="hidden"
+          name="gender"
+          value="{% if product.tags contains 'Men' %}MEN{% else %}WOMEN{% endif %}">
+      {% endif %}
+
+      <div class="fm-group mb-2">
+        <input
+          type="email"
+          name="email"
+          class="fm-input"
+          placeholder="{{ 'customer.login.email' | t | upcase }}"
+          required="true"
+          spx-form:session="emailAddress"
+          spx-node="form.inputField"
+          spx@input="form.onInput">
+        <button
+          type="submit"
+          class="btn btn-black"
+          spx-node="form.submit">
+          {{ 'forms.buttons.notify' | t }}
+        </button>
+      </div>
+
+      <div
+        class="fs-xs fw-light"
+        data-form-target="response"></div>
+    </div>
+  </form>
+</div>
+
+{% schema %}
+{
+  "name": "Restock Notification",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "List ID",
+      "info": "Enter the Klaviyo list Identifier."
+    },
+    {
+      "type": "text",
+      "id": "klaviyo_list",
+      "default": "VWXU3n",
+      "label": "List ID"
+    },
+    {
+      "type": "header",
+      "content": "Data Collection",
+      "info": "Define the data to collect from the restock subscription. This information will be added to the Klaviyo Lists."
+    },
+    {
+      "type": "checkbox",
+      "id": "product",
+      "label": "Product Name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_id",
+      "label": "Product ID",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection",
+      "label": "Collection Name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "gender",
+      "label": "Product Gender",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "visits",
+      "label": "User Visits",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "locale",
+      "label": "User Locale",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Text Banner",
+      "info": "Content text block"
+    },
+    {
+      "type": "richtext",
+      "id": "banner",
+      "label": "Content",
+      "default": "<p>This item is not currently in stock. If you want us to let you know when it becomes available, subscribe to the re-stock notification.</p>"
+    },
+    {
+      "type": "select",
+      "id": "ta",
+      "label": "Text Alignment",
+      "default": "tc",
+      "options": [
+        {
+          "value": "tl",
+          "label": "Left"
+        },
+        {
+          "value": "tc",
+          "label": "Center"
+        },
+        {
+          "value": "tr",
+          "label": "Right"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -52,7 +52,7 @@
     "@utils": "pnpm -F @syncify/utils",
     "@acquire": "pnpm -F @syncify/acquire",
     "@kill": "pnpm -F @syncify/kill",
-    "@docs": "pnpm -F @syncify/docs",
+    "@docs": "cd docs; pnpm dev; cd ..",
     "@update": "pnpm -F @syncify/update",
     "@config": "pnpm -F @syncify/config",
     "@codeframe": "pnpm -F @syncify/codeframe",

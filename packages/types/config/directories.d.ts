@@ -2,7 +2,7 @@
 /* BASE DIRECTORIES                             */
 /* -------------------------------------------- */
 
-export interface Directories {
+export type Directories = {
   /**
    * The resolved `input` directory path
    *

@@ -1,0 +1,1091 @@
+{%
+  liquid
+
+  capture hero_overlay
+    if section.settings.navbar_overlay
+      echo '--hero-navbar:' | append: '-45px;'
+    else
+      echo '--hero-navbar:' | append: '0;'
+    endif
+  endcapture
+%}
+
+{% for block in section.blocks %}
+
+  {% if block.type == 'image_annotation' %}
+
+    {{ block.settings.hl_fw }}
+
+  {% endif %}
+
+  {% if block.type == 'image' or block.type == 'image_form' %}
+
+    {%
+      liquid
+
+      capture css_vars
+        echo hero_overlay
+        echo '--hero-overlay:' | append: block.settings.linear_bg | append: ';'
+      endcapture
+
+      # HEADLINE STYLE
+      #
+      if block.settings.headline != nil
+        capture headline_style
+          echo 'font-size:' | append: block.settings.headline_fs | append: 'px;'
+          echo 'font-weight:' | append: block.settings.headline_fw | append: ';'
+          echo 'color:' | append: block.settings.headline_fc | append: ';'
+        endcapture
+      endif
+
+      # HEADING STYLE
+      #
+      if block.settings.heading != nil
+        capture heading_style
+          echo 'font-size:' | append: block.settings.heading_fs | append: 'px;'
+          echo 'font-weight:' | append: block.settings.heading_fw | append: ';'
+          echo 'color:' | append: block.settings.heading_fc | append: ';'
+        endcapture
+      endif
+
+      # CAPTION SPACING
+      # Additional padding to be applied to the text content overlay container
+      #
+      if block.settings.gutter > 0
+        assign pixels = block.settings.gutter | append: '%;'
+        capture padding
+          if block.settings.top
+            echo 'padding-top:' | append: pixels
+          endif
+          if block.settings.bottom
+            echo 'padding-bottom:' | append: pixels
+          endif
+          if block.settings.left
+            echo 'padding-left:' | append: pixels
+          endif
+          if block.settings.right
+            echo 'padding-right:' | append: pixels
+          endif
+        endcapture
+      endif
+
+      # ASPECT RATIO
+      # The image aspect ratio to be applied on heros
+      #
+      capture desktop_height
+        if section.settings.use_h
+          echo block.settings.img_desktop.height
+        else
+          echo section.settings.ratio_h
+        endif
+      endcapture
+      capture desktop_width
+        if section.settings.use_w
+          echo block.settings.img_desktop.width
+        else
+          echo section.settings.ratio_w
+        endif
+      endcapture
+      capture mobile_height
+        if section.settings.use_h
+          echo block.settings.img_mobile.height
+        else
+          echo section.settings.ratio_h
+        endif
+      endcapture
+      capture mobile_width
+        if section.settings.use_w
+          echo block.settings.img_mobile.width
+        else
+          echo section.settings.ratio_w
+        endif
+      endcapture
+    %}
+
+    <div
+      class="col-12 rel"
+      style="{{ css_vars }}">
+      <picture
+        class="ratio d-none d-md-block"
+        style="--ratio: calc({{ desktop_height }} / {{ desktop_width }});">
+        <source
+          media="(max-width: 343px)"
+          srcset="{{ block.settings.img_desktop | image_url: width: 380 }}">
+        <source
+          media="(min-width: 344px) and (max-width: 576px)"
+          srcset="{{ block.settings.img_desktop | image_url: width: 620 }}">
+        <source
+          media="(min-width: 1024px) and (max-width: 1399px)"
+          srcset="{{ block.settings.img_desktop | image_url: width: 3000 }}">
+        <source
+          media="(min-width: 1400px) and (max-width: 1799px)"
+          srcset="{{ block.settings.img_desktop | image_url: width: 3000 }}">
+        <source
+          media="(min-width: 1800px)"
+          srcset="{{ block.settings.img_desktop | image_url: width: 3000 }}">
+        <img
+          src="{{ block.settings.img_desktop | image_url: width: 3000 }}"
+          loading="lazy"
+          height="{{ block.settings.img_desktop.height }}"
+          width="{{ block.settings.img_desktop.width }}">
+      </picture>
+      <picture
+        class="ratio d-block d-md-none"
+        style="--ratio: calc({{ mobile_height }} / {{ mobile_width }});">
+        <source
+          media="(max-width: 343px)"
+          srcset="{{ block.settings.img_mobile | image_url: width: 380 }}">
+        <source
+          media="(min-width: 344px) and (max-width: 576px)"
+          srcset="{{ block.settings.img_mobile | image_url: width: 620 }}">
+        <img
+          src="{{ block.settings.img_mobile | image_url: width: 3000 }}"
+          loading="lazy"
+          height="{{ block.settings.img_mobile.height }}"
+          width="{{ block.settings.img_mobile.width }}">
+      </picture>
+
+      {% if block.type == 'image_form' %}
+        <div
+          class="abs-flex {{ block.settings.position }}"
+          spx-component="form"
+          data-form-type-value="newsletter:access"
+          spx-form:klaviyo="RMim8J"
+          spx-form:link="collections/${gender}-private-sale"
+          spx-form:response="toggle"
+          spx-form:success="Thanks for subscribing! We have sent you a confirmation email which includes access to the private sale."
+          spx-morph="false"
+          style="{{ padding | default: 'padding: 25px;' }}">
+
+          <div class="hero-form flex">
+
+            {% if block.settings.headline != blank %}
+              {% capture style %}
+                font-size: {{ block.settings.headline_fs }}px;
+                font-weight: {{ block.settings.headline_fw }};
+                color: {{ block.settings.headline_fc }};
+              {% endcapture %}
+              <div
+                class="hero-caption d-block mb-2 tc {{ block.settings.headline_ts }}"
+                style="{{ style | strip_newlines | strip }}">
+                {{ block.settings.headline }}
+              </div>
+            {% endif %}
+
+            <div
+              class="fc-white italic my-5 mb-3 tc d-none"
+              data-form-target="response">
+            {% # RENDER VIRTUAL RESPONSE %}
+            </div>
+
+            <form
+              method="post"
+              accept-charset="UTF-8"
+              class="d-flex"
+              action="{{ request.path }}"
+              novalidate
+              data-action="form#onSubmit"
+              data-form-target="form">
+
+              <input
+                type="hidden"
+                name="$flow"
+                class="d-none"
+                value="private-sale"
+                data-form-target="field">
+
+              <p class="fc-white italic mb-5 tc">
+                Shop the Fall / Winter 23 collection at 30% discount. Sale access is only available to newsletter subscribers.
+              </p>
+
+              <div>
+                <div class="d-block mb-4">
+                  <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    class="fm-input"
+                    data-action="form#onInput"
+                    data-form-session="emailAddress"
+                    data-form-target="field"
+                    placeholder="Email address"
+                    required>
+                </div>
+              </div>
+
+              <div class="d-block pb-4">
+                <dropdown
+                  class="fm-dropdown"
+                  data-controller="dropdown"
+                  data-form-target="dropdown">
+                  <button
+                    type="button"
+                    class="upper"
+                    data-action="dropdown#toggle"
+                    data-dropdown-target="button">
+                    COLLECTION
+                  </button>
+                  <fieldset data-dropdown-target="collapse">
+                    <label
+                      for="gender-men"
+                      class="upper">
+                      MAN
+                    </label>
+                    <input
+                      id="gender-men"
+                      type="radio"
+                      name="gender"
+                      class="d-none"
+                      aria-label="MAN"
+                      value="M"
+                      data-action="dropdown#select form#onInput"
+                      data-form-target="field"
+                      required>
+                    <label
+                      for="gender-women"
+                      class="upper">
+                      WOMAN
+                    </label>
+                    <input
+                      id="gender-women"
+                      type="radio"
+                      name="gender"
+                      class="d-none"
+                      aria-label="WOMAN"
+                      value="F"
+                      data-action="dropdown#select form#onInput"
+                      data-form-target="field">
+                  </fieldset>
+                </dropdown>
+              </div>
+
+              <button
+                type="submit"
+                class="btn w-100 py-2 btn-black bg-black"
+                data-form-target="submit">
+                ACCESS SALE
+              </button>
+            </form>
+          </div>
+        </div>
+
+      {% elsif block.type == 'image' %}
+
+        {% if block.settings.heading or block.settings.headline %}
+
+          <div
+            class="abs-flex {{ block.settings.position }}"
+            style="{{ padding | default: 'padding: 25px;' }}">
+            <div class="row jc-center">
+              {% if block.settings.headline %}
+                <h1
+                  class="col-12 tc {{ block.settings.headline_ts }}"
+                  style="{{ headline_style }}">
+                  {{ block.settings.headline }}
+                </h1>
+              {% endif %}
+              {% if block.settings.heading %}
+                <h1
+                  class="col-12 tc {{ block.settings.heading_ts }}"
+                  style="{{ heading_style }}">
+                  {{ block.settings.heading }}
+                </h1>
+              {% endif %}
+            </div>
+          </div>
+
+        {% endif %}
+      {% endif %}
+
+    </div>
+  {% endif %}
+{% endfor %}
+
+{% schema %}
+{
+  "name": "Hero Annotation",
+  "class": "hero row g-0 jc-center ai-center d-flex",
+  "tag": "section",
+  "templates": ["index"],
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Navbar Overlay",
+      "info": "Whether or not the navbar overlays the hero image"
+    },
+    {
+      "type": "checkbox",
+      "id": "navbar_overlay",
+      "label": "navbar_overlay",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Image",
+      "info": "Select the image to show"
+    },
+    {
+      "$ref": "common.images"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop",
+      "info": "Applies a transparent gradient backdrop overlay."
+    },
+    {
+      "type": "color_background",
+      "id": "linear_bg",
+      "label": "Background Gradient",
+      "default": "linear-gradient(0deg, rgba(255, 255, 255, 0) 5%, rgba(0, 0, 0, 0.5) 100%)"
+    },
+    {
+      "type": "header",
+      "content": "Aspect Ratio",
+      "info": "Define the image ratios in the collage"
+    },
+    {
+      "type": "number",
+      "id": "ratio_h",
+      "label": "Ratio Height",
+      "default": 1700
+    },
+    {
+      "type": "checkbox",
+      "id": "use_h",
+      "label": "Use Image Height",
+      "info": "Whether or not to use the native image height for aspect ratio.",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "ratio_w",
+      "label": "Ratio Width",
+      "default": 3000
+    },
+    {
+      "type": "checkbox",
+      "id": "use_w",
+      "label": "Use Image Width",
+      "info": "Whether or not to use the native image width for aspect ratio.",
+      "default": true
+    }
+  ],
+  "blocks": [
+
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Link",
+          "info": "Whether or not the background image is linked. Leave it undefined if using caption."
+        },
+        {
+          "type": "url",
+          "id": "href",
+          "label": "Link"
+        },
+        {
+          "type": "header",
+          "content": "Image",
+          "info": "Select the image to show"
+        },
+        {
+          "$ref": "common.images"
+        },
+        {
+          "type": "header",
+          "content": "Backdrop",
+          "info": "Applies a transparent gradient backdrop overlay."
+        },
+        {
+          "type": "color_background",
+          "id": "linear_bg",
+          "label": "Background Gradient",
+          "default": "linear-gradient(0deg, rgba(255, 255, 255, 0) 5%, rgba(0, 0, 0, 0.5) 100%)"
+        },
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Optionally define a heading to output as a headline."
+        },
+        {
+          "type": "text",
+          "id": "headline",
+          "label": "Headline"
+        },
+        {
+          "type": "color",
+          "id": "headline_fc",
+          "label": "Font Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "select",
+          "id": "headline_ts",
+          "label": "Headline Style",
+          "default": "italic normal",
+          "options": [
+            {
+              "value": "normal",
+              "label": "None"
+            },
+            {
+              "value": "upper",
+              "label": "Uppercase"
+            },
+            {
+              "value": "italic normal",
+              "label": "Italic"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "headline_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "headline_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 500
+        },
+        {
+          "type": "header",
+          "content": "heading",
+          "info": "Optionally define a heading to output following the headline."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Enter the heading title"
+        },
+        {
+          "type": "color",
+          "id": "heading_fc",
+          "label": "Font Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "select",
+          "id": "heading_ts",
+          "label": "Style",
+          "default": "italic normal",
+          "options": [
+            {
+              "value": "normal",
+              "label": "Normal"
+            },
+            {
+              "value": "upper",
+              "label": "Uppercase"
+            },
+            {
+              "value": "italic normal",
+              "label": "Italic"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "heading_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "heading_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 500
+        },
+        {
+          "type": "header",
+          "content": "Position / Spacing",
+          "info": "Controls the position and alignment"
+        },
+        {
+          "type": "select",
+          "id": "position",
+          "label": "Position",
+          "default": "jc-center ai-center",
+          "options": [
+            {
+              "value": "jc-start ai-start",
+              "label": "Top Left"
+            },
+            {
+              "value": "jc-center ai-start",
+              "label": "Top Center"
+            },
+            {
+              "value": "jc-end ai-start",
+              "label": "Top Right"
+            },
+            {
+              "value": "jc-start ai-center",
+              "label": "Middle Left"
+            },
+            {
+              "value": "jc-center ai-center",
+              "label": "Middle Center"
+            },
+            {
+              "value": "jc-end ai-center",
+              "label": "Middle Right"
+            },
+            {
+              "value": "jc-start ai-end",
+              "label": "Bottom Left"
+            },
+            {
+              "value": "jc-center ai-end",
+              "label": "Bottom Center"
+            },
+            {
+              "value": "jc-end ai-end",
+              "label": "Bottom Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "gutter",
+          "label": "Gutter",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 0,
+          "unit": "%"
+        },
+        {
+          "type": "checkbox",
+          "id": "top",
+          "label": "Top",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "left",
+          "label": "Left",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "bottom",
+          "label": "Bottom",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "right",
+          "label": "Right",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "image_annotation",
+      "name": "Image Annotation",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Images",
+          "info": "Choose the images to be rendered"
+        },
+        {
+          "$ref": "common.images"
+        },
+        {
+          "type": "header",
+          "content": "Backdrop",
+          "info": "Applies a transparent gradient backdrop overlay"
+        },
+        {
+          "type": "color_background",
+          "id": "linear_bg",
+          "label": "Background Gradient",
+          "default": "linear-gradient(0deg, rgba(255, 255, 255, 0) 5%, rgba(0, 0, 0, 0.5) 100%)"
+        },
+        {
+          "type": "header",
+          "content": "Image Link",
+          "info": "Whether or not the background image is linked. If the annotation applies linked references than leave this blank as it will override annotation links."
+        },
+        {
+          "type": "url",
+          "id": "href",
+          "label": "Link",
+          "info": "Providing a link will override annotation links."
+        },
+        {
+          "type": "header",
+          "content": "Headline",
+          "info": "Headline will be rendered above text annotations."
+        },
+        {
+          "type": "text",
+          "id": "hl_text",
+          "label": "Headline Text"
+        },
+        {
+          "type": "color",
+          "id": "hl_fc",
+          "label": "Font Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "select",
+          "id": "hl_ts",
+          "label": "Text Style",
+          "default": "italic normal",
+          "options": [
+            {
+              "value": "normal",
+              "label": "None"
+            },
+            {
+              "value": "upper",
+              "label": "Uppercase"
+            },
+            {
+              "value": "italic normal",
+              "label": "Italic"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "hl_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "hl_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 500
+        },
+        {
+          "type": "header",
+          "content": "Tagline",
+          "info": "Tagline is optional and will be rendered under the headline text annotation."
+        },
+        {
+          "type": "text",
+          "id": "tl_text",
+          "label": "Tagline Text"
+        },
+        {
+          "type": "color",
+          "id": "tl_fc",
+          "label": "Font Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "select",
+          "id": "tl_ts",
+          "label": "Text Style",
+          "default": "italic normal",
+          "options": [
+            {
+              "value": "normal",
+              "label": "Normal"
+            },
+            {
+              "value": "upper",
+              "label": "Uppercase"
+            },
+            {
+              "value": "italic normal",
+              "label": "Italic"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "tl_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "tl_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 500
+        },
+        {
+          "type": "header",
+          "content": "Position / Spacing",
+          "info": "Controls the position and alignment"
+        },
+        {
+          "type": "select",
+          "id": "position",
+          "label": "Position",
+          "default": "jc-center ai-center",
+          "options": [
+            {
+              "value": "jc-start ai-start",
+              "label": "Top Left"
+            },
+            {
+              "value": "jc-center ai-start",
+              "label": "Top Center"
+            },
+            {
+              "value": "jc-end ai-start",
+              "label": "Top Right"
+            },
+            {
+              "value": "jc-start ai-center",
+              "label": "Middle Left"
+            },
+            {
+              "value": "jc-center ai-center",
+              "label": "Middle Center"
+            },
+            {
+              "value": "jc-end ai-center",
+              "label": "Middle Right"
+            },
+            {
+              "value": "jc-start ai-end",
+              "label": "Bottom Left"
+            },
+            {
+              "value": "jc-center ai-end",
+              "label": "Bottom Center"
+            },
+            {
+              "value": "jc-end ai-end",
+              "label": "Bottom Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "gutter",
+          "label": "Gutter",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 0,
+          "unit": "%"
+        },
+        {
+          "type": "checkbox",
+          "id": "top",
+          "label": "Top",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "left",
+          "label": "Left",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "bottom",
+          "label": "Bottom",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "right",
+          "label": "Right",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "image_form",
+      "name": "Image Form",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Image",
+          "info": "Select the image to show"
+        },
+        {
+          "type": "image_picker",
+          "id": "img",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "href",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "image_carousel",
+      "name": "Image Carousel",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "Full Width",
+          "default": false,
+          "info": "Whether or not the image should span full width."
+        },
+        {
+          "type": "header",
+          "content": "Image",
+          "info": "Select the image to show"
+        },
+        {
+          "type": "image_picker",
+          "id": "img",
+          "label": "Image"
+        },
+        {
+          "type": "header",
+          "content": "Styling",
+          "info": "Shared styling to be applied to either the heading and label or the label."
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tl",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "url",
+          "id": "href",
+          "label": "Link"
+        },
+        {
+          "type": "range",
+          "id": "img_mb",
+          "label": "Gutter Bottom",
+          "info": "The bottom spacing gutter under the image",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Optionally define a heading to output as a headline of the label."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "checkbox",
+          "id": "heading_upper",
+          "label": "Uppercase",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "heading_italic",
+          "label": "Italic",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "heading_fv",
+          "label": "Numeric",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "heading_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "heading_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 500
+        },
+        {
+          "type": "range",
+          "id": "heading_mb",
+          "label": "Gutter Bottom",
+          "info": "The bottom spacing gutter under the heading",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "header",
+          "content": "Label",
+          "info": "Define the label text overlay for the image."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        },
+        {
+          "type": "header",
+          "content": "Label Style",
+          "info": "Customize how the label should look"
+        },
+        {
+          "type": "checkbox",
+          "id": "label_upper",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "label_italic",
+          "label": "Italic",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "label_fv",
+          "label": "Numeric",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "label_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "label_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 300
+        },
+        {
+          "type": "range",
+          "id": "label_mb",
+          "label": "Gutter Bottom",
+          "info": "The bottom spacing gutter under the text",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "header",
+          "content": "Footnote",
+          "info": "Customize how the footnote text should look"
+        },
+        {
+          "type": "text",
+          "id": "footnote",
+          "label": "Footnote"
+        },
+        {
+          "type": "checkbox",
+          "id": "footnote_upper",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "footnote_italic",
+          "label": "Italic",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "footnote_fv",
+          "label": "Numeric",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "footnote_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "footnote_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 300
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Annotation",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}

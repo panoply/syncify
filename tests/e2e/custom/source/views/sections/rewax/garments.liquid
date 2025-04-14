@@ -1,0 +1,123 @@
+<div class="jc-center">
+
+  <h3 class="my-2">
+    {{ section.settings.title }}
+  </h3>
+  <h6 class="mb-0">
+    Select Garment
+  </h6>
+  <p class="pt-2 pr-3">
+    {{- section.settings.description -}}
+  </p>
+  <div
+    class="carousel-rewaxing d-flex jc-center w-100"
+    data-carousel-draggable-value=" {{- section.settings.draggable }}"
+    data-carousel-loop-value=" {{- section.settings.loop }}"
+    data-carousel-duration-value="300"
+    data-carousel-init-hidden-value="true"
+    data-controller="carousel"
+    id="rewaxing-products">
+
+    <div class="d-flex ai-center">
+      <button
+        class="btn-reset prev"
+        aria-label="Previous"
+        data-action="click->carousel#prev"
+        type="button">
+        <svg class="icon">
+          <use xlink:href="#chevron-left"></use>
+        </svg>
+      </button>
+    </div>
+    <div class="d-flex ai-center">
+      <button
+        class="btn-reset next"
+        aria-label="Next"
+        data-action="click->carousel#next"
+        type="button">
+        <svg class="icon">
+          <use xlink:href="#chevron-right"></use>
+        </svg>
+      </button>
+    </div>
+
+    <div class="w-100" data-carousel-target="siema">
+      {%- for product in collections.rewaxing-service.products -%}
+        {%- for variant in product.variants -%}
+          <div
+            class=" {%- unless forloop.first -%}d-none{%- endunless -%}"
+            data-carousel-target="slide"
+            data-title=" {{- variant.title -}}"
+            data-variant=" {{- variant.id -}}">
+            <h4>{{- variant.title -}}</h4>
+            <picture class="image" data-id="{{- product.id -}}">
+              <source
+                media="xl"
+                data-srcset="{{- variant.image.src | img_url: '720x' | format: 'pjpg' -}}" />
+              <source
+                media="lg"
+                data-srcset="{{- variant.image.src | img_url: '580x' | format: 'pjpg' -}}" />
+              <source
+                media="md"
+                data-srcset="{{- variant.image.src | img_url: '490x' | format: 'pjpg' -}}" />
+              <source
+                media="sm"
+                data-srcset="{{- variant.image.src | img_url: '320x' | format: 'pjpg' -}}" />
+              <source
+                media="xs"
+                data-srcset="{{- variant.image.src | img_url: '320x' | format: 'pjpg' -}}" />
+
+              <img
+                class="img-fluid lazy"
+                data-src=" {{- variant.image.src | img_url: '600x' | format: 'pjpg' -}}" />
+
+            </picture>
+          </div>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection",
+  "tag": "section",
+  "class": "col-12 col-md-3 text-center",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "content": "Garment Slideshow",
+      "info": "Supplies a collection as a carousel slideshow"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "draggable",
+      "label": "Draggable",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Buttons",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

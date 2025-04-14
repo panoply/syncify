@@ -1,0 +1,82 @@
+<div
+  class="filter bg-white p-4"
+  data-controller="sticky"
+  data-sticky-offset-value="50"
+  data-sticky-stuck-class="filters-overflow">
+
+  <strong class="upper mb-2">
+    Season
+  </strong>
+
+  {% assign filter_tags = 'All, Spring, Summer, Autumn, Winter, Archive' | split: ',' %}
+
+  <ul class="list-clear mb-4 mt-3">
+    {% for tag in filter_tags %}
+      <li class="mb-1">
+        {{ tag | link_to_tag: tag }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% for filter in collection.filters %}
+
+    <strong class="upper mb-2">
+
+      {{ filter.label | replace: 'Brand', 'Season' | remove: 'Reference' }}
+
+      {% if filter.active_values.size > 0 %}
+        <span class="ml-auto pr-2">
+          {{ filter.active_values.size }}
+        </span>
+      {% endif %}
+    </strong>
+
+    {% if filter.active_values.size > 0 %}
+    {% endif %}
+
+    {% if filter.type == 'boolean' or filter.type == 'list' %}
+
+      {% assign groups = filter.values | uniq %}
+
+      <ul class="pl-0 mb-4 mt-3">
+        {% for filter_value in groups %}
+
+          {% capture attrs %}
+            data-action="input->filter#onCheck"
+            data-filter-target="checkbox"
+              name="{{ filter_value.param_name }}"
+            value="{{ filter_value.value | url_encode }}"
+            id="{{ filter.param_name }}-{{ forloop.index }}"
+            {% if filter_value.active %}
+              data-filter-remove="{{ filter_value.url_to_remove }}"
+              checked
+            {% endif %}
+            {% if filter_value.count == 0 and filter_value.active == false %}
+              disabled
+            {% endif %}
+          {% endcapture %}
+
+          <li class="mb-2">
+            {% if filter.label == 'Size' %}
+
+              {% case filter_value.label %}
+              {% when 'XX Small' %}
+                XXS {% when 'X Small' %}
+                  XS {% when 'Small' %}
+                    S {% when 'Medium' %}
+                      M {% when 'Large' %}
+                        L {% when 'X Large' %}
+                          XL {% when 'XX Large' %}
+                            XXL
+                          {% endcase %}
+                        {% else %}
+                          {{ filter_value.label }}
+                        {% endif %}
+
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endfor %}
+
+            </div>

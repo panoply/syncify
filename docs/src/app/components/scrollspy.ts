@@ -2,7 +2,6 @@ import spx from 'spx';
 
 export class ScrollSpy extends spx.Component({
   name: 'scrollspy',
-  sugar: true,
   nodes: <const>[
     'href',
     'anchor'
@@ -18,8 +17,6 @@ export class ScrollSpy extends spx.Component({
    */
   connect () {
 
-    window.onscroll = this.onScroll;
-    this.anchors = [];
     this.options = {
       rootMargin: this.state.rootMargin,
       threshold: this.state.threshold
@@ -29,17 +26,10 @@ export class ScrollSpy extends spx.Component({
 
   onmount () {
 
-    if (this.hasHref) {
+    window.onscroll = this.onScroll.bind(this);
+    this.hrefNode.classList.add('fc-green');
+    this.anchors = this.hrefNodes.map(a => a.href.slice(a.href.lastIndexOf('#') + 1));
 
-      this.href.addClass('fc-green');
-      this.href(a => {
-        this.anchors.push(a.href.slice(a.href.lastIndexOf('#') + 1));
-      });
-    }
-
-    if (this.hasAnchor) {
-      this.onScroll();
-    }
   }
 
   unmount (): void {
@@ -48,14 +38,14 @@ export class ScrollSpy extends spx.Component({
 
   }
 
-  onScroll = () => {
+  onScroll () {
 
-    this.anchor((node, i) => {
+    this.anchorNodes.forEach((node, i) => {
       if (this.anchors.includes(node.id)) {
-        const next = node.getBoundingClientRect().top;
-        if (next < window.screenY && this.href(i)) {
-          this.href(href => href.removeClass('fc-green'));
-          this.href(i).addClass('fc-green');
+        const next = node.getBoundingClientRect().top - 150;
+        if (next < window.screenY && this.hrefNodes[i]) {
+          this.hrefNodes.forEach(href => href.classList.remove('fc-green'));
+          this.hrefNodes[i].classList.add('fc-green');
         }
       }
     });

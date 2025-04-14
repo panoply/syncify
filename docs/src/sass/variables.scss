@@ -21,6 +21,16 @@ $enable-font-smoothing: true;
 
 $enable-rfs: true;
 
+/// Passed to the Bootstrap flex align items utility.
+///
+$align-items: (
+  start: flex-start,
+  end: flex-end,
+  center: center,
+  base: baseline,
+  stretch: stretch
+);
+
 /* -------------------------------------------- */
 /* PALETTE                                      */
 /* -------------------------------------------- */
@@ -134,8 +144,8 @@ $font-family-base:
 
 $font-family-heading: 'JetBrains Mono', monospace;
 $font-family-other: 'JetBrains Mono', monospace;
-$font-family-code: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono',
-  monospace;
+$font-family-code:
+  Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 
 // stylelint-enable
 
@@ -235,8 +245,8 @@ $form-range-thumb-disabled-bg: $gray-500;
 /* -------------------------------------------- */
 
 // FONT FAMILY
-$papyrus-font-family: consolas, monaco, 'Andale Mono', 'Ubuntu Mono',
-  monospace;
+$papyrus-font-family:
+  consolas, monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 $papyrus-font-size: 0.895rem;
 $papyrus-line-height: 1.7;
 $papyrus-scrollbar-width: 0;

@@ -1,6 +1,7 @@
 ---
 title: 'Directory Structures'
 layout: base.liquid
+sport: 1
 permalink: '/usage/directory-structures/index.html'
 anchors:
   - 'Base Directories'
@@ -15,7 +16,23 @@ anchors:
 
 Syncify requires you to define custom **base** directory paths that point to theme files. The values you provide will refer to a directory name that is relative to the root of your project. You **cannot** define multi-level directories (e.g: `some/dir`) or reverse paths (e.g: `../dir`). You can pass these references within a syncify configuration file or via the CLI.
 
-:::: grid row ai-center dir-each mb-5
+:::: grid row ai-stretch mb-5
+::: grid col fs-sm
+
+```treeview
+/
+├── source/
+├── theme/
+├── .env
+└── syncify.config.ts
+```
+
+:::
+::: grid px-0 col-auto ac-center stash-next
+
+{% svg 'arrow-right', 'icon-output'%}
+
+:::
 ::: grid col-8
 
 <!-- prettier-ignore -->
@@ -26,22 +43,6 @@ export default defineConfig({
   input: 'source',  // Default input directory
   output: 'theme'   // Default output directory
 })
-```
-
-:::
-::: grid px-0 col-auto stash-next
-
-{% svg 'arrow-right', 'icon-output'%}
-
-:::
-::: grid col fs-sm
-
-```treeview
-/
-├── source/
-├── theme/
-├── .env
-└── syncify.cofig.ts
 ```
 
 :::
@@ -59,7 +60,43 @@ The `paths` option lets you customize your theme structure, resolved relative to
 
 ##### Default Defintions:
 
-:::: grid row ai-center dir-each mb-5
+:::: grid row ai-stretch dir-each mb-5
+::: grid col fs-sm
+
+```treeview
+source/
+├── +/
+│   ├── blogs^
+│   ├── files^
+│   ├── meta^
+│   ├── menus^
+│   ├── pages^
+│   ├── policies^
+│   └── schema^
+├── assets^
+├── blocks^
+├── config^
+├── layout^
+├── locales^
+├── sections^
+├── snippets^
+├── templates/
+│   ├── customers^
+│   └── metaobjects^
+├── theme^
+├── .env
+├── .liquidrc.json
+├── package.json
+├── syncify.config.ts
+└── tsconfig.json
+```
+
+:::
+::: grid px-0 col-auto ac-center stash-next
+
+{% svg 'arrow-right', 'icon-output'%}
+
+:::
 ::: grid col-8
 
 <!-- prettier-ignore -->
@@ -70,65 +107,108 @@ export default defineConfig({
   input: 'source',
   output: 'theme',
   paths: {
-    assets: 'assets/**',
-    config: 'config/*.json',
-    locales: 'locales/*.json',
-    layout: 'layout/*.liquid',
-    metafields: 'metafields/**/*.json',
-    schema: 'schema/*.{schema,json}',
-    blocks: 'blocks/*.liquid',
-    sections: 'sections/**/*.{liquid,json}',
-    snippets: 'snippets/**/*.liquid',
-    templates: 'templates/*.{liquid,json}',
-    customers: 'templates/customers/*.{liquid,json}',
-    metaobject: 'templates/metaobject/*.{liquid,json}',
-    pages: 'pages/*.{md,html}',
-    redirects: 'redirects.yaml'
+    assets: 'source/assets/**',
+    blocks: 'source/blocks/*.liquid',
+    config: 'source/config/*.json',
+    locales: 'source/locales/*.json',
+    layout: 'source/layout/*.liquid',
+    sections: 'source/sections/**/*.{liquid,json}',
+    snippets: 'source/snippets/**/*.liquid',
+    metaobject: 'source/templates/metaobject/*.{liquid,json}',
+    customers: 'source/templates/customers/*.{liquid,json}',
+    templates: 'source/templates/*.{liquid,json}',
+    blogs: 'source/+/blogs/**/*.{md,html}',
+    files: 'source/+/files/**',
+    metafields: 'source/+/meta/**/*.json',
+    navigation: 'source/+/menus/**/*.json',
+    pages: 'source/+/pages/*.{md,html}',
+    policies: 'source/+/policies/*.{md,html}',
+    schema: 'source/+/*.{schema,json}',
   }
 })
 ```
 
 :::
-::: grid px-0 col-auto stash-next
+::::
 
-{% svg 'arrow-right', 'icon-output'%}
+<div class="row ">
+  <div class="col">
+  </div>
+  <div class="col">
+  </div>
+</div>
 
-:::
+---
+
+# Custom Structures
+
+Sticking to the default structure isn’t ideal with Syncify. Instead, you’re encouraged to craft an input (theme) structure that fits your project, aligns with your workflow, and reflects your preferences. The `paths` option empowers you to define a tailored setup, giving you control over how your theme is organized. Below is a basic example of how to create a customized structure using `paths`, showcasing the flexibility to adapt the layout to your specific needs
+
+:
+
+```treeview
+| -
+```
+
+:
+:
+
+```js
+s.foo();
+```
+
+:
+
+<div>
+
+</div>
+<div>
+</div>
+
+: s`div`(
+:: s`div`(
+::: s`div`(
+:::: s`div`(
+
+:::: )
+::: )
+:: )
+: )
+
+:::: row ai-stretch dir-each my-5
 ::: grid col fs-sm
 
 ```treeview
 /
 ├── source/
 │   ├── assets/
-│   ├── blocks/
-│   ├── config/
-│   ├── files/
-│   ├── layout/
-│   ├── locales/
+│   │   └── files/
+│   ├── data/
+│   │   ├── config/
+│   │   ├── locales/
+│   │   └── metafields/
+│   │       └── namespace/
 │   ├── pages/
-│   ├── metafields/
-│   │   └── namespace/
-│   ├── schema/
-│   ├── sections/
-│   ├── snippets/
-│   └── templates/
-│       ├── metaobject/
-│       └── customers/
-├── theme/
+│   └── views/
+│       ├── customers/
+│       ├── meta/
+│       ├── sections/
+│       │   ├── blocks/
+│       │   └── schema/
+│       ├── snippets/
+│       ├── templates/
+│       └── theme.liquid
 ├── .env
-└── package.json
+├── package.json
+└── syncify.config.ts
 ```
 
 :::
-::::
+::: grid px-0 col-auto ac-center
 
----
+{% svg 'arrow-right', 'icon-output'%}
 
-# Custom Structures
-
-Sticking to the default structure isn’t ideal with Syncify. Instead, you’re encouraged to craft an input (theme) structure that fits your project, aligns with your workflow, and reflects your preferences. The `paths` option empowers you to define a tailored setup, giving you control over how your theme is organized. Below is a basic example of how to create a customized structure using `paths`, showcasing the flexibility to adapt the layout to your specific needs.
-
-:::: grid row ai-center dir-each my-5
+:::
 ::: grid col-8
 
 <!-- prettier-ignore -->
@@ -144,44 +224,17 @@ export default defineConfig({
     locales: 'data/locales/*.json',
     metafields: 'data/metafields/**/*.json',
     layout: '*.liquid',
+    blocks: 'views/sections/blocks/*.liquid',
     sections: 'views/sections/**/*.liquid',
     snippets: 'views/snippets/**/*.liquid',
     templates: 'views/templates/*.{liquid,json}',
     customers: 'views/customers/*.{liquid,json}',
     schema: 'views/sections/**/*.schema',
     metaobject: 'views/meta/*.{liquid,json}',
-    pages: 'pages/*.{md,html}'
+    pages: 'pages/*.{md,html}',
+    redirects: 'redirects.yaml'
   }
 })
-```
-
-:::
-::: grid px-0 col-auto
-
-{% svg 'arrow-right', 'icon-output'%}
-
-:::
-::: grid col fs-sm
-
-```treeview
-/
-└── source/
-    ├── assets/
-    │   └── files/
-    ├── data/
-    │   ├── config/
-    │   ├── locales/
-    │   └── metafields/
-    │      └── namespace/
-    ├── pages/
-    └── views/
-        ├── customers/
-        ├── meta/
-        ├── sections/
-        │   └── schema/
-        ├── snippets/
-        ├── templates/
-        └── theme.liquid
 ```
 
 :::
@@ -433,6 +486,8 @@ One key constraint in Shopify CLI theme development is its strict flat directory
 Syncify projects enforce a hierarchical **input** ➔ **output** base structure. Developers can mimic flat structures within **input** directories, but the organization of files and folders remains unpredictable, left to the developer or team's discretion. The hierarchical structure might intimidate developers used to the Shopify CLI's flat approach, particularly newcomers to alternative setups. Yet, for modern, high-performance Shopify themes, flat structures falter, growing unwieldy as complexity increases. Syncify's hierarchical design supports expanding theme needs, boosting scalability by letting developers freely organize their projects.
 
 > The Shopify CLI’s flat structure mandate is intentional, mirroring storefront theme architecture. Its lack of custom structure support stems from inherent limitations in the CLI tool itself.
+
+# Something `{ts} { foo: string }`
 
 ### Limitations
 

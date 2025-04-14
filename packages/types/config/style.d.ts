@@ -19,7 +19,7 @@ export type PostCSSConfig = (
 /**
  * Style Minification
  */
-export interface StyleTerse extends CleanCSSOptions {
+export type StyleTerse = CleanCSSOptions & {
  /**
   * Whether or not to purge unused CSS class names
   *
@@ -55,11 +55,11 @@ export interface StyleTerse extends CleanCSSOptions {
   exclude?: string[]
 }
 
-export interface TailwindConfig extends TailwindCSSConfig {
+export type TailwindConfig = TailwindCSSConfig & {
   config: string[]
 }
 
-export interface SASSConfig {
+export type SASSConfig = {
   /**
    * Whether or not to generate sourcemaps
    *
@@ -104,7 +104,7 @@ export interface SASSConfig {
 /* TRANSFORM                                    */
 /* -------------------------------------------- */
 
-export interface StyleTransform<T = string | string[]> {
+export type StyleTransform<T = string | string[]> = {
   /**
    * SVG input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.

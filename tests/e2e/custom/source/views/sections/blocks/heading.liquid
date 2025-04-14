@@ -1,0 +1,265 @@
+{% capture grid %}
+  col-{{ section.settings.sm }}
+  col-lg-{{ section.settings.md }}
+  col-xl-{{ section.settings.lg }}
+  pt-{{ section.settings.py }}
+  px-{{ section.settings.px }}
+{% endcapture %}
+
+<div class="{{ grid }}">
+  {% for block in section.blocks %}
+
+    {% if block.type == 'heading' %}
+      <h1 class="h{{ block.settings.size }} {{ block.settings.align }} mb-{{ block.settings.my }}">
+        {{ block.settings.text }}
+      </h1>
+    {% elsif block.type == 'text' %}
+      <div class="fs-{{ block.settings.fs }} {{ block.settings.align }} mb-{{ block.settings.my }}">
+        {{ block.settings.text }}
+      </div>
+    {% endif %}
+
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Text Block",
+  "tag": "section",
+  "class": "row ai-center",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Layout and structure of the grid"
+    },
+    {
+      "type": "select",
+      "id": "row",
+      "label": "Position",
+      "default": "row jc-center ai-center",
+      "options": [
+        {
+          "value": "row jc-center",
+          "label": "Left"
+        },
+        {
+          "value": "row jc-center ai-center",
+          "label": "Center"
+        },
+        {
+          "value": "row jc-center ai-end",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "py",
+      "label": "Gutter Y",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "px",
+      "label": "Gutter X",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Grid",
+      "info": "Grid configuration to be applied"
+    },
+    {
+      "type": "range",
+      "id": "sm",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "Tablet",
+      "info": "Screens in large tablet",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "lg",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Provide a heading block"
+        },
+        {
+          "type": "text",
+          "id": "foo_bar",
+          "label": "Foo Bar",
+          "default": "example"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alignment",
+          "default": "tl",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            },
+            {
+              "value": "tj",
+              "label": "Justify"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "label": "Size",
+          "info": "Heading Size",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 6
+        },
+        {
+          "type": "header",
+          "content": "Gutter Y",
+          "info": "Control the margin top and bottom spacing"
+        },
+        {
+          "type": "range",
+          "id": "my",
+          "label": "Gutter Y",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Paragraph",
+          "info": "Provide a heading and description paragraph."
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "fs",
+          "label": "Font Size",
+          "default": "md",
+          "options": [
+            {
+              "value": "xs",
+              "label": "X Small"
+            },
+            {
+              "value": "sm",
+              "label": "Small"
+            },
+            {
+              "value": "md",
+              "label": "Medium (base)"
+            },
+            {
+              "value": "lg",
+              "label": "Large"
+            },
+            {
+              "value": "xl",
+              "label": "X Large"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alignment",
+          "default": "tl",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            },
+            {
+              "value": "tj",
+              "label": "Justify"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Gutter Y",
+          "info": "Control the margin top and bottom spacing"
+        },
+        {
+          "type": "range",
+          "id": "my",
+          "label": "Gutter Y",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

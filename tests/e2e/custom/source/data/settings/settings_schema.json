@@ -1,0 +1,21 @@
+[
+  {
+    "name": "theme_info",
+    "theme_author": "Syncify",
+    "theme_documentation_url": "https://github.com/panoply/syncify",
+    "theme_name": "Tailwind Example",
+    "theme_support_url": "https://github.com/panoply/syncify",
+    "theme_version": "1.0.0"
+  },
+  {
+    "name": "font",
+    "settings": [
+      {
+        "default": "mono",
+        "id": "body_font",
+        "label": "Font Family",
+        "type": "font_picker"
+      }
+    ]
+  }
+]

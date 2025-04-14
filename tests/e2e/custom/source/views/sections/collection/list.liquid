@@ -1,0 +1,496 @@
+{% capture columns %}
+  col-{{ section.settings.xs }}
+  col-sm-{{ section.settings.sm }}
+  col-md-{{ section.settings.md }}
+  col-lg-{{ section.settings.lg }}
+  col-xl-{{ section.settings.xl }}
+  col-xxl-{{ section.settings.xxl }}
+  rel
+{% endcapture %}
+
+{% for block in section.blocks %}
+
+  {% liquid
+    capture ratio_height
+      if section.settings.use_h
+        echo block.settings.img.height
+      else
+        echo section.settings.ratio_h
+      endif
+    endcapture
+    capture ratio_width
+      if section.settings.use_w
+        echo block.settings.img.width
+      else
+        echo section.settings.ratio_w
+      endif
+    endcapture
+  %}
+
+  {% if block.type == 'image' %}
+
+    <a href="{{ block.settings.href }}">
+      <div
+        class="ratio"
+        style="--ratio: calc({{ ratio_height }} / {{ ratio_width }})">
+        <picture>
+          <source
+            data-srcset="{{ block.settings.img | image_url: width: 380 }}"
+            media="xxs">
+          <source
+            data-srcset="{{ block.settings.img | image_url: width: 620 }}"
+            media="xs">
+          <source
+            data-srcset="{{ block.settings.img | image_url: width: 800 }}"
+            media="sm">
+          <source
+            data-srcset="{{ block.settings.img | image_url: width: 1024 }}"
+            media="md">
+          <img
+            src="{{ block.settings.img | image_url: width: 1024 }}"
+            class="img-fluid lazy">
+        </picture>
+      </div>
+    </a>
+
+  {% elsif block.type == 'image_with_label' %}
+
+    <div class="{% if block.settings.full_width %}col-12 rel{% else %}{{ columns }}{% endif %}">
+
+      <div
+        class="ratio"
+        style="--ratio: calc({{ ratio_height }} / {{ ratio_width }})">
+
+        <picture>
+          <source
+            data-srcset="{{ block.settings.img.src | image_url: width: 440 }}"
+            media="xxs">
+          <source
+            data-srcset="{{ block.settings.img.src | image_url: width: 620 }}"
+            media="xs">
+          <source
+            data-srcset="{{ block.settings.img.src | image_url: width: 800 }}"
+            media="sm">
+          <source
+            data-srcset="{{ block.settings.img.src | image_url: width: 1024 }}"
+            media="md">
+          <source
+            data-srcset="{{ block.settings.img.src | image_url: width: 1240 }}"
+            media="lg">
+          <img
+            data-src="{{ block.settings.img.src | image_url: width: 1240 }}"
+            alt="{{ block.settings.label }}"
+            class="lazy" />
+        </picture>
+
+        <div class="abs-flex {{ block.settings.position }}">
+
+          {% capture label_style %}
+            font-size: {{ block.settings.fs }}px;
+            {% if block.settings.italic %}
+            font-style: italic;
+            {% endif %}
+            {% if block.settings.upper %}
+            text-transform: uppercase;
+            {% endif %}
+            font-weight: {{ block.settings.fw }};
+          {% endcapture %}
+
+          <a
+            href="{{ block.settings.href }}"
+            title="{{ block.settings.label }}"
+            class="link py-{{ section.settings.py }} px-{{ section.settings.px }} {{ block.settings.ta }}"
+            style="{{ label_style }} color: {{ block.settings.fc }};">
+
+            {% if block.settings.heading != blank %}
+
+              {% capture heading_style %}
+                font-size: {{ block.settings.heading_fs }}px;
+                font-weight: {{ block.settings.heading_fw }};
+                {% if block.settings.heading_italic %}
+                  font-style: italic;
+                {% endif %}
+                {% if block.settings.heading_upper %}
+                  text-transform: uppercase;
+                {% endif %}
+              {% endcapture %}
+
+              <div
+                class="d-block mb-{{ block.settings.mb }}"
+                style="{{ heading_style }}">
+                {{ block.settings.heading }}
+              </div>
+
+            {% endif %}
+
+            <div class="d-block">
+              {{ block.settings.label }}
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  {% endif %}
+
+{% endfor %}
+
+{% schema %}
+{
+  "name": "Collection List",
+  "class": "row g-0 jc-center ai-center",
+  "tag": "section",
+  "templates": ["list-collections"],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Aspect Ratio",
+      "info": "Define the image ratios in the collage"
+    },
+    {
+      "type": "number",
+      "id": "ratio_h",
+      "label": "Ratio Height",
+      "default": 700
+    },
+    {
+      "type": "checkbox",
+      "id": "use_h",
+      "label": "Use Image Height",
+      "info": "Whether or not to use the native image height for aspect ratio.",
+      "default": false
+    },
+    {
+      "type": "number",
+      "id": "ratio_w",
+      "label": "Ratio Width",
+      "default": 1240
+    },
+    {
+      "type": "checkbox",
+      "id": "use_w",
+      "label": "Use Image Width",
+      "info": "Whether or not to use the native image width for aspect ratio.",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Grid",
+      "info": "Define grid layout to be rendered"
+    },
+    {
+      "type": "range",
+      "id": "xxl",
+      "label": "1440px >",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "xl",
+      "label": "1200px > 1439px",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "lg",
+      "label": "992px > 1199px",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "768px > 991px",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "sm",
+      "label": "576px > 767px",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "xs",
+      "label": "0px > 575px",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Gutters",
+      "info": "Customize the gutter spacing applied to label"
+    },
+    {
+      "type": "range",
+      "id": "px",
+      "label": "Gutter X",
+      "info": "The X (left and right) spacing gutters surrounding the label",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "py",
+      "label": "Gutter Y",
+      "info": "The Y (top and bottom) spacing gutters surrounding the label",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Image",
+          "info": "Select the image to show"
+        },
+        {
+          "type": "image_picker",
+          "id": "img",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "href",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "image_with_label",
+      "name": "Image with Label",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "Full Width",
+          "default": false,
+          "info": "Whether or not the image should span full width."
+        },
+        {
+          "type": "header",
+          "content": "Image",
+          "info": "Select the image to show"
+        },
+        {
+          "type": "image_picker",
+          "id": "img",
+          "label": "Image"
+        },
+        {
+          "type": "header",
+          "content": "Styling",
+          "info": "Shared styling to be applied to either the heading and label or the label."
+        },
+        {
+          "type": "select",
+          "id": "ta",
+          "label": "Text Alignment",
+          "default": "tl",
+          "options": [
+            {
+              "value": "tl",
+              "label": "Left"
+            },
+            {
+              "value": "tc",
+              "label": "Center"
+            },
+            {
+              "value": "tr",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "url",
+          "id": "href",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "label": "Font Colour",
+          "id": "fc",
+          "default": "#dc3545"
+        },
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Optionally define a heading to output as a headline of the label."
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "checkbox",
+          "id": "heading_upper",
+          "label": "Uppercase",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "heading_italic",
+          "label": "Italic",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "heading_fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "heading_fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 500
+        },
+        {
+          "type": "range",
+          "id": "mb",
+          "label": "Gutter Bottom",
+          "info": "The bottom spacing gutter under the heading",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "header",
+          "content": "Label",
+          "info": "Define the label text overlay for the image."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        },
+        {
+          "type": "header",
+          "content": "Label Style",
+          "info": "Customize how the label should look"
+        },
+        {
+          "type": "checkbox",
+          "id": "upper",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "italic",
+          "label": "Italic",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "fs",
+          "label": "Font Size",
+          "min": 1,
+          "max": 50,
+          "step": 0.5,
+          "default": 15,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 900,
+          "step": 100,
+          "default": 300
+        },
+        {
+          "type": "header",
+          "content": "Position",
+          "info": "Controls the position and alignment"
+        },
+        {
+          "type": "select",
+          "id": "position",
+          "label": "Position",
+          "default": "jc-center ai-center",
+          "options": [
+            {
+              "value": "jc-start ai-start",
+              "label": "Top Left"
+            },
+            {
+              "value": "jc-center ai-start",
+              "label": "Top Center"
+            },
+            {
+              "value": "jc-end ai-start",
+              "label": "Top Right"
+            },
+            {
+              "value": "jc-start ai-center",
+              "label": "Middle Left"
+            },
+            {
+              "value": "jc-center ai-center",
+              "label": "Middle Center"
+            },
+            {
+              "value": "jc-end ai-center",
+              "label": "Middle Right"
+            },
+            {
+              "value": "jc-start ai-end",
+              "label": "Bottom Left"
+            },
+            {
+              "value": "jc-center ai-end",
+              "label": "Bottom Center"
+            },
+            {
+              "value": "jc-end ai-end",
+              "label": "Bottom Right"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collage",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}

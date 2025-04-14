@@ -1,0 +1,125 @@
+{% comment %}
+
+  SIDEBAR
+
+  This is a layout section which renders within pages.
+{% endcomment %}
+
+<div class="sidebar bl-0 br h-100">
+
+  <div class="d-block py-4 px-3 d-none">
+    <input
+      type="search"
+      class="fm-input fm-lined d-none"
+      aria-label="{{ 'general.search.placeholder' | t }}"
+      placeholder="Search">
+  </div>
+
+  <div
+    spx-component="sticky"
+    spx-sticky:offset="45">
+
+    <div
+      class="accordion bt-0 br-0"
+      spx-component="accordion"
+      spx-accordion:multiple="false"
+      spx-accordion:persist="true"
+      style="width: {{ section.settings.width }}px;">
+
+      {% for block in section.blocks %}
+
+        {% if block.type == 'link_list' %}
+
+          {% liquid
+            assign expand = ''
+            assign within = linklists[block.settings.menu].links | map: 'url'
+            if within contains request.path
+              assign expand = 'open'
+            endif
+          %}
+
+          {% assign bt = '' %}
+          {% if block.settings.title == 'Online Shopping' %}
+            {% assign bt = 'bt-0' %}
+          {% endif %}
+
+          <details {{ expand }}>
+
+            <summary class="accordion-btn h5 mb-0 py-2 pl-4 {{ bt }}">
+              {{ block.settings.title }}
+            </summary>
+
+            <div class="accordion-fold">
+              <ul class="list-dash py-4 pl-4">
+                {% for link in linklists[block.settings.menu].links %}
+                  <li class="mb-1">
+                    <a
+                      href="{{ link.url }}"
+                      itemprop="url"
+                      title="{{ link.title }}"
+                      class="fs-sm upper">
+                      {% if link.active %}
+                        <strong>
+                          {{ link.title }}
+                        </strong>
+                      {% else %}
+                        {{ link.title }}
+                      {% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </details>
+
+        {% endif %}
+
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Sidebar",
+  "tag": "aside",
+  "class": "col-auto rel pl-0 pr-5 d-none d-md-block",
+  "max_blocks": 10,
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "settings": [
+    {
+      "type": "range",
+      "id": "width",
+      "label": "Width",
+      "min": 100,
+      "max": 750,
+      "step": 25,
+      "unit": "px",
+      "default": 250
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Link List",
+      "type": "link_list",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "info": "Select the menu link-list to render"
+        }
+      ]
+    }
+  ],
+  "presets": []
+}
+{% endschema %}

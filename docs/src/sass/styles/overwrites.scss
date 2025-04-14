@@ -337,7 +337,13 @@ h1 {
   > code {
     text-transform: initial;
     border: none !important;
-    font-size: 1rem !important;
+    font-size: 1.1rem !important;
+
+    &.language-bash {
+      font-size: 1.1rem !important;
+      padding: 0 !important;
+      font-weight: 600 !important;
+    }
   }
 }
 
@@ -519,5 +525,11 @@ ul.compare-list {
 .targets-height {
   pre {
     height: 370px;
+  }
+}
+
+.ai-stretch {
+  pre.papyrus {
+    height: 100% !important;
   }
 }

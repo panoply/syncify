@@ -1,0 +1,234 @@
+{% capture grid %}
+  col-{{ section.settings.sm }}
+  col-lg-{{ section.settings.md }}
+  col-xl-{{ section.settings.lg }}
+  pt-{{ section.settings.py }}
+  px-{{ section.settings.px }}
+{% endcapture %}
+
+<div class="{{ grid }}">
+  {% for block in section.blocks %}
+
+    {% if block.type == 'content' %}
+
+      <h1 id="{{ block.settings.heading | handleize }}" class="h{{ block.settings.hs }} {{ section.settings.align }} mb-{{ block.settings.hb }}">
+        {{ block.settings.heading }}
+      </h1>
+
+      <div class="fs-{{ block.settings.ps }} {{ section.settings.align }} mb-{{ block.settings.pb }}">
+        {{ block.settings.paragraph
+          | remove: cart.currency.symbol
+          | remove: '.00'
+          | remove: ',00' }}
+      </div>
+
+    {% endif %}
+
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Text Content",
+  "tag": "section",
+  "class": "row ai-center",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Layout and structure of the grid"
+    },
+    {
+      "type": "select",
+      "id": "row",
+      "label": "Position",
+      "default": "row jc-center ai-center",
+      "options": [
+        {
+          "value": "row jc-center",
+          "label": "Left"
+        },
+        {
+          "value": "row jc-center ai-center",
+          "label": "Center"
+        },
+        {
+          "value": "row jc-center ai-end",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Spacing",
+      "info": "The outer spacing and gutter"
+    },
+    {
+      "type": "range",
+      "id": "py",
+      "label": "Gutter Y",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "px",
+      "label": "Gutter X",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Text Alignment",
+      "info": "Text alignment applied to heading and paragraph"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Alignment",
+      "default": "tl",
+      "options": [
+        {
+          "value": "tl",
+          "label": "Left"
+        },
+        {
+          "value": "tc",
+          "label": "Center"
+        },
+        {
+          "value": "tr",
+          "label": "Right"
+        },
+        {
+          "value": "tj",
+          "label": "Justify"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Grid",
+      "info": "Grid configuration to be applied"
+    },
+    {
+      "type": "range",
+      "id": "sm",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "Tablet",
+      "info": "Screens in large tablet",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "lg",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "content",
+      "name": "Content",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Provide a heading block"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading Text"
+        },
+        {
+          "type": "range",
+          "id": "hs",
+          "label": "Size",
+          "info": "Heading Font Size",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "hb",
+          "label": "Heading Margin Bottom",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "header",
+          "content": "Paragraph",
+          "info": "Provide a heading and description paragraph."
+        },
+        {
+          "type": "richtext",
+          "id": "paragraph",
+          "label": "Paragraph"
+        },
+        {
+          "type": "select",
+          "id": "ps",
+          "label": "Paragraph Font Size",
+          "default": "sm",
+          "options": [
+            {
+              "value": "xs",
+              "label": "X Small"
+            },
+            {
+              "value": "sm",
+              "label": "Small"
+            },
+            {
+              "value": "md",
+              "label": "Medium (base)"
+            },
+            {
+              "value": "lg",
+              "label": "Large"
+            },
+            {
+              "value": "xl",
+              "label": "X Large"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "pb",
+          "label": "Paragraph Margin Bottom",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

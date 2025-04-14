@@ -1,0 +1,53 @@
+<div
+  class="bl"
+  style="width: {{- section.settings.width -}}px;">
+  <ul>
+    <li><a href="#">Our Policy</a></li>
+    <li><a href="#">Conditions for Return</a></li>
+    <li><a href="#">How to Return</a></li>
+    <li><a href="#">Return Fees</a></li>
+  </ul>
+</div>
+
+{% schema %}
+{
+  "name": "Anchors",
+  "tag": "aside",
+  "class": "col-auto rel pl-0 pr-5",
+  "max_blocks": 10,
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "settings": [
+    {
+      "type": "range",
+      "id": "width",
+      "label": "Width",
+      "min": 100,
+      "max": 750,
+      "step": 25,
+      "unit": "px",
+      "default": 250
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Link",
+      "type": "link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "url"
+        }
+      ]
+    }
+  ],
+  "presets": []
+}
+{% endschema %}

@@ -9,7 +9,6 @@ export class Sidebar extends spx.Component({
       typeof: Number
     }
   },
-  sugar: true,
   nodes: <const>[
     'link'
   ]
@@ -19,7 +18,7 @@ export class Sidebar extends spx.Component({
 
   onmount () {
 
-    relapse();
+    relapse({ multiple: false });
 
   }
 
@@ -39,11 +38,10 @@ export class Sidebar extends spx.Component({
 
   onLink ({ target }: SPX.Event<HTMLAnchorElement>) {
 
-    this.link(link => {
-
+    this.linkNodes.forEach(link => {
       link.isEqualNode(target)
-        ? link.addClass('active')
-        : link.removeClass('active');
+        ? link.classList.add('active')
+        : link.classList.remove('active');
 
     });
 

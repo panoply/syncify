@@ -13,7 +13,7 @@ export { SVGOConfig };
 
 type RenamePaths = `${'assets' | 'snippets'}/${string}`
 
-export interface SVGFile {
+export type SVGFile = {
   /**
    * SVG input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.
@@ -72,7 +72,7 @@ export interface SVGFile {
   svgo?: SVGOConfig;
 }
 
-export interface SVGSprite extends Omit<SVGFile, 'format'> {
+export type SVGSprite = Omit<SVGFile, 'format'> & {
   /**
    * The SVG export format. Syncify can produce 2 different SVG formats.
    * All SVG file types will pre-process and transform using [SVGO](https://github.com/svg/svgo).

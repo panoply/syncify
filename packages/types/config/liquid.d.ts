@@ -1,4 +1,4 @@
-export interface LiquidTerse {
+export type LiquidTerse = {
   /**
    * Removes redundant whitespace Liquid dash trims from Liquid tags and objects.
    *
@@ -46,7 +46,7 @@ export interface LiquidTerse {
 /**
  * Liquid Minification
  */
-export interface LiquidTransform {
+export type LiquidTransform = {
   /**
    * Liquid and HTML minification options. By default, the option is set to `false`
    * which disables minification being applied to `.liquid` file types. Setting

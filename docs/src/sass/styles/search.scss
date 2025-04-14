@@ -97,7 +97,7 @@
 
   .search-list {
     position: absolute;
-    top: 65px;
+    top: 50px;
     width: 450px;
     max-height: 400px;
     background-color: $ebony;
@@ -174,6 +174,7 @@
         }
       }
 
+      &.active,
       &:hover {
         transition: background-color 20ms linear 20ms;
         background-color: $body-bg;

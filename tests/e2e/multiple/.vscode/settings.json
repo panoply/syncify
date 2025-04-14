@@ -1,0 +1,24 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "package.json"
+      ],
+      "url": "https://unpkg.com/@syncify/schema/syncify.json"
+    }
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.ruby-lsp": true,
+    "**/.vscode": false,
+    "**/coverage": true,
+    "**/.idea": true,
+    "**/.bundle": true,
+    "**/node_modules": true
+  }
+}

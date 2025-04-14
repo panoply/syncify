@@ -1,0 +1,283 @@
+{%- liquid
+
+  assign i18n = shop.metafields.i18n.locales.value[localization.country.iso_code]
+  assign handling_fee = 200
+  assign currency_code = i18n.currency | prepend: " " | append: " " -%}
+
+<h4 id="overview">
+  Overview
+</h4>
+
+<p>
+  Brixtol Textiles is doing what we can to reduce returns. Our reason for this is the unnecessary environmental impact caused in the transportation of orders. Another aspect is the high costs for shipping and handling. We encourage our customers to think again before ordering 2 sizes of the same style to compare which is a better fit for both the environment, and for smaller businesses. All Brixtol Textiles garments have measurement charts to help customers find the right size when purchasing from our site and if you have any trouble we are happy to help and advise you.
+</p>
+
+<h6 id="policy">
+  SECTION 1
+</h6>
+<h4>
+  OUR POLICY
+</h4>
+<p>
+  If you’re not happy with your purchase or wish to change the size you can return it to us in Sweden within
+  <strong>
+    14 days
+  </strong>
+  from the date of which you received your order. If you wish to exchange the garment for another colour, style or size this is also applicable on the grounds that there is available stock and/or the cost is equal to that of your order amount. If you return your order to us after the 14 days have passed we will deduct a handling and shipping fee of
+  <span
+    class="price fw-bold pr-1"
+    data-currency-render="code"
+    data-currency-from="SEK"
+    data-currency-price="{{ handling_fee -}}">
+    {{- handling_fee | append: currency_code -}}
+  </span>
+  from your account and return the order to you.
+</p>
+
+<h6 id="return-fees">
+  SECTION 2
+</h6>
+<h4>
+  RETURN FEES
+</h4>
+<p>
+  We offer a flexible refund/exchange process for our local and international wearers. All orders shipped from our warehouse in Sweden to destinations located within the European Union include
+  <strong>
+    parcel return
+  </strong>
+  post labels and any incurred fees/costs will be deducted on your refund total. We do not provide parcel return labels for orders shipped outside of the European Union, and you will need to arrange this at your local postal office.
+</p>
+
+<h4 class="mb-3">
+  WITHIN THE EUROPEAN UNION
+</h4>
+
+<p>
+  We offer free returns on products purchased for
+  <span
+    class="price fw-bold pr-1"
+    data-currency-render="code"
+    data-currency-from="SEK"
+    data-currency-price="{{ i18n.return_threshold }}">
+    {{- i18n.return_threshold | append: currency_code -}}
+  </span>
+  or more and shipping within the European Union. If an item is below this amount we will deduct the return cost from your refund total. We will process the refund once goods have been received and inspected by our warehouse staff. Please find the return fee to be incurred below:
+</p>
+
+<i class="d-block py-3 mb-3">
+  We offer
+  <strong>
+    Free Returns
+  </strong>
+  within the
+  <strong>
+    E.U
+  </strong>
+  when the product price exceeds
+  <span
+    class="price"
+    data-currency-render="code"
+    data-currency-from="SEK"
+    data-currency-to="{{ i18n.currency }}"
+    data-currency-price="{{ i18n.return_threshold }}">
+    {{ i18n.return_threshold | append: " " | append: i18n.currency }}
+  </span>
+</i>
+
+<div class="page-table table-scroll">
+  <table class="mb-3">
+    <thead>
+      <tr>
+        <th
+          colspan="2"
+          class="py-1 px-3"
+          style="border-right: none; !important">
+          <span>
+            Country
+          </span>
+          <span style="float: right;">
+            PRICE
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for item in shop.metafields.i18n.rates.value %}
+
+        {%- if item[0] != "Europe" -%}
+          {%- continue -%}
+        {%- endif %}
+
+        {%- for rate in item[1] -%}
+          <tr>
+            <td style="border-right: none;">
+              <div class="py-1 px-3" scope="row">
+                <img src="https://brixtol.cloud/flags/flag_{{ rate.iso | downcase }}.svg" style="width: 18px;">
+                <span>
+                  {{ rate.country }}
+                </span>
+              </div>
+            </td>
+            <td style="border-left: none;">
+              <div class="py-1 px-3 text-right" scope="row">
+                <span
+                  class="price"
+                  data-currency-render="code"
+                  data-currency-from="SEK"
+                  data-currency-price="{{ rate.returns }}">
+                  {{ rate.returns | append: curency_code }}
+                </span>
+              </div>
+            </td>
+          </tr>
+        {%- endfor -%}
+
+      {%- endfor -%}
+
+    </tbody>
+  </table>
+</div>
+
+<h4 class="mt-5">
+  OUTSIDE THE EUROPEAN UNION
+</h4>
+
+We currently do not offer free returns on orders that are shipping outside of the European Union. Please find the specific fee to be incurred:
+
+<div
+  class="accordion mt-3 mb-4 bx-0"
+  data-accordion-collapsible-value="1"
+  data-accordion-multiselect-value="false"
+  data-controller="accordion">
+
+  {% for item in shop.metafields.i18n.rates.value %}
+
+    {%- if item[0] == "Europe" -%}
+      {%- continue -%}
+    {%- endif %}
+
+    <button class="accordion-btn py-2 px-1">
+      {{ item[0] | upcase }}
+    </button>
+
+    <div class="accordion-fold">
+      <div class="page-table table-scroll px-1 pb-2">
+        <table class="mb-3">
+          <tbody>
+            {%- for rate in item[1] -%}
+              <tr>
+                <td class="bd-x-none">
+                  <div class="py-1" scope="row">
+                    <img src="https://brixtol.cloud/flags/flag_{{ rate.iso | downcase }}.svg" style="width: 18px;">
+                    <span>
+                      {{ rate.country }}
+                    </span>
+                  </div>
+                </td>
+                <td class="bd-x-none">
+                  <div class="py-1 text-right" scope="row">
+                    <span
+                      class="price"
+                      data-currency-render="code"
+                      data-currency-from="SEK"
+                      data-currency-price="{{ rate.returns }}">
+                      {{ rate.returns | replace: ".00", " kr" }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<h6 class="fc-dark-gray" id="conditions">
+  SECTION 3
+</h6>
+<h4>
+  CONDITIONS FOR RETURNS
+</h4>
+
+<p>
+  Any purchased items are to be returned to us within a
+  <strong>
+    14 day
+  </strong>
+  period from the day they were received. Items must be returned to us in the condition they were received and any indication of wear, exposure to outdoor elements, odor or damage will void your eligibility for a refund and/or exchange. Returns are reviewed by our warehouse staff who report upon the quality of goods sent back to us. In order for the goods to be eligible for refund, please make sure that:
+</p>
+<ol type="I" class="pb-3">
+  <li>
+    The product/s were purchased in the last
+    <strong class="fw-bold">
+      14 days
+    </strong>
+    .
+  </li>
+  <li>
+    The Brixtol Textiles hangtag/s and labelling are completely intact.
+  </li>
+  <li>
+    The return slip and receipt are included in the return package.
+  </li>
+  <li>
+    The return must include any inclusive or promotional goods received.
+  </li>
+  <li>
+    The order was processed on
+    <strong class="fw-bold">
+      www.brixtoltextiles.com
+    </strong>
+    and handled by us.
+  </li>
+</ol>
+
+<p>
+  We reserve the right to refuse returns of any merchandise that does not meet the above return conditions in our sole discretion. For more information please contact us at
+  <a href="mailto:help@brixtoltextiles.com" class="fw-bolder">
+    help@brixtoltextiles.com
+  </a>
+  .
+</p>
+
+<h6 class="fc-dark-gray">
+  SECTION 4
+</h6>
+<h4>
+  HOW TO RETURN
+</h4>
+
+<p>
+  Orders shipped to a detination located within the European Union will contain a return slip, receipt of purchase and return shipping label. If you wish to return your garment, you will find all the necessary information in the package your order was received. In the event that you have lost or misplaced those documents, please contact
+  <a href="mailto:help@brixtoltextiles.com" class="fw-bolder">
+    help@brixtoltextiles.com
+  </a>
+  .
+  <strong>
+    <p>Please note that we do not provide parcel return labels for orders shipped outside of the European Union.</p>
+  </strong>
+</p>
+
+<ol type="I" class="pb-3">
+  <li>
+    Place item/s in the package good/s were recieved
+  </li>
+  <li>
+    Fill in the return slip recieved with your order
+  </li>
+  <li>
+    Include the receipt and return slip in the package
+  </li>
+  <li>
+    Make sure you seal the package securely.
+  </li>
+  <li>
+    Send the return/exchange to the return address
+  </li>
+  <li>
+    We will contact you as soon as we receive your return/exchange
+  </li>
+</ol>

@@ -1,0 +1,425 @@
+{% capture grid %}
+  col-{{ section.settings.sm }}
+  col-lg-{{ section.settings.md }}
+  col-xl-{{ section.settings.lg }}
+  pt-{{ section.settings.py }}
+  px-{{ section.settings.px }}
+{% endcapture %}
+
+<div class="{{ grid }}">
+  {% for block in section.blocks %}
+
+    {% if block.type == 'content' %}
+
+      <h1
+        id="{{ block.settings.heading | handleize }}"
+        class="h{{ block.settings.hs }} {{ section.settings.align }} mb-{{ block.settings.hb }}">
+        {{ block.settings.heading }}
+      </h1>
+
+      <section class="fs-{{ block.settings.ps }} {{ section.settings.align }} mb-{{ block.settings.pb }}">
+        {{ block.settings.paragraph | remove: cart.currency.symbol | remove: '.00' | remove: ',00' }}
+      </section>
+
+    {% elsif block.type == 'page' %}
+
+      {% if block.settings.title %}
+        <h1
+          id="{{ block.settings.heading | handleize }}"
+          class="h{{ block.settings.hs }} {{ section.settings.align }} mb-{{ block.settings.hb }}">
+          {{ page.title }}
+        </h1>
+      {% endif %}
+
+      {% if block.settings.content %}
+        <section class="fs-{{ block.settings.ps }} {{ section.settings.align }} mb-{{ block.settings.pb }}">
+          {{ page.content
+            | remove: '<br />'
+            | remove: '<span>'
+            | remove: '</span>'
+            | remove: cart.currency.symbol
+            | remove: '.00'
+            | remove: ',00' }}
+        </section>
+      {% endif %}
+
+    {% endif %}
+  {% endfor %}
+</div>
+{% comment %}
+  {% if section.settings.anchors %}
+  {% capture class %}
+  pt-{{ section.settings.py }}
+  {% if section.settings.bl %}
+  {{ ' d-none ' | append: section.settings.hide | prepend: ' bl' }}
+  {% else %}
+  {{ 'd-none ' | append: section.settings.hide }}
+  {% endif %}
+  {% endcapture %}
+  <div
+  class="col-auto offset-1 px-5 vh-100 {{ class }}"
+  style="width:{{ section.settings.width }}px;">
+  <ul>
+  {% for block in section.blocks %}
+  {% if block.type == 'content' %}
+  <li class="upper">
+  <a href="#{{ block.settings.heading | handleize }}">
+  {{ block.settings.heading }}
+  </a>
+  </li>
+  {% endif %}
+  {% endfor %}
+  </ul>
+  </div>
+  {% endif %}
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Page Content",
+  "tag": "section",
+  "class": "row",
+  "presets": [
+    {
+      "name": "Page Content"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Layout and structure of the grid"
+    },
+    {
+      "type": "select",
+      "id": "row",
+      "label": "Position",
+      "default": "row jc-center ai-center",
+      "options": [
+        {
+          "value": "row jc-center",
+          "label": "Left"
+        },
+        {
+          "value": "row jc-center ai-center",
+          "label": "Center"
+        },
+        {
+          "value": "row jc-center ai-end",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Spacing",
+      "info": "The outer spacing and gutter"
+    },
+    {
+      "type": "range",
+      "id": "py",
+      "label": "Gutter Y",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "px",
+      "label": "Gutter X",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Text Alignment",
+      "info": "Text alignment applied to heading and paragraph"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Alignment",
+      "default": "tl",
+      "options": [
+        {
+          "value": "tl",
+          "label": "Left"
+        },
+        {
+          "value": "tc",
+          "label": "Center"
+        },
+        {
+          "value": "tr",
+          "label": "Right"
+        },
+        {
+          "value": "tj",
+          "label": "Justify"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Grid",
+      "info": "Grid configuration to be applied"
+    },
+    {
+      "type": "range",
+      "id": "sm",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "Tablet",
+      "info": "Screens in large tablet",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "lg",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Anchors",
+      "info": "Customise the anchors sidebar"
+    },
+    {
+      "type": "checkbox",
+      "id": "anchors",
+      "label": "Enable Anchors",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "Width",
+      "info": "The width of the anchors region",
+      "min": 50,
+      "max": 500,
+      "step": 25,
+      "default": 300
+    },
+    {
+      "type": "select",
+      "id": "hide",
+      "label": "Hide",
+      "default": "d-xl-flex",
+      "info": "When should anchors be hidden",
+      "options": [
+        {
+          "value": "d-md-flex",
+          "label": "576px"
+        },
+        {
+          "value": "d-lg-flex",
+          "label": "768px"
+        },
+        {
+          "value": "d-xl-flex",
+          "label": "992px"
+        },
+        {
+          "value": "d-xxl-flex",
+          "label": "1200px"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "bl",
+      "label": "Border Left",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "page",
+      "name": "Page",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Page Title",
+          "info": "Provide a heading block"
+        },
+        {
+          "type": "checkbox",
+          "id": "title",
+          "label": "Title",
+          "default": true,
+          "info": "The page title"
+        },
+        {
+          "type": "range",
+          "id": "hs",
+          "label": "Size",
+          "info": "Heading Font Size",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "hb",
+          "label": "Heading Margin Bottom",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "header",
+          "content": "Paragraph",
+          "info": "Provides the description (content) block,."
+        },
+        {
+          "type": "checkbox",
+          "id": "content",
+          "label": "Content",
+          "default": false,
+          "info": "The page content"
+        },
+        {
+          "type": "select",
+          "id": "ps",
+          "label": "Paragraph Font Size",
+          "default": "sm",
+          "options": [
+            {
+              "value": "xs",
+              "label": "X Small"
+            },
+            {
+              "value": "sm",
+              "label": "Small"
+            },
+            {
+              "value": "md",
+              "label": "Medium (base)"
+            },
+            {
+              "value": "lg",
+              "label": "Large"
+            },
+            {
+              "value": "xl",
+              "label": "X Large"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "pb",
+          "label": "Paragraph Margin Bottom",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        }
+      ]
+    },
+    {
+      "type": "content",
+      "name": "Content",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Heading",
+          "info": "Provide a heading block"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading Text"
+        },
+        {
+          "type": "range",
+          "id": "hs",
+          "label": "Size",
+          "info": "Heading Font Size",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "hb",
+          "label": "Heading Margin Bottom",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "header",
+          "content": "Paragraph",
+          "info": "Provide a heading and description paragraph."
+        },
+        {
+          "type": "richtext",
+          "id": "paragraph",
+          "label": "Paragraph"
+        },
+        {
+          "type": "select",
+          "id": "ps",
+          "label": "Paragraph Font Size",
+          "default": "sm",
+          "options": [
+            {
+              "value": "xs",
+              "label": "X Small"
+            },
+            {
+              "value": "sm",
+              "label": "Small"
+            },
+            {
+              "value": "md",
+              "label": "Medium (base)"
+            },
+            {
+              "value": "lg",
+              "label": "Large"
+            },
+            {
+              "value": "xl",
+              "label": "X Large"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "pb",
+          "label": "Paragraph Margin Bottom",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

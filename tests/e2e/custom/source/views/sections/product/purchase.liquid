@@ -1,0 +1,395 @@
+{% liquid
+
+  # PRIVATE SALE
+  # Whether or not item is private sale
+  #
+  if request.path contains "private-sale" and product.metafields.data.private_sale.value
+    assign private_sale = true
+  else
+    assign private_sale = false
+  endif
+
+
+  # CART BUTTON
+  # Renders the default "Add to Bag" button label
+  #
+  capture add_to_cart
+    echo 'product_page.add_to_cart' | t
+  endcapture
+
+  # FORM CLASS
+  # Renders the default form class
+  #
+  capture form_class
+    echo 'd-flex jc-center py-2 pt-md-5'
+  endcapture
+
+  # PRE-ORDER
+  # When products are marked with pre-order data the purchase
+  # logic will apply different handling.
+  #
+  if product.metafields.data.pre_order.value != blank
+
+    # WEEK
+    # Renders the week number for pre-order tagged products
+    #
+    capture week
+      echo product.metafields.data.pre_order.value | date: '%W'
+    endcapture
+
+    # CART BUTTON
+    # Render the pre-order label instead of add to bag
+    #
+    capture add_to_cart
+      echo 'product_page.preorder_button' | t
+    endcapture
+
+    # FORM CLASS
+    # Pre-order products will use a different form class
+    #
+    capture form_class
+      echo 'd-flex jc-center py-3'
+    endcapture
+
+  endif
+%}
+
+{% comment %}
+
+  PRE-ORDER DESCLAIMER
+
+  Renders a pre-order desclaimer informing upon the
+  intended shipment of the product.
+
+{% endcomment %}
+{% if meta.pre_order.value != blank %}
+  <div class="row jc-center pt-5 g-0">
+    <div class="col-12 col-md-9 col-lg-7 tc">
+      <h5 class="mb-3">
+        {{ 'product_page.preorder_available' | t }}
+      </h5>
+      <p class="fs-sm italic">
+        {{ 'product_page.preorder_disclaimer' | t: week: week }}
+      </p>
+    </div>
+  </div>
+{% endif %}
+
+{% form 'product'
+  , product
+  , data-product-handle: product.handle
+  , data-enable-history-state: 'true'
+  , class: form_class %}
+
+  <div class="row ji-center col-11 col-sm-12 col-md-9 col-lg-11 col-xl-9 col-xxl-7 g-0 pb-sm-5 mb-md-1">
+    <div class="col-6 pl-sm-3">
+      <div
+        class="fm-dropdown"
+        spx-component="dropdown"
+        spx-dropdown:accordion="product-description">
+        <button
+          type="button"
+          class="btn py-2 h6 mb-0"
+          spx-node="dropdown.button"
+          spx@click="dropdown.toggle">
+          {{ 'product_page.select_size' | t }}
+        </button>
+        <fieldset
+          class="rel"
+          spx-node="purchase.selectVariant dropdown.collapse">
+
+          {% for variant in product.variants %}
+            {% if variant.available %}
+
+              {% if section.settings.stock_left
+                and variant.inventory_quantity <= section.settings.stock_left_threshold %}
+                <label
+                  for="{{ variant.id }}"
+                  class="fs-xs upper"
+                  aria-label="{{ 'product_page.stock_left' | t: q: variant.inventory_quantity }}">
+                  {{ variant.title }}
+                </label>
+              {% else %}
+                <label
+                  for="{{ variant.id }}"
+                  class="fs-xs upper">
+                  {{ variant.title }}
+                </label>
+              {% endif %}
+
+              <input
+                id="{{ variant.id }}"
+                type="radio"
+                name="size"
+                class="d-none"
+                aria-label="{{ variant.title }}"
+                value="{{ variant.id }}"
+                spx@input="dropdown.select purchase.variant" />
+
+            {% elsif product.metafields.data.restock_notification.value %}
+
+              <label
+                for="{{ variant.id }}"
+                class="fs-xs upper"
+                aria-label="{{ 'product_page.restock_label' | t }}"
+                spx-node="purchase.restockVariant">
+                {{ variant.title }}
+              </label>
+              <input
+                id="{{ variant.id }}"
+                type="radio"
+                name="size"
+                class="d-none"
+                aria-label="{{ variant.title }}"
+                value="{{ variant.id }}"
+                spx@input="dropdown.select purchase.restock" />
+
+            {% else %}
+
+              <label
+                for="{{ variant.id }}"
+                class="fs-xs upper disabled"
+                aria-label="{{ 'product_page.out_of_stock' | t }}">
+                {{ variant.title }}
+              </label>
+              <input
+                id="{{ variant.id }}"
+                type="radio"
+                name="size"
+                class="d-none"
+                aria-label="{{ variant.title }}"
+                value="{{ variant.id }}"
+                spx@input="dropdown.select" />
+
+            {% endif %}
+          {% endfor %}
+        </fieldset>
+      </div>
+    </div>
+
+    <div
+      class="col-6"
+      spx-component="modal as incentive"
+      spx-incentive:class="col-11 col-sm-8 col-md-5 col-lg-3 col-xl-2"
+      spx-incentive:enable="false"
+      spx-node="purchase.modal">
+
+      <button
+        type="submit"
+        class="btn bg-black fw-bold btn-add-to-cart bl-0 py-2"
+        aria-label="{{ 'product_page.size_required' | t }}"
+        disabled="true"
+        spx-node="purchase.addToCart"
+        spx@click="purchase.addToCart incentive.open">
+        {{ add_to_cart }}
+      </button>
+
+      {% for block in section.blocks %}
+
+        {% if block.type == 'newsletter_incentive' and private_sale == false %}
+
+          <div
+            class="d-block mt-2 tc"
+            spx-component="modal"
+            spx-modal:class="col-11 col-sm-8 col-md-5 col-lg-3 col-xl-3 py-3"
+            spx-modal:enable="true"
+            spx-modal:width="340px"
+            spx-node="purchase.modal">
+
+            <button
+              type="button"
+              class="btn italic fs-xs upcase fw-light px-0 fc-dark-gray"
+              spx@click="modal.open">
+              {{ block.settings.modal_btn }}
+            </button>
+
+            <template spx-node="modal.template">
+              {% render 'purchase-incentive', block: block %}
+            </template>
+
+          </div>
+
+          {% break %}
+
+        {% endif %}
+
+        {% if block.type == 'restock_notification' %}
+
+          <template spx-node="incentive.template">
+            {% render 'purchase-restock', block: block %}
+          </template>
+
+          {% break %}
+
+        {% endif %}
+
+      {% endfor %}
+
+    </div>
+  </div>
+
+{% endform %}
+
+{% schema %}
+{
+  "name": "Purchasing",
+  "tag": "div",
+  "class": "od-first od-lg-last",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product Purchase",
+      "info": "Controls the product purchase (add to cart) component logic."
+    },
+    {
+      "type": "checkbox",
+      "id": "stock_left",
+      "label": "Stock Label",
+      "info": "Whether or not to enable a stock remaning label",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "stock_left_threshold",
+      "label": "Stock Left Threshold",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "info": "Stock remaning label threshold"
+    }
+  ],
+  "max_blocks": 1,
+  "blocks": [
+    {
+      "name": "Newsletter Incentive",
+      "type": "newsletter_incentive",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Newsletter Incentive",
+          "info": "Activates a purchase incentive newsletter discount."
+        },
+        {
+          "type": "text",
+          "id": "modal_btn",
+          "label": "Button Label",
+          "default": "Newsletter Discount?",
+          "info": "The button label which will open the modal"
+        },
+        {
+          "type": "header",
+          "content": "Newsletter Form",
+          "info": "The form input submitted to Klaviyo which will invoke the [D15: Newsletter (15%)](https://www.klaviyo.com/flow/S5jYq4/edit) or the [D10: Newsletter (15%)](https://www.klaviyo.com/flow/WYFneM/edit) flows. This is a custom integration, we don't use Klaviyo's basic bitch templating."
+        },
+        {
+          "type": "select",
+          "id": "flow",
+          "label": "Flow",
+          "default": "D15",
+          "info": "Selector the newsletter flow to enter",
+          "options": [
+            {
+              "value": "D10",
+              "label": "D10: Newsletter Discount (10%)"
+            },
+            {
+              "value": "D15",
+              "label": "D15: Newsletter Discount (15%)"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "klaviyo_list",
+          "label": "Klaviyo List",
+          "default": "RiHref",
+          "info": "The Kalviyo list ID for the incentive"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "SUBSCRIBE FOR 15% DISCOUNT",
+          "info": "The heading to render within the modal"
+        },
+        {
+          "type": "textarea",
+          "id": "paragraph",
+          "label": "Paragraph",
+          "default": "Subscribe to our newsletter get 15% discount off this purchase. Limited time offer."
+        },
+        {
+          "type": "text",
+          "id": "submit_btn",
+          "label": "Submit Button",
+          "default": "Activate Discount",
+          "info": "The submit button lable within the modal"
+        },
+        {
+          "type": "textarea",
+          "id": "footnote",
+          "label": "Footnote",
+          "default": "Existing subscribers will also receive the discount"
+        }
+      ]
+    },
+    {
+      "name": "Restock Notification",
+      "type": "restock_notification",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Notification Restock",
+          "info": "Activates the restock notification form."
+        },
+        {
+          "type": "text",
+          "id": "klaviyo_list",
+          "label": "Klaviyo List",
+          "default": "WWnqr2",
+          "info": "The list ID where those who accept marketing will be added"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Notify when Restocked"
+        },
+        {
+          "type": "textarea",
+          "id": "paragraph",
+          "label": "Paragraph",
+          "default": "We will send a notification to the email address provided when this item is restocked."
+        },
+        {
+          "type": "header",
+          "content": "Restock Form",
+          "info": "The form input submitted to Klaviyo which will invoke the [Notification: Restock Flow](https://www.klaviyo.com/flow/VtRNkM/edit). This is a custom integration, we don't use Klaviyo's basic bitch templating."
+        },
+        {
+          "type": "checkbox",
+          "id": "offer_newsletter",
+          "label": "Newsletter",
+          "default": true,
+          "info": "Offer Newsletter"
+        },
+        {
+          "type": "text",
+          "id": "offer_newsletter_label",
+          "label": "Newsletter Label",
+          "default": "Subscribe to newsletter as well"
+        },
+        {
+          "type": "text",
+          "id": "submit_btn",
+          "label": "Submit Button",
+          "default": "Get Notified"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,6 +1,5 @@
 packages:
   - '.'
-  - 'docs'
   - 'configs/*'
   - 'packages/types'
   - 'packages/config'

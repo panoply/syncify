@@ -1,0 +1,159 @@
+{% if canonical_url contains "?type=" %}
+  {% assign type = canonical_url | split: "?" | last | prepend: "?" %}
+  {% assign url = type | append: "&sort_by=" %}
+{% else %}
+  {% assign url = "?sort_by=" %}
+{% endif %}
+
+<ul class="dash">
+  {% if section.settings.manual %}
+    <li>
+      <a href="{{ url | append: 'manual' }}">
+        {{ "collections.sorting.manual" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+  {% if section.settings.best_selling %}
+    <li>
+      <a href="{{ url | append: 'best-selling' }}">
+        {{ "collections.sorting.best_selling" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+  {% if section.settings.price_ascending %}
+    <li>
+      <a href="{{ url | append: 'price-ascending' }}">
+        {{ "collections.sorting.price_ascending" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+  {% if section.settings.price_descending %}
+    <li>
+      <a href="{{ url | append: 'price-descending' }}">
+        {{ "collections.sorting.price_descending" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+  {% if section.settings.alphabetical_az %}
+    <li>
+      <a href="{{ url | append: 'title-ascending' }}">
+        {{ "collections.sorting.alphabetical_az" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+  {% if section.settings.alphabetical_za %}
+    <li>
+      <a href="{{ url | append: 'title-descending' }}">
+        {{ "collections.sorting.alphabetical_za" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+  {% if section.settings.date_ascending %}
+    <li>
+      <a href="{{ url | append: 'created-ascending' }}">
+        {{ "collections.sorting.date_ascending" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+  {% if section.settings.date_descending %}
+    <li>
+      <a href="{{ url | append: 'created-descending' }}">
+        {{ "collections.sorting.date_descending" | t }}
+        <div class="d-block d-md-none float-right">
+          {% include "icon.checked" class: "checked" %}
+          {% include "icon.checked" class: "unchecked" %}
+        </div>
+      </a>
+    </li>
+  {% endif %}
+</ul>
+
+{% schema %}
+  {
+    "name": "Sorting",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Sorting",
+        "info": "Enable sort filtering for product collections"
+      },
+
+      {
+        "type": "checkbox",
+        "id": "manual",
+        "default": true,
+        "label": "New Arrivals"
+      },
+      {
+        "type": "checkbox",
+        "id": "best_selling",
+        "default": true,
+        "label": "Best Selling"
+      },
+      {
+        "type": "checkbox",
+        "id": "price_ascending",
+        "default": true,
+        "label": "Price Ascending"
+      },
+      {
+        "type": "checkbox",
+        "id": "price_descending",
+        "default": true,
+        "label": "Price Descending"
+      },
+      {
+        "type": "checkbox",
+        "id": "alphabetical_az",
+        "default": true,
+        "label": "Alphabetically A-Z"
+      },
+      {
+        "type": "checkbox",
+        "id": "alphabetical_za",
+        "default": true,
+        "label": "Alphabetically Z-A"
+      },
+      {
+        "type": "checkbox",
+        "id": "date_ascending",
+        "default": true,
+        "label": "Date Ascending"
+      },
+      {
+        "type": "checkbox",
+        "id": "date_descending",
+        "default": true,
+        "label": "Date Descending"
+      }
+    ]
+  }
+{% endschema %}

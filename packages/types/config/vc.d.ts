@@ -1,4 +1,7 @@
-export interface VC {
+/**
+ * Version Control
+ */
+export type VC = {
   /**
    * Sets the maximum patch number before incrementing the minor version. Passing a value of `0` will
    * result in **minor** version increments only.

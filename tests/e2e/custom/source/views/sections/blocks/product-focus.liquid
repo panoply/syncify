@@ -1,0 +1,300 @@
+{% for block in section.blocks %}
+
+  {% if block.type == 'product' %}
+
+    {% liquid
+
+      # FEATURE PRODUCT
+      assign product = block.settings.product
+
+      # TOP PRODUCT
+      if block.settings.top_product != nil
+        assign top_product = block.settings.top_product
+      else
+        assign top_product = nil
+      endif
+
+      # BOTTOM PRODUCT
+      if block.settings.bottom_product != nil
+        assign bottom_product = block.settings.bottom_product
+      else
+        assign bottom_product = nil
+      endif
+    %}
+
+    <div class="row g-0">
+
+      {% comment %}
+        Left Side - Product Image
+      {% endcomment %}
+      <div class="col-12 col-md-6">
+
+        <a
+          class="row g-0 ai-center jc-center"
+          {% if top_product %}
+            href="{{ block.settings.top_url }}"
+          {% else %}
+            href="{{ product.url }}"
+          {% endif %}>
+
+          <div class="col-6 tc {{ block.settings.top_order }}">
+            {% if top_product %}
+              <h4>{{ top_product.title | replace_first: '-', '–' | split: '–' | first }}</h4>
+              <h5>{{ top_product.title | replace_first: '-', '–' | split: '–' | last }}</h5>
+            {% else %}
+              <h4>{{ product.title | replace_first: '-', '–' | split: '–' | first }}</h4>
+              <h5>{{ product.title | replace_first: '-', '–' | split: '–' | last }}</h5>
+            {% endif %}
+          </div>
+
+          <div class="col-6">
+            {% if block.settings.top_image != nil %}
+              {% render 'image' with block.settings.top_image as image %}
+            {% elsif top_product %}
+              {% render 'image' with top_product.images[block.settings.top_index] as image %}
+            {% else %}
+              {% render 'image' with product.images[block.settings.top_index] as image %}
+            {% endif %}
+          </div>
+        </a>
+
+        {% comment %}
+          BOTTOM IMAGE
+        {% endcomment %}
+
+        <a
+          class="row g-0 ai-center jc-center d-none d-sm-flex"
+          {% if bottom_product %}
+            href="{{ bottom_product.url }}"
+          {% else %}
+            href="{{ product.url }}"
+          {% endif %}>
+
+          <div class="col-6 {{ block.settings.bottom_order }}">
+
+            {% if block.settings.bottom_image != nil %}
+              {% render 'image' with block.settings.bottom_image as image %}
+            {% elsif bottom_product %}
+              {% render 'image' with bottom_product.images[block.settings.bottom_index] as image %}
+            {% else %}
+              {% render 'image' with product.images[block.settings.bottom_index] as image %}
+            {% endif %}
+
+          </div>
+
+          {% if bottom_product %}
+            <div class="col-6 tc">
+              <h4>{{ bottom_product.title | replace_first: '-', '–' | split: '–' | first }}</h4>
+              <h5>{{ bottom_product.title | replace_first: '-', '–' | split: '–' | last }}</h5>
+            </div>
+          {% else %}
+            <div class="col-6">
+              {% if block.settings.info != 'hide' %}
+                {% unless product.metafields.data[block.settings.info].value == nil %}
+                  <ul class="list pb-4 px-4 px-xl-3 px-xl-5 d-none d-sm-block">
+                    {% for item in product.metafields.data[block.settings.info].value %}
+                      <li class="fs-sm">
+                        {{ item | strip }}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endunless %}
+              {% endif %}
+            </div>
+          {% endif %}
+
+        </a>
+
+      </div>
+
+      {% comment %}
+        Left Side - Product Image
+      {% endcomment %}
+
+      <a href="{{ product.url }}" class="col-6 d-none d-sm-unset {{ block.settings.order }}">
+        {% if block.settings.feature_image != nil %}
+          {% render 'image' with block.settings.feature_image as image
+            , xs: 480
+            , sm: 620
+            , md: 840
+            , lg: 920
+            , xl: 1120
+          %}
+        {% else %}
+          {% render 'image' with product.images[block.settings.feature_index] as image
+            , xs: 480
+            , sm: 620
+            , md: 840
+            , lg: 920
+            , xl: 1120
+          %}
+        {% endif %}
+      </a>
+
+    </div>
+  {% endif %}
+{% endfor %}
+
+{% schema %}
+{
+  "name": "Product Focus",
+  "tag": "section",
+  "blocks": [
+    {
+      "name": "Product",
+      "type": "product",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Product Focus",
+          "info": "Select the product this block will focus on, you can optionally customise each region within."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Select the feature product."
+        },
+        {
+          "type": "number",
+          "id": "feature_index",
+          "label": "Feature Index",
+          "info": "Select the feature image index to use (if no custom image is provided)",
+          "default": 3
+        },
+        {
+          "type": "image_picker",
+          "id": "feature_image",
+          "label": "Feature Image",
+          "info": "Optionally provide a custom image"
+        },
+        {
+          "type": "select",
+          "id": "order",
+          "label": "Alignment",
+          "default": "od-last",
+          "info": "Set the image section order alignment",
+          "options": [
+            {
+              "value": "od-first",
+              "label": "Left"
+            },
+            {
+              "value": "od-last",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Top Content",
+          "info": "The inner contents of the top block in the section containing smaller images"
+        },
+        {
+          "type": "url",
+          "id": "top_product",
+          "label": "Top Product",
+          "info": "Optionally provide a different product"
+        },
+        {
+          "type": "number",
+          "id": "top_index",
+          "label": "Top Index",
+          "info": "Select the image index to use based on feature product (if no custom image is provided)",
+          "default": 0
+        },
+        {
+          "type": "image_picker",
+          "id": "top_image",
+          "label": "Top Image",
+          "info": "Optionally provide a custom image"
+        },
+        {
+          "type": "select",
+          "id": "top_order",
+          "label": "Alignment",
+          "default": "od-first",
+          "info": "Set the image block order alignment",
+          "options": [
+            {
+              "value": "od-first",
+              "label": "Left"
+            },
+            {
+              "value": "od-last",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Bottom Content",
+          "info": "The inner contents of the bottom block in the section containing smaller images"
+        },
+        {
+          "type": "url",
+          "id": "bottom_product",
+          "label": "Bottom Product",
+          "info": "Optionally provide a different product"
+        },
+        {
+          "type": "number",
+          "id": "bottom_index",
+          "label": "Image Bottom",
+          "info": "Select the image index to use (if no custom image is provided)",
+          "default": 1
+        },
+        {
+          "type": "image_picker",
+          "id": "bottom_image",
+          "label": "Bottom Image",
+          "info": "Optionally provide a custom image"
+        },
+        {
+          "type": "select",
+          "id": "bottom_order",
+          "label": "Alignment",
+          "default": "od-last",
+          "info": "Set the image block order alignment",
+          "options": [
+            {
+              "value": "od-first",
+              "label": "Left"
+            },
+            {
+              "value": "od-last",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "info",
+          "label": "Info",
+          "default": "details",
+          "info": "The product information to show",
+          "options": [
+            {
+              "value": "hide",
+              "label": "Hide"
+            },
+            {
+              "value": "details",
+              "label": "Details"
+            },
+            {
+              "value": "material_shell",
+              "label": "Shell Fabric"
+            },
+            {
+              "value": "material_lining",
+              "label": "Shell Lining"
+            }
+          ]
+        }
+      ]
+    }
+
+  ]
+}
+{% endschema %}

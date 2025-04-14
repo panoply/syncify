@@ -133,7 +133,7 @@ export async function ExtractSchema (file: File): Promise<[
 
   if (indices === null) return [ content, null, null ];
 
-  const { start, begin, ender } = indices;
+  const { begin, ender } = indices;
 
   if (ender < 0) {
 
@@ -154,7 +154,7 @@ export async function ExtractSchema (file: File): Promise<[
     const schema = parse<SchemaSectionTag>(content.slice(begin, ender));
 
     return [
-      content.slice(0, start),
+      content.slice(0, begin),
       schema,
       content.slice(ender)
     ];

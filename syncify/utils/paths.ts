@@ -122,7 +122,7 @@ export function normalPath (input: string, cwd = null) {
    */
   return function prepend (path: any) {
 
-    if (Array.isArray(path)) return path.map(prepend);
+    if (isArray(path)) return path.map(prepend);
 
     const ignore = path.charCodeAt(0) === 33;
 
@@ -132,7 +132,7 @@ export function normalPath (input: string, cwd = null) {
     if (path.charCodeAt(0) === 46 && path.charCodeAt(1) === 46 && path.charCodeAt(2) === 47) {
       throwError(
         `Invalid path defined at: ${COL} ${yellowBright(`"${path}"`)}`,
-        [ 'Paths must be relative to source' ]
+        [ 'Paths must be relative to the input directory' ]
       );
     }
 

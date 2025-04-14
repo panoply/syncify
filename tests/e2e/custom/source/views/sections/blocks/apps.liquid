@@ -1,0 +1,217 @@
+<div class="{{ section.settings.xs }} {{ section.settings.md }} {{ section.settings.lg }}">
+  {% for block in section.blocks %}
+    {% render block %}
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "App Wrapper",
+  "tag": "section",
+  "class": "row jc-center ai-center",
+  "settings": [
+    {
+      "type": "select",
+      "id": "xs",
+      "label": "Mobile Viewport",
+      "default": "col-12",
+      "options": [
+        {
+          "value": "col",
+          "label": "Fluid"
+        },
+        {
+          "value": "col-auto",
+          "label": "Auto"
+        },
+        {
+          "value": "col-12",
+          "label": "12 Columns"
+        },
+        {
+          "value": "col-11",
+          "label": "11 Columns"
+        },
+        {
+          "value": "col-10",
+          "label": "10 Columns"
+        },
+        {
+          "value": "col-9",
+          "label": "9 Columns"
+        },
+        {
+          "value": "col-8",
+          "label": "8 Columns"
+        },
+        {
+          "value": "col-7",
+          "label": "7 Columns"
+        },
+        {
+          "value": "col-6",
+          "label": "6 Columns"
+        },
+        {
+          "value": "col-5",
+          "label": "5 Columns"
+        },
+        {
+          "value": "col-4",
+          "label": "4 Columns"
+        },
+        {
+          "value": "col-3",
+          "label": "3 Columns"
+        },
+        {
+          "value": "col-2",
+          "label": "2 Columns"
+        },
+        {
+          "value": "col-1",
+          "label": "1 Columns"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "md",
+      "label": "Tablet Viewport",
+      "default": "col",
+      "options": [
+        {
+          "value": "col",
+          "label": "Fluid"
+        },
+        {
+          "value": "col-auto",
+          "label": "Auto"
+        },
+        {
+          "value": "col-12",
+          "label": "12 Columns"
+        },
+        {
+          "value": "col-11",
+          "label": "11 Columns"
+        },
+        {
+          "value": "col-10",
+          "label": "10 Columns"
+        },
+        {
+          "value": "col-9",
+          "label": "9 Columns"
+        },
+        {
+          "value": "col-8",
+          "label": "8 Columns"
+        },
+        {
+          "value": "col-7",
+          "label": "7 Columns"
+        },
+        {
+          "value": "col-6",
+          "label": "6 Columns"
+        },
+        {
+          "value": "col-5",
+          "label": "5 Columns"
+        },
+        {
+          "value": "col-4",
+          "label": "4 Columns"
+        },
+        {
+          "value": "col-3",
+          "label": "3 Columns"
+        },
+        {
+          "value": "col-2",
+          "label": "2 Columns"
+        },
+        {
+          "value": "col-1",
+          "label": "1 Columns"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "lg",
+      "label": "Desktop Viewport",
+      "default": "col",
+      "options": [
+        {
+          "value": "col",
+          "label": "Fluid"
+        },
+        {
+          "value": "col-auto",
+          "label": "Auto"
+        },
+        {
+          "value": "col-12",
+          "label": "12 Columns"
+        },
+        {
+          "value": "col-11",
+          "label": "11 Columns"
+        },
+        {
+          "value": "col-10",
+          "label": "10 Columns"
+        },
+        {
+          "value": "col-9",
+          "label": "9 Columns"
+        },
+        {
+          "value": "col-8",
+          "label": "8 Columns"
+        },
+        {
+          "value": "col-7",
+          "label": "7 Columns"
+        },
+        {
+          "value": "col-6",
+          "label": "6 Columns"
+        },
+        {
+          "value": "col-5",
+          "label": "5 Columns"
+        },
+        {
+          "value": "col-4",
+          "label": "4 Columns"
+        },
+        {
+          "value": "col-3",
+          "label": "3 Columns"
+        },
+        {
+          "value": "col-2",
+          "label": "2 Columns"
+        },
+        {
+          "value": "col-1",
+          "label": "1 Columns"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "App wrapper"
+    }
+  ]
+}
+{% endschema %}

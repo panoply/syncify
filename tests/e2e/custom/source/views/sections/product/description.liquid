@@ -1,0 +1,323 @@
+{% liquid
+
+  assign meta = product.metafields
+  assign fit = meta.specification.fit_reference | default: meta.product.fit_reference
+  assign fabric = meta.specification.fabric.value | default: meta.product.fabric
+  assign gender = nil
+
+  if product.metafields.data.product_gender contains 'Female'
+
+    assign model = shop.metafields.product.model.value['woman']
+    assign gender = 'women'
+    capture pictogram
+      render 'wmn.pictogram'
+    endcapture
+
+  elsif product.metafields.data.product_gender contains 'Male'
+
+    assign model = shop.metafields.product.model.value['man']
+    assign gender = 'men'
+    capture pictogram
+      render 'men.pictogram'
+    endcapture
+
+  endif
+
+  # SIZING PROPERTIES
+  assign metrics = 'size,chest,waist,shoulder' | split: ','
+
+  # MATERIAL PROPERTIES AND COUNT REFERENCE
+  assign mp = 'shell,lining,padding,piping,webbing' | split: ','
+  assign mc = 0
+
+  # MODEL SIZES - REQUIRED DATA
+  capture height_cm
+    echo model.height.cm | append: 'cm'
+  endcapture
+  capture height_in
+    echo model.height.in | append: 'in'
+  endcapture
+  capture weight_kg
+    echo model.weight.kg | append: 'kg'
+  endcapture
+  capture weight_lbs
+    echo model.weight.lbs | append: 'lbs'
+  endcapture
+
+  capture model_size
+    if product.vendor == 'Spring / Summer 23'
+      if gender == 'men'
+        echo 'product_page.model_size' | t: size: model.wearing, height: '183cm', weight: weight_kg
+      else
+        echo 'product_page.model_size' | t: size: model.wearing, height: '173cm', weight: weight_kg
+      endif
+    elsif product.vendor == 'Autumn / Winter 23'
+      if gender == 'women'
+        echo 'product_page.model_size' | t: size: model.wearing, height: '174cm', weight: weight_kg
+      else
+        echo 'product_page.model_size' | t: size: model.wearing, height: '184cm', weight: weight_kg
+      endif
+    else
+      echo 'product_page.model_size' | t: size: model.wearing, height: height_cm, weight: weight_kg
+    endif
+  endcapture
+%}
+
+<section
+  class="accordion product-description bb-0 bb-sm bx-0 px-1 px-sm-0 pt-2 pt-sm-0"
+  spx-component="accordion"
+  spx-accordion:multiple="false"
+  spx-accordion:persist="false">
+
+  <details>
+
+    <summary class="accordion-btn h5 mb-0 py-3 pl-3 px-md-5">
+      {{ 'product_page.description' | t }}
+    </summary>
+
+    <div class="accordion-fold">
+
+      <p class="fs-sm mt-3 mt-md-0 px-3 px-md-5 col-12 col-sm-11">
+        {{ product.description | strip_html }}
+      </p>
+
+      {% unless meta.data.details.value == nil %}
+        <h5 class="pt-3 pt-md-0 mb-3 px-3 px-md-5">
+          {{ 'product_page.details' | t }}
+        </h5>
+        <ul class="list-dash pb-4 px-4 px-md-5">
+          {% for item in meta.data.details.value %}
+            <li class="fs-sm">
+              {{ item | strip }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endunless %}
+
+    </div>
+  </details>
+
+  <details>
+    <summary class="accordion-btn fc-black h5 mb-0 py-3 pl-3 px-md-5">
+      {{ 'product_page.fit_and_size' | t }}
+    </summary>
+    <div class="accordion-fold">
+      {% if meta.data.oversize == true %}
+        <p class="fs-sm mb-0 px-3 px-md-5">
+          {{ 'product_page.measurements.oversize_html' | t }}
+        </p>
+      {% endif %}
+      <p class="fs-sm mb-0 pb-5 pb-sm-4 px-3 px-md-5">
+        {{ model_size }}
+      </p>
+    </div>
+  </details>
+
+  {% if product.type != 'Extra' %}
+
+    <details>
+      <summary class="accordion-btn h5 mb-0 py-3 pl-3 px-md-5">
+        {{ 'product_page.measurements.title' | t }}
+      </summary>
+      <div class="accordion-fold">
+        <p class="fs-sm pt-4 pt-md-2 px-3 px-md-5 d-none">
+          {{ 'product_page.measurements.recommend_html' | t }}
+        </p>
+        <div class="d-block py-4">
+
+          <table class="size-chart-table col-11 col-xl-10 m-auto tc">
+            <thead>
+              <tr>
+                <th class="py-1 px-3 fw-bold fs-sm">
+                  {{ 'product_page.sizing.group' | t }}
+                </th>
+                <th class="py-1 px-3 fw-bold fs-sm">
+                  {{ 'product_page.sizing.chest' | t }}
+                </th>
+                <th class="py-1 px-3 fw-bold fs-sm">
+                  {% if gender == 'women' %}
+                    {{ 'product_page.sizing.hip' | t }}
+                  {% else %}
+                    {{ 'product_page.sizing.waist' | t }}
+                  {% endif %}
+                </th>
+                <th class="py-1 px-3 fw-bold fs-sm">
+                  {{ 'product_page.sizing.shoulders' | t }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for variant in product.variants %}
+
+                {% liquid
+
+                  # HANDLEIZE VARIANT
+                  assign handle = variant.title | downcase | replace: ' ', '_'
+
+                  # LOCALE TRANSLATION
+                  assign locale = 'product_page.sizing.' | append: handle
+
+                  # TITLE XX SMALL
+                  capture title
+                    echo locale | append: '.title' | t
+                  endcapture
+
+                  # ABBREVIATED XXS
+                  capture abbrv
+                    echo locale | append: '.abbreviation' | t
+                  endcapture
+                %}
+
+                {% tablerow type in metrics cols: 4 %}
+
+                  {% if type == 'size' %}
+
+                    <div
+                      class="size-chart__group py-1 px-2 px-xl-4 m-auto"
+                      scope="row">
+                      <span class="d-none d-xl-block fs-xs upper">
+                        {{ title }}
+                      </span>
+                      <span class="d-block d-xl-none fs-xs upper">
+                        {{ abbrv }}
+                      </span>
+                    </div>
+
+                  {% else %}
+
+                    {% assign size = shop.metaobjects.product_measurement[gender][type].value[handle] %}
+
+                    <div class="fs-xs lower px-1 px-xl-4">
+                      <span
+                        data-imperial="{{ size.from.in }}"
+                        data-metric="{{ size.from.cm }}"
+                        data-sizing-target="measurement">
+                        {{ size.from.cm }}
+                      </span>
+                      &ndash;
+                      <span
+                        data-imperial="{{ size.to.in }}"
+                        data-metric="{{ size.to.cm }}"
+                        data-sizing-target="measurement">
+                        {{ size.to.cm | append: 'cm' }}
+                      </span>
+                    </div>
+                  {% endif %}
+                {% endtablerow %}
+
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div
+          class="tc"
+          spx-component="modal"
+          spx-modal:class="col-11 col-sm-10 col-md-8 col-lg-7 col-xl-6">
+
+          <button
+            type="button"
+            class="btn btn-sm fs-xs btn-black mx-auto px-3 py-1"
+            spx@click="modal.open">
+            {{ 'product_page.measurements.guide.how_to_measure' | t }}
+          </button>
+
+          <small class="fs-xs italic d-block mt-3 mb-5">
+            {{ 'product_page.measurements.guide.determine_size' | t }}
+          </small>
+
+          {% render 'measurements', pictogram: pictogram, gender: gender %}
+
+        </div>
+      </div>
+    </details>
+
+  {% endif %}
+
+  {% unless meta.data.material_shell.value == nil and meta.data.material_lining.value == nil %}
+
+    <details>
+      <summary class="accordion-btn h5 mb-0 py-3 pl-3 px-md-5">
+        {{ 'product_page.material.title' | t }}
+      </summary>
+      <div class="accordion-fold">
+        <div class="row py-3 pl-3 px-md-5">
+          {% for m in mp %}
+
+            {% assign mn = 'material_' | append: m %}
+
+            {% unless meta.data[mn].value == nil %}
+              <div class="{% if mc > 2 %}col-12{% endif %} col-lg-auto pl-1">
+                <h5 class="mb-3 px-2 px-md-3 upper">
+                  {{ 'product_page.material.' | append: m | t }}
+                </h5>
+                <ul class="list-dash pb-3 px-2 px-md-3">
+                  {% for item in meta.data[mn].value %}
+                    <li class="fs-sm">
+                      {{ item | strip }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endunless %}
+
+          {% endfor %}
+        </div>
+      </div>
+    </details>
+
+  {% endunless %}
+
+  {% if meta.data.certificates.value != blank %}
+
+    <details>
+      <summary class="accordion-btn h5 mb-0 py-3 pl-3 px-md-5">
+        {{ 'product_page.fabric_sustainability' | t }}
+      </summary>
+      <div class="accordion-fold">
+        <div class="py-4 py-3 px-3 px-md-5">
+          {% for certificate in meta.data.certificates.value %}
+            {% case certificate %}
+            {% when 'BCI' %}
+
+              <h5 class="mb-3">
+                {{ 'product_item.certificate.bci.title' | t }}
+              </h5>
+              <p class="fs-sm col-12 col-sm-10 mb-4">
+                {{ 'product_item.certificate.bci.description' | t }}
+              </p>
+
+            {% when 'GRS' %}
+
+              <h5 class="mb-3">
+                {{ 'product_item.certificate.grs.title' | t }}
+              </h5>
+              <p class="fs-sm col-12 col-sm-10 mb-4">
+                {{ 'product_item.certificate.grs.description' | t }}
+              </p>
+
+            {% when 'GOTS' %}
+
+              <h5 class="mb-3">
+                {{ 'product_item.certificate.gots.title' | t }}
+              </h5>
+              <p class="fs-sm col-12 col-sm-10 mb-4">
+                {{ 'product_item.certificate.gots.description' | t }}
+              </p>
+
+            {% endcase %}
+          {% endfor %}
+        </div>
+      </div>
+    </details>
+  {% endif %}
+
+</section>
+
+{% schema %}
+{
+  "tag": "div",
+  "name": "Product Description",
+  "class": "od-last od-md-first"
+}
+{% endschema %}

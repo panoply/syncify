@@ -1,0 +1,182 @@
+<div class="row jc-center my-4 g-0">
+  <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-8 italic fs-sm {{ section.settings.ta }}">
+    <h4 class="normal my-4">
+      {{ section.settings.title }}
+    </h4>
+    {{ section.settings.banner }}
+  </div>
+</div>
+
+<div class="row jc-center my-md-4 g-0">
+
+  <form
+    method="post"
+    accept-charset="UTF-8"
+    class="col-11 col-sm-10 col-md-8 col-xl-6"
+    action="{{ request.path }}"
+    novalidate="true"
+    spx-component="form"
+    spx-form:klaviyo="{{ section.settings.action }}"
+    spx-form:response="append"
+    spx-form:success="{{ section.settings.success }}"
+    spx-form:type="notification:instock"
+    spx@submit="form.onSubmit">
+
+    <div
+      class="col-11 col-sm-10 m-auto"
+      style="height: 80px;">
+
+      {% if section.settings.action != nil %}
+        <input
+          type="hidden"
+          name="g"
+          value="{{ section.settings.action }}">
+      {% endif %}
+
+      <input
+        type="hidden"
+        name="instock_{{ product.id }}"
+        class="d-none"
+        value="{{ product.title }}"
+        spx-node="form.inputField">
+
+      <div class="fm-group mb-2">
+        <input
+          type="email"
+          name="email"
+          class="fm-input"
+          placeholder="{{ 'customer.login.email' | t | upcase }}"
+          required="true"
+          spx-form:session="emailAddress"
+          spx-node="form.inputField"
+          spx@input="form.onInput">
+        <button
+          type="submit"
+          class="btn btn-black"
+          spx-node="form.submit">
+          {{ section.settings.btn_label }}
+        </button>
+      </div>
+      <div
+        class="fs-xs fw-light"
+        spx-node="form.response">
+
+        {% # FORM RESPONSE > DYNAMICALLY POPULATED %}
+
+      </div>
+    </div>
+  </form>
+</div>
+
+{% schema %}
+{
+  "name": "Instock Notification",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Form",
+      "info": "Define form related operations, like the Klaviyo list Identifier and response message."
+    },
+    {
+      "type": "text",
+      "id": "action",
+      "label": "Action",
+      "info": "The action of the form - Define Klaviyo List ID here (if required).",
+      "default": "VWXU3n"
+    },
+    {
+      "type": "richtext",
+      "id": "success",
+      "default": "<p>Thanks, we will email <strong>${email}</strong> when this product becomes available.</p>",
+      "info": "The success message after customer has subscribed",
+      "label": "Success Response"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Action",
+      "info": "The button label",
+      "default": "Notify Me"
+    },
+    {
+      "type": "header",
+      "content": "Data Collection",
+      "info": "Define the data to collect from the restock subscription. This information will be added to the Klaviyo Lists."
+    },
+    {
+      "type": "checkbox",
+      "id": "product",
+      "label": "Product Name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_id",
+      "label": "Product ID",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection",
+      "label": "Collection Name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "gender",
+      "label": "Product Gender",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "visits",
+      "label": "User Visits",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "locale",
+      "label": "User Locale",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Text Banner",
+      "info": "Content text block"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "OUT OF STOCK"
+    },
+    {
+      "type": "richtext",
+      "id": "banner",
+      "label": "Content",
+      "default": "<p>This item will be in stock soon. If you want us to let you know when it becomes available, subscribe to an in-stock notification.</p>"
+    },
+    {
+      "type": "select",
+      "id": "ta",
+      "label": "Text Alignment",
+      "default": "tc",
+      "options": [
+        {
+          "value": "tl",
+          "label": "Left"
+        },
+        {
+          "value": "tc",
+          "label": "Center"
+        },
+        {
+          "value": "tr",
+          "label": "Right"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

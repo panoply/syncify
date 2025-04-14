@@ -1,0 +1,198 @@
+{% comment %}
+
+  VARIABLES
+
+  Various assignment variables required
+  in the rendering of the section. Hero
+  image types can be hidden in different
+  viewports which we assert here.
+
+  BUTTONS
+
+  We assign a nil value to the buttons
+  variable which we are leveraging when
+  buttons are defined. This will be used
+  to wrap buttons in a list.
+
+{% endcomment %}
+{% liquid
+  assign buttons = nil
+  assign visible = nil
+  unless section.settings.mobile
+    assign visible = "d-none d-sm-block"
+  endunless
+  unless section.settings.tablet
+    if visible == nil
+      assign visible = "d-block d-sm-none d-md-block"
+    else
+      assign visible = "d-none d-md-block"
+    endif
+  endunless
+  unless section.settings.desktop
+    if visible == nil
+      assign visible = "d-block d-lg-none"
+    else
+      assign visible = visible | append: " d-lg-none"
+    endif
+  endunless
+%}
+
+{% capture attrs %}
+  {% if section.settings.autoplay %}
+    autoplay muted
+  {% endif %}
+{% endcapture %}
+
+<div class="col-auto {{ visible }}">
+
+  {% for block in section.blocks %}
+
+    {% comment %}
+
+      VIDEO VIA BRIXTOL.CLOUD
+
+      Remotely served video content which
+      renders a HTML5 video wrapper
+
+    {% endcomment %}
+    {% if block.type == "video_cdn" %}
+
+      <video
+        {{ attrs }}
+        poster="{{ block.settings.poster }}">
+        <source
+          src="{{ block.settings.webm }}"
+          type="video/webm" />
+        <source
+          src="{{ block.settings.mp4 }}"
+          type="video/mp4" />
+        <source
+          src="{{ block.settings.ogg }}"
+          type="video/ogg" />
+      </video>
+
+    {% endif %}
+  {% endfor %}
+
+</div>
+
+{% schema %}
+{
+  "name": "Video",
+  "class": "row jc-center ai-center py-2",
+  "tag": "section",
+  "max_blocks": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Visibility",
+      "info": "Control the responsive visibility of the image at different screen sizes"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile",
+      "label": "Mobile",
+      "info": "Visible upto 540px",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "tablet",
+      "label": "Tablet",
+      "info": "Visible between 540px > 720px",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "desktop",
+      "label": "Desktop",
+      "info": "Visible from 720px ",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Player",
+      "info": "Control the video player options"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true,
+      "info": "When autoplay is true video will play muted"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "default": true
+    },
+    {
+      "type": "radio",
+      "id": "buttons",
+      "label": "Controls",
+      "options": [
+        {
+          "value": "mouseover",
+          "label": "Mouseover"
+        },
+        {
+          "value": "visible",
+          "label": "Visible"
+        },
+        {
+          "value": "hidden",
+          "label": "Hidden"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "name": "Video via CDN",
+      "type": "video_cdn",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Video URLs",
+          "info": "Video served from [brixtol.cloud/video](https://console.cloud.google.com/storage/browser/brixtol.cloud/video)"
+        },
+        {
+          "type": "text",
+          "id": "webm",
+          "label": "webm Format"
+        },
+        {
+          "type": "text",
+          "id": "mp4",
+          "label": "mp4 Format"
+        },
+        {
+          "type": "text",
+          "id": "ogg",
+          "label": "ogg Format"
+        },
+        {
+          "type": "header",
+          "content": "Poster",
+          "info": "Add poster image to be displayed while buffering"
+        },
+        {
+          "type": "image_picker",
+          "label": "Poster",
+          "id": "poster"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video",
+      "category": "Video"
+    }
+  ]
+}
+{% endschema %}

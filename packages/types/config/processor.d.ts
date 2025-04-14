@@ -8,7 +8,7 @@ import type { Options as MarkdownConfig } from 'markdown-it';
  *
  * Holds reference to default config options for each supported processor.
  */
-export interface Processors {
+export type Processors = {
   /**
    * [ESBuild](https://esbuild.github.io/) Config
    */

@@ -1,0 +1,126 @@
+{% liquid
+
+  if product.metafields.data.variants.value.count > section.settings.limit
+    assign render_carousel = true
+  else
+    assign render_carousel = false
+  endif
+%}
+
+<div
+  class="col-12"
+  spx-component="variants"
+  spx-variants:breakpoint="xs|sm"
+  spx-variants:count="{{ product.metafields.data.variants.value.count }}"
+  spx-variants:current="{{ product.metafields.data.product_variant }}"
+  spx-variants:limit="{{ section.settings.limit }}">
+
+  <h5
+    class="mb-4 fw-light"
+    spx-node="variants.variant">
+    {{ product.metafields.data.product_variant }}
+  </h5>
+
+  {% if product.metafields.data.variants.value.count > 1 %}
+
+    <div class="row jc-start product-variants">
+      <div
+        {% if render_carousel %}
+          class="col-11 hidden"
+          spx-node="variants.carousel"
+        {% else %}
+          class="col-auto"
+        {% endif %}>
+
+        <div class="d-flex">
+          {% for item in product.metafields.data.variants.value %}
+
+            {% liquid
+
+              # PRIVATE SALE VARIANT URL
+              #
+              capture url
+                if request.path contains 'private-sale' and item.metafields.data.private_sale
+                  echo item.url | within: collection
+                else
+                  echo item.url
+                endif
+              endcapture
+
+              # FLAT CROP
+              #
+              capture height
+                if item.metafields.image.crop
+                  echo 280 | minus: item.metafields.image.crop
+                else
+                  echo 280
+                endif
+              endcapture
+
+              capture width
+                echo 200
+              endcapture
+            %}
+
+            <a
+              href="{{ url }}"
+              class="slide bd bc-gray {% if item.id == product.id %}active{% endif %}"
+              aria-label="{{ item.metafields.data.product_variant }}"
+              spx-data:category="{{ item.type }}"
+              spx-data:currency="{{ cart.currency.iso_code }}"
+              spx-data:id="{{ item.id }}"
+              spx-data:name="{{ item.title }}"
+              spx-data:price="{{ item.price | replace_last: '00', '.00' }}"
+              spx-history="replace"
+              spx@mouseenter="variants.onHover"
+              style="--slide-width: {{ section.settings.image_width }}px;">
+              <picture
+                class="ratio"
+                style="--ratio: calc({{ height }} / {{ width }});">
+                <img
+                  itemprop="image"
+                  src="{{ item.metafields.image.flat | image_url: width: width, height: height, crop: 'center' }}"
+                  alt="{{ item.title }}"
+                  loading="lazy"
+                  class="img-fluid"
+                  height="{{ height }}"
+                  width="{{ width }}">
+              </picture>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Variants",
+  "tag": "section",
+  "class": "row g-0 px-3 mb-4 px-md-5 od-2 od-md-first rel",
+  "settings": [
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Limit",
+      "info": "Variant limit before carousel applies",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Image Width",
+      "info": "The variant image widths",
+      "min": 25,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 50
+    }
+  ]
+}
+{% endschema %}

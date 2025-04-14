@@ -1,5 +1,5 @@
 import type { Get, PascalCase } from 'type-fest';
-import type { DotPaths, LiteralString, MultipleTopLevelPatch, PathBundle, PathsRef } from 'types';
+import type { DotPaths, LiteralString, MultipleTopLevelPatch } from 'types';
 
 import { exec, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -10,7 +10,7 @@ import zlib from 'node:zlib';
 
 import { bold, COL, DSH } from '@syncify/ansi';
 
-import { DAY_IN_MS, PATH_KEYS, UNITS } from '~const';
+import { DAY_IN_MS, UNITS } from '~const';
 
 import { $ } from '$';
 
@@ -424,28 +424,6 @@ export function last <T extends any[]> (input: T) {
 /* -------------------------------------------- */
 /* CREATORS                                     */
 /* -------------------------------------------- */
-
-/**
- * Generates the {@link $.paths} store which will hold
- * location URI's, globs and various other information
- * which pertain to paths.
- */
-export function paths (): PathBundle {
-
-  return reduce<string, PathBundle>(PATH_KEYS, (state, p) => {
-
-    state[p] = o<PathsRef>({
-      input: null,
-      match: null,
-      config: null,
-      rename: []
-    });
-
-    return state;
-
-  }, o({ transforms: m() }));
-
-};
 
 /**
  * Returns the package manager

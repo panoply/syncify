@@ -1,0 +1,29 @@
+<div class="contain bg-amber-600">
+
+  <a
+    href="{{ section.settings.url }}"
+    target="_blank"
+    class="logo">
+    {% render 'icon.logo' %}
+  </a>
+
+  {% render 'example' %}
+  <p class="text">
+    {{ section.settings.title }}
+  </p>
+
+  <h1>f</h1>
+
+
+</div>
+
+{% schema %}
+{
+  "name": "page",
+  "settings": [
+    {
+      "$ref": "page.example"
+    }
+  ]
+}
+{% endschema %}

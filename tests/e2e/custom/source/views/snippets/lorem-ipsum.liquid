@@ -1,0 +1,34 @@
+<div style="padding: 50px; width: 700px;">
+  <h1>Example snippet (Syncify demo)</h1>
+
+  <h2>This is added in theme.liquid layout</h2>
+  <p>
+
+    This file is contained within a snippets sub-directory, but will be output to your
+    themes snippets directory. This file will also be HOT Reloaded, even though it is
+    a snippet which contains Liquid.
+
+    {% assign foo = 'something' %}
+
+    {% if foo == 'something' %}
+
+    {% capture text %}
+
+      <h3>Testing Capture</h3>
+      <p style="width: 400px">
+        The Shopify CLI has a dozen "engineers" working on it who get paid
+        thousands of dollars per month to develop/improve it and yet despite that,
+        it does not support snippet HOT reloading. Why? because Shopify engineers
+        are not very good. However, Syncify supports this feature!
+      </p>
+      <p>
+        Edit this file in HOT mode and see the changes in real time!
+      </p>
+    {% endcapture %}
+
+    {{ text }}
+
+    {% endif %}
+
+  </p>
+</div>

@@ -117,8 +117,8 @@ module.exports = defineConfig(function (config) {
 
   config.addLiquidShortcode('schema', () => '{% schema %}');
   config.addLiquidShortcode('endschema', () => '{% endschema %}');
-  config.addPlugin(search, { minify: true });
   config.addPlugin(sprite, { inputPath: './src/assets/svg' });
+  config.addPlugin(search, { minify: true });
   config.addPlugin(terser);
   config.addPassthroughCopy({ 'src/assets/fonts/': 'assets/fonts' });
 

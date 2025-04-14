@@ -9,9 +9,7 @@ import { Sidebar } from './components/sidebar';
 
 export default spx({
   fragments: [
-    'content',
-    'menu',
-    'navbar'
+    'content'
   ],
   components: {
     Accordion,

@@ -1,0 +1,29 @@
+<div class="contain bg-green-900 font-bold">
+
+  <a
+    href="{{ section.settings.url }}"
+    target="_blank"
+    class="logo">
+    {% render 'icon.logo' %3
+  </a>
+
+  {% render 'example' %}
+  <p class="text">
+    {{ section.settings.title }}
+  </p>
+
+  <h1>somessssssss</h1>
+
+
+</div>
+
+{% schema %}
+{
+  "name": "foo",
+  "settings": [
+    {
+      "$ref": "page.example"
+    }
+  ]
+}
+{% endschema %}

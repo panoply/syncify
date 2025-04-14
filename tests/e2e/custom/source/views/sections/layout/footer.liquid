@@ -1,0 +1,241 @@
+{% liquid
+  assign newsletter = section.blocks | where: "type", "newsletter" | first
+  assign navigation = section.blocks | where: "type", "menu"
+  assign about = routes.root_url | append: '/pages/our-story'
+%}
+
+<div
+  id="footer"
+  class="row jc-center jc-lg-around jc-xl-between pt-5 pr-xxl-5 bt mb-5">
+
+  <div
+    class="col-12 col-xs-11 col-sm-8 col-md-7 col-lg col-xxl-5 tc tl-lg px-4 px-md-0 pl-md-4 pl-xxl-5"
+    spx-component="form"
+    spx-form:klaviyo="{{ newsletter.settings.klaviyo_list }}"
+    spx-form:success="{{ newsletter.settings.success }}"
+    spx-form:type="newsletter:footer"
+    spx-node="form.form">
+
+    <h5 class="mb-3">
+      {{ 'newsletter.title' | t }}
+    </h5>
+
+    <p class="fs-sm fw-light">
+
+      {{ newsletter.settings.description | strip_html }}
+
+      {% unless newsletter.settings.incentive == 'none' %}
+        <span class="d-inline d-xxl-block pl-1 pl-xxl-0">
+          {{ 'newsletter.discount_incentive' | t: d: newsletter.settings.incentive }}
+        </span>
+      {% endunless %}
+    </p>
+
+    <form
+      method="post"
+      accept-charset="UTF-8"
+      class="row"
+      spx@submit="form.onSubmit">
+      <div class="col-12 col-sm col-lg-10 col-xl-8">
+        <div class="fm-group fm-lined mb-2">
+          <input
+            type="email"
+            name="email"
+            class="fm-input"
+            placeholder="{{ 'customer.login.email' | t | upcase }}"
+            required="true"
+            spx-form:session="emailAddress"
+            spx-node="form.fieldInput"
+            spx@input="form.onInput">
+          <button
+            type="submit"
+            class="btn"
+            spx-node="form.submit">
+            {{ 'newsletter.submit' | t }}
+          </button>
+        </div>
+
+        <div
+          class="fs-xs fw-light"
+          spx-node="form.response">
+          {% # DYNAMIC RESPONSE %}
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+  <div class="col-11 col-sm-12 col-md-10 col-lg-auto col-xxl-6 pt-5 pt-lg-0 pr-xl-5">
+    <div class="row g-lg-0 jc-center jc-sm-between tl tc-xs tl-md">
+      {% for menu in navigation %}
+
+        <div
+          id="footer-links"
+          {% unless forloop.first %}
+            class="col-xs-10 col-sm-auto pl-lg-5 pt-5 pt-sm-0"
+          {% else %}
+            class="col-xs-10 col-sm-auto pl-lg-5"
+          {% endunless %}>
+
+          <h5 class="mb-3">
+            {{ menu.settings.title }}
+          </h5>
+          <ul>
+            {% for link in linklists[menu.settings.navigation].links %}
+              {% if link.url contains 'our-story' %}
+                <li class="mb-1">
+                  <div
+                    id="about-us"
+                    spx-component="modal"
+                    spx-modal:class="col-11 col-sm-10 col-md-8 col-lg-7 col-xl-6">
+                    <button
+                      type="button"
+                      class="btn upper fs-sm tl p-0 fw-light fc-black"
+                      spx@click="modal.open">
+                      {{ link.title }}
+                    </button>
+                    {% render 'about-us' %}
+                  </div>
+                </li>
+              {% else %}
+                <li class="mb-1">
+                  {% if link contains 'pages' %}
+                    <a
+                      href="{{ link.url }}"
+                      title="{{ link.title }}"
+                      class="upper fs-sm"
+                      target="_blank">
+                      {{ link.title }}
+                    </a>
+                  {% else %}
+                    <a
+                      href="{{ link.url }}"
+                      title="{{ link.title }}"
+                      class="upper fs-sm"
+                      target="_blank">
+                      {{ link.title }}
+                    </a>
+                  {% endif %}
+                </li>
+              {% endif %}
+
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="row jc-center pt-5 pb-4">
+  <div class="col-auto tc fs-xs fc-dark-gray">
+
+    <h6>{{ settings.company_name }}</h6>
+
+    {{ settings.agency_name | append: ' | ' | append: settings.vat_number }}
+
+    <div class="d-block mt-1">
+      {{ settings.city | append: ', ' | append: settings.country }}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Footer",
+  "tag": "footer",
+  "class": "container-fluid gx-0",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Newsletter",
+      "info": "The newsletter subscription form"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "placeholder": "value",
+      "label": "Description"
+    },
+    {
+      "type": "checkbox",
+      "id": "discount",
+      "label": "Discount Incentive",
+      "info": "The text content to show in cookie banner"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Form",
+          "info": "Define the type of form to generate. This required."
+        },
+        {
+          "type": "text",
+          "id": "klaviyo_list",
+          "label": "Klaviyo List ID",
+          "default": "RMim8J",
+          "info": "Provide the Klaviyo List ID here."
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Subscribe to the Brixtol Textiles newsletter for weekly inspiration and news."
+        },
+        {
+          "type": "select",
+          "id": "incentive",
+          "label": "Discount Incentive",
+          "info": "Enable subscription incentive to visitors",
+          "default": "10",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "10",
+              "label": "10% OFF"
+            }
+          ]
+        },
+        {
+          "type": "textarea",
+          "id": "success",
+          "label": "Success Message",
+          "default": "Thanks, We've sent the discount code to: ${email}"
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Linklist",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Linklist",
+          "info": "Define a linklist menu"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "link_list",
+          "id": "navigation",
+          "default": "main-menu",
+          "label": "Select navigation"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

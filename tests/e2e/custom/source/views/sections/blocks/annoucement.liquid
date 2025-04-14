@@ -1,0 +1,172 @@
+{% capture arrow_class %}
+  {% unless section.blocks.size > 1 and section.settings.show_arrows %}
+    d-none
+  {% else %}
+    {% if section.settings.bg_color != "transparent" %}
+      mx-1 px-4
+    {% endif %}
+  {% endunless %}
+{% endcapture %}
+
+{% capture gutter %}
+  py-{{ section.settings.gutter }} my-{{ section.settings.gutter }}
+{% endcapture %}
+
+<div
+  class="row jc-between ai-center {{ gutter }}"
+  data-controller="carousel"
+  data-carousel-draggable-value=" {{- section.settings.draggable }}"
+  data-carousel-interval-value=" {{- section.settings.interval | append: '000' -}}"
+  data-carousel-loop-value=" {{- section.settings.loop }}"
+  style="background-color: {{ section.settings.bg_color }};">
+
+  <div class="col-auto banner-prev {{ arrow_class }}">
+    <button
+      type="button"
+      aria-label="Previous"
+      data-action="carousel#prev"
+      style="fill: {{- section.settings.text_color -}};">
+      {% include 'icon.chevron-left' %}
+    </button>
+  </div>
+
+  {% if section.settings.text_size == 6 %}
+    {% assign text_size = section.settings.text_size | prepend: 'h' %}
+  {% else %}
+    {% assign text_size = 6 | minus: section.settings.text_size | prepend: 'h' %}
+  {% endif %}
+
+  <div
+    class="col text-center"
+    data-carousel-target="siema">
+    {% for block in section.blocks %}
+      {% unless block.settings.link %}
+        <a
+          href=" {{- block.settings.link }}"
+          title=" {{- block.settings.text }}"
+          class=" {{- text_size -}} my-0"
+          data-carousel-target="slide"
+          style="color: {{- section.settings.text_color -}};">
+          {{ block.settings.text }}
+        </a>
+      {% else %}
+        {{ block.settings.text }}
+      {% endunless %}
+    {% endfor %}
+  </div>
+
+  <div class="col-auto banner-next {{ arrow_class }}">
+    <button
+      type="button"
+      aria-label="Next"
+      data-action="carousel#next"
+      style="fill: {{- section.settings.text_color -}};">
+      {% include 'icon.chevron-right' %}
+    </button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Annoucement Bar",
+  "tag": "section",
+  "class": "banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Annoucement",
+      "info": "Customize the annoucement banner with sliding text promotions"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "draggable",
+      "label": "Draggable",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Buttons",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "interval",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "sec",
+      "label": "Slideshow Interval",
+      "default": 4,
+      "info": "The time interval delay between slides. Setting zero will disable auto-play looping"
+    },
+    {
+      "type": "header",
+      "content": "Styling",
+      "info": "Customize how the carousel slideshow slides should look"
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "label": "Gutter",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text Size",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Colour",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Colour",
+      "default": "transparent"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "select",
+      "name": "Banner Content",
+      "limit": 10,
+      "settings": [
+        {
+          "id": "text",
+          "type": "text",
+          "label": "Text"
+        },
+        {
+          "type": "url",
+          "id": "href",
+          "label": "Link",
+          "info": "Optional"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Annoucement Bar",
+      "category": "Text"
+    }
+  ]
+}
+{% endschema %}

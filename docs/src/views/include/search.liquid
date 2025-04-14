@@ -1,7 +1,8 @@
 <div
   class="search d-none d-md-flex"
   spx-component="search"
-  spx-search:source="{{ '/syncify.json' | url }}">
+  spx-search:source="{{ '/syncify.json' | url }}"
+  spx@keypress="search.onKeyboard">
   <input
     type="search"
     name="search"

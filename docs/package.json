@@ -20,7 +20,7 @@
     "tsup:build": "tsup --minify --env.NODE_ENV production",
     "search:json": "tsup --env.NODE_ENV search",
     "sass:build": "sass ./src/sass/stylesheet.scss public/style.css --no-source-map",
-    "sass:watch": "sass ./src/sass/stylesheet.scss public/style.css -q --poll --watch"
+    "sass:watch": "sass ./src/sass/stylesheet.scss public/style.css -q --watch"
   },
   "browserslist": [
     "defaults",
@@ -35,37 +35,27 @@
     "Android >= 4",
     "not dead"
   ],
-  "stylelint": {
-    "extends": "@syncify/stylelint-config"
-  },
-  "eslintConfig": {
-    "extends": "@syncify/eslint-config"
-  },
-  "prettier": "@syncify/prettier-config",
   "dependencies": {
-    "fuse.js": "^7.0.0",
+    "fuse.js": "^7.1.0",
     "match-sorter": "^8.0.0",
     "qvp": "^0.3.2",
     "relapse": "^0.9.1",
-    "spx": "0.0.1-rc.0"
+    "spx": "0.0.5-rc.0"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
     "@brixtol/bootstrap": "^1.7.5",
     "@fullhuman/postcss-purgecss": "^7.0.2",
-    "@syncify/eslint-config": "^0.1.1",
-    "@syncify/prettier-config": "^0.1.0",
-    "@syncify/stylelint-config": "^0.1.0",
-    "autoprefixer": "^10.4.20",
-    "concurrently": "^9.1.0",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
     "cssnano": "^7.0.6",
     "e11ty": "^0.1.2",
     "markdown-it-container": "^4.0.0",
-    "netlify-cli": "^17.38.1",
-    "papyrus": "^0.6.93",
-    "postcss": "^8.4.49",
-    "postcss-cli": "^11.0.0",
-    "sass": "^1.83.0",
-    "tsup": "^8.3.0"
+    "netlify-cli": "^19.0.3",
+    "papyrus": "^0.7.2",
+    "postcss": "catalog:",
+    "postcss-cli": "^11.0.1",
+    "sass": "^1.86.0",
+    "tsup": "catalog:"
   }
 }

@@ -17,7 +17,7 @@ $ sy build <transform> --flags   # Run transform specific build with flags
 
 ---
 
-# `-b, --build`
+# `{bash} -b, --build`
 
 In some instances you may require pre-build functionality. Say, for example you want to upload your local theme to a store. This can be done by first running `sy build` and then `sy push` but you may prefer that such an operation be carried out in a single command line argument. The `--build` (or `-b`) flag is available to the following modes:
 
@@ -30,7 +30,7 @@ $ sy publish  --build           # Available in publish mode
 
 ---
 
-# Transform
+# `{bash} sy build <transform>`
 
 You can provide [Transform](/usage/transforms/) targets to `sy build` and have Syncify perform build operations on a specific file type.
 
@@ -44,7 +44,7 @@ $ sy build liquid             # Run build on Liquid files
 
 ---
 
-# Flags
+# `{bash} sy build --flags`
 
 The `sy build` command accepts several flags that allow you to customize its behavior in **build** mode. Certain flags can alter how Syncify processes file modifications.
 

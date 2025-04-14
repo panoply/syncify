@@ -8,7 +8,7 @@ import type { SVGTransformer } from './svg';
 /* TRANSFORMS                                   */
 /* -------------------------------------------- */
 
-export interface Transforms {
+export type Transforms = {
   /**
    * ###### [DOCUMENTATION](https://syncify.sh/options/transform/style/)
    *
@@ -186,5 +186,13 @@ export interface Transforms {
    * > If this option is set to `false` then no minification will be applied to `.liquid` files.
    */
   liquid?: LiquidTransform;
+  /**
+   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/svg/)
+   *
+   * **Markdown File Transforms**
+   *
+   * Supported markdown transforms accepted for resource specific operations.
+   */
+  markdown?: SVGTransformer;
 
 }

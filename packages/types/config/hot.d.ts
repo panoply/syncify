@@ -1,6 +1,6 @@
 import type { LiteralUnion } from 'type-fest';
 
-interface Shared {
+type HOTShared = {
  /**
    * Specify the static server port. By default, Syncify uses port `41001` to
    * avoid any conflicts with other running hosts of tools.
@@ -95,7 +95,7 @@ interface Shared {
   ];
 }
 
-interface Extension extends Shared {
+type HOTExtension = HOTShared & {
   /**
    * > **!! NOT YET AVAILABLE !!**
    * >
@@ -109,7 +109,7 @@ interface Extension extends Shared {
   client?: 'extension'
 }
 
-interface Inject extends Shared {
+type HOTInject = HOTShared & {
   /**
    * The type of client-side scripting method being used. If you are using the Syncify browser
    * extension then set this value to `extension`, otherwise use `inject`.
@@ -141,4 +141,4 @@ interface Inject extends Shared {
   layouts?: string[];
 }
 
-export type HOT = Inject | Extension
+export type HOT = HOTInject | HOTExtension

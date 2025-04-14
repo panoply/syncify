@@ -1,0 +1,198 @@
+{% liquid
+
+  capture aspect_ratio
+    if product.vendor == 'Autumn / Winter 22' or product.vendor == 'Spring / Summer 23'
+      echo 'ratio-3000x2250'
+    elsif product.vendor == 'Autumn / Winter 23'
+      echo 'ratio-3000x2400'
+    else
+      echo 'ratio-2048x1365'
+    endif
+  endcapture
+%}
+
+<div
+  class="product-viewer"
+  spx-component="viewer"
+  spx-viewer:breakpoint="xs|sm|md"
+  spx-viewer:loop="{{ section.settings.loop }}"
+  spx-viewer:navigation="{{ section.settings.navs }}"
+  spx@window:resize="viewer.screen">
+
+  <div
+    itemscope
+    class="d-lg-block"
+    itemtype="http://schema.org/imagegallery"
+    spx-node="viewer.images">
+
+    {% for image in product.images %}
+      <div class="slide">
+        <picture
+          class="ratio"
+          style="--ratio: calc({{ image.height }} / {{ image.width }})">
+          <source
+            media="(max-width: 576px)"
+            srcset="{{ image | image_url: width: 620 }}">
+          <source
+            media="(min-width: 577px) and (max-width: 767px)"
+            srcset="{{ image | image_url: width: 1140 }}">
+          <source
+            media="(min-width: 768px) and (max-width: 1023px)"
+            srcset="{{ image | image_url: width: 1024 }}">
+          <source
+            media="(min-width: 1024px) and (max-width: 1399px)"
+            srcset="{{ image | image_url: width: 1024 }}">
+          <source
+            media="(min-width: 1400px) and (max-width: 1799px)"
+            srcset="{{ image | image_url: width: 1140 }}">
+          <source
+            media="(min-width: 1800px)"
+            srcset="{{ image | image_url: width: 1140 }}">
+          <img
+            itemprop="image"
+            src="{{ product.featured_image | image_url: width: 1024 }}"
+            alt="{{ product.title }}"
+            loading="lazy">
+        </picture>
+      </div>
+    {% endfor %}
+
+    {% comment %}
+
+      PRODUCT PAIRS
+
+      Renders the desktop product pairs caorusels. There are 2 different pair
+      components. The below compnent applies within desktop or largers screen
+      devices, whereas the other pair component is specific to mobile.
+
+      Mobile → template/product.liquid
+
+    {% endcomment %}
+    {% if product.metafields.data.pairs.value.count > 2 %}
+
+      {% liquid
+
+        # PRIVATE SALE
+        # Determine whether the product is private sale to render correct url
+        #
+        if request.path contains "private-sale" and product.tags contains "Private Sale"
+          assign private_sale = true
+        else
+          assign private_sale = false
+        endif
+      %}
+
+      <div
+        class="slide rel py-4"
+        spx-component="carousel as pairsDesktop"
+        spx-carousel:align="center"
+        spx-carousel:md="2"
+        spx-carousel:screens="lg|xl|xxl"
+        spx-carousel:sm="2"
+        spx-carousel:xs="1"
+        spx-carousel:xxs="1"
+        spx-node="viewer.pairs">
+        <div class="row g-0 ai-center d-none d-md-flex">
+
+          {% # HEADING + SUB-HEADING %}
+          <h1 class="col-12 tc italic lower mt-4 mb-2">
+            {{ 'product_page.pairs_title' | t }}
+          </h1>
+          <h5 class="col-12 tc mb-5 fw-light">
+            {{ 'product_page.pairs_subtitle' | t }}
+          </h5>
+
+          {% # PREV SLIDE %}
+          <input
+            type="button"
+            class="btn slide-prev col-auto pl-2 pr-5"
+            spx@click="pairsDesktop.prev">
+
+          <div
+            itemscope
+            class="product-pairs col"
+            spx-node="pairsDesktop.slideshow">
+            <div>
+              {% for item in product.metafields.data.pairs.value %}
+                {% render 'product' with item
+                  , grid: 'slide'
+                  , gutter: 'px-0 px-sm-2'
+                  , private_sale: private_sale %}
+              {% endfor %}
+            </div>
+          </div>
+
+          {% # NEXT SLIDE %}
+          <input
+            type="button"
+            class="btn slide-next col-auto pl-5 pr-2"
+            spx@click="pairsDesktop.next">
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Image Viewer",
+  "tag": "div",
+  "class": "col-12 col-md-12 col-lg-6 br",
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Viewer",
+      "info": "Mobile width will default to 100% size defined here starts at a 768px screen size width"
+    },
+    {
+      "type": "range",
+      "id": "viewer_size",
+      "label": "Viewer Size",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "info": "Loop the carousel images",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Product Pairs",
+      "info": "Settings which reflect the product pairs"
+    },
+    {
+      "type": "number",
+      "id": "pair_index",
+      "label": "Pair Index",
+      "default": -1
+    },
+    {
+      "type": "header",
+      "content": "Descriptive",
+      "info": "Mobile width will default to 100% size defined here starts at a 768px screen size width"
+    },
+    {
+      "type": "range",
+      "id": "descriptive_size",
+      "label": "Descriptive Size",
+      "min": 4,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    }
+  ]
+}
+{% endschema %}

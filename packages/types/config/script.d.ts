@@ -121,7 +121,7 @@ export type ESBuildConfig = Merge<ESBuildAllowedOptions, {
 /* TRANSFORM                                    */
 /* -------------------------------------------- */
 
-interface ScriptSharedConfig {
+type ScriptSharedConfig = {
   /**
    * JS/TS input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.
@@ -229,7 +229,7 @@ interface ScriptSharedConfig {
   esbuild?: boolean | ESBuildConfig;
 }
 
-interface ScriptFormatESM extends ScriptSharedConfig {
+type ScriptFormatESM = ScriptSharedConfig & {
 
   /**
    * The format to be generated. Because we are targeting
@@ -241,7 +241,7 @@ interface ScriptFormatESM extends ScriptSharedConfig {
   format?: 'esm';
 }
 
-interface ScriptFormatIIFE extends ScriptSharedConfig {
+type ScriptFormatIIFE = ScriptSharedConfig & {
   /**
    * The format to be generated. Because we are targeting
    * browser environments, Syncify does not allow for CJS (commonjs)

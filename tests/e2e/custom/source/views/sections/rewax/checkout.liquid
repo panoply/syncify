@@ -1,0 +1,187 @@
+<div class="jc-center {{ section.settings.position -}}">
+
+  {%- for product in collections.rewaxing-service.products -%}
+    <div class="h3 d-flex jc-between w-100 my-2">
+      <span data-rewaxing-target="productName" class="d-none">
+        {{- product.variants[forloop.index].title -}}
+      </span>
+
+      {%- comment -%}
+
+        PRICE INTEGER
+
+        Capture of the product price. This is applied so prices
+        can render in attributes for dynamic coversion. This is
+        only useful when store is in SEK.
+
+      {%- endcomment -%}
+      {%- capture product_price -%}
+        {%- if cart.currency.iso_code == shop.currency -%}
+          {{- product.price
+        | money_without_trailing_zeros
+        | remove: ','
+        | remove: '.'
+        | remove: cart.currency.symbol -}}
+        {% endif %}
+      {%- endcapture -%}
+      <span class="price" data-currency-price="{{- product_price | default: 'NaN'  }}">
+        {{- product.price | money_without_trailing_zeros -}}
+    </div>
+
+    <h3 class="my-2">{{ section.settings.title }}</h3>
+    <p>{{- product.description -}}</p>
+
+    <div
+      class="accordion mt-3"
+      data-accordion-collapsible-value=" {{- section.settings.collapsible -}}"
+      data-accordion-multiselect-value=" {{- section.settings.multi_select -}}"
+      data-controller="accordion">
+
+      {%- for block in section.blocks -%}
+
+        {%- if section.settings.text_size == 6 -%}
+          {%- assign text_size = section.settings.text_size | prepend: 'h' -%}
+        {%- else -%}
+          {%- assign text_size = 6 | minus: section.settings.text_size | prepend: 'h' -%}
+        {%- endif -%}
+
+        {%- capture class -%}
+          py-{{- section.settings.gutter }}
+        {%- endcapture -%}
+
+        <div class="accordion-header {{ class }}">
+          <button class="accordion-button {{ text_size }}">
+            {{- block.settings.title -}}
+          </button>
+        </div>
+
+        <div class="accordion-content" {{- block.settings.auto_open -}}>
+          <div class="accordion-inner py-3">
+            {{- block.settings.content -}}
+          </div>
+        </div>
+
+      {%- endfor -%}
+    </div>
+
+    <button class="btn-radius bg-green" data-action="click->rewaxing#checkout">
+      <icon name="payment" class="icon-right" />
+      <span data-rewaxing-target="checkout">
+        {{ 'rewaxing_page.goto_checkout' | t }}
+      </span>
+    </button>
+
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "Rewaxing Checkout",
+  "tag": "section",
+  "class": "col-12 col-md-4 d-flex flex-wrap",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Position"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "default": "as-center",
+      "options": [
+        {
+          "value": "as-start",
+          "label": "Top"
+        },
+        {
+          "value": "as-center",
+          "label": "Center"
+        },
+        {
+          "value": "as-end",
+          "label": "Bottom"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "multi_select",
+      "label": "Multiselect",
+      "default": false,
+      "info": "Maximum one item opened. This will enforce 1 panel to persist its open state"
+    },
+    {
+      "type": "checkbox",
+      "id": "collapsible",
+      "label": "Collapsible",
+      "default": true,
+      "info": "Maximum one item opened and not toggable. This will prevent an opened panel from being closed, enforcing its open state."
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "label": "Gutter",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text Size",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Service by Brixtol"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text_block",
+      "name": "Text Block",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Text Block"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content"
+        },
+        {
+          "type": "radio",
+          "id": "auto_open",
+          "label": "Automatic Open",
+          "info": "When enabled this panel will be load in an open state",
+          "default": "data-closed",
+          "options": [
+            {
+              "value": "data-open",
+              "label": "Enable"
+            },
+            {
+              "value": "data-closed",
+              "label": "Disable"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

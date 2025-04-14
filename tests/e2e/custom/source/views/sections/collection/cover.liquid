@@ -1,0 +1,122 @@
+{% liquid
+  assign cover = section.settings.visible | where: 'id', collection.id | first
+  assign description = collection.description | strip_html | strip | default: shop.description
+%}
+
+{% if cover != blank %}
+
+  {% if collection.image %}
+
+    <div
+      class="row ai-center jc-center g-0 bb"
+      style="background-color: {{ section.settings.bg }};">
+      <div class="col-12 col-md-6">
+        <div
+          class="ratio"
+          style="--ratio: calc(600 / 1240);">
+          <picture>
+            <source
+              data-srcset="{{ collection.image | image_url: width: 400 }}"
+              media="xxs">
+            <source
+              data-srcset="{{ collection.image | image_url: width: 500 }}"
+              media="md">
+            <source
+              data-srcset="{{ collection.image | image_url: width: 600 }}"
+              media="lg">
+            <source
+              data-srcset="{{ collection.image | image_url: width: 700 }}"
+              media="xl">
+            <source
+              data-srcset="{{ collection.image | image_url: width: 900 }}"
+              media="xxl">
+            <img
+              data-src="{{ collection.image | image_url: width: 700 }}"
+              alt="{{ collection.title }}"
+              class="lazy"
+              height="{{ collection.image.height }}px"
+              width="{{ collection.image.width }}px">
+          </picture>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 p-4 p-md-5 rel">
+        <div class="col-12 col-md-10 col-xl-9 m-auto">
+          <h1 class="h4 mb-3">
+            {{ collection.title }}
+          </h1>
+          <p class="fs-sm">
+            {{ collection.description | strip_html }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+
+    <div
+      class="row jc-center ai-center py-5"
+      style="background-color: {{ section.settings.fallback_bg }};">
+
+      <div class="col-11 col-lg-6 col-xl-4 col-xxl-3">
+        <h1 class="h3 tc mb-3">
+          {{ collection.title }}
+        </h1>
+
+        {% if description.size > 0 %}
+          <p class="tc italic">
+            {{ description }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+{% endif %}
+
+{% schema %}
+{
+  "name": "Collection Cover",
+  "tag": "section",
+  "templates": ["collection"],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Cover",
+      "info": "The collection image cover"
+    },
+    {
+      "type": "collection_list",
+      "id": "visible",
+      "label": "Visible",
+      "info": "The collections where the cover is visible"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Padding",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Background",
+      "info": "Customize the cover background colors."
+    },
+    {
+      "type": "color",
+      "label": "Background Colour",
+      "id": "bg",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "label": "Fallback Background",
+      "id": "fallback_bg",
+      "default": "#FCFBE8"
+    }
+  ]
+
+}
+{% endschema %}

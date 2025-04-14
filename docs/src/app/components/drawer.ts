@@ -434,7 +434,7 @@ export class Drawer extends spx.Component({
       this.target.classList.add('drawer-active');
     }
 
-    if (this.state.hasBackdropClass && !this.backdrop.classList.contains(this.state.backdropClass)) {
+    if (!this.backdrop.classList.contains(this.state.backdropClass)) {
       this.backdrop.classList.add(this.state.backdropClass);
     }
 
@@ -502,8 +502,8 @@ export class Drawer extends spx.Component({
       }
     }
 
-    if (this.hasBackdropClass && this.backdrop.classList.contains(this.backdropClass)) {
-      this.backdrop.classList.remove(this.backdropClass);
+    if (this.backdrop.classList.contains(this.state.backdropClass)) {
+      this.backdrop.classList.remove(this.state.backdropClass);
     }
 
     if (this.state.mode === 'pull') {
@@ -613,10 +613,8 @@ export class Drawer extends spx.Component({
     this.state.isOpen = !this.state.isOpen;
 
     if (this.state.isOpen) {
-      if (this.state.redraw === 'open') m.redraw();
       this.open();
     } else {
-      if (this.state.redraw === 'close') m.redraw();
       this.close();
     }
 

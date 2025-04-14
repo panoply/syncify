@@ -1,4 +1,4 @@
-export interface Git {
+export type Git = {
   /**
    * Specifies the default branch where your project exists. This branch will be be used to trigger
    * the auto-merging behaviour when running `git pull`. Your `output` (theme) directory will not

@@ -1,0 +1,75 @@
+<div
+  class="row g-0 jc-center ai-center px-5 locale-redirect d-none"
+  spx-component="locale"
+  spx-locale:prompt="true"
+  spx-locale:redirect="{{ section.settings.text }}">
+
+  <div class="col-auto fs-sm tc rel p-5 bg-white bg-blur bs-2">
+
+    {% if section.settings.title != blank %}
+      <h4 class="mb-3">
+        {{ section.settings.title }}
+      </h4>
+    {% endif %}
+
+    <p
+      class="italic px-4 fs-md fw-light mb-4"
+      spx-node="locale.redirectText">
+      {{ section.settings.text | replace: '[COUNTRY]', '<span data-locale-target=country></span>' }}
+    </p>
+
+    <div class="row jc-center">
+      <button
+        type="button"
+        class="col-auto d-flex btn btn-sm fs-sm btn-sm bd rd-1 upper py-1 px-3 mr-2"
+        aria-label="brixtoltextiles.com"
+        data-tooltip="top"
+        spx@click="locale.closePrompt">
+        {{ section.settings.continue }}
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Locale Redirect",
+  "tag": "section",
+  "class": "container-fluid",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content",
+      "info": "Text content applied to the redirection prompt"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "YOUR LOCATION"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "We think your location is [COUNTRY]?",
+      "info": "The [COUNTRY] TOKEN will be replaced with the country name"
+    },
+    {
+      "type": "text",
+      "id": "continue",
+      "label": "Continue",
+      "default": "Sverige",
+      "info": "Use text which will push the visitor to continue to the proper domain."
+    },
+    {
+      "type": "header",
+      "content": "Style",
+      "info": "Configure the design of redirect prompt"
+    }
+
+  ]
+}
+{% endschema %}

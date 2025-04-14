@@ -1,4 +1,4 @@
-import type { Cache, PathBundle } from 'types';
+import type { Cache, PathsBundle, PathsPlus } from 'types';
 
 /**
  * The packaged distribution path to syncify
@@ -169,23 +169,37 @@ export const PULL_ALIGN = [
 ] as const;
 
 /**
- * Syncify path Keys as per the `syncify.config` > `paths`
+ * Syncify Plus Paths for extended features
  */
-export const PATH_KEYS: Array<Exclude<keyof PathBundle, 'transforms'>> = [
+export const PATH_PLUS_KEYS: Array<keyof PathsPlus> = [
+  'blogs',
+  'files',
+  'metafields',
+  'navigation',
+  'pages',
+  'policies',
+  'schema'
+] as const;
+
+export const PATH_THEME_KEYS = [
   'assets',
   'config',
   'layout',
   'customers',
   'locales',
   'sections',
-  'schema',
   'blocks',
   'snippets',
   'templates',
-  'metaobject',
-  'metafields',
-  'pages',
-  'redirects'
+  'metaobject'
+] as const;
+
+/**
+ * Syncify path Keys as per the `syncify.config` > `paths`
+ */
+export const PATH_KEYS: Array<keyof PathsBundle> = [
+  ...PATH_THEME_KEYS,
+  ...PATH_PLUS_KEYS
 ];
 
 /**

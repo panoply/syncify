@@ -1,0 +1,116 @@
+{% liquid
+  assign option = section.settings
+%}
+
+<div class="col-{{ option.sm }} col-lg-{{ option.md }} col-xl-{{ option.lg }} py-{{ option.py }} px-{{ option.px }}">
+
+  <div class="page">
+    <h1>
+      {{ page.title }}
+    </h1>
+
+    {{
+      page.content
+      | remove: '<br />'
+      | remove: '<span>'
+      | remove: '</span>'
+      | remove: '<meta charset='utf-8' />'
+    }}
+
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Page Content",
+  "tag": "section",
+  "class": "row",
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Grid",
+      "info": "Grid configuration to be applied"
+    },
+    {
+      "type": "range",
+      "id": "sm",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "md",
+      "label": "Tablet",
+      "info": "Screens in large tablet",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "lg",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "header",
+      "content": "Spacing",
+      "info": "Gutters and spacing applied to the grid"
+    },
+    {
+      "type": "range",
+      "id": "py",
+      "label": "Gutter Y",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "px",
+      "label": "Gutter X",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "anchors_width",
+      "label": "Anchors Width",
+      "min": 100,
+      "max": 750,
+      "step": 25,
+      "unit": "px",
+      "default": 250
+    }
+  ],
+  "blocks": [
+    {
+      "type": "anchors",
+      "name": "Anchors",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

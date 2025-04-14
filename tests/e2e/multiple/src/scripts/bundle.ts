@@ -1,0 +1,20 @@
+import bar from './components/bar';
+import baz from './components/baz';
+import foo from './components/foo';
+import qux from './components/qux';
+import test from './components/test';
+import b from './globs/b';
+import { d } from './globs/d';
+import { e } from './globs/e';
+
+console.log('HOT RELOAD');
+
+b();
+d();
+e();
+// ssss
+bar();
+foo();
+baz();
+qux();
+test();

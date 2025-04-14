@@ -1,0 +1,325 @@
+{% capture grid %}
+  col-{{ section.settings.mobile }}
+  col-md-{{ section.settings.desktop }}
+{% endcapture %}
+
+{% liquid
+
+  # IMAGE SWAP EFFECT
+  if section.settings.enable_swap
+    assign image_swap = section.settings.swap
+  else
+    assign image_swap = false
+  endif
+
+  # CURRENCY CODE WITH SPACE
+  assign currency_code = ' ' | append: cart.currency.iso_code
+
+  # CURRENCY SYMBOL
+  if cart.currency.iso_code != shop.currency.iso_code and currency_symbol contains '.'
+    assign currency_symbol = currency_symbol | remove: '.'
+  else
+    assign currency_symbol = cart.currency.symbol
+  endif
+
+  # PRIVATE SALE
+  if collection.handle contains "private"
+    assign private_sale = true
+  else
+    assign private_sale = false
+  endif
+
+  assign collection_image = nil
+%}
+
+<div class="col p-5">
+  <div
+    data-controller="sticky"
+    data-sticky-bounding-value="false"
+    data-sticky-breakpoint-value="lg|xl|xxl"
+    data-sticky-offset-value="{{ section.settings.sticky_offset }}">
+
+    {% for block in section.blocks %}
+
+      {% if block.type == 'heading' %}
+        <h1
+          class="mb-4
+          {% if block.settings.italic %}italic {% endif %}
+          {%- if block.settings.uppercase %}upper{% else %}lower{% endif -%}"
+          style=" font-size: {{ block.settings.fs }}px; font-weight: {{ block.settings.fw }};">
+          {{ block.settings.header }}
+        </h1>
+
+      {% elsif block.type == 'description' %}
+
+        <div
+          class="{% if block.settings.italic %}italic {% endif %} w-50 tj d-fex"
+          style="font-size: {{ block.settings.fs }}px; font-weight:{{ block.settings.fw }};">
+          {{ block.settings.description }}
+        </div>
+
+      {% elsif block.type == 'collections' %}
+
+        <div class="row jc-start">
+          <ul class="col-auto fs-sm my-5">
+
+            {% for item in block.settings.collections %}
+
+              {% capture href %}{{ collection.url }}/{{ item.handle }}{% endcapture %}
+              {% if request.path == href %}
+                {% assign collection_image = item.image %}
+              {% endif %}
+
+              <li class="upper my-{{ block.settings.my }}">
+                <a
+                  href="{{ collection.url }}/{{ item.handle }}"
+                  title="{{ item.title }}"
+                  class="{% if request.path == href %}fw-bold{% endif %}">
+                  {{ item.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      {% endif %}
+    {% endfor %}
+
+  </div>
+</div>
+<div class="col-8 pr-4 py-4">
+
+  {% if collection_image %}
+    {% render 'image' with collection_image as image
+      , space: 'pb-4'
+      , xs: 480
+      , sm: 620
+      , md: 840
+      , lg: 920
+      , xl: 1120
+    %}
+  {% endif %}
+
+  <div class="row jc-center">
+
+    {% paginate collection.products by section.settings.per_page %}
+
+      {% for product in collection.products %}
+
+        {% render 'product' with product
+          , grid: grid
+          , private_sale: private_sale
+          , currency_symbol: currency_symbol
+          , currency_code: currency_code
+          , image_swap: image_swap %}
+
+      {% endfor %}
+
+      {% if paginate.pages > 1 %}
+
+        {% render 'paginate', paginate: paginate, anchor: '' %}
+
+      {% endif %}
+
+    {% endpaginate %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection Sustainable",
+  "tag": "section",
+  "class": "row jc-center ac-center g-0",
+  "blocks": [
+    {
+      "name": "Heading",
+      "type": "heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "header",
+          "label": "Header",
+          "default": "Sustainability"
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Uppercase",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "italic",
+          "label": "Italic",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 600,
+          "step": 100,
+          "default": 300
+        },
+        {
+          "type": "range",
+          "id": "fs",
+          "label": "Font Size",
+          "min": 10,
+          "max": 50,
+          "step": 1,
+          "unit": "px",
+          "default": 25
+        }
+      ]
+    },
+    {
+      "name": "Description",
+      "type": "description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Sustainable Descriptive",
+          "info": "Paragraph text description which describes the sustainable collection"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Since the start we have produced each garment in close cooperation with carefully selected manufacturers. Each chosen for their know-how and experience in the making of a specific fabric or garment, that matches what we have set out to produce. Brixtol Textiles specializes in the making of outer-wear, we are fueled by an aspiration and focus to evolve this category. This strive has pushed us to constantly explore new and interesting materials, everything from waxed cotton and nylons to recycled wools and fabrics. A continuous exploration to make demanding garments that stand the test of time."
+        },
+        {
+          "type": "checkbox",
+          "id": "italic",
+          "label": "Italic",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "fw",
+          "label": "Font Weight",
+          "min": 100,
+          "max": 600,
+          "step": 100,
+          "default": 300
+        },
+        {
+          "type": "range",
+          "id": "fs",
+          "label": "Font Size",
+          "min": 10,
+          "max": 50,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "type": "collections",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "collection_list",
+          "id": "collections",
+          "label": "Select Collections"
+        },
+        {
+          "type": "range",
+          "id": "my",
+          "label": "Links Spacing Y",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 2
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Sticky",
+      "info": "Setttings for the sticky component"
+    },
+    {
+      "type": "range",
+      "id": "sticky_offset",
+      "label": "Sticky Offset",
+      "min": 0,
+      "max": 250,
+      "step": 5,
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Pagination",
+      "info": "Products to show per page"
+    },
+    {
+      "type": "number",
+      "id": "per_page",
+      "label": "Products (Per Page)",
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "Swap Hover",
+      "info": "Customize image swap effect in pointer (non~touch) devices"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_swap",
+      "label": "Hover",
+      "default": true,
+      "info": "Enable Image Swap"
+    },
+    {
+      "type": "number",
+      "id": "swap",
+      "label": "Show Image",
+      "default": 1,
+      "placeholder": "The Zero based index of the image to show"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Customize the grid layout and structure of collections"
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "label": "Gutter",
+      "info": "Spacing and padding between products",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mobile",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 6,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "desktop",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    }
+  ]
+}
+{% endschema %}

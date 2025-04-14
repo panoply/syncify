@@ -1,0 +1,101 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "order": [
+    "collapsible_content_DjDJkR",
+    "main",
+    "foos",
+    "bar"
+  ],
+  "sections": {
+    "collapsible_content_DjDJkR": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_Jaqtyp": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Collapsible rows",
+            "icon": "check_mark",
+            "row_content": "",
+            "page": ""
+          }
+        },
+        "collapsible_row_KXWD33": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Collapsible row",
+            "icon": "check_mark",
+            "row_content": "",
+            "page": ""
+          }
+        },
+        "collapsible_row_4PpQrh": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Collapsible row",
+            "icon": "check_mark",
+            "row_content": "",
+            "page": ""
+          }
+        },
+        "collapsible_row_zHefQN": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Collapsible row",
+            "icon": "check_mark",
+            "row_content": "",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_Jaqtyp",
+        "collapsible_row_KXWD33",
+        "collapsible_row_4PpQrh",
+        "collapsible_row_zHefQN"
+      ],
+      "settings": {
+        "caption": "",
+        "heading": "Collapsible content",
+        "heading_size": "h1",
+        "heading_alignment": "center",
+        "layout": "none",
+        "color_scheme": "",
+        "container_color_scheme": "",
+        "open_first_collapsible_row": false,
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "main": {
+      "type": "page",
+      "settings": {
+        "title": "Lorem foo",
+        "url": "https://syncify.sh"
+      }
+    },
+    "foos": {
+      "type": "page2",
+      "settings": {
+        "title": "Lorem foo",
+        "url": "https://syncify.sh"
+      }
+    },
+    "bar": {
+      "type": "page",
+      "settings": {
+        "title": "Lorem foo",
+        "url": "https://syncify.sh"
+      }
+    }
+  }
+}

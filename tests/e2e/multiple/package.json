@@ -1,0 +1,75 @@
+{
+  "name": "@syncify/e2e-custom",
+  "version": "1.2.1",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "dev": "syncify boefje -t dev,prod --watch",
+    "hot": "syncify boefje -t dev,prod --watch --hot --prod",
+    "dev:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --watch",
+    "build": "syncify --build --prod --clean",
+    "upload": "syncify syncify -t custom --upload",
+    "upload:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --upload",
+    "upload:multi:filter": "syncify syncify,boefje --syncify custom --boefje dev,prod --upload --filter templates/*",
+    "download": "syncify syncify -t custom --import",
+    "download:multi": "syncify syncify,boefje --syncify custom --boefje dev,prod --import",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "syncify": {
+    "stores": [
+      {
+        "domain": "boefje",
+        "themes": {
+          "dev": 43989205050,
+          "prod": 43989205050
+        }
+      }
+    ]
+  },
+  "prettier": "@sissel/prettier-config",
+  "eslintConfig": {
+    "extends": "@sissel/eslint-config",
+    "ignorePatterns": [
+      "docs",
+      "dist",
+      "test/e2e/theme"
+    ],
+    "rules": {
+      "object-curly-newline": "off",
+      "no-import-assign": "off"
+    }
+  },
+  "devDependencies": {
+    "@sissel/eslint-config": "^1.2.1",
+    "@sissel/prettier-config": "^1.2.5",
+    "@syncify/cli": "link:../../..",
+    "@syncify/schema": "workspace:^",
+    "autoprefixer": "^10.4.20",
+    "bootstrap": "^5.3.3",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.16.0",
+    "postcss": "^8.4.49",
+    "postcss-import": "^16.1.0",
+    "prettier": "^3.4.1",
+    "rollup": "^4.28.0",
+    "sass": "^1.81.0",
+    "sharp": "^0.33.5",
+    "svg-sprite": "^2.0.4",
+    "svgo": "^3.3.2",
+    "tailwindcss": "^3.4.15",
+    "tsup": "^8.3.5",
+    "tw-elements": "^2.0.0",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@liquify/highlight": "^0.1.0",
+    "lazysizes": "^5.3.2",
+    "lightgallery": "2.8.2",
+    "mithril": "^2.2.11"
+  }
+}

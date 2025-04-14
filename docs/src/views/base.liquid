@@ -23,7 +23,7 @@
 
       <div
         class="container-fluid container-wrapper"
-        id="content">
+        >
         <aside
           class="vh-100 d-none d-sm-block sidebar drawer-left drawer-panel"
           spx-component="drawer"
@@ -31,7 +31,8 @@
           spx-drawer:width="280">
           {%- include 'include/sidebar' -%}
         </aside>
-        <div class="row jc-center {% if anchors %}jc-md-around{% else %}jc-md-start pl-4{% endif %} content-offset">
+        <div id="content"
+        class="row jc-center {% if anchors %}jc-md-around{% else %}jc-md-start pl-4{% endif %} content-offset">
           <main class="col-11 col-sm-9 pb-4">
             {%- include 'include/breadcrumb' -%}
             {{- content -}}
@@ -40,7 +41,8 @@
           {%- if anchors -%}
             <div
               class="col-auto anchors d-none d-md-unset"
-              spx-component="scrollspy">
+              spx-component="scrollspy"
+              >
               <ul>
                 {%- for name in anchors -%}
                   <li>

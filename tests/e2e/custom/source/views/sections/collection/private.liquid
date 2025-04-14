@@ -1,0 +1,239 @@
+{% capture grid %}
+  col-{{ section.settings.mobile }}
+  col-md-{{ section.settings.tablet }}
+  col-xl-{{ section.settings.desktop }}
+{% endcapture %}
+
+{% liquid
+
+  # IMAGE SWAP EFFECT
+  if section.settings.enable_swap
+    assign image_swap = section.settings.swap
+  else
+    assign image_swap = false
+  endif
+
+  # CURRENCY CODE WITH SPACE
+  assign currency_code = ' ' | append: cart.currency.iso_code
+
+  # CURRENCY SYMBOL
+  if cart.currency.iso_code != shop.currency.iso_code and currency_symbol contains '.'
+    assign currency_symbol = currency_symbol | remove: '.'
+  else
+    assign currency_symbol = cart.currency.symbol
+  endif
+
+  # PRIVATE SALE
+  if collection.handle contains "private"
+    assign private_sale = true
+  else
+    assign private_sale = false
+  endif
+
+  if collection.metafields.data.gender.value contains "Women"
+    assign navigation = linklists.womens-collection
+  elsif collection.metafields.data.gender.value contains "Men"
+    assign navigation = linklists.mens-collection
+  endif
+
+  if collection.metafields.data.group.value contains "Sustainable"
+    assign sustainable = true
+  else
+    assign sustainable = false
+  endif
+%}
+
+<div class="col-4 d-none d-md-unset">
+  <div
+    class="row jc-start pl-5"
+    spx-component="sticky"
+    spx-sticky:offset="43">
+    <h1
+      class="italic lower mt-5 mb-4"
+      style="font-size: 2rem;">
+      {{ collection.metafields.data.display_name.value }}
+    </h1>
+    <p class="fs-sm w-75 mb-3 tj">
+      {{ collection.description }}
+    </p>
+    <div class="col-auto p-5 pl-0 h-100">
+      <ul class="upper fs-sm">
+        <li class="fs-xl fw-bold italic lower mb-3">
+          {{ 'words.collection' | t }}
+        </li>
+        {% for link in navigation.links %}
+
+          {% if link.links != blank %}
+            <li class="fs-xl fw-bold italic lower mt-5 mb-3">
+              {{ link.title }}
+            </li>
+            {% for childlink in link.links %}
+              <li class="li-mb linklist-link {% if childlink.active %}active{% endif %}">
+                <a href="{{ childlink.url }}">
+                  {{ childlink.title }}
+                </a>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li class="li-mb">
+              <a
+                href="{{ link.url }}"
+                class="linklist-link {% if link.active %}active{% endif %}">
+                {{ link.title }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <h1 class="label-rotate">
+    Private Sale
+  </h1>
+
+</div>
+<div class="col pl-md-0">
+  <div class="row gx-4 p-3 px-md-0 py-4 mt-4">
+
+    {% paginate collection.products by section.settings.per_page %}
+
+      {% for product in collection.products %}
+        {% render 'product' with product
+          , grid: grid
+          , variants: product.metafields.data.variants.value
+          , private_sale: private_sale
+          , currency_symbol: currency_symbol
+          , currency_code: currency_code
+        %}
+      {% endfor %}
+
+      {% if paginate.pages > 1 %}
+        {% render 'paginate', paginate: paginate, anchor: '' %}
+      {% endif %}
+
+    {% endpaginate %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection Products",
+  "tag": "section",
+  "class": "row flex jc-start ac-center mx-2",
+  "templates": ["collection"],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Pagination",
+      "info": "Products to show per page"
+    },
+    {
+      "type": "number",
+      "id": "per_page",
+      "label": "Products (Per Page)",
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "Swap Hover",
+      "info": "Customize image swap effect in pointer (non~touch) devices"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_swap",
+      "label": "Hover",
+      "default": true,
+      "info": "Enable Image Swap"
+    },
+    {
+      "type": "number",
+      "id": "swap",
+      "label": "Show Image",
+      "default": 1,
+      "placeholder": "The Zero based index of the image to show"
+    },
+    {
+      "type": "header",
+      "content": "Layout",
+      "info": "Customize the grid layout and structure of collections"
+    },
+    {
+      "type": "range",
+      "id": "gutter",
+      "label": "Gutter",
+      "info": "Spacing and padding between products",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mobile",
+      "label": "Mobile",
+      "info": "Screens in mobile",
+      "min": 6,
+      "max": 12,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "tablet",
+      "label": "Tablet",
+      "info": "Screens in large tablet",
+      "min": 4,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "desktop",
+      "label": "Desktop",
+      "info": "Screens in laptops and desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    }
+  ],
+  "blocks": [
+    {
+      "type": "filter",
+      "name": "Filter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Layout",
+          "info": "Customize the layout and position of the collection filter."
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "label": "Width",
+          "info": "Use 100% for stacked layout",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 15
+        },
+        {
+          "type": "header",
+          "content": "Rendering",
+          "info": "Control how filters render behave when scrolling a collection."
+        },
+        {
+          "type": "checkbox",
+          "id": "sticky",
+          "label": "Sticky",
+          "default": true
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
