@@ -11,16 +11,16 @@ var types = require('node:util/types');
 var node_fs = require('node:fs');
 var node_crypto = require('node:crypto');
 var node_util = require('node:util');
-var zlib2 = require('node:zlib');
-var notifier2 = require('node-notifier');
-var EventEmitter2 = require('node:events');
+var zlib = require('node:zlib');
 var glob = require('fast-glob');
 var fsExtra = require('fs-extra');
+var acquire = require('@syncify/acquire');
+var cbor = require('cbor');
+var notifier2 = require('node-notifier');
+var EventEmitter = require('node:events');
 var xior = require('xior');
 var json = require('@syncify/json');
-var cbor = require('cbor');
 var enquirer = require('enquirer');
-var acquire = require('@syncify/acquire');
 var uws = require('@syncify/uws');
 var esbuild = require('esbuild');
 var fsPromises2 = require('node:fs/promises');
@@ -35,12 +35,12 @@ function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 var path2__default = /*#__PURE__*/_interopDefault(path2);
 var process8__default = /*#__PURE__*/_interopDefault(process8);
 var readline__default = /*#__PURE__*/_interopDefault(readline);
-var zlib2__default = /*#__PURE__*/_interopDefault(zlib2);
-var notifier2__default = /*#__PURE__*/_interopDefault(notifier2);
-var EventEmitter2__default = /*#__PURE__*/_interopDefault(EventEmitter2);
+var zlib__default = /*#__PURE__*/_interopDefault(zlib);
 var glob__default = /*#__PURE__*/_interopDefault(glob);
-var xior__default = /*#__PURE__*/_interopDefault(xior);
 var cbor__default = /*#__PURE__*/_interopDefault(cbor);
+var notifier2__default = /*#__PURE__*/_interopDefault(notifier2);
+var EventEmitter__default = /*#__PURE__*/_interopDefault(EventEmitter);
+var xior__default = /*#__PURE__*/_interopDefault(xior);
 var esbuild__default = /*#__PURE__*/_interopDefault(esbuild);
 var fsPromises2__default = /*#__PURE__*/_interopDefault(fsPromises2);
 
@@ -107,226 +107,6 @@ var __privateWrapper = (obj, member, setter, getter) => ({
   },
   get _() {
     return __privateGet(obj, member, getter);
-  }
-});
-
-// node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.js
-var require_eventemitter3 = __commonJS({
-  "node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.js"(exports, module) {
-    var has2 = Object.prototype.hasOwnProperty;
-    var prefix = "~";
-    function Events() {
-    }
-    if (Object.create) {
-      Events.prototype = /* @__PURE__ */ Object.create(null);
-      if (!new Events().__proto__) prefix = false;
-    }
-    function EE(fn, context, once) {
-      this.fn = fn;
-      this.context = context;
-      this.once = once || false;
-    }
-    function addListener(emitter, event2, fn, context, once) {
-      if (typeof fn !== "function") {
-        throw new TypeError("The listener must be a function");
-      }
-      var listener = new EE(fn, context || emitter, once), evt = prefix ? prefix + event2 : event2;
-      if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
-      else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
-      else emitter._events[evt] = [emitter._events[evt], listener];
-      return emitter;
-    }
-    function clearEvent(emitter, evt) {
-      if (--emitter._eventsCount === 0) emitter._events = new Events();
-      else delete emitter._events[evt];
-    }
-    function EventEmitter3() {
-      this._events = new Events();
-      this._eventsCount = 0;
-    }
-    EventEmitter3.prototype.eventNames = function eventNames() {
-      var names = [], events, name;
-      if (this._eventsCount === 0) return names;
-      for (name in events = this._events) {
-        if (has2.call(events, name)) names.push(prefix ? name.slice(1) : name);
-      }
-      if (Object.getOwnPropertySymbols) {
-        return names.concat(Object.getOwnPropertySymbols(events));
-      }
-      return names;
-    };
-    EventEmitter3.prototype.listeners = function listeners(event2) {
-      var evt = prefix ? prefix + event2 : event2, handlers = this._events[evt];
-      if (!handlers) return [];
-      if (handlers.fn) return [handlers.fn];
-      for (var i = 0, l = handlers.length, ee = new Array(l); i < l; i++) {
-        ee[i] = handlers[i].fn;
-      }
-      return ee;
-    };
-    EventEmitter3.prototype.listenerCount = function listenerCount(event2) {
-      var evt = prefix ? prefix + event2 : event2, listeners = this._events[evt];
-      if (!listeners) return 0;
-      if (listeners.fn) return 1;
-      return listeners.length;
-    };
-    EventEmitter3.prototype.emit = function emit(event2, a1, a2, a3, a4, a5) {
-      var evt = prefix ? prefix + event2 : event2;
-      if (!this._events[evt]) return false;
-      var listeners = this._events[evt], len = arguments.length, args, i;
-      if (listeners.fn) {
-        if (listeners.once) this.removeListener(event2, listeners.fn, void 0, true);
-        switch (len) {
-          case 1:
-            return listeners.fn.call(listeners.context), true;
-          case 2:
-            return listeners.fn.call(listeners.context, a1), true;
-          case 3:
-            return listeners.fn.call(listeners.context, a1, a2), true;
-          case 4:
-            return listeners.fn.call(listeners.context, a1, a2, a3), true;
-          case 5:
-            return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-          case 6:
-            return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-        }
-        for (i = 1, args = new Array(len - 1); i < len; i++) {
-          args[i - 1] = arguments[i];
-        }
-        listeners.fn.apply(listeners.context, args);
-      } else {
-        var length = listeners.length, j;
-        for (i = 0; i < length; i++) {
-          if (listeners[i].once) this.removeListener(event2, listeners[i].fn, void 0, true);
-          switch (len) {
-            case 1:
-              listeners[i].fn.call(listeners[i].context);
-              break;
-            case 2:
-              listeners[i].fn.call(listeners[i].context, a1);
-              break;
-            case 3:
-              listeners[i].fn.call(listeners[i].context, a1, a2);
-              break;
-            case 4:
-              listeners[i].fn.call(listeners[i].context, a1, a2, a3);
-              break;
-            default:
-              if (!args) for (j = 1, args = new Array(len - 1); j < len; j++) {
-                args[j - 1] = arguments[j];
-              }
-              listeners[i].fn.apply(listeners[i].context, args);
-          }
-        }
-      }
-      return true;
-    };
-    EventEmitter3.prototype.on = function on(event2, fn, context) {
-      return addListener(this, event2, fn, context, false);
-    };
-    EventEmitter3.prototype.once = function once(event2, fn, context) {
-      return addListener(this, event2, fn, context, true);
-    };
-    EventEmitter3.prototype.removeListener = function removeListener(event2, fn, context, once) {
-      var evt = prefix ? prefix + event2 : event2;
-      if (!this._events[evt]) return this;
-      if (!fn) {
-        clearEvent(this, evt);
-        return this;
-      }
-      var listeners = this._events[evt];
-      if (listeners.fn) {
-        if (listeners.fn === fn && (!once || listeners.once) && (!context || listeners.context === context)) {
-          clearEvent(this, evt);
-        }
-      } else {
-        for (var i = 0, events = [], length = listeners.length; i < length; i++) {
-          if (listeners[i].fn !== fn || once && !listeners[i].once || context && listeners[i].context !== context) {
-            events.push(listeners[i]);
-          }
-        }
-        if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
-        else clearEvent(this, evt);
-      }
-      return this;
-    };
-    EventEmitter3.prototype.removeAllListeners = function removeAllListeners(event2) {
-      var evt;
-      if (event2) {
-        evt = prefix ? prefix + event2 : event2;
-        if (this._events[evt]) clearEvent(this, evt);
-      } else {
-        this._events = new Events();
-        this._eventsCount = 0;
-      }
-      return this;
-    };
-    EventEmitter3.prototype.off = EventEmitter3.prototype.removeListener;
-    EventEmitter3.prototype.addListener = EventEmitter3.prototype.on;
-    EventEmitter3.prefixed = prefix;
-    EventEmitter3.EventEmitter = EventEmitter3;
-    if ("undefined" !== typeof module) {
-      module.exports = EventEmitter3;
-    }
-  }
-});
-
-// packages/timer/dist/index.js
-var require_dist = __commonJS({
-  "packages/timer/dist/index.js"(exports) {
-    var perf_hooks = __require("perf_hooks");
-    var { floor: e } = Math;
-    var f = new class {
-      marks = [];
-      time = /* @__PURE__ */ Object.create(null);
-      cache = /* @__PURE__ */ Object.create(null);
-      now(t2) {
-        return this.stop(t2 || true);
-      }
-      sec(t2) {
-        let r2 = this.stop(t2 || true);
-        return r2.slice(0, r2.lastIndexOf(" "));
-      }
-      pause(t2) {
-        t2 in this.marks && (this.cache[t2] = this.stop(t2 || true));
-      }
-      start(t2) {
-        t2 ? this.time[t2] = perf_hooks.performance.now() : this.marks.push(perf_hooks.performance.now());
-      }
-      clear(t2) {
-        if (t2) {
-          if (t2 in this.time) {
-            delete this.time[t2];
-            return;
-          }
-          if (t2 in this.cache) {
-            delete this.cache[t2];
-            return;
-          }
-        }
-        for (; this.marks.length !== 0; ) this.marks.pop();
-      }
-      stop(t2 = false, r2 = false, o2 = false) {
-        let n;
-        if (typeof t2 == "boolean") n = t2 ? this.marks[this.marks.length - 1] : this.marks.pop();
-        else if (t2) {
-          if (t2 in this.cache) {
-            let m2 = this.cache[t2];
-            return delete this.cache[t2], m2;
-          }
-          r2 ? (n = this.time[t2], delete this.time[t2]) : n = this.time[t2];
-        }
-        let s2 = perf_hooks.performance.now() - n;
-        if (isNaN(s2)) return "";
-        if (s2 < 1) return `${Math.round(s2 * 1e3)}\u03BCs`;
-        if (s2 < 1e3) return `${Math.floor(s2)}ms`;
-        let i = e(s2 / 1e3);
-        if (i < 60) return `${i}s ${e(s2 % 1e3)}ms`;
-        let h = e(i / 60), a = i % 60;
-        return h < 60 ? `${h}m ${a}s ${e(s2 % 1e3)}ms` : `${e(h / 60)}h ${h % 60}m ${i % 60}s ${e(s2 % 1e3)}ms`;
-      }
-    }();
-    exports.timer = f;
   }
 });
 
@@ -2517,6 +2297,226 @@ var require_lib = __commonJS({
           cleanup();
         }
       }
+    }
+  }
+});
+
+// packages/timer/dist/index.js
+var require_dist = __commonJS({
+  "packages/timer/dist/index.js"(exports) {
+    var perf_hooks = __require("perf_hooks");
+    var { floor: e } = Math;
+    var f = new class {
+      marks = [];
+      time = /* @__PURE__ */ Object.create(null);
+      cache = /* @__PURE__ */ Object.create(null);
+      now(t2) {
+        return this.stop(t2 || true);
+      }
+      sec(t2) {
+        let r2 = this.stop(t2 || true);
+        return r2.slice(0, r2.lastIndexOf(" "));
+      }
+      pause(t2) {
+        t2 in this.marks && (this.cache[t2] = this.stop(t2 || true));
+      }
+      start(t2) {
+        t2 ? this.time[t2] = perf_hooks.performance.now() : this.marks.push(perf_hooks.performance.now());
+      }
+      clear(t2) {
+        if (t2) {
+          if (t2 in this.time) {
+            delete this.time[t2];
+            return;
+          }
+          if (t2 in this.cache) {
+            delete this.cache[t2];
+            return;
+          }
+        }
+        for (; this.marks.length !== 0; ) this.marks.pop();
+      }
+      stop(t2 = false, r2 = false, o2 = false) {
+        let n;
+        if (typeof t2 == "boolean") n = t2 ? this.marks[this.marks.length - 1] : this.marks.pop();
+        else if (t2) {
+          if (t2 in this.cache) {
+            let m2 = this.cache[t2];
+            return delete this.cache[t2], m2;
+          }
+          r2 ? (n = this.time[t2], delete this.time[t2]) : n = this.time[t2];
+        }
+        let s2 = perf_hooks.performance.now() - n;
+        if (isNaN(s2)) return "";
+        if (s2 < 1) return `${Math.round(s2 * 1e3)}\u03BCs`;
+        if (s2 < 1e3) return `${Math.floor(s2)}ms`;
+        let i = e(s2 / 1e3);
+        if (i < 60) return `${i}s ${e(s2 % 1e3)}ms`;
+        let h = e(i / 60), a = i % 60;
+        return h < 60 ? `${h}m ${a}s ${e(s2 % 1e3)}ms` : `${e(h / 60)}h ${h % 60}m ${i % 60}s ${e(s2 % 1e3)}ms`;
+      }
+    }();
+    exports.timer = f;
+  }
+});
+
+// node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.js
+var require_eventemitter3 = __commonJS({
+  "node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.js"(exports, module) {
+    var has2 = Object.prototype.hasOwnProperty;
+    var prefix = "~";
+    function Events() {
+    }
+    if (Object.create) {
+      Events.prototype = /* @__PURE__ */ Object.create(null);
+      if (!new Events().__proto__) prefix = false;
+    }
+    function EE(fn, context, once) {
+      this.fn = fn;
+      this.context = context;
+      this.once = once || false;
+    }
+    function addListener(emitter, event2, fn, context, once) {
+      if (typeof fn !== "function") {
+        throw new TypeError("The listener must be a function");
+      }
+      var listener = new EE(fn, context || emitter, once), evt = prefix ? prefix + event2 : event2;
+      if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
+      else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
+      else emitter._events[evt] = [emitter._events[evt], listener];
+      return emitter;
+    }
+    function clearEvent(emitter, evt) {
+      if (--emitter._eventsCount === 0) emitter._events = new Events();
+      else delete emitter._events[evt];
+    }
+    function EventEmitter3() {
+      this._events = new Events();
+      this._eventsCount = 0;
+    }
+    EventEmitter3.prototype.eventNames = function eventNames() {
+      var names = [], events, name;
+      if (this._eventsCount === 0) return names;
+      for (name in events = this._events) {
+        if (has2.call(events, name)) names.push(prefix ? name.slice(1) : name);
+      }
+      if (Object.getOwnPropertySymbols) {
+        return names.concat(Object.getOwnPropertySymbols(events));
+      }
+      return names;
+    };
+    EventEmitter3.prototype.listeners = function listeners(event2) {
+      var evt = prefix ? prefix + event2 : event2, handlers = this._events[evt];
+      if (!handlers) return [];
+      if (handlers.fn) return [handlers.fn];
+      for (var i = 0, l = handlers.length, ee = new Array(l); i < l; i++) {
+        ee[i] = handlers[i].fn;
+      }
+      return ee;
+    };
+    EventEmitter3.prototype.listenerCount = function listenerCount(event2) {
+      var evt = prefix ? prefix + event2 : event2, listeners = this._events[evt];
+      if (!listeners) return 0;
+      if (listeners.fn) return 1;
+      return listeners.length;
+    };
+    EventEmitter3.prototype.emit = function emit(event2, a1, a2, a3, a4, a5) {
+      var evt = prefix ? prefix + event2 : event2;
+      if (!this._events[evt]) return false;
+      var listeners = this._events[evt], len = arguments.length, args, i;
+      if (listeners.fn) {
+        if (listeners.once) this.removeListener(event2, listeners.fn, void 0, true);
+        switch (len) {
+          case 1:
+            return listeners.fn.call(listeners.context), true;
+          case 2:
+            return listeners.fn.call(listeners.context, a1), true;
+          case 3:
+            return listeners.fn.call(listeners.context, a1, a2), true;
+          case 4:
+            return listeners.fn.call(listeners.context, a1, a2, a3), true;
+          case 5:
+            return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+          case 6:
+            return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+        }
+        for (i = 1, args = new Array(len - 1); i < len; i++) {
+          args[i - 1] = arguments[i];
+        }
+        listeners.fn.apply(listeners.context, args);
+      } else {
+        var length = listeners.length, j;
+        for (i = 0; i < length; i++) {
+          if (listeners[i].once) this.removeListener(event2, listeners[i].fn, void 0, true);
+          switch (len) {
+            case 1:
+              listeners[i].fn.call(listeners[i].context);
+              break;
+            case 2:
+              listeners[i].fn.call(listeners[i].context, a1);
+              break;
+            case 3:
+              listeners[i].fn.call(listeners[i].context, a1, a2);
+              break;
+            case 4:
+              listeners[i].fn.call(listeners[i].context, a1, a2, a3);
+              break;
+            default:
+              if (!args) for (j = 1, args = new Array(len - 1); j < len; j++) {
+                args[j - 1] = arguments[j];
+              }
+              listeners[i].fn.apply(listeners[i].context, args);
+          }
+        }
+      }
+      return true;
+    };
+    EventEmitter3.prototype.on = function on(event2, fn, context) {
+      return addListener(this, event2, fn, context, false);
+    };
+    EventEmitter3.prototype.once = function once(event2, fn, context) {
+      return addListener(this, event2, fn, context, true);
+    };
+    EventEmitter3.prototype.removeListener = function removeListener(event2, fn, context, once) {
+      var evt = prefix ? prefix + event2 : event2;
+      if (!this._events[evt]) return this;
+      if (!fn) {
+        clearEvent(this, evt);
+        return this;
+      }
+      var listeners = this._events[evt];
+      if (listeners.fn) {
+        if (listeners.fn === fn && (!once || listeners.once) && (!context || listeners.context === context)) {
+          clearEvent(this, evt);
+        }
+      } else {
+        for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+          if (listeners[i].fn !== fn || once && !listeners[i].once || context && listeners[i].context !== context) {
+            events.push(listeners[i]);
+          }
+        }
+        if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+        else clearEvent(this, evt);
+      }
+      return this;
+    };
+    EventEmitter3.prototype.removeAllListeners = function removeAllListeners(event2) {
+      var evt;
+      if (event2) {
+        evt = prefix ? prefix + event2 : event2;
+        if (this._events[evt]) clearEvent(this, evt);
+      } else {
+        this._events = new Events();
+        this._eventsCount = 0;
+      }
+      return this;
+    };
+    EventEmitter3.prototype.off = EventEmitter3.prototype.removeListener;
+    EventEmitter3.prototype.addListener = EventEmitter3.prototype.on;
+    EventEmitter3.prefixed = prefix;
+    EventEmitter3.EventEmitter = EventEmitter3;
+    if ("undefined" !== typeof module) {
+      module.exports = EventEmitter3;
     }
   }
 });
@@ -11948,21 +11948,30 @@ var BASE_DIRS = [
   ["output", "theme"],
   ["config", "."]
 ];
-var PATH_KEYS = [
+var PATH_PLUS_KEYS = [
+  "blogs",
+  "files",
+  "metafields",
+  "navigation",
+  "pages",
+  "policies",
+  "schema"
+];
+var PATH_THEME_KEYS = [
   "assets",
   "config",
   "layout",
   "customers",
   "locales",
   "sections",
-  "schema",
   "blocks",
   "snippets",
   "templates",
-  "metaobject",
-  "metafields",
-  "pages",
-  "redirects"
+  "metaobject"
+];
+var PATH_KEYS = [
+  ...PATH_THEME_KEYS,
+  ...PATH_PLUS_KEYS
 ];
 var THEME_KEYS = [
   "assets",
@@ -12045,16 +12054,19 @@ var defaults = () => ({
     config: "config/*.json",
     layout: "layout/*.liquid",
     locales: "locales/*.json",
-    metafields: "metafields/**/*.json",
-    redirects: "redirects.yaml",
-    schema: "schema/*.{schema,json}",
     templates: "templates/*",
     customers: "templates/customers/*",
     metaobject: "templates/metaobject/*",
-    pages: "pages/*",
     snippets: "snippets/**/*.liquid",
     sections: "sections/**/*.{liquid,json}",
-    blocks: "blocks/*.liquid"
+    blocks: "blocks/*.liquid",
+    files: "+/files/*",
+    metafields: "+/metafields/**/*.json",
+    blogs: "+/blogs/*.{html,md}",
+    navigation: "+/navigation/*.json",
+    policies: "+/policies/*.{html,md}",
+    schema: "+schema/*.{schema,json}",
+    pages: "+pages/*.{html,json}"
   },
   transform: {
     svg: null,
@@ -12288,6 +12300,1559 @@ var processor = () => ({
     ]
   }
 });
+
+// syncify/options/utils.ts
+var import_anymatch = __toESM(require_anymatch());
+
+// syncify/process/cache.ts
+var import_write_file_atomic = __toESM(require_lib());
+var gunzipAsync = node_util.promisify(zlib__default.default.gunzip);
+var gzipAsync = node_util.promisify(zlib__default.default.gzip);
+async function decode(uri) {
+  const content = await fsExtra.readFile(uri);
+  const gunzip = await gunzipAsync(content);
+  return cbor__default.default.decode(gunzip);
+}
+function save(uri, data) {
+  return async () => {
+    if ($.file.project === null) {
+      throwError([
+        "Project cache has not been created"
+      ]);
+      return;
+    }
+    if (!/[/]/.test(uri)) {
+      uri = $.cache.uri[uri];
+      if (!data) data = $.cache[uri];
+    }
+    const encoded = await cbor__default.default.encodeAsync(data, { omitUndefinedProperties: true, canonical: true });
+    const gzip = await gzipAsync(encoded);
+    gzip[9] = 3;
+    await (0, import_write_file_atomic.default)(uri, gzip);
+  };
+}
+function clearCache(id = null) {
+  if (id === null) {
+    for (const key of CACHE_FILES) {
+      if (!isEmpty($.cache[key])) {
+        $.cache[key] = {};
+        q.cache.add(save($.cache.uri[key], $.cache[key]));
+      }
+    }
+    return q.cache.onIdle();
+  }
+  $.cache[id] = {};
+  return q.cache.add(save($.cache.uri[id], $.cache[id]));
+}
+function runChecksum(input, value) {
+  const hash = checksum(value);
+  if (has(input, $.cache.checksum) && $.cache.checksum[input] === hash) return true;
+  $.cache.checksum[input] = hash;
+  q.cache.add(save($.cache.uri.checksum, $.cache.checksum));
+  return false;
+}
+function saveCache(id = null) {
+  if (id === null) {
+    for (const key of CACHE_FILES) {
+      if (!isEmpty($.cache[key])) {
+        q.cache.add(save($.cache.uri[key], $.cache[key]));
+      }
+    }
+    return q.cache.onIdle();
+  } else {
+    return q.cache.add(save($.cache.uri[id], $.cache[id]));
+  }
+}
+function getPageCache(domain, pageId = NaN) {
+  const store = domain.endsWith(".myshopify.com") ? domain.slice(0, domain.indexOf(".myshopify.com")).toLowerCase() : domain.toLowerCase();
+  if (isNaN(pageId) === false) {
+    if (hasPath(`${store}.${pageId}`, $.cache.pages)) {
+      return $.cache.pages[store][pageId];
+    }
+    if (!has(store, $.cache.pages)) {
+      $.cache.pages[store] = { [pageId]: {} };
+    } else {
+      $.cache.pages[store][pageId] = {};
+    }
+    q.cache.add(save($.cache.uri.pages, $.cache.pages));
+    return $.cache.pages[store][pageId];
+  } else {
+    if (!has(store, $.cache.pages)) {
+      $.cache.pages[store] = {};
+      q.cache.add(save($.cache.uri.pages, $.cache.pages));
+    }
+  }
+  return $.cache.pages[store];
+}
+function setPageCache(domain, data) {
+  const store = domain.endsWith(".myshopify.com") ? domain.slice(0, domain.indexOf(".myshopify.com")).toLowerCase() : domain.toLowerCase();
+  if (!has(store, $.cache.pages)) {
+    $.cache.pages[store] = { [data.id]: data };
+  } else {
+    $.cache.pages[store][data.id] = data;
+  }
+  q.cache.add(save($.cache.uri.pages, $.cache.pages));
+  return $.cache.pages[store][data.id];
+}
+function setTemplateCache(domain, themeId, path5, data) {
+  const store = domain.endsWith(".myshopify.com") ? domain.slice(0, domain.indexOf(".myshopify.com")).toLowerCase() : domain.toLowerCase();
+  if (!has(store, $.cache.templates)) {
+    $.cache.templates[store] = { [themeId]: { [path5]: data } };
+  } else if (!has(`${themeId}`, $.cache.templates[store])) {
+    $.cache.templates[store][themeId] = { [path5]: data };
+  } else {
+    $.cache.templates[store][themeId][path5] = data;
+  }
+  q.cache.add(save($.cache.uri.templates, $.cache.templates));
+  return $.cache.templates[store][themeId][path5];
+}
+function setPathCache(input, output) {
+  let update = null;
+  if (!has("paths", $.cache)) {
+    $.cache.paths = {};
+  }
+  if (!has(input, $.cache.paths)) {
+    update = $.cache.paths[input] = output;
+  }
+  if ($.cache.paths[input] !== output) {
+    update = $.cache.paths[input] = output;
+  }
+  if (!has(output, $.cache.paths)) {
+    update = $.cache.paths[output] = input;
+  }
+  if ($.cache.paths[output] !== input) {
+    update = $.cache.paths[output] = input;
+  }
+  if (update) {
+    q.cache.add(save($.cache.uri.paths, $.cache.paths));
+  }
+}
+var File = class {
+  constructor(uri) {
+    assign(this, path2.parse(uri));
+  }
+  /**
+   * Configuration reference. This will hold a reference to additional data.
+   * Typically, this is used for transforms, wherein it holds the indexed config.
+   *
+   * @default undefined // getter when required
+   */
+  data = void 0;
+  /**
+   * File value is set in the final process cycle and will hold the file
+   * content after transforms conclude.
+   *
+   * @default ''
+   */
+  value = "";
+  /**
+   * Hash reference of the file contents, used for diffing comparison, couples with
+   * the caching datasets.
+   *
+   * @example
+   *
+   * 'aa11bb22cc33dd44ee55ff66gg77'
+   */
+  hash;
+  /**
+   * A unique UUID reference for this file - This option can change
+   * where required and when dealing with multiple stores at the request level.
+   *
+   * @example
+   *
+   * 'ABD41WX'
+   */
+  uuid;
+  /**
+   * The file type that was intercepted. This is an enum number value.
+   * The number value will infer on how the file should be handled and uses
+   * the `FileType` enum for checks.
+   *
+   * @example
+   *
+   * file.type === FileType.Template
+   *
+   */
+  type;
+  /**
+   * The resource API endpoint to which the file will be synced.
+   * This will be passed to the request client.
+   *
+   * @example
+   *
+   * 'assets'
+   * 'redirects'
+   */
+  resource;
+  /**
+   * The root of the file path
+   *
+   * > Value is obtained via the native `path.parse()` method
+   *
+   * @example
+   *
+   * '/' OR 'c:\'
+   */
+  root;
+  /**
+   * The full directory path such.
+   *
+   * > Value is obtained via the native `path.parse()` method
+   *
+   * @example
+   *
+   * '/home/user/dir' OR 'c:\path\dir'
+   */
+  dir;
+  /**
+   * The file name without extension (if any).
+   *
+   * > Value is obtained via the native `path.parse()` method
+   *
+   * @example
+   *
+   * 'filename' // filename.ext
+   */
+  name;
+  /**
+   * The filename extension including the dot, eg: `.liquid`
+   *
+   * > Value is obtained via the native `path.parse()` method
+   *
+   * @example
+   *
+   * '.ext'
+   */
+  ext;
+  /**
+   * The input base filename including file extension.
+   *
+   * > Value is obtained via the native `path.parse()` method
+   *
+   * @example
+   *
+   * 'filename.ext'
+   */
+  base;
+  /**
+   * The input relative path location from current _root_ working directory
+   *
+   * @example
+   *
+   * 'source/views/sections/dir/file.liquid'
+   */
+  relative;
+  /**
+   * The `key` value will be passed into the sync request. This
+   * will contain the namespace and base name and is used for
+   * uploading to Shopify stores.
+   *
+   * @example
+   *
+   * 'sections/file.liquid'
+   * 'snippets/file.liquid'
+   * 'templates/index.liquid'
+   */
+  key;
+  /**
+   * The `namespace` value will typically refelect the output
+   * parent directory name reference, but sometimes this might
+   * be a unique value depending on the file type we are handling.
+   *
+   * @example
+   *
+   * 'snippets'
+   * 'sections'
+   * 'templates'
+   */
+  namespace;
+  /**
+   * The file kind grouping. This is used internally and describes
+   * the type of file we are working with.
+   *
+   * @example
+   *
+   * 'json'
+   * 'liquid'
+   * 'sass'
+   * 'css'
+   *
+   * // etc etc
+   */
+  kind;
+  /**
+   * The absolute passed path - this is full URI file path.
+   *
+   * @example
+   *
+   * 'User/name/project/source/dir/file.liquid'
+   */
+  input;
+  /**
+   * The output path location which files will be written. Only theme specific files
+   * have an output path location, when a file writes from its source (like a metafield) or
+   * if the file is handled in an asset pipeline transform then this will have a `null` value.
+   *
+   * @example
+   *
+   * // When file is theme specific
+   * 'User/name/project/theme/dir/filename.liquid'
+   *
+   * // When file is not theme specific
+   * null
+   */
+  output;
+  /**
+   * The file size in bytes before any augmentation is applied. This
+   * value will be assigned post-context, typically in a transform.
+   *
+   * @example
+   *
+   * 1024 // => 1.24kb
+   */
+  size;
+};
+var import_timer2 = __toESM(require_dist());
+var import_timer = __toESM(require_dist());
+function bulk() {
+  if ($.bulk.id === null) {
+    $.bulk.id = uuid();
+    import_timer.timer.start($.bulk.id);
+  }
+  if ($.bulk.synced.size > 0) {
+    $.bulk.synced.clear();
+    $.errors.clear();
+    $.warnings.clear();
+  }
+  if (bulk.tui === null) {
+    bulk.tui = Create().Template({ prefix: true, id: "changes", color: neonCyan }).Template({ prefix: true, id: "errors", color: gray2 }).Template({ prefix: true, id: "warnings", color: gray2 }).Template({ prefix: true, id: $.bulk.type, color: whiteBright2 });
+  }
+  if (bulk.progress === null) {
+    bulk.progress = progress($.bulk.files, {
+      barSize: 30,
+      prepend: null,
+      barColor: $.bulk.type === "uploaded" ? "neonGreen" : "blueBright"
+    });
+  } else {
+    bulk.progress.reset($.bulk.files);
+  }
+  bulk.tui.Update("changes", `${bold2($.bulk.files)} Files`).Update("errors", `${bold2($.errors.size)} Errors`).Update("warnings", `${bold2($.warnings.size)} Warnings`).Update($.bulk.type, bulk.progress.render()).toUpdate();
+}
+bulk.notifier = (type2) => {
+  notifier2__default.default.notify({
+    warnings: {
+      contentImage: $.file.notifier,
+      title: `Bulk ${plur("Warning", $.warnings.size)}`,
+      message: `${$.warnings.size} ${plur("warning", $.warnings.size)} encountered`
+    },
+    errors: {
+      contentImage: $.file.notifier,
+      title: `Bulk ${plur("Error", $.errors.size)}`,
+      message: `${$.errors.size} ${plur("Error", $.errors.size)} encountered`
+    }
+  }[type2]);
+};
+bulk.complete = () => {
+  if (!$.mode.bulk) return;
+  const color = $.bulk.type === "deleted" ? blueBright2 : neonGreen;
+  bulk.tui.Update($.bulk.type, `${bold2($.bulk.synced.size)} Files ${Append(import_timer.timer.stop($.bulk.id))}`, color).Newline();
+  if ($.bulk.synced.size > 0) {
+    bulk.tui.Line(`Type ${bold2("i")} and press ${bold2("enter")} to view ${$.bulk.type}`, gray2);
+  }
+  if ($.warnings.size > 0) {
+    bulk.tui.Line(`Type ${bold2("w")} and press ${bold2("enter")} to view warnings`, gray2);
+    bulk.notifier("warnings");
+  }
+  if ($.errors.size > 0) {
+    bulk.tui.Line(`Type ${bold2("e")} and press ${bold2("enter")} to view errors`, gray2);
+    bulk.notifier("errors");
+  }
+  bulk.tui.toUpdate({ clear: true, trim: true }).done();
+  bulk.tui = null;
+  bulk.progress = null;
+  $.mode.bulk = false;
+  $.bulk.files = 0;
+  $.bulk.id = null;
+};
+bulk.synced = (filename, target, store) => {
+  const message = $.bulk.type === "uploaded" ? neonGreen(Prefix("uploaded", filename, bold2(target), store, import_timer.timer.stop())) : blueBright2(Prefix("deleted", filename, bold2(target), store));
+  $.bulk.synced.add(Line(message));
+};
+bulk.progress = null;
+bulk.tui = null;
+var event = new class Event extends EventEmitter__default.default {
+  id;
+  /**
+   * Whether or not an event is listening with the provided name
+   */
+  has(name) {
+    return this.listenerCount(name) > 0;
+  }
+  /**
+   * Changes the current event listening mode. Used for specific run-modes
+   * such a bulk operations or stdin debugs.
+   */
+  mode(name) {
+    this.id = name;
+    return this;
+  }
+  /**
+   * Each Event
+   *
+   * Iterates over an array of arguments and emits to the provided event name.
+   */
+  each(args) {
+    for (const arg of args) {
+      this.emit(this.id, arg);
+    }
+  }
+}();
+
+// syncify/cli/stdin.ts
+var setStdin = stdin;
+function stdin() {
+  stdin.errors = StdinError();
+  if ($.mode.watch) {
+    stdin.watch = StdinWatch();
+    stdin.warnings = StdinWarning();
+  }
+}
+stdin.errors = void 0;
+stdin.watch = void 0;
+stdin.warnings = void 0;
+stdin.ansi = {
+  footer: `USE ${Encase("SB", gray2("\u25C4"))} AND ${Encase("SB", gray2("\u25BA"))} ARROW KEYS TO NAVIGATE`,
+  legend: {
+    /** `[q] exit debug mode` */
+    q: Encase("SB", gray2.bold("q")) + " exit debug mode",
+    /** `[s] skip error */
+    s: Encase("SB", gray2.bold("s")) + " skip error",
+    /** `[w] view warnings */
+    w: Encase("SB", gray2.bold("w")) + " view warnings",
+    /** `[e] view errors */
+    e: Encase("SB", gray2.bold("e")) + " view errors",
+    /** `[p] print all errors and exit' */
+    p: Encase("SB", gray2.bold("p")) + " print all"
+  }
+};
+function StdinError() {
+  const state = {
+    index: 0,
+    isAttached: false,
+    write: [],
+    keypress: null,
+    skipped: null,
+    errors: null,
+    warnings: null,
+    get shown() {
+      return this.write[this.index];
+    }
+  };
+  function listen(write2) {
+    if (state.isAttached) return update(write2);
+    state.index = 0;
+    state.write = write2;
+    state.isAttached = true;
+    state.keypress = (_data, key) => {
+      if (key.name === "left") return prev();
+      if (key.name === "right") return next();
+      if (key.name === "q") return quit();
+      if (key.name === "p") return print();
+      if (key.name === "s") return event.emit("stdin:skip");
+      if (key.name === "w") return event.emit("stdin:warn");
+      if (key.name === "e") return event.emit("stdin:errors");
+    };
+    prexit.listener(state.keypress);
+    log.update(state.shown.toString({ clear: false }));
+    event.on("stdin:dispose", () => {
+      log.update.done();
+      dispose();
+    });
+  }
+  function quit() {
+  }
+  function update(messages2) {
+    state.index = 0;
+    state.write = messages2;
+    log.update.clear();
+    log.update(state.shown.toString({ clear: false }));
+  }
+  function dispose() {
+    if (!state.keypress) return;
+    state.shown.Remove("debug", Infinity);
+    log.update(state.shown.toString({ clear: false }));
+    log.update.done();
+    process.stdin.removeListener("keypress", state.keypress);
+    state.keypress = void 0;
+    state.isAttached = false;
+    state.write = [];
+    state.index = 0;
+    if (state.skipped) event.off("stdin:skip", state.skipped);
+    if (state.warnings) event.off("stdin:warn", state.warnings);
+    if (state.errors) event.off("stdin:errors", state.errors);
+    event.off("stdin:dispose", dispose);
+  }
+  function skip(callback) {
+    if (!state.skipped) {
+      state.skipped = () => callback(state.index);
+      event.on("stdin:skip", state.skipped);
+    }
+  }
+  function errors(callback) {
+    if (!state.errors) {
+      state.errors = () => callback(state.index);
+      event.on("stdin:error", state.errors);
+    }
+  }
+  function warn2(callback) {
+    if (!state.warnings) {
+      state.warnings = () => callback(state.index);
+      event.on("stdin:warn", state.warnings);
+    }
+  }
+  function print() {
+    log.update.clear();
+    log.update.done();
+    log.nl();
+    event.emit("stdin:view", state.index);
+    state.write.forEach((write2, index) => {
+      write2.Remove("legend", "debug").True(index !== state.write.length - 1, (tui) => tui.Pop()).True(index !== state.write.length - 1, (tui) => tui.Ruler()).toLog({ clear: true });
+    });
+    dispose();
+    kill.exit(0);
+  }
+  function next() {
+    if (state.index < state.write.length - 1) {
+      state.index++;
+      log.update(state.shown.toString({ clear: false }));
+    }
+  }
+  function prev() {
+    if (state.index > 0) {
+      state.index--;
+      log.update(state.shown.toString({ clear: false }));
+    }
+  }
+  return {
+    get isAttached() {
+      return state.isAttached;
+    },
+    listen,
+    dispose,
+    update,
+    skip,
+    warn: warn2,
+    errors
+  };
+}
+function StdinWatch() {
+  const preview = $.target.map(({ preview: preview2 }) => preview2);
+  const editors = $.target.map(({ editor }) => editor);
+  const write2 = Create().Newline().Template(preview, { id: "p", hidden: true, color: gray2.underline }).Template(editors, { id: "a", hidden: true, color: gray2.underline });
+  let keypress;
+  function listen() {
+    keypress = (_data, key) => {
+      if (key.name === "p") return write2.Update("p").toLog({ clear: "p", trim: false });
+      if (key.name === "a") return write2.Update("c").toLog({ clear: "a", trim: false });
+    };
+    prexit.listener(keypress);
+    stdin.warnings.listen();
+  }
+  function dispose() {
+    if (keypress) {
+      process.stdin.removeListener("keypress", keypress);
+      keypress = void 0;
+    }
+  }
+  return { listen, dispose };
+}
+function StdinWarning() {
+  const state = {
+    index: 0,
+    isAttached: false,
+    write: [],
+    keypress: null,
+    get shown() {
+      return this.write[this.index];
+    }
+  };
+  function reset3() {
+    log.update.clear();
+    state.write = [];
+    state.index = 0;
+  }
+  function listen() {
+    if (state.isAttached) return;
+    state.isAttached = true;
+    state.keypress = (_data, key) => {
+      if (key.name === "left") return prev();
+      if (key.name === "right") return next();
+      if (key.name === "v") return view();
+    };
+    prexit.listener(state.keypress);
+    event.on("warn:dispose", () => {
+      log.update.done();
+      dispose();
+    });
+  }
+  function dispose() {
+    if (!state.keypress) return;
+    process.stdin.removeListener("keypress", state.keypress);
+    state.keypress = void 0;
+    state.isAttached = false;
+    state.write = [];
+    state.index = 0;
+    event.off("stdin:dispose", dispose);
+  }
+  function view() {
+    if (!$.warnings.has($.log.uri)) return;
+    state.write = [];
+    state.index = 0;
+    let count = 0;
+    $.warnings.get($.log.uri).values().forEach((stack) => count += stack.size);
+    for (const stack of $.warnings.get($.log.uri).values()) {
+      stack.forEach((value) => {
+        const tui = Create({ type: "warning " });
+        if (count > 1) {
+          tui.Newline("line").Append(`WARNING ${state.write.length + 1} of ${count}`, bold2.yellowBright).Insert(value).Newline("line").End(stdin.ansi.footer);
+        } else {
+          tui.Insert(value);
+        }
+        state.write.push(tui);
+      });
+    }
+    log.update(state.shown.toString({ clear: false }));
+  }
+  function next() {
+    if (state.write.length > 1 && state.index < state.write.length - 1) {
+      state.index++;
+      log.update(state.shown.toString({ clear: false }));
+    }
+  }
+  function prev() {
+    if (state.write.length > 1 && state.index > 0) {
+      state.index--;
+      log.update(state.shown.toString({ clear: false }));
+    }
+  }
+  return {
+    get isAttached() {
+      return state.isAttached;
+    },
+    listen,
+    dispose,
+    view,
+    reset: reset3
+  };
+}
+
+// syncify/model/console.ts
+var console2 = new Log();
+var { stdout: stdout2, stderr: stderr2 } = Log;
+
+// syncify/cli/log.ts
+function log(...message) {
+  forEach((line) => console2.write(line), message);
+  return log;
+}
+log.runtime = TUI("runtime");
+log.progress = progress;
+log.update = log_update_default;
+log.spinner = Spinner();
+log.line = console2.info;
+log.header = console2.header;
+log.bulk = bulk;
+log.wrap = console2.wrap;
+log.hline = (options = {}) => {
+  const { wrap } = $.terminal;
+  if (isEmpty(options)) {
+    options.width = wrap;
+    options.newlines = false;
+  } else {
+    const has2 = hasProp(options);
+    if (!has2("width")) options.width = wrap;
+    if (!has2("newlines")) options.newlines = false;
+  }
+  log(
+    Ruler(
+      options.width,
+      options.newlines
+    )
+  );
+};
+log.nl = function(entry) {
+  entry === "" ? console2.break() : console2.tree(entry);
+  return this;
+};
+log.clear = (clear2 = true) => clear2 ? log(clear) : log;
+log.group = function(name) {
+  if ($.config.log.silent || $.env.tree === false) return;
+  if ($.mode.bulk) {
+    name = g("Bulk", CHV, toUpcase(name));
+    if ($.log.group === name) return this;
+    $.log.group = name;
+  }
+  log.ender($.log.group);
+  if ($.config.log.clear && name !== false) log.clear();
+  if (isString(name)) {
+    $.log.group = name;
+    log.begin($.log.group);
+  }
+  return this;
+};
+log.task = (name, timestamp = true) => {
+  if ($.config.log.silent || $.env.tree === false) return;
+  if (isString(name)) {
+    console2.dash(
+      g.ws(gray2(name), timestamp ? Append(getTime2()) : "")
+    );
+  } else {
+    log.clear()(
+      Tree.trim,
+      Dash(g.ws(gray2($.log.group), Append(getTime2())))
+    );
+  }
+};
+log.process = (label, ...message) => {
+  if ($.mode.pack || $.mode.build || $.config.log.silent) return;
+  console2.info(
+    Prefix(
+      "process",
+      message.length === 2 ? g.ws(bold2(label), CHV, message[0], Append(message[1])) : g.ws(bold2(label), Append(message[0]))
+    )
+  );
+};
+log.upsert = (upsert) => {
+  const { target, store } = upsert.target;
+  if ($.mode.bulk) {
+    forEach(({ filename }) => {
+      bulk.synced(filename, target, store.name);
+      bulk.progress.increment();
+      bulk.tui.Update($.bulk.type, bulk.progress.render()).toUpdate();
+    }, upsert.synced);
+    if (upsert.errors.length > 0) {
+      error.upsert(upsert.errors);
+      bulk.progress.increment(upsert.errors.length);
+      bulk.tui.Update($.bulk.type, bulk.progress.render()).Update("errors", `${bold2($.errors.size)} ${plur("Error", $.errors.size)}`, redBright2).toUpdate();
+    }
+  } else {
+    forEach(({ filename }) => {
+      console2.info(
+        Prefix("uploaded", bold2(target), store.name, filename, import_timer2.timer.stop()),
+        neonGreen
+      );
+    }, upsert.synced);
+    upsert.errors.length > 0 && error.upsert(upsert.errors);
+  }
+};
+log.changed = (file) => {
+  if ($.errors.size > 0) $.errors.clear();
+  if ($.warnings.size > 0) {
+    $.warnings.clear();
+    stdin.warnings.reset();
+  }
+  if ($.config.log.silent === true || $.mode.watch === false) return;
+  import_timer2.timer.start();
+  const name = `${file.kind} ${CHV} ${toUpcase(file.namespace)}`;
+  const change = $.log.changes.has(file.relative) ? $.log.changes.get(file.relative) + 1 : 1;
+  $.log.changes.set(file.relative, change);
+  if ($.log.group !== name) {
+    log.group(name);
+    if ($.log.title !== file.namespace) $.log.title = file.namespace;
+  } else {
+    log.group(name);
+  }
+  if ($.log.uri !== file.input) $.log.uri = file.input;
+  console2.info(
+    Prefix("changed", `${file.relative} ${Append(`${change} ${plur("change", change)}`)}`),
+    neonCyan
+  );
+};
+log.syncing = (path5, { hot = false } = {}) => {
+  if ($.mode.pack || $.mode.bulk || $.mode.build || $.mode.debug || $.config.log.silent) return;
+  if ($.warnings.has(path5)) {
+    const { size } = $.warnings.get(path5);
+    log.warn(`${bold2(size)} ${plur("warning", size)}`, Suffix.warning);
+  }
+  console2.info(
+    magentaBright2(
+      Prefix(
+        "syncing",
+        path5.replace(/^(\d+)/, bold2("$1"))
+      )
+    )
+  );
+  if (q.http.pending > (hot ? 0 : 2)) {
+    console2.info(
+      orange(
+        Prefix(
+          "queued",
+          g.ws(
+            path5,
+            TLD,
+            bold2(addSuffix(q.http.pending)),
+            "in queue"
+          )
+        )
+      )
+    );
+  }
+};
+log.resource = (type2, store) => {
+  if ($.mode.watch) {
+    $.log.queue.add(
+      [
+        type2,
+        store.domain,
+        import_timer2.timer.stop()
+      ]
+    );
+    if ($.log.idle) return;
+    else $.log.idle = true;
+    q.http.onIdle().then(() => {
+      for (const [type3, store2, ctime] of $.log.queue) {
+        console2.info(
+          Line(
+            neonGreen(
+              Prefix(
+                "uploaded",
+                g.ws(
+                  bold2(type3),
+                  ARR,
+                  store2,
+                  Append(ctime)
+                )
+              )
+            )
+          )
+        );
+      }
+      $.log.queue.clear();
+      $.log.idle = false;
+    });
+  } else {
+    console2.info(
+      Line(
+        neonGreen(
+          Prefix(
+            "uploaded",
+            g.ws(
+              bold2(type2),
+              ARR,
+              store.domain,
+              Append(import_timer2.timer.stop())
+            )
+          )
+        )
+      )
+    );
+  }
+};
+log.invalid = (path5, message) => {
+  console2.error(Prefix("invalid", path5));
+  notifier2__default.default.notify(
+    {
+      title: "Syncify Error",
+      sound: "Pop",
+      open: path5,
+      subtitle: path5,
+      message: "Invalid error"
+    }
+  ).notify();
+  if (message) {
+    console2.error(Wrap(...message, { line: "red", color: redBright2 }));
+  }
+};
+log.error = (input, { suffix = null, notify = null } = {}) => {
+  if ($.mode.bulk) return;
+  const message = capture.numbers(input, bold2);
+  console2.error(Prefix("failed", suffix ? `${message} ${Append(suffix)}` : message));
+  if (notify !== null) {
+    notify.contentImage = $.file.notifier;
+    notifier2__default.default.notify(notify).notify();
+  }
+};
+log.transform = (label, ...suffix) => $.mode.build || $.mode.bulk || $.mode.debug || console2.info(
+  Prefix("transform", bold2(label), ...suffix),
+  whiteBright2
+);
+log.minified = (...p) => $.mode.pack || $.mode.bulk || $.mode.build || console2.info(
+  Prefix("minified", bold2(p.shift()), ...p.slice(0, -1), `saved ${p.pop()}`),
+  whiteBright2
+);
+log.begin = (message, { timestamp = true, clear: clear2 = true, group = false } = {}) => log.clear(clear2)(
+  NWL2,
+  Top(group ? $.log.group = message : message, timestamp),
+  Tree.next + NWL2
+);
+log.ender = (message, { timestamp = true, clear: clear2 = true } = {}) => log.clear(clear2)(
+  Tree.trim + "\n",
+  End(message || $.log.group, timestamp),
+  NLR2
+);
+log.skipped = (file, reason) => $.mode.pack || $.mode.build || $.mode.bulk || console2.info(
+  Prefix("skipped", `${isString(file) ? file : file.key} ${Append(reason)}`),
+  gray2
+);
+log.deleted = (file, theme2) => console2.info(
+  Prefix("deleted", file, ...[$.mode.bulk ? (theme2.target, theme2.store.domain) : void 0]),
+  blueBright2
+);
+log.zipped = (size, path5) => console2.info(
+  Prefix("zipped", `${bold2("ZIP")} ${size} ${Append(path5)}`),
+  whiteBright2
+);
+log.ignored = (path5) => console2.info(
+  Prefix("ignored", path5),
+  yellowBright2
+);
+log.rename = (from, to) => $.running === false || $.mode.watch || console2.info(
+  Prefix("renamed", bold2(from), bold2(to)),
+  whiteBright2
+);
+log.warn = (message, suffix) => console2.info(
+  Prefix("warnings", suffix ? `${message} ${Append(suffix)}` : `${message}`),
+  yellowBright2
+);
+log.hot = (id) => console2.info(
+  Prefix("reloaded", bold2("HOT RELOAD"), import_timer2.timer.now(id)),
+  neonRouge
+);
+log.exported = (from, to) => console2.info(
+  Prefix("exported", bold2(from), bold2(to)),
+  teal
+);
+log.retrying = (file, theme2) => console2.info(
+  Prefix("retrying", file, theme2.target, theme2.store.domain),
+  orange
+);
+log.reloaded = (path5, time) => console2.info(
+  Prefix("reloaded", path5, time),
+  whiteBright2
+);
+log.version = (version, action) => console2.info(
+  Prefix("version", bold2(version.number), bold2(version.update.number), action),
+  whiteBright2
+);
+function globPath(path5) {
+  return isArray(path5) ? path5.filter((uri) => /\*/.test(uri)) : /\*/.test(path5) ? path5 : null;
+}
+function lastPath(path5) {
+  if (isArray(path5)) return path5.map(lastPath);
+  if (path5.indexOf("/") === -1) return path5;
+  const dir = path5.endsWith("/") ? path2.dirname(path5.slice(0, -1)) : path2.dirname(path5);
+  const ender = dir.lastIndexOf("/") + 1;
+  return dir.slice(ender);
+}
+function parentPath(path5) {
+  if (isArray(path5)) return path5.map(parentPath);
+  const last = path5.lastIndexOf("/");
+  if (last === -1) return path5;
+  const glob9 = path5.indexOf("*");
+  return glob9 === -1 ? path5.slice(0, last) : path5.slice(0, glob9);
+}
+function normalPath(input, cwd2 = null) {
+  const regex2 = new RegExp(`^\\.?\\/?${input}\\/`);
+  const source = new RegExp(`^\\.?\\/?${path2.basename(input)}\\/`);
+  return function prepend(path5) {
+    if (isArray(path5)) return path5.map(prepend);
+    const ignore = path5.charCodeAt(0) === 33;
+    if (ignore) path5 = path5.slice(1);
+    if (regex2.test(path5)) return ignore ? "!" + path5 : path5;
+    if (path5.charCodeAt(0) === 46 && path5.charCodeAt(1) === 46 && path5.charCodeAt(2) === 47) {
+      throwError(
+        `Invalid path defined at: ${COL} ${yellowBright2(`"${path5}"`)}`,
+        ["Paths must be relative to the input directory"]
+      );
+    }
+    if (cwd2 !== null) {
+      const exists2 = path2.join(cwd2, path5);
+      return (ignore ? "!" : "") + (exists2.startsWith(input) ? exists2 : path2.join(input, path5));
+    } else {
+      return (ignore ? "!" : "") + path2.join(input, source.test(path5) ? path5.replace(source, "") : path5);
+    }
+  };
+}
+var basePath = (cwd2) => (path5) => {
+  if (path5.indexOf("*") !== -1) {
+    throwError(
+      `Base directory path cannot contain glob${COL} ${yellowBright2(`"${path5}"`)}`,
+      ["Ensure that path you are resolving is correctly formed"]
+    );
+  }
+  if (path5.charCodeAt(0) === 46) {
+    if (path5.length === 1) return cwd2 + "/";
+    if (path5.charCodeAt(1) === 47) {
+      path5 = path5.slice(1);
+    } else {
+      throwError(
+        `Directory path is invalid at${COL} ${yellowBright2(`"${path5}"`)}`,
+        ["Ensure that the path you attempting to resolve is correctly formed"]
+      );
+    }
+  }
+  if (path5.charCodeAt(0) === 47) {
+    if (path5.length === 1) {
+      return cwd2 + "/";
+    } else {
+      path5 = path5.slice(1);
+    }
+  }
+  if (/^[a-zA-Z0-9_-]+/.test(path5)) {
+    path5 = path2.join(cwd2, path5);
+    return path5[path5.length - 1].charCodeAt(0) === 47 ? path5 : path5 + "/";
+  } else {
+    throwError(
+      `Directory path is invalid at${COL} ${yellowBright2(`"${path5}"`)}`,
+      ["Ensure that the path you attempting to resolve is correctly formed"]
+    );
+  }
+};
+
+// syncify/process/context.ts
+function svg(file) {
+  const config = $.svg.filter((context) => {
+    if (context.input.has(file.input)) return true;
+    if (!context.match(file.input)) return false;
+    context.input.add(file.input);
+    return true;
+  });
+  if (isUndefined(config)) return file;
+  defineProperty(file, "data", {
+    get() {
+      return config;
+    }
+  });
+  return file;
+}
+function style(file) {
+  const config = $.style.find((x) => x.watch(file.input));
+  if (isUndefined(config)) {
+    file.type = 16 /* Asset */;
+    return file;
+  }
+  defineProperty(file, "data", {
+    get() {
+      return config;
+    }
+  });
+  if (config.snippet) {
+    file.namespace = "snippets" /* Snippets */;
+    file.key = path2.join("snippets", config.rename);
+  } else {
+    file.key = path2.join("assets", config.rename);
+  }
+  if (file.output) {
+    if (file.data.rename !== path2.basename(file.output)) {
+      if (config.snippet) {
+        file.output = path2.join($.dirs.output, file.key);
+      } else {
+        file.output = path2.join(parentPath(file.output), file.data.rename);
+      }
+    }
+  } else {
+    file.output = path2.join($.dirs.output, file.key);
+  }
+  return file;
+}
+function script(file) {
+  const config = $.script.filter((config2) => config2.watch.has(file.input));
+  if (config.length === 0) return file;
+  defineProperty(file, "data", { get() {
+    return config;
+  } });
+  return file;
+}
+function schema(parse10, file) {
+  defineProperty(file, "data", { get() {
+    return parse10;
+  } });
+  return file;
+}
+function section(file) {
+  if ($.paths.sections.rename.length > 0) {
+    const path5 = file.input;
+    const find = $.paths.sections.rename.find(({ match }) => match(path5));
+    if (isUndefined(find)) return file;
+    const oldName = file.base;
+    const rename = renameFileParse(file.input, find.pattern);
+    file.name = rename.name;
+    file.ext = rename.ext;
+    file.base = rename.base;
+    file.key = path2.join(file.namespace, rename.base);
+    file.output = path2.join(path2.dirname(file.output), rename.base);
+    if ($.mode.watch) log.rename(oldName, file.base);
+  }
+  return file;
+}
+function snippet(file) {
+  if ($.paths.snippets.rename.length > 0) {
+    const path5 = file.input;
+    const find = $.paths.snippets.rename.find(({ match }) => match(path5));
+    if (isUndefined(find)) return file;
+    const oldName = file.base;
+    const rename = renameFileParse(file.input, find.pattern);
+    file.name = rename.name;
+    file.ext = rename.ext;
+    file.base = rename.base;
+    file.key = path2.join(file.namespace, rename.base);
+    file.output = path2.join(path2.dirname(file.output), rename.base);
+    if ($.mode.watch) log.rename(oldName, file.base);
+  }
+  return file;
+}
+
+// syncify/process/files.ts
+function renameFile({ name, dir, ext, namespace }, rename) {
+  let newName = rename;
+  if (/\[dir\]/.test(newName)) newName = newName.replace(/\[dir\]/g, dir);
+  if (/\[name\]/.test(newName)) newName = newName.replace(/\[name\]/g, name);
+  if (/\[file\]/.test(newName)) newName = newName.replace(/\[file\]/g, name);
+  if (/\[ext\]/.test(newName)) newName = newName.replace(/\[ext\]/g, ext);
+  if (namespace === "snippets" && rename.endsWith(".liquid") === false) return newName + ".liquid";
+  if (!rename.endsWith(".[ext]") || !rename.endsWith(ext)) {
+    return /\.[a-z]+$/.test(rename) ? newName : newName + ext;
+  }
+  return newName;
+}
+function setFile(file, input, output) {
+  file.size = NaN;
+  return function(namespace, type2, kind) {
+    let key;
+    if (type2 === 17 /* Metafield */ || type2 === 18 /* Page */) {
+      key = path2.join(lastPath(file.dir), file.base);
+      output = null;
+    } else {
+      key = path2.join(namespace, file.base);
+      output = path2.join(output, key);
+    }
+    if (kind === -1) {
+      input = $.cache.paths[output];
+    } else {
+      setPathCache(input, output);
+    }
+    file.uuid = uuid();
+    file.type = type2;
+    file.key = key;
+    file.namespace = namespace;
+    file.kind = kind;
+    file.input = input;
+    file.output = output;
+    file.relative = input ? path2.relative($.cwd, input) : $.cwd;
+    return file;
+  };
+}
+function parseProcessorConfigs(path5, namespace) {
+  const file = new File(path5);
+  file.namespace = namespace;
+  file.input = path5;
+  file.relative = path2.relative($.cwd, file.input);
+  switch (file.ext) {
+    case ".ts":
+      file.kind = "TypeScript" /* TypeScript */;
+      break;
+    case ".js":
+    case ".mjs":
+    case ".cjs":
+      file.kind = "JavaScript" /* JavaScript */;
+      break;
+  }
+  return file;
+}
+function parseSyncifyConfig(path5) {
+  const file = new File(path5);
+  file.namespace = "syncify" /* Syncify */;
+  file.input = path5;
+  file.type = 20 /* Syncify */;
+  file.relative = path2.relative($.cwd, file.input);
+  switch (file.ext) {
+    case ".ts":
+      file.kind = "TypeScript" /* TypeScript */;
+      break;
+    case ".js":
+    case ".mjs":
+    case ".cjs":
+      file.kind = "JavaScript" /* JavaScript */;
+      break;
+  }
+  return file;
+}
+function parse2(path5) {
+  const { paths } = $;
+  const file = new File(path5);
+  const define = setFile(file, path5, $.dirs.output);
+  if (file.ext === ".liquid") {
+    if (paths.sections.match(path5)) {
+      return section(define("sections" /* Sections */, 5 /* Section */, "Liquid" /* Liquid */));
+    } else if (paths.snippets.match(path5)) {
+      return snippet(define("snippets" /* Snippets */, 4 /* Snippet */, "Liquid" /* Liquid */));
+    } else if (paths.layout.match(path5)) {
+      return define("layout" /* Layout */, 2 /* Layout */, "Liquid" /* Liquid */);
+    } else if (paths.templates.match(path5)) {
+      return define("templates" /* Templates */, 1 /* Template */, "Liquid" /* Liquid */);
+    } else if (paths.customers.match(path5)) {
+      return define("templates/customers" /* Customers */, 1 /* Template */, "Liquid" /* Liquid */);
+    } else if (paths.metaobject.match(path5)) {
+      return define("templates/metaobject" /* Metaobject */, 1 /* Template */, "Liquid" /* Liquid */);
+    }
+  } else if (file.ext === ".schema" && paths.schema.match(path5)) {
+    return schema(parse2, define("schema" /* Schema */, 7 /* Schema */, "JSON" /* JSON */));
+  } else if (file.ext === ".json") {
+    if (paths.metafields.match(path5)) {
+      return define("metafields" /* Metafields */, 17 /* Metafield */, "JSON" /* JSON */);
+    } else if (paths.sections.match(path5)) {
+      return define("sections" /* Sections */, 6 /* Group */, "JSON" /* JSON */);
+    } else if (paths.templates.match(path5)) {
+      return define("templates" /* Templates */, 1 /* Template */, "JSON" /* JSON */);
+    } else if (paths.config.match(path5)) {
+      return define("config" /* Config */, 9 /* Config */, "JSON" /* JSON */);
+    } else if (paths.locales.match(path5)) {
+      return define("locales" /* Locales */, 10 /* Locale */, "JSON" /* JSON */);
+    } else if (paths.customers.match(path5)) {
+      return define("templates/customers" /* Customers */, 1 /* Template */, "JSON" /* JSON */);
+    } else if (paths.metaobject.match(path5)) {
+      return define("templates/metaobject" /* Metaobject */, 8 /* Metaobject */, "JSON" /* JSON */);
+    } else if (paths.schema.match(path5)) {
+      return schema(parse2, define("schema" /* Schema */, 7 /* Schema */, "JSON" /* JSON */));
+    }
+  }
+  if (paths.assets.match(path5)) {
+    switch (file.ext) {
+      case ".js":
+      case ".mjs":
+        return define("assets" /* Assets */, 16 /* Asset */, "JavaScript" /* JavaScript */);
+      case ".json":
+        return define("assets" /* Assets */, 16 /* Asset */, "JSON" /* JSON */);
+      case ".svg":
+        return define("assets" /* Assets */, 16 /* Asset */, "SVG" /* SVG */);
+      case ".css":
+        return define("assets" /* Assets */, 16 /* Asset */, "CSS" /* CSS */);
+      case ".ico":
+      case ".jpg":
+      case ".png":
+      case ".gif":
+      case ".webp":
+      case ".pjpg":
+        return define("assets" /* Assets */, 16 /* Asset */, "Image" /* Image */);
+      case ".mov":
+      case ".mp4":
+      case ".webm":
+      case ".ogg":
+        return define("assets" /* Assets */, 16 /* Asset */, "Video" /* Video */);
+      case ".pdf":
+        return define("assets" /* Assets */, 16 /* Asset */, "PDF" /* PDF */);
+      case ".eot":
+      case ".ttf":
+      case ".woff":
+      case ".woff2":
+        return define("assets" /* Assets */, 16 /* Asset */, "Font" /* Font */);
+      default:
+        return define("assets" /* Assets */, 16 /* Asset */, "Unknown" /* Unknown */);
+    }
+  }
+  switch (file.ext) {
+    case ".js":
+    case ".mjs":
+      return script(define("assets" /* Assets */, 12 /* Script */, "JavaScript" /* JavaScript */));
+    case ".ts":
+      return script(define("assets" /* Assets */, 12 /* Script */, "TypeScript" /* TypeScript */));
+    case ".tsx":
+      return script(define("assets" /* Assets */, 12 /* Script */, "TSX" /* TSX */));
+    case ".jsx":
+      return script(define("assets" /* Assets */, 12 /* Script */, "JSX" /* JSX */));
+    case ".svg":
+      return svg(define("assets" /* Assets */, 13 /* Svg */, "SVG" /* SVG */));
+    case ".css":
+      return style(define("assets" /* Assets */, 11 /* Style */, "CSS" /* CSS */));
+    case ".scss":
+      return style(define("assets" /* Assets */, 11 /* Style */, "SCSS" /* SCSS */));
+    case ".sass":
+      return style(define("assets" /* Assets */, 11 /* Style */, "SASS" /* SASS */));
+    case ".md":
+      return define("pages" /* Pages */, 18 /* Page */, "Markdown" /* Markdown */);
+    case ".html":
+      return define("pages" /* Pages */, 18 /* Page */, "HTML" /* HTML */);
+  }
+  return void 0;
+}
+var outputFile = (output) => (path5) => {
+  const file = new File(path5);
+  const define = setFile(file, path5, output);
+  switch (path2.basename(file.dir)) {
+    case "sections":
+      return define("sections" /* Sections */, 5 /* Section */, -1);
+    case "blocks":
+      return define("blocks" /* Blocks */, 3 /* Block */, -1);
+    case "snippets":
+      return define("snippets" /* Snippets */, 4 /* Snippet */, -1);
+    case "layout":
+      return define("layout" /* Layout */, 2 /* Layout */);
+    case "templates":
+      return define("templates" /* Templates */, 1 /* Template */, -1);
+    case "customers":
+      return define("templates/customers" /* Customers */, 1 /* Template */, -1);
+    case "metaobject":
+      return define("templates/metaobject" /* Metaobject */, 1 /* Template */, -1);
+    case "config":
+      return define("config" /* Config */, 9 /* Config */, -1);
+    case "locales":
+      return define("locales" /* Locales */, 10 /* Locale */, -1);
+    case "assets":
+      return define("assets" /* Assets */, 16 /* Asset */, -1);
+  }
+};
+
+// syncify/options/utils.ts
+function createPathsState() {
+  const state = o();
+  for (const path5 of PATH_KEYS) {
+    state[path5] = o({
+      input: null,
+      match: null,
+      config: null,
+      stash: null,
+      rename: []
+    });
+  }
+  return state;
+}
+function getResolvedPaths(filePath, hook2) {
+  const match = isFunction(hook2) ? [] : false;
+  const warn2 = warnOption("Path Resolver");
+  const getUri = normalPath($.dirs.input, $.cwd);
+  if (isArray(filePath)) {
+    const paths = [];
+    for (const item of filePath) {
+      const uri = getUri(item);
+      const resolved = glob__default.default.sync(uri, {
+        cwd: $.cwd,
+        absolute: true
+      });
+      if (match !== false) {
+        const test = hook2(uri);
+        if (isString(test)) {
+          match.push(test);
+        } else if (isArray(test)) {
+          match.push(...test);
+        }
+      }
+      if (resolved.length === 0) {
+        warn2("No files can be resolved in", item);
+      } else {
+        paths.push(...resolved);
+      }
+    }
+    return match === false ? paths : {
+      paths,
+      match: (0, import_anymatch.default)(match)
+    };
+  }
+  if (isString(filePath)) {
+    const uri = getUri(filePath);
+    const paths = glob__default.default.sync(uri, { cwd: $.cwd });
+    if (paths.length === 0) {
+      warn2("No files can be resolved in", filePath);
+    }
+    if (match !== false) {
+      const test = hook2(uri);
+      if (isString(test)) {
+        match.push(test);
+      } else if (isArray(test)) {
+        match.push(...test);
+      }
+    }
+    return match === false ? paths : {
+      paths,
+      match: (0, import_anymatch.default)(match)
+    };
+  }
+  typeError({
+    option: "uri",
+    name: "uri/path",
+    provided: filePath,
+    expects: "string | string[]"
+  });
+}
+function getTransform(transforms, opts) {
+  if (!has("assertSnippet", opts)) opts.snippet = true;
+  if (isString(transforms)) {
+    const { paths, match } = getResolvedPaths(transforms, (watch) => globPath(watch));
+    return opts.flatten ? paths.map((input) => ({ input, rename: path2.basename(input), snippet: false })) : { input: paths, rename: "[name].[ext]", snippet: false, match };
+  } else if (isArray(transforms)) {
+    if (transforms.every(isString)) {
+      const { paths, match } = getResolvedPaths(transforms, globPath);
+      opts.flatten ? paths.map((input) => ({ input, rename: path2.basename(input), snippet: false })) : { };
+    } else if (transforms.every(isObject)) {
+      return transforms.map((option) => {
+        if (!has("input", option)) {
+          invalidError({
+            option: "tranform",
+            name: "input",
+            value: option,
+            expects: "{ input: string | string[] }"
+          });
+        }
+        const { paths, match } = getResolvedPaths(option.input, globPath);
+        option.match = match;
+        option.input = paths[0];
+        option.snippet = has("snippet", option) ? option.snippet : false;
+        if (!has("rename", option)) {
+          option.rename = option.snippet ? "[name].liquid" : "[name].[ext]";
+        }
+        return option;
+      });
+    }
+  } else if (isObject(transforms)) {
+    const config = [];
+    if (has("input", transforms)) {
+      const record = merge(transforms);
+      const { paths, match } = getResolvedPaths(record.input, globPath);
+      if (!has("snippet", record)) {
+        record.snippet = false;
+      }
+      if (!has("rename", record)) {
+        record.rename = record.snippet ? "[name].liquid" : "[name].[ext]";
+      }
+      if (opts.flatten) {
+        for (const input of paths) {
+          config.push({ ...record, input });
+        }
+      } else {
+        record.input = paths;
+        record.match = match;
+        config.push(record);
+      }
+    } else {
+      for (const prop in transforms) {
+        const record = { snippet: prop.startsWith("snippets/") };
+        const asset = prop.startsWith("assets/");
+        const option = transforms[prop];
+        const rename = asset || record.snippet;
+        if (isString(option)) {
+          if (rename) record.rename = asset ? prop.slice(7) : prop.slice(9);
+          const { paths, match } = getResolvedPaths(option, globPath);
+          if (opts.flatten) {
+            for (const input of paths) {
+              config.push({ ...record, input });
+            }
+          } else {
+            config.push({ ...record, input: paths, match });
+          }
+        } else if (isObject(option)) {
+          if (!has("input", option)) {
+            invalidError({
+              option: "transform",
+              name: prop,
+              value: option,
+              expects: "{ input: string | string[] }"
+            });
+          }
+          const { paths, match } = getResolvedPaths(option.input, globPath);
+          if (paths.length > 0) {
+            const merge2 = rename ? { ...option, ...record, rename: asset ? prop.slice(7) : prop.slice(9) } : { ...record, ...option };
+            if (opts.flatten) {
+              for (const input of paths) {
+                config.push({ ...merge2, input });
+              }
+            } else {
+              config.push({ ...merge2, input: paths, match });
+            }
+          }
+        } else if (isArray(option)) {
+          if (option.every(isString)) {
+            const { paths, match } = getResolvedPaths(option, globPath);
+            if (hasRenameNamespace(prop)) record.rename = path2.basename(prop);
+            if (paths) {
+              if (opts.flatten) {
+                for (const input of paths) {
+                  config.push({ ...record, input });
+                }
+              } else {
+                config.push({ ...record, input: paths, match });
+              }
+            }
+          } else {
+            typeError({
+              option: "transform",
+              name: prop,
+              provided: option,
+              expects: "string[]"
+            });
+          }
+        }
+      }
+    }
+    return config;
+  }
+}
+function getModules(pkg, name) {
+  if (has("devDependencies", pkg)) {
+    if (has(name, pkg.devDependencies)) return true;
+  }
+  if (has("dependencies", pkg)) {
+    if (has(name, pkg.dependencies)) return true;
+  }
+  if (has("peerDependencies", pkg)) {
+    if (has(name, pkg.peerDependencies)) return true;
+  }
+  if (has("optionalDependencies", pkg)) {
+    if (has(name, pkg.peerDependencies)) return true;
+  }
+  return false;
+}
+async function getConfigFilePath(filename) {
+  for (const ext of CONFIG_FILE_EXT) {
+    const filepath = `${filename}.${ext}`;
+    const fileExists = await fsExtra.pathExists(filepath);
+    if (fileExists) return filepath;
+  }
+  return null;
+}
+async function readConfigFile(path5, namespace, onRebuild) {
+  try {
+    const file = await getConfigFilePath(path5);
+    if (file !== null) {
+      const config = await acquire.acquire({
+        file,
+        cwd: $.cwd,
+        tsconfig: false,
+        type: has("type", $.pkg) ? $.pkg.type : "commonjs",
+        onRebuild,
+        onError: (errors) => {
+          const p = parseProcessorConfigs(file, namespace);
+          Create({ type: "error" }).Append("BUILD ERROR", bold2).Wrap(`The ${yellowBright2(p.base)} file could not be processed.`).toLog({ clear: true });
+          error.esbuild(p, errors);
+        }
+      });
+      return { file, config };
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+function hasRenameNamespace(rename) {
+  return /\[(?:file|name|dir|ext)\]/.test(rename);
+}
+function renameFileParse(src, pattern) {
+  let rename = pattern;
+  const dir = lastPath(src);
+  const ext = path2.extname(src);
+  const file = path2.basename(src, ext);
+  if (isUndefined(pattern)) return { dir, ext, file, name: file, base: file + ext };
+  if (/(\[dir\])/.test(rename)) rename = rename.replace("[dir]", dir);
+  if (/(\[name\])/.test(rename)) rename = rename.replace("[name]", file);
+  if (/(\[file\])/.test(rename)) rename = rename.replace("[file]", file);
+  if (/(\.?\[ext\])/.test(rename)) rename = rename.replace(/\.?\[ext\]/, ext);
+  const name = pattern.replace(pattern, rename);
+  return {
+    ext,
+    file,
+    dir,
+    name,
+    base: name + ext
+  };
+}
 
 // node_modules/.pnpm/eventemitter3@5.0.1/node_modules/eventemitter3/index.mjs
 var import_index2 = __toESM(require_eventemitter3(), 1);
@@ -13053,40 +14618,8 @@ var $ = new class Bundle {
   warnings = m();
   /**
    * Directory structure paths.
-   *
-   * Includes a special `transforms` Map reference for transform related files
-   * which may potentially be using an extension that would lead to it being identified
-   * as a different file type. This occurs when (for example) a snippet generated transform
-   * is set as an output.
-   *
-   * >**NOTE**
-   * >
-   * > The `transform` option will point to resolved file names and the values for each entry
-   * > will equal an enum `Type` number. The following transforms are identifiable:
-   *
-   * - `7` > `Type.Style`
-   * - `8` > `Type.Script`
-   * - `9` > `Type.SVG`
    */
-  paths = paths();
-  /**
-   * Stash Import paths
-   *
-   * Used in `pull` modes and assigns the locations to files that are unresolvable.
-   * This will only be assigned and populated in certain modes.
-   */
-  stash = o({
-    assets: null,
-    blocks: null,
-    config: null,
-    customers: null,
-    layout: null,
-    locales: null,
-    metaobject: null,
-    sections: null,
-    snippets: null,
-    templates: null
-  });
+  paths = createPathsState();
   /**
    * Execution options which describe the invocation and operation
    * instructions Syncify was initialised.
@@ -13497,17 +15030,6 @@ function isNull(param) {
 function isUndefined(param) {
   return typeof param === "undefined" && param === void 0;
 }
-function paths() {
-  return reduce(PATH_KEYS, (state, p) => {
-    state[p] = o({
-      input: null,
-      match: null,
-      config: null,
-      rename: []
-    });
-    return state;
-  }, o({ transforms: m() }));
-}
 function pm() {
   if (!process8.env.npm_config_user_agent) return "?";
   const userAgent = process8.env.npm_config_user_agent;
@@ -13753,7 +15275,7 @@ function sizeDiff(content, beforeSize) {
       return size > beforeSize || size === beforeSize;
     },
     get brotli() {
-      return byteConvert(zlib2__default.default.brotliCompressSync(content).length);
+      return byteConvert(zlib__default.default.brotliCompressSync(content).length);
     },
     get before() {
       return byteConvert(beforeSize);
@@ -14241,813 +15763,6 @@ function U(e, t2) {
   return le(e, { start: t2.start, end: t2.end }, { language: "javascript", type: "error", highlight: true, linesAbove: 2, linesBelow: 2, ...t2 });
 }
 U.shopify = de;
-var import_timer2 = __toESM(require_dist());
-var import_timer = __toESM(require_dist());
-function bulk() {
-  if ($.bulk.id === null) {
-    $.bulk.id = uuid();
-    import_timer.timer.start($.bulk.id);
-  }
-  if ($.bulk.synced.size > 0) {
-    $.bulk.synced.clear();
-    $.errors.clear();
-    $.warnings.clear();
-  }
-  if (bulk.tui === null) {
-    bulk.tui = Create().Template({ prefix: true, id: "changes", color: neonCyan }).Template({ prefix: true, id: "errors", color: gray2 }).Template({ prefix: true, id: "warnings", color: gray2 }).Template({ prefix: true, id: $.bulk.type, color: whiteBright2 });
-  }
-  if (bulk.progress === null) {
-    bulk.progress = progress($.bulk.files, {
-      barSize: 30,
-      prepend: null,
-      barColor: $.bulk.type === "uploaded" ? "neonGreen" : "blueBright"
-    });
-  } else {
-    bulk.progress.reset($.bulk.files);
-  }
-  bulk.tui.Update("changes", `${bold2($.bulk.files)} Files`).Update("errors", `${bold2($.errors.size)} Errors`).Update("warnings", `${bold2($.warnings.size)} Warnings`).Update($.bulk.type, bulk.progress.render()).toUpdate();
-}
-bulk.notifier = (type2) => {
-  notifier2__default.default.notify({
-    warnings: {
-      contentImage: $.file.notifier,
-      title: `Bulk ${plur("Warning", $.warnings.size)}`,
-      message: `${$.warnings.size} ${plur("warning", $.warnings.size)} encountered`
-    },
-    errors: {
-      contentImage: $.file.notifier,
-      title: `Bulk ${plur("Error", $.errors.size)}`,
-      message: `${$.errors.size} ${plur("Error", $.errors.size)} encountered`
-    }
-  }[type2]);
-};
-bulk.complete = () => {
-  if (!$.mode.bulk) return;
-  const color = $.bulk.type === "deleted" ? blueBright2 : neonGreen;
-  bulk.tui.Update($.bulk.type, `${bold2($.bulk.synced.size)} Files ${Append(import_timer.timer.stop($.bulk.id))}`, color).Newline();
-  if ($.bulk.synced.size > 0) {
-    bulk.tui.Line(`Type ${bold2("i")} and press ${bold2("enter")} to view ${$.bulk.type}`, gray2);
-  }
-  if ($.warnings.size > 0) {
-    bulk.tui.Line(`Type ${bold2("w")} and press ${bold2("enter")} to view warnings`, gray2);
-    bulk.notifier("warnings");
-  }
-  if ($.errors.size > 0) {
-    bulk.tui.Line(`Type ${bold2("e")} and press ${bold2("enter")} to view errors`, gray2);
-    bulk.notifier("errors");
-  }
-  bulk.tui.toUpdate({ clear: true, trim: true }).done();
-  bulk.tui = null;
-  bulk.progress = null;
-  $.mode.bulk = false;
-  $.bulk.files = 0;
-  $.bulk.id = null;
-};
-bulk.synced = (filename, target, store) => {
-  const message = $.bulk.type === "uploaded" ? neonGreen(Prefix("uploaded", filename, bold2(target), store, import_timer.timer.stop())) : blueBright2(Prefix("deleted", filename, bold2(target), store));
-  $.bulk.synced.add(Line(message));
-};
-bulk.progress = null;
-bulk.tui = null;
-var event = new class Event extends EventEmitter2__default.default {
-  id;
-  /**
-   * Whether or not an event is listening with the provided name
-   */
-  has(name) {
-    return this.listenerCount(name) > 0;
-  }
-  /**
-   * Changes the current event listening mode. Used for specific run-modes
-   * such a bulk operations or stdin debugs.
-   */
-  mode(name) {
-    this.id = name;
-    return this;
-  }
-  /**
-   * Each Event
-   *
-   * Iterates over an array of arguments and emits to the provided event name.
-   */
-  each(args) {
-    for (const arg of args) {
-      this.emit(this.id, arg);
-    }
-  }
-}();
-
-// syncify/cli/stdin.ts
-var setStdin = stdin;
-function stdin() {
-  stdin.errors = StdinError();
-  if ($.mode.watch) {
-    stdin.watch = StdinWatch();
-    stdin.warnings = StdinWarning();
-  }
-}
-stdin.errors = void 0;
-stdin.watch = void 0;
-stdin.warnings = void 0;
-stdin.ansi = {
-  footer: `USE ${Encase("SB", gray2("\u25C4"))} AND ${Encase("SB", gray2("\u25BA"))} ARROW KEYS TO NAVIGATE`,
-  legend: {
-    /** `[q] exit debug mode` */
-    q: Encase("SB", gray2.bold("q")) + " exit debug mode",
-    /** `[s] skip error */
-    s: Encase("SB", gray2.bold("s")) + " skip error",
-    /** `[w] view warnings */
-    w: Encase("SB", gray2.bold("w")) + " view warnings",
-    /** `[e] view errors */
-    e: Encase("SB", gray2.bold("e")) + " view errors",
-    /** `[p] print all errors and exit' */
-    p: Encase("SB", gray2.bold("p")) + " print all"
-  }
-};
-function StdinError() {
-  const state = {
-    index: 0,
-    isAttached: false,
-    write: [],
-    keypress: null,
-    skipped: null,
-    errors: null,
-    warnings: null,
-    get shown() {
-      return this.write[this.index];
-    }
-  };
-  function listen(write2) {
-    if (state.isAttached) return update(write2);
-    state.index = 0;
-    state.write = write2;
-    state.isAttached = true;
-    state.keypress = (_data, key) => {
-      if (key.name === "left") return prev();
-      if (key.name === "right") return next();
-      if (key.name === "q") return quit();
-      if (key.name === "p") return print();
-      if (key.name === "s") return event.emit("stdin:skip");
-      if (key.name === "w") return event.emit("stdin:warn");
-      if (key.name === "e") return event.emit("stdin:errors");
-    };
-    prexit.listener(state.keypress);
-    log.update(state.shown.toString({ clear: false }));
-    event.on("stdin:dispose", () => {
-      log.update.done();
-      dispose();
-    });
-  }
-  function quit() {
-  }
-  function update(messages2) {
-    state.index = 0;
-    state.write = messages2;
-    log.update.clear();
-    log.update(state.shown.toString({ clear: false }));
-  }
-  function dispose() {
-    if (!state.keypress) return;
-    state.shown.Remove("debug", Infinity);
-    log.update(state.shown.toString({ clear: false }));
-    log.update.done();
-    process.stdin.removeListener("keypress", state.keypress);
-    state.keypress = void 0;
-    state.isAttached = false;
-    state.write = [];
-    state.index = 0;
-    if (state.skipped) event.off("stdin:skip", state.skipped);
-    if (state.warnings) event.off("stdin:warn", state.warnings);
-    if (state.errors) event.off("stdin:errors", state.errors);
-    event.off("stdin:dispose", dispose);
-  }
-  function skip(callback) {
-    if (!state.skipped) {
-      state.skipped = () => callback(state.index);
-      event.on("stdin:skip", state.skipped);
-    }
-  }
-  function errors(callback) {
-    if (!state.errors) {
-      state.errors = () => callback(state.index);
-      event.on("stdin:error", state.errors);
-    }
-  }
-  function warn2(callback) {
-    if (!state.warnings) {
-      state.warnings = () => callback(state.index);
-      event.on("stdin:warn", state.warnings);
-    }
-  }
-  function print() {
-    log.update.clear();
-    log.update.done();
-    log.nl();
-    event.emit("stdin:view", state.index);
-    state.write.forEach((write2, index) => {
-      write2.Remove("legend", "debug").True(index !== state.write.length - 1, (tui) => tui.Pop()).True(index !== state.write.length - 1, (tui) => tui.Ruler()).toLog({ clear: true });
-    });
-    dispose();
-    kill.exit(0);
-  }
-  function next() {
-    if (state.index < state.write.length - 1) {
-      state.index++;
-      log.update(state.shown.toString({ clear: false }));
-    }
-  }
-  function prev() {
-    if (state.index > 0) {
-      state.index--;
-      log.update(state.shown.toString({ clear: false }));
-    }
-  }
-  return {
-    get isAttached() {
-      return state.isAttached;
-    },
-    listen,
-    dispose,
-    update,
-    skip,
-    warn: warn2,
-    errors
-  };
-}
-function StdinWatch() {
-  const preview = $.target.map(({ preview: preview2 }) => preview2);
-  const editors = $.target.map(({ editor }) => editor);
-  const write2 = Create().Newline().Template(preview, { id: "p", hidden: true, color: gray2.underline }).Template(editors, { id: "a", hidden: true, color: gray2.underline });
-  let keypress;
-  function listen() {
-    keypress = (_data, key) => {
-      if (key.name === "p") return write2.Update("p").toLog({ clear: "p", trim: false });
-      if (key.name === "a") return write2.Update("c").toLog({ clear: "a", trim: false });
-    };
-    prexit.listener(keypress);
-    stdin.warnings.listen();
-  }
-  function dispose() {
-    if (keypress) {
-      process.stdin.removeListener("keypress", keypress);
-      keypress = void 0;
-    }
-  }
-  return { listen, dispose };
-}
-function StdinWarning() {
-  const state = {
-    index: 0,
-    isAttached: false,
-    write: [],
-    keypress: null,
-    get shown() {
-      return this.write[this.index];
-    }
-  };
-  function reset3() {
-    log.update.clear();
-    state.write = [];
-    state.index = 0;
-  }
-  function listen() {
-    if (state.isAttached) return;
-    state.isAttached = true;
-    state.keypress = (_data, key) => {
-      if (key.name === "left") return prev();
-      if (key.name === "right") return next();
-      if (key.name === "v") return view();
-    };
-    prexit.listener(state.keypress);
-    event.on("warn:dispose", () => {
-      log.update.done();
-      dispose();
-    });
-  }
-  function dispose() {
-    if (!state.keypress) return;
-    process.stdin.removeListener("keypress", state.keypress);
-    state.keypress = void 0;
-    state.isAttached = false;
-    state.write = [];
-    state.index = 0;
-    event.off("stdin:dispose", dispose);
-  }
-  function view() {
-    if (!$.warnings.has($.log.uri)) return;
-    state.write = [];
-    state.index = 0;
-    let count = 0;
-    $.warnings.get($.log.uri).values().forEach((stack) => count += stack.size);
-    for (const stack of $.warnings.get($.log.uri).values()) {
-      stack.forEach((value) => {
-        const tui = Create({ type: "warning " });
-        if (count > 1) {
-          tui.Newline("line").Append(`WARNING ${state.write.length + 1} of ${count}`, bold2.yellowBright).Insert(value).Newline("line").End(stdin.ansi.footer);
-        } else {
-          tui.Insert(value);
-        }
-        state.write.push(tui);
-      });
-    }
-    log.update(state.shown.toString({ clear: false }));
-  }
-  function next() {
-    if (state.write.length > 1 && state.index < state.write.length - 1) {
-      state.index++;
-      log.update(state.shown.toString({ clear: false }));
-    }
-  }
-  function prev() {
-    if (state.write.length > 1 && state.index > 0) {
-      state.index--;
-      log.update(state.shown.toString({ clear: false }));
-    }
-  }
-  return {
-    get isAttached() {
-      return state.isAttached;
-    },
-    listen,
-    dispose,
-    view,
-    reset: reset3
-  };
-}
-
-// syncify/model/console.ts
-var console2 = new Log();
-var { stdout: stdout2, stderr: stderr2 } = Log;
-
-// syncify/cli/log.ts
-function log(...message) {
-  forEach((line) => console2.write(line), message);
-  return log;
-}
-log.runtime = TUI("runtime");
-log.progress = progress;
-log.update = log_update_default;
-log.spinner = Spinner();
-log.line = console2.info;
-log.header = console2.header;
-log.bulk = bulk;
-log.wrap = console2.wrap;
-log.hline = (options = {}) => {
-  const { wrap } = $.terminal;
-  if (isEmpty(options)) {
-    options.width = wrap;
-    options.newlines = false;
-  } else {
-    const has2 = hasProp(options);
-    if (!has2("width")) options.width = wrap;
-    if (!has2("newlines")) options.newlines = false;
-  }
-  log(
-    Ruler(
-      options.width,
-      options.newlines
-    )
-  );
-};
-log.nl = function(entry) {
-  entry === "" ? console2.break() : console2.tree(entry);
-  return this;
-};
-log.clear = (clear2 = true) => clear2 ? log(clear) : log;
-log.group = function(name) {
-  if ($.config.log.silent || $.env.tree === false) return;
-  if ($.mode.bulk) {
-    name = g("Bulk", CHV, toUpcase(name));
-    if ($.log.group === name) return this;
-    $.log.group = name;
-  }
-  log.ender($.log.group);
-  if ($.config.log.clear && name !== false) log.clear();
-  if (isString(name)) {
-    $.log.group = name;
-    log.begin($.log.group);
-  }
-  return this;
-};
-log.task = (name, timestamp = true) => {
-  if ($.config.log.silent || $.env.tree === false) return;
-  if (isString(name)) {
-    console2.dash(
-      g.ws(gray2(name), timestamp ? Append(getTime2()) : "")
-    );
-  } else {
-    log.clear()(
-      Tree.trim,
-      Dash(g.ws(gray2($.log.group), Append(getTime2())))
-    );
-  }
-};
-log.process = (label, ...message) => {
-  if ($.mode.pack || $.mode.build || $.config.log.silent) return;
-  console2.info(
-    Prefix(
-      "process",
-      message.length === 2 ? g.ws(bold2(label), CHV, message[0], Append(message[1])) : g.ws(bold2(label), Append(message[0]))
-    )
-  );
-};
-log.upsert = (upsert) => {
-  const { target, store } = upsert.target;
-  if ($.mode.bulk) {
-    forEach(({ filename }) => {
-      bulk.synced(filename, target, store.name);
-      bulk.progress.increment();
-      bulk.tui.Update($.bulk.type, bulk.progress.render()).toUpdate();
-    }, upsert.synced);
-    if (upsert.errors.length > 0) {
-      error.upsert(upsert.errors);
-      bulk.progress.increment(upsert.errors.length);
-      bulk.tui.Update($.bulk.type, bulk.progress.render()).Update("errors", `${bold2($.errors.size)} ${plur("Error", $.errors.size)}`, redBright2).toUpdate();
-    }
-  } else {
-    forEach(({ filename }) => {
-      console2.info(
-        Prefix("uploaded", bold2(target), store.name, filename, import_timer2.timer.stop()),
-        neonGreen
-      );
-    }, upsert.synced);
-    upsert.errors.length > 0 && error.upsert(upsert.errors);
-  }
-};
-log.changed = (file) => {
-  if ($.errors.size > 0) $.errors.clear();
-  if ($.warnings.size > 0) {
-    $.warnings.clear();
-    stdin.warnings.reset();
-  }
-  if ($.config.log.silent === true || $.mode.watch === false) return;
-  import_timer2.timer.start();
-  const name = `${file.kind} ${CHV} ${toUpcase(file.namespace)}`;
-  const change = $.log.changes.has(file.relative) ? $.log.changes.get(file.relative) + 1 : 1;
-  $.log.changes.set(file.relative, change);
-  if ($.log.group !== name) {
-    log.group(name);
-    if ($.log.title !== file.namespace) $.log.title = file.namespace;
-  } else {
-    log.group(name);
-  }
-  if ($.log.uri !== file.input) $.log.uri = file.input;
-  console2.info(
-    Prefix("changed", `${file.relative} ${Append(`${change} ${plur("change", change)}`)}`),
-    neonCyan
-  );
-};
-log.syncing = (path5, { hot = false } = {}) => {
-  if ($.mode.pack || $.mode.bulk || $.mode.build || $.mode.debug || $.config.log.silent) return;
-  if ($.warnings.has(path5)) {
-    const { size } = $.warnings.get(path5);
-    log.warn(`${bold2(size)} ${plur("warning", size)}`, Suffix.warning);
-  }
-  console2.info(
-    magentaBright2(
-      Prefix(
-        "syncing",
-        path5.replace(/^(\d+)/, bold2("$1"))
-      )
-    )
-  );
-  if (q.http.pending > (hot ? 0 : 2)) {
-    console2.info(
-      orange(
-        Prefix(
-          "queued",
-          g.ws(
-            path5,
-            TLD,
-            bold2(addSuffix(q.http.pending)),
-            "in queue"
-          )
-        )
-      )
-    );
-  }
-};
-log.resource = (type2, store) => {
-  if ($.mode.watch) {
-    $.log.queue.add(
-      [
-        type2,
-        store.domain,
-        import_timer2.timer.stop()
-      ]
-    );
-    if ($.log.idle) return;
-    else $.log.idle = true;
-    q.http.onIdle().then(() => {
-      for (const [type3, store2, ctime] of $.log.queue) {
-        console2.info(
-          Line(
-            neonGreen(
-              Prefix(
-                "uploaded",
-                g.ws(
-                  bold2(type3),
-                  ARR,
-                  store2,
-                  Append(ctime)
-                )
-              )
-            )
-          )
-        );
-      }
-      $.log.queue.clear();
-      $.log.idle = false;
-    });
-  } else {
-    console2.info(
-      Line(
-        neonGreen(
-          Prefix(
-            "uploaded",
-            g.ws(
-              bold2(type2),
-              ARR,
-              store.domain,
-              Append(import_timer2.timer.stop())
-            )
-          )
-        )
-      )
-    );
-  }
-};
-log.invalid = (path5, message) => {
-  console2.error(Prefix("invalid", path5));
-  notifier2__default.default.notify(
-    {
-      title: "Syncify Error",
-      sound: "Pop",
-      open: path5,
-      subtitle: path5,
-      message: "Invalid error"
-    }
-  ).notify();
-  if (message) {
-    console2.error(Wrap(...message, { line: "red", color: redBright2 }));
-  }
-};
-log.error = (input, { suffix = null, notify = null } = {}) => {
-  if ($.mode.bulk) return;
-  const message = capture.numbers(input, bold2);
-  console2.error(Prefix("failed", suffix ? `${message} ${Append(suffix)}` : message));
-  if (notify !== null) {
-    notify.contentImage = $.file.notifier;
-    notifier2__default.default.notify(notify).notify();
-  }
-};
-log.transform = (label, ...suffix) => $.mode.build || $.mode.bulk || $.mode.debug || console2.info(
-  Prefix("transform", bold2(label), ...suffix),
-  whiteBright2
-);
-log.minified = (...p) => $.mode.pack || $.mode.bulk || $.mode.build || console2.info(
-  Prefix("minified", bold2(p.shift()), ...p.slice(0, -1), `saved ${p.pop()}`),
-  whiteBright2
-);
-log.begin = (message, { timestamp = true, clear: clear2 = true, group = false } = {}) => log.clear(clear2)(
-  NWL2,
-  Top(group ? $.log.group = message : message, timestamp),
-  Tree.next + NWL2
-);
-log.ender = (message, { timestamp = true, clear: clear2 = true } = {}) => log.clear(clear2)(
-  Tree.trim + "\n",
-  End(message || $.log.group, timestamp),
-  NLR2
-);
-log.skipped = (file, reason) => $.mode.pack || $.mode.build || $.mode.bulk || console2.info(
-  Prefix("skipped", `${isString(file) ? file : file.key} ${Append(reason)}`),
-  gray2
-);
-log.deleted = (file, theme2) => console2.info(
-  Prefix("deleted", file, ...[$.mode.bulk ? (theme2.target, theme2.store.domain) : void 0]),
-  blueBright2
-);
-log.zipped = (size, path5) => console2.info(
-  Prefix("zipped", `${bold2("ZIP")} ${size} ${Append(path5)}`),
-  whiteBright2
-);
-log.ignored = (path5) => console2.info(
-  Prefix("ignored", path5),
-  yellowBright2
-);
-log.rename = (from, to) => $.running === false || $.mode.watch || console2.info(
-  Prefix("renamed", bold2(from), bold2(to)),
-  whiteBright2
-);
-log.warn = (message, suffix) => console2.info(
-  Prefix("warnings", suffix ? `${message} ${Append(suffix)}` : `${message}`),
-  yellowBright2
-);
-log.hot = (id) => console2.info(
-  Prefix("reloaded", bold2("HOT RELOAD"), import_timer2.timer.now(id)),
-  neonRouge
-);
-log.exported = (from, to) => console2.info(
-  Prefix("exported", bold2(from), bold2(to)),
-  teal
-);
-log.retrying = (file, theme2) => console2.info(
-  Prefix("retrying", file, theme2.target, theme2.store.domain),
-  orange
-);
-log.reloaded = (path5, time) => console2.info(
-  Prefix("reloaded", path5, time),
-  whiteBright2
-);
-log.version = (version, action) => console2.info(
-  Prefix("version", bold2(version.number), bold2(version.update.number), action),
-  whiteBright2
-);
-var File = class {
-  constructor(uri) {
-    assign(this, path2.parse(uri));
-  }
-  /**
-   * Configuration reference. This will hold a reference to additional data.
-   * Typically, this is used for transforms, wherein it holds the indexed config.
-   *
-   * @default undefined // getter when required
-   */
-  data = void 0;
-  /**
-   * File value is set in the final process cycle and will hold the file
-   * content after transforms conclude.
-   *
-   * @default ''
-   */
-  value = "";
-  /**
-   * Hash reference of the file contents, used for diffing comparison, couples with
-   * the caching datasets.
-   *
-   * @example
-   *
-   * 'aa11bb22cc33dd44ee55ff66gg77'
-   */
-  hash;
-  /**
-   * A unique UUID reference for this file - This option can change
-   * where required and when dealing with multiple stores at the request level.
-   *
-   * @example
-   *
-   * 'ABD41WX'
-   */
-  uuid;
-  /**
-   * The file type that was intercepted. This is an enum number value.
-   * The number value will infer on how the file should be handled and uses
-   * the `FileType` enum for checks.
-   *
-   * @example
-   *
-   * file.type === FileType.Template
-   *
-   */
-  type;
-  /**
-   * The resource API endpoint to which the file will be synced.
-   * This will be passed to the request client.
-   *
-   * @example
-   *
-   * 'assets'
-   * 'redirects'
-   */
-  resource;
-  /**
-   * The root of the file path
-   *
-   * > Value is obtained via the native `path.parse()` method
-   *
-   * @example
-   *
-   * '/' OR 'c:\'
-   */
-  root;
-  /**
-   * The full directory path such.
-   *
-   * > Value is obtained via the native `path.parse()` method
-   *
-   * @example
-   *
-   * '/home/user/dir' OR 'c:\path\dir'
-   */
-  dir;
-  /**
-   * The file name without extension (if any).
-   *
-   * > Value is obtained via the native `path.parse()` method
-   *
-   * @example
-   *
-   * 'filename' // filename.ext
-   */
-  name;
-  /**
-   * The filename extension including the dot, eg: `.liquid`
-   *
-   * > Value is obtained via the native `path.parse()` method
-   *
-   * @example
-   *
-   * '.ext'
-   */
-  ext;
-  /**
-   * The input base filename including file extension.
-   *
-   * > Value is obtained via the native `path.parse()` method
-   *
-   * @example
-   *
-   * 'filename.ext'
-   */
-  base;
-  /**
-   * The input relative path location from current _root_ working directory
-   *
-   * @example
-   *
-   * 'source/views/sections/dir/file.liquid'
-   */
-  relative;
-  /**
-   * The `key` value will be passed into the sync request. This
-   * will contain the namespace and base name and is used for
-   * uploading to Shopify stores.
-   *
-   * @example
-   *
-   * 'sections/file.liquid'
-   * 'snippets/file.liquid'
-   * 'templates/index.liquid'
-   */
-  key;
-  /**
-   * The `namespace` value will typically refelect the output
-   * parent directory name reference, but sometimes this might
-   * be a unique value depending on the file type we are handling.
-   *
-   * @example
-   *
-   * 'snippets'
-   * 'sections'
-   * 'templates'
-   */
-  namespace;
-  /**
-   * The file kind grouping. This is used internally and describes
-   * the type of file we are working with.
-   *
-   * @example
-   *
-   * 'json'
-   * 'liquid'
-   * 'sass'
-   * 'css'
-   *
-   * // etc etc
-   */
-  kind;
-  /**
-   * The absolute passed path - this is full URI file path.
-   *
-   * @example
-   *
-   * 'User/name/project/source/dir/file.liquid'
-   */
-  input;
-  /**
-   * The output path location which files will be written. Only theme specific files
-   * have an output path location, when a file writes from its source (like a metafield) or
-   * if the file is handled in an asset pipeline transform then this will have a `null` value.
-   *
-   * @example
-   *
-   * // When file is theme specific
-   * 'User/name/project/theme/dir/filename.liquid'
-   *
-   * // When file is not theme specific
-   * null
-   */
-  output;
-  /**
-   * The file size in bytes before any augmentation is applied. This
-   * value will be assigned post-context, typically in a transform.
-   *
-   * @example
-   *
-   * 1024 // => 1.24kb
-   */
-  size;
-};
 
 // syncify/cli/errors.ts
 function error(...message) {
@@ -15628,8 +16343,8 @@ function throwCommand(message) {
 function unknownError(option, value) {
   if (option.indexOf(".") > -1) {
     const opts = option.split(".").filter(Boolean).join(" " + ARR + " ");
-    const join30 = g.ws(opts, ARR, red2.bold(value));
-    option = Encase("CB", join30, { spaced: true });
+    const join29 = g.ws(opts, ARR, red2.bold(value));
+    option = Encase("CB", join29, { spaced: true });
   }
   const base = path2.basename($.file.config);
   const file = base === "package.json" ? `${blue2("syncify")} config in the ${blue2("package.json")} file.` : `${blue2(base)} file.`;
@@ -16316,130 +17031,6 @@ async function AssetTransform(file) {
 
 // syncify/transform/json.ts
 var import_timer4 = __toESM(require_dist());
-
-// syncify/process/cache.ts
-var import_write_file_atomic = __toESM(require_lib());
-var gunzipAsync = node_util.promisify(zlib2__default.default.gunzip);
-var gzipAsync = node_util.promisify(zlib2__default.default.gzip);
-async function decode(uri) {
-  const content = await fsExtra.readFile(uri);
-  const gunzip = await gunzipAsync(content);
-  return cbor__default.default.decode(gunzip);
-}
-function save(uri, data) {
-  return async () => {
-    if ($.file.project === null) {
-      throwError([
-        "Project cache has not been created"
-      ]);
-      return;
-    }
-    if (!/[/]/.test(uri)) {
-      uri = $.cache.uri[uri];
-      if (!data) data = $.cache[uri];
-    }
-    const encoded = await cbor__default.default.encodeAsync(data, { omitUndefinedProperties: true, canonical: true });
-    const gzip = await gzipAsync(encoded);
-    gzip[9] = 3;
-    await (0, import_write_file_atomic.default)(uri, gzip);
-  };
-}
-function clearCache(id = null) {
-  if (id === null) {
-    for (const key of CACHE_FILES) {
-      if (!isEmpty($.cache[key])) {
-        $.cache[key] = {};
-        q.cache.add(save($.cache.uri[key], $.cache[key]));
-      }
-    }
-    return q.cache.onIdle();
-  }
-  $.cache[id] = {};
-  return q.cache.add(save($.cache.uri[id], $.cache[id]));
-}
-function runChecksum(input, value) {
-  const hash = checksum(value);
-  if (has(input, $.cache.checksum) && $.cache.checksum[input] === hash) return true;
-  $.cache.checksum[input] = hash;
-  q.cache.add(save($.cache.uri.checksum, $.cache.checksum));
-  return false;
-}
-function saveCache(id = null) {
-  if (id === null) {
-    for (const key of CACHE_FILES) {
-      if (!isEmpty($.cache[key])) {
-        q.cache.add(save($.cache.uri[key], $.cache[key]));
-      }
-    }
-    return q.cache.onIdle();
-  } else {
-    return q.cache.add(save($.cache.uri[id], $.cache[id]));
-  }
-}
-function getPageCache(domain, pageId = NaN) {
-  const store = domain.endsWith(".myshopify.com") ? domain.slice(0, domain.indexOf(".myshopify.com")).toLowerCase() : domain.toLowerCase();
-  if (isNaN(pageId) === false) {
-    if (hasPath(`${store}.${pageId}`, $.cache.pages)) {
-      return $.cache.pages[store][pageId];
-    }
-    if (!has(store, $.cache.pages)) {
-      $.cache.pages[store] = { [pageId]: {} };
-    } else {
-      $.cache.pages[store][pageId] = {};
-    }
-    q.cache.add(save($.cache.uri.pages, $.cache.pages));
-    return $.cache.pages[store][pageId];
-  } else {
-    if (!has(store, $.cache.pages)) {
-      $.cache.pages[store] = {};
-      q.cache.add(save($.cache.uri.pages, $.cache.pages));
-    }
-  }
-  return $.cache.pages[store];
-}
-function setPageCache(domain, data) {
-  const store = domain.endsWith(".myshopify.com") ? domain.slice(0, domain.indexOf(".myshopify.com")).toLowerCase() : domain.toLowerCase();
-  if (!has(store, $.cache.pages)) {
-    $.cache.pages[store] = { [data.id]: data };
-  } else {
-    $.cache.pages[store][data.id] = data;
-  }
-  q.cache.add(save($.cache.uri.pages, $.cache.pages));
-  return $.cache.pages[store][data.id];
-}
-function setTemplateCache(domain, themeId, path5, data) {
-  const store = domain.endsWith(".myshopify.com") ? domain.slice(0, domain.indexOf(".myshopify.com")).toLowerCase() : domain.toLowerCase();
-  if (!has(store, $.cache.templates)) {
-    $.cache.templates[store] = { [themeId]: { [path5]: data } };
-  } else if (!has(`${themeId}`, $.cache.templates[store])) {
-    $.cache.templates[store][themeId] = { [path5]: data };
-  } else {
-    $.cache.templates[store][themeId][path5] = data;
-  }
-  q.cache.add(save($.cache.uri.templates, $.cache.templates));
-  return $.cache.templates[store][themeId][path5];
-}
-function setPathCache(input, output) {
-  let update = null;
-  if (!has("paths", $.cache)) {
-    $.cache.paths = {};
-  }
-  if (!has(input, $.cache.paths)) {
-    update = $.cache.paths[input] = output;
-  }
-  if ($.cache.paths[input] !== output) {
-    update = $.cache.paths[input] = output;
-  }
-  if (!has(output, $.cache.paths)) {
-    update = $.cache.paths[output] = input;
-  }
-  if ($.cache.paths[output] !== input) {
-    update = $.cache.paths[output] = input;
-  }
-  if (update) {
-    q.cache.add(save($.cache.uri.paths, $.cache.paths));
-  }
-}
 var theme = {
   pointer(choice, index) {
     const line = this.state.index === index ? Tree.dash : Tree.line;
@@ -16659,659 +17250,6 @@ warn.postcss = (file, data) => {
   );
   if (!stack.has(output)) {
     stack.add(output);
-  }
-};
-
-// syncify/options/utils.ts
-var import_anymatch = __toESM(require_anymatch());
-function globPath(path5) {
-  return isArray(path5) ? path5.filter((uri) => /\*/.test(uri)) : /\*/.test(path5) ? path5 : null;
-}
-function lastPath(path5) {
-  if (isArray(path5)) return path5.map(lastPath);
-  if (path5.indexOf("/") === -1) return path5;
-  const dir = path5.endsWith("/") ? path2.dirname(path5.slice(0, -1)) : path2.dirname(path5);
-  const ender = dir.lastIndexOf("/") + 1;
-  return dir.slice(ender);
-}
-function parentPath(path5) {
-  if (isArray(path5)) return path5.map(parentPath);
-  const last = path5.lastIndexOf("/");
-  if (last === -1) return path5;
-  const glob9 = path5.indexOf("*");
-  return glob9 === -1 ? path5.slice(0, last) : path5.slice(0, glob9);
-}
-function normalPath(input, cwd2 = null) {
-  const regex2 = new RegExp(`^\\.?\\/?${input}\\/`);
-  const source = new RegExp(`^\\.?\\/?${path2.basename(input)}\\/`);
-  return function prepend(path5) {
-    if (Array.isArray(path5)) return path5.map(prepend);
-    const ignore = path5.charCodeAt(0) === 33;
-    if (ignore) path5 = path5.slice(1);
-    if (regex2.test(path5)) return ignore ? "!" + path5 : path5;
-    if (path5.charCodeAt(0) === 46 && path5.charCodeAt(1) === 46 && path5.charCodeAt(2) === 47) {
-      throwError(
-        `Invalid path defined at: ${COL} ${yellowBright2(`"${path5}"`)}`,
-        ["Paths must be relative to source"]
-      );
-    }
-    if (cwd2 !== null) {
-      const exists2 = path2.join(cwd2, path5);
-      return (ignore ? "!" : "") + (exists2.startsWith(input) ? exists2 : path2.join(input, path5));
-    } else {
-      return (ignore ? "!" : "") + path2.join(input, source.test(path5) ? path5.replace(source, "") : path5);
-    }
-  };
-}
-var basePath = (cwd2) => (path5) => {
-  if (path5.indexOf("*") !== -1) {
-    throwError(
-      `Base directory path cannot contain glob${COL} ${yellowBright2(`"${path5}"`)}`,
-      ["Ensure that path you are resolving is correctly formed"]
-    );
-  }
-  if (path5.charCodeAt(0) === 46) {
-    if (path5.length === 1) return cwd2 + "/";
-    if (path5.charCodeAt(1) === 47) {
-      path5 = path5.slice(1);
-    } else {
-      throwError(
-        `Directory path is invalid at${COL} ${yellowBright2(`"${path5}"`)}`,
-        ["Ensure that the path you attempting to resolve is correctly formed"]
-      );
-    }
-  }
-  if (path5.charCodeAt(0) === 47) {
-    if (path5.length === 1) {
-      return cwd2 + "/";
-    } else {
-      path5 = path5.slice(1);
-    }
-  }
-  if (/^[a-zA-Z0-9_-]+/.test(path5)) {
-    path5 = path2.join(cwd2, path5);
-    return path5[path5.length - 1].charCodeAt(0) === 47 ? path5 : path5 + "/";
-  } else {
-    throwError(
-      `Directory path is invalid at${COL} ${yellowBright2(`"${path5}"`)}`,
-      ["Ensure that the path you attempting to resolve is correctly formed"]
-    );
-  }
-};
-
-// syncify/options/utils.ts
-function getResolvedPaths(filePath, hook2) {
-  const { cwd: cwd2 } = $;
-  const match = isFunction(hook2) ? [] : false;
-  const warn2 = warnOption("Path Resolver");
-  const path5 = normalPath($.dirs.input, $.cwd);
-  if (isArray(filePath)) {
-    const paths2 = [];
-    for (const item of filePath) {
-      const uri = path5(item);
-      const resolved = glob__default.default.sync(uri, { cwd: cwd2, absolute: true });
-      if (match !== false) {
-        const test = hook2(uri);
-        if (isString(test)) {
-          match.push(test);
-        } else if (isArray(test)) {
-          match.push(...test);
-        }
-      }
-      if (resolved.length === 0) {
-        warn2("No files can be resolved in", item);
-      } else {
-        paths2.push(...resolved);
-      }
-    }
-    return match === false ? paths2 : { paths: paths2, match: (0, import_anymatch.default)(match) };
-  }
-  if (isString(filePath)) {
-    const uri = path5(filePath);
-    const paths2 = glob__default.default.sync(uri, { cwd: cwd2 });
-    if (paths2.length === 0) {
-      warn2("No files can be resolved in", filePath);
-    }
-    if (match !== false) {
-      const test = hook2(uri);
-      if (isString(test)) {
-        match.push(test);
-      } else if (isArray(test)) {
-        match.push(...test);
-      }
-    }
-    return match === false ? paths2 : { paths: paths2, match: (0, import_anymatch.default)(match) };
-  }
-  typeError({
-    option: "uri",
-    name: "uri/path",
-    provided: filePath,
-    expects: "string | string[]"
-  });
-}
-function getTransform(transforms, opts) {
-  if (!has("assertSnippet", opts)) opts.assertSnippet = true;
-  if (isString(transforms)) {
-    const { paths: paths2, match } = getResolvedPaths(transforms, (watch) => globPath(watch));
-    if (paths2) {
-      if (opts.flatten) {
-        return paths2.map((input) => opts.assertSnippet ? {
-          input,
-          rename: path2.basename(input),
-          snippet: false
-        } : {
-          input,
-          rename: path2.basename(input)
-        });
-      } else {
-        return opts.assertSnippet ? {
-          input: paths2,
-          rename: "[name].[ext]",
-          snippet: false,
-          match
-        } : {
-          input: paths2,
-          rename: "[name].[ext]",
-          match
-        };
-      }
-    }
-  } else if (isArray(transforms)) {
-    if (transforms.every(isString)) {
-      const { paths: paths2, match } = getResolvedPaths(transforms, (watch) => globPath(watch));
-      if (opts.flatten) {
-        return paths2.map((input) => opts.assertSnippet ? {
-          input,
-          rename: path2.basename(input),
-          snippet: false
-        } : {
-          input,
-          rename: path2.basename(input)
-        });
-      } else {
-        return opts.assertSnippet ? {
-          input: paths2,
-          rename: "[name].[ext]",
-          snippet: false,
-          match
-        } : {
-          input: paths2,
-          rename: "[name].[ext]",
-          match
-        };
-      }
-    } else if (transforms.every(isObject)) {
-      return transforms.map((option) => {
-        if (!has("input", option)) {
-          invalidError({
-            option: "tranform",
-            name: "input",
-            value: option,
-            expects: "{ input: string | string[] }"
-          });
-        }
-        const { paths: paths2, match } = getResolvedPaths(option.input, (watch) => globPath(watch));
-        option.match = match;
-        option.input = paths2[0];
-        if (opts.assertSnippet && !has("snippet", option)) option.snippet = false;
-        if (!has("rename", option)) {
-          option.rename = option.snippet ? "[name].liquid" : "[name].[ext]";
-        }
-        return option;
-      });
-    }
-  } else if (isObject(transforms)) {
-    const config = [];
-    if (has("input", transforms)) {
-      const record = merge(transforms);
-      const { paths: paths2, match } = getResolvedPaths(record.input, (watch) => {
-        return globPath(watch);
-      });
-      if (opts.assertSnippet && !has("snippet", record)) {
-        record.snippet = false;
-      }
-      if (!has("rename", record)) {
-        record.rename = record.snippet ? "[name].liquid" : "[name].[ext]";
-      }
-      if (opts.flatten) {
-        for (const input of paths2) {
-          config.push(assign({}, record, { input }));
-        }
-      } else {
-        record.input = paths2;
-        record.match = match;
-        config.push(record);
-      }
-    } else {
-      for (const prop in transforms) {
-        const record = { snippet: prop.startsWith("snippets/") };
-        const asset = prop.startsWith("assets/");
-        const option = transforms[prop];
-        const rename = asset || record.snippet;
-        if (isString(option)) {
-          if (rename) {
-            record.rename = asset ? prop.slice(7) : prop.slice(9);
-          }
-          const { paths: paths2, match } = getResolvedPaths(option, (watch) => {
-            return globPath(watch);
-          });
-          if (paths2) {
-            if (opts.flatten) {
-              for (const input of paths2) config.push(assign({}, record, { input }));
-            } else {
-              config.push(assign({}, record, { input: paths2, match }));
-            }
-          }
-        } else if (isObject(option)) {
-          if (!has("input", option)) {
-            invalidError({
-              option: "transform",
-              name: prop,
-              value: option,
-              expects: "{ input: string | string[] }"
-            });
-          }
-          const { paths: paths2, match } = getResolvedPaths(option.input, (watch) => {
-            return globPath(watch);
-          });
-          if (paths2.length > 0) {
-            const merge2 = rename ? assign({}, option, record, { rename: asset ? prop.slice(7) : prop.slice(9) }) : assign({}, record, option);
-            if (opts.flatten) {
-              for (const input of paths2) {
-                config.push(assign({}, merge2, { input }));
-              }
-            } else {
-              config.push(assign(merge2, { input: paths2, match }));
-            }
-          }
-        } else if (isArray(option)) {
-          if (option.every(isString)) {
-            const { paths: paths2, match } = getResolvedPaths(option, (watch) => globPath(watch));
-            if (hasRenameNamespace(prop)) record.rename = path2.basename(prop);
-            if (paths2) {
-              if (opts.flatten) {
-                for (const input of paths2) {
-                  config.push(assign({}, record, { input }));
-                }
-              } else {
-                config.push(assign({}, record, { input: paths2, match }));
-              }
-            }
-          } else {
-            typeError({
-              option: "transform",
-              name: prop,
-              provided: option,
-              expects: "string[]"
-            });
-          }
-        }
-      }
-    }
-    return config;
-  }
-}
-function getModules(pkg, name) {
-  if (has("devDependencies", pkg)) {
-    if (has(name, pkg.devDependencies)) return true;
-  }
-  if (has("dependencies", pkg)) {
-    if (has(name, pkg.dependencies)) return true;
-  }
-  if (has("peerDependencies", pkg)) {
-    if (has(name, pkg.peerDependencies)) return true;
-  }
-  if (has("optionalDependencies", pkg)) {
-    if (has(name, pkg.peerDependencies)) return true;
-  }
-  return false;
-}
-async function getConfigFilePath(filename) {
-  for (const ext of CONFIG_FILE_EXT) {
-    const filepath = `${filename}.${ext}`;
-    const fileExists = await fsExtra.pathExists(filepath);
-    if (fileExists) return filepath;
-  }
-  return null;
-}
-async function readConfigFile(path5, namespace, onRebuild) {
-  try {
-    const file = await getConfigFilePath(path5);
-    if (file !== null) {
-      const config = await acquire.acquire({
-        file,
-        cwd: $.cwd,
-        tsconfig: false,
-        type: has("type", $.pkg) ? $.pkg.type : "commonjs",
-        onRebuild,
-        onError: (errors) => {
-          const p = parseProcessorConfigs(file, namespace);
-          Create({ type: "error" }).Append("BUILD ERROR", bold2).Wrap(`The ${yellowBright2(p.base)} file could not be processed.`).toLog({ clear: true });
-          error.esbuild(p, errors);
-        }
-      });
-      return { file, config };
-    }
-    return null;
-  } catch (e) {
-    return null;
-  }
-}
-function hasRenameNamespace(rename) {
-  return /\[(?:file|name|dir|ext)\]/.test(rename);
-}
-function renameFileParse(src, pattern) {
-  let rename = pattern;
-  const dir = lastPath(src);
-  const ext = path2.extname(src);
-  const file = path2.basename(src, ext);
-  if (isUndefined(pattern)) return { dir, ext, file, name: file, base: file + ext };
-  if (/(\[dir\])/.test(rename)) rename = rename.replace("[dir]", dir);
-  if (/(\[name\])/.test(rename)) rename = rename.replace("[name]", file);
-  if (/(\[file\])/.test(rename)) rename = rename.replace("[file]", file);
-  if (/(\.?\[ext\])/.test(rename)) rename = rename.replace(/\.?\[ext\]/, ext);
-  const name = pattern.replace(pattern, rename);
-  return {
-    ext,
-    file,
-    dir,
-    name,
-    base: name + ext
-  };
-}
-
-// syncify/process/context.ts
-function svg(file) {
-  const config = $.svg.filter((context) => {
-    if (context.input.has(file.input)) return true;
-    if (!context.match(file.input)) return false;
-    context.input.add(file.input);
-    return true;
-  });
-  if (isUndefined(config)) return file;
-  defineProperty(file, "data", {
-    get() {
-      return config;
-    }
-  });
-  return file;
-}
-function style(file) {
-  const config = $.style.find((x) => x.watch(file.input));
-  if (isUndefined(config)) {
-    file.type = 16 /* Asset */;
-    return file;
-  }
-  defineProperty(file, "data", {
-    get() {
-      return config;
-    }
-  });
-  if (config.snippet) {
-    file.namespace = "snippets" /* Snippets */;
-    file.key = path2.join("snippets", config.rename);
-  } else {
-    file.key = path2.join("assets", config.rename);
-  }
-  if (file.output) {
-    if (file.data.rename !== path2.basename(file.output)) {
-      if (config.snippet) {
-        file.output = path2.join($.dirs.output, file.key);
-      } else {
-        file.output = path2.join(parentPath(file.output), file.data.rename);
-      }
-    }
-  } else {
-    file.output = path2.join($.dirs.output, file.key);
-  }
-  return file;
-}
-function script(file) {
-  const config = $.script.filter((config2) => config2.watch.has(file.input));
-  if (config.length === 0) return file;
-  defineProperty(file, "data", { get() {
-    return config;
-  } });
-  return file;
-}
-function schema(parse10, file) {
-  defineProperty(file, "data", { get() {
-    return parse10;
-  } });
-  return file;
-}
-function section(file) {
-  if ($.paths.sections.rename.length > 0) {
-    const path5 = file.input;
-    const find = $.paths.sections.rename.find(([match]) => match(path5));
-    if (isUndefined(find)) return file;
-    const oldName = file.base;
-    const rename = renameFileParse(file.input, find[1]);
-    file.name = rename.name;
-    file.ext = rename.ext;
-    file.base = rename.base;
-    file.key = path2.join(file.namespace, rename.base);
-    file.output = path2.join(path2.dirname(file.output), rename.base);
-    if ($.mode.watch) log.rename(oldName, file.base);
-  }
-  return file;
-}
-function snippet(file) {
-  if ($.paths.snippets.rename.length > 0) {
-    const path5 = file.input;
-    const find = $.paths.snippets.rename.find(([match]) => match(path5));
-    if (isUndefined(find)) return file;
-    const oldName = file.base;
-    const rename = renameFileParse(file.input, find[1]);
-    file.name = rename.name;
-    file.ext = rename.ext;
-    file.base = rename.base;
-    file.key = path2.join(file.namespace, rename.base);
-    file.output = path2.join(path2.dirname(file.output), rename.base);
-    if ($.mode.watch) log.rename(oldName, file.base);
-  }
-  return file;
-}
-
-// syncify/process/files.ts
-function renameFile({ name, dir, ext, namespace }, rename) {
-  let newName = rename;
-  if (/\[dir\]/.test(newName)) newName = newName.replace(/\[dir\]/g, dir);
-  if (/\[name\]/.test(newName)) newName = newName.replace(/\[name\]/g, name);
-  if (/\[file\]/.test(newName)) newName = newName.replace(/\[file\]/g, name);
-  if (/\[ext\]/.test(newName)) newName = newName.replace(/\[ext\]/g, ext);
-  if (namespace === "snippets" && rename.endsWith(".liquid") === false) return newName + ".liquid";
-  if (!rename.endsWith(".[ext]") || !rename.endsWith(ext)) {
-    return /\.[a-z]+$/.test(rename) ? newName : newName + ext;
-  }
-  return newName;
-}
-function setFile(file, input, output) {
-  file.size = NaN;
-  return function(namespace, type2, kind) {
-    let key;
-    if (type2 === 17 /* Metafield */ || type2 === 18 /* Page */) {
-      key = path2.join(lastPath(file.dir), file.base);
-      output = null;
-    } else {
-      key = path2.join(namespace, file.base);
-      output = path2.join(output, key);
-    }
-    if (kind === -1) {
-      input = $.cache.paths[output];
-    } else {
-      setPathCache(input, output);
-    }
-    file.uuid = uuid();
-    file.type = type2;
-    file.key = key;
-    file.namespace = namespace;
-    file.kind = kind;
-    file.input = input;
-    file.output = output;
-    file.relative = input ? path2.relative($.cwd, input) : $.cwd;
-    return file;
-  };
-}
-function parseProcessorConfigs(path5, namespace) {
-  const file = new File(path5);
-  file.namespace = namespace;
-  file.input = path5;
-  file.relative = path2.relative($.cwd, file.input);
-  switch (file.ext) {
-    case ".ts":
-      file.kind = "TypeScript" /* TypeScript */;
-      break;
-    case ".js":
-    case ".mjs":
-    case ".cjs":
-      file.kind = "JavaScript" /* JavaScript */;
-      break;
-  }
-  return file;
-}
-function parseSyncifyConfig(path5) {
-  const file = new File(path5);
-  file.namespace = "syncify" /* Syncify */;
-  file.input = path5;
-  file.type = 20 /* Syncify */;
-  file.relative = path2.relative($.cwd, file.input);
-  switch (file.ext) {
-    case ".ts":
-      file.kind = "TypeScript" /* TypeScript */;
-      break;
-    case ".js":
-    case ".mjs":
-    case ".cjs":
-      file.kind = "JavaScript" /* JavaScript */;
-      break;
-  }
-  return file;
-}
-function parse2(path5) {
-  const { paths: paths2 } = $;
-  const file = new File(path5);
-  const define = setFile(file, path5, $.dirs.output);
-  if (file.ext === ".liquid") {
-    if (paths2.sections.match(path5)) {
-      return section(define("sections" /* Sections */, 5 /* Section */, "Liquid" /* Liquid */));
-    } else if (paths2.snippets.match(path5)) {
-      return snippet(define("snippets" /* Snippets */, 4 /* Snippet */, "Liquid" /* Liquid */));
-    } else if (paths2.layout.match(path5)) {
-      return define("layout" /* Layout */, 2 /* Layout */, "Liquid" /* Liquid */);
-    } else if (paths2.templates.match(path5)) {
-      return define("templates" /* Templates */, 1 /* Template */, "Liquid" /* Liquid */);
-    } else if (paths2.customers.match(path5)) {
-      return define("templates/customers" /* Customers */, 1 /* Template */, "Liquid" /* Liquid */);
-    } else if (paths2.metaobject.match(path5)) {
-      return define("templates/metaobject" /* Metaobject */, 1 /* Template */, "Liquid" /* Liquid */);
-    } else if (paths2.transforms.get(path5) === 11 /* Style */) {
-      return style(define("snippets" /* Snippets */, 11 /* Style */, "CSS" /* CSS */));
-    }
-  } else if (file.ext === ".schema" && paths2.schema.match(path5)) {
-    return schema(parse2, define("schema" /* Schema */, 7 /* Schema */, "JSON" /* JSON */));
-  } else if (file.ext === ".json") {
-    if (paths2.metafields.match(path5)) {
-      return define("metafields" /* Metafields */, 17 /* Metafield */, "JSON" /* JSON */);
-    } else if (paths2.sections.match(path5)) {
-      return define("sections" /* Sections */, 6 /* Group */, "JSON" /* JSON */);
-    } else if (paths2.templates.match(path5)) {
-      return define("templates" /* Templates */, 1 /* Template */, "JSON" /* JSON */);
-    } else if (paths2.config.match(path5)) {
-      return define("config" /* Config */, 9 /* Config */, "JSON" /* JSON */);
-    } else if (paths2.locales.match(path5)) {
-      return define("locales" /* Locales */, 10 /* Locale */, "JSON" /* JSON */);
-    } else if (paths2.customers.match(path5)) {
-      return define("templates/customers" /* Customers */, 1 /* Template */, "JSON" /* JSON */);
-    } else if (paths2.metaobject.match(path5)) {
-      return define("templates/metaobject" /* Metaobject */, 8 /* Metaobject */, "JSON" /* JSON */);
-    } else if (paths2.schema.match(path5)) {
-      return schema(parse2, define("schema" /* Schema */, 7 /* Schema */, "JSON" /* JSON */));
-    }
-  }
-  if (paths2.assets.match(path5)) {
-    switch (file.ext) {
-      case ".js":
-      case ".mjs":
-        return define("assets" /* Assets */, 16 /* Asset */, "JavaScript" /* JavaScript */);
-      case ".json":
-        return define("assets" /* Assets */, 16 /* Asset */, "JSON" /* JSON */);
-      case ".svg":
-        return define("assets" /* Assets */, 16 /* Asset */, "SVG" /* SVG */);
-      case ".css":
-        return define("assets" /* Assets */, 16 /* Asset */, "CSS" /* CSS */);
-      case ".ico":
-      case ".jpg":
-      case ".png":
-      case ".gif":
-      case ".webp":
-      case ".pjpg":
-        return define("assets" /* Assets */, 16 /* Asset */, "Image" /* Image */);
-      case ".mov":
-      case ".mp4":
-      case ".webm":
-      case ".ogg":
-        return define("assets" /* Assets */, 16 /* Asset */, "Video" /* Video */);
-      case ".pdf":
-        return define("assets" /* Assets */, 16 /* Asset */, "PDF" /* PDF */);
-      case ".eot":
-      case ".ttf":
-      case ".woff":
-      case ".woff2":
-        return define("assets" /* Assets */, 16 /* Asset */, "Font" /* Font */);
-      default:
-        return define("assets" /* Assets */, 16 /* Asset */, "Unknown" /* Unknown */);
-    }
-  }
-  switch (file.ext) {
-    case ".js":
-    case ".mjs":
-      return script(define("assets" /* Assets */, 12 /* Script */, "JavaScript" /* JavaScript */));
-    case ".ts":
-      return script(define("assets" /* Assets */, 12 /* Script */, "TypeScript" /* TypeScript */));
-    case ".tsx":
-      return script(define("assets" /* Assets */, 12 /* Script */, "TSX" /* TSX */));
-    case ".jsx":
-      return script(define("assets" /* Assets */, 12 /* Script */, "JSX" /* JSX */));
-    case ".svg":
-      return svg(define("assets" /* Assets */, 13 /* Svg */, "SVG" /* SVG */));
-    case ".css":
-      return style(define("assets" /* Assets */, 11 /* Style */, "CSS" /* CSS */));
-    case ".scss":
-      return style(define("assets" /* Assets */, 11 /* Style */, "SCSS" /* SCSS */));
-    case ".sass":
-      return style(define("assets" /* Assets */, 11 /* Style */, "SASS" /* SASS */));
-    case ".md":
-      return define("pages" /* Pages */, 18 /* Page */, "Markdown" /* Markdown */);
-    case ".html":
-      return define("pages" /* Pages */, 18 /* Page */, "HTML" /* HTML */);
-  }
-  return void 0;
-}
-var outputFile = (output) => (path5) => {
-  const file = new File(path5);
-  const define = setFile(file, path5, output);
-  switch (path2.basename(file.dir)) {
-    case "sections":
-      return define("sections" /* Sections */, 5 /* Section */, -1);
-    case "blocks":
-      return define("blocks" /* Blocks */, 3 /* Block */, -1);
-    case "snippets":
-      return define("snippets" /* Snippets */, 4 /* Snippet */, -1);
-    case "layout":
-      return define("layout" /* Layout */, 2 /* Layout */);
-    case "templates":
-      return define("templates" /* Templates */, 1 /* Template */, -1);
-    case "customers":
-      return define("templates/customers" /* Customers */, 1 /* Template */, -1);
-    case "metaobject":
-      return define("templates/metaobject" /* Metaobject */, 1 /* Template */, -1);
-    case "config":
-      return define("config" /* Config */, 9 /* Config */, -1);
-    case "locales":
-      return define("locales" /* Locales */, 10 /* Locale */, -1);
-    case "assets":
-      return define("assets" /* Assets */, 16 /* Asset */, -1);
   }
 };
 
@@ -17798,8 +17736,8 @@ runtime.modes = function() {
       const tui = Create().Newline().Line(`Filters${COL}`, white2.bold);
       const space = eqWS($.filters);
       for (const group in $.filters) {
-        const join30 = white2($.filters[group].map((k) => path2.relative($.cwd, k)).join(", "));
-        tui.Line(` ${TLD} ${group}${COL}${space(group)}${join30}`, neonCyan);
+        const join29 = white2($.filters[group].map((k) => path2.relative($.cwd, k)).join(", "));
+        tui.Line(` ${TLD} ${group}${COL}${space(group)}${join29}`, neonCyan);
       }
       tui.Newline().toLog({ clear: true });
     }
@@ -17828,7 +17766,7 @@ runtime.stores = function() {
           WSP2.repeat(width.theme - target.length),
           ARR,
           WSP2,
-          gray2.underline(editor || preview)
+          gray2.underline(url === "editor" ? editor : preview)
         )
       );
     }).True(url === "editor", (tui) => tui.Newline());
@@ -18134,7 +18072,7 @@ async function ExtractSchema(file) {
   const content = await fsExtra.readFile(file.input, "utf-8");
   const indices = GetSchemaIndices(content);
   if (indices === null) return [content, null, null];
-  const { start, begin, ender } = indices;
+  const { begin, ender } = indices;
   if (ender < 0) {
     log.error("Missing {% endschema %} tag in file.", {
       suffix: file.relative,
@@ -18148,7 +18086,7 @@ async function ExtractSchema(file) {
   try {
     const schema2 = json.parse(content.slice(begin, ender));
     return [
-      content.slice(0, start),
+      content.slice(0, begin),
       schema2,
       content.slice(ender)
     ];
@@ -18850,12 +18788,12 @@ async function SvgTransform(file) {
 
 // syncify/mode/build.ts
 function getGlobs() {
-  const paths2 = [];
-  for (const p in $.paths) if ($.paths[p].input) paths2.push(...$.paths[p].input.values());
-  paths2.push(...$.script.map(({ input }) => input));
-  paths2.push(...$.style.map(({ input }) => input));
-  paths2.push(...$.svg.flatMap(({ input }) => toArray(input)));
-  return paths2;
+  const paths = [];
+  for (const p in $.paths) if ($.paths[p].input) paths.push(...$.paths[p].input.values());
+  paths.push(...$.script.map(({ input }) => input));
+  paths.push(...$.style.map(({ input }) => input));
+  paths.push(...$.svg.flatMap(({ input }) => toArray(input)));
+  return paths;
 }
 function getModel(globs) {
   const match = (0, import_anymatch2.default)(getGlobs());
@@ -19293,10 +19231,10 @@ async function writePackage(filePath, data, options) {
   return writeJsonFile(filePath, data, options);
 }
 
-// node_modules/.pnpm/parse-json@8.1.0/node_modules/parse-json/index.js
+// node_modules/.pnpm/parse-json@8.2.0/node_modules/parse-json/index.js
 var import_code_frame = __toESM(require_lib4(), 1);
 
-// node_modules/.pnpm/index-to-position@0.1.2/node_modules/index-to-position/index.js
+// node_modules/.pnpm/index-to-position@1.0.0/node_modules/index-to-position/index.js
 var safeLastIndexOf = (string, searchString, index) => index < 0 ? -1 : string.lastIndexOf(searchString, index);
 function getPosition(text, textIndex) {
   const lineBreakBefore = safeLastIndexOf(text, "\n", textIndex - 1);
@@ -19308,6 +19246,12 @@ function getPosition(text, textIndex) {
   return { line, column };
 }
 function indexToLineColumn(text, textIndex, { oneBased = false } = {}) {
+  if (typeof text !== "string") {
+    throw new TypeError("Text parameter should be a string");
+  }
+  if (!Number.isInteger(textIndex)) {
+    throw new TypeError("Index parameter should be an integer");
+  }
   if (textIndex < 0 || textIndex >= text.length && text.length > 0) {
     throw new RangeError("Index out of bounds");
   }
@@ -19315,24 +19259,40 @@ function indexToLineColumn(text, textIndex, { oneBased = false } = {}) {
   return oneBased ? { line: position.line + 1, column: position.column + 1 } : position;
 }
 
-// node_modules/.pnpm/parse-json@8.1.0/node_modules/parse-json/index.js
+// node_modules/.pnpm/parse-json@8.2.0/node_modules/parse-json/index.js
 var getCodePoint = (character) => `\\u{${character.codePointAt(0).toString(16)}}`;
-var _message;
+var _input, _jsonParseError, _message, _codeFrame, _rawCodeFrame, _JSONError_instances, getCodeFrame_fn;
 var _JSONError = class _JSONError extends Error {
-  constructor(message) {
+  constructor(messageOrOptions) {
+    var __super = (...args) => {
+      super(...args);
+      __privateAdd(this, _JSONError_instances);
+      __publicField(this, "name", "JSONError");
+      __publicField(this, "fileName");
+      __privateAdd(this, _input);
+      __privateAdd(this, _jsonParseError);
+      __privateAdd(this, _message);
+      __privateAdd(this, _codeFrame);
+      __privateAdd(this, _rawCodeFrame);
+      return this;
+    };
     var _a14;
-    super();
-    __publicField(this, "name", "JSONError");
-    __publicField(this, "fileName");
-    __publicField(this, "codeFrame");
-    __publicField(this, "rawCodeFrame");
-    __privateAdd(this, _message);
-    __privateSet(this, _message, message);
+    if (typeof messageOrOptions === "string") {
+      __super();
+      __privateSet(this, _message, messageOrOptions);
+    } else {
+      const { jsonParseError, fileName, input } = messageOrOptions;
+      __super(void 0, { cause: jsonParseError });
+      __privateSet(this, _input, input);
+      __privateSet(this, _jsonParseError, jsonParseError);
+      this.fileName = fileName;
+    }
     (_a14 = Error.captureStackTrace) == null ? void 0 : _a14.call(Error, this, _JSONError);
   }
   get message() {
-    const { fileName, codeFrame } = this;
-    return `${__privateGet(this, _message)}${fileName ? ` in ${fileName}` : ""}${codeFrame ? `
+    __privateGet(this, _message) ?? __privateSet(this, _message, `${addCodePointToUnexpectedToken(__privateGet(this, _jsonParseError).message)}${__privateGet(this, _input) === "" ? " while parsing empty string" : ""}`);
+    const { codeFrame } = this;
+    return `${__privateGet(this, _message)}${this.fileName ? ` in ${this.fileName}` : ""}${codeFrame ? `
 
 ${codeFrame}
 ` : ""}`;
@@ -19340,10 +19300,41 @@ ${codeFrame}
   set message(message) {
     __privateSet(this, _message, message);
   }
+  get codeFrame() {
+    __privateGet(this, _codeFrame) ?? __privateSet(this, _codeFrame, __privateMethod(this, _JSONError_instances, getCodeFrame_fn).call(
+      this,
+      /* highlightCode */
+      true
+    ));
+    return __privateGet(this, _codeFrame);
+  }
+  get rawCodeFrame() {
+    __privateGet(this, _rawCodeFrame) ?? __privateSet(this, _rawCodeFrame, __privateMethod(this, _JSONError_instances, getCodeFrame_fn).call(
+      this,
+      /* highlightCode */
+      false
+    ));
+    return __privateGet(this, _rawCodeFrame);
+  }
 };
+_input = new WeakMap();
+_jsonParseError = new WeakMap();
 _message = new WeakMap();
+_codeFrame = new WeakMap();
+_rawCodeFrame = new WeakMap();
+_JSONError_instances = new WeakSet();
+getCodeFrame_fn = function(highlightCode) {
+  if (!__privateGet(this, _jsonParseError)) {
+    return;
+  }
+  const input = __privateGet(this, _input);
+  const location = getErrorLocation(input, __privateGet(this, _jsonParseError).message);
+  if (!location) {
+    return;
+  }
+  return (0, import_code_frame.codeFrameColumns)(input, { start: location }, { highlightCode });
+};
 var JSONError = _JSONError;
-var generateCodeFrame = (string, location, highlightCode = true) => (0, import_code_frame.codeFrameColumns)(string, { start: location }, { highlightCode });
 var getErrorLocation = (string, message) => {
   const match = message.match(/in JSON at position (?<index>\d+)(?: \(line (?<line>\d+) column (?<column>\d+)\))?$/);
   if (!match) {
@@ -19366,31 +19357,15 @@ var addCodePointToUnexpectedToken = (message) => message.replace(
   (_, _quote, token) => `"${token}"(${getCodePoint(token)})`
 );
 function parseJson2(string, reviver, fileName) {
-  let message;
   try {
     return JSON.parse(string, reviver);
   } catch (error2) {
-    message = error2.message;
+    throw new JSONError({
+      jsonParseError: error2,
+      fileName,
+      input: string
+    });
   }
-  let location;
-  if (string) {
-    location = getErrorLocation(string, message);
-    message = addCodePointToUnexpectedToken(message);
-  } else {
-    message += " while parsing empty string";
-  }
-  const jsonError = new JSONError(message);
-  jsonError.fileName = fileName;
-  if (location) {
-    jsonError.codeFrame = generateCodeFrame(string, location);
-    jsonError.rawCodeFrame = generateCodeFrame(
-      string,
-      location,
-      /* highlightCode */
-      false
-    );
-  }
-  throw jsonError;
 }
 
 // node_modules/.pnpm/read-pkg@9.0.1/node_modules/read-pkg/index.js
@@ -21227,194 +21202,26 @@ function setFilters() {
 // syncify/options/define/paths.ts
 var import_anymatch3 = __toESM(require_anymatch());
 async function setPaths() {
-  const path5 = normalPath($.dirs.input);
+  const getUri = normalPath($.dirs.input);
   const warn2 = warnOption("paths");
-  const setStash = (key, files, stash = null) => {
-    if (key === "schema" || key === "metafields" || key === "redirects") return;
-    if (stash !== null) {
-      const isNum = isNumber(stash.stash);
-      const index = "index" in stash ? stash.index : isNum ? stash.stash : 0;
-      const val = isNum ? "*" : stash.stash === true ? "stash" : stash.stash;
-      const uri = files[index];
-      if (uri[0] === "!") {
-        throwError([
-          "custom stash uri is referencing an ignored glob pattern"
-        ], [
-          "Change the stash value to a path which is not an ignore"
-        ]);
-      }
-      if (val === "*") {
-        $.stash[key] = uri.replace(/\/\*{1,2}.*$/, "");
-      } else if (val === "stash") {
-        $.stash[key] = uri.replace(/\/\*{1,2}.*$/, "/stash");
-      } else {
-        $.stash[key] = uri.replace(/\/\*{1,2}.*$/, "/" + val.replace(/^\//, ""));
-      }
+  for (const path5 of PATH_KEYS) {
+    let paths = [];
+    if (path5 === "snippets" || path5 === "sections") {
+      paths = setRenamePaths(path5, `${path5}/*`);
+    } else if (path5 === "customers" || path5 === "metaobject") {
+      paths = setBaseUri(path5, $.config.paths[path5], `templates/${path5}/*`);
+    } else if (path5 === "schema" || path5 === "blogs" || path5 === "files" || path5 === "metafields" || path5 === "navigation" || path5 === "pages" || path5 === "policies") {
+      paths = setBaseUri(path5, $.config.paths[path5], `+/${path5}/*`);
     } else {
-      const value = files.find((p) => p[0] !== "!");
-      $.stash[key] = value ? value.replace(/\/\*{1,2}.*$/, "") : path2.join($.cwd, "stash");
+      paths = setBaseUri(path5, $.config.paths[path5], `${path5}/*`);
     }
-  };
-  const getGlobs2 = (key, files, fallback) => {
-    if (isNil(files)) {
-      const fb = [path5(fallback)];
-      setStash(key, fb);
-      return fb;
-    } else if (isString(files)) {
-      const str = [path5(files)];
-      setStash(key, str);
-      return str;
-    } else if (isArray(files)) {
-      if (isObject(files[files.length - 1])) {
-        const stashed = files.pop();
-        const resolve3 = files.map(path5);
-        setStash(key, resolve3, stashed);
-        return resolve3;
-      }
-      const resolve2 = files.map(path5);
-      setStash(key, resolve2);
-      return resolve2;
-    }
-    typeError({
-      option: "paths",
-      expects: "string | string[]",
-      provided: files,
-      name: key
-    });
-  };
-  const renameGlobs = (key, fallback) => {
-    const files = $.config.paths[key];
-    if (isObject(files)) {
-      if (isEmpty(files)) {
-        warn2(`Undefined path/s on "${key}", using fallback`, "{}");
-        return [path5(fallback)];
-      }
-      if ("*" in files && "[name]" in files) {
-        warn2("Multiple fallback rename keys, paths will be merged", '"*" and "[name]"');
-        if (isArray(files["*"])) {
-          if (isObject(files["*"][files["*"].length - 1])) {
-            const stashed = files["*"].pop();
-            const resolve2 = files["*"].map(path5);
-            setStash(key, resolve2, stashed);
-          }
-          if (isArray(files["[name]"])) {
-            files["*"] = files["*"].concat(files["[name]"]);
-          } else if (isString(files["[name]"])) {
-            files["*"].push(files["[name]"]);
-          }
-          delete files["[name]"];
-        } else if (isArray(files["[name]"])) {
-          if (isObject(files["[name]"][files["[name]"].length - 1])) {
-            const stashed = files["[name]"].pop();
-            const resolve2 = files["[name]"].map(path5);
-            setStash(key, resolve2, stashed);
-          }
-          if (isArray(files["*"])) {
-            files["[name]"] = files["[name]"].concat(files["*"]);
-          } else if (isString(files["*"])) {
-            files["[name]"].push(files["*"]);
-          }
-          delete files["*"];
-        }
-      }
-      const global2 = m();
-      const rename = m();
-      let stash = [];
-      for (const pattern in files) {
-        if (isArray(files[pattern])) {
-          if ($.stash[key] === null) {
-            if (isObject(files[pattern][files[pattern].length - 1])) {
-              const stashed = files[pattern].pop();
-              const resolve2 = files[pattern].map(path5);
-              setStash(key, resolve2, stashed);
-            } else {
-              stash = stash.concat(files[pattern].map(path5));
-            }
-          }
-          if (pattern === "*" || pattern === "[name]") {
-            global2.set(pattern, s(files[pattern].map(path5)));
-          } else {
-            rename.set(pattern, s(files[pattern].map(path5)));
-          }
-        } else if (isString(files[pattern])) {
-          if ($.stash[key] === null) {
-            stash.push(path5(files[pattern]));
-          }
-          pattern === "*" || pattern === "[name]" ? global2.has(pattern) ? global2.get(pattern).add(path5(files[pattern])) : global2.set(pattern, s([path5(files[pattern])])) : rename.has(pattern) ? rename.get(pattern).add(path5(files[pattern])) : rename.set(pattern, s([path5(files[pattern])]));
-        } else if (isNil(files[pattern])) {
-          typeError({
-            option: `paths ${ARR} ${key}`,
-            expects: "string | string[]",
-            provided: files[pattern],
-            name: pattern
-          });
-        }
-      }
-      if ($.stash[key] === null) {
-        setStash(key, stash);
-      }
-      const globals = toArray(global2.values()).flatMap((globs) => toArray(globs));
-      const entries = globals;
-      for (const [pattern, paths2] of rename) {
-        const spread = toArray(paths2);
-        const match = (0, import_anymatch3.default)(spread);
-        if (match(globals)) {
-          const value = [];
-          if (isArray(files[pattern])) {
-            for (const p of files[pattern]) value.push(`${BAD} ${bold2(p)}`);
-          } else {
-            value.push(`${BAD} ${bold2(files[pattern])}`);
-          }
-          throwError([
-            "Mixed global and rename path patterns defined which will result in resolution collisions.",
-            `The paths provided to ${yellowBright2(key)} ${ARR} ${yellowBright2(pattern)} overlap with the globals.`,
-            "\n\n",
-            `${value.join("\n")}`
-          ], [
-            `Provide a verbose pattern on the ${yellowBright2.bold("*")} global, which resolve to directory level.`,
-            `Both global and rename paths accept ${white2("string[]")} types, so this error can`,
-            "be easily fixed."
-          ]);
-        } else {
-          $.paths[key].rename.push([
-            match,
-            pattern
-          ]);
-        }
-        entries.push(...spread);
-      }
-      const ignores = s(entries.filter((p) => p.startsWith("!")).map((p) => p.slice(1)));
-      const find = s(entries);
-      entries.forEach((p, i) => {
-        if (ignores.has(p)) {
-          find.delete(`!${p}`);
-        }
-      });
-      return [...find];
+    $.paths[path5].config = paths;
+    $.paths[path5].match = (0, import_anymatch3.default)(paths);
+    const globs = await glob__default.default.async(paths, { cwd: $.cwd });
+    if ($.paths[path5].input === null) {
+      $.paths[path5].input = s(globs);
     } else {
-      return getGlobs2(key, files, fallback);
-    }
-  };
-  for (const key of PATH_KEYS) {
-    let paths2 = [];
-    if (key === "snippets" || key === "sections") {
-      paths2 = renameGlobs(key, `${key}/*`);
-    } else if (key === "customers" || key === "metaobject") {
-      paths2 = getGlobs2(key, $.config.paths[key], `templates/${key}/*`);
-    } else {
-      paths2 = getGlobs2(key, $.config.paths[key], `${key}/*`);
-    }
-    $.paths[key].match = (0, import_anymatch3.default)(paths2);
-    $.paths[key].config = paths2;
-    const globs = await glob__default.default.async(paths2, { cwd: $.cwd });
-    if (key !== "metafields" && key !== "redirects") {
-      if ($.paths[key].input === null) {
-        $.paths[key].input = s(globs);
-      } else {
-        for (let i = 0, s2 = globs.length; i < s2; i++) {
-          $.paths[key].input.add(globs[i]);
-        }
-      }
+      forEach($.paths[path5].input.add, globs);
     }
   }
   q.cache.add(() => {
@@ -21427,6 +21234,157 @@ async function setPaths() {
       }
     }
   });
+  function setBaseUri(name, files, fallback) {
+    if (isNil(files)) {
+      return setStashPaths(name, [getUri(fallback)], null);
+    } else if (isString(files)) {
+      return setStashPaths(name, [getUri(files)], null);
+    } else if (isArray(files)) {
+      const { stash = null } = isObject(files[files.length - 1]) ? files.pop() : {};
+      return setStashPaths(name, getUri(files), stash);
+    }
+    typeError({
+      option: "paths",
+      expects: "string | string[]",
+      provided: files,
+      name
+    });
+  }
+  function setStashPaths(name, files, stash) {
+    if (isNil(stash)) {
+      $.paths[name].stash = /\/\*/.test(files[0]) ? files[0] : null;
+    } else if (isNumber(stash)) {
+      $.paths[name].stash = files[stash];
+    } else if (isString(stash)) {
+      $.paths[name].stash = getUri(stash);
+    }
+    return files;
+  }
+  function setRenamePaths(name, fallback) {
+    var _a14;
+    const files = $.config.paths[name];
+    if (isEmpty(files)) {
+      warn2(`Undefined path/s on "${name}", using fallback`, "{}");
+      return setStashPaths(name, [getUri(fallback)], null);
+    }
+    if (isArray(files)) {
+      return setStashPaths(name, getUri(files), null);
+    } else if (isString(files)) {
+      return setStashPaths(name, [getUri(fallback)], null);
+    }
+    const config = o({ ...files });
+    const entries = Object.entries(config);
+    const transformed = {};
+    const allPatterns = [];
+    const getPattern = (key, pattern) => {
+      const isExclusion = pattern.startsWith("!");
+      const cleanPattern = isExclusion ? pattern.slice(1) : pattern;
+      allPatterns.push({
+        pattern: cleanPattern,
+        key,
+        generality: getGlobGenerality(cleanPattern),
+        isExclusion
+      });
+    };
+    try {
+      for (const [key, patterns] of entries) {
+        transformed[key] = [];
+        if (isArray(patterns)) {
+          const { stash = null } = isObject(patterns[patterns.length - 1]) ? patterns.pop() : {};
+          const items = stash !== null ? setStashPaths(name, patterns, stash) : patterns;
+          for (const pattern of items) getPattern(key, pattern);
+        } else {
+          getPattern(key, patterns);
+        }
+      }
+      if (allPatterns.length === 0) return setStashPaths(name, [getUri(fallback)], null);
+      const patternOwners = /* @__PURE__ */ new Map();
+      for (const { pattern, key, isExclusion } of allPatterns) {
+        if (!isExclusion) {
+          const specificity = getGlobSpecificity(pattern);
+          const existing = patternOwners.get(pattern);
+          if (!existing || specificity > existing.specificity) {
+            patternOwners.set(pattern, { key, specificity });
+          }
+        }
+      }
+      for (const [key, patterns] of entries) {
+        const inclusions = [];
+        const exclusions = /* @__PURE__ */ new Set();
+        for (const pattern of patterns) {
+          if (pattern.startsWith("!")) {
+            exclusions.add(`!${getUri(pattern.slice(1))}`);
+          } else {
+            const isExcludedHere = patterns.some((p) => p.startsWith("!") && p.slice(1) === pattern);
+            if (((_a14 = patternOwners.get(pattern)) == null ? void 0 : _a14.key) === key && !isExcludedHere) {
+              inclusions.push(getUri(pattern));
+            }
+          }
+        }
+        for (const [otherPattern, owner] of patternOwners) {
+          if (owner.key !== key) {
+            for (const pattern of patterns) {
+              if (!pattern.startsWith("!")) {
+                if ((0, import_anymatch3.default)(pattern, otherPattern) && getGlobSpecificity(otherPattern) > getGlobSpecificity(pattern)) {
+                  const excludePath = `!${getUri(otherPattern)}`;
+                  exclusions.add(excludePath);
+                }
+              }
+            }
+          }
+        }
+        transformed[key].push(...toArray(exclusions).sort(), ...inclusions.sort());
+      }
+      $.paths[name].rename = keys(transformed).map((pattern) => ({
+        pattern,
+        match: (0, import_anymatch3.default)(transformed[pattern])
+      }));
+      const inclusionPatterns = allPatterns.filter((p) => !p.isExclusion).sort((a, b) => b.generality - a.generality);
+      const generalPatterns = [];
+      const coveredPatterns = s();
+      for (const { pattern, generality } of inclusionPatterns) {
+        if (!coveredPatterns.has(pattern)) {
+          let isGeneral = true;
+          for (const other of inclusionPatterns) {
+            if (other.pattern !== pattern && !coveredPatterns.has(other.pattern)) {
+              if ((0, import_anymatch3.default)(pattern, other.pattern)) {
+                coveredPatterns.add(other.pattern);
+              } else if (generality === other.generality && !(0, import_anymatch3.default)(other.pattern, pattern)) {
+                continue;
+              } else if (generality < other.generality && !(0, import_anymatch3.default)(other.pattern, pattern)) {
+                isGeneral = false;
+                break;
+              }
+            }
+          }
+          if (isGeneral && !generalPatterns.includes(getUri(pattern))) {
+            generalPatterns.push(getUri(pattern));
+            coveredPatterns.add(pattern);
+          }
+        }
+      }
+      return generalPatterns.length > 0 ? generalPatterns.sort() : setStashPaths(name, [getUri(fallback)], null);
+    } catch (error2) {
+      warn2(`Error processing rename paths for "${name}": ${error2.message}`, "{}");
+      return setStashPaths(name, [getUri(fallback)], null);
+    }
+    function getGlobSpecificity(glob9) {
+      const segments = glob9.split("/").filter(Boolean);
+      let score = segments.length;
+      if (glob9.includes("**")) score -= 1;
+      if (/\.[a-z]+$/.test(glob9)) score += 1;
+      return score;
+    }
+    function getGlobGenerality(glob9) {
+      const segments = glob9.split("/").filter(Boolean);
+      let score = 0;
+      if (glob9.includes("**")) score += 2;
+      if (glob9.includes("*")) score += 1;
+      score -= segments.length;
+      if (/\.[a-z]+$/.test(glob9)) score -= 2;
+      return score;
+    }
+  }
 }
 async function setSectionOptions() {
   if ($.paths.schema.input !== null && $.paths.schema.input.size > 0 && $.running === false) {
@@ -22682,10 +22640,7 @@ async function setScriptOptions() {
     warn2("processor option is not allowed and was omitted", "entryPoints");
     delete $.processor.esbuild.entryPoints;
   }
-  const transforms = getTransform($.config.transform.script, {
-    addWatch: false,
-    flatten: true
-  });
+  const transforms = getTransform($.config.transform.script, { flatten: true });
   if (!has("absWorkingDir", $.processor.esbuild)) {
     $.processor.esbuild.absWorkingDir = $.cwd;
   }
@@ -22892,10 +22847,7 @@ async function setStyleConfig() {
   $import("clean-css");
   await getExternalModules();
   const warn2 = warnOption("Style Transform");
-  const styles2 = getTransform($.config.transform.style, {
-    addWatch: false,
-    flatten: true
-  });
+  const styles2 = getTransform($.config.transform.style, { flatten: true });
   const path5 = normalPath($.config.input);
   for (let i = 0; i < styles2.length; i++) {
     const style2 = styles2[i];
@@ -23191,10 +23143,9 @@ async function setStyleConfig() {
       if (!has("rename", bundle)) {
         bundle.rename = rename.name;
       }
-      if (rename.name.endsWith(".liquid") === false || bundle.rename.endsWith(".liquid") === false) {
+      if (!(rename.name.endsWith(".liquid") && bundle.rename.endsWith(".liquid"))) {
         bundle.rename = rename.name + ".liquid";
       }
-      $.paths.transforms.set(bundle.input, 11 /* Style */);
     } else {
       bundle.rename = rename.name;
     }
@@ -23206,10 +23157,7 @@ function setSvgOptions() {
   if (!$.config.transform.svg || isEmpty($.config.transform.svg)) return;
   $import("svgo");
   const warn2 = warnOption("SVG Transform");
-  const svgs = getTransform($.config.transform.svg, {
-    addWatch: true,
-    flatten: false
-  });
+  const svgs = getTransform($.config.transform.svg, { flatten: false });
   for (const svg2 of svgs) {
     const files = svg2.input.filter((path5) => {
       if (path2.extname(path5) === ".svg") return true;

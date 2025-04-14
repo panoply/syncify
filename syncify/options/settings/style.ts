@@ -8,7 +8,6 @@ import { exists } from 'fs-extra';
 import { $import } from 'modules';
 
 import { invalidError, missingDependency, typeError, warnOption } from '~cli/throws';
-import { Type } from '~file';
 import { getModules, getTransform, readConfigFile, renameFileParse } from '~options/utils';
 import * as u from '~utils';
 import { normalPath } from '~utils/paths';
@@ -117,10 +116,7 @@ export async function setStyleConfig () {
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const styles = getTransform <StyleTransform<string>[]>($.config.transform.style, {
-    addWatch: false,
-    flatten: true
-  });
+  const styles = getTransform <StyleTransform<string>[]>($.config.transform.style, { flatten: true });
 
   // Path normalizer
   const path = normalPath($.config.input);
@@ -559,11 +555,9 @@ export async function setStyleConfig () {
         bundle.rename = rename.name;
       }
 
-      if (rename.name.endsWith('.liquid') === false || bundle.rename.endsWith('.liquid') === false) {
+      if (!(rename.name.endsWith('.liquid') && bundle.rename.endsWith('.liquid'))) {
         bundle.rename = rename.name + '.liquid';
       }
-
-      $.paths.transforms.set(bundle.input, Type.Style);
 
     } else {
 

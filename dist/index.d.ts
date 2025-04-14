@@ -18,7 +18,7 @@ import { Options } from 'markdown-it';
 /* BASE DIRECTORIES                             */
 /* -------------------------------------------- */
 
-interface Directories {
+type Directories = {
   /**
    * The resolved `input` directory path
    *
@@ -39,7 +39,7 @@ interface Directories {
   config?: string;
 }
 
-interface Git {
+type Git = {
   /**
    * Specifies the default branch where your project exists. This branch will be be used to trigger
    * the auto-merging behaviour when running `git pull`. Your `output` (theme) directory will not
@@ -407,7 +407,7 @@ type LiteralUnion<
 	BaseType extends Primitive,
 > = LiteralType | (BaseType & Record<never, never>);
 
-interface Shared {
+type HOTShared = {
  /**
    * Specify the static server port. By default, Syncify uses port `41001` to
    * avoid any conflicts with other running hosts of tools.
@@ -502,7 +502,7 @@ interface Shared {
   ];
 }
 
-interface Extension extends Shared {
+type HOTExtension = HOTShared & {
   /**
    * > **!! NOT YET AVAILABLE !!**
    * >
@@ -516,7 +516,7 @@ interface Extension extends Shared {
   client?: 'extension'
 }
 
-interface Inject extends Shared {
+type HOTInject = HOTShared & {
   /**
    * The type of client-side scripting method being used. If you are using the Syncify browser
    * extension then set this value to `extension`, otherwise use `inject`.
@@ -548,7 +548,7 @@ interface Inject extends Shared {
   layouts?: string[];
 }
 
-type HOT = Inject | Extension
+type HOT = HOTInject | HOTExtension
 
 /* -------------------------------------------- */
 /* LOGGER                                       */
@@ -583,21 +583,16 @@ interface Logger {
   clear?: boolean;
 }
 
-interface StashIndex {
- /**
-   * If there are multiple glob paths defined, and you'd like to cherry-pick
-   * a specific entry, provide its index here.
-   *
-   * @default 0
-   */
-  index?: number;
+type StashType = string | number;
+
+/**
+ * Stash Reference
+ */
+type Stash = {
   /**
    * Set a stash import location for remote `pull` operations. Files which cannot
-   * be mapped to existing local path relative to your `input` will be written to
-   * a provided stash destination.
-   *
-   * When no stash reference is defined, Syncify will determine output
-   * location based on the path resolutions.
+   * be mapped to an existing project-level path location (relative to your `input`)
+   * will be written the provided stash destination defined here.
    *
    * > `*`
    * >
@@ -616,28 +611,23 @@ interface StashIndex {
    * You can optionally provide a sub-directory path.
    *
    */
-  stash: LiteralUnion<'*', string> | true | number;
+  stash: StashType;
 }
 
-interface StashWithIndex extends StashIndex {
-  /**
-   * If there are multiple glob paths defined, and you'd like to cherry-pick
-   * a specific entry, provide its index here.
-   *
-   * @default 0
-   */
-  index?: number;
-}
+/**
+ * String or Array of strings
+ */
+type Path = string | string[];
 
-type CustomStash = StashIndex | StashWithIndex
-type PathsGlob = string | string[];
-type PathsStash = [ ...globs: string[], stash: CustomStash ]
-type PathsType = PathsGlob | PathsStash;
+/**
+ * Union join of accepted Path patterns
+ */
+type Pattern = Path | [ ...globs: string[], stash: Stash ];
 
 /**
  * Section and Snippet Rename Paths
  */
-interface RenamePaths$1<T = PathsType> {
+type Rename = {
   /**
    * Uses the filename as per the source, idenitical behaviour as that of `[name]`.
    *
@@ -665,7 +655,7 @@ interface RenamePaths$1<T = PathsType> {
    *   }
    * }
    */
-  '*'?: T;
+  '*'?: Pattern;
   /**
    * Use the filename as per the source. Passing `[name]` only will result in fallback
    * behaviour, as that of `'*'`.
@@ -697,38 +687,58 @@ interface RenamePaths$1<T = PathsType> {
    *   }
    * }
    */
-  '[name]'?: T;
+  '[name]'?: Pattern;
   /**
    * Prefix directory name and suffix filename in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout-header.liquid'
    */
-  '[dir]-[name]'?: T;
+  '[dir]-[name]'?: Pattern;
   /**
    * Prefix directory name and suffix filename in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout_header.liquid'
    */
-  '[dir]_[name]'?: T;
+  '[dir]_[name]'?: Pattern;
   /**
    * Prefix filename and suffix directory in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header-layout.liquid'
    */
-  '[name]-[dir]'?: T;
+  '[name]-[dir]'?: Pattern;
   /**
    * Prefix filename and suffix directory in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header_layout.liquid'
    */
-  '[name]_[dir]'?: T;
+  '[name]_[dir]'?: Pattern;
 }
 
-interface Paths<T = PathsType> {
+/**
+ * Snippet Renames accept `.` separated values
+ */
+type RenameSnippets = Rename & {
+  /**
+   * Prefix filename and suffix directory with `.` dot separator.
+   *
+   * @example
+   * 'layout/header.liquid' > 'header.layout.liquid'
+   */
+  '[name].[dir]'?: Pattern;
+  /**
+   * Prefix directory and suffix filename with `.` dot separator.
+   *
+   * @example
+   * 'layout/header.liquid' > 'layout.header.liquid'
+   */
+  '[dir].[name]'?: Pattern;
+}
+
+type Paths = {
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as snippets.
    *
@@ -771,7 +781,7 @@ interface Paths<T = PathsType> {
    *   }
    * }
    */
-  snippets?: T | Record<string, T> | RenamePaths$1<T>;
+  snippets?: Pattern | RenameSnippets
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as sections.
    *
@@ -825,89 +835,115 @@ interface Paths<T = PathsType> {
    *   ]
    * }
    */
-  sections?: T | Record<string, T> | RenamePaths$1<T>;
+  sections?: Pattern | Rename;
   /**
    * A glob string or glob array of files to be uploaded as blocks
    *
    * @default 'source/blocks/*.{liquid}'
    */
-  blocks?: T;
+  blocks?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as templates.
    *
    * @default 'source/templates/*.{liquid,json}'
    */
-  templates?: T;
+  templates?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded asas metaobject templates
    *
    * @default 'source/templates/metaobject/*.{liquid,json}'
    */
-  metaobject?: T;
+  metaobject?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as template/customers
    *
    * @default 'source/templates/customers/*.{liquid,json}'
    */
-  customers?: T;
+  customers?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as assets
    *
    * @default 'source/assets/*'
    */
-  assets?: T;
+  assets?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as layouts
    *
    * @default 'source/layout/*.liquid'
    */
-  layout?: T;
+  layout?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as configs, i.e, `settings_schema.json`
    *
    * @default 'source/config/.json'
    */
-  config?: T;
+  config?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as config, i.e, `en.default.json`
    *
    * @default 'source/locales/*.json'
    */
-  locales?: T;
+  locales?: Pattern;
   /**
    * A glob string or glob array of files to be uploaded as **shared schema** `.json` or `.schema` files.
    *
-   * @default 'source/schema/*.{json,schema}'
+   * @default 'source/+/schema/*.{json,schema}'
    */
-  schema?: PathsGlob;
+  schema?: Path;
   /**
    * **NOT YET AVAILABLE**
    *
-   * > **This option will be available in later versions**
+   * **This option will be available in later versions**
    *
    * ---
    *
    * The resolved `metafields` directory path
    *
-   * @default 'source/metafields/'
+   * @default 'source/+/metafields/**'
    */
-  metafields?: PathsGlob;
-  /**
-   * A glob string or glob array string to be uploaded, published and controlled as `pages`
-   *
-   * @default 'source/pages/*.{md,html}'
-   */
-  pages?: T;
+  metafields?: Path;
   /**
    * **NOT YET AVAILABLE**
    *
-   * > **This option will be available in later versions**
+   * **This option will be available in later versions**
    *
-   * ---
+   * A glob string or glob array string to be uploaded, published and controlled as `pages`
    *
-   * @default 'redirects.yaml'
+   * @default 'source/+/pages/*.{md,html}'
    */
-  redirects?: `${string}.${'yaml' | 'yml'}`;
+  pages?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/blogs/*'
+   */
+  blogs?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/menus/*.json'
+   */
+  navigation?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/policies/*.{html,md}'
+   */
+  policies?: Path;
+  /**
+   * **NOT YET AVAILABLE**
+   *
+   * **This option will be available in later versions**
+   *
+   * @default 'source/+/files/**'
+   */
+  files?: Path;
 }
 
 type ScriptRename = `${'assets' | 'snippets'}/${string}`
@@ -1029,7 +1065,7 @@ type ESBuildConfig = Merge<ESBuildAllowedOptions, {
 /* TRANSFORM                                    */
 /* -------------------------------------------- */
 
-interface ScriptSharedConfig {
+type ScriptSharedConfig = {
   /**
    * JS/TS input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.
@@ -1137,7 +1173,7 @@ interface ScriptSharedConfig {
   esbuild?: boolean | ESBuildConfig;
 }
 
-interface ScriptFormatESM extends ScriptSharedConfig {
+type ScriptFormatESM = ScriptSharedConfig & {
 
   /**
    * The format to be generated. Because we are targeting
@@ -1149,7 +1185,7 @@ interface ScriptFormatESM extends ScriptSharedConfig {
   format?: 'esm';
 }
 
-interface ScriptFormatIIFE extends ScriptSharedConfig {
+type ScriptFormatIIFE = ScriptSharedConfig & {
   /**
    * The format to be generated. Because we are targeting
    * browser environments, Syncify does not allow for CJS (commonjs)
@@ -1202,7 +1238,7 @@ type PostCSSConfig = (
 /**
  * Style Minification
  */
-interface StyleTerse extends OptionsOutput {
+type StyleTerse = OptionsOutput & {
  /**
   * Whether or not to purge unused CSS class names
   *
@@ -1238,11 +1274,11 @@ interface StyleTerse extends OptionsOutput {
   exclude?: string[]
 }
 
-interface TailwindConfig extends Config$1 {
+type TailwindConfig = Config$1 & {
   config: string[]
 }
 
-interface SASSConfig {
+type SASSConfig = {
   /**
    * Whether or not to generate sourcemaps
    *
@@ -1287,7 +1323,7 @@ interface SASSConfig {
 /* TRANSFORM                                    */
 /* -------------------------------------------- */
 
-interface StyleTransform<T = string | string[]> {
+type StyleTransform<T = string | string[]> = {
   /**
    * SVG input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.
@@ -1433,7 +1469,7 @@ type StyleTransformer = (
 
 type RenamePaths = `${'assets' | 'snippets'}/${string}`
 
-interface SVGFile {
+type SVGFile = {
   /**
    * SVG input source paths. Accepts `string` or `string[]` glob patterns.
    * Resolution is relative to your defined `input` directory.
@@ -1492,7 +1528,7 @@ interface SVGFile {
   svgo?: Config$2;
 }
 
-interface SVGSprite extends Omit<SVGFile, 'format'> {
+type SVGSprite = Omit<SVGFile, 'format'> & {
   /**
    * The SVG export format. Syncify can produce 2 different SVG formats.
    * All SVG file types will pre-process and transform using [SVGO](https://github.com/svg/svgo).
@@ -1628,7 +1664,7 @@ type SVGTransformer = (
  *
  * Holds reference to default config options for each supported processor.
  */
-interface Processors {
+type Processors = {
   /**
    * [ESBuild](https://esbuild.github.io/) Config
    */
@@ -1665,7 +1701,7 @@ interface Publishing {
 /**
  * JSON File Minification
  */
-interface JSONTerse {
+type JSONTerse = {
   /**
    * Minify `.json` files writing to `theme/assets`
    *
@@ -1716,7 +1752,7 @@ interface JSONTerse {
   exclude?: string[]
 }
 
-interface JSONTransform {
+type JSONTransform = {
   /**
    * If line termination should be Windows (CRLF) format.
    * Unix (LF) format is the default.
@@ -1802,7 +1838,7 @@ interface JSONTransform {
   terse?: boolean | JSONTerse;
 }
 
-interface LiquidTerse {
+type LiquidTerse = {
   /**
    * Removes redundant whitespace Liquid dash trims from Liquid tags and objects.
    *
@@ -1850,7 +1886,7 @@ interface LiquidTerse {
 /**
  * Liquid Minification
  */
-interface LiquidTransform {
+type LiquidTransform = {
   /**
    * Liquid and HTML minification options. By default, the option is set to `false`
    * which disables minification being applied to `.liquid` file types. Setting
@@ -1868,7 +1904,7 @@ interface LiquidTransform {
 /* TRANSFORMS                                   */
 /* -------------------------------------------- */
 
-interface Transforms {
+type Transforms = {
   /**
    * ###### [DOCUMENTATION](https://syncify.sh/options/transform/style/)
    *
@@ -2046,10 +2082,21 @@ interface Transforms {
    * > If this option is set to `false` then no minification will be applied to `.liquid` files.
    */
   liquid?: LiquidTransform;
+  /**
+   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/svg/)
+   *
+   * **Markdown File Transforms**
+   *
+   * Supported markdown transforms accepted for resource specific operations.
+   */
+  markdown?: SVGTransformer;
 
 }
 
-interface VC {
+/**
+ * Version Control
+ */
+type VC = {
   /**
    * Sets the maximum patch number before incrementing the minor version. Passing a value of `0` will
    * result in **minor** version increments only.
@@ -2104,6 +2151,7 @@ interface Config extends Directories {
   editor?: LiteralUnion<
     | 'vscode'
     | 'sublime'
+    | 'cursor'
     | 'atom'
     | 'webstorm'
     | 'intellij'
@@ -2213,4 +2261,4 @@ declare const env: {
  */
 declare const defineConfig: (config: Config) => Config;
 
-export { type Config, type CustomStash, type Directories, type ESBuildConfig, type ESBuildTarget, type Git, type HOT, type JSONTerse, type JSONTransform, type LiquidTerse, type LiquidTransform, type Logger, type Paths, type PostCSSConfig, type Processors, type Publishing, type RenamePaths$1 as RenamePaths, type SASSConfig, type SVGFile, type SVGSprite, type SVGTransform, type SVGTransformer, type ScriptTransform, type ScriptTransformer, type StyleTerse, type StyleTransform, type StyleTransformer, type TailwindConfig, type Transforms, type VC, defineConfig, env };
+export { type Config, type Directories, type ESBuildConfig, type ESBuildTarget, type Git, type HOT, type JSONTerse, type JSONTransform, type LiquidTerse, type LiquidTransform, type Logger, type Paths, type Pattern, type PostCSSConfig, type Processors, type Publishing, type Rename, type SASSConfig, type SVGFile, type SVGSprite, type SVGTransform, type SVGTransformer, type ScriptTransform, type ScriptTransformer, type Stash, type StyleTerse, type StyleTransform, type StyleTransformer, type TailwindConfig, type Transforms, type VC, defineConfig, env };

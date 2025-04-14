@@ -13,7 +13,8 @@ import { Stores, Targets } from './extends';
 import { plugins } from './plugins';
 import { processor } from './processor';
 
-import { checksum, m, merge, o, paths, pm, s } from '~utils';
+import { createPathsState } from '~options/utils';
+import { checksum, m, merge, o, pm, s } from '~utils';
 
 export { q } from './queue';
 
@@ -277,41 +278,8 @@ export const $ = new class Bundle {
 
   /**
    * Directory structure paths.
-   *
-   * Includes a special `transforms` Map reference for transform related files
-   * which may potentially be using an extension that would lead to it being identified
-   * as a different file type. This occurs when (for example) a snippet generated transform
-   * is set as an output.
-   *
-   * >**NOTE**
-   * >
-   * > The `transform` option will point to resolved file names and the values for each entry
-   * > will equal an enum `Type` number. The following transforms are identifiable:
-   *
-   * - `7` > `Type.Style`
-   * - `8` > `Type.Script`
-   * - `9` > `Type.SVG`
    */
-  public paths: Type.PathBundle = paths();
-
-  /**
-   * Stash Import paths
-   *
-   * Used in `pull` modes and assigns the locations to files that are unresolvable.
-   * This will only be assigned and populated in certain modes.
-   */
-  public stash: Type.PathStash = o<Type.PathStash>({
-    assets: null,
-    blocks: null,
-    config: null,
-    customers: null,
-    layout: null,
-    locales: null,
-    metaobject: null,
-    sections: null,
-    snippets: null,
-    templates: null
-  });
+  public paths: Type.PathsBundle = createPathsState();
 
   /**
    * Execution options which describe the invocation and operation

@@ -327,8 +327,6 @@ export function parse (path: string) {
       return define(Namespace.Customers, Type.Template, Kind.Liquid);
     } else if (paths.metaobject.match(path)) {
       return define(Namespace.Metaobject, Type.Template, Kind.Liquid);
-    } else if (paths.transforms.get(path) === Type.Style) {
-      return style(define(Namespace.Snippets, Type.Style, Kind.CSS));
     }
   } else if (file.ext === '.schema' && paths.schema.match(path)) {
 

@@ -1,14 +1,4 @@
-import type {
-  Input,
-  PKG,
-  ScriptTransform,
-  ScriptTransformer,
-  StyleTransform,
-  StyleTransformer,
-  SVGTransform,
-  SVGTransformer,
-  Transform
-} from 'types';
+import type { Input, PathConfig, PathsBundle, PKG, Transform } from 'types';
 
 import { basename, extname } from 'node:path';
 
@@ -20,10 +10,10 @@ import { acquire } from '@syncify/acquire';
 import { bold, Create, yellowBright } from '@syncify/ansi';
 
 import { invalidError, typeError, warnOption } from '~cli/throws';
-import { CONFIG_FILE_EXT } from '~const';
+import { CONFIG_FILE_EXT, PATH_KEYS } from '~const';
 import { error } from '~errors';
 import { parseProcessorConfigs } from '~process/files';
-import { assign, has, isArray, isFunction, isObject, isString, isUndefined, merge } from '~utils';
+import { has, isArray, isFunction, isObject, isString, isUndefined, merge, o } from '~utils';
 import { globPath, lastPath, normalPath } from '~utils/paths';
 
 import { $ } from '$';
@@ -31,6 +21,29 @@ import { $ } from '$';
 /* -------------------------------------------- */
 /* FUNCTIONS                                    */
 /* -------------------------------------------- */
+
+/**
+ * Generates the {@link $.paths} store which will hold
+ * location URI's, globs and various other information
+ * which pertain to paths.
+ */
+export function createPathsState (): PathsBundle {
+
+  const state: PathsBundle = o();
+
+  for (const path of PATH_KEYS) {
+    state[path] = o<PathConfig>({
+      input: null,
+      match: null,
+      config: null,
+      stash: null,
+      rename: []
+    });
+  }
+
+  return state;
+
+};
 
 /**
  * Path Resovler
@@ -51,10 +64,9 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
   hook?: ((uri: string) => string | string[])
 ): T {
 
-  const { cwd } = $;
   const match = isFunction(hook) ? [] : false;
   const warn = warnOption('Path Resolver');
-  const path = normalPath($.dirs.input, $.cwd); // Path normalizer
+  const getUri = normalPath($.dirs.input, $.cwd); // Path normalizer
 
   if (isArray(filePath)) {
 
@@ -62,8 +74,11 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
 
     for (const item of filePath) {
 
-      const uri = path(item);
-      const resolved = glob.sync(uri, { cwd, absolute: true });
+      const uri = getUri(item);
+      const resolved = glob.sync(uri, {
+        cwd: $.cwd,
+        absolute: true
+      });
 
       if (match !== false) {
         const test = hook(uri);
@@ -82,14 +97,17 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
 
     }
 
-    return <T>(match === false ? paths : { paths, match: anymatch(match) });
+    return <T>(match === false ? paths : {
+      paths,
+      match: anymatch(match)
+    });
 
   }
 
   if (isString(filePath)) {
 
-    const uri = path(filePath);
-    const paths = glob.sync(uri, { cwd });
+    const uri = getUri(filePath);
+    const paths = glob.sync(uri, { cwd: $.cwd });
 
     if (paths.length === 0) {
       warn('No files can be resolved in', filePath);
@@ -104,7 +122,10 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
       }
     }
 
-    return <T>(match === false ? paths : { paths, match: anymatch(match) });
+    return <T>(match === false ? paths : {
+      paths,
+      match: anymatch(match)
+    });
 
   }
 
@@ -186,83 +207,30 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
  * }
  * ```
  */
-export function getTransform <T extends (
-  ScriptTransform |
-  ScriptTransform[] |
-  StyleTransform |
-  StyleTransform[] |
-  SVGTransform |
-  SVGTransform[]
-)> (
-  transforms: ScriptTransformer | StyleTransformer | SVGTransformer,
+export function getTransform <T extends Transform.Resolved[] | Transform.Resolved> (
+  transforms: Transform.Param,
   opts: Transform.Options
 ): T {
 
-  if (!has('assertSnippet', opts)) opts.assertSnippet = true;
+  if (!has('assertSnippet', opts)) opts.snippet = true;
 
   if (isString(transforms)) {
 
     const { paths, match } = getResolvedPaths<Transform.Resolver>(transforms, watch => globPath(watch));
 
-    if (paths) {
-      if (opts.flatten) {
-
-        return <T>paths.map(input => (opts.assertSnippet ? {
-          input,
-          rename: basename(input),
-          snippet: false
-        } : {
-          input,
-          rename: basename(input)
-        }));
-
-      } else {
-
-        return (opts.assertSnippet ? {
-          input: paths,
-          rename: '[name].[ext]',
-          snippet: false,
-          match
-        } : {
-          input: paths,
-          rename: '[name].[ext]',
-          match
-        }) as unknown as T;
-
-      }
-    }
+    return opts.flatten
+      ? <T>paths.map(input => ({ input, rename: basename(input), snippet: false }))
+      : <T>{ input: paths, rename: '[name].[ext]', snippet: false, match };
 
   } else if (isArray(transforms)) {
 
     if (transforms.every<string>(isString)) {
 
-      const { paths, match } = getResolvedPaths<Transform.Resolver>(transforms, watch => globPath(watch));
+      const { paths, match } = getResolvedPaths<Transform.Resolver>(transforms, globPath);
 
-      if (opts.flatten) {
-
-        return <T>paths.map<Transform.Resolved>(input => (opts.assertSnippet ? {
-          input,
-          rename: basename(input),
-          snippet: false
-        } : {
-          input,
-          rename: basename(input)
-        }));
-
-      } else {
-
-        return (opts.assertSnippet ? {
-          input: paths,
-          rename: '[name].[ext]',
-          snippet: false,
-          match
-        } : {
-          input: paths,
-          rename: '[name].[ext]',
-          match
-        }) as unknown as T;
-
-      }
+      opts.flatten
+        ? <T>paths.map<Transform.Resolved>(input => ({ input, rename: basename(input), snippet: false }))
+        : <T>{ input: paths, rename: '[name].[ext]', snippet: false, match };
 
     } else if (transforms.every<Input.SingleConfig>(isObject)) {
 
@@ -277,20 +245,16 @@ export function getTransform <T extends (
           });
         }
 
-        const { paths, match } = getResolvedPaths<Transform.Resolver>(option.input, watch => globPath(watch));
+        const { paths, match } = getResolvedPaths<Transform.Resolver>(option.input, globPath);
 
         option.match = match;
         option.input = paths[0];
-
-        // apply snippet default is not defined
-        if (opts.assertSnippet && !has('snippet', option)) option.snippet = false;
+        option.snippet = has('snippet', option) ? option.snippet : false;
 
         // apply namespaced rename if no rename is defined
         if (!has('rename', option)) {
 
-          option.rename = option.snippet
-            ? '[name].liquid'
-            : '[name].[ext]';
+          option.rename = option.snippet ? '[name].liquid' : '[name].[ext]';
 
         }
 
@@ -304,18 +268,14 @@ export function getTransform <T extends (
 
     const config: T[] = [];
 
-    // config based transfrom
+    // config based transform
     if (has('input', transforms)) {
 
       const record = merge<Transform.Resolved>(transforms);
-
-      const { paths, match } = getResolvedPaths<Transform.Resolver>(record.input, watch => {
-        // if (opts.addWatch) $.watch.add(watch);
-        return globPath(watch);
-      });
+      const { paths, match } = getResolvedPaths<Transform.Resolver>(record.input, globPath);
 
       // apply snippet default if not defined
-      if (opts.assertSnippet && !has('snippet', record)) {
+      if (!has('snippet', record)) {
         record.snippet = false;
       }
 
@@ -325,18 +285,13 @@ export function getTransform <T extends (
       }
 
       if (opts.flatten) {
-
         for (const input of paths) {
-          config.push(assign({}, record as T, { input }));
+          config.push({ ...<T>record, input });
         }
-
       } else {
-
         record.input = paths;
         record.match = match;
-
-        config.push(record as T);
-
+        config.push(<T>record);
       }
 
     } else {
@@ -351,21 +306,16 @@ export function getTransform <T extends (
 
         if (isString(option)) { // { 'assets/file': '...' }
 
-          if (rename) {
-            record.rename = asset ? prop.slice(7) : prop.slice(9);
-          }
+          if (rename) record.rename = asset ? prop.slice(7) : prop.slice(9);
 
-          const { paths, match } = getResolvedPaths<Transform.Resolver>(option, watch => {
-            // if (opts.addWatch) $.watch.add(watch);
-            return globPath(watch);
-          });
+          const { paths, match } = getResolvedPaths<Transform.Resolver>(option, globPath);
 
-          if (paths) {
-            if (opts.flatten) {
-              for (const input of paths) config.push(assign({}, record as T, { input }));
-            } else {
-              config.push(assign({}, record as T, { input: paths, match }));
+          if (opts.flatten) {
+            for (const input of paths) {
+              config.push({ ...<T>record, input });
             }
+          } else {
+            config.push({ ...<T>record, input: paths, match });
           }
 
         } else if (isObject<Input.SingleConfig>(option)) { // { 'assets/file': {} }
@@ -381,23 +331,20 @@ export function getTransform <T extends (
 
           }
 
-          const { paths, match } = getResolvedPaths<Transform.Resolver>(option.input, watch => {
-            // if (opts.addWatch) $.watch.add(watch);
-            return globPath(watch);
-          });
+          const { paths, match } = getResolvedPaths<Transform.Resolver>(option.input, globPath);
 
           if (paths.length > 0) {
 
             const merge = rename
-              ? assign({}, option, record as T, { rename: asset ? prop.slice(7) : prop.slice(9) })
-              : assign({}, record, option);
+              ? <T>{ ...option, ...<T>record, rename: asset ? prop.slice(7) : prop.slice(9) }
+              : <T>{ ...record, ...option };
 
             if (opts.flatten) {
               for (const input of paths) {
-                config.push(assign(<T>{}, merge, { input }));
+                config.push({ ...<T>merge, input });
               }
             } else {
-              config.push(assign(<T>merge, { input: paths, match }));
+              config.push({ ...<T>merge, input: paths, match });
             }
           }
 
@@ -405,17 +352,17 @@ export function getTransform <T extends (
 
           if (option.every(isString)) {
 
-            const { paths, match } = getResolvedPaths<Transform.Resolver>(option, watch => globPath(watch));
+            const { paths, match } = getResolvedPaths<Transform.Resolver>(option, globPath);
 
             if (hasRenameNamespace(prop)) record.rename = basename(prop);
 
             if (paths) {
               if (opts.flatten) {
                 for (const input of paths) {
-                  config.push(assign(<T>{}, record, { input }));
+                  config.push({ ...<T>record, input });
                 }
               } else {
-                config.push(assign(<T>{}, record, { input: paths, match }));
+                config.push({ ...<T>record, input: paths, match });
               }
             }
 
@@ -429,9 +376,7 @@ export function getTransform <T extends (
             });
 
           }
-
         }
-
       }
     }
 

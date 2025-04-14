@@ -35,10 +35,7 @@ export async function setScriptOptions () {
 
   }
 
-  const transforms = getTransform<ScriptTransform[]>($.config.transform.script, {
-    addWatch: false,
-    flatten: true
-  });
+  const transforms = getTransform<ScriptTransform[]>($.config.transform.script, { flatten: true });
 
   if (!u.has('absWorkingDir', $.processor.esbuild)) {
 

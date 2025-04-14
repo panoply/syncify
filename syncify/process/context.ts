@@ -120,12 +120,12 @@ export function section (file: File) {
   if ($.paths.sections.rename.length > 0) {
 
     const path = file.input;
-    const find = $.paths.sections.rename.find(([ match ]) => match(path));
+    const find = $.paths.sections.rename.find(({ match }) => match(path));
 
     if (isUndefined(find)) return file;
 
     const oldName = file.base;
-    const rename = renameFileParse(file.input, find[1]);
+    const rename = renameFileParse(file.input, find.pattern);
 
     file.name = rename.name;
     file.ext = rename.ext;
@@ -151,12 +151,12 @@ export function snippet (file: File) {
   if ($.paths.snippets.rename.length > 0) {
 
     const path = file.input;
-    const find = $.paths.snippets.rename.find(([ match ]) => match(path));
+    const find = $.paths.snippets.rename.find(({ match }) => match(path));
 
     if (isUndefined(find)) return file;
 
     const oldName = file.base;
-    const rename = renameFileParse(file.input, find[1]);
+    const rename = renameFileParse(file.input, find.pattern);
 
     file.name = rename.name;
     file.ext = rename.ext;

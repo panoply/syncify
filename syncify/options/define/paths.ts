@@ -1,18 +1,14 @@
-import type { PathsType } from '@syncify/types/config/paths';
-
-import { join } from 'node:path';
+import type { Rename, StashType } from '@syncify/types/config/paths';
+import type { Pattern, Stash } from 'types';
 
 import anymatch from 'anymatch';
 import glob from 'fast-glob';
-import { CustomStash, RenamePaths } from 'types';
 
-import { ARR, BAD, bold, white, yellowBright } from '@syncify/ansi';
-
-import { throwError, typeError, warnOption } from '~cli/throws';
+import { typeError, warnOption } from '~cli/throws';
 import { PATH_KEYS, THEME_KEYS } from '~const';
 import { setPathCache } from '~process/cache';
 import { parse } from '~process/files';
-import { defineProperty, isArray, isEmpty, isNil, isNumber, isObject, isString, m, s, toArray } from '~utils';
+import { forEach, isArray, isEmpty, isNil, isNumber, isObject, isString, keys, o, s, toArray } from '~utils';
 import { normalPath } from '~utils/paths';
 
 import { $, q } from '$';
@@ -26,291 +22,61 @@ import { $, q } from '$';
  */
 export async function setPaths () {
 
-  const path = normalPath($.dirs.input);
+  const getUri = normalPath($.dirs.input);
   const warn = warnOption('paths');
 
-  const setStash = (key: string, files: string[], stash: CustomStash = null) => {
-
-    if (key === 'schema' || key === 'metafields' || key === 'redirects') return;
-
-    if (stash !== null) {
-
-      const isNum = isNumber(stash.stash);
-      const index = 'index' in stash
-        ? stash.index
-        : isNum ? stash.stash as number : 0;
-
-      const val = isNum ? '*' : stash.stash === true ? 'stash' : stash.stash;
-      const uri = files[index];
-
-      if (uri[0] === '!') {
-        throwError([
-          'custom stash uri is referencing an ignored glob pattern'
-        ], [
-          'Change the stash value to a path which is not an ignore'
-        ]);
-      }
-
-      if (val === '*') {
-        $.stash[key] = uri.replace(/\/\*{1,2}.*$/, '');
-      } else if (val === 'stash') {
-        $.stash[key] = uri.replace(/\/\*{1,2}.*$/, '/stash');
-      } else {
-        $.stash[key] = uri.replace(/\/\*{1,2}.*$/, '/' + (val as string).replace(/^\//, '') as string);
-      }
-
-    } else {
-
-      const value = files.find(p => p[0] !== '!');
-      $.stash[key] = value ? value.replace(/\/\*{1,2}.*$/, '') : join($.cwd, 'stash');
-
-    }
-
-  };
-
-  const getGlobs = (key: string, files: PathsType, fallback: string): string[] => {
-
-    if (isNil(files)) {
-      const fb = [ path(fallback) ];
-      setStash(key, fb);
-      return fb;
-    } else if (isString(files)) {
-      const str = [ path(files) ];
-      setStash(key, str);
-      return str;
-    } else if (isArray<string[]>(files)) {
-
-      if (isObject(files[files.length - 1])) {
-        const stashed = files.pop() as unknown as CustomStash;
-        const resolve = files.map(path);
-        setStash(key, resolve, stashed);
-        return resolve;
-      }
-
-      const resolve = files.map(path);
-      setStash(key, resolve);
-      return resolve;
-
-    }
-
-    typeError({
-      option: 'paths',
-      expects: 'string | string[]',
-      provided: files,
-      name: key
-    });
-
-  };
-
-  const renameGlobs = (key: 'sections' | 'snippets', fallback: string): string[] => {
-
-    const files = $.config.paths[key];
-
-    // sections and snippets accept glob rename objects, so we need to
-    // do a little extra work in order to find resolution correctly.
-    if (isObject<RenamePaths>(files)) {
-
-      if (isEmpty(files)) {
-        warn(`Undefined path/s on "${key}", using fallback`, '{}');
-        return [ path(fallback) ];
-      }
-
-      if ('*' in files && '[name]' in files) {
-
-        warn('Multiple fallback rename keys, paths will be merged', '"*" and "[name]"');
-
-        if (isArray(files['*'])) {
-
-          if (isObject(files['*'][files['*'].length - 1])) {
-            const stashed = files['*'].pop() as unknown as CustomStash;
-            const resolve = files['*'].map(path);
-            setStash(key, resolve, stashed);
-          }
-
-          if (isArray(files['[name]'])) {
-            files['*'] = files['*'].concat(files['[name]']);
-          } else if (isString(files['[name]'])) {
-            files['*'].push(files['[name]']);
-          }
-
-          delete files['[name]'];
-
-        } else if (isArray(files['[name]'])) {
-
-          if (isObject(files['[name]'][files['[name]'].length - 1])) {
-            const stashed = files['[name]'].pop() as unknown as CustomStash;
-            const resolve = files['[name]'].map(path);
-            setStash(key, resolve, stashed);
-          }
-
-          if (isArray(files['*'])) {
-            files['[name]'] = files['[name]'].concat(files['*']);
-          } else if (isString(files['*'])) {
-            files['[name]'].push(files['*']);
-          }
-
-          delete files['*'];
-
-        }
-      }
-
-      const global: Map<string, Set<string>> = m();
-      const rename: Map<string, Set<string>> = m();
-
-      let stash: string[] = [];
-
-      for (const pattern in files) {
-
-        if (isArray<string[]>(files[pattern])) {
-
-          if ($.stash[key] === null) {
-            if (isObject(files[pattern][files[pattern].length - 1])) {
-              const stashed = files[pattern].pop() as unknown as CustomStash;
-              const resolve = files[pattern].map(path);
-              setStash(key, resolve, stashed);
-            } else {
-              stash = stash.concat(files[pattern].map(path));
-            }
-          }
-
-          if (pattern === '*' || pattern === '[name]') {
-            global.set(pattern, s(files[pattern].map(path)));
-          } else {
-            rename.set(pattern, s(files[pattern].map(path)));
-          }
-
-        } else if (isString(files[pattern])) {
-
-          if ($.stash[key] === null) {
-            stash.push(path(files[pattern]));
-          }
-
-          (pattern === '*' || pattern === '[name]')
-            ? global.has(pattern)
-              ? global.get(pattern).add(path(files[pattern]))
-              : global.set(pattern, s([ path(files[pattern]) ]))
-            : rename.has(pattern)
-              ? rename.get(pattern).add(path(files[pattern]))
-              : rename.set(pattern, s([ path(files[pattern]) ]));
-
-        } else if (isNil(files[pattern])) {
-
-          typeError({
-            option: `paths ${ARR} ${key}`,
-            expects: 'string | string[]',
-            provided: files[pattern],
-            name: pattern
-          });
-
-        }
-      }
-
-      if ($.stash[key] === null) {
-        setStash(key, stash);
-      }
-
-      const globals = toArray(global.values()).flatMap(globs => toArray(globs));
-      const entries = globals;
-
-      for (const [ pattern, paths ] of rename) {
-
-        const spread = toArray(paths);
-        const match = anymatch(spread);
-
-        if (match(globals)) {
-
-          const value: string[] = [];
-
-          if (isArray(files[pattern])) {
-            for (const p of files[pattern]) value.push(`${BAD} ${bold(p)}`);
-          } else {
-            value.push(`${BAD} ${bold(files[pattern])}`);
-          }
-
-          throwError([
-            'Mixed global and rename path patterns defined which will result in resolution collisions.',
-            `The paths provided to ${yellowBright(key)} ${ARR} ${yellowBright(pattern)} overlap with the globals.`,
-            NLR,
-            `${value.join(NWL)}`
-          ], [
-            `Provide a verbose pattern on the ${yellowBright.bold('*')} global, which resolve to directory level.`,
-            `Both global and rename paths accept ${white('string[]')} types, so this error can`,
-            'be easily fixed.'
-          ]);
-
-        } else {
-
-          $.paths[key].rename.push([
-            match,
-            pattern
-          ]);
-
-        }
-
-        entries.push(...spread);
-
-      }
-
-      const ignores = s(entries.filter(p => p.startsWith('!')).map(p => p.slice(1)));
-      const find = s(entries);
-
-      entries.forEach((p, i) => {
-        if (ignores.has(p)) {
-          find.delete(`!${p}`);
-        }
-      });
-
-      return [ ...find ];
-
-    } else {
-
-      return getGlobs(key, files as string | string[], fallback);
-
-    }
-  };
-
-  for (const key of PATH_KEYS) {
+  for (const path of PATH_KEYS) {
 
     let paths: string[] = [];
 
-    if (key === 'snippets' || key === 'sections') {
+    if (
+      path === 'snippets' ||
+      path === 'sections') {
 
       // snippets and sections accepts object rename structures
-      paths = renameGlobs(key, `${key}/*`);
+      //
+      paths = setRenamePaths(path, `${path}/*`);
 
-    } else if (key === 'customers' || key === 'metaobject') {
+    } else if (
+      path === 'customers' ||
+      path === 'metaobject') {
 
       // These paths as defaults are sudirectories of the themes templates
-      paths = getGlobs(key, $.config.paths[key], `templates/${key}/*`);
+      //
+      paths = setBaseUri(path, $.config.paths[path], `templates/${path}/*`);
+
+    } else if (
+      path === 'schema' ||
+      path === 'blogs' ||
+      path === 'files' ||
+      path === 'metafields' ||
+      path === 'navigation' ||
+      path === 'pages' ||
+      path === 'policies') {
+
+      // Plus paths are extended references which default to a + prefix
+      //
+      paths = setBaseUri(path, $.config.paths[path], `+/${path}/*`);
 
     } else {
 
       // all other paths with either be glob string or glob array
-      paths = getGlobs(key, $.config.paths[key], `${key}/*`);
+      //
+      paths = setBaseUri(path, $.config.paths[path], `${path}/*`);
 
     }
 
-    $.paths[key].match = anymatch(paths);
-    $.paths[key].config = paths;
+    $.paths[path].config = paths;
+    $.paths[path].match = anymatch(paths);
 
     const globs = await glob.async(paths, { cwd: $.cwd });
 
-    if (key !== 'metafields' && key !== 'redirects') {
-
-      if ($.paths[key].input === null) {
-
-        $.paths[key].input = s(globs);
-
-      } else {
-
-        for (let i = 0, s = globs.length; i < s; i++) {
-
-          $.paths[key].input.add(globs[i]);
-
-        }
-
-      }
+    if ($.paths[path].input === null) {
+      $.paths[path].input = s(globs);
+    } else {
+      forEach($.paths[path].input.add, globs);
     }
+
   }
 
   q.cache.add(() => {
@@ -328,4 +94,226 @@ export async function setPaths () {
 
   });
 
+  /* -------------------------------------------- */
+  /* FUNCTIONS                                    */
+  /* -------------------------------------------- */
+
+  /**
+   * Determines the path value type and applies resolution if required.
+   * A path value can be a string, arrays or object. Paths can also accept
+   * additional stash references.
+   */
+  function setBaseUri (name: string, files: Pattern, fallback: string): string[] {
+
+    if (isNil(files)) {
+
+      return setStashPaths(name, [ getUri(fallback) ], null);
+
+    } else if (isString(files)) {
+
+      return setStashPaths(name, [ getUri(files) ], null);
+
+    } else if (isArray<string[]>(files)) {
+
+      const { stash = null } = isObject(files[files.length - 1]) ? files.pop() as unknown as Stash : {};
+
+      return setStashPaths(name, getUri(files), stash);
+
+    }
+
+    typeError({
+      option: 'paths',
+      expects: 'string | string[]',
+      provided: files,
+      name
+    });
+
+  }
+
+  function setStashPaths (name: string, files: string[], stash: StashType): string[] {
+
+    if (isNil(stash)) {
+
+      $.paths[name].stash = /\/\*/.test(files[0]) ? files[0] : null;
+
+    } else if (isNumber(stash)) {
+
+      $.paths[name].stash = files[stash];
+
+    } else if (isString(stash)) {
+
+      $.paths[name].stash = getUri(stash);
+
+    }
+
+    return files;
+
+  }
+
+  function setRenamePaths (name: 'sections' | 'snippets', fallback: string): string[] {
+
+    const files = $.config.paths[name];
+
+    if (isEmpty(files)) {
+      warn(`Undefined path/s on "${name}", using fallback`, '{}');
+      return setStashPaths(name, [ getUri(fallback) ], null);
+    }
+
+    if (isArray(files)) {
+      return setStashPaths(name, getUri(files), null);
+    } else if (isString(files)) {
+      return setStashPaths(name, [ getUri(fallback) ], null);
+    }
+
+    const config: Rename = o({ ...files });
+    const entries = Object.entries(config);
+    const transformed: { [key: string]: string[] } = {};
+    const allPatterns: { pattern: string, key: string, generality: number, isExclusion: boolean }[] = [];
+    const getPattern = (key: string, pattern: string) => {
+      const isExclusion = pattern.startsWith('!');
+      const cleanPattern = isExclusion ? pattern.slice(1) : pattern;
+      allPatterns.push({
+        pattern: cleanPattern,
+        key,
+        generality: getGlobGenerality(cleanPattern),
+        isExclusion
+      });
+    };
+
+    try {
+
+      for (const [ key, patterns ] of entries) {
+
+        transformed[key] = [];
+
+        if (isArray(patterns)) {
+          const { stash = null } = isObject(patterns[patterns.length - 1]) ? patterns.pop() as unknown as Stash : {};
+          const items = stash !== null ? setStashPaths(name, patterns as string[], stash) : patterns as string[];
+          for (const pattern of items) getPattern(key, pattern);
+        } else {
+          getPattern(key, patterns);
+        }
+      }
+
+      // If no patterns, return fallback
+      if (allPatterns.length === 0) return setStashPaths(name, [ getUri(fallback) ], null);
+
+      // Step 2: Generate transformed object
+      const patternOwners = new Map<string, { key: string, specificity: number }>();
+
+      // Assign ownership based on specificity (inclusions only)
+      for (const { pattern, key, isExclusion } of allPatterns) {
+        if (!isExclusion) {
+          const specificity = getGlobSpecificity(pattern);
+          const existing = patternOwners.get(pattern);
+          if (!existing || specificity > existing.specificity) {
+            patternOwners.set(pattern, { key, specificity });
+          }
+        }
+      }
+
+      // Build transformed object
+      for (const [ key, patterns ] of entries) {
+
+        const inclusions: string[] = [];
+        const exclusions: Set<string> = new Set();
+
+        // Process input patterns
+        for (const pattern of patterns as string[]) {
+          if (pattern.startsWith('!')) {
+            exclusions.add(`!${getUri(pattern.slice(1))}`);
+          } else {
+
+            // Only include if owned by this key and not excluded in this key
+            const isExcludedHere = (patterns as string[]).some(p => p.startsWith('!') && p.slice(1) === pattern);
+            if (patternOwners.get(pattern)?.key === key && !isExcludedHere) {
+              inclusions.push(getUri(pattern));
+            }
+          }
+        }
+
+        // Add exclusions for more specific patterns from other keys
+        for (const [ otherPattern, owner ] of patternOwners) {
+          if (owner.key !== key) {
+            for (const pattern of patterns as string[]) {
+              if (!pattern.startsWith('!')) {
+                if (
+                  anymatch(pattern, otherPattern) &&
+                  getGlobSpecificity(otherPattern) > getGlobSpecificity(pattern)
+                ) {
+                  const excludePath = `!${getUri(otherPattern)}`;
+                  exclusions.add(excludePath);
+                }
+              }
+            }
+          }
+        }
+
+        transformed[key].push(...toArray(exclusions).sort(), ...inclusions.sort());
+
+      }
+
+      $.paths[name].rename = keys(transformed).map(pattern => ({
+        pattern,
+        match: anymatch(transformed[pattern])
+      }));
+
+      // Step 4: Find general pattern(s) (inclusions only)
+      const inclusionPatterns = allPatterns.filter(p => !p.isExclusion).sort((a, b) => b.generality - a.generality);
+      const generalPatterns: string[] = [];
+      const coveredPatterns = s<string>();
+
+      for (const { pattern, generality } of inclusionPatterns) {
+        if (!coveredPatterns.has(pattern)) {
+          let isGeneral = true;
+          for (const other of inclusionPatterns) {
+            if (other.pattern !== pattern && !coveredPatterns.has(other.pattern)) {
+              if (anymatch(pattern, other.pattern)) {
+                coveredPatterns.add(other.pattern);
+              } else if (generality === other.generality && !anymatch(other.pattern, pattern)) {
+                continue;
+              } else if (generality < other.generality && !anymatch(other.pattern, pattern)) {
+                isGeneral = false;
+                break;
+              }
+            }
+          }
+
+          if (isGeneral && !generalPatterns.includes(getUri(pattern))) {
+            generalPatterns.push(getUri(pattern));
+            coveredPatterns.add(pattern);
+          }
+        }
+      }
+
+      return generalPatterns.length > 0 ? generalPatterns.sort() : setStashPaths(name, [ getUri(fallback) ], null);
+
+    } catch (error) {
+
+      warn(`Error processing rename paths for "${name}": ${error.message}`, '{}');
+
+      return setStashPaths(name, [ getUri(fallback) ], null);
+
+    }
+
+    // Specificity helper (for transformed object)
+    function getGlobSpecificity (glob: string): number {
+      const segments = glob.split('/').filter(Boolean);
+      let score = segments.length;
+      if (glob.includes('**')) score -= 1;
+      if (/\.[a-z]+$/.test(glob)) score += 1;
+      return score;
+    }
+
+    // Generality helper (for return value)
+    function getGlobGenerality (glob: string): number {
+      const segments = glob.split('/').filter(Boolean);
+      let score = 0;
+      if (glob.includes('**')) score += 2;
+      if (glob.includes('*')) score += 1;
+      score -= segments.length;
+      if (/\.[a-z]+$/.test(glob)) score -= 2;
+      return score;
+    }
+  }
 }

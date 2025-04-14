@@ -199,7 +199,7 @@ runtime.stores = function () {
           _.WSP.repeat(width.theme - target.length),
           _.ARR,
           _.WSP,
-          _.gray.underline(editor || preview)
+          _.gray.underline(url === 'editor' ? editor : preview)
         )
       );
     }).True(url === 'editor', tui => tui.Newline());

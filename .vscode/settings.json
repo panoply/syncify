@@ -51,6 +51,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.stylelint": "explicit"
   },
+  "spx.enable": true,
   "spx.files": [
     "./docs/src/app/**/*.ts"
   ],
@@ -145,6 +146,9 @@
       ]
     }
   ],
+  "vsicons.projectDetection.autoReload": true,
+  "vsicons.presets.foldersAllDefaultIcon": true,
+  //"vsicons.presets.hideFolders": true,
   "vsicons.associations.files": [
     {
       "icon": "vscode",
