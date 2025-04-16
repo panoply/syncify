@@ -394,7 +394,7 @@ export async function PromptCredentialsFile (options: {
             'Tokens have a minimum length, please check the token and try again.'
           );
 
-        } else if (/^[a-zA-Z0-9_]+$/.test(value)) {
+        } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
 
           return _.Multiline(
             _.red.bold('BAD TOKEN'),
