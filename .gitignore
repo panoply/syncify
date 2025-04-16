@@ -13,6 +13,4 @@ test/e2e/custom/dist
 dump.rdb
 !packages/tests
 packages/**/dist
-
-
-
+dist/
