@@ -6,12 +6,12 @@ import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 
 import { accessScopeList, accessStore } from '~http/access';
-import { cancel, intercept, labels, prompt, theme } from '~prompt';
+import { cancel, intercept, label, prompt, theme } from '~prompt';
 import { eqWS, has, isEmpty, isNil, keys, prettyDate } from '~utils';
 
 import { $ } from '$';
 
-interface CredentialsPrompt {
+export interface CredentialsPrompt {
   /** String copy of .env file to be written */
   env?: string;
   /** The store */
@@ -38,7 +38,7 @@ interface CredentialsPrompt {
 /* PROMPTS                                      */
 /* -------------------------------------------- */
 
-export async function credentials (options: {
+export async function PromptCredentialsFile (options: {
   /** Whether or not the greeting message logs */
   greeting: boolean;
   /** Whether or not we are working with the keychain */
@@ -74,25 +74,11 @@ export async function credentials (options: {
     }
   };
 
-  /** Prompt Labels */
-  const label = labels({
-    padding: 0,
-    prompts: <const>[
-      'Storage Method',
-      'Existing Token',
-      'Which Keychain',
-      'Select Token',
-      'Shopify Domain',
-      'API Admin Token',
-      'API Token Name'
-    ]
-  });
-
   /* GREETING ----------------------------------- */
 
   if (options.greeting) {
 
-    tui.Newline().Wrap(
+    tui.Wrap(
       _.gray
       , 'Hello Hacker 👋' + NLR
       , `Projects require Shopify API Authorization tokens. Store them in a ${_.cyan('.env')} file`
@@ -157,7 +143,7 @@ export async function credentials (options: {
 
   const credential = glue.nl(
     `# Credentials: ${state.domain}`,
-    `${state.store}_api_token = '${state.token.trim()}'`
+    `${state.name}_api_token = '${state.token.trim()}'`
   );
 
   if ($.file.env !== null) {
@@ -235,15 +221,18 @@ export async function credentials (options: {
    */
   async function PromptKeychain () {
 
+    const items = keys($.keychain);
+    const maxLen = Math.max(...items.map(s => s.length));
+    const padded = items.map(s => ' '.repeat(maxLen - s.length + 2));
     const { domain } = await prompt<{ domain: string }>({
       theme,
       message: label.WhichKeychain,
       type: 'select',
       name: 'domain',
-      choices: keys($.keychain).map(value => ({
+      choices: items.map((value, i) => ({
         name: value,
         message: value.replace('.myshopify.com', ''),
-        hint: `   https://${value}`
+        hint: padded[i] + `https://${value}`
       }))
     }).catch(cancel);
 
@@ -255,14 +244,16 @@ export async function credentials (options: {
     if (tokens.length > 0) {
       if (tokens.length > 1) {
 
+        const maxLen = Math.max(...tokens.map(s => s.length));
+        const padded = tokens.map(s => ' '.repeat(maxLen - s.length + 2));
         const { name } = await prompt<{ name: string }>({
           theme,
           message: label.SelectToken,
           type: 'select',
           name: 'name',
-          choices: tokens.map(name => ({
+          choices: tokens.map((name, i) => ({
             name,
-            hint: `    Created ${prettyDate(store[name].created)}`
+            hint: padded[i] + `Created ${prettyDate(store[name].created)}`
           }))
         }).catch(cancel);
 
