@@ -367,7 +367,7 @@ export function parse (path: string) {
 
   }
 
-  if (paths.assets.match(path)) {
+  if (paths.assets.match(path) && !paths.assets.exclude.has(path)) {
 
     switch (file.ext) {
       case '.js':

@@ -13,7 +13,7 @@ import { invalidError, typeError, warnOption } from '~cli/throws';
 import { CONFIG_FILE_EXT, PATH_KEYS } from '~const';
 import { error } from '~errors';
 import { parseProcessorConfigs } from '~process/files';
-import { has, isArray, isFunction, isObject, isString, isUndefined, merge, o } from '~utils';
+import { has, isArray, isFunction, isObject, isString, isUndefined, merge, o, s } from '~utils';
 import { globPath, lastPath, normalPath } from '~utils/paths';
 
 import { $ } from '$';
@@ -36,6 +36,7 @@ export function createPathsState (): PathsBundle {
       input: null,
       match: null,
       config: null,
+      exclude: s(),
       stash: null,
       rename: []
     });

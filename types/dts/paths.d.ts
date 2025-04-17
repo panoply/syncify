@@ -27,6 +27,10 @@ export type PathConfig = {
    */
   match: Tester;
   /**
+   * Path excludes
+   */
+  exclude: Set<string>
+  /**
    * The input stash location where remote files pulled from store are written.
    *
    * @default null

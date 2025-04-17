@@ -465,6 +465,7 @@ export async function setStyleConfig () {
       };
 
       watch.push(bundle.input);
+      watch.forEach(x => $.paths.assets.exclude.add(x));
 
       // for (const path of watch) $.watch.add(path);
 
@@ -475,6 +476,7 @@ export async function setStyleConfig () {
       bundle.watch = anymatch([ bundle.input ]);
 
       //  $.watch.add(bundle.input);
+      $.paths.assets.exclude.add(bundle.input);
 
     }
 

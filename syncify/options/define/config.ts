@@ -176,5 +176,7 @@ export async function getConfig () {
 
     $.config = settings;
 
+    console.log($.config);
+
   }
 };

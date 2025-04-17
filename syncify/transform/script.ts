@@ -36,9 +36,8 @@ export async function esbuildBundle (bundle: ScriptBundle): Promise<void> {
   if ($.mode.watch) {
     await getWatchPaths(bundle, result.metafile.inputs);
   } else {
-    if (!bundle.watch.has(bundle.input)) {
-      bundle.watch.add(bundle.input);
-    }
+    if (!bundle.watch.has(bundle.input)) bundle.watch.add(bundle.input);
+    if ($.paths.assets.match(bundle.input)) $.paths.assets.exclude.add(bundle.input);
   }
 }
 
@@ -55,6 +54,8 @@ async function getWatchPaths (bundle: ScriptBundle, inputs: Metafile['inputs']) 
 
     if (!bundle.watch.has(path)) bundle.watch.add(path);
     if (mode.watch) store.push(path);
+    if ($.paths.assets.match(bundle.input)) $.paths.assets.exclude.add(bundle.input);
+
   }
 
   if (mode.watch) {
@@ -101,7 +102,7 @@ export async function ScriptTransform <T extends ScriptBundle> (file: File<T[]>)
     const { metafile, outputFiles, warnings } = await esbuild.build(bundle.esbuild);
 
     if (file.data.length > 1) {
-      log.nl().write(relative($.cwd, input));
+      log.nl().line(relative($.cwd, input));
     }
 
     if ($.mode.watch) {

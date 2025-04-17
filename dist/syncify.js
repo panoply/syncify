@@ -10988,7 +10988,7 @@ function parse2(path5) {
       return schema(parse2, define("schema" /* Schema */, 7 /* Schema */, "JSON" /* JSON */));
     }
   }
-  if (paths.assets.match(path5)) {
+  if (paths.assets.match(path5) && !paths.assets.exclude.has(path5)) {
     switch (file.ext) {
       case ".js":
       case ".mjs":
@@ -11082,6 +11082,7 @@ function createPathsState() {
       input: null,
       match: null,
       config: null,
+      exclude: s2(),
       stash: null,
       rename: []
     });
@@ -16046,9 +16047,8 @@ async function esbuildBundle(bundle) {
   if ($.mode.watch) {
     await getWatchPaths(bundle, result.metafile.inputs);
   } else {
-    if (!bundle.watch.has(bundle.input)) {
-      bundle.watch.add(bundle.input);
-    }
+    if (!bundle.watch.has(bundle.input)) bundle.watch.add(bundle.input);
+    if ($.paths.assets.match(bundle.input)) $.paths.assets.exclude.add(bundle.input);
   }
 }
 async function getWatchPaths(bundle, inputs) {
@@ -16058,6 +16058,7 @@ async function getWatchPaths(bundle, inputs) {
     const path5 = path2.join(cwd2, file);
     if (!bundle.watch.has(path5)) bundle.watch.add(path5);
     if (mode.watch) ;
+    if ($.paths.assets.match(bundle.input)) $.paths.assets.exclude.add(bundle.input);
   }
   if (mode.watch) {
     await pNext().then(() => {
@@ -16081,7 +16082,7 @@ async function ScriptTransform(file) {
     const { key, input, output, snippet: snippet3, attrs, esbuild: { format: format2 } } = bundle;
     const { metafile, outputFiles, warnings: warnings2 } = await esbuild__default.default.build(bundle.esbuild);
     if (file.data.length > 1) {
-      log.nl().write(path2.relative($.cwd, input));
+      log.nl().line(path2.relative($.cwd, input));
     }
     if ($.mode.watch) {
       await getWatchPaths(bundle, metafile.inputs);
@@ -18490,6 +18491,7 @@ async function getConfig() {
   const settings = await getConfigFile();
   if (settings !== null) {
     $.config = settings;
+    console.log($.config);
   }
 }
 async function setThemeDirs(basePath2) {
@@ -20692,9 +20694,11 @@ async function setStyleConfig() {
         }
       }
       watch.push(bundle.input);
+      watch.forEach((x2) => $.paths.assets.exclude.add(x2));
       bundle.watch = (0, import_anymatch7.default)(watch);
     } else {
       bundle.watch = (0, import_anymatch7.default)([bundle.input]);
+      $.paths.assets.exclude.add(bundle.input);
     }
     if (isObject(bundle.sass)) {
       bundle.sass.include.unshift($.cwd, path2.join($.cwd, rename.dir));
