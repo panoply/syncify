@@ -275,6 +275,20 @@ export function parseProcessorConfigs (path: string, namespace: string) {
 
 }
 
+export function parsePackageJson (path: string) {
+
+  const file = new File(path);
+
+  file.namespace = Namespace.Package;
+  file.input = path;
+  file.type = Type.Package;
+  file.relative = relative($.cwd, file.input);
+  file.kind = Kind.JSON;
+
+  return file;
+
+}
+
 export function parseSyncifyConfig (path: string) {
 
   const file = new File(path);
