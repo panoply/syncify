@@ -1,0 +1,14 @@
+{
+  "version": "0.0.0",
+  "name": "create",
+  "private": true,
+  "description": "",
+  "license": "UNLICENSED",
+  "syncify": {
+    "stores": {
+      "syncify": {
+        "dev": 136656060657
+      }
+    }
+  }
+}

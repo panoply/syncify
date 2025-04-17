@@ -42,8 +42,7 @@ export default defineConfig({
     ],
     sections: {
       '[dir]-[name]': [
-        'source/views/sections/**',
-        { stash: 0 }
+        'source/views/sections/**'
       ],
       '[name]': [
         'source/views/sections/blocks/**',
@@ -61,8 +60,7 @@ export default defineConfig({
     ],
     layout: [
       'source/views/theme.liquid',
-      'source/views/layouts/*.liquid',
-      { stash: 1 }
+      'source/views/layouts/*.liquid'
     ]
   },
   transform: {
