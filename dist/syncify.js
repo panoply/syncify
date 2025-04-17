@@ -18445,16 +18445,14 @@ async function getConfigFile() {
         break;
       }
     }
-    if ($.pkg !== null) {
-      if (hasPath("syncify.config", $.pkg) && !isEmpty($.pkg.syncify.config)) {
-        $.file.config = $.file.pkg;
-        $.project.syncifyConfig = $.file.pkg;
-        return $.pkg.syncify.config;
-      }
-    }
     return null;
   }
   if (path2.extname($.file.config) === ".json") {
+    if ($.pkg !== null && hasPath("syncify.config", $.pkg) && !isEmpty($.pkg.syncify.config)) {
+      $.file.config = $.file.pkg;
+      $.project.syncifyConfig = $.file.pkg;
+      return $.pkg.syncify.config;
+    }
     try {
       const json$1 = await fsExtra.readFile($.file.config, "utf8");
       return json.parse(json$1);
@@ -18490,7 +18488,9 @@ async function getConfigFile() {
 async function getConfig() {
   if ($.running) return;
   const settings = await getConfigFile();
-  if (settings !== null) $.config = settings;
+  if (settings !== null) {
+    $.config = settings;
+  }
 }
 async function setThemeDirs(basePath2) {
   if (!basePath2) basePath2 = $.dirs.output;

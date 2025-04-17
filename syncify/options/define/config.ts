@@ -83,7 +83,6 @@ export async function getConfigFile (): Promise<Config> {
   }
 
   if ($.file.config === null) {
-
     for (const file of SYNCIFY_CONFIG) {
 
       const path = join($.cwd, file);
@@ -95,19 +94,17 @@ export async function getConfigFile (): Promise<Config> {
       }
     }
 
-    if ($.pkg !== null) {
-      if (hasPath('syncify.config', $.pkg) && !isEmpty($.pkg.syncify.config)) {
-        $.file.config = $.file.pkg;
-        $.project.syncifyConfig = $.file.pkg;
-        return $.pkg.syncify.config;
-      }
-    }
-
     return null;
 
   }
 
   if (extname($.file.config) === '.json') {
+
+    if ($.pkg !== null && hasPath('syncify.config', $.pkg) && !isEmpty($.pkg.syncify.config)) {
+      $.file.config = $.file.pkg;
+      $.project.syncifyConfig = $.file.pkg;
+      return $.pkg.syncify.config;
+    }
 
     try {
       const json = await readFile($.file.config, 'utf8');
@@ -175,6 +172,9 @@ export async function getConfig () {
 
   const settings = await getConfigFile();
 
-  if (settings !== null) $.config = settings;
+  if (settings !== null) {
 
+    $.config = settings;
+
+  }
 };
