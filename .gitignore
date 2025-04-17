@@ -8,7 +8,7 @@ npm-debug.log
 package
 versions
 node_modules
-tests/samples
+
 test/e2e/custom/dist
 dump.rdb
 !packages/tests
