@@ -43,7 +43,7 @@ export function save (uri: Cache.UriKeys, data?: any) {
 
   return async () => {
 
-    if ($.file.project === null) {
+    if ($.mode.init === false && $.file.project === null) {
 
       throwError([
         'Project cache has not been created'
