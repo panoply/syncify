@@ -116,9 +116,9 @@ export const SYNCIFY_CONFIG = [
  * Syncify target files
  */
 export const TARGET_FILES = [
-  'theme.toml',
-  'theme.yaml',
-  'theme.yml'
+  'stores.toml',
+  'stores.yaml',
+  'stores.yml'
 ];
 
 /**
@@ -304,6 +304,18 @@ export const STRAP_EXAMPLES: [
   [ 'using-schema', '      Strap using Shared Schema' ],
   [ 'using-tailwind', '    Strap using Tailwind transform' ],
   [ 'using-typescript', '  Strap using TypeScript transform' ]
+];
+
+/**
+ * Time ago reference
+ */
+export const TIME = [
+  { label: 'year', seconds: 31536000 },
+  { label: 'month', seconds: 2592000 },
+  { label: 'day', seconds: 86400 },
+  { label: 'hour', seconds: 3600 },
+  { label: 'minute', seconds: 60 },
+  { label: 'second', seconds: 1 }
 ];
 
 /**

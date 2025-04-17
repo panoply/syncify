@@ -10,7 +10,7 @@ import zlib from 'node:zlib';
 
 import { bold, COL, DSH } from '@syncify/ansi';
 
-import { DAY_IN_MS, UNITS } from '~const';
+import { DAY_IN_MS, TIME, UNITS } from '~const';
 
 import { $ } from '$';
 
@@ -1372,6 +1372,42 @@ export function prettyDate (time: number) {
   });
 
   return locale.replace(/\d+/, addSuffix(date.getDate()));
+
+}
+
+/**
+ * **timeAgo**
+ *
+ * Converts an ISO 8601 date string to a readable format:
+ *
+ * ```js
+ * '2025-04-07T15:50:00Z'
+ *  // TO
+ * '5 seconds ago'
+ * '1 minute ago'
+ * '1 hour ago'
+ * '2 days ago'
+ * '1 month ago'
+ * '2 years ago'
+ * ```
+ */
+export function timeAgo (dateStr: string | number) {
+
+  const date = new Date(dateStr);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const absSeconds = Math.abs(seconds);
+
+  for (const interval of TIME) {
+    const count = Math.floor(absSeconds / interval.seconds);
+    if (count >= 1) {
+      const prefix = seconds < 0 ? 'in ' : '';
+      const suffix = seconds >= 0 ? ' ago' : '';
+      return `${prefix}${count} ${interval.label}${count === 1 ? '' : 's'}${suffix}`;
+    }
+  }
+
+  return '1 second ago';
 
 }
 
