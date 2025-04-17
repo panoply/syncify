@@ -313,8 +313,8 @@ export function invalidTarget ({
   ];
 
   const solution = [
-    `Check for typos in the ${type} target name. If you intended to use this target`,
-    `ensure it is properly defined and associated or use ${_.blue('sy setup')} to connect it.`
+    `Check for a typo in the ${type} target name. If you intended to use this target`,
+    `ensure it is properly defined and associated or use ${_.blue('sy keychain')} to connect it.`
   ];
 
   const expected = storeName

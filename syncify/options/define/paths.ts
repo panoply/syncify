@@ -3,8 +3,9 @@ import type { Pattern, Stash } from 'types';
 
 import anymatch from 'anymatch';
 import glob from 'fast-glob';
+import { pathExists } from 'fs-extra';
 
-import { typeError, warnOption } from '~cli/throws';
+import { invalidInput, typeError, warnOption } from '~cli/throws';
 import { PATH_KEYS, THEME_KEYS } from '~const';
 import { setPathCache } from '~process/cache';
 import { parse } from '~process/files';
@@ -21,6 +22,11 @@ import { $, q } from '$';
  * build directory input in directory paths it will ensure it is formed correctly.
  */
 export async function setPaths () {
+
+  if (!(await pathExists($.dirs.input))) {
+
+    return invalidInput('Missing input directory');
+  }
 
   const getUri = normalPath($.dirs.input);
   const warn = warnOption('paths');

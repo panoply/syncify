@@ -145,7 +145,7 @@ export function setStoreClient (vars: { [key: string]: string; }) {
 
       const name = p.slice(0, m);
       const password = getStorefrontPassword(name);
-      const token = getAxiosConfig(vars, name);
+      const token = getXiorConfig(vars, name);
 
       $.stores.push({
         name,
@@ -167,7 +167,7 @@ export function setStoreClient (vars: { [key: string]: string; }) {
  * Generate the the authorization request url for axios clients. This will contain the
  * `X-Shopify-Access-Token` headers and endpoint URL.
  */
-export function getAxiosConfig (vars: { [key: string]: string; }, name: string) {
+export function getXiorConfig (vars: { [key: string]: string; }, name: string) {
 
   let api_token = name + '_api_token'; // => some-store_api_token
 

@@ -25,11 +25,9 @@ export async function createProject (path: string) {
  */
 export function updateProject () {
 
-  q.cache.add(async () => {
-    if ($.file.project !== null) {
-      await writeFileAtomic($.file.project, JSON.stringify($.project));
-    }
-  });
+  if ($.file.project !== null) {
+    q.cache.add(async () => await writeFileAtomic($.file.project, JSON.stringify($.project)));
+  }
 
 }
 
@@ -94,6 +92,7 @@ export function project () {
       targetSource: null,
       textEditor: null,
       gitRemote: null,
+      syncifyConfig: null,
       expires: getFuture(3),
       credentials: null,
       createdAt: date,
@@ -101,7 +100,7 @@ export function project () {
       lastVersionCheck: date
     });
 
-    getGitAddress();
+    if (!$.project.gitRemote) getGitAddress();
 
   }
 
@@ -114,13 +113,11 @@ export function project () {
  */
 export function getGitAddress () {
 
-  if (!$.project.gitRemote) {
-
-    try {
-      $.project.gitRemote = execSync('git config --get remote.origin.url').toString().trim();
-    } catch {
-      return false;
-    }
-
+  try {
+    $.project.gitRemote = execSync('git config --get remote.origin.url').toString().trim();
+  } catch {
+    $.project.gitRemote = null;
+    return false;
   }
+
 }

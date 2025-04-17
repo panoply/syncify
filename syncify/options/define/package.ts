@@ -8,6 +8,7 @@ import { updatePackage, writePackage } from 'write-package';
 import { parse } from '@syncify/json';
 
 import { error } from '~cli/errors';
+import { parsePackageJson } from '~process/files';
 import { has, isArray, isEmpty, isString, keys, merge } from '~utils';
 
 import { $ } from '$';
@@ -25,7 +26,7 @@ export function getPkgSync () {
 
     } catch (e) {
 
-      throw error.json(e, { relative: 'package.json' });
+      throw error.json(e, parsePackageJson($.file.pkg));
 
     }
 
@@ -59,12 +60,15 @@ export async function getPkg (cwd?: string) {
 
     } catch (e) {
 
-      throw error.json(e, { base: 'package.json' });
+      throw error.json(e, parsePackageJson(path));
 
     }
 
-  }
+  } else {
 
+    if ($.file.project !== null && $.project.targetSource === 'package.json') $.project.targetSource = null;
+
+  }
 }
 
 /**
@@ -81,13 +85,17 @@ export async function setPkg (json: PKG, cwd?: string) {
 
     if (cwd) {
 
-      await writePackage(join(cwd, 'package.json'), json);
+      await writePackage(join(cwd, 'package.json'), json, { indent: $.json.useTab ? '\t' : $.json.indent });
 
       return getPkg(cwd);
 
     } else {
 
-      await updatePackage($.file.pkg, json);
+      if ($.pkg === null) {
+        await writePackage($.file.pkg, json, { indent: $.json.useTab ? '\t' : $.json.indent });
+      } else {
+        await updatePackage($.file.pkg, json);
+      }
 
       return getPkg();
 
@@ -95,7 +103,7 @@ export async function setPkg (json: PKG, cwd?: string) {
 
   } catch (e) {
 
-    throw error.json(e, { base: 'package.json' });
+    throw error.json(e, parsePackageJson($.file.pkg));
 
   }
 

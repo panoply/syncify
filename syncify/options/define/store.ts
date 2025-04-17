@@ -13,31 +13,31 @@ import { throwError, warnSevere } from '~cli/throws';
 import { TARGET_FILES } from '~const';
 import { error } from '~errors';
 import { PromptSelectThemes, PromptStorage, PromptThemeTargets } from '~prompts/targets';
-import { has, hasPath, isEmpty, isObject, murmur } from '~utils';
+import { assign, delay, has, hasPath, isEmpty, isObject, murmur } from '~utils';
 import { parseToml, parseYaml } from '~utils/parsers';
 
 import { $ } from '$';
 
 const enum TargetFile {
   /**
-   * No external `theme.toml` or `theme.yaml` config file exists.
+   * No external `stores.toml` or `stores.yaml` config file exists.
    */
   NONE = -1,
   /**
-   * An external `theme.toml` file is present
+   * An external `stores.toml` file is present
    */
   TOML = 0,
   /**
-   * An external `theme.yaml` file is present
+   * An external `stores.yaml` file is present
    */
   YAML = 1,
   /**
-   * An external `theme.yml` file is present
+   * An external `stores.yml` file is present
    */
   YML = 2
 }
 
-const enum Action {
+export const enum Action {
   /**
    * Do nothing, this infers targets are already configured.
    */
@@ -67,12 +67,33 @@ const enum Action {
 }
 
 /**
- * Search for the existence of `theme.toml` or `theme.yaml` file
+ * Search for the existence of `stores.toml` or `stores.yaml` file
  * in the projects workspace root directory.
  */
 async function getTargetFile () {
 
   let type: TargetFile = TargetFile.NONE;
+
+  if ($.project.targetSource !== null) {
+
+    const path = join($.cwd, $.project.targetSource);
+
+    type = path.endsWith('toml')
+      ? TargetFile.TOML
+      : path.endsWith('yaml')
+        ? TargetFile.YAML
+        : TargetFile.YML;
+
+    if (await pathExists(path)) {
+      $.file.targets = path;
+      return type;
+    }
+
+    $.project.targetSource = null;
+
+    return TargetFile.NONE;
+
+  }
 
   for (let i = 0, s = TARGET_FILES.length; i < s; i++) {
 
@@ -137,59 +158,70 @@ async function getStoresFromFile (): Promise<FileTargets> {
 /**
  * Obtain store and theme targets from the available reference points.
  * Looks in the `package.json` file and when not found moves to external
- * `theme.toml` or `theme.yaml` files. If still unable to obtain, proceeds
+ * `stores.toml` or `stores.yaml` files. If still unable to obtain, proceeds
  * with an actionable operation based on runtime commands and mode.
  */
-export async function getTargets () {
+export async function getTargets (options?: {
+  action?: Action,
+  method?: LiteralString<'package.json' | 'stores.toml' | 'stores.yaml'>,
+  target?: FileTargets,
+  banner?: boolean,
+  oninit?: boolean
+}) {
 
-  let action: Action = Action.NOTHING;
-  let method: LiteralString<'package.json' | 'theme.toml' | 'theme.yaml'>;
-  let target: FileTargets;
+  let {
+    action,
+    method,
+    target,
+    banner,
+    oninit
+  } = assign({
+    action: Action.NOTHING,
+    method: undefined,
+    target: undefined,
+    banner: false,
+    oninit: $.mode.init
+  }, options);
 
-  if ($.pkg !== null) {
+  if (action === Action.NOTHING) {
+    if ($.pkg !== null) {
+      if (hasPath('syncify.stores', $.pkg)) {
 
-    if (hasPath('syncify.stores', $.pkg)) {
+        if (isObject($.pkg.syncify.stores)) {
 
-      if (isObject($.pkg.syncify.stores)) {
-
-        method = 'package.json';
-
-        if (isEmpty($.pkg.syncify.stores)) {
-
-          action = Action.PROMPT_THEMES;
           method = 'package.json';
+
+          if (isEmpty($.pkg.syncify.stores)) {
+
+            action = Action.PROMPT_THEMES;
+            method = 'package.json';
+
+          } else {
+
+            target = $.pkg.syncify.stores;
+
+          }
 
         } else {
 
-          target = $.pkg.syncify.stores;
+          throwError([
+            `Invalid store/theme target references defined in ${bold('package.json')} file`
+          ], [
+            `Syncify expects and ${cyan('object')} type structure`
+          ]);
 
         }
 
+      } else if (has('syncify', $.pkg)) {
+        action = Action.PKG_KEY;
+        method = 'package.json';
       } else {
-
-        throwError([
-          `Invalid store/theme target references defined in ${bold('package.json')} file`
-        ], [
-          `Syncify expects and ${cyan('object')} type structure`
-        ]);
-
+        action = Action.CHECK_FILES;
       }
 
-    } else if (has('syncify', $.pkg)) {
-
-      action = Action.PKG_KEY;
-      method = 'package.json';
-
     } else {
-
       action = Action.CHECK_FILES;
-
     }
-
-  } else {
-
-    action = Action.CHECK_FILES;
-
   }
 
   if (action === Action.CHECK_FILES || action === Action.PKG_KEY) {
@@ -198,7 +230,7 @@ export async function getTargets () {
 
     if (targets !== null) {
 
-      method = $.file.targets.endsWith('toml') ? 'theme.toml' : 'theme.yaml';
+      method = $.file.targets.endsWith('toml') ? 'stores.toml' : 'stores.yaml';
 
       if (isEmpty(targets)) {
 
@@ -218,51 +250,57 @@ export async function getTargets () {
     }
   }
 
+  if (oninit) return;
   if (action === Action.PKG_KEY) action = Action.PROMPT_THEMES;
 
-  let banner: boolean = false;
-
   if (action === Action.PROMPT) {
-    banner = true;
-    action = Action.PROMPT_THEMES;
-    method = await PromptStorage([
-      'You have not provided store and theme targets. Syncify requires a hard-reference',
-      'to be defined in your projects root directory. Please select a storage method to use',
-      'and follow the prompts' + COL
-    ]);
+    if ($.project.credentials !== null) {
+
+      banner = true;
+      action = Action.PROMPT_THEMES;
+      method = await PromptStorage([
+        'You have not provided store and theme targets. Syncify requires a hard-reference',
+        'to be defined in your projects root directory. Please select a storage method to use',
+        'and follow the prompts' + COL
+      ]);
+
+    }
   }
 
   if (action === Action.PROMPT_THEMES) {
+    if ($.project.credentials !== null) {
 
-    const message = banner ? undefined : [
-      'You have not provided theme target references which are required by Syncify.',
-      'You can choose to associate existing theme/s from your store or create and publish',
-      'a new theme based on the current project' + COL
-    ];
+      const message = banner ? undefined : [
+        'You have not provided theme target references which are required by Syncify.',
+        'You can choose to associate existing theme/s from your store or create and publish',
+        'a new theme based on the current project' + COL
+      ];
 
-    const run = await PromptThemeTargets(message);
+      const run = await PromptThemeTargets(message);
 
-    if (run === 'select') {
+      if (run === 'select') {
 
-      const { string, parsed } = await PromptSelectThemes(method);
+        const { string, parsed } = await PromptSelectThemes(method);
 
-      if (method !== 'package.json') {
+        if (method !== 'package.json') {
 
-        target = parsed;
+          target = parsed;
 
-        await writeFile($.file.targets, string);
+          await writeFile($.file.targets, string);
 
-      } else {
+        } else {
 
-        $.pkg = await setPkg({ syncify: parsed });
+          await setPkg({ syncify: parsed });
 
-        target = $.pkg.syncify.stores;
+          target = $.pkg.syncify.stores;
+
+        }
 
       }
-
     }
-
   }
+
+  if ($.project.credentials === null) return;
 
   const warn = warnSevere('targets');
 

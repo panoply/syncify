@@ -117,15 +117,22 @@ export async function getCaches () {
   // First, we are going to analyse the execution performed
   // Only when init mode is false and project file is null
   //
-  if ($.mode.init === false && $.file.project === null) {
-    if ($.project.credentials !== null) {
-      caches({ create: true });
+  if ($.file.project === null) {
+    if ($.mode.init === false) {
+      if ($.project.credentials !== null) {
+        caches({ create: true });
+      } else {
+        unknownProject();
+        return;
+      }
     } else {
-      unknownProject();
+
+      // await createCaches();
+
       return;
+
     }
   }
-
   $.cache.uri = o();
 
   for (const file of CACHE_FILES) {

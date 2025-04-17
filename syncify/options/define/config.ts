@@ -74,21 +74,31 @@ export async function getTSConfig (): Promise<Tsconfig> {
  */
 export async function getConfigFile (): Promise<Config> {
 
-  for (const file of SYNCIFY_CONFIG) {
-
-    const path = join($.cwd, file);
-
-    if (await pathExists(path)) {
-      $.file.config = path;
-      break;
+  if ($.project.syncifyConfig !== null) {
+    if (await pathExists($.project.syncifyConfig)) {
+      $.file.config = $.project.syncifyConfig;
+    } else {
+      $.file.config = null;
     }
   }
 
   if ($.file.config === null) {
 
+    for (const file of SYNCIFY_CONFIG) {
+
+      const path = join($.cwd, file);
+
+      if (await pathExists(path)) {
+        $.file.config = path;
+        $.project.syncifyConfig = path;
+        break;
+      }
+    }
+
     if ($.pkg !== null) {
       if (hasPath('syncify.config', $.pkg) && !isEmpty($.pkg.syncify.config)) {
         $.file.config = $.file.pkg;
+        $.project.syncifyConfig = $.file.pkg;
         return $.pkg.syncify.config;
       }
     }
