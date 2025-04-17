@@ -151,6 +151,7 @@ const external = [
   'svgo',
   'js-yaml',
   'smol-toml',
+  '@tailwindcss/postcss',
 
   // PEER TRANSFORM SPECIFIC
   //

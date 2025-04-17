@@ -91,6 +91,7 @@
   "prettier": "@syncify/prettier-config",
   "dependencies": {
     "@parcel/watcher": "catalog:",
+    "@syncify/acquire": "workspace:^",
     "@syncify/json": "workspace:^",
     "@syncify/turndown": "workspace:^",
     "@syncify/uws": "workspace:^",
@@ -122,7 +123,6 @@
     "@graphql-codegen/typescript-operations": "^4.5.1",
     "@liquify/schema": "^0.9.10",
     "@shopify/api-codegen-preset": "^1.1.5",
-    "@syncify/acquire": "workspace:^",
     "@syncify/ansi": "workspace:^",
     "@syncify/codeframe": "workspace:^",
     "@syncify/codegen": "workspace:^",

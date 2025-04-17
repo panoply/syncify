@@ -17,19 +17,19 @@ Syncify is a specialized tool designed for Shopify theme development. It offers 
 
 If you are seeking a tool that has considered requirement factors across the modern Shopify Theme Development ecosystem, and would like a solution that produces performance-focused optimizations at the development process level with features designed for the complexities of modern e-commerce, see the below core capabilities offerred by Syncify:
 
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Custom input → output directory structures for tailored project organization.</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Compiling TypeScript, JavaScript, TSX, and JSX to support modern web development practices</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Tailwind, PostCSS, and SASS stylesheet support for advanced CSS management</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Terse minification of Markup and Liquid to optimize performance</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Static pages with Markdown → Markup transformation for content creation flexibility</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Metafield, Redirects, and Navigation synchronization for seamless data management</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Version Controlled theme distribution ensuring consistency and traceability</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Shared Schemas as a superset implementation for enhanced data modeling</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Frontmatter controlled liquid level configuration to fine-tune template behavior</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>SVG transform and sprite generation processing for efficient icon and graphic handling</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Multistore and theme parallel synchronization to manage multiple storefronts</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Websocket HOT Reloads with CFH control and morphing for real-time development feedback</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong> $\color{Green}{✓}$ <samp>Git-based automations with CI baked integrations for streamlined development workflows</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Custom input → output directory structures for tailored project organization.</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Compiling TypeScript, JavaScript, TSX, and JSX to support modern web development practices</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Tailwind, PostCSS, and SASS stylesheet support for advanced CSS management</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Terse minification of Markup and Liquid to optimize performance</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Static pages with Markdown → Markup transformation for content creation flexibility</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Metafield, Redirects, and Navigation synchronization for seamless data management</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Version Controlled theme distribution ensuring consistency and traceability</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Shared Schemas as a superset implementation for enhanced data modeling</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Frontmatter controlled liquid level configuration to fine-tune template behavior</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>SVG transform and sprite generation processing for efficient icon and graphic handling</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Multistore and theme parallel synchronization to manage multiple storefronts</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Websocket HOT Reloads with CFH control and morphing for real-time development feedback</samp></strong></i><br>
+&nbsp;&nbsp;<i><strong>✓<samp>Git-based automations with CI baked integrations for streamlined development workflows</samp></strong></i><br>
 
 <h1></h1>
 
