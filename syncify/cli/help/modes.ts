@@ -51,6 +51,27 @@ export function Modes (mode: string) {
 };
 
 /**
+ * `sy help init`
+ */
+Modes.init = () => {
+
+  const info = description('init');
+
+  _.Create()
+  .BR
+  .Top(`help ${_.TLD} sy inspect`, false)
+  .True(info, tui => tui.Header(`DESCRIPTION${_.COL}`, _.bold).Wrap(_.gray, info.overview))
+  .True(info, tui => tui.Prepend(info.reference, _.gray.underline))
+  .Header(`COMMANDS${_.COL}`, _.bold)
+  .Line(' $ sy init')
+  .NL
+  .End(`help ${_.TLD} sy inspect`, false)
+  .BR
+  .toLog(highlight);
+
+};
+
+/**
  * `sy help push`
  */
 Modes.push = () => {

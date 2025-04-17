@@ -1,4 +1,8 @@
 export const description = (mode: string) => ({
+  init: {
+    reference: 'https://syncify.sh/cli/sy-init',
+    overview: 'The init command is used to initalize a new Syncify project. This command analyzes the current directory and guides you through an interactive setup prompt.'
+  },
   create: {
     reference: 'https://syncify.sh/cli/sy-create',
     overview: 'The create command is an interactive command prompt. You can (optionally) provide a strap name option to skip choice selection. Options with strikethrough are either deprecated or not yet available for use.'
