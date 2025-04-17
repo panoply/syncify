@@ -32,7 +32,8 @@ export const enum Type {
   Metafield,
   Page,
   Spawn,
-  Syncify
+  Syncify,
+  Package
 }
 
 /**
@@ -54,6 +55,7 @@ export const enum Namespace {
   Pages = 'pages',
   Schema = 'schema',
   Syncify = 'syncify',
+  Package = 'package',
 }
 
 /**
