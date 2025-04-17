@@ -1,7 +1,6 @@
 {
   "name": "@syncify/acquire",
-  "version": "0.0.5",
-  "access": "restricted",
+  "version": "0.0.6",
   "description": "File require and import helper with TS Transform support",
   "scripts": {
     "dev": "tsup --watch",
@@ -10,6 +9,11 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "LICENSE"
+  ],
   "keywords": [
     "syncify",
     "config-file",
@@ -27,10 +31,7 @@
     "email": "n.savvidis@gmx.com"
   },
   "license": "Apache-2.0",
-  "devDependencies": {
-    "esbuild": "catalog:"
-  },
-  "peerDependencies": {
+  "dependencies": {
     "esbuild": "catalog:"
   }
 }

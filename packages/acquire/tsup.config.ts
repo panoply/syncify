@@ -10,8 +10,7 @@ export default defineConfig([
     bundle: true,
     dts: true,
     external: [
-      'esbuild',
-      '@parcel/watcher'
+      'esbuild'
     ]
   }
 ]);
