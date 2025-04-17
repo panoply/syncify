@@ -282,13 +282,13 @@
       "title": "CLI",
       "links": [
         {
-          "title": "sy create",
-          "url": "/cli/sy-create/",
+          "title": "sy init",
+          "url": "/cli/sy-init/",
           "navbar": "documentation"
         },
         {
-          "title": "sy setup",
-          "url": "/cli/sy-setup/",
+          "title": "sy create",
+          "url": "/cli/sy-create/",
           "navbar": "documentation"
         },
         {

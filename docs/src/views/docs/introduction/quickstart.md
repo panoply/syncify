@@ -4,9 +4,11 @@ layout: base.liquid
 permalink: '/quickstart/index.html'
 anchors:
   - 'Quickstart'
-  - 'Key Features'
-  - 'Developer Driven Innovation'
-  - 'Rationale'
+  - 'Installation'
+  - 'Initialize'
+  - 'Generating'
+  - 'Publishing'
+  - 'Development'
 ---
 
 # Quickstart
@@ -70,51 +72,55 @@ $ bun add @syncify/cli -g
 
 ---
 
-# Authorization
-
-Syncify needs access to your Shopify store(s). You can grant this access either on a per-project basis using a `.env` file, or through the [Syncify Keychain](/usage/keychain/). If you wish to set up store access at a later stage, you can skip ahead to the [Initialize](#initialize) step below. For this quickstart walkthrough, we'll use the keychain approach. This method securely stores and encrypts access tokens for your stores on your device, allowing reuse across multiple projects.
-
-:::: grid row mt-3
-::: grid col-12 col-md-5 fs-sm
-
-#### CLI
-
-```bash
-$ sy keychain
-```
-
-:::
-::::
-
-> The [authentication](/setup/authentication/) guide can assist you in obtaining an API Token from Shopify. The interactive prompt will check these tokens and report back if a connection cannot be established.
-
----
-
 # Initialize
 
-#### Cli
+After installing Syncify, use the `sy init` command to initialize a new project. This command analyzes the current directory and guides you through an interactive setup prompt. It's typically used to set up Syncify in existing projects or when migrating from the Shopify CLI. For starting a new project from scratch, use the `sy create` command, detailed below.
 
-:::: grid row mt-3
-::: grid col-12 col-md-5 fs-sm
+:::: grid row mt-5
+::: grid col-12 col-md-6 fs-sm pr-5
+
+#### Global Binary 👍
 
 ```bash
 $ sy init
 ```
 
 :::
+::: grid col-12 col-md-6 fs-sm
+
+#### Local Binary 👎
+
+```bash
+$ pnpm sy init
+```
+
+:::
 ::::
 
-# Generate
+> If you execute `sy init` inside an existing theme project that is determined to be using a flat-directory structure, Syncify will complain due to the enforced [hierarchical](/usage/directory-structures/) structure it imposes.
 
-Syncify can generate projects using one of the available starting-point [straps](https://github.com/syncifycli/). These straps provide pre-configured themes and usage examples that help developers kickstart their development with Syncify. To generate a new project, we'll use the bare-bones [Dusk Theme](https://github.com/syncifycli/) strap. Run the `create` command along with `"dusk"` and Syncify will create a project based on that strap:
+---
 
-:::: grid row mt-3
-::: grid col-12 col-md-5 fs-sm
+# Generating
 
-#### Cli
+If you're looking to test things out, you can use Syncify to generate projects from one of the available starting-point [straps](https://github.com/syncifycli/). These straps provide pre-configured themes and usage examples that help developers kickstart their development with Syncify. To generate a new project, we'll use the bare-bones [Dusk Theme](https://github.com/syncifycli/dusk) strap. Run the `create` command along with `"dusk"` and Syncify will create a project based on that strap:
+
+:::: grid row mt-5
+::: grid col-12 col-md-6 fs-sm pr-5
+
+#### Global Binary 👍
 
 ```bash
 $ sy create "dusk"
+```
+
+:::
+::: grid col-12 col-md-6 fs-sm
+
+#### Local Binary 👎
+
+```bash
+$ pnpm sy create "dusk"
 ```
 
 :::
@@ -124,17 +130,26 @@ $ sy create "dusk"
 
 ---
 
-# Publish
+# Publishing
 
-If you've provided Syncify with store access, the `create` command would have offered you the option to publish the generated theme directly to your Shopify store. If the theme has already been published, you can proceed with development. However, if you haven't provided store access or published the theme, you'll need to do so before development can start. Use the `publish` command, which will verify store access and guide you through setting up authorization if needed, before moving forward.
+If you've provided Syncify with store access, the `sy create` command would have offered you the option to publish the generated theme directly to your Shopify store. If the theme has already been published, you can proceed with development. However, if you haven't provided store access or published the theme, you'll need to do so before development can start. Use the `publish` command, which will verify store access and guide you through setting up authorization if needed, before moving forward.
 
-:::: grid row mt-3
-::: grid col-12 col-md-5 fs-sm
+:::: grid row mt-5
+::: grid col-12 col-md-6 fs-sm pr-5
 
-#### Cli
+#### Global Binary 👍
 
 ```bash
 $ sy publish
+```
+
+:::
+::: grid col-12 col-md-6 fs-sm
+
+#### Local Binary 👎
+
+```bash
+$ pnpm sy publish
 ```
 
 :::
@@ -144,20 +159,16 @@ $ sy publish
 
 ---
 
-# Developing
+# Development
 
-If you've followed the above steps, you can start developing, but before we begin let's quickly go over the theme, some basic commands and usage. The first thing you'll notice in Syncify is that themes do not use flat directory structures and for developers migrating from the Shopify CLI this might feel disorientating, but have some faith compadre.
-
-#### Dusk Theme
-
-When developing, you will edit files contained in the `source` directory. The `theme` directory is where source files will be written and it reflects the remote version available in your store. Dusk defaults to using a familiar structure that mimics the standard (flat) theme structure, with the only different being that you'll find files within the `source` directory.
+If you've followed the above steps, you can start developing. Depending on how you have set things up, at this point you should have an input directory and output directory located in the root of your project. When developing, you will edit files contained in the `source` directory. The `theme` directory is where source files will be written and it reflects the remote version available in your store.
 
 ```treeview
 /
-├── source/                              # The main directory where all source files are contained
-├── theme/                               # The distribution directory where source themes are written
-├── .gitignore                      # Ignored files for git, includes theme directory and node_modules
-├── package.json                  # The package.json file for node modules and friends
+├── source/                    # The main directory where all source files are contained
+├── theme/                    # The distribution directory where source themes are written
+├── .gitignore                # Ignored files for git, includes theme directory and node_modules
+├── package.json              # The package.json file for node modules and friends
 └── syncify.config.ts         # The configuration file for Syncify
 ```
 
@@ -166,6 +177,6 @@ When developing, you will edit files contained in the `source` directory. The `t
 Syncify provides an extensive list of commands, all of which you will likely use at some point or another, but the main two are the **build** and **watch** commands.
 
 ```bash
-$ sy watch  # Watches for changes and syncs them to store
-$ sy build  # Build the entire theme from source
+$ sy watch     # Watches for changes and syncs them to store
+$ sy build     # Build the entire theme from source
 ```

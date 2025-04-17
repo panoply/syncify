@@ -12,16 +12,13 @@ anchors:
   - Syncify CLI
   - Binaries
   - Command List
-  - Generators
 ---
 
 # Syncify CLI
 
-Syncify is engineered as a Command Line Interface (CLI) tool, presenting a Terminal User Interface that combines functionality with an elegant design. It supports prompt-based navigation and short code flags for streamlined interaction.
+Syncify is engineered as a Command Line Interface (CLI) tool. It distributes with a Terminal User Interface (TUI) that combines functionality with an elegant design. The CLI supports prompt-based navigation and short code flags for streamlined interaction, with a ton of other great features.
 
-The CLI leverages information from your project's `package.json`, which needs to reside in the root directory. Given its integration with Shopify, Syncify also requires a `.env` file with your store's credentials (find setup instructions at [authentication](/setup/authentication/)).
-
-> This guide aims to introduce you to Syncify's basic command line operations, and help you understand how to execute different tasks and carry out operations for your local machine to your remote Shopify store and theme.
+> The CLI leverages information from your project's `package.json`, which needs to reside in the root directory. Given its integration with Shopify, Syncify also requires a `.env` file with your store's credentials (see [authentication](/setup/authentication/)).
 
 ---
 
@@ -29,11 +26,11 @@ The CLI leverages information from your project's `package.json`, which needs to
 
 The CLI can be installed globally or locally depending on your preference. If installed globally, the `sy` (or `syncify`) binary becomes universally accessible from any project directory on your device. For those opting for project-specific installations, it is recommended that your provide `{json} "script":{}` shortcuts for your package manager to access the Syncify executable binary, for example:
 
-### Global Install
+### 👍 Global Installation
 
 Those who have opted for a global installation do not need to add a script shortcut. One of the benefits of using a global installation is that Syncify will perform periodic checks for version updates and notifies you when an update is available. In localized installations, this feature will not apply.
 
-### Local Install
+### 👎 Local Installation
 
 For those opting for project-specific installations, it is recommended that your provide `{json} "script":{}` shortcuts for your package manager to access the Syncify executable binary, for example:
 
@@ -61,8 +58,8 @@ Default:
   $ syncify                   # Alias of sy, meaning it can be used instead of sy
 
 Modes:
+  sy init                     # Initilise a Syncify project
   sy create                   # Generate a fresh Syncify theme strap boilerplate
-  sy setup                    # Interactive helper for setting up Syncify
   sy build                    # Builds the theme from input source, can be used with filter
   sy watch                    # Watches theme for changes and builds theme from source
   sy pull                     # Pull prompt, sync remote versions with local (optional glob accepted)
@@ -107,35 +104,5 @@ Miscellaneous:
 ```
 
 {% endraw %}
-
----
-
-# Generators
-
-With a fresh installation of Syncify, the first step is to utilize the setup and strap generator prompts. These prompts help you quickly create Syncify-ready projects with minimal effort. The cool thing about modern package managers is that you don’t even need Syncify installed to generate projects because tools like `npm`, `yarn` and `pnpm` offer `dlx` capabilities that can run it headless.
-
-##### Setup
-
-Open up your terminal and run the following command:
-
-```bash
-$ pnpm dlx @syncify/cli sy setup
-```
-
-##### Strap
-
-If you have a project already created or `.env` file exists you can ran the `strap` command. This will provide you with a list of usage example and themes to generate.
-
-```bash
-$ sy strap
-```
-
-##### Themes
-
-If you have a project already created or `.env` file exists you can ran the `strap` command. This will provide you with a list of usage example and themes to generate.
-
-```bash
-$ sy themes
-```
 
 ---

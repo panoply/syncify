@@ -362,6 +362,10 @@ h5 {
   border: none !important;
 }
 
+.dir-struc .papyrus {
+  height: 300px;
+}
+
 ol {
   margin-top: $spacer-4;
   margin-bottom: $spacer-4;
@@ -382,6 +386,36 @@ ol {
       font-family: $font-family-heading;
       margin-right: $spacer-2;
     }
+  }
+}
+
+h4.good {
+  background-position: center right;
+  background-size: 20px;
+  color: $green;
+  background-repeat: no-repeat;
+  background-image: url(icon-check($green, 2));
+}
+
+h4.bad {
+  background-position: center right;
+  background-size: 20px;
+  color: $red;
+  background-repeat: no-repeat;
+  background-image: url(icon-cross($red, 2));
+}
+
+.bd-good {
+  > .papyrus {
+    border-width: 0.01rem;
+    border-color: $green;
+  }
+}
+
+.bd-bad {
+  > .papyrus {
+    border-width: 0.01rem;
+    border-color: $red;
   }
 }
 

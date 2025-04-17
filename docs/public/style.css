@@ -11562,6 +11562,10 @@ h5 > code, .h5 > code {
   border: none !important;
 }
 
+.dir-struc .papyrus {
+  height: 300px;
+}
+
 ol {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
@@ -11579,6 +11583,32 @@ ol li::marker {
   font-weight: bold;
   font-family: "JetBrains Mono", monospace;
   margin-right: 0.5rem;
+}
+
+h4.good, .good.h4 {
+  background-position: center right;
+  background-size: 20px;
+  color: #4ebb74;
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ebb74' stroke-width='2'%3e%3cpath d='M20 6 9 17l-5-5' /%3e%3c/svg%3e");
+}
+
+h4.bad, .bad.h4 {
+  background-position: center right;
+  background-size: 20px;
+  color: #dc3545;
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23dc3545' stroke-width='2'%3e%3cpath d='M18 6 6 18M6 6l12 12'/%3e%3c/svg%3e");
+}
+
+.bd-good > .papyrus {
+  border-width: 0.01rem;
+  border-color: #4ebb74;
+}
+
+.bd-bad > .papyrus {
+  border-width: 0.01rem;
+  border-color: #dc3545;
 }
 
 ul.compare-list {

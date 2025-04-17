@@ -4,8 +4,8 @@ layout: base
 permalink: '/usage/modes/index.html'
 anchors:
   - Modes
+  - sy init
   - sy create
-  - sy setup
   - sy build
   - sy watch
   - sy pull
@@ -37,8 +37,8 @@ Modes in Syncify define distinct execution tasks that drive your Shopify theme d
 
 ```bash
 Modes:
+  $ sy init                     # Interactive helper for setting up Syncify
   $ sy create                   # Generate a fresh Syncify theme strap boilerplate
-  $ sy setup                    # Interactive helper for setting up Syncify
   $ sy build                    # Builds the theme from input source, can be used with filter
   $ sy watch                    # Watches theme for changes and builds theme from source
   $ sy pull                     # Pull prompt, sync remote versions with local (optional glob accepted)
@@ -61,13 +61,13 @@ Modes:
 :::: grid row mt-5
 ::: grid col-12 col-md-12 fs-sm
 
+## sy init
+
+The sy init mode launches an interactive helper to guide you through configuring Syncify for your environment. This command prompts for essential details—like store credentials, theme selection, and directory preferences—streamlining the initial setup process. It’s particularly useful for first-time users or when onboarding Syncify to a new project, ensuring a smooth integration without the guesswork.
+
 ## sy create
 
 The sy create mode generates a fresh Syncify theme strap boilerplate, providing a ready-to-use starting point for Shopify theme development. This command sets up a structured foundation with pre-configured files and directories, incorporating Syncify’s best practices. It’s ideal for developers kicking off a new project who want to bypass manual setup and dive straight into customization, leveraging a template designed for performance and extensibility.
-
-## sy setup
-
-The sy setup mode launches an interactive helper to guide you through configuring Syncify for your environment. This command prompts for essential details—like store credentials, theme selection, and directory preferences—streamlining the initial setup process. It’s particularly useful for first-time users or when onboarding Syncify to a new project, ensuring a smooth integration without the guesswork.
 
 ## sy build
 

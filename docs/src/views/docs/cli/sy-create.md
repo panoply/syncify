@@ -4,7 +4,7 @@ layout: base
 permalink: '/cli/sy-create/index.html'
 ---
 
-# `sy create`
+# Create `{bash} sy create <strap> --flags`
 
 The `sy create` command, available in **global** Syncify installations, initiates a project generator prompt for starting new projects. It creates a theme project on your device, providing a foundation for development by automating setup tasks like credential linking and dependency installation. Ideal for bootstrapping new Shopify themes, it streamlines the initial configuration process.
 
@@ -17,7 +17,7 @@ This create command supports cloning example projects and themes from the [Synci
 
 ---
 
-# `{bash} sy create <strap>`
+# Arguments `{bash} sy create <strap>`
 
 The `sy create` command accepts the following positional arguments.
 
@@ -43,7 +43,7 @@ Examples:
 
 ---
 
-# `{bash} sy create --flags`
+# Flags `{bash} sy create --flags`
 
 The `sy create` command accepts one optional flag to modify its behavior. This is particularly useful for understanding functionality, syntax, or troubleshooting without running the command itself.
 
