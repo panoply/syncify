@@ -8,7 +8,7 @@ import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 
 import { PATH_KEYS } from '~const';
-import { cancel, labels, prompt } from '~prompt';
+import { cancel, choose, label, prompt } from '~prompt';
 import { theme } from '~prompts/enquirer';
 import { assign, constructTree, s } from '~utils';
 
@@ -122,10 +122,10 @@ function buildTree (paths: string[]) {
  * Select Directories Prompt
  *
  * This is a prompt interface used for directory selection
- * or creation. Rendered via various modes with additional
+ * or creation. Rendered via various modes when additional
  * context is required from the user.
  */
-export async function selectDirsPrompt (options: State) {
+export async function PromptSelectDirectories (options: State) {
 
   const state = assign<State, State>({
     action: 'select',
@@ -134,17 +134,6 @@ export async function selectDirsPrompt (options: State) {
     dirName: null,
     subDir: null
   }, options);
-
-  /** Prompt Labels */
-  const label = labels({
-    padding: 0,
-    prompts: <const>[
-      'Action',
-      'Directory Name',
-      'Path Directory',
-      'Sub-Directory'
-    ]
-  });
 
   if (state.action !== 'select') {
     state.action = await PromptAction();
@@ -179,27 +168,27 @@ export async function selectDirsPrompt (options: State) {
 
     const resolve: { action: string } = await prompt<{ action: string }>({
       theme,
-      message: label.Action,
+      message: label.SelectAction,
       name: 'action',
       type: 'select',
       required: true,
-      choices: [
+      choices: choose([
         {
           name: 'select',
           message: 'Select',
-          hint: '    Select an existing directory'
+          hint: 'Select an existing directory'
         },
         {
           name: 'create',
           message: 'Create',
-          hint: '    Create a new sub-directory'
+          hint: 'Create a new sub-directory'
         },
         {
           name: 'cancel',
           message: 'Cancel',
-          hint: '    Cancel and exit'
+          hint: 'Cancel and exit'
         }
-      ]
+      ], { padding: 4, prop: 'name' })()
     }).catch(cancel);
 
     return resolve.action;
@@ -290,11 +279,7 @@ export async function selectDirsPrompt (options: State) {
    */
   async function PromptPathDirectories () {
 
-    const choices = PATH_KEYS.sort().map<Choice>(name => ({
-      name,
-      value: name,
-      message: name
-    }));
+    const choices = PATH_KEYS.sort().map<Choice>(name => ({ name, value: name, message: name }));
 
     choices.push({
       role: 'separator',

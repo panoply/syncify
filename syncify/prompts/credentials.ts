@@ -6,31 +6,79 @@ import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 
 import { accessScopeList, accessStore } from '~http/access';
-import { cancel, intercept, label, prompt, theme } from '~prompt';
-import { eqWS, has, isEmpty, isNil, keys, prettyDate } from '~utils';
+import { cancel, choose, intercept, label, prompt, theme } from '~prompt';
+import { has, isEmpty, isNil, keys, plur, timeAgo } from '~utils';
 
 import { $ } from '$';
 
 export interface CredentialsPrompt {
-  /** String copy of .env file to be written */
+  /**
+   * String copy of .env file to be written
+   *
+   * ```env
+   * # Credentials syncify.myshopify.com
+   * syncify_api_token = 'shppa_88aabbccddeeffgghhiijjllmmnn'
+   * ```
+   */
   env?: string;
-  /** The store */
+  /**
+   * The store name
+   *
+   * @example
+   * 'syncify' in 'syncify.myshopify.com'
+   */
   store?: string;
-  /** The store domain name */
+  /**
+   * The store domain name
+   *
+   * @example
+   * 'syncify.myshopify.com'
+   */
   domain: string;
-  /** The token name */
-  name: string;
-  /** The date keychain reference was created */
+  /**
+   * The date keychain reference was created
+   */
   created: number;
-  /** The date keychain reference was updated */
+  /**
+   * The date keychain reference was updated
+   */
   updated: number;
-  /** The token */
+  /**
+   * The actual API Token
+   *
+   * @example
+   * 'shppa_88aabbccddeeffgghhiijjllmmnn'
+   */
   token: string;
-  /** Whether or not credentials are from existing keychain  */
+  /**
+   * A token name alias to either add to the keychain domain list or
+   * to be selected. This value represents the key names within the
+   * keychain object.
+   *
+   * @example
+   * {
+   *   "syncify.myshopify.com": {
+   *     "<here>": {
+   *       "name":"<here>",
+   *       // ...
+   *      }
+   *    }
+   *  }
+   * }
+   */
+  name: string;
+  /**
+   * Whether or not credentials are from existing keychain
+   */
   existing: boolean;
-  /** The storage method  */
+  /**
+   * The storage method
+   */
   method: LiteralString<'keychain' | 'env'>;
-  /** Access scopes */
+  /**
+   * Access scopes
+   *
+   */
   scopes: Record<AccessScopes, boolean>
 }
 
@@ -41,7 +89,7 @@ export interface CredentialsPrompt {
 export async function PromptCredentialsFile (options: {
   /** Whether or not the greeting message logs */
   greeting: boolean;
-  /** Whether or not we are working with the keychain */
+  /** Whether or not we should use keychain related prompts */
   keychain: boolean;
 }) {
 
@@ -138,12 +186,13 @@ export async function PromptCredentialsFile (options: {
 
   /* ADDING NEW CREDENTIAL ---------------------- */
 
-  state.store = state.domain;
-  state.domain = `${state.store}.myshopify.com`;
+  if (state.domain !== null && state.store === null) {
+    state.store = state.domain.replace(/\.myshopify\.com$/, '');
+  }
 
   const credential = glue.nl(
     `# Credentials: ${state.domain}`,
-    `${state.name}_api_token = '${state.token.trim()}'`
+    `${state.store}_api_token = '${state.token.trim()}'`
   );
 
   if ($.file.env !== null) {
@@ -166,30 +215,21 @@ export async function PromptCredentialsFile (options: {
    */
   async function PromptStoreMethod () {
 
-    const choices: Choice[] = [
-      {
-        name: 'env',
-        value: 'env',
-        hint: 'Per-Project .env file token storage'
-      },
-      {
-        name: 'keychain',
-        value: 'keychain',
-        hint: 'Gobally accessible token vault storage'
-      }
-    ];
-
-    const spacing = eqWS(choices, { prop: 'name', padding: 4 });
     const resolve = await prompt<{ method: string }>({
       theme,
       message: label.StorageMethod,
       name: 'method',
       type: 'select',
-      choices: choices.map(({ name, value, hint }) => ({
-        name,
-        value,
-        hint: spacing(name) + hint
-      }))
+      choices: choose(<Choice[]>[
+        {
+          name: 'env',
+          hint: 'Per-Project .env file token storage'
+        },
+        {
+          name: 'keychain',
+          hint: 'Globally accessible token vault storage'
+        }
+      ], { prop: 'name', padding: 3 })()
     }).catch(cancel);
 
     return resolve.method;
@@ -201,7 +241,7 @@ export async function PromptCredentialsFile (options: {
    */
   async function PromptExisting () {
 
-    const resolve = await prompt<{ existing: string }>({
+    const resolve = await prompt<{ existing: boolean }>({
       theme,
       message: label.ExistingToken,
       name: 'existing',
@@ -218,54 +258,51 @@ export async function PromptCredentialsFile (options: {
 
   /**
    * Select store keychain reference and the API token to use.
+   * Prompts each keychain key which is the related store domain name
+   * in which the token belongs.
    */
   async function PromptKeychain () {
 
-    const items = keys($.keychain);
-    const maxLen = Math.max(...items.map(s => s.length));
-    const padded = items.map(s => ' '.repeat(maxLen - s.length + 2));
     const { domain } = await prompt<{ domain: string }>({
       theme,
       message: label.WhichKeychain,
       type: 'select',
       name: 'domain',
-      choices: items.map((value, i) => ({
-        name: value,
-        message: value.replace('.myshopify.com', ''),
-        hint: padded[i] + `https://${value}`
-      }))
+      choices: choose(keys($.keychain))((domain, value) => {
+        const tokens = keys($.keychain[domain]);
+        const hint = `${tokens.length} ${plur('token', tokens.length)} available`;
+        return {
+          name: domain,
+          hint
+        };
+      })
     }).catch(cancel);
 
     state.domain = domain;
+    state.store = domain.replace(/\.myshopify\.com$/, '');
 
-    const store = $.keychain[domain];
-    const tokens = keys(store);
+    const tokens = keys($.keychain[domain]);
 
-    if (tokens.length > 0) {
-      if (tokens.length > 1) {
+    if (tokens.length > 1) {
 
-        const maxLen = Math.max(...tokens.map(s => s.length));
-        const padded = tokens.map(s => ' '.repeat(maxLen - s.length + 2));
-        const { name } = await prompt<{ name: string }>({
-          theme,
-          message: label.SelectToken,
-          type: 'select',
-          name: 'name',
-          choices: tokens.map((name, i) => ({
-            name,
-            hint: padded[i] + `Created ${prettyDate(store[name].created)}`
-          }))
-        }).catch(cancel);
+      const { name } = await prompt<{ name: string; }>({
+        theme,
+        message: label.SelectToken,
+        type: 'select',
+        name: 'name',
+        choices: choose(tokens)(name => ({
+          name,
+          hint: `added ${timeAgo($.keychain[domain][name].updated)}`
+        }))
+      }).catch(cancel);
 
-        state.name = name;
-        state.token = store[name].token;
+      state.name = name;
+      state.token = $.keychain[domain][name].token;
 
-      } else {
+    } else {
 
-        state.name = tokens[0];
-        state.token = store[tokens[0]].token;
-
-      }
+      state.name = tokens[0];
+      state.token = $.keychain[domain][state.name].token;
 
     }
 
@@ -456,7 +493,7 @@ export async function PromptCredentialsFile (options: {
 
     dispose();
 
-    return resolve.token;
+    return resolve.token.trim();
 
   }
 
@@ -471,7 +508,7 @@ export async function PromptCredentialsFile (options: {
       required: true,
       type: 'input',
       name: 'name',
-      hint: 'Name the API Access Token'
+      hint: 'Name the API Access Token (internal use)'
     }).catch(cancel);
 
     return resolve.name;

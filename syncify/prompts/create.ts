@@ -9,7 +9,7 @@ import writeFile from 'write-file-atomic';
 import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 
-import { credentials } from './credentials';
+import { CredentialsPrompt, PromptCredentialsFile } from './credentials';
 
 import { log } from '~cli/log';
 import * as throws from '~cli/throws';
@@ -17,7 +17,7 @@ import { STRAP_EXAMPLES, STRAP_THEMES } from '~const';
 import { createCaches } from '~options/define/caches';
 import { getPkg, setPkg } from '~options/define/package';
 import { createProject } from '~options/define/project';
-import { cancel, intercept, labels, prompt, theme } from '~prompt';
+import { cancel, intercept, label, prompt, theme } from '~prompt';
 import { assign, checksum, delay, has, hasPath } from '~utils';
 import { execAsync } from '~utils/child';
 
@@ -100,27 +100,12 @@ export async function Create () {
     credentials: null
   };
 
-  /** Prompt Labels */
-  const label = labels({
-    padding: 3,
-    prompts: <const>[
-      'Strap Source',
-      'Choose Strap',
-      'Project Name',
-      'Credentials',
-      'Installation',
-      'Overwrite'
-    ]
-  });
-
   /* PRE-SELECT STRAP --------------------------- */
 
   if (straps.has(select)) {
     state.template = select;
     state.repository = `https://github.com/syncifycli/${select}.git`;
   }
-
-  /* GREETING ----------------------------------- */
 
   /* -------------------------------------------- */
   /* BEGIN PROMPTS                                */
@@ -142,7 +127,7 @@ export async function Create () {
   /* -------------------------------------------- */
 
   const pkguri = join(state.projectPath, 'package.json');
-  const access = await credentials({ greeting: false, keychain: true });
+  const access = await PromptCredentialsFile({ greeting: false, keychain: true });
 
   // Clone the strap from and add into project
   await CreateStrap();
@@ -157,15 +142,17 @@ export async function Create () {
   // at this point we have created the project
   // lets now install any dependencies and set things up
   // first let's grag the package manager if we don't have it.
-  if ($.pm === '?') {
-
-    $.pm = await PromptPackageManager();
-
-  }
+  if ($.pm === '?') $.pm = await PromptPackageManager();
 
   /* CREATE CACHE STORES ------------------------ */
 
-  await CreateCache();
+  await CreateCache({
+    access,
+    cacheRootPath: state.cacheRootPath,
+    hash: state.checksum,
+    name: state.name,
+    projectPath: state.projectPath
+  });
 
   /* INSTALL PROJECT DEPS ----------------------- */
 
@@ -176,7 +163,7 @@ export async function Create () {
   write
   .Header(`${_.CHK} Project ${_.neonGreen.bold(state.name)} Created`, _.bold.white)
   .Wrap(`You can now ${_.cyan(`cd ${state.name}`)} into the directory and start hacking.`, _.gray)
-  .Newline()
+  .NL
   .End($.log.group)
   .toLog({ clear: true })
   .Break();
@@ -315,7 +302,8 @@ export async function Create () {
       choices: [
         {
           name: 'pnpm',
-          message: 'pnpm'
+          message: 'pnpm',
+          hint: WSP + _.gray('recommended')
         },
         {
           name: 'npm',
@@ -339,23 +327,6 @@ export async function Create () {
   /* -------------------------------------------- */
   /* UTILITIES                                    */
   /* -------------------------------------------- */
-
-  /**
-   * Executes package manager installation
-   */
-  async function InstallDependencies () {
-
-    log.spinner('Installing Dependencies', {
-      style: 'spinning',
-      color: _.neonGreen
-    });
-
-    await execAsync(`${$.pm} install`);
-    await delay();
-
-    log.spinner.stop();
-
-  }
 
   /**
    * Creates and updates the straps `package.json` file of the strap.
@@ -387,9 +358,7 @@ export async function Create () {
     $.project.themeVersion = pkg.version;
 
     if (hasPath('devDependencies.@syncify/config', pkg)) {
-
       $.project.configVersion = pkg.devDependencies['@syncify/config'];
-
     }
 
     await setPkg(pkg, state.projectPath);
@@ -403,10 +372,7 @@ export async function Create () {
    */
   async function CreateStrap () {
 
-    log.spinner('Cloning Strap', {
-      style: 'spinning',
-      color: _.neonGreen
-    });
+    log.spinner('Cloning Strap', { color: _.neonGreen });
 
     await execAsync(`git clone --depth 1 ${state.repository} ${state.name}`);
     await delay(); // Ensure clone has finished
@@ -414,78 +380,141 @@ export async function Create () {
 
   }
 
-  /**
-   * Internal operation for creating the cache references in the `.syncify` directory.
-   */
-  async function CreateCache () {
+}
 
-    $.project.dir = state.projectPath;
-    $.project.name = state.name;
-    $.project.credentials = access.method === 'env' ? 'env' : 'kc';
-    $.project.createdAt = Date.now();
+/**
+ * Internal operation for creating the cache references in the `.syncify` directory.
+ */
+export async function CreateCache (options: {
+  /** The Resolved URI of project, this will be {@link $.cwd} in most cases, assigns {@link $.project.dir}. */
+  projectPath: string;
+  /** The projects name that will be assigned to {@link $.project.name} */
+  name: string;
+  /** The cache hash reference for directory names */
+  hash: string;
+  /** Used for joining project name and cacheRootPath then assigned to {@link $.file.project} value */
+  cacheRootPath: string;
+  /** Access object obtained by the {@link PromptCredentialsFile} prompt. */
+  access: CredentialsPrompt
+}) {
 
-    await createCaches(state.checksum);
-    await createProject(join(state.cacheRootPath, state.name));
+  $.project.dir = options.projectPath;
+  $.project.name = options.name;
+  $.project.credentials = options.access.method === 'env' ? 'env' : 'kc';
+  $.project.createdAt = Date.now();
 
-    /* CREATE CREDENTIALS ------------------------- */
+  await createCaches(options.hash);
+  await createProject(join(options.cacheRootPath, options.name));
 
-    if (access.method === 'keychain') {
+  /* CREATE CREDENTIALS ------------------------- */
 
-      await SaveKeychain();
+  if (options.access.method === 'keychain') {
 
-    } else {
+    await SaveKeychain(options.access, {
+      hash: options.hash,
+      cacheRootPath: options.cacheRootPath
+    });
 
-      await writeFile(join(state.projectPath, '.env'), access.env);
+  } else {
 
-    }
+    await writeFile(join(options.projectPath, '.env'), options.access.env);
 
   }
 
-  /**
-   * Saves keychain token references.
-   */
-  async function SaveKeychain () {
+}
 
-    if (has(access.domain, $.keychain)) {
+/**
+ * Executes package manager installation
+ */
+export async function InstallDependencies () {
 
-      if (has(access.name, $.keychain[access.domain])) {
+  log.spinner('Installing Dependencies', { style: 'spinning', color: _.neonGreen });
 
-        const kc = $.keychain[access.domain][access.name];
+  await execAsync(`${$.pm} install`);
+  await delay();
 
-        kc.updated = access.updated;
-        kc.projects.includes(state.checksum) || kc.projects.push(state.checksum);
+  log.spinner.stop();
 
-      } else {
+}
 
-        assign($.keychain[access.domain], {
-          [access.name]: <Keychain>{
-            name: access.name,
-            created: access.created,
-            updated: access.updated,
-            projects: [ state.checksum ],
-            token: access.token
-          }
-        });
+/**
+ * `4` Package Manager
+ *
+ * Prompts user to choose the package manager they will be using to install strap dependencies.
+ */
+export async function PromptPackageManager () {
 
+  const resolve = await prompt<{ pm: string }>({
+    theme,
+    message: label.Installation,
+    type: 'select',
+    name: 'pm',
+    choices: [
+      {
+        name: 'pnpm',
+        hint: WSP + _.gray('recommended')
+      },
+      {
+        name: 'npm'
+      },
+      {
+        name: 'yarn'
+      },
+      {
+        name: 'bun'
       }
+    ]
+  }).catch(cancel);
+
+  return resolve.pm;
+
+}
+
+/**
+ * Saves keychain token references.
+ */
+export async function SaveKeychain (access: CredentialsPrompt, options?: { hash: string; cacheRootPath: string; }) {
+
+  const { hash, cacheRootPath } = assign({ hash: $.hash, cacheRootPath: $.root }, options);
+
+  if (has(access.domain, $.keychain)) {
+
+    if (has(access.name, $.keychain[access.domain])) {
+
+      const kc = $.keychain[access.domain][access.name];
+
+      kc.updated = access.updated;
+      kc.projects.includes(hash) || kc.projects.push(hash);
 
     } else {
 
-      $.keychain[access.domain] = {
+      assign($.keychain[access.domain], {
         [access.name]: <Keychain>{
           name: access.name,
           created: access.created,
           updated: access.updated,
-          projects: [ state.checksum ],
+          projects: [ hash ],
           token: access.token
         }
-      };
+      });
 
     }
 
-    await writeFile($.file.keychain, JSON.stringify($.keychain));
-    await writeFile(join(state.cacheRootPath, '.env'), access.env);
+  } else {
+
+    $.keychain[access.domain] = {
+      [access.name]: <Keychain>{
+        name: access.name,
+        created: access.created,
+        updated: access.updated,
+        projects: [ hash ],
+        token: access.token
+      }
+    };
 
   }
+
+  await writeFile($.file.keychain, JSON.stringify($.keychain));
+  await writeFile(join(cacheRootPath, '.env'), access.env);
 
 }

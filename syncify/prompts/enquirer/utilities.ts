@@ -1,5 +1,5 @@
 import type { PascalCase } from 'type-fest';
-import type { PromptTheme } from 'types';
+import type { Choice, PromptTheme } from 'types';
 
 import { stdout } from 'node:process';
 
@@ -42,7 +42,7 @@ export const theme: PromptTheme = {
   }
 };
 
-export function cancel () {
+export function cancel (e: any): never {
 
   kill(() => {
     log.nl().line('PROCESS EXIT WITH CODE 0', neonRouge);
@@ -51,7 +51,30 @@ export function cancel () {
 
   kill.exit(0);
 
-  return null;
+  throw new Error(e);
+}
+
+export function choose <T extends any[] = Choice[]> (array: T, {
+  prop = '',
+  padding = 2
+}: {
+  prop?: T[number] extends object ? keyof T[number] : T[number],
+  padding?: number
+} = {}) {
+
+  const p = prop.length > 0;
+  const maxLen = Math.max(...array.map(s => p ? s[prop].length : s.length));
+  const padded = array.map(s => ' '.repeat(maxLen - (p ? s[prop].length : s.length) + padding));
+
+  return (cb?: (item: T[number], index?: number) => Choice): Choice[] => array.map((x, i) => {
+    if (cb) {
+      const c = cb(x, i);
+      c.hint = padded[i] + c.hint;
+      return c;
+    }
+    x.hint = padded[i] + x.hint;
+    return x;
+  });
 
 }
 

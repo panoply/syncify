@@ -1,5 +1,6 @@
-import type { Stores, Targets } from 'syncify/model/extends';
-import type { Choice, Fields, LiteralString, PromiseString, SnippetPromptOptions } from 'types';
+import type { Fields, LiteralString, OnlineStoreTheme, PromiseString, SnippetPromptOptions, Store } from 'types';
+
+import { join } from 'node:path';
 
 import { $import } from 'modules';
 
@@ -8,8 +9,9 @@ import { glue } from '@syncify/glue';
 
 import { log } from '~cli/log';
 import { themesList } from '~http/themeFiles';
-import { cancel, intercept, prompt, render, theme } from '~prompt';
-import { eqWS, isArray, keys, values } from '~utils';
+import { setPkg } from '~options/define/package';
+import { cancel, choose, intercept, label, prompt, render, theme } from '~prompt';
+import { delay, isArray, timeAgo, values } from '~utils';
 
 import { $ } from '$';
 
@@ -23,7 +25,7 @@ function JsonTemplate (store: string) {
   );
 
   return {
-    insert: (theme: { name: string; id: number }) => {
+    insert: (theme: { name: string; id: string; }) => {
       template += `      "\${${theme.name}}": ${_.white(theme.id)},${NWL}`;
     },
     output: () => {
@@ -42,70 +44,68 @@ function JsonTemplate (store: string) {
 
 }
 
-function TomlTemplate (store: string) {
+async function TomlTemplate (store: string) {
+
+  await $import('smol-toml');
 
   let template = glue.nl(
-    `${_.gray('theme.toml')}` + NWL,
+    `${_.gray('stores.toml')}` + NWL,
     `[${store.toLowerCase()}]` + NWL
   );
 
   return {
-    insert: (theme: { name: string; id: number }) => {
-      template += `  \${${theme.name}} = ${_.white(theme.id)}${NWL}`;
+    insert: (theme: { name: string; id: string }) => {
+      template += `  \${${theme.name}} = ${_.magentaBright(theme.id)}${NWL}`;
     },
     output: () => template,
-    string: (input: string) => input.trim().replace('theme.toml', '').trim(),
+    string: (input: string) => input.trim().replace('stores.toml', '').trim(),
     parse: (input: string) => $import.toml.parse(input)
   };
 
 }
 
-function YamlTemplate (store: string) {
+async function YamlTemplate (store: string) {
+
+  await $import('js-yaml');
 
   let template = glue.nl(
-    `${_.gray('theme.yaml')}` + NWL,
+    `${_.gray('stores.yaml')}` + NWL,
     `${store.toLowerCase()}:` + NWL
   );
 
   return {
-    insert: (theme: { name: string; id: number }) => {
-      template += `  \${${theme.name}}: ${_.white(theme.id)}${NWL}`;
+    insert: (theme: { name: string; id: string }) => {
+      template += `  \${${theme.name}}: ${_.magentaBright(theme.id)}${NWL}`;
     },
     output: () => template,
-    string: (input: string) => input.trim().replace('theme.yaml', '').trim(),
-    parse: (input: string) => $import.yaml.load(input.trim().replace('theme.yaml', ''))
+    string: (input: string) => input.trim().replace('stores.yaml', '').trim(),
+    parse: (input: string) => $import.yaml.load(input.trim().replace('stores.yaml', ''))
   };
 
 }
 
-export async function PromptTargetFileTemplate ({
-  store,
-  method,
-  targets
-}: {
-  store: Stores,
-  targets: Targets,
-  method: LiteralString<'package.json' | 'store.toml' | 'store.yaml'>
+export async function PromptTargetFileTemplate ({ store, method, targets }: {
+  store: Store,
+  targets: OnlineStoreTheme[],
+  method: LiteralString<'package.json' | 'stores.toml' | 'stores.yaml'>
 }) {
 
   const template = method === 'package.json'
     ? JsonTemplate(store.name)
-    : method === 'store.toml'
-      ? TomlTemplate(store.name)
-      : YamlTemplate(store.name);
+    : method === 'stores.toml' ? await TomlTemplate(store.name) : await YamlTemplate(store.name);
 
   const fields: Fields[] = [];
 
-  for (const theme of targets) {
-    template.insert(theme);
+  for (const { name, id } of targets) {
+    template.insert({ name, id });
     fields.push({
-      name: theme.name,
-      message: theme.name,
+      name,
+      message: name,
       validate (value, state, field) {
 
-        this.state.symbols.pointer = '';
+        this.state.symbols.pointer = _.Tree.red;
 
-        if (field && field.name === theme.name) {
+        if (field && field.name === name) {
           if (/[A-Z]/.test(value)) {
             return _.reset.redBright('  Target name must be lowercase');
           }
@@ -143,17 +143,13 @@ export async function PromptTargetFileTemplate ({
     name: 'stores',
     type: 'snippet',
     required: targets.map(({ name }) => name),
-    message: 'Theme Targets',
+    message: label.DefineTargets,
     newline: _.Tree.next + _.Tree.next,
     template: template.output(),
     format () {
-
       if (this.state.submitted === true && this.state.completed !== 100) {
-
         return _.neonGreen(`${this.state.completed}% completed`);
-
       }
-
       return `${_.ARR}  ${_.gray(`${this.state.completed}% completed`)}`;
 
     }
@@ -173,19 +169,16 @@ export async function PromptTargetFileTemplate ({
 
 export async function PromptSelectThemes (method: LiteralString<
   | 'package.json'
-  | 'store.toml'
-  | 'store.yaml'
+  | 'stores.toml'
+  | 'stores.yaml'
 >) {
 
   const selected: Record<string, Array<{ name: string }>> = {};
-  const stores = keys($.target);
 
-  if (stores.length > 1) {
+  if ($.stores.length > 1) {
 
-    for (const { target, uid } of $.target) {
-
-      selected[target] = await PromptEachStore($.target.get(uid));
-
+    for (const store of $.stores) {
+      selected[store.name] = await PromptEachStore(store);
     }
 
   } else {
@@ -200,52 +193,47 @@ export async function PromptSelectThemes (method: LiteralString<
 
   }
 
-  async function PromptEachStore (store: Themes) {
+  async function PromptEachStore (store: Store) {
 
-    log.spinner('fetching themes', {
-      color: _.gray,
-      style: 'brielle'
-    });
+    log.spinner('Fetching Themes', { color: _.gray });
 
     const items = await themesList(store);
     const themes = items
     .filter(({ role }) => role !== 'demo')
     .sort((a, b) => (a.role === 'main' ? -1 : b.role === 'main' ? 1 : 0));
 
-    const space = eqWS(themes, { prop: 'name' });
+    await delay();
 
     log.spinner.stop();
 
     const dispose = intercept();
-
-    const resolve: {
-      targets: Array<{
-        name: string;
-        id: number
-      }>
-    } = await prompt({
+    const resolve = await prompt<{ targets: Record<string, OnlineStoreTheme> }>({
       theme,
       name: 'targets',
       type: 'select',
       multiple: true,
       required: true,
-      message: 'Select Themes',
-      hint: 'Press spacebar to select',
-      choices: themes.map<Choice>(
-        value => ({
-          name: value.name,
-          message: value.name,
-          hint: `${space(value.name)} ${_.TLD} ${_.gray(value.role)}`,
-          value
-        })
-      ),
+      message: label.SelectThemes,
+      hint: '   Press spacebar to select',
+      choices: choose(themes, { prop: 'name' })((choice, value) => {
+
+        const updated = timeAgo(choice.updatedAt);
+        const label = updated + ' '.repeat((14 - updated.length));
+
+        return {
+          name: choice.name,
+          hint: choice.role === 'MAIN'
+            ? _.gray(`updated ${label + _.ARR + WSR + _.neonCyan('Live Theme')}`)
+            : _.gray(`updated ${label}`),
+          value: choice
+        };
+      }),
       validate (value) {
         this.state.symbols.pointer = _.Tree.red;
-        if (value.length === 0) return 'Error: You must select at least 1 theme';
-        return true;
+        return value.length === 0 ? 'You must select at least 1 theme' : true;
       },
       result (names: string[]) {
-        return values(this.map(names));
+        return this.map(names);
       },
       format (value: string | string[]) {
         if (isArray(value) && value.length > 0) {
@@ -256,30 +244,52 @@ export async function PromptSelectThemes (method: LiteralString<
 
     dispose();
 
-    return resolve.targets;
+    return values(resolve.targets);
+
   }
 }
 
 /**
  * Prompt selection for the target file storage method to be used.
  */
-export async function PromptStorage (message?: string[]): PromiseString<'package.json' | 'store.toml' | 'store.yaml'> {
+export async function PromptStorage (message?: string[]) {
 
-  !message || log(_.Create({ type: 'warning' }).Wrap(message, _.yellowBright.bold).toLine());
+  if (message) {
+    _.Create({ type: 'warning' })
+    .Wrap(message, _.yellowBright.bold)
+    .Newline('line')
+    .toLog({ clear: true });
+  }
 
-  const resolve: { storage: LiteralString<'package.json' | 'store.toml' | 'store.yaml'> } = await prompt<{
-    storage: string
-  }>({
+  const resolve = await prompt<{ storage: LiteralString<'package.json' | 'stores.toml' | 'stores.yaml'> }>({
     theme,
-    message: 'Target Storage',
+    message: label.TargetStorage,
     name: 'storage',
     type: 'select',
-    choices: [
-      { name: 'package.json' },
-      { name: 'store.toml' },
-      { name: 'store.yaml' }
-    ]
+    choices: choose([
+      { name: 'package.json', hint: 'Saves targets in package.json file' },
+      { name: 'stores.toml', hint: 'Saves targets in stores.toml file' },
+      { name: 'stores.yaml', hint: 'Saves targets in stores.yaml file' }
+    ], {
+      prop: 'name',
+      padding: 4
+    })()
   }).catch(cancel);
+
+  if (resolve.storage === 'package.json' && $.pkg === null) {
+
+    await setPkg({
+      version: `${$.vc.patch}.${$.vc.minor}.${$.vc.major}`,
+      name: $.project.name,
+      private: true,
+      description: '',
+      license: 'UNLICENSED'
+    });
+
+  }
+
+  $.project.targetSource = resolve.storage;
+  $.file.targets = join($.cwd, resolve.storage);
 
   return resolve.storage;
 
@@ -287,26 +297,38 @@ export async function PromptStorage (message?: string[]): PromiseString<'package
 
 export async function PromptThemeTargets (message?: string[]): PromiseString<'select' | 'create'> {
 
-  !message || log(_.Create({ type: 'warning' }).Wrap(message, _.yellowBright.bold).toLine());
+  if (message) {
+    _.Create({ type: 'warning' })
+    .Wrap(message, _.yellowBright.bold)
+    .Newline('line')
+    .toLog({ clear: true });
+  }
 
-  const resolve: { theme: LiteralString<'select' | 'create'> } = await prompt<{ theme: string }>({
+  const resolve = await prompt<{
+    theme: LiteralString<'select' | 'create'>
+  }>({
     theme,
-    message: 'Theme Targets',
-    name: 'theme',
+    message: label.ThemeTargets,
     type: 'select',
+    name: 'theme',
     required: true,
-    choices: [
+    choices: choose([
       {
         name: 'select',
         message: 'Select Theme',
-        hint: '  Links an existing theme/s from the store'
+        hint: 'Link existing theme/s from the store'
       },
       {
         name: 'create',
         message: 'Create Theme',
-        hint: '  Creates a new unpublished theme in the store'
+        disabled: true,
+        hint: 'Create a new unpublished theme in the store'
       }
-    ]
+    ], {
+      padding: 3,
+      prop: 'message'
+    })()
+
   }).catch(cancel);
 
   return resolve.theme;

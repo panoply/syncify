@@ -7,21 +7,11 @@ import { readJsonSync } from 'fs-extra';
 
 import * as _ from '@syncify/ansi';
 
-import { cancel, labels, prompt } from '~prompt';
+import { cancel, choose, labels, prompt } from '~prompt';
 import { theme } from '~prompts/enquirer';
-import { eqWS, prettyDate } from '~utils';
+import { prettyDate } from '~utils';
 
 import { $ } from '$';
-
-interface Choice {
-  name?: string
-  message?: string
-  value?: any
-  hint?: string
-  role?: string
-  enabled?: boolean
-  disabled?: boolean | string
-}
 
 async function GetProjectsDirs () {
 
@@ -48,8 +38,8 @@ async function GetProjectNames (dirs: string[]) {
   for (const dir of dirs) {
 
     const file = await glob([ `${dir}/*`, `!${dir}/hot-snippet` ], { cwd: $.home, absolute: true });
-
     const uri = file[0];
+
     projects.push({
       hash: basename(dir),
       name: basename(uri),
@@ -118,21 +108,16 @@ export async function Projects () {
 
   async function PromptProjects (): Promise<number> {
 
-    const spacing = eqWS(files, {
-      prop: 'name',
-      padding: 1
-    });
-
-    const resolve = await prompt<{ project: [string, number ]}>({
+    const resolve = await prompt<{ project: number }>({
       theme,
       message: label.Project,
       name: 'project',
       type: 'select',
-      choices: files.map<Choice>(({ name, project }, value) => ({
+      choices: choose(files, { prop: 'name' })(({ name, project }, value) => ({
         name,
         value,
         message: name,
-        hint: spacing(name) + project.dir
+        hint: project.dir
       })),
       result (name: string) {
         return Object.entries(this.map([ name ]))[0][1];
@@ -152,18 +137,18 @@ export async function Projects () {
       message: label.Action,
       name: 'action',
       type: 'select',
-      choices: <Choice[]>[
+      choices: choose([
         {
           name: 'inspect',
           message: 'Inspect',
-          hint: '   Print information about the project'
+          hint: 'Print information about the project'
         },
         {
           name: 'cancel',
           message: 'Cancel',
-          hint: '   Exit the prompt'
+          hint: 'Exit the prompt'
         }
-      ]
+      ], { prop: 'message' })()
     }).catch(cancel);
 
     return resolve.action;
