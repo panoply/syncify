@@ -202,7 +202,7 @@ export const $ = new class Bundle {
   /**
    * Global keychain for store access tokens stored in home
    */
-  public keychain: Record<string, { [tokenName: string]: Type.Keychain }> = null;
+  public keychain: { [domain: string]: { [tokenName: string]: Type.Keychain } } = null;
 
   /**
    * The project store which references the parsed cache project file. This reference
@@ -574,8 +574,8 @@ export const $ = new class Bundle {
   });
 
   /**
-  * Returns the {@link Bundle.cache} static model
-  */
+   * Returns the {@link Bundle.cache} static model
+   */
   get cache () { return Bundle.cache; }
   /**
    * Returns the {@link Bundle.cache.checksum} static model
@@ -602,7 +602,7 @@ export const $ = new class Bundle {
    */
   set pkg (pkg) { Bundle.package = pkg; }
   /**
-   * Returns the `package.json` contents
+   * Returns the users package manager
    */
   get pm (): string { return Bundle.pm === null ? pm() : Bundle.pm; }
   /**
