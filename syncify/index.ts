@@ -1,6 +1,5 @@
 import { internalError } from '~cli/throws';
 import { Build } from '~mode/build';
-import { Init } from '~mode/init';
 import { Pack } from '~mode/pack';
 import { Publish } from '~mode/publish';
 import { Pull } from '~mode/pull';
@@ -8,6 +7,7 @@ import { Push } from '~mode/push';
 import { Watch } from '~mode/watch';
 import { Configure } from '~options/configure';
 import { Create } from '~prompts/create';
+import { Init } from '~prompts/init';
 import { Keychain } from '~prompts/keychain';
 import { Link } from '~prompts/link';
 import { Projects } from '~prompts/projects';

@@ -166,6 +166,7 @@ command(
       accepts: [
         'examples',
         // SUPPORTED
+        'init',
         'watch',
         'build',
         'push',
@@ -182,7 +183,6 @@ command(
         'keychain',
         'theme',
         'git',
-        'setup',
         'prune',
         'doctor'
       ]
@@ -190,6 +190,13 @@ command(
     {
       mode: 'init',
       accepts: null
+    },
+    {
+      mode: 'link',
+      accepts: [
+        'theme',
+        'store'
+      ]
     },
     {
       mode: 'projects',
