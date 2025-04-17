@@ -427,19 +427,19 @@ export interface Files {
    */
   githook: string;
   /**
-   * The full resolved path to the projects `theme.toml` file, which
+   * The full resolved path to the projects `stores.toml` file, which
    * is used as an alternative to `package.json` theme and store defined
    * targets.
    *
-   * > If `null` no `theme.toml` file exists in the project root
+   * > If `null` no `stores.toml` file exists in the project root
    *
    * @default
    * null
    *
    * @example
-   * 'Users/Sissel/Sites/Folder/project/webshop/theme.toml'
-   * 'Users/Sissel/Sites/Folder/project/webshop/theme.yaml'
-   * 'Users/Sissel/Sites/Folder/project/webshop/theme.yml'
+   * 'Users/Sissel/Sites/Folder/project/webshop/stores.toml'
+   * 'Users/Sissel/Sites/Folder/project/webshop/stores.yaml'
+   * 'Users/Sissel/Sites/Folder/project/webshop/stores.yml'
    */
   targets: string;
 }
@@ -541,15 +541,22 @@ export interface Project {
   hotVersion: string;
  /**
   * The method in which credentials are stored for this project
+  *
+  * > When this is `null` the project has not yet defined any credential methods
   */
   credentials: 'kc' | 'env';
+  /**
+   * The fully resolve uri of the syncify configuration file used by the
+   * project. This will be `null` if no config file is used.
+   */
+  syncifyConfig: string;
  /**
   * The target source method used for theme and store references.
   *
   * @example
   *  'package.json'
   */
-  targetSource: 'package.json' | 'theme.toml' | 'theme.yaml' | 'theme.yml';
+  targetSource: LiteralString<'package.json' | 'stores.toml' | 'stores.yaml' | 'stores.yml'>;
  /**
   * When cache auto-expires and is regenerated
   */

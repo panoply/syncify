@@ -414,6 +414,8 @@ export interface PromptState {
   clone(): Omit<PromptState, 'clone' | 'buffer'> & { buffer: Buffer };
   /** A color function or value. */
   color: Function | any;
+  /** Holds a number value signaling percentage completion. */
+  completed: number;
   /** A method that returns the pointer string. */
   pointer(): string;
   /** An array of choices for the prompt. */

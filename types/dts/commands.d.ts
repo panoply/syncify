@@ -3,6 +3,7 @@ export type CommandModes =
   | 'watch'
   | 'create'
   | 'init'
+  | 'targets'
   | 'link'
   | 'keychain'
   | 'projects'
