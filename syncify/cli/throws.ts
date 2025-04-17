@@ -6,7 +6,7 @@ import { kill } from '@syncify/kill';
 
 import { error } from '~errors';
 import { log } from '~log';
-import { has, isString, isUndefined, keys, o, type } from '~utils';
+import { has, isString, isUndefined, keys, o, prettyDate, type } from '~utils';
 
 import { $ } from '$';
 
@@ -610,6 +610,34 @@ export function invalidError ({
 };
 
 /**
+ * Invalid Structure
+ *
+ * Throws when resolution cannot be obtained of the input (source)
+ */
+export function invalidInput (title: string) {
+
+  error(
+    _.Create()
+    .Error(title.toUpperCase(), _.bold.redBright)
+    .Newline('red')
+    .Error(`Failed to obtain resolution of the ${_.bold('input')} base directory.`)
+    .Error('The path does not exist or the directory is empty.')
+    .Newline('red')
+    .Error(`${_.BAD} ${_.bold.underline($.dirs.input.replace($.cwd, '').slice(1))}**`)
+    .Newline()
+    .Line('How to fix?', _.gray.bold)
+    .Line(`Check that the ${_.cyan(basename($.dirs.input))} directory can be resolved.`, _.gray)
+    .Newline()
+    .End($.log.group)
+    .Break()
+    .toString()
+  );
+
+  $.running ? kill.exit(0) : process.exit(0);
+
+};
+
+/**
  * Missing Stores
  *
  * Throws when store references are missing within the `package.json` file.
@@ -654,26 +682,28 @@ export function missingStores (cwd: string) {
 export function missingConfig (cwd: string) {
 
   error(
-    _.Create({ type: 'nil' })
-    .Line(`${`Missing ${_.cyan('syncify.config.js')} configuration`}`, _.bold)
-    .Break()
-    .Line('Unable to resolve a configuration file within the workspace')
-    .Break()
-    .Line(`at${_.COL} ${_.gray.underline('~' + cwd)}`)
-    .Break()
+    _.Create()
+    .Error(`${`Missing ${_.cyan('syncify.config.js')} configuration`}`, _.bold)
+    .Newline('red')
+    .Error('Unable to resolve a configuration file within the workspace')
+    .Newline('red')
+    .Error(`at${_.COL} ${_.gray.underline('~' + cwd)}`)
+    .NL
     .Line('How to fix?', _.white.bold)
     .Line('You need to add one the following files to your project', _.gray)
-    .Break()
+    .NL
     .Line(`${_.DSH} ${_.white('syncify.config.ts')}`, _.gray)
     .Line(`${_.DSH} ${_.white('syncify.config.js')}`, _.gray)
     .Line(`${_.DSH} ${_.white('syncify.config.mjs')}`, _.gray)
     .Line(`${_.DSH} ${_.white('syncify.config.cjs')}`, _.gray)
     .Line(`${_.DSH} ${_.white('syncify.config.json')}`, _.gray)
-    .Break()
+    .NL
     .Line(`You can also provide configuration in your ${_.white('package.json')}`, _.gray)
     .Line(`file using the ${_.cyan('"syncify": { "config": {} }')} 'property.`, _.gray)
+    .NL
+    .End($.log.group)
     .Break()
-    .toString({ color: _.red })
+    .toString()
   );
 
   $.running ? kill.exit(0) : process.exit(0);
@@ -865,7 +895,7 @@ export function invalidCredentials () {
 export function errorRuntime (e: any, options: {
   message: string | string[];
   solution: string | string[]
-  entries: {
+  entries?: {
     [name: string]: string | number;
   }
 }) {
@@ -889,7 +919,7 @@ export function errorRuntime (e: any, options: {
   .Line('How to fix?', _.gray.bold)
   .Wrap(options.solution, _.gray)
   .Newline()
-  .Context({ entries: options.entries })
+  .True(has('entries', options), _ => _.Context({ entries: options.entries }))
   .Newline()
   .End($.log.group)
   .Break()
@@ -995,3 +1025,58 @@ export function unknownError (option: string, value: any) {
   $.running ? kill.exit(0) : process.exit(0);
 
 };
+
+/**
+ * Throws when attempting to initialise in an existing project
+ */
+export function projectExists () {
+
+  _.Create({ type: 'error' })
+  .Error('PROJECT ALREADY EXISTS ' + _.BAD, _.bold.redBright)
+  .Newline('red')
+  .Error('You cannot initialize inside of a pre-existing project.', _.redBright)
+  .Header(`PROJECT${_.COL}`, _.bold)
+  .Line(`${_.gray('NAME')}${_.COL}     ${_.whiteBright($.project.name)}`)
+  .Line(`${_.gray('CWD')}${_.COL}      ${_.whiteBright($.cwd)}`)
+  .Line(`${_.gray('CACHE')}${_.COL}    ${_.whiteBright($.dirs.cache)}`)
+  .Line(`${_.gray('CREATED')}${_.COL}  ${_.whiteBright(prettyDate($.project.createdAt))}`)
+  .Line(`${_.gray('UPDATED')}${_.COL}  ${_.whiteBright(prettyDate($.project.lastRunAt))}`)
+  .Line(`${_.gray('TARGETS')}${_.COL}  ${_.whiteBright($.project.targetSource)}`)
+  .Line(`${_.gray('AUTH')}${_.COL}     ${_.whiteBright($.project.credentials)}`)
+  .NL
+  .End(`Syncify ${_.CHV} Error`, false)
+  .BR
+  .Break()
+  .toLog();
+
+  $.running ? kill.exit(0) : process.exit(0);
+
+}
+
+/**
+ * Throws when attempting to initialise in a project that is determined to be a flat structure
+ */
+export function flatStructure () {
+
+  _.Create({ type: 'error' })
+  .Error('FLAT DIRECTORY STRUCTURE ' + _.BAD, _.bold.redBright)
+  .Newline('red')
+  .Multiline([
+    'Attempting to initialize a Syncify project within a flat structure.',
+    'You will need to convert to a hierarchical structure and try again.'
+  ])
+  .NL
+  .Line('How to fix?', _.gray.bold)
+  .Line(`Move theme directories into a sub-directory called ${_.blue('source')}`, _.gray)
+  .Line('Please refer to the documentation for more information:', _.gray)
+  .NL
+  .Line(`${_.CHV} ${_.underline('https://syncify.sh/usage/directory-structures')}`, _.gray)
+  .Newline('line')
+  .End($.log.group)
+  .BR
+  .Break()
+  .toLog();
+
+  $.running ? kill.exit(0) : process.exit(0);
+
+}
