@@ -110,7 +110,7 @@ bulk.complete = () => {
     bulk.notifier('errors');
   }
 
-  bulk.tui.toUpdate({ clear: true, trim: true }).done();
+  bulk.tui.toUpdate({ clear: true, trim: true });
   bulk.tui = null;
   bulk.progress = null;
 
