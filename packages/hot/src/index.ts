@@ -268,7 +268,7 @@ declare global {
   function RuntimeFlags (dom: Document) {
 
     requestAnimationFrame(() => {
-      dom.body.querySelector<HTMLIFrameElement>('#preview-bar-iframe').remove();
+      dom.body.querySelector<HTMLIFrameElement>('#PBarNextFrameWrapper').remove();
       dom.documentElement.style.removeProperty('padding-bottom');
     });
 
