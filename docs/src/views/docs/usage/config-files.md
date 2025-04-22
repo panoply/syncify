@@ -42,7 +42,6 @@ export default defineConfig({
   editor: 'vscode',
   input: 'source',
   output: 'theme',
-  config: '.',
   paths: {
     assets: 'source/assets/**',
     blocks: 'source/blocks/*.liquid',
@@ -61,6 +60,7 @@ export default defineConfig({
     pages: 'source/+/pages/*.{md,html}',
     policies: 'source/+/policies/*.{md,html}',
     schema: 'source/+/*.{schema,json}',
+    root: {}
   },
   hot: {
     label: true,
@@ -72,9 +72,9 @@ export default defineConfig({
     flags: ['--no-preview-bar'],
   },
   transform: {
-    script: {},
-    style: {},
-    svg: {},
+    script: [],
+    style: [],
+    svg: [],
     liquid: {
       terse: false
     },
@@ -88,6 +88,12 @@ export default defineConfig({
       noSortList: [],
       terse: false
     }
+  },
+  git: {
+    branch: 'main',
+    default: 'master',
+    force: [],
+    mirror: {}
   },
   vc: {
     minorLimit: 10,

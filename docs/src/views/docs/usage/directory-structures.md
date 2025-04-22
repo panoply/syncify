@@ -8,6 +8,7 @@ anchors:
   - 'Hierarchical VS Flat Structures'
   - 'Base Directories'
   - 'Path Defintions'
+  - 'Root Defintions'
   - 'Custom Structures'
   - 'Renaming Files'
   - 'Stash References'
@@ -70,11 +71,11 @@ An example of a hierarchical structure where theme directories are placed inside
 
 <h1 class="vs"> Hierarchical <span>VS</span> Flat Structures</h1>
 
-While it’s straightforward to critique the Shopify CLI’s rigid flat structure mandate for theme development, the hierarchical (custom) structures offered by Syncify come with their own set of challenges. Despite these shortcomings, Syncify strives to address each potential issue with minimally invasive workarounds, ensuring flexibility without overwhelming complexity.
+While it's easy to critique the Shopify CLI's rigid flat structure mandate for theme development, the hierarchical (custom) structures offered by Syncify come with their own set of challenges. Despite these shortcomings, Syncify strives to address each potential issue with minimally invasive workarounds, ensuring flexibility without overwhelming complexity.
 
-One notable limitation of the hierarchical approach is the difficulty in pinpointing location context. This can complicate certain tasks, such as downloading files from a theme using `sy pull` commands. To mitigate this, Syncify offers solutions like [Stash References](#stash-references), which provide a clear method to handle such cases and maintain control over file organization. The hierarchical approach, while powerful, is not flawless. It trades some of the flat structure's simplicity for greater flexibility, which can occasionally feel like a double-edged sword. Still, when compared holistically, the hierarchical model imposes fewer overall constraints.
+One notable limitation of the hierarchical approach is the difficulty in pinpointing location context. This can complicate certain tasks, such as downloading files from a theme using `sy pull` commands. To mitigate this, Syncify offers solutions like [Root Definitions](#root-references), which provide a clear method to handle such cases and maintain control over file organization. The hierarchical approach, while powerful, is not flawless. It trades some of the flat structure's simplicity for greater flexibility, which can occasionally feel like a double-edged sword. Still, when compared holistically, the hierarchical model imposes fewer overall constraints.
 
-The last notable limitation the developers should consider is the longevity, in the shape transitioning a Syncify theme back to a Shopify CLI workflow, or vice versa. This does require significant restructuring, as the tools prioritize different paradigms. Developers must weigh this trade-off: The robust, customizable environment with Syncify versus the Shopify CLI's standardized, predictable simplicity and general shit-show. For those committed to Syncify, the need for compatibility with Shopify CLI fades, as Syncify delivers a comprehensive, standalone alternative.
+The last notable limitation the developers should consider is the longevity, in the shape transitioning a Syncify theme back to a Shopify CLI workflow, or vice versa. This does require significant restructuring, as the tools prioritize different paradigms. Developers must weigh this trade-off.
 
 ---
 
@@ -173,25 +174,87 @@ export default defineConfig({
   input: 'source',
   output: 'theme',
   paths: {
-    assets: 'source/assets/**',
-    blocks: 'source/blocks/*.liquid',
-    config: 'source/config/*.json',
-    locales: 'source/locales/*.json',
-    layout: 'source/layout/*.liquid',
-    sections: 'source/sections/**/*.{liquid,json}',
-    snippets: 'source/snippets/**/*.liquid',
-    metaobject: 'source/templates/metaobject/*.{liquid,json}',
-    customers: 'source/templates/customers/*.{liquid,json}',
-    templates: 'source/templates/*.{liquid,json}',
-    blogs: 'source/+/blogs/**/*.{md,html}',
-    files: 'source/+/files/**',
-    metafields: 'source/+/meta/**/*.json',
-    navigation: 'source/+/menus/**/*.json',
-    pages: 'source/+/pages/*.{md,html}',
-    policies: 'source/+/policies/*.{md,html}',
-    schema: 'source/+/*.{schema,json}',
+    assets: 'assets/**',
+    blocks: 'blocks/*.liquid',
+    config: 'config/*.json',
+    locales: 'locales/*.json',
+    layout: 'layout/*.liquid',
+    sections: 'sections/**/*.{liquid,json}',
+    snippets: 'snippets/**/*.liquid',
+    metaobject: 'templates/metaobject/*.{liquid,json}',
+    customers: 'templates/customers/*.{liquid,json}',
+    templates: 'templates/*.{liquid,json}',
+    blogs: '+/blogs/**/*.{md,html}',
+    files: '+/files/**',
+    metafields: '+/meta/**/*.json',
+    navigation: '+/menus/**/*.json',
+    pages: '+/pages/*.{md,html}',
+    policies: '+/policies/*.{md,html}',
+    schema: '+/*.{schema,json}',
   }
 })
+```
+
+:::
+::::
+
+---
+
+# Root Definitions
+
+Root definitions are additional references available to `paths` and represent write locations in projects with custom structures and complex path patterns. Though the **input** ➔ **output** approach of Syncify offers developers flexibility, there are nuances when we execute [pull](/cli/sy-pull/) operations.
+
+In a flat structure, file placement is predictable and intuitive, there is no room for ambiguity or deviation when importing from an online store. Snippets will land in the `snippets/` directory, sections in the `sections/` directory, templates in the `templates/` directory etc. In Syncify, the freedom to create custom nested theme structures introduces complexity and mapping files to their intended locations becomes less straightforward.
+
+Root definitions are _typically_ not a hard-requirement and in most cases, Syncify will be able to determine import locations, but in some situations, you may need to provide root definitions.
+
+:::: grid row mb-4 ai-center root-def-height mt-5
+::: grid col fs-sm pr-4
+
+<h4 class="bad mb-1">Root Unknown</h4>
+
+The snippets and sections are too wide for resolution.
+
+<!--prettier-ignore-->
+```js
+export default defineConfig({
+  input: 'source',
+  paths: {
+    // ...
+    snippets: {
+      '[name]': 'snippets/**/*.liquid'
+    },
+    sections: {
+      '[name]': 'sections/**',
+      '[dir]-[name]': 'sections/product/*'
+    }
+  }
+});
+```
+
+:::
+::: grid col fs-sm pl-2
+
+<h4 class="good mb-1">Root Mapping</h4>
+
+We provide a `[root]` key and provide path for imports.
+
+<!--prettier-ignore-->
+```js
+export default defineConfig({
+  input: 'source',
+  paths: {
+    snippets: {
+      '[root]': 'snippets/imports',
+      '[name]': 'snippets/**/*.liquid'
+    },
+    sections: {
+      '[root]': 'sections/imports',
+      '[name]': 'sections/**',
+      '[dir]-[name]': 'sections/product/*'
+    }
+  }
+});
 ```
 
 :::
@@ -217,17 +280,17 @@ Sticking to the default structure isn’t ideal with Syncify. Instead, you’re 
 │   │   └── metafields/
 │   │       └── namespace/
 │   ├── pages/
-│   └── views/
-│       ├── customers/
-│       ├── meta/
-│       ├── sections/
-│       │   ├── blocks/
-│       │   └── schema/
-│       ├── snippets/
-│       ├── templates/
-│       └── theme.liquid
-├── .env
+│   ├── views/
+│   │   ├── customers/
+│   │   ├── meta/
+│   │   ├── sections/
+│   │   │   ├── blocks/
+│   │   │   └── schema/
+│   │   ├── snippets/
+│   │   └── templates/
+│   └── theme.liquid
 ├── package.json
+├── redirects.yaml
 └── syncify.config.ts
 ```
 
@@ -241,7 +304,7 @@ Sticking to the default structure isn’t ideal with Syncify. Instead, you’re 
 
 <!-- prettier-ignore -->
 ```js
-import { defineConfig } from '@syncify/cli';
+import { defineConfig } from '@syncify/config';
 
 export default defineConfig({
   input: 'source',
@@ -250,7 +313,6 @@ export default defineConfig({
     assets: 'assets/**',
     config: 'data/config/*.json',
     locales: 'data/locales/*.json',
-    metafields: 'data/metafields/**/*.json',
     layout: '*.liquid',
     blocks: 'views/sections/blocks/*.liquid',
     sections: 'views/sections/**/*.liquid',
@@ -380,7 +442,7 @@ The pattern `'card-[name]'` dynamically renames files by adding the prefix `card
 
 ---
 
-# Stash References
+# Write References
 
 Stash references are write locations used in projects with custom structures and complex globs patterns. The **input** ➔ **output** approach of Syncify offers developers flexibility, but there are nuances when we execute [pull](/cli/sy-pull/) operations.
 
@@ -407,11 +469,11 @@ export default defineConfig({
     snippets: [
       'path/snippets/*',
       'path/examples/*',
-      { index: 1, stash: '*' }
+      { write: 0 }
     ],
     sections: [
       'path/sections/*',
-      { stash: 'temp' }
+      { write: 'temp' }
     ]
   }
 });
