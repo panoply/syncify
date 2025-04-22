@@ -1,8 +1,12 @@
 {
   "name": "@syncify/types",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Type Declarations for the Syncify CLI",
-  "files": ["config", "index.d.ts", "LICENSE"],
+  "files": [
+    "config",
+    "index.d.ts",
+    "LICENSE"
+  ],
   "types": "./index.d.ts",
   "main": "./index.d.ts",
   "license": "Apache-2.0",

@@ -42,6 +42,7 @@ export type SVGFile = {
   /**
    * Rename the svg file/s. The same name as source file will be used
    * when undefined. Accepts namespaces, `[file]`, `[dir]` and `[ext]`.
+   *
    * ---
    *
    * @default undefined

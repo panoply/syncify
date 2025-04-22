@@ -15,10 +15,4 @@ export type Directories = {
    * @default 'theme/'
    */
   output?: string;
-  /**
-   * The resolved `config` directory path for build tool files
-   *
-   * @default '/'
-   */
-  config?: string;
 }

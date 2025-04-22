@@ -122,7 +122,7 @@ export type JSONTransform = {
    * An optional string list of paths/filenames to exclude
    * from processing, ie: pass through
    *
-   * @default false
+   * @default []
    */
   exclude?: string[];
   /**

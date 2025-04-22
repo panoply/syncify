@@ -10,9 +10,12 @@ import type { SVGTransformer } from './svg';
 
 export type Transforms = {
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/style/)
-   *
    * **Style File transforms**
+   *
+   * Style transformations perform CSS processing. Syncify supports various cascades,
+   * including SASS, Tailwind and PostCSS.
+   *
+   * [Syncify Documentation](https://syncify.sh/options/transform/style/)
    *
    * @example
    *
@@ -83,14 +86,13 @@ export type Transforms = {
   style?: StyleTransformer;
 
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/script/)
-   *
    * **JavaScript/TypeScript Transforms**
    *
    * Script inputs can be defined a few different ways depending on your preference.
    * You can also override ESBuild `processor` defined options on a per-file basis.
    * Options 1, 2 and 3 are typically the preferred structures.
    *
+   * [Syncify Documentation](https://syncify.sh/options/transform/script/)
    *
    * @example
    *
@@ -149,36 +151,32 @@ export type Transforms = {
    */
   script?: false | ScriptTransformer
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/svg/)
-   *
    * **SVG File Transforms**
    *
    * Inline SVG files and Sprites generation. Uses SVGO under the hood
    * and can export as assets (or snippets).
+   *
+   *  [Syncify Documentation](https://syncify.sh/options/transform/svg/)
    */
   svg?: SVGTransformer;
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/json/)
-   *
    * **JSON File Transforms**
    *
    * Options defined here are used when writing to the file system and
-   * uploading `.json` files to themes. When running sync operations that
-   * import from remote sources will also use these options, they include:
+   * uploading `.json` files to themes. When running `sy pull` or operations
+   * that import from online stores, configuration defined here will be respected.
    *
-   * - `--merge`
-   * - `--pull`
-   * - `--download`
+   * [Syncify Documentation](https://syncify.sh/options/transform/json/)
    */
   json?: JSONTransform;
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/liquid/)
-   *
    * **Liquid File Transforms**
    *
    * Liquid transform options are terse-specific and related to minification operations.
    * Syncify uses HTML Minifier Terser under the hood, it has been configured to work with
    * Liquid files.
+   *
+   * [Syncify Documentation](https://syncify.sh/options/transform/liquid/)
    *
    * > **NOTE**
    *
@@ -187,7 +185,11 @@ export type Transforms = {
    */
   liquid?: LiquidTransform;
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/svg/)
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
+   *
+   * ---
    *
    * **Markdown File Transforms**
    *

@@ -8,7 +8,6 @@ import type { HOT } from './config/hot';
 import type { Logger } from './config/logger';
 import type { Paths } from './config/paths';
 import type { Processors } from './config/processor';
-import type { Publishing } from './config/publishing';
 import type { Transforms } from './config/transform';
 import type { VC } from './config/vc';
 import type { LiteralUnion } from 'type-fest';
@@ -32,8 +31,7 @@ export type { VC } from './config/vc';
 export type { Git } from './config/git';
 export type { Directories } from './config/directories';
 export type { Logger } from './config/logger';
-export type { Paths, Pattern, Rename, Stash } from './config/paths';
-export type { Publishing } from './config/publishing';
+export type { Paths, Rename } from './config/paths';
 export type { Transforms } from './config/transform';
 export type { Processors } from './config/processor';
 
@@ -46,7 +44,7 @@ export type { Processors } from './config/processor';
  *
  * The `defineConfig` named export used within `syncify.config.js` (or `.ts`) configuration files.
  */
-export interface Config extends Directories {
+export type Config = Directories & {
   /**
    * Specify the text-editor you use for development. This is optional and when
    * left undefined, Syncify will attempt guess your preferred editor.
@@ -71,9 +69,13 @@ export interface Config extends Directories {
    */
   paths?: Paths;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * > Syncify plugins are planned in future releases!
+   * ---
+   *
+   * Syncify plugins are planned in future releases!
    */
   plugins?: never;
   /**
@@ -97,12 +99,6 @@ export interface Config extends Directories {
    * Console log options
    */
   log?: Logger;
-  /**
-   * **Publish**
-   *
-   * Provide publish configuration
-   */
-  publish?: Publishing;
   /**
    * **Git**
    *
@@ -158,7 +154,7 @@ export declare const env: {
 };
 
 /**
- * Define Config (named export)
+ * Syncify Define Config (named export)
  *
  * Used in `syncify.config.js` or `syncify.config.ts` files and provides type completions to the export.
  */

@@ -220,14 +220,18 @@ export type StyleTransform<T = string | string[]> = {
    */
   sass?: boolean | SASSConfig;
   /**
-   * **NOTE YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
+   *
+   * ---
    *
    * Terse Style (CSS) Minification
    *
    * > Uses [clean-css](https://github.com/clean-css/clean-css) minification
    * > Uses [purge-css](https://github.com/FullHuman/purgecss)
    */
-  terse?: boolean | SASSConfig;
+  terse?: boolean | CleanCSSOptions;
 }
 
 /* -------------------------------------------- */

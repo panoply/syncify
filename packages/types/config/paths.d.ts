@@ -1,43 +1,57 @@
-export type StashType = string | number;
-
-/**
- * Stash Reference
- */
-export type Stash = {
-  /**
-   * Set a stash import location for remote `pull` operations. Files which cannot
-   * be mapped to an existing project-level path location (relative to your `input`)
-   * will be written the provided stash destination defined here.
-   *
-   * > `*`
-   * >
-   * > asterisk value signals for stashes to be written within directory at index `0`
-   *
-   * > `number`
-   * >
-   * > number value will default to `*` and write within directories at that index.
-   *
-   * > `true`
-   * >
-   * > boolean `true` value signals for stashed to be written in `stash/` directory at index `0`
-   *
-   * ---
-   *
-   * You can optionally provide a sub-directory path.
-   *
-   */
-  stash: StashType;
-}
-
 /**
  * String or Array of strings
  */
 export type Path = string | string[];
 
 /**
- * Union join of accepted Path patterns
+ * Root Paths
  */
-export type Pattern = Path | [ ...globs: string[], stash: Stash ];
+export type Roots = {
+  /**
+   * Root path for assets
+   */
+  assets?: string;
+  /**
+   * Root path for snippets
+   */
+  snippets?: string;
+  /**
+   * Root path for sections
+   */
+  sections?: string;
+  /**
+   * Root path for sections groups
+   */
+  groups?: string;
+  /**
+   * Root path for blocks
+   */
+  blocks?: string;
+  /**
+   * Root path for metaobject templates
+   */
+  metaobject?: string;
+  /**
+   * Root path for templates
+   */
+  templates?: string;
+  /**
+   * Root path for customers
+   */
+  customers?: string;
+  /**
+   * Root path for layouts
+   */
+  layout?: string;
+  /**
+   * Root path for config
+   */
+  config?: string;
+  /**
+   * Root path for locations
+   */
+  locales?: string;
+}
 
 /**
  * Section and Snippet Rename Paths
@@ -53,9 +67,8 @@ export type Rename = {
    *      'sections/foo/*', // sections in this directory will prefix foo-
    *      'sections/bar/*' // sections in this directory will prefix bar-
    *    ],
-   *    '*': [
-   *      './sections/**',   // all other sections will use source name
-   *      { stash: 'files' } // stashes imports within sections/files
+   *    '[name]': [
+   *      './sections/**'   // all other sections will use source name
    *    ],
    *   },
    *   snippets: {
@@ -63,14 +76,13 @@ export type Rename = {
    *      'snippets/foo/*', // snippets in this directory will prefix foo-
    *      'snippets/bar/*' // snippets in this directory will prefix bar-
    *    ],
-   *    '*': [
+   *    '[name]': [
    *      './snippets/**',  // all other snippets will use source name
-   *      { stash: true }   // stashes will be written
    *    ]
    *   }
    * }
    */
-  '*'?: Pattern;
+  '*'?: Path;
   /**
    * Use the filename as per the source. Passing `[name]` only will result in fallback
    * behaviour, as that of `'*'`.
@@ -102,35 +114,35 @@ export type Rename = {
    *   }
    * }
    */
-  '[name]'?: Pattern;
+  '[name]'?: Path;
   /**
    * Prefix directory name and suffix filename in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout-header.liquid'
    */
-  '[dir]-[name]'?: Pattern;
+  '[dir]-[name]'?: Path;
   /**
    * Prefix directory name and suffix filename in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout_header.liquid'
    */
-  '[dir]_[name]'?: Pattern;
+  '[dir]_[name]'?: Path;
   /**
    * Prefix filename and suffix directory in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header-layout.liquid'
    */
-  '[name]-[dir]'?: Pattern;
+  '[name]-[dir]'?: Path;
   /**
    * Prefix filename and suffix directory in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header_layout.liquid'
    */
-  '[name]_[dir]'?: Pattern;
+  '[name]_[dir]'?: Path;
 }
 
 /**
@@ -143,17 +155,41 @@ export type RenameSnippets = Rename & {
    * @example
    * 'layout/header.liquid' > 'header.layout.liquid'
    */
-  '[name].[dir]'?: Pattern;
+  '[name].[dir]'?: Path;
   /**
    * Prefix directory and suffix filename with `.` dot separator.
    *
    * @example
    * 'layout/header.liquid' > 'layout.header.liquid'
    */
-  '[dir].[name]'?: Pattern;
+  '[dir].[name]'?: Path;
 }
 
 export type Paths = {
+  /**
+   * Root path defintions represent write locations in projects with custom structures and
+   * complex path Paths.
+   *
+   * This is optional, it is only required if custom structures cannot resolve due to advanced
+   * glob uri's. IN most cases, you can omit this, Syncify will complain and inform when it is
+   * required.
+   *
+   * @example
+   * {
+   *   roots: {
+   *    assets: 'source/assets/import',
+   *    snippets: 'source/snippets/import',
+   *    sections: 'source/sections/import',
+   *    blocks: 'source/blocks/import',
+   *    templates: 'source/templates',
+   *    customers: 'source/templates/customers',
+   *    layout: 'source/layout',
+   *    config: 'source/config',
+   *    locales: 'source/locales'
+   *   }
+   * }
+   */
+  roots?: Roots;
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as snippets.
    *
@@ -196,7 +232,7 @@ export type Paths = {
    *   }
    * }
    */
-  snippets?: Pattern | RenameSnippets
+  snippets?: Path | RenameSnippets
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as sections.
    *
@@ -250,55 +286,55 @@ export type Paths = {
    *   ]
    * }
    */
-  sections?: Pattern | Rename;
+  sections?: Path | Rename;
   /**
    * A glob string or glob array of files to be uploaded as blocks
    *
    * @default 'source/blocks/*.{liquid}'
    */
-  blocks?: Pattern;
+  blocks?: Path;
   /**
    * A glob string or glob array of files to be uploaded as templates.
    *
    * @default 'source/templates/*.{liquid,json}'
    */
-  templates?: Pattern;
+  templates?: Path;
   /**
    * A glob string or glob array of files to be uploaded asas metaobject templates
    *
    * @default 'source/templates/metaobject/*.{liquid,json}'
    */
-  metaobject?: Pattern;
+  metaobject?: Path;
   /**
    * A glob string or glob array of files to be uploaded as template/customers
    *
    * @default 'source/templates/customers/*.{liquid,json}'
    */
-  customers?: Pattern;
+  customers?: Path;
   /**
    * A glob string or glob array of files to be uploaded as assets
    *
    * @default 'source/assets/*'
    */
-  assets?: Pattern;
+  assets?: Path;
   /**
    * A glob string or glob array of files to be uploaded as layouts
    *
    * @default 'source/layout/*.liquid'
    */
-  layout?: Pattern;
+  layout?: Path;
   /**
    * A glob string or glob array of files to be uploaded as configs, i.e, `settings_schema.json`
    *
    * @default 'source/config/.json'
    */
-  config?: Pattern;
+  config?: Path;
   /**
    * A glob string or glob array of files to be uploaded as config, i.e, `en.default.json`
    *
    * @default 'source/locales/*.json'
    */
-  locales?: Pattern;
+  locales?: Path;
   /**
    * A glob string or glob array of files to be uploaded as **shared schema** `.json` or `.schema` files.
    *
@@ -318,9 +354,11 @@ export type Paths = {
    */
   metafields?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * A glob string or glob array string to be uploaded, published and controlled as `pages`
    *
@@ -328,33 +366,41 @@ export type Paths = {
    */
   pages?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/blogs/*'
    */
   blogs?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/menus/*.json'
    */
   navigation?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/policies/*.{html,md}'
    */
   policies?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/files/**'
    */

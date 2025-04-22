@@ -13,7 +13,7 @@ type HOTShared = {
    * Specify the websocket port. By default, Syncify uses port `51001` to
    * avoid any conflicts with other running hosts of tools.
    *
-   * @default w
+   * @default 51001
    * @example 'ws://localhost:51001/ws'
    */
   socket?: number;
