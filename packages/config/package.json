@@ -1,6 +1,6 @@
 {
   "name": "@syncify/config",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "Project-level defineConfig utiltity for usage with global installations of Syncify",
   "files": [
     "dist",

@@ -1,7 +1,7 @@
 import type { Config } from '@syncify/types';
 
 /**
- * ENV Utilities
+ * **Syncify** ~ ENV Utilities
  *
  * Helper utility for checking environment variables and returning some other data references
  */
@@ -18,8 +18,20 @@ export const env = {
 };
 
 /**
- * Define Config (named export)
+ * **Syncify** ~ Define Config
  *
  * Used in `syncify.config.js` or `syncify.config.ts` files and provides type completions to the export.
+ *
+ * ---
+ *
+ * @example
+ *
+ * export default defineConfig({
+ *  input: 'source',
+ *  output: 'theme',
+ *  paths: {},
+ *  transform: []
+ *  // etc etc
+ * })
  */
 export const defineConfig = (config: Config) => config;
