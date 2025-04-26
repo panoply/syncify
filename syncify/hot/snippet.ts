@@ -8,9 +8,8 @@ import { glue } from '@syncify/glue';
 
 import { wss } from './socket';
 
-import { warnOption } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { HOT_SNIPPET_KEY, REGEX_HOT_SNIPPET } from '~const';
-import { event } from '~events';
 import { themeFilesList, themeFilesUpsert } from '~http/themeFiles';
 import { forEach, forMap, isString, m } from '~utils';
 
@@ -244,15 +243,7 @@ export async function snippet (theme: Theme) {
 
       }, input);
 
-      themeFilesUpsert({ input: upsert, onError: reject }).then(() => {
-
-        if ($.mode.align) {
-          resolve('hot:active');
-        } else {
-          resolve('hot:active');
-        }
-
-      });
+      themeFilesUpsert({ input: upsert, onError: reject }).then(() => resolve('hot:active'));
 
     });
 
