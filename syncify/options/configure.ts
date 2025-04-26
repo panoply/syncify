@@ -3,7 +3,7 @@
 //
 import { getCaches } from './define/caches';
 import { getConfig } from './define/config';
-import { setBaseDirs, setImportDirs, setThemeDirs } from './define/directories';
+import { setBaseDirs, setImportDirs, setOutputDirs } from './define/directories';
 import { getEnv } from './define/env';
 import { setFilters } from './define/filters';
 import { getPkg } from './define/package';
@@ -30,7 +30,7 @@ import { setVersion } from './settings/versioning';
 
 import { runtime } from '~cli/runtime';
 import { setStdin } from '~cli/stdin';
-import { runAlignment } from '~mode/pull';
+import { setAlignMerge } from '~mode/pull';
 
 import { $ } from '$';
 
@@ -67,7 +67,7 @@ export async function Configure () {
   setProcessors();
 
   await setPublishConfig();
-  await setThemeDirs();
+  await setOutputDirs();
   await setImportDirs();
   await setPaths();
 
@@ -87,10 +87,8 @@ export async function Configure () {
   await setStyleConfig();
   await setTemplates();
 
-  if ($.mode.align) await runAlignment();
-
+  if ($.mode.align) await setAlignMerge();
   if ($.mode.hot) await setHotReloads();
-
   if ($.mode.watch) runtime.time();
 
 };
