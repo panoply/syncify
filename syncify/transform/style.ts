@@ -84,9 +84,7 @@ function write <T extends StyleBundle> (file: File<T>, { noUpsert = false } = {}
 async function sassProcess (file: File) {
 
   if (u.isUndefined(file.data) || (u.isBoolean(file.data.sass) && file.data.sass === false)) {
-
     return readStyleFile(file);
-
   }
 
   const options: SASSConfig = u.isObject(file.data.sass)
@@ -99,17 +97,20 @@ async function sassProcess (file: File) {
 
     try {
 
-      const { css, sourceMap } = await $import.sass.compileAsync(file.data.input, {
+      const { css, sourceMap } = $import.sass.compile(file.data.input, {
         loadPaths: options.include,
         sourceMapIncludeSources: file.data.postcss,
         sourceMap: options.sourcemap,
         style: options.style,
+        fatalDeprecations: options.fatalDeprecations,
+        futureDeprecations: options.futureDeprecations,
+        functions: options.functions,
+        silenceDeprecations: options.silenceDeprecations,
         alertColor: false,
         alertAscii: false,
         quietDeps: options.quietDeps,
         charset: file.data.snippet === false,
         logger: {
-          debug: msg => console.log('DEBUG', msg),
           warn: warn.sass(file)
         }
       });
@@ -316,9 +317,9 @@ export async function postcssProcess (file: File<StyleBundle>, css: string, map:
         }
       });
 
-      console.log(e);
-
     }
+
+    error.postcss(file, e);
 
     return null;
 
@@ -379,7 +380,10 @@ export async function StyleTransform (file: File<StyleBundle>) {
 
   } catch (e) {
 
-    console.log(e);
+    error.throw(e, {
+      transform: 'Style',
+      input: file.input
+    });
 
     return null;
   }
