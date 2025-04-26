@@ -4,7 +4,7 @@ import { ensureDir, ensureDirSync, mkdirSync, pathExists, pathExistsSync } from 
 
 import { updateProject } from './project';
 
-import { unknownProject } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { CACHE_FILES, READ_WRITE_OWNER } from '~const';
 import { clearCache, decode, save } from '~process/cache';
 import { forEach, o } from '~utils';
@@ -92,9 +92,11 @@ export async function createCaches (hash?: string) {
     const path = join($.dirs.cache, file);
 
     if (await pathExists(path)) {
-
-      await save(path, {})();
-
+      if (file === 'paths') {
+        await save(path, new Map())();
+      } else {
+        await save(path, {})();
+      }
     }
 
   }
@@ -122,7 +124,7 @@ export async function getCaches () {
       if ($.project.credentials !== null) {
         caches({ create: true });
       } else {
-        unknownProject();
+        throws.unknown();
         return;
       }
     } else {
@@ -140,15 +142,21 @@ export async function getCaches () {
     $.cache.uri[file] = join($.dirs.cache, file);
 
     if (await pathExists($.cache.uri[file])) {
-      q.cache.add(async () => {
-        $.cache[file] = await decode($.cache.uri[file]);
-      });
-    } else {
-      $.cache[file] = {};
-      q.cache.add(save($.cache.uri[file], $.cache[file]));
-    }
 
-  }
+      q.cache.add(async () => {
+
+        $.cache[file] = await decode($.cache.uri[file]);
+
+      });
+
+    } else {
+
+      $.cache[file] = file === 'paths' ? new Map() : {};
+
+      q.cache.add(save($.cache.uri[file], $.cache[file]));
+
+    }
+  };
 
   if ($.mode.prune) {
     q.cache.onIdle().then(() => clearCache());
