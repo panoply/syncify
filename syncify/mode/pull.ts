@@ -1,6 +1,4 @@
-import type { File } from '~file';
-
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 
 import { ensureDir, pathExists, readFile, writeFile } from 'fs-extra';
 
@@ -11,6 +9,7 @@ import { timer } from '@syncify/timer';
 
 import { error } from '~errors';
 import { event } from '~events';
+import { type File, Kind } from '~file';
 import { List, themeFilesList, themeFilesMap } from '~http/themeFiles';
 import { log } from '~log';
 import { outputFile } from '~process/files';
@@ -48,7 +47,7 @@ interface Alignment {
  * can be triggered in isolation using the `--align` flag and will
  * carry-out diffing, syncing only changed files.
  */
-export async function runAlignment () {
+export async function setAlignMerge () {
 
   if (!$.mode.align) return;
 
@@ -114,14 +113,10 @@ export async function runAlignment () {
 
           state.update.set(filename, file);
 
-        }).catch(
-          error.write(
-            'Error writing file during alignment', {
-              input: file.input,
-              output: file.output
-            }
-          )
-        ).then(() => state.update.set(filename, file));
+        }).catch(error.write('Error writing file during alignment', {
+          input: file.input,
+          output: file.output
+        })).then(() => state.update.set(filename, file));
 
       } else {
 
@@ -131,22 +126,22 @@ export async function runAlignment () {
 
     } else {
 
-      file.input = join($.paths[stashDir].stash, fileName);
-      file.value = format(body.content, $.json.options);
+      // file.input = join($.paths[stashDir].stash, fileName);
+      // file.value = format(body.content, $.json.options);
 
-      await ensureDir($.paths[stashDir].stash);
-      await writeFile(file.input, file.value).then(() => {
+      // await ensureDir($.paths[stashDir].stash);
+      // await writeFile(file.input, file.value).then(() => {
 
-        state.create.set(filename, file);
+      //   state.create.set(filename, file);
 
-      }).catch(
-        error.write(
-          'Error writing file during alignment', {
-            input: file.input,
-            output: file.output
-          }
-        )
-      );
+      // }).catch(
+      //   error.write(
+      //     'Error writing file during alignment', {
+      //       input: file.input,
+      //       output: file.output
+      //     }
+      //   )
+      // );
 
     }
   }
@@ -176,6 +171,7 @@ interface State {
    * File exists in remote but not local
    */
   files: {
+    writes: Map<string, File<List.Node>[]>;
     create: File<List.Node>[];
     update: File<List.Node>[];
     stash: File<List.Node>[];
@@ -194,7 +190,7 @@ export async function Pull () {
 
   $.running = true;
 
-  if ($.mode.align) return runAlignment();
+  if ($.mode.align) return setAlignMerge();
 
   log.spinner('0 Files', { style: 'spinning', color: _.whiteBright });
 
@@ -207,7 +203,8 @@ export async function Pull () {
     files: {
       create: [],
       update: [],
-      stash: []
+      stash: [],
+      writes: m()
     }
   };
 
@@ -265,7 +262,10 @@ export async function Pull () {
 
     for (const input of getChunk(items, 40)) {
 
-      const { files } = await themeFilesList({ target: $.target.default, input });
+      const { files } = await themeFilesList({
+        input,
+        target: $.target.default
+      });
 
       state.count += input.length;
       state.progress.increment(input.length);
@@ -277,9 +277,7 @@ export async function Pull () {
         const stashDir = splitDir.length > 1 ? splitDir.pop() : splitDir[0];
         const file: File = output(item.filename);
 
-        file.value = file.ext === '.json'
-          ? format(item.body.content, $.json.options)
-          : item.body.content;
+        file.value = file.kind === Kind.JSON ? format(item.body.content, $.json.options) : item.body.content;
 
         if (file.input) {
 
@@ -291,7 +289,11 @@ export async function Pull () {
 
         } else {
 
-          file.input = join($.paths[stashDir].stash, fileName);
+          if (!state.files.writes.has(directory)) {
+            state.files.writes.set(directory, [ file ]);
+          } else {
+            state.files.writes.get(directory).push(file);
+          }
 
           state.files.stash.push(file);
 
@@ -312,6 +314,34 @@ export async function Pull () {
 
   }
 
+  clearInterval(state.interval);
+
   state.interval = null;
+
+  for (const [ dir, files ] of state.files.writes) {
+
+    const base = join($.dirs.input, dir);
+
+    await ensureDir(base);
+
+    for (const file of files) {
+
+      file.input = join(base, file.base);
+
+      console.log(file.input);
+
+      // await writeFile(file.input, file.value);
+
+    }
+    // await writeFile(file.input, file.value).then(() => align.create.set(filename, file)).catch(
+    //   error.write(
+    //     'Error writing file during alignment', {
+    //       input: file.input,
+    //       output: file.output
+    //     }
+    //   )
+    // );
+
+  }
 
 };
