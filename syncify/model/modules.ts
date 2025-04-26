@@ -1,13 +1,14 @@
 /* eslint-disable quote-props */
 import type { Dependencies, Import, ImportMap } from 'types';
 
-import { throwError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { o } from '~utils';
 
 const IMPORT_MAP: ImportMap = o({
   'smol-toml': 'toml',
   'js-yaml': 'yaml',
   'svgo': 'svgo',
+  'tailwindcss': 'tailwind',
   '@tailwindcss/postcss': 'tailwind',
   'postcss': 'postcss',
   'sass-embedded': 'sass',
@@ -24,7 +25,7 @@ const IMPORT_MAP: ImportMap = o({
  * Dynamically imports third-party dependencies, loads and caches them.
  * Repeating calls will use the cache.
  */
-export const $import = Object.assign(async function <T extends Dependencies> (name: T) {
+export const $import = Object.assign(async function <T extends Dependencies> (name: T, { as = false } = {}) {
 
   const id = IMPORT_MAP[name];
 
@@ -34,7 +35,7 @@ export const $import = Object.assign(async function <T extends Dependencies> (na
 
     const resolve = await import(name);
 
-    $import[id] = resolve.default || resolve;
+    $import[id] = as ? resolve : resolve.default || resolve;
 
     return $import[id];
 
@@ -42,7 +43,7 @@ export const $import = Object.assign(async function <T extends Dependencies> (na
 
     $import[id] = null;
 
-    throwError(`Module import failed for ${name}`, [
+    throws(`Module import failed for ${name}`, [
       'Please ensure the module is installed correctly. If this error persists, try',
       'to reinstall Syncify or install the import in isolation.'
     ]);
