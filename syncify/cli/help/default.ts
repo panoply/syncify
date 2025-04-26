@@ -22,7 +22,6 @@ export function Default () {
   .Line(` $ sy watch                      ${describe('Watch and rebuild changes')}`)
   .Line(` $ sy pull                       ${describe('Download from a store theme')}`)
   .Line(` $ sy push                       ${describe('Upload to a store theme')}`)
-  .Line(` $ sy create                     ${describe('Create a new Syncify project')}`)
   .Line(` $ sy publish                    ${describe('Changes a theme role to and makes it main')}`, _.dim)
   .Line(` $ sy delete                     ${describe('Remove files/resources from a store or theme')}`, _.dim)
   .Line(` $ sy pack                       ${describe('Generate a .zip package of the current theme')}`, _.dim)
