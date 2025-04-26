@@ -12,7 +12,7 @@ You can override or redefine the `input` directory value through the command lin
 ::: grid col
 
 ```bash
-$ syncify --build --input src
+syncify --build --input src
 ```
 
 :::
@@ -24,7 +24,7 @@ OR
 ::: grid col
 
 ```bash
-$ sy -b -i src
+sy -b -i src
 ```
 
 :::

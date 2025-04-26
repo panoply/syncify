@@ -51,11 +51,11 @@
     "cssnano": "^7.0.6",
     "e11ty": "^0.1.2",
     "markdown-it-container": "^4.0.0",
-    "netlify-cli": "^20.0.1",
+    "netlify-cli": "^20.0.3",
     "papyrus": "^0.7.2",
     "postcss": "catalog:",
     "postcss-cli": "^11.0.1",
-    "sass": "^1.86.3",
+    "sass": "^1.87.0",
     "tsup": "catalog:"
   }
 }

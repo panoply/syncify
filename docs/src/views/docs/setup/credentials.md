@@ -45,7 +45,7 @@ The `.env` file approach provides a project-level reference for token management
 Setup or control keychain up within **existing** syncify project
 
 ```bash
-$ sy keychain
+sy keychain
 ```
 
 ---

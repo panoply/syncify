@@ -11633,6 +11633,21 @@ ul.compare-list li.cross {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='%23dc3545' stroke-width='2'%3e%3cpath d='M18 6 6 18M6 6l12 12'/%3e%3c/svg%3e");
 }
 
+.ll-check h5, .ll-check .h5,
+.ll-check h4,
+.ll-check .h4 {
+  padding-left: 30px;
+  background-position: center left;
+  background-size: 18px;
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ebb74' stroke-width='2'%3e%3cpath d='M20 6 9 17l-5-5' /%3e%3c/svg%3e");
+}
+.ll-check h5 + p, .ll-check .h5 + p,
+.ll-check h4 + p,
+.ll-check .h4 + p {
+  padding-left: 30px;
+}
+
 .icon-brave,
 .icon-chrome,
 .icon-safari,

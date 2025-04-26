@@ -20,14 +20,14 @@ Get started using one the example straps for a real-world implementation referen
 ::: grid col-6
 
 ```bash
-$ sy create using-javascript
+sy create using-javascript
 ```
 
 :::
 ::: grid col-6
 
 ```bash
-$ sy create using-typescript
+sy create using-typescript
 ```
 
 :::

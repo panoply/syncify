@@ -19,6 +19,8 @@ anchors:
 
 Syncify projects adopt a hierarchical **input** ➔ **output** structure, allowing developers to organize files and folders within the input directory as they see fit, including mimicking flat structures if desired. While this flexible hierarchy offers powerful customization, it may feel unfamiliar to developers accustomed to the flat structure of the Shopify CLI.
 
+> Syncify currently enforces a strict hierarchical structure and does not support flat structures. However, plans are in place to introduce flat structure compatibility in a future minor version release.
+
 :::: grid row dir-struc my-5
 ::: grid col fs-sm bd-bad
 
@@ -67,9 +69,7 @@ An example of a hierarchical structure where theme directories are placed inside
 :::
 ::::
 
-> Syncify currently enforces a strict hierarchical structure and does not support flat structures. However, plans are in place to introduce flat structure compatibility in a future minor version release.
-
-<h1 class="vs"> Hierarchical <span>VS</span> Flat Structures</h1>
+<h3 class="vs"> Hierarchical <span>VS</span> Flat Structures</h3>
 
 While it's easy to critique the Shopify CLI's rigid flat structure mandate for theme development, the hierarchical (custom) structures offered by Syncify come with their own set of challenges. Despite these shortcomings, Syncify strives to address each potential issue with minimally invasive workarounds, ensuring flexibility without overwhelming complexity.
 
@@ -202,63 +202,125 @@ export default defineConfig({
 
 # Root Definitions
 
-Root definitions are additional references available to `paths` and represent write locations in projects with custom structures and complex path patterns. Though the **input** ➔ **output** approach of Syncify offers developers flexibility, there are nuances when we execute [pull](/cli/sy-pull/) operations.
-
-In a flat structure, file placement is predictable and intuitive, there is no room for ambiguity or deviation when importing from an online store. Snippets will land in the `snippets/` directory, sections in the `sections/` directory, templates in the `templates/` directory etc. In Syncify, the freedom to create custom nested theme structures introduces complexity and mapping files to their intended locations becomes less straightforward.
-
-Root definitions are _typically_ not a hard-requirement and in most cases, Syncify will be able to determine import locations, but in some situations, you may need to provide root definitions.
-
-:::: grid row mb-4 ai-center root-def-height mt-5
-::: grid col fs-sm pr-4
-
-<h4 class="bad mb-1">Root Unknown</h4>
-
-The snippets and sections are too wide for resolution.
+Root definitions in Syncify allow developers to specify where files should be written during a pull operation, which imports files from an online store to a local project. This feature is particularly valuable for projects with custom or nested directory structures, where determining the correct write location for imported files can be complex. By defining explicit write paths for resource types like snippets or sections, root definitions ensure that pulled files are placed exactly where intended relative to `input` (source) which eliminates ambiguity and aligning with a project's structure.
 
 <!--prettier-ignore-->
 ```js
 export default defineConfig({
   input: 'source',
   paths: {
-    // ...
     snippets: {
       '[name]': 'snippets/**/*.liquid'
     },
     sections: {
       '[name]': 'sections/**',
       '[dir]-[name]': 'sections/product/*'
+    },
+    roots: {
+      snippets: 'snippets/imports',    // Write pulls to source/snippets/imports
+      sections: 'sections/imports'     // Write pulls to source/sections/imports
     }
   }
 });
 ```
 
+Assume we are executing a pull operation and
+
+:::: grid row dir-each my-5
+::: grid col-5 fs-sm
+
+#### Breakdown
+
+The above command instructs Syncify to pull sections and snippets which are not currently present in your local workspace. The `--new` flag ensures that only unknown files are imported, whereas `-F` (or `--filter`) signals to only look in these directories.
+
+```bash
+sy pull --new -F sections -F snippets
+```
+
+#### Snippets
+
+- carousel.liquid
+- search.liquid
+- button.liquid
+
 :::
-::: grid col fs-sm pl-2
+::: grid col fs-sm
 
-<h4 class="good mb-1">Root Mapping</h4>
+```treeview
+/
+├── source/
+│   ├── sections/
+│   │   ├── layout/
+│   │   │   ├── footer.liquid
+│   │   │   └── header.liquid
+│   │   ├── carousel.liquid
+│   │   └── split-image.liquid
+│   └── snippets/
+│       └── common/
+│           ├── search.liquid
+│           └── button.liquid
+├── .env
+├── package.json
+└── syncify.config.ts
+```
 
-We provide a `[root]` key and provide path for imports.
+:::
+::: grid col
 
-<!--prettier-ignore-->
-```js
-export default defineConfig({
-  input: 'source',
-  paths: {
-    snippets: {
-      '[root]': 'snippets/imports',
-      '[name]': 'snippets/**/*.liquid'
-    },
-    sections: {
-      '[root]': 'sections/imports',
-      '[name]': 'sections/**',
-      '[dir]-[name]': 'sections/product/*'
-    }
-  }
-});
+```treeview
+/
+├── source/
+│   ├── sections/
+│   │   ├── layout/
+│   │   │   ├── footer.liquid
+│   │   │   └── header.liquid
+│   │   ├── carousel.liquid
+│   │   └── split-image.liquid
+│   └── snippets/
+│       └── common/
+│           ├── search.liquid
+│           └── button.liquid
+├── .env
+├── package.json
+└── syncify.config.ts
 ```
 
 :::
 ::::
+
+<!--prettier-ignore-->
+```js
+export default defineConfig({
+  input: 'source',
+  paths: {
+    snippets: {
+      '[name]': 'snippets/**/*.liquid'
+    },
+    sections: {
+      '[name]': 'sections/**',
+      '[dir]-[name]': 'sections/product/*'
+    },
+    roots: {
+      snippets: 'snippets/imports',    // Write pulls to source/snippets/imports
+      sections: 'sections/imports'     // Write pulls to source/sections/imports
+    }
+  }
+});
+```
+
+The configuration code sample above ensures that snippets and sections imported from an online store are written to their respective `imports/` sub-directories, regardless of the store's structure or the complexity of the paths globs.
+
+We don't need to pass `source` prefix to the paths because it is assumed. Roots make it possible to maintain a consistent and predictable project structure.
+
+Syncify's flexibility enables developers to create tailored project structures, moving beyond the standard input-to-output workflow. In a simple, flat project, file placement during a pull is straightforward, with snippets written to snippets/, sections to sections/, and templates to templates/. Syncify can easily map these files based on their resource type. However, in projects with nested directories or intricate path patterns, this process becomes less predictable. Without clear guidance, Syncify may place files in unintended directories, disrupting the project's organization. Root definitions address this challenge by providing a predefined path for each resource type, ensuring pulled files are written correctly.
+
+In most cases, root definitions are optional, as Syncify can often infer write locations using the paths configuration, which defines how files are read and mapped during operations like push or watch. However, for projects with complex setups, such as nested subdirectories or overlapping path globs, relying solely on paths may lead to errors or misplaced files. Root definitions act as a safeguard, offering an explicit instruction for where to write files during a pull, making them an essential tool for developers working with non-standard project structures.
+
+### When to Use Root Definitions
+
+Root definitions are particularly useful in scenarios where a project's structure introduces complexity. For instance, if a project uses nested directories and different resolution points, Syncify may not automatically know where to write pulled files without explicit guidance. Similarly, if the paths configuration includes broad or overlapping globs, such as `sections/**` the ambiguity can result in files being written to incorrect locations. By providing clear write paths, root definitions eliminate guesswork and ensure that the project remains organized.
+
+To illustrate the practical impact, consider running the `sy-pull` command to import snippets and sections from an online store. Without root definitions, Syncify would rely on the paths globs to determine write locations, potentially placing snippets in `source/snippets/` and sections in `source/sections/`. If the globs are ambiguous, files might end up in unexpected directories, disrupting the workflow.
 
 ---
 

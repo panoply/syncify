@@ -20,21 +20,21 @@ Get started using one the example straps for a real-world implementation referen
 ::: grid col-4
 
 ```bash
-$ sy create using-postcss
+sy create using-postcss
 ```
 
 :::
 ::: grid col-4
 
 ```bash
-$ sy create using-tailwind
+sy create using-tailwind
 ```
 
 :::
 ::: grid col-4
 
 ```bash
-$ sy create using-sass
+sy create using-sass
 ```
 
 :::

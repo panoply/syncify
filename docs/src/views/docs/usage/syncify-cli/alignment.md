@@ -12,11 +12,15 @@ anchors:
 
 # Alignment
 
-In real-world Shopify theme development, merchants often rely on the Shopify theme customizer to tweak settings, update content, and adjust layouts through a web interface. These changes primarily modify JSON-based files in a theme structure, leaving source files like `.liquid` untouched by most merchants.
+In real-world Shopify theme development, merchants often rely on the Shopify theme customizer to tweak settings, update content, and adjust layouts through a web interface. These changes primarily modify JSON-based files in a theme structure. The `{bash} --align` flag facilitates **remote** ⥂ **local** merges of JSON files which are subject to auto-generated changes applied from the online store.
 
-If your theme is developed using Syncify, it's typically distributed in a terse, optimized format. This approach reduces the size of markup files and helps prevent changes from being applied outside your controlled development workflow. The terse structure in `.liquid` files is intentional, Syncify discourages merchants from directly modifying source files, steering them toward the theme customizer for adjustments instead.
+{% include 'include/video', video: 'hot-cli-align', height: 450 %}
 
-You might wonder why syncify takes this stance. Consider a parallel with a company like Apple: when you buy one of their devices, it’s designed to be sleek and functional, but not easily opened or altered without specialized tools or a technician. Similarly, syncify streamlines theme files to maintain integrity and consistency, ensuring that updates happen in a predictable, developer-managed way rather than through ad-hoc edits that could break functionality or styling.
+> In the above screener, It takes Syncify **8 seconds** to perfoms a full alignment + merge and then begin watching with [HOT](/usage/hot-reloading/) enabled. The same operation/s if performed by the Shopify CLI would take close to **60 seconds** complete.
+
+#### Performance Focused
+
+Syncify alignments are more than **4x** faster than the equivalent operation performed by the Shopify CLI. Syncify can efficiently power through the entire alignment process, executing requests, reads, diffs, formats and merges in the same amount of time it takes the Shopify CLI to fumbles through initiating a single fetch.
 
 ---
 
@@ -42,8 +46,8 @@ Developers should use the `--align` flag when they are certain that source files
 The `--align` flag is available in the following modes. In most cases, you'll apply alignment when invoking watch:
 
 ```bash
-$ sy watch   --align
-$ sy pull    --align
-$ sy push    --align
-$ sy publish --align
+sy watch   --align
+sy pull    --align
+sy push    --align
+sy publish --align
 ```

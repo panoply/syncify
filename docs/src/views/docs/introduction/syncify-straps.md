@@ -13,7 +13,7 @@ anchors:
 
 Syncify Straps serve as a comprehensive resource for developers, offering an extensive collection of open-source themes and usage examples made available under the [Github Orgisation](https://github.com/SyncifyCLI). Straps are invaluable for anyone aiming to explore the full potential of Syncify through real-world implementations. They showcase the capabilities of Syncify and illustrate the varied methods by which it can be integrated into different projects.
 
-All straps are easily accessible and can be installed directly from the command line using the `sy create` command, which simplifies the process of setting up and experimenting with Syncify in your development environment.
+> Straps are easily accessible and can be installed directly via the CLI using the `sy init` command.
 
 # Theme Straps
 
@@ -28,13 +28,12 @@ Theme straps from Syncify are comprehensive, fully-developed themes intended to 
 
 Syncify offers an array of impressive features, and for those who learn best through practical examples, there are dedicated example straps available. These examples are specifically designed to showcase and leverage the various capabilities of Syncify, providing users with a clear demonstration of how to implement Syncify in real-world scenarios.
 
-- [Using Export](#)
-- [Using Import](#)
-- [Using Metafields](#)
-- [Using Pages](#)
-- [Using Publish](#)
+- [Using Paths](#)
 - [Using Rename](#)
 - [Using Sass](#)
+- [Using Tailwind](#)
+- [Using Metafields](#)
+- [Using Pages](#)
 - [Using Schema](#)
 - [Using Spawns](#)
 - [Using Terser](#)

@@ -19,7 +19,7 @@ Shopify requires themes to be uploaded to stores in a compressed `.zip` file for
 # References
 
 ```bash
-$ sy themes
+sy themes
 ```
 
 ---
@@ -27,7 +27,7 @@ $ sy themes
 # Importing
 
 ```bash
-$ sy import
+sy import
 ```
 
 ---
@@ -37,7 +37,7 @@ $ sy import
 To use this command, type syncify export followed by any optional parameters. You can specify an output directory with -o or --output and a custom name for your zip file with -n or --name. If no options are provided, the file will be saved in the current directory named theme*export*[timestamp].zip.
 
 ```bash
-$ sy export
+sy export
 ```
 
 ---
@@ -51,5 +51,5 @@ $ sy export
 5. Push version .zip to git versions branch
 
 ```bash
-$ sy publish
+sy publish
 ```

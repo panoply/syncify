@@ -444,6 +444,19 @@ ul.compare-list {
   }
 }
 
+.ll-check h5,
+.ll-check h4 {
+  padding-left: 30px;
+  background-position: center left;
+  background-size: 18px;
+  background-repeat: no-repeat;
+  background-image: url(icon-check($green, 2));
+
+  + p {
+    padding-left: 30px;
+  }
+}
+
 .icon-brave,
 .icon-chrome,
 .icon-safari,

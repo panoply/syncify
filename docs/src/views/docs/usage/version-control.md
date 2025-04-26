@@ -99,13 +99,13 @@ flag automatically increments the version based on configuration.
 
 ```bash
 Command:
-  $ sy version             # Interactive version control prompt
-  $ sy version --bump      # Increments theme version on the
+  sy version             # Interactive version control prompt
+  sy version --bump      # Increments theme version on the
 
 Argument:
-  $ sy version patch       # Increments the package.json version patch, e.g, 1.0.0 to 1.0.1
-  $ sy version minor       # Increments the package.json version minor, e.g, 1.0.0 to 1.1.0
-  $ sy version major       # Increments the package.json version major, e.g, 1.0.0 to 2.0.0
+  sy version patch       # Increments the package.json version patch, e.g, 1.0.0 to 1.0.1
+  sy version minor       # Increments the package.json version minor, e.g, 1.0.0 to 1.1.0
+  sy version major       # Increments the package.json version major, e.g, 1.0.0 to 2.0.0
 ```
 
 > Additional arguments like `patch`, `minor`, or `major` enable direct updates to the version in `package.json`, reflecting changes like 1.0.0 → 1.0.1, 1.0.0 → 1.1.0, or 1.0.0 → 2.0.0, respectively.

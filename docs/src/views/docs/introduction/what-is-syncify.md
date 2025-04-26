@@ -13,7 +13,7 @@ anchors:
 
 Syncify is a specialized CLI tool crafted for Shopify theme development, offering a robust alternative to the Shopify CLI. Designed for developers, agencies, and teams, it provides a high-performance, customizable solution that enhances productivity through a structured yet flexible approach to store development. Syncify integrates seamlessly with modern tooling, addressing the complex demands of e-commerce SaaS-facing webshop creation.
 
-The inception of Syncify was driven by an apparent necessity within the Shopify developer community, which has long sought tools that work in harmony with the intricate demands of modern e-commerce SaaS-facing webshop development. Despite significant investment by Shopify, their open-source offerings for theme development via the Shopify CLI remains malnourished in features and functionality with most advancements focused on subset capabilities that cater to novices, often ignoring the needs of the experienced in this eco-system.
+The inception of Syncify was driven by an apparent necessity within the Shopify developer community, which has long sought tools that work in harmony with the intricate demands of modern e-commerce SaaS-facing webshop development. Despite significant investment by Shopify, their open-source offerings for theme development via the Shopify CLI remains malnourished in features and functionality with most advancements focused on subset capabilities that cater to novices, often ignoring the needs of the experienced in this eco-system. Syncify is the independent open source alternative that has been engineered from the ground up to not only outperform Shopify's current offerings, but to bring developers a tool that actually works and does not impede upon their productivity.
 
 ---
 
@@ -51,11 +51,11 @@ To reinforce this, Syncify offers a terse, optimized output option for your them
 
 # How to use Syncify?
 
-If Syncify is entirely new to you, start with the [installation](/setup/installation/) process, followed by understanding the [authentication](/setup/authentication/) procedures. These are essential first steps. OFor hands-on learning, check out the [Syncify Straps](https://github.com/SyncifyCLI) repository, for examples and themes designed to illustrate how Syncify can be leveraged in real-world scenarios.
+If Syncify is entirely new to you, start with the [installation](/setup/installation/) process, followed by understanding the [authentication](/setup/authentication/) procedures. These are essential first steps. For hands-on learning, check out the [Syncify Straps](https://github.com/SyncifyCLI) repository, for examples and themes designed to illustrate how Syncify can be leveraged in real-world scenarios.
 
 1. [Installation Guide](/setup/installation/)
 2. [Access Tokens and Authentication](/setup/authentication/)
 3. [Examples in Syncify Straps](/syncify-straps/)
 4. [Command Line Usage](/usage/syncify-cli/)
 
-Syncify demands a mindset shift, especially if you’re used to Shopify CLI workflows. It doesn't replicate its predecessor - it redefines synchronization between local and remote sources with innovative approaches. The goal? To make Shopify CLI obsolete for theme development, offering a comprehensive, developer-centric tool that stands alone.
+It's important new adopters understand that Syncify demands a mindset shift, especially if you’re used to Shopify CLI workflows. It doesn't replicate behaviour you already know, it redefines sync operations between local and remote sources with different approaches. It's goal is to provide skilled developers a solution that improves their productivity.

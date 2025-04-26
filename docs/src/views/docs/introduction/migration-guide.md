@@ -44,3 +44,5 @@ For developers juggling multiple Shopify stores, Syncify offers a [Keychain](#) 
 ---
 
 # Github Integration
+
+TODO

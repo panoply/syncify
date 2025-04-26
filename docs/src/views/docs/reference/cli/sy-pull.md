@@ -7,8 +7,8 @@ permalink: '/cli/sy-pull/index.html'
 # `sy pull`
 
 ```bash
-$ sy pull
-$ sy pull --flags
+sy pull
+sy pull --flags
 ```
 
 # Flags `{bash} sy pull --flags`

@@ -20,7 +20,7 @@ Syncify requires users to have both [Node](https://nodejs.org/) (v20 or higher) 
 #### PNPM
 
 ```bash
-$ pnpm add @syncify/cli -g
+pnpm add @syncify/cli -g
 ```
 
 :::
@@ -29,7 +29,7 @@ $ pnpm add @syncify/cli -g
 #### NPM
 
 ```bash
-$ npm i @syncify/cli -g
+npm i @syncify/cli -g
 ```
 
 :::
@@ -38,7 +38,7 @@ $ npm i @syncify/cli -g
 #### YARN
 
 ```bash
-$ yarn add @syncify/cli -g
+yarn add @syncify/cli -g
 ```
 
 :::
@@ -47,7 +47,7 @@ $ yarn add @syncify/cli -g
 #### BUN
 
 ```bash
-$ bun add @syncify/cli -g
+bun add @syncify/cli -g
 ```
 
 :::

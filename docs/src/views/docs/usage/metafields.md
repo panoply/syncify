@@ -17,7 +17,7 @@ The `metafields` directory `path` reference is where you can provide **global** 
 Syncify provides you with simple interactive prompt based approach for importing pre-existing metafields from your online store. You can optionally choose which metafields you'd like to maintain. Use the `-m` or `--metafields` flag together with the `--pull` flag on the command line to download metafields:
 
 ```bash
-$ sy --metafields --pull
+sy --metafields --pull
 ```
 
 ### Merge Metafields
@@ -25,7 +25,7 @@ $ sy --metafields --pull
 Working with metafields from your local machine may have result in unexpected overwrites if changes were made to remote versions that conflict with local versions. In order to combat this Syncify support **merge** capabilities which can be used to merge changes when metafield modification timestamps differ. Use the `-m` or `--metafields` flag together with the `--merge` flag on the command line perform local and remote alignments.
 
 ```bash
-$ sy --metafields --merge
+sy --metafields --merge
 ```
 
 ### Structure

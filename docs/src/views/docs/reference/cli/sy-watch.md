@@ -9,8 +9,8 @@ permalink: '/cli/sy-watch/index.html'
 The watch command runs Syncify in **watch** mode. In this mode, Syncify continuously monitors files in the specified **input** directory for changes. When a file is modified, it writes the updated content to the **output** directory and then uploads those changes to a Shopify theme/store or [target](/usage/targeting/). This keeps the output directory and Shopify environment synchronized with you local version throughout the session.
 
 ```bash
-$ sy watch            # Starts watching the project for changes
-$ sy watch --flags    # Pass an accepted flag to modify watch execution
+sy watch            # Starts watching the project for changes
+sy watch --flags    # Pass an accepted flag to modify watch execution
 ```
 
 ---

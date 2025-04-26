@@ -279,212 +279,237 @@
       ]
     },
     {
-      "title": "CLI",
+      "title": "Reference",
       "links": [
         {
-          "title": "sy init",
-          "url": "/cli/sy-init/",
+          "title": "Overview",
+          "url": "/reference/overview/",
           "navbar": "documentation"
         },
         {
-          "title": "sy create",
-          "url": "/cli/sy-create/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy build",
-          "url": "/cli/sy-build/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy watch",
-          "url": "/cli/sy-watch/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy pull",
-          "url": "/cli/sy-pull/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy push",
-          "url": "/cli/sy-push/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy pack",
-          "url": "/cli/sy-pack/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy delete",
-          "url": "/cli/sy-delete/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy duplicate",
-          "url": "/cli/sy-duplicate/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy publish",
-          "url": "/cli/sy-publish/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy theme",
-          "url": "/cli/sy-theme/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy keychain",
-          "url": "/cli/sy-keychain/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy prune",
-          "url": "/cli/sy-prune/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy git",
-          "url": "/cli/sy-git/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy version",
-          "url": "/cli/sy-version/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy projects",
-          "url": "/cli/sy-projects/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy inspect",
-          "url": "/cli/sy-inspect/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy help",
-          "url": "/cli/sy-help/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "sy doctor",
-          "url": "/cli/sy-doctor/",
-          "navbar": "documentation"
-        }
-      ]
-    },
-    {
-      "title": "Options",
-      "links": [
-        {
-          "title": "input",
-          "url": "/options/input/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "output",
-          "url": "/options/output/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "config",
-          "url": "/options/config/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "paths",
-          "url": "/options/paths/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "hot",
-          "url": "/options/hot/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "clean",
-          "url": "/options/clean/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "git",
-          "url": "/options/paths/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "log",
-          "url": "/options/log/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "editor",
-          "url": "/options/editor/",
-          "navbar": "documentation"
-        },
-        {
-          "title": "transform",
+          "title": "Commands",
           "links": [
             {
-              "title": "script",
-              "url": "/options/transform/script/",
+              "title": "sy init",
+              "url": "/cli/sy-init/",
               "navbar": "documentation"
             },
             {
-              "title": "style",
-              "url": "/options/transform/style/",
+              "title": "sy create",
+              "url": "/cli/sy-create/",
               "navbar": "documentation"
             },
             {
-              "title": "svg",
-              "url": "/options/transform/svg/",
+              "title": "sy build",
+              "url": "/cli/sy-build/",
               "navbar": "documentation"
             },
             {
-              "title": "json",
-              "url": "/options/transform/json/",
+              "title": "sy watch",
+              "url": "/cli/sy-watch/",
               "navbar": "documentation"
             },
             {
-              "title": "liquid",
-              "url": "/options/transform/liquid/",
+              "title": "sy pull",
+              "url": "/cli/sy-pull/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy push",
+              "url": "/cli/sy-push/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy pack",
+              "url": "/cli/sy-pack/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy delete",
+              "url": "/cli/sy-delete/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy duplicate",
+              "url": "/cli/sy-duplicate/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy publish",
+              "url": "/cli/sy-publish/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy theme",
+              "url": "/cli/sy-theme/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy keychain",
+              "url": "/cli/sy-keychain/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy prune",
+              "url": "/cli/sy-prune/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy git",
+              "url": "/cli/sy-git/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy version",
+              "url": "/cli/sy-version/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy projects",
+              "url": "/cli/sy-projects/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy inspect",
+              "url": "/cli/sy-inspect/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy help",
+              "url": "/cli/sy-help/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "sy doctor",
+              "url": "/cli/sy-doctor/",
               "navbar": "documentation"
             }
           ]
         },
         {
-          "title": "processor",
+          "title": "Options",
           "links": [
             {
-              "title": "esbuild",
-              "url": "/options/processors/esbuild/",
+              "title": "input",
+              "url": "/options/input/",
               "navbar": "documentation"
             },
             {
-              "title": "sass",
-              "url": "/options/processors/sass/",
+              "title": "output",
+              "url": "/options/output/",
               "navbar": "documentation"
             },
             {
-              "title": "postcss",
-              "url": "/options/processors/postcss/",
+              "title": "config",
+              "url": "/options/config/",
               "navbar": "documentation"
             },
             {
-              "title": "tailwind",
-              "url": "/options/processors/tailwind/",
+              "title": "paths",
+              "url": "/options/paths/",
               "navbar": "documentation"
             },
             {
-              "title": "svgo",
-              "url": "/options/processors/svgo/",
+              "title": "hot",
+              "url": "/options/hot/",
               "navbar": "documentation"
+            },
+            {
+              "title": "clean",
+              "url": "/options/clean/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "git",
+              "url": "/options/paths/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "log",
+              "url": "/options/log/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "editor",
+              "url": "/options/editor/",
+              "navbar": "documentation"
+            },
+            {
+              "title": "transform",
+              "links": [
+                {
+                  "title": "script",
+                  "url": "/options/transform/script/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "style",
+                  "url": "/options/transform/style/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "svg",
+                  "url": "/options/transform/svg/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "json",
+                  "url": "/options/transform/json/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "liquid",
+                  "url": "/options/transform/liquid/",
+                  "navbar": "documentation"
+                }
+              ]
+            },
+            {
+              "title": "processor",
+              "links": [
+                {
+                  "title": "esbuild",
+                  "url": "/options/processors/esbuild/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "sass",
+                  "url": "/options/processors/sass/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "postcss",
+                  "url": "/options/processors/postcss/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "tailwind",
+                  "url": "/options/processors/tailwind/",
+                  "navbar": "documentation"
+                },
+                {
+                  "title": "svgo",
+                  "url": "/options/processors/svgo/",
+                  "navbar": "documentation"
+                }
+              ]
             }
           ]
+        },
+        {
+          "title": "Limitations",
+          "url": "/reference/limitations/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "Author",
+          "url": "/reference/author/",
+          "navbar": "documentation"
+        },
+        {
+          "title": "License",
+          "url": "/reference/license/",
+          "navbar": "documentation"
         }
       ]
     }

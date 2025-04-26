@@ -37,7 +37,7 @@ If you haven't already installed Syncify, proceed with a global installation. Al
 #### PNPM
 
 ```bash
-$ pnpm add @syncify/cli -g
+pnpm add @syncify/cli -g
 ```
 
 :::
@@ -46,7 +46,7 @@ $ pnpm add @syncify/cli -g
 #### NPM
 
 ```bash
-$ npm i @syncify/cli -g
+npm i @syncify/cli -g
 ```
 
 :::
@@ -55,7 +55,7 @@ $ npm i @syncify/cli -g
 #### YARN
 
 ```bash
-$ yarn add @syncify/cli -g
+yarn add @syncify/cli -g
 ```
 
 :::
@@ -64,7 +64,7 @@ $ yarn add @syncify/cli -g
 #### BUN
 
 ```bash
-$ bun add @syncify/cli -g
+bun add @syncify/cli -g
 ```
 
 :::
@@ -74,7 +74,7 @@ $ bun add @syncify/cli -g
 
 # Initialize
 
-After installing Syncify, use the `sy init` command to initialize a new project. This command analyzes the current directory and guides you through an interactive setup prompt. It's typically used to set up Syncify in existing projects or when migrating from the Shopify CLI. For starting a new project from scratch, use the `sy create` command, detailed below.
+After installing Syncify, use the `sy init` command to initialize a new project. This command analyzes the current directory and guides you through an interactive setup prompt. It's the fastest way to get started using Syncify.
 
 :::: grid row mt-5
 ::: grid col-12 col-md-6 fs-sm pr-5
@@ -82,7 +82,7 @@ After installing Syncify, use the `sy init` command to initialize a new project.
 #### Global Binary 👍
 
 ```bash
-$ sy init
+sy init
 ```
 
 :::
@@ -91,7 +91,7 @@ $ sy init
 #### Local Binary 👎
 
 ```bash
-$ pnpm sy init
+pnpm sy init
 ```
 
 :::
@@ -101,9 +101,9 @@ $ pnpm sy init
 
 ---
 
-# Generating
+# Straps
 
-If you're looking to test things out, you can use Syncify to generate projects from one of the available starting-point [straps](https://github.com/syncifycli/). These straps provide pre-configured themes and usage examples that help developers kickstart their development with Syncify. To generate a new project, we'll use the bare-bones [Dusk Theme](https://github.com/syncifycli/dusk) strap. Run the `create` command along with `"dusk"` and Syncify will create a project based on that strap:
+If you're looking to test things out, you can select [straps](https://github.com/syncifycli/). These straps provide pre-configured themes and usage examples that help developers kickstart their development with Syncify. To generate a new project, we'll use the bare-bones [Dusk Theme](https://github.com/syncifycli/dusk) strap. Run the `create` command along with `"dusk"` and Syncify will create a project based on that strap:
 
 :::: grid row mt-5
 ::: grid col-12 col-md-6 fs-sm pr-5
@@ -111,7 +111,7 @@ If you're looking to test things out, you can use Syncify to generate projects f
 #### Global Binary 👍
 
 ```bash
-$ sy create "dusk"
+sy create "dusk"
 ```
 
 :::
@@ -120,13 +120,13 @@ $ sy create "dusk"
 #### Local Binary 👎
 
 ```bash
-$ pnpm sy create "dusk"
+pnpm sy create "dusk"
 ```
 
 :::
 ::::
 
-> Omitting the strap target name (i.e, `"dusk"`) and running `{bash} $ sy create` will provide you with a list of usage examples and themes to select from. All straps are open source and available on [github](https://github.com/syncifycli/).
+> Omitting the strap target name (i.e, `"dusk"`) and running `{bash} sy create` will provide you with a list of usage examples and themes to select from. All straps are open source and available on [github](https://github.com/syncifycli/).
 
 ---
 
@@ -140,7 +140,7 @@ If you've provided Syncify with store access, the `sy create` command would have
 #### Global Binary 👍
 
 ```bash
-$ sy publish
+sy publish
 ```
 
 :::
@@ -149,7 +149,7 @@ $ sy publish
 #### Local Binary 👎
 
 ```bash
-$ pnpm sy publish
+pnpm sy publish
 ```
 
 :::
@@ -177,6 +177,6 @@ If you've followed the above steps, you can start developing. Depending on how y
 Syncify provides an extensive list of commands, all of which you will likely use at some point or another, but the main two are the **build** and **watch** commands.
 
 ```bash
-$ sy watch     # Watches for changes and syncs them to store
-$ sy build     # Build the entire theme from source
+sy watch     # Watches for changes and syncs them to store
+sy build     # Build the entire theme from source
 ```

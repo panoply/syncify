@@ -14,7 +14,7 @@ For example, to set the `dist` directory as the output and trigger a theme build
 ::: grid col
 
 ```bash
-$ syncify --build --output dist
+syncify --build --output dist
 ```
 
 :::
@@ -26,7 +26,7 @@ OR
 ::: grid col
 
 ```bash
-$ sy -b -o dist
+sy -b -o dist
 ```
 
 :::

@@ -54,8 +54,8 @@ The following list includes frequently used commands and flags for the Command L
 
 ```bash
 Default:
-  $ sy                        # The binary command line name
-  $ syncify                   # Alias of sy, meaning it can be used instead of sy
+  sy                        # The binary command line name
+  syncify                   # Alias of sy, meaning it can be used instead of sy
 
 Modes:
   sy init                     # Initilise a Syncify project
@@ -106,3 +106,9 @@ Miscellaneous:
 {% endraw %}
 
 ---
+
+# Help Command
+
+You can obtain a full command-line reference by running the `sy help` command.
+
+{% include 'include/video', video: 'cli-help', height: 450 %}

@@ -16,6 +16,8 @@ Syncify provides **HOT Reloading** capabilities during watch mode operations. Th
 
 Hot reloading can be activated by passing the `--hot` flag during initialization, and for developers requiring programmatic control, Syncify exposes an interface API to manage the reloading process via `{js} window.syncify`. This approach significantly accelerates the development workflow by eliminating the latency typically associated with full page reloads and CDN propagation delays.
 
+{% include 'include/video', video: 'hot-cli', height: 450 %}
+
 ---
 
 # Syncify Approach
@@ -92,27 +94,44 @@ Both approaches have their trade-offs. While Syncify's method requires DOM injec
 
 # CLI Usage
 
+The `--hot` flag must be passed when running `sy watch` mode to enable HOT Reloading. You can control and fine grain HOT Reloading behaviour on the `hot` option within config files, but in most cases the defaults will work just fine.
+
+:::: grid row my-5
+::: grid col-12 col-md-6 fs-sm pr-5
+
+#### Global Binary 👍
+
 ```bash
-$ syncify dev -w --hot
+sy watch --hot
 ```
 
-### Default Options
+:::
+::: grid col-12 col-md-6 fs-sm
+
+#### Local Binary 👎
+
+```bash
+pnpm sy watch --hot
+```
+
+:::
+::::
+
+### Config Options
+
+Users can customise HOT Reloading behaviour within config files via the `hot` option. Syncify provides several helpful options, including the functionaity to override and intercept Shopify CFH injections that will improve per-change swaps to filter through the bullshit you don't need in development modes.
 
 <!--prettier-ignore-->
 ```js
-import { definedConfig } from '@syncify/cli';
+import { definedConfig } from '@syncify/config';
 
 export default defineConfig({
   hot: {
-    server: 41001,
-    socket: 51001,
+    eject: true,
     label: true,
     method: 'hot',
-    roles: {
-      published: false,
-      unpublished: true,
-      development: true
-    }
+    server: 41001,
+    socket: 51001,
     layouts: [
       'theme.liquid'
     ],
@@ -134,26 +153,35 @@ export default defineConfig({
 
 Running in HOT mode will result in Syncify injecting a snippet into layouts. The snippet is the socket receiver that is responsible for executing replacements/morphs and exposes programmatic control for developers who can to customize or hook into the HOT reload rendering cycles.
 
-```js
-// STATUS
+```ts
+// VALUES
 //
-window.syncify.ready: boolean
-window.syncify.connected: boolean;
+syncify.version           // The HOT Module version number
+syncify.template          // Returns the current template name according to Liquid objects
+syncify.isReady           // Boolean, informing on whether syncify is ready or not
+syncify.isConnected       // Boolean, whether or not the websocket is connected
+syncify.WebC              // A Set() of Web Components registered in the DOM.
+syncify.options           // Object, The current options used
+syncify.errors[]          // List of errors encountered, title, description and group entries
 
-// RELOADS
+// FUNCTIONS
 //
-window.syncify.assets(): void;
-window.syncify.reload(): void;
-window.syncify.refresh(): void
+syncify.connect()         // Connect Syncify HOT, accepts options parameter
+syncify.disconnect()      // Disconnect Syncify HOT
+syncify.route()           // Sends message to the server of websocket to informs upon template
+syncify.refresh()         // Triggers a Full page refresh
+syncify.reload()          // Triggers a HOT reloads of the DOM the <body>, accepts callback param
+syncify.assets()          // HOT Reloads all assets in the DOM
 
 // SECTIONS
 //
-window.syncify.sections.get()
-window.syncify.sections.list()
-window.syncify.sections.load()
+syncify.sections.list()   // Object, model of { map: {}, alias: {} } with dynamic identifiers
+syncify.sections.list()   // Object, Alias is template defined sections
+syncify.sections.load()   // Method for loading section id maps, accepts HTMLElement parameter
+syncify.sections.get()    // Returns all elements matching the provided id, accepts ID parameter
 
 // LABEL
 //
-window.syncify.style.parent({ /* CSS */ });
-window.syncify.style.label({ /* CSS */ });
+syncify.style.parent()    // Label specific, returns the dynamic parent node
+syncify.style.label()     // Label specific, the inner node which contains the event text
 ```
