@@ -4,12 +4,12 @@ import { join } from 'node:path';
 import { argv, env } from 'node:process';
 import { parseArgs } from 'node:util';
 
-import { blue, bold, COL, DSH, gray, red, TLD } from '@syncify/ansi';
+import * as _ from '@syncify/ansi';
 import { glue } from '@syncify/glue';
+import { kill } from '@syncify/kill';
 
 import { log } from '~cli/log';
 import { runtime } from '~cli/runtime';
-import { throwCommand } from '~cli/throws';
 import { LogModes } from '~enums';
 import { event } from '~events';
 import { Help } from '~mode/help';
@@ -29,6 +29,7 @@ const flags = (): Record<string, ParseArgsOptions> => ({
   help: { type: 'boolean', short: 'h' },
   version: { type: 'boolean', short: 'v' },
   align: { type: 'boolean' },
+  new: { type: 'boolean' },
   merge: { type: 'boolean' },
   dev: { type: 'boolean' },
   prod: { type: 'boolean' },
@@ -91,11 +92,11 @@ function parse (cmd: ParseCommand[]): [ ParseCommand, ReturnType<typeof parseArg
     while (++i < s) if (cmd[i].mode === find) break;
 
     if (i === s) {
-      throwCommand([
-        `Invalid positional or mode${COL} "${red.bold(find)}"` + NWL,
+      CommandError([
+        `Invalid positional or mode${_.COL} "${_.red.bold(find)}"` + NWL,
         'You must provide a known and valid execution mode.',
-        `For a list of available modes, run the help command${COL}` + NLR,
-        `${gray('$')} ${blue('sy help modes')}`
+        `For a list of available modes, run the help command${_.COL}` + NLR,
+        `${_.gray('$')} ${_.blue('sy help modes')}`
       ]);
     }
 
@@ -117,10 +118,10 @@ function parse (cmd: ParseCommand[]): [ ParseCommand, ReturnType<typeof parseArg
 
           // This is actually an internal error and means "flags[]"
           // has not been provided in the flags() options.
-          throwCommand([
-            `Unknown flag expression provided "${bold(`--${mode.flags[i]}`)}"` + NWL,
-            `Accepted flags for ${bold(mode.mode)} mode${COL}` + NLR,
-            `${glue.nl(mode.flags.map(v => gray('--') + blue(v)))}`
+          CommandError([
+            `Unknown flag expression provided "${_.bold(`--${mode.flags[i]}`)}"` + NWL,
+            `Accepted flags for ${_.bold(mode.mode)} mode${_.COL}` + NLR,
+            `${glue.nl(mode.flags.map(v => _.gray('--') + _.blue(v)))}`
           ]);
         }
       }
@@ -139,7 +140,7 @@ function parse (cmd: ParseCommand[]): [ ParseCommand, ReturnType<typeof parseArg
 
     } catch (error) {
 
-      throwCommand(error.message.replace(/(--?)([a-z-]+)?/g, red.bold('$1$2')));
+      CommandError(error.message.replace(/(--?)([a-z-]+)?/g, _.red.bold('$1$2')));
 
     }
   }
@@ -155,10 +156,10 @@ function positional (cmd: ParseCommand, tokens: string[]) {
 
     if (tokens.length > 1) {
 
-      throwCommand([
-        `Invalid positional ${bold('build')} arguments expression provided. No more than 1 transform`,
-        `can be passed. Use comma ${bold(',')} separated expression instead, e.g:` + NLR,
-        `${gray('$')} ${blue(`sy build ${bold(tokens.join(gray(',')))}`)}`
+      CommandError([
+        `Invalid positional ${_.bold('build')} arguments expression provided. No more than 1 transform`,
+        `can be passed. Use comma ${_.bold(',')} separated expression instead, e.g:` + NLR,
+        `${_.gray('$')} ${_.blue(`sy build ${_.bold(tokens.join(_.gray(',')))}`)}`
       ]);
 
       return false;
@@ -172,10 +173,10 @@ function positional (cmd: ParseCommand, tokens: string[]) {
 
           if (!includes(transform, cmd.accepts)) {
 
-            throwCommand([
-              `Invalid ${bold('sy build')} transform "${bold(transform)}" provided.`,
-              `Must be one of the following${COL}` + NLR,
-              `${glue.nl(cmd.accepts.map(v => blue(v)))}`
+            CommandError([
+              `Invalid ${_.bold('sy build')} transform "${_.bold(transform)}" provided.`,
+              `Must be one of the following${_.COL}` + NLR,
+              `${glue.nl(cmd.accepts.map(v => _.blue(v)))}`
             ]);
 
             return false;
@@ -193,10 +194,10 @@ function positional (cmd: ParseCommand, tokens: string[]) {
       } else {
         if (!includes(tokens[0], cmd.accepts)) {
 
-          throwCommand([
-            `Invalid ${bold('sy build')} transform "${bold(tokens[0])}"`,
-            `Must be one of the following${COL}` + NLR,
-            `${glue.nl(cmd.accepts.map(v => blue(v)))}`
+          CommandError([
+            `Invalid ${_.bold('sy build')} transform "${_.bold(tokens[0])}"`,
+            `Must be one of the following${_.COL}` + NLR,
+            `${glue.nl(cmd.accepts.map(v => _.blue(v)))}`
           ]);
 
           return false;
@@ -223,10 +224,10 @@ function positional (cmd: ParseCommand, tokens: string[]) {
 
     } else {
 
-      throwCommand([
-        `Invalid ${bold('sy help')} argument "${bold(tokens[0])}" ${TLD}`,
-        `Must be one of the following${COL}` + NLR,
-        `${glue.nl(cmd.accepts.map(v => `${DSH} sy help ${v}`))}`
+      CommandError([
+        `Invalid ${_.bold('sy help')} argument "${_.bold(tokens[0])}" ${_.TLD}`,
+        `Must be one of the following${_.COL}` + NLR,
+        `${glue.nl(cmd.accepts.map(v => `${_.DSH} sy help ${v}`))}`
       ]);
 
       return false;
@@ -241,10 +242,10 @@ function positional (cmd: ParseCommand, tokens: string[]) {
       $.mode._ = tokens[0];
       return true;
     } else {
-      throwCommand([
-        `Invalid ${bold('keychain')} argument "${bold(tokens[0])}" ${TLD}`,
-        `Must be one of the following${COL}` + NLR,
-        `${glue.nl(cmd.accepts.map(v => `${DSH} ${blue(v)}`))}`
+      CommandError([
+        `Invalid ${_.bold('keychain')} argument "${_.bold(tokens[0])}" ${_.TLD}`,
+        `Must be one of the following${_.COL}` + NLR,
+        `${glue.nl(cmd.accepts.map(v => `${_.DSH} ${_.blue(v)}`))}`
       ]);
 
       return false;
@@ -357,5 +358,36 @@ export function command (commands: ParseCommand[]): any {
   env.SYNCIFY_VERSION = VERSION;
 
   return (fn: Function) => fn();
+
+};
+
+/* -------------------------------------------- */
+/* ERRORS                                       */
+/* -------------------------------------------- */
+
+/**
+ * Command Error
+ *
+ * Throws an error of any kind.
+ */
+function CommandError (message: string | string[]) {
+
+  _.Create({ type: 'error' })
+  .Top(`Syncify ${_.CHV} Error`, false)
+  .Newline(_.Tree.trim)
+  .Line(`COMMAND LINE ERROR ${_.BAD}`, _.bold)
+  .Newline()
+  .Wrap(message)
+  .Tree('info')
+  .NL
+  .Line('Need Help?', _.gray.bold)
+  .Line('Refer to the usage documentation for more information:', _.gray)
+  .Prepend(`${_.CHV} ${_.underline('https://syncify.sh/usage/syncify-cli')}`, _.gray)
+  .NL
+  .End(`Syncify ${_.CHV} Error`, false)
+  .BR
+  .toLog();
+
+  $.running ? kill.exit(0) : process.exit(0);
 
 };
