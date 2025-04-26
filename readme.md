@@ -17,19 +17,19 @@ Syncify is a specialized tool designed for Shopify theme development. It offers 
 
 If you are seeking a tool that has considered requirement factors across the modern Shopify Theme Development ecosystem, and would like a solution that produces performance-focused optimizations at the development process level with features designed for the complexities of modern e-commerce, see the below core capabilities offerred by Syncify:
 
-&nbsp;&nbsp;<i><strong>✓<samp>Custom input → output directory structures for tailored project organization.</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Compiling TypeScript, JavaScript, TSX, and JSX to support modern web development practices</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Tailwind, PostCSS, and SASS stylesheet support for advanced CSS management</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Terse minification of Markup and Liquid to optimize performance</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Static pages with Markdown → Markup transformation for content creation flexibility</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Metafield, Redirects, and Navigation synchronization for seamless data management</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Version Controlled theme distribution ensuring consistency and traceability</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Shared Schemas as a superset implementation for enhanced data modeling</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Frontmatter controlled liquid level configuration to fine-tune template behavior</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>SVG transform and sprite generation processing for efficient icon and graphic handling</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Multistore and theme parallel synchronization to manage multiple storefronts</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Websocket HOT Reloads with CFH control and morphing for real-time development feedback</samp></strong></i><br>
-&nbsp;&nbsp;<i><strong>✓<samp>Git-based automations with CI baked integrations for streamlined development workflows</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Custom input → output directory structures for tailored project organization.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Compiling TypeScript, JavaScript, TSX, and JSX to support modern web development practices</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Tailwind, PostCSS, and SASS stylesheet support for advanced CSS management</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Terse minification of Markup and Liquid to optimize performance</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Static pages with Markdown → Markup transformation for content creation flexibility</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Metafield, Redirects, and Navigation synchronization for seamless data management</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Version Controlled theme distribution ensuring consistency and traceability</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Shared Schemas as a superset implementation for enhanced data modeling</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Frontmatter controlled liquid level configuration to fine-tune template behavior</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>SVG transform and sprite generation processing for efficient icon and graphic handling</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Multistore and theme parallel synchronization to manage multiple storefronts</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Websocket HOT Reloads with CFH control and morphing for real-time development feedback</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Git-based automations with CI baked integrations for streamlined development workflows</samp></strong></i><br>
 
 <h1></h1>
 
@@ -77,6 +77,14 @@ The nightly releases of Syncify can be installed using the `@next` version tag v
 
 ```bash
 $ pnpm add @syncify/cli@next --global
+```
+
+## Unstable Release
+
+The unstable releases of Syncify can be installed using the `@unstable` version tag via NPM, code is on [unstable](https://github.com/panoply/syncify/tree/unstable) branch.
+
+```bash
+$ pnpm add @syncify/cli@unstable --global
 ```
 
 # Contributing
@@ -153,16 +161,19 @@ pnpm build                  #  Build production bundles for all modules and pack
 ### Targeting (Workspace Root)
 
 ```bash
+pnpm @docs     <cmd>        # Targets the documentation SSG directory
 pnpm @acquire  <cmd>        # Targets the @syncify/acquire acquire config bundle
 pnpm @ansi     <cmd>        # Targets the @syncify/ansi CLI enhancement package
 pnpm @config   <cmd>        # Targets the @syncify/config configuration package
 pnpm @glue     <cmd>        # Targets the @syncify/glue Glue utility package
 pnpm @codframe <cmd>        # Targets the @syncify/codeframe Codeframe CLI package
+pnpm @codegen  <cmd>        # Targets the @syncify/codegen Codegen generator helper
 pnpm @hot      <cmd>        # Targets the @syncify/hot HOT Reloading client
 pnpm @json     <cmd>        # Targets the @syncify/json JSON parser and differ
 pnpm @kill     <cmd>        # Targets the @syncify/kill process kill package
 pnpm @turndown <cmd>        # Targets the @syncify/turndown reversed markdown parser
 pnpm @timer    <cmd>        # Targets the @syncify/timer timing utility
+pnpm @tests    <cmd>        # Targets the @syncify/tests internal test utility
 pnpm @update   <cmd>        # Targets the @syncify/update version check utility
 pnpm @uws      <cmd>        # Targets the @syncify/uws uWebsockets repackage
 pnpm @cli      <cmd>        # Targets the @syncify/cli package (main package)
