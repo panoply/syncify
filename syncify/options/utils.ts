@@ -1,6 +1,6 @@
 import type { Input, PathConfig, PathsBundle, PKG, Transform } from 'types';
 
-import { basename, extname } from 'node:path';
+import { basename, dirname, extname, join } from 'node:path';
 
 import anymatch from 'anymatch';
 import glob from 'fast-glob';
@@ -9,11 +9,12 @@ import { pathExists } from 'fs-extra';
 import { acquire } from '@syncify/acquire';
 import { bold, Create, yellowBright } from '@syncify/ansi';
 
-import { invalidError, typeError, warnOption } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { CONFIG_FILE_EXT, PATH_KEYS } from '~const';
 import { error } from '~errors';
 import { parseProcessorConfigs } from '~process/files';
-import { has, isArray, isFunction, isObject, isString, isUndefined, merge, o, s } from '~utils';
+import { forEach, has, isArray, isFunction, isObject, isString, merge, o, s } from '~utils';
 import { globPath, lastPath, normalPath } from '~utils/paths';
 
 import { $ } from '$';
@@ -32,14 +33,16 @@ export function createPathsState (): PathsBundle {
   const state: PathsBundle = o();
 
   for (const path of PATH_KEYS) {
+
     state[path] = o<PathConfig>({
       input: null,
+      root: null,
       match: null,
       config: null,
       exclude: s(),
-      stash: null,
       rename: []
     });
+
   }
 
   return state;
@@ -75,7 +78,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
 
     for (const item of filePath) {
 
-      const uri = getUri(item);
+      const uri = getUri<string>(item);
       const resolved = glob.sync(uri, {
         cwd: $.cwd,
         absolute: true
@@ -107,7 +110,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
 
   if (isString(filePath)) {
 
-    const uri = getUri(filePath);
+    const uri = getUri<string>(filePath);
     const paths = glob.sync(uri, { cwd: $.cwd });
 
     if (paths.length === 0) {
@@ -130,7 +133,7 @@ export function getResolvedPaths <T extends string[] | Transform.Resolver> (
 
   }
 
-  typeError({
+  throws.typeError({
     option: 'uri',
     name: 'uri/path',
     provided: filePath,
@@ -238,7 +241,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
       return <T>transforms.map((option: Transform.Resolved) => {
 
         if (!has('input', option)) {
-          invalidError({
+          throws.option({
             option: 'tranform',
             name: 'input',
             value: option,
@@ -254,9 +257,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
 
         // apply namespaced rename if no rename is defined
         if (!has('rename', option)) {
-
           option.rename = option.snippet ? '[name].liquid' : '[name].[ext]';
-
         }
 
         return option;
@@ -286,9 +287,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
       }
 
       if (opts.flatten) {
-        for (const input of paths) {
-          config.push({ ...<T>record, input });
-        }
+        forEach(input => config.push({ ...<T>record, input }), paths);
       } else {
         record.input = paths;
         record.match = match;
@@ -323,7 +322,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
 
           if (!has('input', option)) {
 
-            invalidError({
+            throws.option({
               option: 'transform',
               name: prop,
               value: option,
@@ -341,9 +340,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
               : <T>{ ...record, ...option };
 
             if (opts.flatten) {
-              for (const input of paths) {
-                config.push({ ...<T>merge, input });
-              }
+              forEach(input => config.push({ ...<T>merge, input }), paths);
             } else {
               config.push({ ...<T>merge, input: paths, match });
             }
@@ -359,9 +356,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
 
             if (paths) {
               if (opts.flatten) {
-                for (const input of paths) {
-                  config.push({ ...<T>record, input });
-                }
+                forEach(input => config.push({ ...<T>record, input }), paths);
               } else {
                 config.push({ ...<T>record, input: paths, match });
               }
@@ -369,7 +364,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
 
           } else {
 
-            typeError({
+            throws.typeError({
               option: 'transform',
               name: prop,
               provided: option,
@@ -442,13 +437,17 @@ export async function getConfigFilePath (filename: string): Promise<string> {
  * Supports loading config as es module or common js module,
  */
 export async function readConfigFile <T> (
-  path: string,
+  filename: string,
   namespace: string,
   onRebuild: (bundle: any) => void
-): Promise<{ config: T; file: string; }> {
+): Promise<{
+  config: T;
+  file: string;
+}> {
 
   try {
 
+    const path = join($.dirs.config, filename);
     const file = await getConfigFilePath(path);
 
     if (file !== null) {
@@ -480,7 +479,7 @@ export async function readConfigFile <T> (
 
   } catch (e) {
 
-    return null;
+    throw error.acquire(e);
 
   }
 
@@ -498,75 +497,139 @@ export function hasRenameNamespace (rename: string) {
 }
 
 /**
+ * Extracts the output directory names where files will be written
+ */
+export function extractKeyDirName (uri: string) {
+
+  // Normalize the path to use forward slashes and get the directory
+  const dir = dirname(uri).replace(/\\/g, '/');
+
+  return dir.endsWith('templates/metaobject')
+    ? 'templates/metaobject'
+    : dir.endsWith('templates/customers')
+      ? 'templates/customers'
+      : lastPath(uri);
+}
+
+/**
+ * Returns a `key` value from a resolved input and output URI, extracting the uri directory name and filename.
+ *
+ * @example
+ *
+ * // Before Correction
+ * //
+ * renameCorrect(
+ *  '<uri>/source/sections/foo/file.liquid' // input
+ *  '<uri>/theme/sections/foo/file.liquid', // current output
+ *  '[dir]-[name]' // rename pattern
+ * )
+ *
+ * // Returns
+ * {
+ *   output: '<uri>/theme/sections/foo-file.liquid',
+ *   key: 'sections/foo-file.liquid'
+ * }
+ *
+ */
+export function renameCorrect (input: string, output: string, pattern: string) {
+
+  const dir = extractKeyDirName(output);
+  const { base } = renameFileParse(input, pattern);
+
+  return {
+    key: join(dir, base),
+    output: join(dirname(output), base)
+  };
+
+}
+
+/**
  * Rename File
  *
  * String parser for file renaming. Uses the common braced
  * reference structures found in most bundlers.
  */
 export function renameFileParse (src: string, pattern?: string): {
- /**
+  /**
    * The filename extension including the dot, eg: `.liquid`
    *
-   * @example
-   *
+   * ```js
    * '.ext'
+   * ```
    */
   ext: string;
   /**
    * The {@link lastPath} parent directory name. This will be used for `[dir]` matches
    *
-   * @example
-   *
+   * ```js
    * '/project/sections/foo/file.liquid' > 'foo'
+   * ```
    */
   dir: string;
   /**
    * The filename without extension
    *
-   * @example
-   *
-   *  'filename.ext' > 'filename'
+   * ```js
+   * 'filename.ext' > 'filename'
+   * ```
    */
   file: string;
   /**
    * The new name of the file (i.e, the rename result).
    *
-   * @example
+   * ```js
    * // Say we have passed the following arguments:
    * renameFileParse('/project/sections/foo/file.liquid', '[dir]-[file]')
    *
    * // The value here will be the renamed filename, e.g:
    * 'foo-file.liquid'
+   * ```
    */
   name: string;
   /**
    * The input base filename including file extension.
-   * @example
    *
+   * ```js
    * 'filename.ext'
+   * ```
    */
   base: string;
 } {
 
-  let rename = pattern;
-
-  // Get the filename (remember we flattened this earlier)
+  // Get the last directory name (e.g., `templates`)
   const dir = lastPath(src);
+  const base = basename(src); // e.g., `cart.json`
+  const ext = extname(base); // e.g., `.json`
+  const file = basename(base, ext); // e.g., `cart`
 
-  // file input extension
-  const ext = extname(src);
+  // If no pattern is provided, return basic components
+  if (!pattern) {
+    return {
+      ext,
+      file,
+      dir,
+      name: file,
+      base: file + ext
+    };
+  }
 
-  // Get the filename (remember we flattened this earlier)
-  const file = basename(src, ext);
-
-  if (isUndefined(pattern)) return { dir, ext, file, name: file, base: file + ext };
-
-  if (/(\[dir\])/.test(rename)) rename = rename.replace('[dir]', dir);
-  if (/(\[name\])/.test(rename)) rename = rename.replace('[name]', file);
-  if (/(\[file\])/.test(rename)) rename = rename.replace('[file]', file);
-  if (/(\.?\[ext\])/.test(rename)) rename = rename.replace(/\.?\[ext\]/, ext);
-
-  const name = pattern.replace(pattern, rename);
+  // Perform pattern replacement
+  const name = pattern.replace(/\[dir\]|\[name\]|\[file\]|\.?\[ext\]/g, match => {
+    switch (match) {
+      case '[dir]':
+        return dir;
+      case '[name]':
+        return file;
+      case '[file]':
+        return file;
+      case '[ext]':
+        return ext;
+      case '.[ext]':
+        return ext;
+      default:
+        return match;
+    }
+  });
 
   return {
     ext,
