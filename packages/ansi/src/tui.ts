@@ -360,11 +360,9 @@ export class Tui<Templates extends string = string> {
   private dash: string;
 
   /**
-   * Whether or not tree line prefixes apply
-   *
-   * @default true
+   * The `Tree()` method was called and line changed if `switch` is true. Enable determines render
    */
-  private tree: boolean = true;
+  private tree: { enable: boolean; switch: boolean; } = { enable: true, switch: false };
 
   /**
    * Optionally provide an existing structure to build from.
@@ -401,11 +399,11 @@ export class Tui<Templates extends string = string> {
     if (typeof options === 'object') {
 
       this.id = 'id' in options ? options.id : null;
-      this.tree = 'tree' in options ? options.tree : true;
+      this.tree.enable = 'tree' in options ? options.tree : true;
       this.type = 'type' in options ? options.type : 'info';
       this.stack = 'stack' in options ? options.stack : [];
 
-      if (this.tree) {
+      if (this.tree.enable) {
         if (this.type === 'error') {
           this.line = Tree.red;
           this.trim = Tree.redTrim;
@@ -621,6 +619,7 @@ export class Tui<Templates extends string = string> {
    * {
    *   clear: false,      // stack is preserved by default in toUpdate
    *   trim: false,       // trim is not applied by default in toUpdate
+   *   update: []        // controls log update, accepts ['done', 'clear']
    * }
    * ```
    *
@@ -634,22 +633,41 @@ export class Tui<Templates extends string = string> {
    * // Calling no parameter
    * _.Create().Line('foo').toUpdate()
    *
-   * // Called log update methods
-   * _.Create().Line('foo').toUpdate().done()
-   * _.Create().Line('foo').toUpdate().clear()
+   * // Controls Log Update
+   *
+   * // Calls log.update.done()
+   * _.Create().Line('foo').toUpdate({ update: ['done'] })
+   * // Calls log.update.clear() and then log.update.done()
+   * _.Create().Line('foo').toUpdate({ update: ['clear', 'done'] })
+   * // Calls log.update.clear()
+   * _.Create().Line('foo').toUpdate({ update: ['clear'] })
    * ```
    */
   toUpdate (options?: {
     clear?: boolean,
     trim?: boolean,
+    update?: [
+      'clear',
+      'done'
+    ] | [
+      'clear' |
+      'done'
+    ]
   }) {
 
     if (options === null) return this;
 
-    const output = this.toString({ clear: false, trim: false, ...options });
+    const o = { clear: false, trim: false, update: [], ...options };
+
+    const output = this.toString({ clear: o.clear, trim: o.trim });
 
     this.spin.stopOn = 'done';
     this.update(output);
+
+    if (o.update.length > 0) {
+      if (o.update.includes('clear')) this.update.clear();
+      if (o.update.includes('done')) this.update.done();
+    }
 
     return this;
 
@@ -845,7 +863,9 @@ export class Tui<Templates extends string = string> {
    *
    * Allows for the tree lines to be changed, but no modification applies to text.
    */
-  Tree (tree?: 'error' | 'warning' | 'info' | 'nil') {
+  Tree (tree: LiteralUnion<'error' | 'warning' | 'info' | 'nil', string> = this.type) {
+
+    this.tree.switch = this.type !== tree;
 
     if (tree === 'error') {
       this.line = Tree.red;
@@ -1101,11 +1121,16 @@ export class Tui<Templates extends string = string> {
    * // When we want to stop and clear spinner
    * _.Stop()
    */
-  Spinner (message: string, options?: { style?: 'spinning' | 'brielle', color?: Ansis }) {
+  Spinner (message: string, options?: {
+    style?: 'spinning' | 'brielle',
+    color?: Ansis,
+    indent?: number
+  }) {
 
     options = Object.assign({
       style: 'spinning',
-      color: neonTeal
+      color: neonTeal,
+      indent: 0
     }, {
       color: this.spin.color,
       style: this.spin.style
@@ -1124,6 +1149,7 @@ export class Tui<Templates extends string = string> {
       const spin = Spinner.loaders[this.spin.style];
       const frames = spin.frames;
       const size = frames.length;
+      const indent = WSP.repeat(options.indent);
 
       this.spin.index = this.stack.push('') - 1;
       this.spin.color = options.color;
@@ -1135,6 +1161,7 @@ export class Tui<Templates extends string = string> {
         if (this.spin.active) {
           this.update(glue(
             this.line,
+            indent,
             this.spin.color(frames[++frame % size] + WSP + this.spin.label),
             NWL
           ));
@@ -1373,7 +1400,7 @@ export class Tui<Templates extends string = string> {
 
     if (width === undefined) width = tsize().wrap;
 
-    if (this.tree) {
+    if (this.tree.enable) {
       if (noLines) {
         this.stack.push(lightGray(`├${'─'.repeat(width)}`) + '\n');
       } else {
@@ -1529,7 +1556,7 @@ export class Tui<Templates extends string = string> {
       let input: string = this.trim + '\n';
 
       if (color) {
-        if (this.tree) {
+        if (this.tree.enable) {
           if (color === 'yellow') {
             input = Tree.yellowTrim + '\n';
           } else if (color === 'red') {
@@ -1547,9 +1574,9 @@ export class Tui<Templates extends string = string> {
       } else if (addLines === 'line') {
         this.stack.push(Tree.trim + '\n');
       } else if (addLines === 'yellow') {
-        this.stack.push((this.tree ? Tree.yellowTrim : '') + '\n');
+        this.stack.push((this.tree.enable ? Tree.yellowTrim : '') + '\n');
       } else if (addLines === 'red') {
-        this.stack.push((this.tree ? Tree.redTrim : '') + '\n');
+        this.stack.push((this.tree.enable ? Tree.redTrim : '') + '\n');
       } else if (typeof addLines === 'string') {
         this.stack.push(addLines + '\n');
       } else {
@@ -1826,7 +1853,15 @@ export class Tui<Templates extends string = string> {
    */
   Error (input: string, color?: Ansis) {
 
-    this.stack.push((this.tree ? Tree.red : '') + (color ? color(input) : redBright(input)) + '\n');
+    this.stack.push((
+      this.tree.enable
+        ? this.tree.switch
+          ? this.line
+          : Tree.red
+        : ''
+    ) + (
+      color ? color(input) : redBright(input)
+    ) + '\n');
 
     return this;
 
@@ -1843,7 +1878,13 @@ export class Tui<Templates extends string = string> {
    */
   Warn (input: string, color?: Ansis) {
 
-    this.stack.push((this.tree ? Tree.yellow : '') + (color ? color(input) : yellowBright(input)), '\n');
+    this.stack.push((
+      this.tree.enable
+        ? this.tree.switch
+          ? this.line
+          : Tree.yellow
+        : ''
+    ) + (color ? color(input) : yellowBright(input)), '\n');
 
     return this;
 
@@ -1952,7 +1993,7 @@ export class Tui<Templates extends string = string> {
    */
   Dash (input: string, color?: Ansis) {
 
-    this.stack.push((this.tree ? this.dash : `${DSH} `) + (color ? color(input) : input) + '\n');
+    this.stack.push((this.tree.enable ? this.dash : `${DSH} `) + (color ? color(input) : input) + '\n');
 
     return this;
 
