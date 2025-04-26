@@ -1,6 +1,6 @@
 import type { Config, Tsconfig } from 'types';
 
-import { extname, join } from 'node:path';
+import { join } from 'node:path';
 
 import { pathExists, readFile } from 'fs-extra';
 
@@ -84,33 +84,29 @@ export async function getConfigFile (): Promise<Config> {
 
   if ($.file.config === null) {
     for (const file of SYNCIFY_CONFIG) {
-
       const path = join($.cwd, file);
-
       if (await pathExists(path)) {
         $.file.config = path;
         $.project.syncifyConfig = path;
         break;
       }
     }
-
-    return null;
-
   }
 
-  if (extname($.file.config) === '.json') {
+  if ($.file.config === null || ($.file.config !== null && $.file.config.endsWith('.json'))) {
 
-    if ($.pkg !== null && hasPath('syncify.config', $.pkg) && !isEmpty($.pkg.syncify.config)) {
-      $.file.config = $.file.pkg;
-      $.project.syncifyConfig = $.file.pkg;
+    if ($.pkg !== null && hasPath('syncify.config', $.pkg) && isEmpty($.pkg.syncify.config) === false) {
+      $.project.syncifyConfig = $.file.config = $.file.pkg;
       return $.pkg.syncify.config;
     }
 
-    try {
-      const json = await readFile($.file.config, 'utf8');
-      return parse<Config>(json);
-    } catch (e) {
-      throw error.json(e, $.file.config);
+    if ($.file.config !== null) {
+      try {
+        const json = await readFile($.file.config, 'utf-8');
+        return parse<Config>(json);
+      } catch (e) {
+        throw error.json(e, $.file.config);
+      }
     }
 
   } else {
@@ -126,12 +122,10 @@ export async function getConfigFile (): Promise<Config> {
         tsconfig,
         type: has('type', $.pkg) ? $.pkg.type : 'commonjs',
         onRebuild: $.mode.watch ? (bundle: Config) => {
-
           $.config = bundle; // rebuild configuration file
           $.running && event.emit('restart', Configure);
-
         } : undefined,
-        onError: (errors) => {
+        onError: errors => {
 
           const file = parseSyncifyConfig($.file.config);
 
@@ -175,8 +169,6 @@ export async function getConfig () {
   if (settings !== null) {
 
     $.config = settings;
-
-    console.log($.config);
 
   }
 };
