@@ -13,11 +13,87 @@ import { codeframe } from '@syncify/codeframe';
 import { glue } from '@syncify/glue';
 
 import { stderr } from '~console';
-import { forEach, has, isNumber, isObject, m, s } from '~utils';
+import { forEach, has, isNumber, isObject, isUndefined, m, o, s } from '~utils';
 
 import { $ } from '$';
 
 export function warn (...message: string[]) { forEach(line => stderr.write(line), message); };
+
+/**
+ * Warning Store
+ *
+ * This object holds a reference to each option warning
+ * to be printed. The `key` values infer the config option
+ * and the values are the warning messages to be printed.
+ *
+ * Example:
+ *
+ * ```
+ * │ (!) 2 group warnings
+ * │
+ * │ Some warning: 'option'
+ * │ Some warning: 'option'
+ * ```
+ */
+export const warnings: { [group: string]: string[] } = o();
+
+/**
+ * Severities Store
+ *
+ * This object holds a reference to each severe warnings
+ * to be printed (or otherwise errors which do not throw).
+ * The `key` values infer the config option and the values
+ * are the warning messages to be printed.
+ *
+ * Example:
+ *
+ * ```
+ * │ (!) 2 errors
+ * │
+ * │ Some error: 'option'
+ * │ Some error: 'option'
+ * ```
+ */
+export const severities: { [group: string]: string[] } = o();
+
+/**
+ * Option Warnings
+ *
+ * Records all config option warnings. Warnings are
+ * printed to the console at the end of runtime cycle.
+ * This function merely populates the `warning` object store.
+ */
+export function warnOption (group: string) {
+
+  if (!has(group, warnings)) warnings[group] = [];
+
+  return (message: string, value?: string) => {
+    if (isUndefined(value)) {
+      warnings[group].push(_.yellowBright(message));
+    } else {
+      warnings[group].push(_.yellowBright(message + _.COL + WSP + _.bold(value)));
+    }
+  };
+};
+
+/**
+ * Error Warnings
+ *
+ * Prints a warning that requires attention but will not throw.
+ * A warn error demands attention from the user.
+ */
+export function warnSevere (group: string) {
+
+  if (!has(group, severities)) severities[group] = [];
+
+  return (message: string, value?: string) => {
+    if (isUndefined(value)) {
+      severities[group].push(_.Tree.red + _.red(message));
+    } else {
+      severities[group].push(_.Tree.red + _.red(message + _.COL + WSP + _.bold(value)));
+    }
+  };
+};
 
 /**
  * Returns warning count total
@@ -80,9 +156,9 @@ warn.schema = (file: File, options: {
 };
 
 /**
- * SASS Warnings
+ * SASS Warnings Parser
  */
-warn.sass = (file: File) => (message: string, options: LoggerWarnOptions) => {
+warn.sass = (file: File) => (message: string, options?: LoggerWarnOptions) => {
 
   const stack = messages('sass', file.input);
   const text = _.capture.url(message.replace(/\n+/g, WSP), text => _.underline(text));
@@ -98,7 +174,7 @@ warn.sass = (file: File) => (message: string, options: LoggerWarnOptions) => {
     column?: number;
   } = {};
 
-  if (has('span', options)) {
+  if (options && has('span', options)) {
 
     if (isObject(options.span)) {
 
@@ -133,7 +209,7 @@ warn.sass = (file: File) => (message: string, options: LoggerWarnOptions) => {
 
   location.processor = _.neonMagenta('SASS Dart');
 
-  if (options.deprecation) {
+  if (options && options.deprecation) {
     location.details = 'DEPRECATION WARNING';
   }
 
@@ -163,8 +239,6 @@ warn.esbuild = (data: Message[]) => {
 
 /**
  * PostCSS Warning Parser
- *
- * Pretty formatted log for postcss stack.
  */
 warn.postcss = (file: File, data: Warning) => {
 
