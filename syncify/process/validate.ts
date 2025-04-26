@@ -7,7 +7,7 @@ import { Stats } from 'types';
 import * as c from '@syncify/ansi';
 
 import { log } from '~cli/log';
-import { throwError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { s } from '~utils';
 
 import { $ } from '$';
@@ -159,7 +159,7 @@ export function isEmptyOutputDir (stats?: Stats) {
     stats.snippets === 0 &&
     stats.sections === 0) {
 
-    throwError('Empty output directory', [
+    throws('Empty output directory', [
       `There are no files within ${c.neonCyan(relative($.cwd, $.dirs.output) + '/**')}`,
       `You may need to run the ${c.neonCyan.bold('syncify build')} command and try again.`
     ]);
@@ -176,7 +176,7 @@ export function hasMissingFiles (stats: Stats) {
 
   if (stats.layout === 0) {
 
-    throwError(`Missing ${c.neonCyan('layout')} files/s`, [
+    throws(`Missing ${c.neonCyan('layout')} files/s`, [
       `There are no layout files ${c.neonCyan(relative($.cwd, $.dirs.output + '/layout') + '/*.liquid')}`,
       `Theme exports require a layout (${c.neonCyan.bold('theme.liquid')}) to be provided.`
     ]);
@@ -185,7 +185,7 @@ export function hasMissingFiles (stats: Stats) {
 
   if (stats.locales === 0) {
 
-    throwError('Missing locales/s', [
+    throws('Missing locales/s', [
       `There are no locale files ${c.neonCyan(relative($.cwd, $.dirs.output + '/locale') + '/*.json')}`,
       `Theme exports require at least ${c.bold('1')} of the following locale JSON files:`,
       '',
@@ -197,7 +197,7 @@ export function hasMissingFiles (stats: Stats) {
 
   if (stats.config === 0) {
 
-    throwError('Missing config/s', [
+    throws('Missing config/s', [
       `There are no config files ${c.neonCyan(relative($.cwd, $.dirs.output + '/config') + '/*.json')}`,
       `Theme exports require at least ${c.bold('1')} of the following setting JSON files:`,
       '',
@@ -210,7 +210,7 @@ export function hasMissingFiles (stats: Stats) {
 
   if (stats.templates === 0) {
 
-    throwError('Missing template/s', [
+    throws('Missing template/s', [
       `There are no templates files ${c.neonCyan(relative($.cwd, $.dirs.output + '/templates') + '/**')}`,
       'Theme exports should include the below list of templates to exist:',
       '',
