@@ -1,35 +1,225 @@
-import { join, resolve } from 'node:path';
+import type { AccessScopes, LiteralString } from 'types';
 
-import { pathExists, stat, writeFile } from 'fs-extra';
+import { dirname, join, resolve } from 'node:path';
+import { chdir } from 'node:process';
+
+import { existsSync, mkdir, pathExists, rm, stat, writeFile } from 'fs-extra';
 
 import * as _ from '@syncify/ansi';
+import { kill } from '@syncify/kill';
 
-import * as throws from '~cli/throws';
+import { READ_WRITE_OWNER, STRAP_EXAMPLES, STRAP_THEMES } from '~const';
+import { log } from '~log';
 import { createCaches } from '~options/define/caches';
 import { getEnv } from '~options/define/env';
 import { createProject } from '~options/define/project';
 import { Action, getTargets } from '~options/define/store';
+import { cancel, choose, intercept, label, prompt, theme } from '~prompt';
 import { SaveKeychain } from '~prompts/create';
 import { PromptCredentialsFile } from '~prompts/credentials';
 import { PromptStorage } from '~prompts/targets';
-import { plur } from '~utils';
+import { delay, plur, prettyDate } from '~utils';
+import { execAsync } from '~utils/child';
+import { isFlatStructure } from '~utils/directory';
 
 import { $ } from '$';
 
+interface State {
+  /** The directory prompt answer */
+  directory?: LiteralString<'create' | 'current'>;
+  /** If `change` was selected this will hold the directory name input */
+  dirName?: string;
+  /** The current working directory */
+  cwd: string;
+ /** The name of the strap */
+  template: string;
+  /** The Resolved URI of project */
+  projectPath: string;
+  /** The cache root path */
+  cacheRootPath: string;
+  /** The strap group to choose from */
+  strap: LiteralString<'themes' | 'examples'>;
+  /** The hashed checksum of the project */
+  checksum: string;
+  /** The github respository for cloning */
+  repository: string;
+  /** The project name to use */
+  name: string;
+  /** Whether or not overwrite is to apply - Only if directory name exists */
+  overwrite: boolean;
+  /** The package manager selection */
+  pm: string;
+  /** The syncify credentials model */
+  credentials: {
+    env: string;
+    store: string;
+    password: string;
+    domain: string;
+    token: string;
+    version: string;
+    keychain: boolean;
+    selected: number;
+    scopes: Record<AccessScopes, boolean>
+  }
+}
+
 export async function Init () {
 
-  if (
-    $.file.project !== null &&
-    $.project.credentials !== null &&
-    $.project.targetSource !== null) return throws.projectExists();
+  if ($.file.project !== null && $.project.credentials !== null && $.project.targetSource !== null) {
+    return ErrorProjectExists();
+  }
 
-  if (await isFlatStructure()) return throws.flatStructure();
+  if (await isFlatStructure()) {
+    return ErrorFlatStructure();
+  }
+
+  const write = _.Create().Wrap(
+    _.gray
+    , 'Hello Hacker 👋' + NLR
+    , 'Launch a new project by selecting an open-source theme, usage example, or importing a store theme,'
+    , `which Syncify will strap for you. API credentials can be stored in a project-level ${_.cyan('.env')} file`
+    , 'or within the Syncify keychain.'
+  );
+
+  write.NL.toLog({ clear: true });
+
+  const state: State = {
+    directory: null,
+    cwd: $.cwd,
+    template: null,
+    strap: null,
+    repository: null,
+    projectPath: null,
+    cacheRootPath: null,
+    checksum: null,
+    name: null,
+    pm: null,
+    overwrite: false,
+    credentials: null
+  };
+
+  await PromptDirectory();
+  await PromptBootstrap();
+  await PromptCredentials();
+  await PromptTargets();
 
   const tasks: string[] = [];
 
+  if (tasks.length > 0) {
+    write
+    .Each(tasks, task => this.Line(`${_.CHK} ${task}`))
+    .Newline();
+  }
+
+  write
+  .End($.log.group)
+  .Break()
+  .toLog();
+
+  process.exit(0);
+
+}
+
+async function PromptDirectory () {
+
+  if ($.project.credentials === null && $.project.targetSource === null) {
+
+    const resolve = await prompt<{ cwd: boolean }>({
+      theme,
+      message: label.ProjectPath,
+      name: 'cwd',
+      type: 'toggle',
+      header: _.Tree.line + _.gray.bold('Initialise in current directory?') + _.Tree.next,
+      hint: WSR + $.cwd,
+      default: 'Yes',
+      disabled: 'No',
+      enabled: 'Yes'
+    }).catch(cancel);
+
+    if (!resolve.cwd) {
+
+      _.Create()
+      .NL
+      .Wrap(
+        _.yellow.bold
+        , 'Change or create a new directory where you want to initialize a Syncify project'
+        , `and then run the ${_.cyan('sy init')} command from that location.`
+      )
+      .toLog({ clear: true });
+
+      return cancel(null);
+
+    }
+  }
+}
+
+async function PromptSelectStap () {
+
+  const resolve = await prompt<{ strap: string }>({
+    theme,
+    message: label.StrapSource,
+    type: 'select',
+    name: 'strap',
+    choices: choose([
+      {
+        name: 'import',
+        message: 'Import',
+        hint: 'Import from Shopify store'
+      },
+      {
+        name: 'themes',
+        message: 'Themes',
+        hint: 'Boilerplate theme straps'
+      },
+      {
+        name: 'examples',
+        message: 'Examples',
+        hint: 'One of the usage examples'
+      },
+      {
+        name: 'skip',
+        message: 'Skip',
+        hint: 'Skip theme strapping'
+      }
+    ], { prop: 'name' })()
+  }).catch(cancel);
+
+  return resolve.strap;
+
+}
+
+async function PromptBootstrap () {
+
+  /** Set of starting point straps available within https://github.com/SyncifyStraps  */
+  const straps = new Set([
+    ...STRAP_THEMES.map(([ name ]) => name),
+    ...STRAP_EXAMPLES.map(([ name ]) => name)
+  ]);
+
+  /** CLI Argv */
+  const select = $.argv.length > 1 ? $.argv[1] : null;
+
+  if (straps.has(select)) {
+    state.template = select;
+    state.repository = `https://github.com/syncifycli/${select}.git`;
+  }
+
+  if (state.template === null) {
+    state.strap = await PromptSelectStap();
+  }
+
+  if (state.strap === 'examples' || state.strap === 'themes') {
+    state.template = await PromptChooseTemplate(state.strap);
+    state.repository = `https://github.com/syncifycli/${state.template}.git`;
+  }
+
+}
+
+async function PromptCredentials () {
+
   if ($.project.credentials === null) {
 
-    const access = await PromptCredentialsFile({ greeting: true, keychain: true });
+    const access = await PromptCredentialsFile({ keychain: true });
 
     $.project.credentials = access.method === 'env' ? 'env' : 'kc';
     $.project.createdAt = Date.now();
@@ -37,7 +227,7 @@ export async function Init () {
     await createCaches($.hash);
     await createProject(join($.root, $.project.name));
 
-    tasks.push('Created cache reference for project');
+    // tasks.push('Created cache reference for project');
 
     /* CREATE CREDENTIALS ------------------------- */
 
@@ -45,7 +235,7 @@ export async function Init () {
 
       await SaveKeychain(access);
 
-      tasks.push('Project credentials stored in keychain');
+      //  tasks.push('Project credentials stored in keychain');
 
     } else {
 
@@ -54,10 +244,14 @@ export async function Init () {
       await writeFile($.file.env, access.env);
       await getEnv();
 
-      tasks.push('Project credentials stored in .env file');
+      // tasks.push('Project credentials stored in .env file');
     }
 
   }
+
+}
+
+async function PromptTargets () {
 
   if ($.file.targets === null || $.project.targetSource === null) {
 
@@ -65,7 +259,7 @@ export async function Init () {
     const method = await PromptStorage();
 
     if (method === 'package.json') {
-      if (!hasPKG) tasks.push('Generated a package.json file in project');
+      hasPKG || tasks.push('Generated a package.json file in project');
       tasks.push('Project targets stored in package.json file');
     } else {
       tasks.push(`Project targets stored in ${method} file`);
@@ -82,62 +276,94 @@ export async function Init () {
 
   }
 
-  const write = _.Create().Newline();
+}
 
-  if (tasks.length > 0) {
-    write.Each(tasks, function (task) { this.Line(`${_.CHK} ${task}`); }).Newline();
-  }
+async function PromptChooseTemplate (strap: string) {
 
-  write
-  .End($.log.group)
-  .Break()
+  /** Returns the strap boilerplates */
+  const boilers = (strap: string) => (strap === 'themes' ? STRAP_THEMES : STRAP_EXAMPLES);
+
+  const resolve = await prompt<{ template: string }>({
+    theme,
+    type: 'select',
+    name: 'template',
+    message: label.ChooseStrap,
+    choices: boilers(strap).map(([ name, hint, disabled = false ]) => ({
+      name,
+      hint,
+      disabled
+    }))
+  }).catch(cancel);
+
+  return resolve.template;
+
+}
+
+async function CreateStrap (options: { repository: string; name: string; projectPath: string; }) {
+
+  log.spinner('Cloning Strap', { color: _.neonGreen });
+
+  await execAsync(`git clone --depth 1 ${options.repository} ${options.name}`);
+  await delay(); // Ensure clone has finished
+  await rm(join(options.projectPath, '.git'), { recursive: true, force: true });
+
+}
+
+/* -------------------------------------------- */
+/* ERRORS                                       */
+/* -------------------------------------------- */
+
+/**
+ * Throws when attempting to initialise in an existing project
+ */
+function ErrorProjectExists () {
+
+  _
+  .Create({ type: 'error' })
+  .Line(`PROJECT ALREADY EXISTS ${_.BAD}`, _.bold.redBright)
+  .NL
+  .Line('You cannot initialize inside of a pre-existing project.')
+  .Tree('info')
+  .Header(`PROJECT${_.COL}`, _.bold)
+  .Line(`${_.gray('NAME')}${_.COL}     ${_.whiteBright($.project.name)}`)
+  .Line(`${_.gray('CWD')}${_.COL}      ${_.whiteBright($.cwd)}`)
+  .Line(`${_.gray('CACHE')}${_.COL}    ${_.whiteBright($.dirs.cache)}`)
+  .Line(`${_.gray('CREATED')}${_.COL}  ${_.whiteBright(prettyDate($.project.createdAt))}`)
+  .Line(`${_.gray('UPDATED')}${_.COL}  ${_.whiteBright(prettyDate($.project.lastRunAt))}`)
+  .Line(`${_.gray('TARGETS')}${_.COL}  ${_.whiteBright($.project.targetSource)}`)
+  .Line(`${_.gray('AUTH')}${_.COL}     ${_.whiteBright($.project.credentials)}`)
+  .NL
+  .End(`Syncify ${_.CHV} Error`, false)
+  .BR
   .toLog();
 
-  process.exit(0);
+  $.running ? kill.exit(0) : process.exit(0);
 
 }
 
 /**
- * Checks for the existence of theme directories in the location where
- * `sy init` was executed. When boolean `true` we are in a
+ * Throws when attempting to initialise in a project that is determined to be a flat structure
  */
-async function isFlatStructure () {
+function ErrorFlatStructure () {
 
-  try {
+  _
+  .Create({ type: 'error' })
+  .Line(`FLAT DIRECTORY STRUCTURE ${_.BAD}`, _.bold)
+  .NL
+  .Line('Attempting to initialize a Syncify project within a flat structure.')
+  .Line('You will need to convert to a hierarchical structure and try again.')
+  .Tree('info')
+  .NL
+  .Line('How to fix?', _.gray.bold)
+  .Line(`Move theme directories into a sub-directory called ${_.blue('source')}`, _.gray)
+  .Line('Please refer to the documentation for more information:', _.gray)
+  .NL
+  .Line(`${_.CHV} ${_.underline('https://syncify.sh/usage/directory-structures')}`, _.gray)
+  .NL
+  .End($.log.group)
+  .BR
+  .toLog();
 
-    for (const dir of [
-      'assets',
-      'config',
-      'layout',
-      'locales',
-      'sections',
-      'snippets',
-      'templates'
-    ]) {
+  $.running ? kill.exit(0) : process.exit(0);
 
-      const dirPath = resolve(dir);
-      const exists = await pathExists(dirPath);
-
-      if (!exists) return false;
-
-      const stats = await stat(dirPath);
-
-      if (!stats.isDirectory()) return false;
-    }
-
-    return true;
-
-  } catch (e) {
-
-    throws.errorRuntime(e, {
-      message: `Error checking directories when performing ${_.blue('sy init')} tasks.`,
-      solution: [
-        'This error was thrown during fs operations. It is typically rare and likely',
-        'unrelated to Syncify. Please report the issue on github.'
-      ]
-    });
-
-    return false;
-
-  }
 }
