@@ -251,7 +251,10 @@ export async function JsonTransform (file: File): Promise<string> {
 
   file.size = u.byteSize(local);
 
-  if (local.length === 0) return log.skipped(file, 'empty file');
+  if (local.length === 0) {
+    log.skipped(file, 'empty file');
+    return;
+  }
 
   if ($.mode.build === false && isDiff(file.type)) {
     file.value = await jsonCompare(file, local);
