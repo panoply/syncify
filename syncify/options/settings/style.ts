@@ -7,7 +7,8 @@ import glob from 'fast-glob';
 import { exists } from 'fs-extra';
 import { $import } from 'modules';
 
-import { invalidError, missingDependency, typeError, warnOption } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { getModules, getTransform, readConfigFile, renameFileParse } from '~options/utils';
 import * as u from '~utils';
 import { normalPath } from '~utils/paths';
@@ -31,7 +32,7 @@ const _TERSER = {
 };
 
 type PostCSSProcess = Processors['postcss']
-type SassDartProcess = Processors['sass']
+// type SassDartProcess = Processors['sass']
 
 /**
  * Get External Modules
@@ -40,57 +41,38 @@ type SassDartProcess = Processors['sass']
  */
 async function getExternalModules () {
 
-  const postcss = await readConfigFile<PostCSSProcess>(
-    join($.dirs.config, 'postcss.config'),
-    'PostCSS',
-    (config) => {
+  await $import('postcss');
+  await $import('clean-css');
 
-      if (config !== null) {
-
-        $.processor.postcss.config = config;
-
-      }
-
+  const postcss = await readConfigFile<PostCSSProcess>('postcss.config', 'PostCSS', (config) => {
+    if (config !== null) {
+      // TODO: Log processor config file changes
+      $.processor.postcss.config = config;
     }
-  );
+  });
 
   if (postcss !== null) {
     $.processor.postcss.file = postcss.file;
     $.processor.postcss.config = postcss.config;
   }
 
-  $.processor.tailwind.installed = getModules($.pkg, '@tailwindcss/postcss');
+  $.processor.tailwind.installed = getModules($.pkg, 'tailwindcss');
 
-  // Load Tailwind module
   if ($.processor.tailwind.installed) {
 
-    await $import('@tailwindcss/postcss');
+    await $import('tailwindcss');
 
-    const tw = await readConfigFile<TailwindConfig>(
-      join($.dirs.config, 'tailwind.config'),
-      'Tailwind',
-      (config) => {
-
-        if (config !== null) {
-          $.processor.tailwind.config = config;
-        }
-
+    const tw = await readConfigFile<TailwindConfig>('tailwind.config', 'Tailwind', (config) => {
+      if (config !== null) {
+        // TODO: Log processor config file changes
+        $.processor.tailwind.config = config;
       }
-    );
+    });
 
     if (tw !== null) {
       $.processor.tailwind.file = tw.file;
       $.processor.tailwind.config = tw.config;
     }
-
-  }
-
-  $.processor.sass.installed = getModules($.pkg, 'sass');
-
-  // Load SASS Dart module
-  if ($.processor.sass.installed) {
-
-    // await $import('sass');
 
   }
 
@@ -106,9 +88,6 @@ export async function setStyleConfig () {
 
   if (!u.has('style', $.config.transform)) return;
   if (!$.config.transform.style || u.isEmpty($.config.transform.style)) return;
-
-  $import('postcss');
-  $import('clean-css');
 
   await getExternalModules();
 
@@ -128,7 +107,7 @@ export async function setStyleConfig () {
     const bundle = u.o<StyleBundle>();
 
     if (u.isUndefined(style.input)) {
-      throw invalidError({
+      throws.option({
         option: 'transform.style',
         name: style.rename || style.input,
         expects: 'string',
@@ -141,32 +120,24 @@ export async function setStyleConfig () {
     bundle.watch = null;
     bundle.attrs = [];
     bundle.postcss = null;
-    bundle.sass = false;
+    bundle.sass = /\.s[ca]ss$/.test(style.input);
     bundle.tailwind = null;
 
     if (has('postcss')) {
 
       if (u.isArray(style.postcss) && style.postcss.length > 0) {
 
-        u.defineProperty(bundle, 'postcss', {
-          get () {
-            return style.postcss;
-          }
-        });
+        u.defineProperty(bundle, 'postcss', { get () { return style.postcss; } });
 
       } else {
 
         if (u.isBoolean(style.postcss) && style.postcss !== false && u.isNil(style.postcss) === false) {
 
-          u.defineProperty(bundle, 'postcss', {
-            get () {
-              return u.merge($.processor.postcss.config);
-            }
-          });
+          u.defineProperty(bundle, 'postcss', { get () { return u.merge($.processor.postcss.config); } });
 
         } else {
 
-          typeError(
+          throws.typeError(
             {
               option: 'style',
               name: 'postcss',
@@ -178,18 +149,14 @@ export async function setStyleConfig () {
       }
     } else {
 
-      u.defineProperty(bundle, 'postcss', {
-        get () {
-          return u.merge($.processor.postcss.config);
-        }
-      });
+      u.defineProperty(bundle, 'postcss', { get () { return u.merge($.processor.postcss.config); } });
 
     }
 
     if (has('tailwind')) {
 
       if (!$.processor.tailwind.installed) {
-        missingDependency('@tailwindcss/postcss');
+        throws.dependency([ 'tailwindcss' ]);
       }
 
       const override = u.isObject(style.tailwind);
@@ -213,11 +180,7 @@ export async function setStyleConfig () {
 
         }
 
-        u.defineProperty(bundle, 'tailwind', {
-          get () {
-            return tw;
-          }
-        });
+        u.defineProperty(bundle, 'tailwind', { get () { return tw; } });
 
         if ($.mode.watch && u.isArray(bundle.tailwind.content)) {
 
@@ -233,7 +196,7 @@ export async function setStyleConfig () {
 
       } else {
 
-        typeError(
+        throws.typeError(
           {
             option: 'style',
             name: 'tailwind',
@@ -246,21 +209,20 @@ export async function setStyleConfig () {
 
     }
 
-    if ((has('sass') && style.sass !== false) && $.processor.sass.installed === true) {
+    if (has('sass') && style.sass !== false) {
+
+      if ($.processor.sass.loaded === false) {
+        await $import('sass-embedded', { as: true });
+        $.processor.sass.loaded = true;
+      }
 
       const override = u.isObject(style.sass);
 
       if ((u.isBoolean(style.sass) || override) && u.isNil(style.sass) === false) {
 
-        if (!$.processor.sass.installed) missingDependency('sass');
-
         if (override === false) {
 
-          u.defineProperty(bundle, 'sass', {
-            get () {
-              return style.sass;
-            }
-          });
+          u.defineProperty(bundle, 'sass', { get () { return style.sass; } });
 
         } else {
 
@@ -270,10 +232,7 @@ export async function setStyleConfig () {
           for (const option in style.sass as StyleTransform) {
 
             // Validate the boolean options
-            if (
-              option === 'sourcemap' ||
-              option === 'warnings' ||
-              option === 'quietDeps') {
+            if (option === 'sourcemap' || option === 'warnings' || option === 'quietDeps') {
 
               if (u.isBoolean(style.sass[option])) {
 
@@ -281,7 +240,7 @@ export async function setStyleConfig () {
 
               } else {
 
-                typeError(
+                throws.typeError(
                   {
                     option: 'sass',
                     name: option,
@@ -295,7 +254,7 @@ export async function setStyleConfig () {
 
               if (u.isString(style.sass[option]) === false) {
 
-                typeError(
+                throws.typeError(
                   {
                     option: 'sass',
                     name: option,
@@ -306,15 +265,13 @@ export async function setStyleConfig () {
 
               }
 
-              if (
-                style.sass[option] === 'expanded' ||
-                style.sass[option] === 'compressed') {
+              if (style.sass[option] === 'expanded' || style.sass[option] === 'compressed') {
 
                 bundle.sass[option] = style.sass[option];
 
               } else {
 
-                invalidError(
+                throws.option(
                   {
                     option: 'sass',
                     name: option,
@@ -325,42 +282,13 @@ export async function setStyleConfig () {
 
               }
 
-            } else if (option === 'includePaths') {
-
-              if (u.isArray(style.sass[option])) {
-
-                // Full path relative to CWD
-                const includePaths: string[] = [];
-
-                for (const path of style.sass[option]) {
-                  const resolve = join($.cwd, path);
-                  if (await exists(resolve)) {
-                    includePaths.push(resolve);
-                  } else {
-                    warn('Cannot resolve sass includePath entry', path);
-                  }
-                }
-
-                bundle.sass[option] = includePaths;
-
-              } else {
-
-                typeError(
-                  {
-                    option: 'sass',
-                    name: option,
-                    provided: style.sass[option],
-                    expects: 'string[]'
-                  }
-                );
-              }
             }
 
           };
         }
       } else {
 
-        typeError(
+        throws.typeError(
           {
             option: 'style',
             name: 'sass',
@@ -372,9 +300,7 @@ export async function setStyleConfig () {
 
       // Warn if input is not using sass or scss extension
       if (style.snippet === false && !/\.s[ac]ss/.test(extname(bundle.input))) {
-
         warn('Input is not a sass file', bundle.input);
-
       }
 
     }
@@ -387,7 +313,7 @@ export async function setStyleConfig () {
 
       // Ensure the rename value is a string
       if (u.isString(style.rename) === false) {
-        typeError(
+        throws.typeError(
           {
             option: 'styles',
             name: 'rename',
@@ -401,7 +327,7 @@ export async function setStyleConfig () {
 
       // Validate the file new name.
       if (/[a-zA-Z0-9_.-]+/.test(rename.name) === false) {
-        typeError(
+        throws.typeError(
           {
             option: 'sass',
             name: 'rename',
@@ -436,7 +362,7 @@ export async function setStyleConfig () {
     if ($.mode.watch && has('watch')) {
 
       if (!u.isArray(style.watch)) {
-        typeError(
+        throws.typeError(
           {
             option: 'styles',
             name: 'watch',
@@ -467,15 +393,12 @@ export async function setStyleConfig () {
       watch.push(bundle.input);
       watch.forEach(x => $.paths.assets.exclude.add(x));
 
-      // for (const path of watch) $.watch.add(path);
-
       bundle.watch = anymatch(watch);
 
     } else {
 
       bundle.watch = anymatch([ bundle.input ]);
 
-      //  $.watch.add(bundle.input);
       $.paths.assets.exclude.add(bundle.input);
 
     }
@@ -487,7 +410,7 @@ export async function setStyleConfig () {
 
       // Apply includes (for Dart SASS)
       if (u.hasPath('sass.include', style)) {
-        bundle.sass.include = (style.sass as SassDartProcess).include.map(p => join($.cwd, p));
+        bundle.sass.include = (style.sass as { include: string[] }).include.map(p => join($.cwd, p));
       }
 
     }
@@ -496,7 +419,7 @@ export async function setStyleConfig () {
 
       if (!u.isBoolean(style.snippet)) {
 
-        typeError(
+        throws.typeError(
           {
             option: 'styles',
             name: 'snippet',
@@ -523,7 +446,7 @@ export async function setStyleConfig () {
 
             } else {
 
-              typeError(
+              throws.typeError(
                 {
                   option: 'style',
                   name: `attrs[${i}]`,
@@ -537,7 +460,7 @@ export async function setStyleConfig () {
 
         } else {
 
-          typeError(
+          throws.typeError(
             {
               option: 'style',
               name: 'attrs',
