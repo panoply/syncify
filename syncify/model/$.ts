@@ -156,7 +156,7 @@ export const $ = new class Bundle {
   /**
    * **READY AT RUNTIME**
    *
-   * Root directory base
+   * Project cache root directory base
    *
    * @example
     * '/Users/sissel/.syncify/eb4e712f2f3970b7'
