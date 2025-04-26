@@ -9,7 +9,7 @@ import { $import } from 'modules';
 import { timer } from '@syncify/timer';
 
 import { log } from '~cli/log';
-import { THEME_DIRS } from '~const';
+import { THEME_PATHS } from '~const';
 import { error } from '~errors';
 import { Build } from '~mode/build';
 import { setPkgVersion } from '~options/define/package';
@@ -60,7 +60,7 @@ export async function Pack (): Promise<void> {
 
   const zip = new $import.admzip();
 
-  for (const dir of THEME_DIRS) {
+  for (const [ , dir ] of THEME_PATHS) {
 
     const uri = join($.dirs.output, dir);
     const has = await pathExists(uri);
