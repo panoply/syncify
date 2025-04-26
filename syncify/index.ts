@@ -1,12 +1,12 @@
-import { internalError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { Build } from '~mode/build';
+import { Doctor } from '~mode/doctor';
 import { Pack } from '~mode/pack';
 import { Publish } from '~mode/publish';
 import { Pull } from '~mode/pull';
 import { Push } from '~mode/push';
 import { Watch } from '~mode/watch';
 import { Configure } from '~options/configure';
-import { Create } from '~prompts/create';
 import { Init } from '~prompts/init';
 import { Keychain } from '~prompts/keychain';
 import { Link } from '~prompts/link';
@@ -35,13 +35,13 @@ export async function syncify () {
 
       Init();
 
+    } else if ($.mode.doctor) {
+
+      Doctor();
+
     } else if ($.mode.link) {
 
       Link();
-
-    } else if ($.mode.create) {
-
-      Create();
 
     } else if ($.mode.projects) {
 
@@ -77,6 +77,6 @@ export async function syncify () {
 
     }
 
-  }).catch(internalError);
+  }).catch(throws.internal);
 
 };
