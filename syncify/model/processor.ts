@@ -14,14 +14,16 @@ export const processor = (): ProcessorsBundle => ({
     config: null
   },
   sass: {
-    installed: false,
     loaded: false,
-    file: false,
     config: {
       warnings: true,
       style: 'compressed',
       sourcemap: true,
       quietDeps: false,
+      fatalDeprecations: [],
+      functions: {},
+      futureDeprecations: [],
+      silenceDeprecations: [],
       include: [ 'node_modules' ]
     }
   },
