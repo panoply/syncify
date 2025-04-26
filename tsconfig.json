@@ -181,6 +181,9 @@
       "~enums": [
         "./syncify/utils/enum.ts",
       ],
+      "~utils/directory": [
+        "./syncify/utils/directory.ts",
+      ],
       "~utils/piper": [
         "./syncify/utils/piper.ts",
       ],
