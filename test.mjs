@@ -1,32 +1,45 @@
-function updateLine (lineNum, newText) {
-  // Get terminal size
-  const { rows, columns } = process.stdout;
+import path from 'path';
+import { performance } from 'perf_hooks';
+const src = '/Users/Panoply/Projects/syncify/tests/e2e/custom/source/views/templates/cart.json';
+const iterations = 1000000;
 
-  // Calculate lines from the bottom (assuming we're at the bottom)
-  // lineNum is counted from the top
-  const targetLine = lineNum - 1; // 0-based index
+function lastPath (path) {
+  // Handle array input
+  if (Array.isArray(path)) {
+    return path.map(p => lastPath(p)).filter(result => result !== null);
+  }
 
-  // Move cursor to beginning of target line
-  process.stdout.cursorTo(0);
-  process.stdout.moveCursor(0, -(rows - targetLine));
+  // Ensure path is a string and non-empty
+  if (typeof path !== 'string' || path.length === 0) {
+    return null;
+  }
 
-  // Clear the line and write new text
-  process.stdout.clearLine(0);
-  process.stdout.write(newText);
+  // Remove trailing separator if present
+  const cleanPath = path.endsWith(path.sep) ? path.slice(0, -1) : path;
 
-  // Move cursor back to original position (bottom)
-  process.stdout.cursorTo(0);
-  process.stdout.moveCursor(0, (rows - targetLine));
+  // Split path using OS-specific separator
+  const parts = cleanPath.split(path.sep);
+
+  // Ensure at least two components (directory + file)
+  if (parts.length < 2) {
+    return parts.length === 1 ? parts[0] : null;
+  }
+
+  // Join the last two components
+  return `${parts[parts.length - 2]}${path.sep}${parts[parts.length - 1]}`;
 }
 
-// Example usage:
-console.log('Line 1');
-console.log('Line 2');
-console.log('Line 3');
-console.log('Current line 4');
+let start = performance.now();
+for (let i = 0; i < iterations; i++) {
+  lastPath(src);
+}
+console.log(`Optimized lastPath: ${(performance.now() - start).toFixed(2)}ms`);
 
-// Wait a moment, then update Line 2
-setTimeout(() => {
-  updateLine(2, 'Updated Line 2');
-  console.log('Cursor is back at the current position');
-}, 1000);
+start = performance.now();
+for (let i = 0; i < iterations; i++) {
+  // Original lastPath implementation
+  const dir = src.endsWith('/') ? path.dirname(src.slice(0, -1)) : path.dirname(src);
+  const ender = dir.lastIndexOf('/') + 1;
+  dir.slice(ender);
+}
+console.log(`Original lastPath: ${(performance.now() - start).toFixed(2)}ms`);
