@@ -1,4 +1,4 @@
-import type { Get, PascalCase } from 'type-fest';
+import type { Get, PascalCase, Paths } from 'type-fest';
 import type { DotPaths, LiteralString, MultipleTopLevelPatch } from 'types';
 
 import { exec, spawn } from 'node:child_process';
@@ -533,10 +533,15 @@ export async function openInEditor (filePath: string) {
 export function getChunk <T = any> (array: T[], perChunk: number = 2) {
 
   return array.reduce((acc, item, index) => {
+
     const ci = Math.floor(index / perChunk); // chunk index
+
     if (!acc[ci]) acc[ci] = []; // start a new chunk
+
     acc[ci].push(item);
+
     return acc;
+
   }, []);
 
 }
@@ -650,7 +655,10 @@ export function hasProp <T extends object> (object: T): (prop: keyof T) => boole
  * // This is invalid, return value will be 'xxx'
  * pathOr(o, 'a.c', (o) => 'xxx')
  */
-export function pathOr<T, P extends DotPaths<T>> (object: T, path: P, fallback: (param: T) => any): Get<T, P> {
+export function pathOr<
+  T,
+  P extends Paths<T, { maxRecursionDepth: 10, bracketNotation: true}>
+> (object: T, path: P, fallback: (param: T) => any): Get<T, P> {
 
   const keys = <string[]>(isString(path) ? path.split('.') : path);
 
