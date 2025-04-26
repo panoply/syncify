@@ -167,30 +167,6 @@ export type RenameSnippets = Rename & {
 
 export type Paths = {
   /**
-   * Root path defintions represent write locations in projects with custom structures and
-   * complex path Paths.
-   *
-   * This is optional, it is only required if custom structures cannot resolve due to advanced
-   * glob uri's. IN most cases, you can omit this, Syncify will complain and inform when it is
-   * required.
-   *
-   * @example
-   * {
-   *   roots: {
-   *    assets: 'source/assets/import',
-   *    snippets: 'source/snippets/import',
-   *    sections: 'source/sections/import',
-   *    blocks: 'source/blocks/import',
-   *    templates: 'source/templates',
-   *    customers: 'source/templates/customers',
-   *    layout: 'source/layout',
-   *    config: 'source/config',
-   *    locales: 'source/locales'
-   *   }
-   * }
-   */
-  roots?: Roots;
-  /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as snippets.
    *
    * @default 'source/snippets/*.{liquid}'
