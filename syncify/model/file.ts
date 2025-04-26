@@ -31,7 +31,6 @@ export const enum Type {
   Asset,
   Metafield,
   Page,
-  Spawn,
   Syncify,
   Package
 }
