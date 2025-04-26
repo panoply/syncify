@@ -1,15 +1,18 @@
-import type { Rename, StashType } from '@syncify/types/config/paths';
-import type { Pattern, Stash } from 'types';
+import type { Path, Rename } from '@syncify/types/config/paths';
+
+import { basename, join, sep } from 'node:path';
 
 import anymatch from 'anymatch';
 import glob from 'fast-glob';
 import { pathExists } from 'fs-extra';
 
-import { invalidInput, typeError, warnOption } from '~cli/throws';
-import { PATH_KEYS, THEME_KEYS } from '~const';
+import * as _ from '@syncify/ansi';
+
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
+import { PATH_KEYS, THEME_PATHS } from '~const';
 import { setPathCache } from '~process/cache';
-import { parse } from '~process/files';
-import { forEach, isArray, isEmpty, isNil, isNumber, isObject, isString, keys, o, s, toArray } from '~utils';
+import { forEach, isArray, isEmpty, isNil, isString, keys, o, s, toArray } from '~utils';
 import { normalPath } from '~utils/paths';
 
 import { $, q } from '$';
@@ -24,8 +27,15 @@ import { $, q } from '$';
 export async function setPaths () {
 
   if (!(await pathExists($.dirs.input))) {
-
-    return invalidInput('Missing input directory');
+    return throws(
+      [
+        `Failed to obtain resolution of the ${_.bold('input')} base directory.`,
+        'The path does not exist or the directory is empty.' + NLR,
+        `${_.BAD} ${_.bold.underline($.dirs.input.replace($.cwd, '').slice(1))}**`
+      ]
+      , [ `Check that the ${_.cyan(basename($.dirs.input))} directory can be resolved.` ]
+      , 'Missing input directory'
+    );
   }
 
   const getUri = normalPath($.dirs.input);
@@ -80,24 +90,19 @@ export async function setPaths () {
     if ($.paths[path].input === null) {
       $.paths[path].input = s(globs);
     } else {
-      forEach($.paths[path].input.add, globs);
+      forEach(x => $.paths[path].input.add(x), globs);
     }
 
   }
 
-  q.cache.add(() => {
-
-    for (const prop of THEME_KEYS) {
-      for (const uri of $.paths[prop].input) {
-
-        const file = parse(uri);
-
-        if (file) {
-          setPathCache(file.input, file.output);
-        }
+  q.cache.add(async () => {
+    for (const [ key, dir ] of THEME_PATHS) {
+      const path = $.paths[key];
+      for (const input of path.input) {
+        const output = join($.dirs.output, dir, basename(input));
+        await setPathCache(input, output, path.rename);
       }
     }
-
   });
 
   /* -------------------------------------------- */
@@ -109,25 +114,23 @@ export async function setPaths () {
    * A path value can be a string, arrays or object. Paths can also accept
    * additional stash references.
    */
-  function setBaseUri (name: string, files: Pattern, fallback: string): string[] {
+  function setBaseUri (name: string, files: Path, fallback: string): string[] {
 
     if (isNil(files)) {
 
-      return setStashPaths(name, [ getUri(fallback) ], null);
+      return getUri(fallback);
 
     } else if (isString(files)) {
 
-      return setStashPaths(name, [ getUri(files) ], null);
+      return [ getUri(files) ];
 
     } else if (isArray<string[]>(files)) {
 
-      const { stash = null } = isObject(files[files.length - 1]) ? files.pop() as unknown as Stash : {};
-
-      return setStashPaths(name, getUri(files), stash);
+      return getUri(files);
 
     }
 
-    typeError({
+    throws.typeError({
       option: 'paths',
       expects: 'string | string[]',
       provided: files,
@@ -136,73 +139,42 @@ export async function setPaths () {
 
   }
 
-  function setStashPaths (name: string, files: string[], stash: StashType): string[] {
-
-    if (isNil(stash)) {
-
-      $.paths[name].stash = /\/\*/.test(files[0]) ? files[0] : null;
-
-    } else if (isNumber(stash)) {
-
-      $.paths[name].stash = files[stash];
-
-    } else if (isString(stash)) {
-
-      $.paths[name].stash = getUri(stash);
-
-    }
-
-    return files;
-
-  }
-
+  /**
+   * An analysis of Rename Paths - Performs globbing and auto-applies patterns for
+   * paths which use ranme patterns.
+   */
   function setRenamePaths (name: 'sections' | 'snippets', fallback: string): string[] {
 
     const files = $.config.paths[name];
 
     if (isEmpty(files)) {
       warn(`Undefined path/s on "${name}", using fallback`, '{}');
-      return setStashPaths(name, [ getUri(fallback) ], null);
+      return [ getUri(fallback) ];
     }
 
-    if (isArray(files)) {
-      return setStashPaths(name, getUri(files), null);
-    } else if (isString(files)) {
-      return setStashPaths(name, [ getUri(fallback) ], null);
-    }
+    if (isArray(files)) return getUri(files);
+    if (isString(files)) return [ getUri(fallback) ];
 
     const config: Rename = o({ ...files });
     const entries = Object.entries(config);
     const transformed: { [key: string]: string[] } = {};
     const allPatterns: { pattern: string, key: string, generality: number, isExclusion: boolean }[] = [];
-    const getPattern = (key: string, pattern: string) => {
-      const isExclusion = pattern.startsWith('!');
-      const cleanPattern = isExclusion ? pattern.slice(1) : pattern;
-      allPatterns.push({
-        pattern: cleanPattern,
-        key,
-        generality: getGlobGenerality(cleanPattern),
-        isExclusion
-      });
-    };
 
     try {
 
       for (const [ key, patterns ] of entries) {
-
         transformed[key] = [];
-
         if (isArray(patterns)) {
-          const { stash = null } = isObject(patterns[patterns.length - 1]) ? patterns.pop() as unknown as Stash : {};
-          const items = stash !== null ? setStashPaths(name, patterns as string[], stash) : patterns as string[];
-          for (const pattern of items) getPattern(key, pattern);
+          for (const pattern of patterns) {
+            getPattern(key, pattern);
+          }
         } else {
           getPattern(key, patterns);
         }
       }
 
       // If no patterns, return fallback
-      if (allPatterns.length === 0) return setStashPaths(name, [ getUri(fallback) ], null);
+      if (allPatterns.length === 0) return [ getUri(fallback) ];
 
       // Step 2: Generate transformed object
       const patternOwners = new Map<string, { key: string, specificity: number }>();
@@ -210,7 +182,7 @@ export async function setPaths () {
       // Assign ownership based on specificity (inclusions only)
       for (const { pattern, key, isExclusion } of allPatterns) {
         if (!isExclusion) {
-          const specificity = getGlobSpecificity(pattern);
+          const specificity = getGlobSpecific(pattern);
           const existing = patternOwners.get(pattern);
           if (!existing || specificity > existing.specificity) {
             patternOwners.set(pattern, { key, specificity });
@@ -232,6 +204,7 @@ export async function setPaths () {
 
             // Only include if owned by this key and not excluded in this key
             const isExcludedHere = (patterns as string[]).some(p => p.startsWith('!') && p.slice(1) === pattern);
+
             if (patternOwners.get(pattern)?.key === key && !isExcludedHere) {
               inclusions.push(getUri(pattern));
             }
@@ -245,7 +218,7 @@ export async function setPaths () {
               if (!pattern.startsWith('!')) {
                 if (
                   anymatch(pattern, otherPattern) &&
-                  getGlobSpecificity(otherPattern) > getGlobSpecificity(pattern)
+                  getGlobSpecific(otherPattern) > getGlobSpecific(pattern)
                 ) {
                   const excludePath = `!${getUri(otherPattern)}`;
                   exclusions.add(excludePath);
@@ -284,7 +257,6 @@ export async function setPaths () {
               }
             }
           }
-
           if (isGeneral && !generalPatterns.includes(getUri(pattern))) {
             generalPatterns.push(getUri(pattern));
             coveredPatterns.add(pattern);
@@ -292,28 +264,46 @@ export async function setPaths () {
         }
       }
 
-      return generalPatterns.length > 0 ? generalPatterns.sort() : setStashPaths(name, [ getUri(fallback) ], null);
+      return generalPatterns.length > 0 ? generalPatterns.sort() : [ getUri(fallback) ];
 
     } catch (error) {
 
       warn(`Error processing rename paths for "${name}": ${error.message}`, '{}');
 
-      return setStashPaths(name, [ getUri(fallback) ], null);
+      return [ getUri(fallback) ];
 
     }
 
-    // Specificity helper (for transformed object)
-    function getGlobSpecificity (glob: string): number {
-      const segments = glob.split('/').filter(Boolean);
+    /**
+     * Generate pattern model for analysis
+     */
+    function getPattern (key: string, pattern: string) {
+      const isExclusion = pattern.startsWith('!');
+      const cleanPattern = isExclusion ? pattern.slice(1) : pattern;
+      allPatterns.push({
+        pattern: cleanPattern,
+        key,
+        generality: getGlobGeneral(cleanPattern),
+        isExclusion
+      });
+    };
+
+    /**
+     * Specificity helper (for transformed object)
+     */
+    function getGlobSpecific (glob: string): number {
+      const segments = glob.split(sep).filter(Boolean);
       let score = segments.length;
       if (glob.includes('**')) score -= 1;
       if (/\.[a-z]+$/.test(glob)) score += 1;
       return score;
     }
 
-    // Generality helper (for return value)
-    function getGlobGenerality (glob: string): number {
-      const segments = glob.split('/').filter(Boolean);
+    /**
+     * Generality helper (for return value)
+     */
+    function getGlobGeneral (glob: string): number {
+      const segments = glob.split(sep).filter(Boolean);
       let score = 0;
       if (glob.includes('**')) score += 2;
       if (glob.includes('*')) score += 1;
