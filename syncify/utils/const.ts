@@ -22,6 +22,11 @@ export const READ_WRITE_OWNER = 0o755;
 export const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 /**
+ * The watch subscription timeout invterval buffer is ms
+ */
+export const WATCH_BUFFER = 100;
+
+/**
  * The snippet filename
  *
  * @example
@@ -141,6 +146,7 @@ export const CACHE_FILES: Array<Cache.Keys> = [
   'metafields',
   'pages',
   'paths',
+  'maps',
   'schema',
   'sections',
   'settings',
@@ -150,10 +156,9 @@ export const CACHE_FILES: Array<Cache.Keys> = [
 /**
  * Syncify base directory defaults
  */
-export const BASE_DIRS: [ 'input' | 'output' | 'config', string ][] = [
+export const BASE_DIRS: [ 'input' | 'output', string ][] = [
   [ 'input', 'source' ],
-  [ 'output', 'theme' ],
-  [ 'config', '.' ]
+  [ 'output', 'theme' ]
 ];
 
 /**
@@ -203,22 +208,6 @@ export const PATH_KEYS: Array<keyof PathsBundle> = [
 ];
 
 /**
- * Syncify theme path keys - Represents official representation of theme directory
- */
-export const THEME_KEYS = [
-  'assets',
-  'config',
-  'layout',
-  'customers',
-  'locales',
-  'sections',
-  'blocks',
-  'snippets',
-  'templates',
-  'metaobject'
-] as const;
-
-/**
  * Theme **build** groups
  */
 export const BUILD_GROUPS = [
@@ -242,17 +231,17 @@ export const BUILD_GROUPS = [
 /**
  * Shopify theme directories - Represents a correct theme structure
  */
-export const THEME_DIRS = [
-  'templates',
-  'templates/customers',
-  'templates/metaobject',
-  'assets',
-  'blocks',
-  'config',
-  'layout',
-  'locales',
-  'sections',
-  'snippets'
+export const THEME_PATHS = <const>[
+  [ 'assets', 'assets' ],
+  [ 'blocks', 'blocks' ],
+  [ 'config', 'config' ],
+  [ 'layout', 'layout' ],
+  [ 'locales', 'locales' ],
+  [ 'sections', 'sections' ],
+  [ 'snippets', 'snippets' ],
+  [ 'templates', 'templates' ],
+  [ 'customers', 'templates/customers' ],
+  [ 'metaobject', 'templates/metaobject' ]
 ];
 
 /**
@@ -327,6 +316,16 @@ export const REGEX_HOT_SNIPPET = /{%-?\s*render\s*['"]hot\.js['"]\s*-?%}/;
  * Log error validations for or type characters
  */
 export const REGEX_OR_CHARS = /([|,])/g;
+
+/**
+ * Path escape
+ */
+export const REGEX_PATH_ESC = /[.*+?^${}()|[\]\\]/g;
+
+/**
+ * Regex for base dir path
+ */
+export const REGEX_BASE_PATH = /[/\\:]+|\.\./;
 
 /**
  * Bundle Require esbuild extension validation
