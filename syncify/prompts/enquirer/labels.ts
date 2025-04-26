@@ -27,6 +27,7 @@ export const label = labels({
     'Sub-Directory',
 
     // create.ts prompt
+    'Project Path',
     'Strap Source',
     'Choose Strap',
     'Project Name',
