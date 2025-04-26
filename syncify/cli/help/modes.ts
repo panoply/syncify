@@ -16,7 +16,8 @@ export function Modes (mode: string) {
   //
   if (mode in Modes) return Modes[mode]();
 
-  const tui = _.Create()
+  const write = _
+  .Create()
   .Top(`Syncify ${_.CHV} Error`, false)
   .Header('NOT YET AVAILABLE', _.yellowBright.bold);
 
@@ -34,16 +35,16 @@ export function Modes (mode: string) {
 
     const equal = eqWS(modes, { padding: 0 });
 
-    tui
+    write
     .Wrap(message, _.yellowBright)
     .Newline()
     .Each(modes, name => name in Modes
-      ? tui.Line(`$ sy help ${name} ${equal(name) + _.CHK}`, _.whiteBright)
-      : tui.Line(`$ ${_.strikethrough(`sy help ${name}`)}`, _.gray));
+      ? write.Line(`$ sy help ${name} ${equal(name) + _.CHK}`, _.whiteBright)
+      : write.Line(`$ ${_.strikethrough(`sy help ${name}`)}`, _.gray));
   }
 
-  tui
-  .Newline()
+  write
+  .NL
   .End(`Syncify ${_.CHV} Error`, false)
   .BR
   .toLog(highlight);
