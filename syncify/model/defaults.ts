@@ -33,7 +33,6 @@ import type { Config } from 'types';
 export const defaults = (): Config => ({
   input: 'source',
   output: 'theme',
-  config: '.',
   editor: null,
   paths: {
     assets: 'assets/*',
@@ -51,8 +50,8 @@ export const defaults = (): Config => ({
     blogs: '+/blogs/*.{html,md}',
     navigation: '+/navigation/*.json',
     policies: '+/policies/*.{html,md}',
-    schema: '+schema/*.{schema,json}',
-    pages: '+pages/*.{html,json}'
+    schema: '+/schema/*.{schema,json}',
+    pages: '+/pages/*.{html,json}'
   },
   transform: {
     svg: null,
