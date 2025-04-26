@@ -86,15 +86,23 @@ export interface CredentialsPrompt {
 /* PROMPTS                                      */
 /* -------------------------------------------- */
 
+/**
+ * Credential Prompt
+ *
+ * ```plaintext
+ * │  Storage Method:   ➔  env
+ * │  Shopify Domain:   ➔  store.myshopify.com
+ * │  API Admin Token:  ➔  shpat_***
+ * │  Target Storage:   ➔  package.json
+ * │  Theme Targets:    ➔  select
+ * │  Select Themes:    ➔  Dawn, Example
+ * │  Define Targets:   ➔  0% completed
+ * ```
+ */
 export async function PromptCredentialsFile (options: {
-  /** Whether or not the greeting message logs */
-  greeting: boolean;
   /** Whether or not we should use keychain related prompts */
   keychain: boolean;
 }) {
-
-  /** TUI Tree */
-  const tui = _.Create();
 
   /** Current timestamp */
   const date = Date.now();
@@ -121,20 +129,6 @@ export async function PromptCredentialsFile (options: {
       write_themes: false
     }
   };
-
-  /* GREETING ----------------------------------- */
-
-  if (options.greeting) {
-
-    tui.Wrap(
-      _.gray
-      , 'Hello Hacker 👋' + NLR
-      , `Projects require Shopify API Authorization tokens. Store them in a ${_.cyan('.env')} file`
-      , 'on a per project basis, or for a more secure, file-free option, use the Syncify keychain.'
-      , 'The keychain bcrypts tokens on your system and auto-loads them on-demand during development.'
-    ).Newline().toLog({ clear: true });
-
-  }
 
   /* -------------------------------------------- */
   /* BEGIN PROMPTS                                */
