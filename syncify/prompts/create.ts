@@ -12,7 +12,7 @@ import { glue } from '@syncify/glue';
 import { CredentialsPrompt, PromptCredentialsFile } from './credentials';
 
 import { log } from '~cli/log';
-import * as throws from '~cli/throws';
+import { throws } from '~cli/throws';
 import { STRAP_EXAMPLES, STRAP_THEMES } from '~const';
 import { createCaches } from '~options/define/caches';
 import { getPkg, setPkg } from '~options/define/package';
@@ -337,7 +337,7 @@ export async function Create () {
 
       log.spinner.stop();
 
-      throw throws.enoentError({
+      throw throws.enoent({
         type: 'file',
         path: pkguri,
         task: glue.ws($.argv),
