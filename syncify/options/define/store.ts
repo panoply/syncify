@@ -9,11 +9,12 @@ import { bold, COL, cyan } from '@syncify/ansi';
 
 import { setPkg } from './package';
 
-import { throwError, warnSevere } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnSevere } from '~cli/warnings';
 import { TARGET_FILES } from '~const';
 import { error } from '~errors';
 import { PromptSelectThemes, PromptStorage, PromptThemeTargets } from '~prompts/targets';
-import { assign, delay, has, hasPath, isEmpty, isObject, murmur } from '~utils';
+import { assign, has, hasPath, isEmpty, isObject, murmur } from '~utils';
 import { parseToml, parseYaml } from '~utils/parsers';
 
 import { $ } from '$';
@@ -204,7 +205,7 @@ export async function getTargets (options?: {
 
         } else {
 
-          throwError([
+          throws([
             `Invalid store/theme target references defined in ${bold('package.json')} file`
           ], [
             `Syncify expects and ${cyan('object')} type structure`

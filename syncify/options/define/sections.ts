@@ -8,7 +8,8 @@ import { bold } from '@syncify/ansi';
 import { JSONError, parse } from '@syncify/json';
 
 import { log } from '~cli/log';
-import { throwError, warnOption } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { error } from '~errors';
 import { GetSchemaIndices } from '~schema';
 import { checksum, defineProperty, has, hasProp, isArray, isObject, s } from '~utils';
@@ -21,7 +22,7 @@ import { $ } from '$';
  * Traverses all sections within the project and constructs workable data models.
  * This operation is responsible for extracting `{% schema %}` JSON contents from
  * section files so we can perform faster section transforms and ensure that shared
- * schema injections in quick succession whenever changes occur.
+ * schema injections perform in quick succession whenever changes occur.
  */
 export async function setSectionOptions () {
 
@@ -48,7 +49,7 @@ async function setSharedSchema () {
     const key = basename(uri, ext);
 
     if ($.section.shared.has(key)) {
-      throwError(`Duplicated shared schema file name ${bold.yellow(key + ext)} detected.`, [
+      throws(`Duplicated shared schema file name ${bold.yellow(key + ext)} detected.`, [
         'Shared Schema JSON file names must be unique across the workspace.',
         'Update the file name and try again.'
       ]);

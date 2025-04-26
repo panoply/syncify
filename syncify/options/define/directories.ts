@@ -2,19 +2,60 @@ import { join } from 'node:path';
 
 import { emptyDir, mkdir, pathExists, readdirSync } from 'fs-extra';
 
-import { typeError } from '~cli/throws';
-import { BASE_DIRS, THEME_DIRS } from '~const';
+import { throws } from '~cli/throws';
+import { BASE_DIRS, PATH_KEYS, THEME_PATHS } from '~const';
 import { has, isArray, isString } from '~utils';
 import { basePath } from '~utils/paths';
 
 import { $ } from '$';
 
 /**
- * Create Theme Directories
+ * Create Output (theme) Directories
  *
- * Generates a Shopify theme structure within the provided `basePath` uri location.
+ * Generates the Shopify theme structure within the provided `basePath` uri location.
  */
-export async function setThemeDirs (basePath?: string) {
+export async function setInputDirs () {
+
+  const hasInput = await pathExists($.dirs.input);
+
+  if (!hasInput) {
+    await mkdir($.dirs.input);
+  }
+
+  for (const dir of PATH_KEYS) {
+
+    const path = $.p;
+
+    if (!(await pathExists(dir))) {
+
+      try {
+
+        await mkdir(uri);
+
+        $.stats[name] = 0;
+
+      } catch (e) {
+
+        throw new Error(e);
+
+      }
+
+    } else {
+
+      $.stats[name] = readdirSync(uri).length;
+
+    }
+
+  }
+
+};
+
+/**
+ * Create Output (theme) Directories
+ *
+ * Generates the Shopify theme structure within the provided `basePath` uri location.
+ */
+export async function setOutputDirs (basePath?: string) {
 
   if (!basePath) basePath = $.dirs.output;
 
@@ -40,10 +81,9 @@ export async function setThemeDirs (basePath?: string) {
 
   }
 
-  for (const dir of THEME_DIRS) {
+  for (const [ name, dir ] of THEME_PATHS) {
 
     const uri = join(basePath, dir);
-    const name = dir.startsWith('templates/') ? dir.slice(10) : dir;
 
     if (!(await pathExists(uri))) {
 
@@ -99,7 +139,7 @@ export async function setBaseDirs () {
 
     } else {
 
-      typeError({
+      throws.typeError({
         option: 'config',
         name: key,
         provided: path,

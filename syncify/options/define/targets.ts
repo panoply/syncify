@@ -80,7 +80,7 @@ export async function setTargets () {
               exists = true;
               const target = syncTheme(store.name, themeTarget, store.themes[themeTarget]);
               if (duplicate.has(target.id)) {
-                duplicateThemeTarget(target.id, store.name);
+                ErrorDuplicate(target.id, store.name);
               } else {
                 $.target.push(target);
                 duplicate.add(target.id);
@@ -90,13 +90,19 @@ export async function setTargets () {
         }
 
         if (!exists) {
-          invalidTarget({ type: 'theme', provided: themes.join(',') });
+          ErrorTarget({
+            type: 'theme',
+            provided: themes.join(',')
+          });
         }
 
       } else {
 
         if (!$.stores.has(storeName)) {
-          invalidTarget({ type: 'store', provided: storeName });
+          ErrorTarget({
+            type: 'store',
+            provided: storeName
+          });
         }
 
         const store = $.stores.get(storeName);
@@ -107,16 +113,16 @@ export async function setTargets () {
             const target = syncTheme(store.name, themeTarget, store.themes[themeTarget]);
 
             if (duplicate.has(target.id)) {
-              duplicateThemeTarget(target.id, store.name);
+              ErrorDuplicate(target.id, store.name);
             } else {
               $.target.push(target);
               duplicate.add(target.id);
             }
           } else {
-            invalidTarget({
+            ErrorTarget({
               type: 'theme',
               provided: themeTarget,
-              storeName
+              target: storeName
             });
           }
         }
@@ -141,7 +147,7 @@ export async function setTargets () {
           for (const theme in $.stores.get(value).themes) {
             const target = syncTheme(value, theme, $.stores.get(value).themes[theme]);
             if (duplicate.has(target.id)) {
-              duplicateThemeTarget(target.id, target.store.name);
+              ErrorDuplicate(target.id, target.store.name);
             } else {
               $.target.push(target);
               duplicate.add(target.id);
@@ -159,10 +165,10 @@ export async function setTargets () {
             if (has(value, store.themes)) {
               const target = syncTheme(store.name, value, store.themes[value]);
               if (duplicate.has(target.id)) {
-                duplicateThemeTarget(target.id, store.name);
+                ErrorDuplicate(target.id, store.name);
               } else {
                 if (ambiguous.has(value)) {
-                  ambiguousThemeTarget(value);
+                  ErrorAmbiguous(value);
                 } else {
                   $.target.push(syncTheme(store.name, value, store.themes[value]));
                   ambiguous.add(value);
@@ -174,7 +180,10 @@ export async function setTargets () {
           }
 
           if (!exists) {
-            invalidTarget({ type: 'theme', provided: value });
+            ErrorTarget({
+              type: 'theme',
+              provided: value
+            });
           }
 
         }
@@ -190,6 +199,74 @@ export async function setTargets () {
 /* -------------------------------------------- */
 /* ERRORS                                       */
 /* -------------------------------------------- */
+
+/**
+ * Invalid Target
+ *
+ * Throws an error when an invalid command expression was passed.
+ * Determined by the `-T` (or `--target`) argument.
+ *
+ * ```
+ * │ INVALID THEME TARGET
+ * │
+ * │ The theme target "name" is either undefined or unknown. Please provide
+ * │ One or more valid theme targets as defined in your package.json:
+ * │
+ * │ — foo
+ * │ — bar
+ * │ — baz
+ * │
+ * │ How to fix?
+ * │ Check for typos in the theme target name. If you intended to use this target,
+ * │ ensure it is properly defined and associated or connect it using sy setup.
+ * ```
+ */
+function ErrorTarget ({ type, provided, target = null }: {
+  /** Infers the error we are to construct */
+  type: 'theme' | 'store';
+  /** This will be null by default but can be a store name */
+  target?: string
+  /** What was provided, this is required */
+  provided?: string;
+}) {
+
+  const targets = $.file.targets === null ? 'package.json' : basename($.file.targets);
+  const message = target ? [
+    `The ${_.cyan(target)} ${type} has no theme "${_.bold.redBright(provided)}" target defined.`,
+    `Provide one or more valid ${target} theme target/s as defined in your ${targets} file:`
+  ] : [
+    `The ${type} target "${_.bold.redBright(provided)}" is either undefined or unknown.`,
+    `Provide one or more valid ${type} target/s as defined in your ${targets} file:`
+  ];
+
+  const expected = target
+    ? keys($.stores.get(target).themes).map(name => `${_.DSH} ${_.redBright(name)}`)
+    : type === 'store'
+      ? $.stores.map(({ name }) => `${_.DSH} ${_.redBright(name)}`)
+      : $.stores.flatMap(({ themes }) => keys(themes).map(name => `${_.DSH} ${_.redBright(name)}`));
+
+  _
+  .Create({ type: 'error' })
+  .Newline('line')
+  .Append(`INVALID ${type.toUpperCase()} TARGET`, _.bold)
+  .Wrap(message)
+  .NL
+  .Multiline(expected)
+  .Tree('info')
+  .Prepend('How to fix?', _.gray.bold)
+  .Wrap(
+    _.gray
+    , `Check for typos in the ${type} target name. If you intended to use this target`
+    , `ensure it is properly defined and associated or use ${_.blue('sy setup')} to connect it.`
+  )
+  .NL
+  .End($.log.group)
+  .BR
+  .toLog();
+
+  $.running ? kill.exit(2) : process.exit(2);
+
+};
 
 /**
  * Ambiguous Target
@@ -234,110 +311,37 @@ export async function setTargets () {
  * │ Use a glob star * prefix to instruct Syncify to target all stores:
  * │
  * │ provided: -T example
- * │ expected: -T :example
+ * │ expected: -T *:example
  * ```
  */
-function ambiguousThemeTarget (target: string) {
+function ErrorAmbiguous (target: string) {
 
+  const alias = _.capture.dash($.argv.some(value => value === '--target') ? '--target' : '-T', _.gray);
   const expected = $.stores
-  .filter(({ themes }) => target in themes)
+  .filter(({ themes }) => has(target, themes))
   .map(({ name }) => `${name}${_.COL}${target}`)
   .join(WSP);
 
-  const alias = _.capture.dash($.argv.some(value => value === '--target') ? '--target' : '-T', _.gray);
-  const message = [
-    `The theme target name "${_.cyan(target)}" is an ambiguous reference and used`,
-    'by multiple stores in this project. Syncify is unable to determine which theme you wish interface'
-  ];
-
-  _.Create({ type: 'error' })
+  _
+  .Create({ type: 'error' })
   .Newline('line')
   .Append('AMBIGUOUS THEME TARGET', _.bold)
-  .Wrap(message)
+  .Wrap(
+    `The theme target name "${_.cyan(target)}" is an ambiguous reference and used by multiple`,
+    'stores in this project. Syncify is unable to determine which theme you want interface with.'
+  )
   .Header('Prefix command with store name/s' + _.COL)
   .Line(`${_.bold('provided')}${_.COL} ${_.yellowBright(`${alias} ${target}`)}`)
   .Line(`${_.bold('expected')}${_.COL} ${_.blueBright(`${alias} ${expected}`)}`)
-  .Header(`Use an empty colon ${_.cyan(':')} prefix to instruct Syncify to target all stores${_.COL}`)
+  .Header(`Use a glob star ${_.cyan('*')} prefix to instruct Syncify to target all stores${_.COL}`)
   .Line(`${_.bold('provided')}${_.COL} ${_.yellowBright(`${alias} ${target}`)}`)
-  .Line(`${_.bold('expected')}${_.COL} ${_.blueBright(`${alias} :${_.COL}${target}`)}`)
-  .Newline('line')
+  .Line(`${_.bold('expected')}${_.COL} ${_.blueBright(`${alias} *${_.COL}${target}`)}`)
+  .NL
   .End($.log.group)
-  .toLog()
-  .Break();
+  .BR
+  .toLog();
 
-  kill.exit(2);
-
-}
-
-/**
- * Invalid Target
- *
- * Throws an error when an invalid command expression was passed.
- * Determined by the `-T` (or `--target`) argument.
- *
- * ```
- * │ INVALID THEME TARGET
- * │
- * │ The theme target "name" is either undefined or unknown. Please provide
- * │ One or more valid theme targets as defined in your package.json:
- * │
- * │ — foo
- * │ — bar
- * │ — baz
- * │
- * │ How to fix?
- * │ Check for typos in the theme target name. If you intended to use this target,
- * │ ensure it is properly defined and associated or connect it using sy setup.
- * ```
- */
-export function invalidTarget ({
-  type,
-  provided,
-  storeName = null
-}: {
-  type: 'theme' | 'store';
-  provided: string;
-  storeName?: string
-}) {
-
-  const targets = $.file.targets === null
-    ? 'package.json'
-    : basename($.file.targets);
-
-  const message = storeName ? [
-    `The ${_.bold(storeName)} ${type} has no theme "${_.bold.redBright(provided)}" target defined.`,
-    `Provide one or more valid ${storeName} theme target/s as defined in your ${targets} file:`
-  ] : [
-    `The ${type} target "${_.bold.redBright(provided)}" is either undefined or unknown.`,
-    `Provide one or more valid ${type} target/s as defined in your ${targets} file:`
-  ];
-
-  const solution = [
-    `Check for a typo in the ${type} target name. If you intended to use this target`,
-    `ensure it is properly defined and associated or use ${_.blue('sy keychain')} to connect it.`
-  ];
-
-  const expected = storeName
-    ? keys($.stores.get(storeName).themes).map(name => `${_.DSH} ${_.redBright(name)}`)
-    : type === 'store'
-      ? $.stores.map(({ name }) => `${_.DSH} ${_.redBright(name)}`)
-      : $.stores.flatMap(({ themes }) => keys(themes).map(name => `${_.DSH} ${_.redBright(name)}`));
-
-  _.Create({ type: 'error' })
-  .Newline('line')
-  .Append(`INVALID ${type.toUpperCase()} TARGET`, _.bold)
-  .Wrap(message)
-  .Newline()
-  .Multiline(expected)
-  .Newline()
-  .Line('How to fix?', _.gray.bold)
-  .Wrap(solution, _.gray)
-  .Newline('line')
-  .End($.log.group)
-  .toLog()
-  .Break();
-
-  kill.exit(2);
+  $.running ? kill.exit(2) : process.exit(2);
 
 }
 
@@ -364,7 +368,7 @@ export function invalidTarget ({
  * │ on the "store-name" store in your package.json file.
  * ```
  */
-export function duplicateThemeTarget (id: number, store: string) {
+function ErrorDuplicate (id: number, store: string) {
 
   const write = _.Create({ type: 'error' })
   .Newline('line')
@@ -404,6 +408,5 @@ export function duplicateThemeTarget (id: number, store: string) {
   .toLog()
   .Break();
 
-  kill.exit(2);
-
+  $.running ? kill.exit(2) : process.exit(2);
 }

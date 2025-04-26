@@ -3,10 +3,11 @@ import { join } from 'node:path';
 import dotenv from 'dotenv';
 import { pathExists, readJson } from 'fs-extra';
 
-import { blue, cyan } from '@syncify/ansi';
+import * as _ from '@syncify/ansi';
+import { kill } from '@syncify/kill';
 
 import { error } from '~cli/errors';
-import { invalidCredentials, missingEnv, throwError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { http } from '~http/client';
 import { defineProperty, has, isEmpty } from '~utils';
 
@@ -31,8 +32,7 @@ export async function getEnv (cwd = $.cwd) {
   } else {
     if ($.file.project !== null) {
       const kc = join($.root, '.env');
-      if (await pathExists(kc)) {
-        // Keychain exists, we can proceeed as normal
+      if (await pathExists(kc)) { // Keychain exists, we can proceeed as normal
         $.file.env = kc;
         $.project.credentials = 'kc';
       }
@@ -56,7 +56,7 @@ export async function getEnv (cwd = $.cwd) {
     // we only need to validate project level credentials defined in a .env file
     if ($.project.credentials === 'env') {
       if (isEmpty($.env.vars)) {
-        invalidCredentials();
+        ThrowCredentials();
       } else {
         setStoreClient($.env.vars);
       }
@@ -71,7 +71,7 @@ export async function getEnv (cwd = $.cwd) {
 
     if (!$.mode.create && !$.mode.init && !$.mode.keychain) {
 
-      if ($.file.project !== null) missingEnv();
+      if ($.file.project !== null) ThrowCredentials({ missing: true });
 
     } else {
 
@@ -84,16 +84,16 @@ export async function getEnv (cwd = $.cwd) {
         // this is a critical failure, the keychain should exist
         // lets notify and give programmatic option.
 
-        throwError([
+        throws([
           'Syncify is missing core reference files. Please report this issue on the',
-          `github repo, ${cyan('https://github.com/panoply/syncify/issues')}). This`,
-          `error may be due to a corrupted installation which prevented ${blue('postinstall')}`,
+          `github repo, ${_.cyan.underline('https://github.com/panoply/syncify/issues')}). This`,
+          `error may be due to a corrupted installation which prevented ${_.blue('postinstall')}`,
           'hooks from firing.'
         ], [
           'Programmatic generation of core references may resolve this issue. Use the',
-          `${cyan('sy doctor')} command and syncify will try and fix the problem.`,
+          `${_.cyan('sy doctor')} command and syncify will try to fix the problem.`,
           'If the error persists, please ensure read/write access permissions allow',
-          `for directory and file generation within ${cyan($.home)} location.`
+          `for directory and file generation within ${_.cyan($.home)} location.`
         ]);
 
       }
@@ -159,7 +159,7 @@ export function setStoreClient (vars: { [key: string]: string; }) {
 
   }
 
-  if (isEmpty($.stores)) invalidCredentials();
+  if (isEmpty($.stores)) ThrowCredentials();
 
 }
 
@@ -197,16 +197,43 @@ export function getXiorConfig (vars: { [key: string]: string; }, name: string) {
 
   } else {
 
-    throwError(
-      `Invalid or missing ${cyan(name + '.myshopify.com')} credentials`,
-      [
-        `Your shop credentials in the ${cyan.bold('.env')} file could`,
-        'not be read correctly or are missing. Please check your environment file and ensure',
-        'you have provided valid authorization, or if you are using the Keychain, please check',
-        'credential association has been applied.' + NLR,
-        `Run the ${cyan('sy doctor')} command for additional support.`
-      ]
-    );
+    throws(`Invalid or missing ${_.cyan(name + '.myshopify.com')} credentials`, [
+      `Your shop credentials in the ${_.cyan.bold('.env')} file could`,
+      'not be read correctly or are missing. Please check your environment file and ensure',
+      'you have provided valid authorization, or if you are using the Keychain, please check',
+      'credential association has been applied.'
+    ]);
   }
+
+};
+
+/* -------------------------------------------- */
+/* ERRORS                                       */
+/* -------------------------------------------- */
+
+function ThrowCredentials ({ missing = false } = {}) {
+
+  _
+  .Create({ type: 'error' })
+  .Line(missing ? 'MISSING CREDENTIALS' : 'BAD CREDENTIALS', _.bold)
+  .Newline()
+  .Wrap(missing ? [
+    'Missing authorization credentials. Syncify could not resolve API tokens within this project.',
+    `There is no ${_.cyan('.env')} file present or keychain association.`
+  ] : [
+    'The project\'s authorization access failed due to missing or invalid credentials.',
+    'Syncify could not obtain shop api access tokens. Check that you have correctly',
+    `provided token reference within your ${_.cyan('.env')} file or use the keychain.`
+  ])
+  .Tree('info')
+  .NL
+  .Line('How to fix?', _.gray.bold)
+  .Line('Refer to the documentation for credential options and setup', _.gray)
+  .Header(`${_.CHV} ${_.underline('https://syncify.sh/setup/credentials')}`, _.gray)
+  .End($.log.group)
+  .BR
+  .toLog();
+
+  $.running ? kill.exit(0) : process.exit(0);
 
 };

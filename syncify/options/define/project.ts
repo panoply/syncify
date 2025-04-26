@@ -26,7 +26,9 @@ export async function createProject (path: string) {
 export function updateProject () {
 
   if ($.file.project !== null) {
-    q.cache.add(async () => await writeFileAtomic($.file.project, JSON.stringify($.project)));
+    q.cache.add(async () => {
+      await writeFileAtomic($.file.project, JSON.stringify($.project));
+    });
   }
 
 }

@@ -7,7 +7,7 @@ import { readFile } from 'fs-extra';
 import { ARR, capture, gray } from '@syncify/ansi';
 import { JSONError, parse } from '@syncify/json';
 
-import { warnOption } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { error } from '~errors';
 import { setTemplateCache } from '~process/cache';
 import { has, values } from '~utils';
