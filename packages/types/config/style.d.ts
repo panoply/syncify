@@ -1,5 +1,6 @@
 import type { OptionsOutput as CleanCSSOptions } from 'clean-css';
 import type { AcceptedPlugin, Plugin as PostCSSPlugin, TransformCallback, Transformer } from 'postcss';
+import type { Options as SassEmbedded } from 'sass-embedded';
 import type { Config as TailwindCSSConfig } from 'tailwindcss';
 
 /* -------------------------------------------- */
@@ -15,6 +16,15 @@ export type PostCSSConfig = (
   | TransformCallback
   | any
 );
+
+export type SassOptions = Pick<
+  SassEmbedded<'sync'>,
+  | 'fatalDeprecations'
+  | 'functions'
+  | 'futureDeprecations'
+  | 'quietDeps'
+  | 'silenceDeprecations'
+>
 
 /**
  * Style Minification
@@ -59,7 +69,7 @@ export type TailwindConfig = TailwindCSSConfig & {
   config: string[]
 }
 
-export type SASSConfig = {
+export type SASSConfig = SassOptions & {
   /**
    * Whether or not to generate sourcemaps
    *
@@ -80,18 +90,6 @@ export type SASSConfig = {
    * @default true
    */
   warnings?: boolean;
-  /**
-   * This option is passed to SASS Dart compile instance. If this option is set to `true`,
-   * Sass won’t print warnings that are caused by dependencies. A "dependency" is defined
-   * as any file that’s loaded through external sources.
-   *
-   * This is useful for silencing deprecation warnings that you can’t fix on your own.
-   * However, please also notify your dependencies of the deprecations so that they can get
-   * fixed as soon as possible!
-   *
-   * @default false
-   */
-  quietDeps?: boolean;
   /**
    * A list of paths to include, ie: node_modules.
    *
