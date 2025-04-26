@@ -5,7 +5,7 @@ import { glue } from '@syncify/glue';
 import { timer } from '@syncify/timer';
 import update from '@syncify/update';
 
-import { warnings } from '~cli/throws';
+import { warnings } from '~cli/warnings';
 import { log } from '~log';
 import { eqWS, isEmpty, keys, plur, toUpcase } from '~utils';
 
@@ -210,12 +210,13 @@ runtime.stores = function () {
 
   if ($.mode.hot) {
     if ($.mode.align) {
-      log.runtime.Spinner(`remote ${_.ARL} local merges`, { color: _.whiteBright });
+      log.runtime.Spinner(`Remote ${_.ARL} Local Merges`, { color: _.gray });
     } else {
-      log.runtime.Spinner('configuring HOT Reloads', { color: _.whiteBright });
+      log.runtime.Line('Reloads' + _.COL, _.bold).toWrite();
+      log.runtime.Spinner('Preparing uWS Sockets', { color: _.gray, indent: 2 });
     }
   } else if ($.mode.align) {
-    log.runtime.Spinner(`remote ${_.ARL} local merges`, { color: _.whiteBright });
+    log.runtime.Spinner(`Remote ${_.ARL} Local Merges`, { color: _.gray });
   }
 
 };
@@ -238,7 +239,6 @@ runtime.hot = ({ isError = false } = {}) => {
 
     log
     .runtime
-    .Line('Reloads' + _.COL, _.whiteBright.bold)
     .Line(`  ${_.BAD} ${_.redBright('server')}  ${_.ARR}  ${_.redBright('FAILED')}`)
     .Line(`  ${_.BAD} ${_.redBright('socket')}  ${_.ARR}  ${_.redBright('FAILED')}`);
 
@@ -246,7 +246,7 @@ runtime.hot = ({ isError = false } = {}) => {
 
     log
     .runtime
-    .Line('Reloads' + _.COL, _.whiteBright.bold)
+    .True($.mode.align, tui => tui.Line('Reloads' + _.COL, _.bold))
     .Line(`  ${_.TLD} ${_.neonMagenta('method')}  ${_.ARR}  ${_.neonMagenta.bold(`${$.hot.method.toUpperCase()}`)}`)
     .Line(`  ${_.TLD} ${_.neonMagenta('server')}  ${_.ARR}  ${_.neonMagenta(`${$.hot.server}`)}`)
     .Line(`  ${_.TLD} ${_.neonMagenta('socket')}  ${_.ARR}  ${_.neonMagenta(`${$.hot.socket}`)}`);
