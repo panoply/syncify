@@ -91,6 +91,7 @@ command(
       accepts: null,
       flags: [
         'help',
+        'new',
         'output',
         'config',
         'target',
