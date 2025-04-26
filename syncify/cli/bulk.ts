@@ -3,6 +3,8 @@ import notifier from 'node-notifier';
 import * as _ from '@syncify/ansi';
 import { timer } from '@syncify/timer';
 
+import { stdin } from './stdin';
+
 import { plur, uuid } from '~utils';
 
 import { $ } from '$';
@@ -10,7 +12,7 @@ import { $ } from '$';
 /**
  * Bulk Instance
  *
- * Toggles bulk logging mode.
+ * Toggles bulk logging mode. The bulk TUI is generated, records are cleared when executing.
  *
  * ```
  * ┌─ Bulk ➤ Operation ~ 05:24:55
@@ -45,17 +47,13 @@ export function bulk () {
   }
 
   if (bulk.progress === null) {
-
     bulk.progress = _.progress($.bulk.files, {
       barSize: 30,
       prepend: null,
       barColor: $.bulk.type === 'uploaded' ? 'neonGreen' : 'blueBright'
     });
-
   } else {
-
     bulk.progress.reset($.bulk.files);
-
   }
 
   bulk.tui
@@ -84,33 +82,28 @@ bulk.notifier = (type: 'warnings' | 'errors') => {
 
 };
 
+/**
+ * Bulk Completion
+ *
+ * Called after the bulk operation has completed and the request queue has finished.
+ * This will be called in `modes/watch.ts > Bulk()` function, upon `q.bulk.onIdle()`
+ */
 bulk.complete = () => {
 
   if (!$.mode.bulk) return;
 
-  const color = $.bulk.type === 'deleted'
-    ? _.blueBright
-    : _.neonGreen;
+  const color = $.bulk.type === 'deleted' ? _.blueBright : _.neonGreen;
 
-  bulk.tui
-  .Update($.bulk.type, `${_.bold($.bulk.synced.size)} Files ${_.Append(timer.stop($.bulk.id))}`, color)
-  .Newline();
-
-  if ($.bulk.synced.size > 0) {
-    bulk.tui.Line(`Type ${_.bold('i')} and press ${_.bold('enter')} to view ${$.bulk.type}`, _.gray);
-  }
-
-  if ($.warnings.size > 0) {
-    bulk.tui.Line(`Type ${_.bold('w')} and press ${_.bold('enter')} to view warnings`, _.gray);
-    bulk.notifier('warnings');
-  }
+  bulk.tui.Update($.bulk.type, `${_.bold($.bulk.synced.size)} Files ${_.Append(timer.stop($.bulk.id))}`, color);
 
   if ($.errors.size > 0) {
-    bulk.tui.Line(`Type ${_.bold('e')} and press ${_.bold('enter')} to view errors`, _.gray);
+
     bulk.notifier('errors');
+    bulk.tui.toUpdate({ clear: true, trim: true, update: [ 'done' ] });
+
+    stdin.bulk.listen();
   }
 
-  bulk.tui.toUpdate({ clear: true, trim: true });
   bulk.tui = null;
   bulk.progress = null;
 
