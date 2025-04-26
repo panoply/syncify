@@ -10,6 +10,10 @@ export const enum LogModes {
    */
   Bulk,
   /**
+   * Showing Bulk Errors interactive stdin
+   */
+  BulkErrors,
+  /**
    * An error was encountered and is shown
    */
   Error,
