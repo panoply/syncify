@@ -1,8 +1,9 @@
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, extname, join, normalize, resolve, sep } from 'node:path';
 
 import { COL, yellowBright } from '@syncify/ansi';
 
-import { throwError } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { REGEX_BASE_PATH, REGEX_PATH_ESC } from '~const';
 import { isArray } from '~utils';
 
 /**
@@ -39,28 +40,37 @@ export function globPath <T extends string | string[]> (path: T): T {
 /**
  * Last Path
  *
- * Will return the portion of a URI path. If
- *  the path does not not contain forward slashes it
- * returns the passed string.
+* Returns the last directory name in a URI path, excluding the file name if present.
+ * If the path contains no slashes, returns the input string.
+ * Handles single paths or arrays of paths, cross-platform separators, and edge cases.
  *
  * @example
- *
- * // File name is excluded
- * '/some/path/to/file.ext' => 'to'
- *
- * // last directory name
- * '/some/path/foo/bar/baz' => 'baz'
+ * lastPath('/some/path/to/file.ext') => 'to'
+ * lastPath('/some/path/foo/bar/baz') => 'baz'
+ * lastPath('file.txt') => 'file.txt'
+ * lastPath('/path/to/dir/') => 'dir'
  */
 export function lastPath (path: string | string[]) {
 
+  // Handle array input
   if (isArray(path)) return path.map(lastPath);
-  if (path.indexOf('/') === -1) return path;
 
-  const dir = path.endsWith('/') ? dirname(path.slice(0, -1)) : dirname(path);
-  const ender = dir.lastIndexOf('/') + 1;
+  // Remove trailing separator if present
+  const cleanPath = path.endsWith(sep) ? path.slice(0, -1) : path;
 
-  return dir.slice(ender);
-};
+  // Split path using OS-specific separator
+  const parts = cleanPath.split(sep);
+
+  // Handle single component or empty path
+  if (parts.length <= 1) return parts[0] || '';
+
+  // Check if the last component is a file (has an extension)
+  const lastComponent = parts[parts.length - 1];
+  const hasExtension = extname(lastComponent) !== '';
+
+  return hasExtension ? parts[parts.length - 2] : lastComponent;
+
+}
 
 /**
  * Parent Path
@@ -80,13 +90,20 @@ export function parentPath (path: string | string[]) {
 
   if (isArray(path)) return path.map(parentPath);
 
-  const last = path.lastIndexOf('/');
+  // Remove trailing separator if present
+  const cleanPath = path.endsWith(sep) ? path.slice(0, -1) : path;
 
-  if (last === -1) return path;
+  // Check for glob pattern
+  const globIndex = cleanPath.indexOf('*');
 
-  const glob = path.indexOf('*');
+  if (globIndex !== -1) {
+    // Truncate at glob, then get parent directory
+    const before = cleanPath.slice(0, globIndex);
+    return before.includes(sep) ? dirname(before) : '';
+  }
 
-  return glob === -1 ? path.slice(0, last) : path.slice(0, glob);
+  // No glob: return parent directory
+  return dirname(cleanPath);
 
 };
 
@@ -111,53 +128,46 @@ export function parentPath (path: string | string[]) {
  * // handles ignores
  * normalPath('input')('!ignore') => '!input/ignore'
  */
-export function normalPath (input: string, cwd = null) {
+export function normalPath (uri: string, cwd = null) {
 
+  // Create regexes once, using hardcoded '/' to match original
+  const input = uri.replace(REGEX_PATH_ESC, '\\$&');
   const regex = new RegExp(`^\\.?\\/?${input}\\/`);
   const source = new RegExp(`^\\.?\\/?${basename(input)}\\/`);
 
-  /**
-   * Prepends the provided input to the path and
-   * returns a correctly formed uri.
-   */
-  return function prepend (path: any) {
+  return function prepend <T extends string | string[]> (path: any): T {
 
-    if (isArray(path)) return path.map(prepend);
+    if (isArray(path)) return <T>path.map(prepend);
 
-    const ignore = path.charCodeAt(0) === 33;
-
+    // Handle ignore prefix
+    const ignore = path.startsWith('!');
     if (ignore) path = path.slice(1);
-    if (regex.test(path)) return ignore ? '!' + path : path;
 
-    if (path.charCodeAt(0) === 46 && path.charCodeAt(1) === 46 && path.charCodeAt(2) === 47) {
-      throwError(
-        `Invalid path defined at: ${COL} ${yellowBright(`"${path}"`)}`,
-        [ 'Paths must be relative to the input directory' ]
-      );
+    // If path starts with input/, return unchanged (with ignore prefix)
+    if (regex.test(path)) return <T>(ignore ? '!' + path : path);
+
+    // Reject paths starting with '../'
+    if (path.startsWith('../')) {
+      throws(`Invalid path defined at${COL} ${yellowBright(`"${path}"`)}`, [
+        'Paths must be relative to the input directory'
+      ]);
     }
 
     if (cwd !== null) {
-
       const exists = join(cwd, path);
-      return (ignore ? '!' : '') + (exists.startsWith(input) ? exists : join(input, path));
-
-    } else {
-
-      // We need to remove occurences where input matches base input dir, eg:
-      // source/dir/file > dir/file
-      // This is because the "input" value already represents full resolution.
-      return (ignore ? '!' : '') + join(input, source.test(path) ? path.replace(source, NIL) : path);
+      return <T>((ignore ? '!' : '') + (exists.startsWith(input) ? exists : join(input, path)));
     }
 
+    // Remove basename(input)/ prefix if present, then prepend input
+    return <T>((ignore ? '!' : '') + join(input, source.test(path) ? path.replace(source, NIL) : path));
   };
-};
+}
 
 /**
  * Base Paths
  *
- * Normalizes base directory paths, handling any
- * malformed or invalid base references. Returns
- * the uri appended with forward slash.
+ * Normalizes base directory paths, handling any malformed or invalid base references.
+ * Returns the uri appended with forward slash.
  *
  * @example
  *
@@ -167,52 +177,40 @@ export function normalPath (input: string, cwd = null) {
  * // root directory
  * basePath('User/name/etc')('.') => '/User/name/etc/'
  */
-export const basePath = (cwd: string) => (path: string) => {
+export function basePath (cwd: string) {
 
-  if (path.indexOf('*') !== -1) {
-    throwError(
-      `Base directory path cannot contain glob${COL} ${yellowBright(`"${path}"`)}`,
-      [ 'Ensure that path you are resolving is correctly formed' ]
-    );
-  }
+  // Normalize cwd to remove redundant separators
+  const normalizedCwd = normalize(cwd);
 
-  // path directory starts with . character
-  if (path.charCodeAt(0) === 46) {
+  /**
+   * Normalizes the path by prepending cwd and ensuring a trailing separator.
+   */
+  return function prepend (path: string) {
 
-    // path define is root (dot)
-    if (path.length === 1) return cwd + '/';
-
-    // path directory next character is not a forward slash
-    // for example, ".folder" this will be invalid
-    if (path.charCodeAt(1) === 47) {
-      path = path.slice(1);
-    } else {
-      throwError(
-        `Directory path is invalid at${COL} ${yellowBright(`"${path}"`)}`,
-        [ 'Ensure that the path you attempting to resolve is correctly formed' ]
-      );
+    // Reject glob patterns
+    if (path.includes('*')) {
+      throws(`Base directory path cannot contain glob${COL} ${yellowBright(`"${path}"`)}`, [
+        'Ensure that path you are resolving is correctly formed'
+      ]);
     }
 
-  }
+    // Handle root paths ('.' or '/')
+    if (path === '.' || path === '/') return normalizedCwd + sep;
 
-  // path directory starts with / character
-  if (path.charCodeAt(0) === 47) {
-    if (path.length === 1) {
-      return cwd + '/'; // path defined is root (slash)
-    } else {
-      path = path.slice(1);
+    // Handle paths starting with './' or '/'
+    const cleanPath = path.startsWith('./') || path.startsWith('/') ? path.slice(1) : path;
+
+    // Validate path: must be a single directory name (no separators, no relative paths, no colons)
+    if (REGEX_BASE_PATH.test(cleanPath)) {
+      throws(`Invalid directory path${COL} ${yellowBright(`"${path}"`)}`, [
+        'Path must be a single directory name without subdirectories or special characters.'
+      ]);
     }
-  }
 
-  // path directory is valid, eg: path
-  // dirs cannot reference sub directories, eg: path/sub
-  if (/^[a-zA-Z0-9_-]+/.test(path)) {
-    path = join(cwd, path);
-    return path[path.length - 1].charCodeAt(0) === 47 ? path : path + '/';
-  } else {
-    throwError(
-      `Directory path is invalid at${COL} ${yellowBright(`"${path}"`)}`,
-      [ 'Ensure that the path you attempting to resolve is correctly formed' ]
-    );
-  }
-};
+    // Join cwd and path, normalize, and ensure trailing separator
+    const result = join(normalizedCwd, cleanPath);
+
+    return result.endsWith(sep) ? result : result + sep;
+
+  };
+}
