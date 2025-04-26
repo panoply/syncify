@@ -3,8 +3,10 @@ import type { XiorInstance } from 'xior';
 
 import xior from 'xior';
 
-import { throwError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { o, pathOr } from '~utils';
+
+type R = (reason: any) => void
 
 /**
  * Passing a `domain` and `token` will create an xior
@@ -44,7 +46,7 @@ export function http (domain: string, token?: string): XiorInstance {
 
     // INTERNAL ERROR
     //
-    throwError(domain ? [
+    throws(domain ? [
       `Xior instance cannot be found for ${domain}`
     ] : [
       'Xior instance could not be created'
@@ -86,10 +88,17 @@ http.request = <T>(domain: string, token?: string) => {
  * Thenable chains to ensure the correct deeply nested structures are accessible.
  * Ensure that the response data can be correctly obtained, if not rejection throws.
  */
-http.chain = <T, P extends Paths<T, { maxRecursionDepth: 10, bracketNotation: true}>> (path: P, reject: (reason: any) => void) => (object: T): Get<T, P> => pathOr(object, path, (reason: any) => {
-  reason.isGraphError = true;
-  reject(reason);
-});
+http.chain = <T, P extends Paths<T, { maxRecursionDepth: 10, bracketNotation: true}>> (path: P, reject: R) => (
+  object: T
+): Get<T, P> => pathOr(
+  object,
+  path,
+  reason => {
+    // @ts-expect-error
+    reason.isGraphError = true;
+    reject(reason);
+  }
+);
 
 /**
  * HTTP xior Instances which are assigned to an object. Each key is a Shopify store name,
