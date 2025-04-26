@@ -24,6 +24,7 @@ export const Keychain = function () {
   const options: Array<[string, string]> = <const>[
     [ 'Create', '    Create a storefront token entry in keychain' ],
     [ 'Associate', ' Associate existing token to project' ],
+    [ 'Migrate', ' Migrate credentials to keychain' ],
     [ 'Update', '    Update tokens in the keychain' ],
     [ 'Inspect', '   View tokens in the global keychain' ],
     [ 'Delete', '    Remove tokens in the global keychain' ]
