@@ -48,7 +48,7 @@ async function getWatchPaths (bundle: ScriptBundle, inputs: Metafile['inputs']) 
 
   for (const file in inputs) {
 
-    if (file.indexOf('/node_modules/') > -1) continue;
+    if (file.includes('/node_modules/')) continue;
 
     const path = join(cwd, file);
 
@@ -65,7 +65,7 @@ async function getWatchPaths (bundle: ScriptBundle, inputs: Metafile['inputs']) 
     // that it does not impact performance.
     await pNext().then(() => {
       for (const path of bundle.watch) {
-        if (path.indexOf('/node_modules/') > -1) continue;
+        if (path.includes('/node_modules/')) continue;
         if (bundle.watchCustom !== null && bundle.watchCustom(path)) continue;
         if (!has(path.slice(cwd.length + 1), inputs)) bundle.watch.delete(path);
       }
