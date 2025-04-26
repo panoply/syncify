@@ -69,10 +69,7 @@ const getPaths = async () => {
 
   for (const key of PATH_KEYS) {
 
-    const paths = $.paths[key].config
-    .filter(c => c.indexOf('/*') > 0)
-    .map(c => c.slice(0, c.indexOf('/*')));
-
+    const paths = $.paths[key].config.filter(c => c.indexOf('/*') > 0).map(c => c.slice(0, c.indexOf('/*')));
     const match = await glob($.paths[key].config, {
       markDirectories: true,
       onlyDirectories: true
@@ -125,10 +122,10 @@ function buildTree (paths: string[]) {
  * or creation. Rendered via various modes when additional
  * context is required from the user.
  */
-export async function PromptSelectDirectories (options: State) {
+export async function PromptSelectDirectories (options?: State) {
 
   const state = assign<State, State>({
-    action: 'select',
+    action: null,
     directory: null,
     pathDir: null,
     dirName: null,
@@ -188,7 +185,7 @@ export async function PromptSelectDirectories (options: State) {
           message: 'Cancel',
           hint: 'Cancel and exit'
         }
-      ], { padding: 4, prop: 'name' })()
+      ], { prop: 'name' })()
     }).catch(cancel);
 
     return resolve.action;
@@ -201,15 +198,17 @@ export async function PromptSelectDirectories (options: State) {
    */
   async function PromptDirectories () {
 
-    const match = await glob($.dirs.input + '**', { markDirectories: true, onlyDirectories: true });
+    const match = await glob($.dirs.input + '**', {
+      markDirectories: true,
+      onlyDirectories: true
+    });
+
     const tree = constructTree(match.sort().map(path => relative($.cwd, path)));
     const choices = tree.map<Choice>(({ name, tree, path }, index) => ({
       name,
       value: path,
       message: name,
-      indent: index === 0
-        ? glue(_.Tree.trim, NWL, _.lightGray('└─┬─'))
-        : _.lightGray(tree)
+      indent: index === 0 ? glue(_.Tree.trim, NWL, _.lightGray('└─┬─')) : _.lightGray(tree)
     }));
 
     const resolve: { dir: LiteralString<keyof Paths> } = await prompt<{ dir: string }>({
@@ -217,7 +216,7 @@ export async function PromptSelectDirectories (options: State) {
       message: label.PathDirectory,
       name: 'dir',
       type: 'select',
-      choices,
+      choices: choose(choices, { prop: 'message' })(),
       pointer (choice: Choice, index: number): string {
         choice.hint = this.state.index === index ? glue(WSP, _.TLD, _.gray(choice.value)) : NIL;
         return '';
@@ -239,7 +238,8 @@ export async function PromptSelectDirectories (options: State) {
       theme,
       type: 'input',
       name: 'dirname',
-      message: 'Directory Name',
+      hint: 'Enter directory name to create',
+      message: label.DirectoryName,
       required: true,
       validate (value) {
 
