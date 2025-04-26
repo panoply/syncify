@@ -6,7 +6,7 @@ import type { File } from '~file';
 import pMap from 'p-map';
 
 import { event } from '~events';
-import { forEach, forMap, hasProp, isArray, isObject, isString } from '~utils';
+import { forEach, forMap, has, hasProp, isArray, isObject, isString } from '~utils';
 
 import { $ } from '$';
 
@@ -78,7 +78,8 @@ export function graph<
   R extends (param: T) => any
 > (object: T, path: P, reject?: R): Get<T, P> {
 
-  if (!isObject(object)) return reject(Object.assign(object, { isGraphError: true }));
+  if (!isObject(object)) return reject(Object.assign(object || {}, { isGraphError: true }));
+  if (has('errors', object)) return reject(Object.assign(object, { isGraphError: true }));
 
   const keys = <string[]>(isString(path) ? path.split('.').filter(Boolean) : path);
 
@@ -153,13 +154,7 @@ export function params <T, E = RequestError> (parameters: any): {
           files = query.input;
 
           // when we receive a File[] array, it is an upsert
-          query = files.map(({ key, value }) => ({
-            filename: key,
-            body: {
-              type: 'TEXT',
-              value
-            }
-          }));
+          query = files.map(({ key }) => key);
 
         } else {
 
@@ -178,7 +173,7 @@ export function params <T, E = RequestError> (parameters: any): {
           files = [ query.input ];
 
           // Lets now convert to an upsert variable
-          query = [ { filename: query.input.key, body: { type: 'TEXT', value: query.input.value } } ];
+          query = [ query.input.key ];
 
         } else {
 
@@ -217,13 +212,7 @@ export function params <T, E = RequestError> (parameters: any): {
         files = query;
 
         // when we receive a File[] array, it is an upsert
-        query = files.map(({ key, value }) => ({
-          filename: key,
-          body: {
-            type: 'TEXT',
-            value
-          }
-        }));
+        query = files.map(({ key }) => key);
 
       }
 
@@ -236,13 +225,8 @@ export function params <T, E = RequestError> (parameters: any): {
         // we will return the original "files" array
         files = [ query ];
 
-        // Lets now convert to an upsert variable
-        query = [
-          {
-            filename: (query as any).key,
-            body: { type: 'TEXT', value: (query as any).value }
-          }
-        ];
+        // Lets now convert to an string list value
+        query = [ (query as any).key ];
 
       } else {
 
