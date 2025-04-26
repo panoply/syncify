@@ -123,7 +123,8 @@ export function themeFilesDelete (...input: Delete.Arguments) {
               userErrors {
                 message
                 filename
-                code
+                code,
+                field
               }
             }
           }
@@ -135,7 +136,7 @@ export function themeFilesDelete (...input: Delete.Arguments) {
       }
     }).then(response => {
 
-      const { deletedThemeFiles, userErrors } = graph(response.data, 'themeFilesDelete', reject);
+      const { deletedThemeFiles, userErrors } = graph(response, 'data.themeFilesDelete', reject);
 
       resolve(
         {
