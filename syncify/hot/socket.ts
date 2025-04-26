@@ -1,6 +1,6 @@
 import type { HOTBundle } from 'types';
 
-import { Append, CHV, gray, magenta, neonCyan, NXT } from '@syncify/ansi';
+import { Append, CHV, gray, magenta, NXT } from '@syncify/ansi';
 import { kill, prexit } from '@syncify/kill';
 import { timer } from '@syncify/timer';
 import { uWS } from '@syncify/uws';
@@ -32,7 +32,7 @@ export const wss = function wss () {
     compression: uWS.SHARED_COMPRESSOR,
     maxPayloadLength: 16 * 1024 * 1024,
     idleTimeout: 32,
-    sendPingsAutomatically: false,
+    sendPingsAutomatically: true,
     open (ws) {
       HOT_SOCKET_TOPICS.forEach(topic => ws.subscribe(topic));
     },
@@ -85,7 +85,7 @@ export const wss = function wss () {
 
       log.ender($.log.group);
       log.begin(`HOT ${CHV} Ejection`, { group: true });
-      log.spinner('HOT snippet ejection', { style: 'brielle', color: neonCyan });
+      log.spinner('HOT snippet ejection', { color: gray });
 
       await removeSnippetInjections().then(layouts => {
 
@@ -96,7 +96,6 @@ export const wss = function wss () {
         log.nl();
         log.line(gray.dim(`${NXT} Exit took ~ ${timer.stop()}`));
         log.ender($.log.group, { clear: false });
-        log.nl(NIL);
 
         kill(() => {
 
