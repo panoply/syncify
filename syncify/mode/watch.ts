@@ -3,6 +3,7 @@ import pMap from 'p-map';
 
 import { log } from '~cli/log';
 import { stdin } from '~cli/stdin';
+import { WATCH_BUFFER } from '~const';
 import { event } from '~events';
 import { File, Kind, Type } from '~file';
 import { themeFilesDeleteMap } from '~http/themeFiles';
@@ -30,11 +31,22 @@ export function Watch () {
 
   $.running = true;
 
+  /** buffer change events */
+  let buffer = [];
+
+  /** timeout instance */
+  let timeout = null;
+
   subscribe($.dirs.input, (e, changes) => {
 
     stdin.errors.isAttached && event.emit('stdin:dispose');
 
-    changes.length > 1 ? Bulk(changes) : Change(changes);
+    buffer.push(...changes);
+    timeout && clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      buffer.length < 1 || buffer.length > 1 ? Bulk(buffer) : Change(buffer);
+      buffer = []; // Reset buffer
+    }, WATCH_BUFFER);
 
   }).then(({ unsubscribe }) => {
 
@@ -87,11 +99,8 @@ async function Bulk <T extends { delete: File[], update: File[] }> (changes: Par
   if (!$.mode.bulk) $.mode.bulk = true;
 
   const change = reduce<ParcelWatcher.Event, T>(changes, (state, { type, path }) => {
-
     state[type === 'delete' ? 'delete' : 'update'].push(parse(path));
-
     return state;
-
   }, <T>{ delete: [], update: [] });
 
   if (change.update.length > 0) {
@@ -169,7 +178,6 @@ export async function Transform (file: File) {
       return PagesTransform(file);
 
     case Type.Asset:
-    case Type.Spawn:
 
       return AssetTransform(file);
 
