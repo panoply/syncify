@@ -1,5 +1,6 @@
-import type { Cache, Resource, SchemaTemplates, SettingsSchema } from 'types';
+import type { Cache, PathRename, Resource, SchemaTemplates, SettingsSchema } from 'types';
 
+import { basename, join } from 'node:path';
 import { promisify } from 'node:util';
 import zlib from 'node:zlib';
 
@@ -7,9 +8,10 @@ import cbor from 'cbor';
 import { readFile } from 'fs-extra';
 import writeFileAtomic from 'write-file-atomic';
 
-import { throwError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { CACHE_FILES } from '~const';
-import { checksum, has, hasPath, isEmpty } from '~utils';
+import { extractKeyDirName, renameCorrect } from '~options/utils';
+import { checksum, has, hasPath, isEmpty, isUndefined, m } from '~utils';
 
 import { $, q } from '$';
 
@@ -18,6 +20,9 @@ import { $, q } from '$';
  */
 const gunzipAsync = promisify(zlib.gunzip);
 
+/**
+ * Asynchronous Gzip
+ */
 const gzipAsync = promisify(zlib.gzip);
 
 /**
@@ -30,7 +35,9 @@ export async function decode <T = any> (uri: string): Promise<T> {
   const content = await readFile(uri);
   const gunzip = await gunzipAsync(content);
 
-  return cbor.decode(gunzip);
+  return cbor.decode(gunzip, {
+    preferMap: uri.endsWith('paths')
+  });
 
 };
 
@@ -45,9 +52,7 @@ export function save (uri: Cache.UriKeys, data?: any) {
 
     if ($.mode.init === false && $.file.project === null) {
 
-      throwError([
-        'Project cache has not been created'
-      ]);
+      throws([ 'Project cache has not been created' ]);
 
       return;
     }
@@ -57,7 +62,11 @@ export function save (uri: Cache.UriKeys, data?: any) {
       if (!data) data = $.cache[uri];
     }
 
-    const encoded = await cbor.encodeAsync(data, { omitUndefinedProperties: true, canonical: true });
+    const encoded = await cbor.encodeAsync(data, {
+      omitUndefinedProperties: true,
+      canonical: true
+    });
+
     const gzip = await gzipAsync(encoded);
 
     gzip[9] = 0x03;
@@ -73,9 +82,16 @@ export function clearCache (id: keyof Cache.Model = null) {
   if (id === null) {
 
     for (const key of CACHE_FILES) {
-      if (!isEmpty($.cache[key])) {
-        $.cache[key] = {};
-        q.cache.add(save($.cache.uri[key], $.cache[key]));
+      if (key === 'paths') {
+        if ($.cache[key] instanceof Map) {
+          $.cache[key].clear();
+          q.cache.add(save($.cache.uri[key], $.cache[key]));
+        }
+      } else {
+        if (!isEmpty($.cache[key])) {
+          $.cache[key] = {};
+          q.cache.add(save($.cache.uri[key], $.cache[key]));
+        }
       }
     }
 
@@ -83,7 +99,10 @@ export function clearCache (id: keyof Cache.Model = null) {
 
   }
 
-  $.cache[id] = <any>{};
+  $.cache[id] = id === 'paths'
+    ? m()
+    : <any>{};
+
   return q.cache.add(save($.cache.uri[id], $.cache[id]));
 
 }
@@ -292,32 +311,73 @@ export function getTemplateCache (domain: string, themeId: number, path: string)
  *
  * Create or update the paths cache
  */
-export function setPathCache (input: string, output: string) {
+export function setPathCache (input: string, output: string, rename?: PathRename) {
 
-  let update: string = null;
+  let update: 0 | 1 = 0;
 
-  if (!has('paths', $.cache)) {
-    $.cache.paths = {};
+  if (!has('paths', $.cache)) $.cache.paths = m();
+
+  if (rename && rename.length > 0) {
+
+    const find = rename.find(({ match }) => match(input));
+
+    if (!isUndefined(find)) {
+
+      const correct = renameCorrect(input, output, find.pattern);
+      output = correct.output;
+
+      if (!$.cache.paths.has(correct.key)) {
+        $.cache.paths.set(correct.key, input);
+        update = 1;
+      }
+
+      if ($.cache.paths.get(correct.key) !== input) {
+        $.cache.paths.set(correct.key, input);
+        update = 1;
+      }
+    }
+
+  } else {
+
+    const dir = extractKeyDirName(output);
+    const key = join(dir, basename(input));
+
+    if (!$.cache.paths.has(key)) {
+      $.cache.paths.set(key, input);
+      update = 1;
+    }
+
+    if ($.cache.paths.get(key) !== input) {
+      $.cache.paths.set(key, input);
+      update = 1;
+    }
+
   }
 
-  if (!has(input, $.cache.paths)) {
-    update = $.cache.paths[input] = output;
+  if (!$.cache.paths.has(input)) {
+    $.cache.paths.set(input, output);
+    update = 1;
   }
 
-  if ($.cache.paths[input] !== output) {
-    update = $.cache.paths[input] = output;
+  if ($.cache.paths.get(input) !== output) {
+    $.cache.paths.set(input, output);
+    update = 1;
   }
 
-  if (!has(output, $.cache.paths)) {
-    update = $.cache.paths[output] = input;
+  if (!$.cache.paths.has(output)) {
+    $.cache.paths.set(output, input);
+    update = 1;
   }
 
-  if ($.cache.paths[output] !== input) {
-    update = $.cache.paths[output] = input;
+  if ($.cache.paths.get(output) !== input) {
+    $.cache.paths.set(output, input);
+    update = 1;
   }
 
-  if (update) {
-    q.cache.add(save($.cache.uri.paths, $.cache.paths));
+  if (update > 0) {
+
+    return q.cache.add(save($.cache.uri.paths, $.cache.paths));
+
   }
 
 }
