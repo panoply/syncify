@@ -9,7 +9,8 @@ import { highlight } from '~help/utils';
  */
 export function Suggest () {
 
-  _.Create()
+  _
+  .Create()
   .Top(`Syncify ${_.CHV} Error`, false)
   .Header(VERSION, _.gray)
   .Error('MISSING COMMAND ' + _.BAD, _.bold.redBright)
