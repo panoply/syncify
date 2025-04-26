@@ -10,7 +10,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/versions'
    */
-  export interface Versions {
+  export type Versions = {
     /**
      * The input file path as key and reference of value
      *
@@ -44,7 +44,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/checksum'
   */
-  export interface Checksum {
+  export type Checksum = {
     /**
      * The input file path as key and reference of value
      *
@@ -56,27 +56,44 @@ export namespace Cache {
   }
 
   /**
-   * Output > Input (Source Path Mapping)
+   * Output > Input and Input > Output (Source Path Mapping)
    *
-   * Holds reverse references between input and output directories. Used when executing `upload` mode.
+   * Holds forward and reverse references between input and output directories.
+   * This map also contains key based mapping references, where the output `dir/filename`
+   * will point to the **input** locations. This reference is specifically for pull operations.
    *
    * > **NOTE**
    * >
    * > This cache reference will update each time build mode runs.
    *
    * @example
-   * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/paths'
+   * Map() {
+   *  // input > output
+   *  '<uri>/source/sections/a.liquid': '<uri>/theme/sections/a.liquid'
+   *  // output > input (Reverse)
+   *  '<uri>/theme/sections/a.liquid': '<uri>/source/sections/a.liquid'
+   *  // output key > input (Reverse)
+   *  'sections/a.liquid': '<uri>/theme/sections/a.liquid'
+   * }
    */
-  export interface Paths {
-    /**
-     * The output path pointing to input path
-     *
-     * > `key` - _The output path_
-     * >
-     * > `value` - _The input path_
-     */
-    [outputPath: string]: string;
-  }
+  export type Paths = Map<string, string>;
+
+  /**
+   * Output > Input and Input > Output (Source Path Mapping)
+   *
+   * Holds forward and reverse references between input and output directories.
+   *
+   * > **NOTE**
+   * >
+   * > This cache reference will update each time build mode runs.
+   *
+   * @example
+   * Map() {
+   *  'sections/a.liquid': '<uri>/theme/sections/a.liquid'
+   *  '<uri>/theme/sections/a.liquid': '<uri>/source/sections/a.liquid'
+   * }
+   */
+  export type Writes = Map<string, string>;
 
   /**
    * Shared Schema path mappings
@@ -86,7 +103,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/sections'
    */
-  export interface Sections {
+  export type Sections = {
     /**
      * The input path and a `Set` of
      */
@@ -100,7 +117,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/schema'
    */
-  export interface Schema {
+  export type Schema = {
     /**
      * The `key` is the shared schema full URI.
      * The `value` is a `Set<string>` of section URI's which reference the shared schema.
@@ -114,7 +131,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/templates'
    */
-  export interface Templates {
+  export type Templates = {
     /**
      * The store domain name containing the templates, eg: `syncify` would
      * equate to `syncify.myshopify.com`.
@@ -141,7 +158,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/config'
    */
-  export interface Settings {
+  export type Settings = {
     /**
      * The store domain name containing the theme config, eg: `syncify` would
      * equate to `syncify.myshopify.com`.
@@ -163,7 +180,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/pages'
    */
-  export interface Pages {
+  export type Pages = {
     /**
      * The store domain name containing the pages, eg: `syncify` would
      * equate to `syncify.myshopify.com`.
@@ -189,7 +206,7 @@ export namespace Cache {
    * @example
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/metafields'
    */
-  export interface Metafields {
+  export type Metafields = {
     /**
      * Metafield pathname > id cache references.
      *
@@ -210,7 +227,7 @@ export namespace Cache {
    *
    * The Cache store object
    */
-  export interface PathModel {
+  export type PathModel = {
     /**
      * URI Paths
      */
@@ -279,7 +296,13 @@ export namespace Cache {
    * Hold data relating to the syncify configuration file
    */
   export interface ConfigModel {
+    /**
+     * The `syncify.config` file checksum
+     */
     checksum: string;
+    /**
+     * The fully resolved input path to syncify config
+     */
     input: string;
   }
 
@@ -407,7 +430,7 @@ export namespace Cache {
        * The absolute URI to the {@link Checksum} cache file
        *
        * @example
-       *  '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/checksum'
+       * '/Users/sissel/.syncify/eb4e712f2f3970b7/cache/checksum'
        */
       checksum: string;
       /**

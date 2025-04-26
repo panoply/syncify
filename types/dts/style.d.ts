@@ -31,7 +31,13 @@ export type TailwindCSSProcesser = Merge<GetProcessorConfigs<TailwindConfig>, {
 /**
  * SASS Processor Configuration
  */
-export type SASSProcesser = GetProcessorConfigs<SASSConfig>
+export type SASSProcesser = {
+  /**
+   * Whether or not the dynamic import of sass-embedded has concluded.
+   */
+  loaded: boolean;
+  config: SASSConfig
+}
 
 /**
  * Bundling Configuration

@@ -29,7 +29,10 @@ export interface Store {
    */
   name: string;
   /**
-   * The store myshopify domain, eg: `store.myshopify.com`,
+   * The store myshopify domain
+   *
+   * @example
+   * store.myshopify.com
    */
   domain: string;
   /**
@@ -40,10 +43,19 @@ export interface Store {
   password: string;
   /**
    * The store API Access token
+   *
+   * @example
+   * 'shppa_abcdefghijklmnopqrstuvwxyz'
    */
   token: string;
   /**
    * List of themes associated with this store.
+   *
+   * @example
+   * {
+   *   dev: 123456789
+   *   prodc: 0987654321
+   * }
    */
   get themes(): Record<string, number>;
 }
@@ -103,6 +115,17 @@ export interface Target {
 export type Theme = Target
 
 export interface Dirs extends Directories {
+  /**
+   *  **READY AT RUNTIME**
+   *
+   * The config directory path where `syncify.config.js` files exist.
+   *
+   * > This will default to `cwd` and can be changed using the `--config` flag.
+   *
+   * @example
+   * '/Users/sissel/projects/syncify'
+   */
+  config: string;
   /**
    * **READY AT RUNTIME**
    *

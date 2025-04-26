@@ -25,6 +25,7 @@ export type CommandFlags =
   | 'output'
   | 'config'
   | 'dev'
+  | 'new'
   | 'prod'
   | 'terse'
   | 'clean'

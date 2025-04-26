@@ -29,6 +29,7 @@ export interface ImportMap {
   'smol-toml': 'toml';
   'js-yaml': 'yaml';
   'svgo': 'svgo';
+  'tailwindcss': 'tailwind';
   '@tailwindcss/postcss': 'tailwind';
   'postcss': 'postcss';
   'sass-embedded':'sass';
@@ -46,6 +47,7 @@ export type Dependencies =
  | 'gray-matter'
  | 'html-minifier-terser'
  | 'svgo'
+ | 'tailwindcss'
  | '@tailwindcss/postcss'
  | 'postcss'
  | 'sass-embedded'
@@ -53,7 +55,7 @@ export type Dependencies =
  | 'markdown-it'
 
 export interface Import extends Record<string, any> {
-  <T extends Dependencies>(id: T): (
+  <T extends Dependencies>(id: T, options?: { as?: boolean }): (
   T extends 'smol-toml' ? Promise<typeof TOML> :
   T extends 'js-yaml' ? Promise<typeof YAML> :
   T extends 'adm-zip' ? Promise<typeof ADMZIP> :

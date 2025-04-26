@@ -4,6 +4,22 @@
 
 import type { Tester } from 'anymatch';
 
+export type PathRename = Array<{
+  /**
+   * An anymatch tester function
+   */
+  match: Tester,
+  /**
+   * The rename pattern
+   *
+   * @example
+   * '[name]'
+   * '[dir]-[name]'
+   * // etc etc
+   */
+  pattern: string;
+}>
+
 /**
  * Internal structure for project paths
  */
@@ -15,7 +31,14 @@ export type PathConfig = {
    */
   input: Set<string>;
   /**
-   * An expanded copy of the user define paths
+   * Base directory reference in input - Used as a fallback to write new files
+   * when executing a pull operation.
+   *
+   * @default null
+   */
+  root: string;
+  /**
+   * An expanded copy of the users defined paths
    *
    * @default null
    */
@@ -30,32 +53,12 @@ export type PathConfig = {
    * Path excludes
    */
   exclude: Set<string>
-  /**
-   * The input stash location where remote files pulled from store are written.
-   *
-   * @default null
-   */
-  stash: string;
  /**
    * Match rename paths, this array will map to a rename pattern.
    *
    * @default []
    */
-  rename: Array<{
-    /**
-     * An anymatch tester function
-     */
-    match: Tester,
-    /**
-     * The rename pattern
-     *
-     * @example
-     * '[name]'
-     * '[dir]-[name]'
-     * // etc etc
-     */
-    pattern: string;
-  }>
+  rename: PathRename
 };
 
 export type PathsPlus = {

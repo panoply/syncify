@@ -455,8 +455,22 @@ export interface BasePromptOptions {
   initial?: any;
   required?: boolean
   enabled?: boolean | string
+  /**
+   * Function that displays header text
+   */
+  header?: string | (() => string) | (() => Promise<string>)
+  /**
+   * Function that displays footer text
+   */
   footer?: string | (() => string) | (() => Promise<string>);
+  /**
+   * Disable a choice so that it cannot be selected. This value may either be `true`, `false`,
+   * or a message to display.
+   */
   disabled?: boolean | string;
+  /**
+   * Help message to display next to a choice.
+   */
   hint?: string;
   theme?: any;
   /**
