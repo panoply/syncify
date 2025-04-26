@@ -2,10 +2,11 @@ import { basename, join } from 'node:path';
 
 import { copyFileSync, existsSync, mkdirSync } from 'fs-extra';
 
-import { cyan } from '@syncify/ansi';
+import { cyan, underline } from '@syncify/ansi';
 
 import { runtime } from '~cli/runtime';
-import { invalidError, throwError, typeError, unknownError, warnOption } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { HOT_SNIPPET, HOT_SOURCE } from '~const';
 import { snippet } from '~hot/snippet';
 import { has, isArray, isBoolean, isEmpty, isNil, isNumber, isObject, isString } from '~utils';
@@ -34,7 +35,7 @@ export async function setHotReloads () {
 
   if (!isObject($.config.hot) && !isNil($.config.hot) && $.config.hot !== false) {
 
-    typeError(
+    throws.typeError(
       {
         option: 'config',
         name: 'hot',
@@ -57,7 +58,7 @@ export async function setHotReloads () {
 
         } else {
 
-          invalidError(
+          throws.option(
             {
               option: 'hot',
               name: prop,
@@ -76,7 +77,7 @@ export async function setHotReloads () {
 
         } else {
 
-          invalidError(
+          throws.option(
             {
               option: 'hot',
               name: prop,
@@ -97,7 +98,7 @@ export async function setHotReloads () {
 
         } else {
 
-          invalidError(
+          throws.option(
             {
               option: 'hot',
               name: prop,
@@ -120,7 +121,7 @@ export async function setHotReloads () {
 
         } else {
 
-          invalidError({
+          throws.option({
             option: 'hot',
             name: prop,
             value: $.config.hot[prop],
@@ -140,7 +141,7 @@ export async function setHotReloads () {
 
         } else {
 
-          invalidError({
+          throws.option({
             option: 'hot',
             name: prop,
             value: $.config.hot[prop],
@@ -168,7 +169,7 @@ export async function setHotReloads () {
 
             } else {
 
-              invalidError({
+              throws.option({
                 option: 'hot',
                 name: prop,
                 value: $.config.hot[prop],
@@ -181,7 +182,7 @@ export async function setHotReloads () {
 
         } else {
 
-          invalidError({
+          throws.option({
             option: 'hot',
             name: prop,
             value: $.config.hot[prop],
@@ -192,13 +193,9 @@ export async function setHotReloads () {
 
       } else {
 
-        if (!has(prop, $.hot)) {
+        if (has(prop, $.hot)) {
 
-          unknownError(`hot.${prop}`, $.config.hot[prop]);
-
-        } else {
-
-          typeError({
+          throws.typeError({
             option: 'hot',
             name: prop,
             provided: $.config.hot[prop],
@@ -206,6 +203,7 @@ export async function setHotReloads () {
           });
 
         }
+
       }
 
     }
@@ -215,12 +213,12 @@ export async function setHotReloads () {
 
   if (!existsSync(from)) {
 
-    return throwError([
+    return throws([
       'Failed to obtain the source HOT Snippet injection file.',
       'This is required and should be located within the Syncify',
       `installation path: ${cyan(from)}`
     ], [
-      'Please submit an issue to: https://github.com/panoply/syncify',
+      `Please submit an issue to: ${underline('https://github.com/panoply/syncify')}`,
       'You can also try to re-install Syncify and trying again.'
     ]);
 

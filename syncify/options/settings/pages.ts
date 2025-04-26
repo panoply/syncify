@@ -1,6 +1,6 @@
 import type { PagesConfig } from 'types';
 
-import { invalidError, typeError, unknownError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { hasProp, isArray, isBoolean, isEmpty, isNil, isString } from '~utils';
 
 import { $ } from '$';
@@ -41,17 +41,13 @@ export function setPageOptions () {
   // Iterate over all the properties in sections option
   for (const option in pages) {
 
-    // Throw if an undefined property is detected
-    // checks against the default model.
-    if (!has(option as keyof PagesConfig)) unknownError('pages', option);
-
     if (option === 'language') {
 
       if (isString(pages[option])) {
         if (pages[option] === 'markdown' || pages[option] === 'html') {
           $.page[option] = pages[option];
         } else {
-          invalidError({
+          throws.option({
             option: 'views.pages',
             name: option,
             value: pages[option],
@@ -59,7 +55,7 @@ export function setPageOptions () {
           });
         }
       } else {
-        typeError({
+        throws({
           option: 'views.pages',
           name: option,
           provided: pages[option],
@@ -76,7 +72,7 @@ export function setPageOptions () {
         $.page[option] = pages[option];
 
       } else {
-        typeError({
+        throws({
           option: 'views.pages',
           name: option,
           provided: pages[option],
@@ -94,7 +90,7 @@ export function setPageOptions () {
 
       } else {
 
-        typeError({
+        throws.typeError({
           option: 'views.pages',
           name: option,
           provided: pages[option],
@@ -115,7 +111,7 @@ export function setPageOptions () {
 
       } else {
 
-        typeError({
+        throws.typeError({
           option: 'views.pages',
           name: option,
           provided: pages[option],

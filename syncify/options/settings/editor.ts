@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { platform } from 'node:os';
 
-import { warnOption } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { has } from '~utils';
 
 import { $ } from '$';

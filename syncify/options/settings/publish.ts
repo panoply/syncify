@@ -1,6 +1,6 @@
 import { bold, gray, underline, whiteBright } from '@syncify/ansi';
 
-import { invalidError, throwError, typeError, unknownError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import * as u from '~utils';
 
 import { $ } from '$';
@@ -19,8 +19,6 @@ export async function setPublishConfig () {
 
     for (const prop in $.config.publish) {
 
-      if (!u.has(prop, $.publish)) unknownError(`publish.${prop}`, $.config.publish[prop]);
-
       if (prop === 'tunnelPort') {
 
         if (u.isNumber($.config.publish[prop]) && isNaN($.config.publish[prop]) === false) {
@@ -28,7 +26,7 @@ export async function setPublishConfig () {
           $.publish[prop] = $.config.publish[prop];
 
         } else {
-          invalidError({
+          throws.option({
             option: 'publish',
             name: prop,
             value: $.config.hot[prop],
@@ -47,7 +45,7 @@ export async function setPublishConfig () {
 
         } else {
 
-          invalidError({
+          throws.option({
             option: 'publish',
             name: prop,
             value: $.config.hot[prop],
@@ -64,7 +62,7 @@ export async function setPublishConfig () {
 
         } else {
 
-          typeError({
+          throws.typeError({
             option: 'bindVersion',
             name: prop,
             provided: $.config.publish[prop],
@@ -77,7 +75,7 @@ export async function setPublishConfig () {
         if (u.isNumber($.config.publish[prop])) {
 
           if ($.config.publish[prop] > 5) {
-            invalidError({
+            throws.option({
               option: 'publish',
               name: prop,
               value: $.config.hot[prop],
@@ -92,7 +90,7 @@ export async function setPublishConfig () {
           }
         } else {
 
-          typeError({
+          throws.typeError({
             option: 'themeLimit',
             name: prop,
             provided: $.config.publish[prop],

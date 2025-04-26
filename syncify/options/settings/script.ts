@@ -4,7 +4,8 @@ import { join } from 'node:path';
 
 import anymatch from 'anymatch';
 
-import { errorRuntime, invalidError, typeError, warnOption } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { Namespace, Type } from '~file';
 import { getResolvedPaths, getTransform, renameFileParse } from '~options/utils';
 import { esbuildBundle } from '~transform/script';
@@ -63,7 +64,7 @@ export async function setScriptOptions () {
 
     } else if (name.endsWith('.cjs')) {
 
-      invalidError({
+      throws.option({
         option: 'transform.script',
         name: 'rename',
         value: name,
@@ -107,7 +108,7 @@ export async function setScriptOptions () {
 
             } else {
 
-              typeError(
+              throws.typeError(
                 {
                   option: 'transform.script',
                   name: `attrs[${i}]`,
@@ -121,7 +122,7 @@ export async function setScriptOptions () {
 
         } else {
 
-          typeError(
+          throws.typeError(
             {
               option: 'transform.script',
               name: 'attrs',
@@ -191,7 +192,7 @@ export async function setScriptOptions () {
         bundle.esbuild = u.merge<any>($.processor.esbuild, script.esbuild);
 
       } else {
-        typeError({
+        throws.typeError({
           option: 'script',
           name: 'esbuild',
           provided: typeof script.esbuild,
@@ -216,7 +217,7 @@ export async function setScriptOptions () {
       } else {
 
         if (!u.isArray(script.watch)) {
-          typeError({
+          throws.typeError({
             option: 'script',
             name: 'watch',
             provided: script.watch,
@@ -241,9 +242,9 @@ export async function setScriptOptions () {
 
       await esbuildBundle(bundle);
 
-    } catch (e) {
+    } catch (err) {
 
-      errorRuntime(e, {
+      throws.runtime(err, {
         message: [
           'Syncify has failed to initialize due to a script transform prebuild error.',
           'Script transforms execute at runtime builds but the compile process did not complete.',

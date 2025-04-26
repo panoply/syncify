@@ -1,9 +1,10 @@
 import anymatch from 'anymatch';
 import { $import } from 'modules';
 
-import { typeError, warnOption } from '~cli/throws';
-import { has, isBoolean, isEmpty, isObject } from '~utils';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { getResolvedPaths } from '~options/utils';
+import { has, isBoolean, isEmpty, isObject } from '~utils';
 
 import { $ } from '$';
 
@@ -28,7 +29,7 @@ export function setLiquidOptions () {
   if (!has('liquid', $.config.transform) || isEmpty($.config.transform.liquid)) return;
 
   if (!isObject($.config.transform.liquid)) {
-    typeError(
+    throws.typeError(
       {
         option: 'transform',
         name: 'liquid',

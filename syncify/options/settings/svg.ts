@@ -8,7 +8,8 @@ import { $import } from 'modules';
 
 import { cyan } from '@syncify/ansi';
 
-import * as e from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { getTransform } from '~options/utils';
 import * as u from '~utils';
 
@@ -26,7 +27,7 @@ export function setSvgOptions () {
 
   $import('svgo');
 
-  const warn = e.warnOption('SVG Transform');
+  const warn = warnOption('SVG Transform');
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
@@ -90,7 +91,7 @@ export function setSvgOptions () {
                 if (u.isArray(attr)) {
                   bundle.sprite.attrs.push(attr.join(NIL));
                 } else {
-                  e.typeError(
+                  throws.typeError(
                     {
                       option: 'transform.script',
                       name: `attrs[${i}]`,
@@ -103,7 +104,7 @@ export function setSvgOptions () {
 
             } else {
 
-              e.typeError(
+              throws.typeError(
                 {
                   option: 'transform.svg.sprite',
                   name: 'attrs',
@@ -123,7 +124,7 @@ export function setSvgOptions () {
                 if (u.isString(svg.sprite.symbols.id)) {
                   bundle.sprite.symbols.id = svg.sprite.symbols.id;
                 } else {
-                  e.typeError({
+                  throws.typeError({
                     option: 'transform.svg.sprite.symbols',
                     name: 'id',
                     expects: 'string',
@@ -136,7 +137,7 @@ export function setSvgOptions () {
                 if (u.isBoolean(svg.sprite.symbols.xmlns)) {
                   bundle.sprite.symbols.xmlns = svg.sprite.symbols.xmlns;
                 } else {
-                  e.typeError({
+                  throws.typeError({
                     option: 'transform.svg.sprite.symbols',
                     name: 'xmlns',
                     expects: 'true | false',
@@ -147,7 +148,7 @@ export function setSvgOptions () {
 
             } else {
 
-              e.typeError({
+              throws.typeError({
                 option: 'transform.svg.sprite',
                 name: 'symbols',
                 expects: '{}',
@@ -160,9 +161,10 @@ export function setSvgOptions () {
       }
 
     } else {
-      e.missingOption({
+      throws.option({
         option: 'transform.svg',
-        key: 'format',
+        name: 'format',
+        value: 'undefined',
         expects: 'sprite | file',
         reason: [
           `SVG transforms require you to provide a ${cyan('format')}. Syncify needs to knows how`,

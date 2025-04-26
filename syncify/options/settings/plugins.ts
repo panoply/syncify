@@ -12,6 +12,7 @@ export function setPlugins () {
   if (!has('plugins', $.config)) return;
   if (!isArray($.config.plugins)) return; // TODO: Throw error if not array
 
+  // @ts-ignore
   for (const plugin of $.config.plugins) {
 
     if (has('onInit', plugin)) plugin.onInit.call({ ...$ }, $.config);

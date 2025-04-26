@@ -2,7 +2,8 @@ import anymatch from 'anymatch';
 
 import { ARR } from '@syncify/ansi';
 
-import { typeError, warnOption } from '~cli/throws';
+import { throws } from '~cli/throws';
+import { warnOption } from '~cli/warnings';
 import { getResolvedPaths } from '~options/utils';
 import { has, isArray, isBoolean, isEmpty, isNil, isNumber, isObject, isString } from '~utils';
 
@@ -24,7 +25,7 @@ export function setJsonOptions () {
 
   // Ensure the section option is an object
   if (!isObject(json)) {
-    typeError(
+    throws.typeError(
       {
         option: 'processors',
         name: 'json',
@@ -48,7 +49,7 @@ export function setJsonOptions () {
         $.json[option] = $.json.options.indentSize = json[option];
 
       } else {
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -63,7 +64,7 @@ export function setJsonOptions () {
         $.json[option] = $.json.options.crlf = json[option];
 
       } else {
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -80,7 +81,7 @@ export function setJsonOptions () {
 
       } else {
 
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -97,7 +98,7 @@ export function setJsonOptions () {
 
       } else {
 
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -115,7 +116,7 @@ export function setJsonOptions () {
 
       } else {
 
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -133,7 +134,7 @@ export function setJsonOptions () {
 
       } else {
 
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -151,7 +152,7 @@ export function setJsonOptions () {
 
       } else {
 
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -170,7 +171,7 @@ export function setJsonOptions () {
         $.json[option] = anymatch(getResolvedPaths<string[]>(json[option]));
 
       } else {
-        typeError(
+        throws.typeError(
           {
             option: 'json',
             name: option,
@@ -204,7 +205,7 @@ export function setJsonOptions () {
               $.json.terse[p] = json.terse[p];
 
             } else {
-              typeError(
+              throws.typeError(
                 {
                   option: `json ${ARR} terse`,
                   name: p,
