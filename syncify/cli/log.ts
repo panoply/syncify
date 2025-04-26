@@ -11,6 +11,7 @@ import { timer } from '@syncify/timer';
 import { bulk } from '~cli/bulk';
 import { stdin } from '~cli/stdin';
 import { console } from '~console';
+import { LogModes } from '~enums';
 import { error } from '~errors';
 import {
   addSuffix,
@@ -146,20 +147,16 @@ log.group = function (this: typeof log, name?: string | boolean) {
 
   if ($.config.log.silent || $.env.tree === false) return;
 
-  if ($.mode.bulk) {
-    name = glue('Bulk', _.CHV, toUpcase(name as string));
-    if ($.log.group === name) return this;
-    $.log.group = name;
-  }
+  if ($.log.mode === LogModes.BulkErrors) stdin.bulk.dispose();
 
-  // Close previous group
-  log.ender($.log.group);
-
-  if ($.config.log.clear && name !== false) log.clear();
+  log.ender();
 
   if (isString(name)) {
-    $.log.group = name;
-    log.begin($.log.group);
+    if ($.mode.bulk) {
+      log.begin(`Bulk ${_.CHV} ${toUpcase(name)}`, { group: true });
+    } else {
+      log.begin(name, { group: true });
+    }
   }
 
   return this;
@@ -279,7 +276,9 @@ log.upsert = (upsert: Upsert.Resolve) => {
  */
 log.changed = (file: File) => {
 
+  if (stdin.watch.isShown) stdin.watch.isShown = false;
   if ($.errors.size > 0) $.errors.clear();
+
   if ($.warnings.size > 0) {
     $.warnings.clear();
     stdin.warnings.reset();
@@ -591,7 +590,7 @@ log.minified = (...p: Type.LogMinifiedParams) => (
 */
 log.begin = (message: string, { timestamp = true, clear = true, group = false } = {}) => log.clear(clear)(
   _.NWL,
-  _.Top(group ? $.log.group = message : message, timestamp),
+  _.Top(group ? ($.log.group = message) : message, timestamp),
   _.Tree.next + _.NWL
 );
 
