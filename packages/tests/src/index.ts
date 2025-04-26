@@ -5,30 +5,36 @@ import { parseArgs } from 'node:util';
 
 import ansis from 'ansis';
 
-const delay = (ms: number = 250) => new Promise(resolve => setTimeout(resolve, ms));
+// const delay = (ms: number = 250) => new Promise(resolve => setTimeout(resolve, ms));
 
 const cwd = process.cwd();
 
 const args = parseArgs({
   args: argv.slice(2),
   options: {
+    dir: {
+      type: 'string',
+      default: ''
+    },
     'bulk-add': {
       type: 'string',
       default: ''
     },
     'bulk-remove': {
-      type: 'string',
-      default: ''
+      type: 'boolean',
+      default: false
     }
   }
 });
 
+const dir = args.values.dir;
+
 if (args.values['bulk-add'].length > 0) {
 
   const type = args.values['bulk-add'];
-  const samplePath = join(cwd, 'test', 'samples', 'bulk', type);
+  const samplePath = join(cwd, 'tests', 'samples', 'bulk', type);
   const samples = readdirSync(samplePath);
-  const sourcePath = join(cwd, 'tests', 'setup', 'src', 'views', type);
+  const sourcePath = join(cwd, 'tests', dir);
 
   async function add () {
 
@@ -50,10 +56,9 @@ if (args.values['bulk-add'].length > 0) {
   add();
 }
 
-if (args.values['bulk-remove'].length > 0) {
+if (args.values['bulk-remove']) {
 
-  const type = args.values['bulk-remove'];
-  const sourcePath = join(cwd, 'tests', 'setup', 'src', 'views', type);
+  const sourcePath = join(cwd, 'tests', dir);
   const sourceFiles = readdirSync(sourcePath);
 
   async function remove () {
