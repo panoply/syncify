@@ -85,8 +85,8 @@ error.upsert = (failed: Upsert.Reject[]) => {
           entries: {
             line: cf.line,
             column: cf.column,
-            input: file.input,
-            output: file.output,
+            input: relative($.cwd, file.input),
+            output: relative($.cwd, file.output),
             code: _.neonMagenta(code),
             graph: _.pink(graph)
           }
@@ -105,7 +105,7 @@ error.upsert = (failed: Upsert.Reject[]) => {
         if (issue.length === 1) {
           write
           .NL
-          .Unshift(`Type ${_.bold('i')} and press ${_.bold('enter')} to view all file erros`, _.gray);
+          .Unshift(`Press ${_.Encase('SB', _.bold('e'))} to view all file errors`, _.gray);
         }
 
         write.toString((message) => issue.push(message));
@@ -114,8 +114,8 @@ error.upsert = (failed: Upsert.Reject[]) => {
 
         context = {
           entries: {
-            input: file.input,
-            output: file.output,
+            input: relative($.cwd, file.input),
+            output: relative($.cwd, file.output),
             namespace: file.namespace,
             code: _.neonMagenta(code),
             graph: _.pink(graph)
@@ -356,17 +356,18 @@ error.throw = (e: any, entries: { [name: string]: string | number }) => {
   if (has('code', e)) context.entries.code = e.code;
   if (has('name', e)) context.entries.name = e.name;
 
-  const tui = _.Create({ type: 'error' });
+  const tui = _
+  .Create({ type: 'error' })
+  .Line(message, _.redBright.bold)
+  .Context(context);
 
   if (context.stack === false) {
-
-    error(tui.Wrap(message, _.redBright).Context(context).toString());
 
     kill.exit(0);
 
   } else {
 
-    $.stacks.add(tui.Wrap(message).Context(context).toString());
+    $.stacks.add(tui.toString());
 
   }
 };
@@ -623,6 +624,7 @@ error.esbuild = <T extends ScriptBundle>(file: File | File<T[]>, errors: Message
 
 error.postcss = (file: File, e: CssSyntaxError) => {
 
+  const write = _.Create({ type: 'error' });
   const stack: string[] = [];
   const trace = _.cleanStack(e.stack, { pretty: true, basePath: $.cwd }).split(NWL);
 
@@ -630,7 +632,22 @@ error.postcss = (file: File, e: CssSyntaxError) => {
 
   $.stacks.add(stack.join(NWL));
 
-  const context: _.IssueContext = {
+  const frame = codeframe(e.source, {
+    start: {
+      line: e.line,
+      column: e.column
+    },
+    end: {
+      line: e.endLine,
+      column: e.endColumn
+    }
+  });
+
+  write
+  .Insert(frame)
+  .NL
+  .Wrap(`${e.name}${_.COL} ${e.reason}`, _.red.bold)
+  .Context({
     stack: true,
     entries: {
       line: e.line,
@@ -640,13 +657,7 @@ error.postcss = (file: File, e: CssSyntaxError) => {
       plugin: _.blue(e.plugin),
       processor: _.neonMagenta('PostCSS')
     }
-  };
-
-  _.Create({ type: 'error' })
-  .NL
-  .Wrap(`${e.name}${_.COL} ${e.reason}`, _.red.bold)
-  .NL
-  .Wrap(e.details)
+  })
   .toLog();
 
 };
