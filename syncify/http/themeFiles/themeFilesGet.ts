@@ -143,7 +143,7 @@ export function themeFilesGet (...input: Get.Arguments) {
       }
     }).then(response => {
 
-      const { nodes, userErrors } = graph(response.data, 'theme.files', reject);
+      const { nodes, userErrors } = graph(response, 'data.theme.files', reject);
 
       resolve(
         {

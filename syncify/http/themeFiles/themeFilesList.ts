@@ -1,5 +1,6 @@
 import type { Merge } from 'type-fest';
 import type * as Type from 'types';
+import type { File } from '~file';
 
 import { error } from '~errors';
 import { http } from '~http/client';

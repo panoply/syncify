@@ -127,7 +127,7 @@ export function themeFilesMap (target: Type.Target, callback: (count: number) =>
         }
       }).then(response => {
 
-        const { nodes, pageInfo } = graph(response.data, 'theme.files', reject);
+        const { nodes, pageInfo } = graph(response, 'data.theme.files', reject);
 
         files.total += nodes.length;
 

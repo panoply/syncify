@@ -110,7 +110,7 @@ export function themeFilesHas (...input: Has.Arguments) {
       }
     }).then(response => {
 
-      const { nodes } = graph(response.data, 'theme.files', reject);
+      const { nodes } = graph(response, 'data.theme.files', reject);
 
       if (nodes.length === query.length) {
         resolve([]);

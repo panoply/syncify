@@ -208,7 +208,7 @@ export function themeFilesUpsert (...input: Upsert.Arguments) {
       }
     }).then((response) => {
 
-      const { upsertedThemeFiles, userErrors } = graph(response.data, 'themeFilesUpsert', reject);
+      const { upsertedThemeFiles, userErrors } = graph(response, 'data.themeFilesUpsert', reject);
 
       resolve(
         {
