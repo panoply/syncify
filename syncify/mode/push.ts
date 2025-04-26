@@ -14,7 +14,7 @@ import { timer } from '@syncify/timer';
 import { Transform } from './watch';
 
 import { stdin } from '~cli/stdin';
-import { throwError } from '~cli/throws';
+import { throws } from '~cli/throws';
 import { error } from '~errors';
 import { event } from '~events';
 import { themeFilesUpsertMap, type Upsert } from '~http/themeFiles';
@@ -30,7 +30,7 @@ import { $, q } from '$';
 function setState (write: _.Tui, files: string[]) {
 
   if (files.length === 0) {
-    throwError([
+    throws([
       'Empty output directory'
     ], [
       `There are no files within ${_.neonCyan(relative($.cwd, $.dirs.output) + '/**')}`,
@@ -278,7 +278,7 @@ function Debug (state: PushMode.State) {
   entries();
   observe();
 
-  stdin.errors.warn((index) => {
+  stdin.errors.on('error', index => {
 
     if (debug.error.length > 0) {
       debug.error.splice(index, 1);
@@ -289,7 +289,7 @@ function Debug (state: PushMode.State) {
 
   });
 
-  stdin.errors.skip((index) => {
+  stdin.errors.on('warning', index => {
 
     if (debug.error.length > 0) {
       debug.error.splice(index, 1);
@@ -314,9 +314,7 @@ function Debug (state: PushMode.State) {
 
       $.mode.debug = true;
 
-      event
-      .mode('debug')
-      .on('debug', change);
+      event.mode('debug').on('debug', change);
 
       kill(async () => await unsubscribe());
 
@@ -343,11 +341,8 @@ function Debug (state: PushMode.State) {
       });
 
       if (debug.error.length === 0) {
-
         stdin.errors.dispose();
-
       } else {
-
         stdin.errors.update(debug.error.map(tui => tui[1]));
       }
 
@@ -363,7 +358,7 @@ function Debug (state: PushMode.State) {
         .Tree('info')
         .Newline()
         .Update('s', stdin.ansi.legend.s, _.gray)
-        .Update('p', stdin.ansi.legend.p, _.gray)
+        .Update('p', stdin.ansi.legend.v, _.gray)
         .Update('e', stdin.ansi.legend.e, _.gray)
         .Update('q', stdin.ansi.legend.q, _.gray)
         .Newline()
@@ -398,6 +393,7 @@ function Debug (state: PushMode.State) {
     for (const { filename } of upsert.synced) {
 
       const find = debug.error.find(([ { key } ]) => key === filename);
+
       if (find) {
         $.errors.delete(find[0]);
         record.success += upsert.synced.length;
