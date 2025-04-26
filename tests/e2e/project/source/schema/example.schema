@@ -1,0 +1,14 @@
+{
+  "block_singleton": {
+    "name": "something",
+    "type": "example",
+    "settings": [
+      {
+        "type": "text",
+        "id": "some_id",
+        "label": "Foo Title",
+        "default": "Lorem ipsum dolor sit amet"
+      }
+    ]
+  }
+}

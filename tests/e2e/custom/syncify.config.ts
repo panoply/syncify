@@ -28,6 +28,7 @@ export default defineConfig({
     ]
   },
   paths: {
+
     config: [
       'source/data/settings/*'
     ],

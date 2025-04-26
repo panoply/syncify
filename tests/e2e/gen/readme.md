@@ -32,10 +32,10 @@ sy create dusk
 Couple of basic commands to use during development:
 
 ```bash
-$ sy -w              # Runs Syncify in development watch mode
-$ sy -w --hot        # Runs Syncify in development watch mode with hot reloads
-$ sy -b              # Runs Syncify in build mode
-$ sy -b --prod       # Runs Syncify in build mode with production output
+sy -w              # Runs Syncify in development watch mode
+sy -w --hot        # Runs Syncify in development watch mode with hot reloads
+sy -b              # Runs Syncify in build mode
+sy -b --prod       # Runs Syncify in build mode with production output
 ```
 
 # License

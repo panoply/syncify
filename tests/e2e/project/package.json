@@ -1,0 +1,33 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "syncify": {
+    "stores": {
+      "syncify": {
+        "dev": 136656060657
+      }
+    },
+    "config": {
+      "transform": {
+        "script": {
+          "input": "assets/script.ts",
+          "format": "esm",
+          "rename": "[file].min.[ext]"
+        },
+        "svg": {
+          "snippets/icon.[file]": "assets/icons/*.svg"
+        },
+        "style": {
+          "assets/style.css": {
+            "input": "styles/style.scss",
+            "sass": {
+              "style": "compressed"
+            }
+          }
+        }
+      }
+    }
+  }
+}

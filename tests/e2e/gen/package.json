@@ -21,7 +21,7 @@
         },
         "style": {
           "assets/style.css": {
-            "input": "assets/style.scss",
+            "input": "styles/style.scss",
             "sass": {
               "style": "compressed"
             }

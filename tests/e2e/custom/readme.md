@@ -22,9 +22,9 @@ Example usage of custom directory architecture in Syncify. Using the `paths` con
 This example assumes you know the command line prompt of Syncify, below are some basics:
 
 ```bash
-$ sy -w       # watch
-$ sy -w --hot # watch with hot reloading
-$ sy -b       # build the theme
+sy -w       # watch
+sy -w --hot # watch with hot reloading
+sy -b       # build the theme
 ```
 
 ### Strap
