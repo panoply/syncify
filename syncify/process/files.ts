@@ -206,13 +206,10 @@ export function setFile (file: File, input: string, output: string) {
     }
 
     if (kind === -1) {
-
-      input = $.cache.paths[output];
-
+      input = $.cache.paths.get(output);
+      kind = getFileKind(file.ext);
     } else {
-
       setPathCache(input, output);
-
     }
 
     file.uuid = uuid();
