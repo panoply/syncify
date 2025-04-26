@@ -117,6 +117,33 @@
       ]
     },
     {
+      "name": "Throws Literals Namespace",
+      "languageRegex": "\\b(typescript)\\b",
+      "regexes": [
+        {
+          "regex": "\\bthrows\\s*\\.(?=\\s*[a-zA-Z]+\\()",
+          "regexFlag": "g",
+          "regexLimit": 25000,
+          "decorations": [
+            {
+              "color": "#E91E63"
+            }
+          ],
+          "regexes": [
+            {
+              "regex": "[.]",
+              "regexFlag": "g",
+              "decorations": [
+                {
+                  "color": "#FAFAFA"
+                }
+              ]
+            }
+          ],
+        }
+      ]
+    },
+    {
       "name": "TS Destructuring",
       "description": "Ensures the methods that apply newlines remain highlighted",
       "languageRegex": "\\b(typescript)\\b",
@@ -181,6 +208,14 @@
       "extensions": [
         "sass.config.js",
         "sass.config.cjs"
+      ],
+      "filename": true,
+      "format": "svg"
+    },
+    {
+      "icon": "markdown",
+      "extensions": [
+        "license.md",
       ],
       "filename": true,
       "format": "svg"
