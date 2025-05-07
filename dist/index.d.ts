@@ -9,10 +9,11 @@ import { BuildOptions } from 'esbuild';
 export { BuildOptions as ESBuildOptions } from 'esbuild';
 import { OptionsOutput } from 'clean-css';
 import { AcceptedPlugin, Plugin, Transformer, TransformCallback } from 'postcss';
+import { Options } from 'sass-embedded';
 import { Config as Config$1 } from 'tailwindcss';
 import { Config as Config$2 } from 'svgo';
 export { Config as SVGOConfig } from 'svgo';
-import { Options } from 'markdown-it';
+import { Options as Options$1 } from 'markdown-it';
 
 /* -------------------------------------------- */
 /* BASE DIRECTORIES                             */
@@ -31,12 +32,6 @@ type Directories = {
    * @default 'theme/'
    */
   output?: string;
-  /**
-   * The resolved `config` directory path for build tool files
-   *
-   * @default '/'
-   */
-  config?: string;
 }
 
 type Git = {
@@ -420,7 +415,7 @@ type HOTShared = {
    * Specify the websocket port. By default, Syncify uses port `51001` to
    * avoid any conflicts with other running hosts of tools.
    *
-   * @default w
+   * @default 51001
    * @example 'ws://localhost:51001/ws'
    */
   socket?: number;
@@ -583,46 +578,10 @@ interface Logger {
   clear?: boolean;
 }
 
-type StashType = string | number;
-
-/**
- * Stash Reference
- */
-type Stash = {
-  /**
-   * Set a stash import location for remote `pull` operations. Files which cannot
-   * be mapped to an existing project-level path location (relative to your `input`)
-   * will be written the provided stash destination defined here.
-   *
-   * > `*`
-   * >
-   * > asterisk value signals for stashes to be written within directory at index `0`
-   *
-   * > `number`
-   * >
-   * > number value will default to `*` and write within directories at that index.
-   *
-   * > `true`
-   * >
-   * > boolean `true` value signals for stashed to be written in `stash/` directory at index `0`
-   *
-   * ---
-   *
-   * You can optionally provide a sub-directory path.
-   *
-   */
-  stash: StashType;
-}
-
 /**
  * String or Array of strings
  */
 type Path = string | string[];
-
-/**
- * Union join of accepted Path patterns
- */
-type Pattern = Path | [ ...globs: string[], stash: Stash ];
 
 /**
  * Section and Snippet Rename Paths
@@ -638,9 +597,8 @@ type Rename = {
    *      'sections/foo/*', // sections in this directory will prefix foo-
    *      'sections/bar/*' // sections in this directory will prefix bar-
    *    ],
-   *    '*': [
-   *      './sections/**',   // all other sections will use source name
-   *      { stash: 'files' } // stashes imports within sections/files
+   *    '[name]': [
+   *      './sections/**'   // all other sections will use source name
    *    ],
    *   },
    *   snippets: {
@@ -648,14 +606,13 @@ type Rename = {
    *      'snippets/foo/*', // snippets in this directory will prefix foo-
    *      'snippets/bar/*' // snippets in this directory will prefix bar-
    *    ],
-   *    '*': [
+   *    '[name]': [
    *      './snippets/**',  // all other snippets will use source name
-   *      { stash: true }   // stashes will be written
    *    ]
    *   }
    * }
    */
-  '*'?: Pattern;
+  '*'?: Path;
   /**
    * Use the filename as per the source. Passing `[name]` only will result in fallback
    * behaviour, as that of `'*'`.
@@ -687,35 +644,35 @@ type Rename = {
    *   }
    * }
    */
-  '[name]'?: Pattern;
+  '[name]'?: Path;
   /**
    * Prefix directory name and suffix filename in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout-header.liquid'
    */
-  '[dir]-[name]'?: Pattern;
+  '[dir]-[name]'?: Path;
   /**
    * Prefix directory name and suffix filename in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'layout_header.liquid'
    */
-  '[dir]_[name]'?: Pattern;
+  '[dir]_[name]'?: Path;
   /**
    * Prefix filename and suffix directory in **kebab-case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header-layout.liquid'
    */
-  '[name]-[dir]'?: Pattern;
+  '[name]-[dir]'?: Path;
   /**
    * Prefix filename and suffix directory in **snake_case** format.
    *
    * @example
    * 'layout/header.liquid' > 'header_layout.liquid'
    */
-  '[name]_[dir]'?: Pattern;
+  '[name]_[dir]'?: Path;
 }
 
 /**
@@ -728,14 +685,14 @@ type RenameSnippets = Rename & {
    * @example
    * 'layout/header.liquid' > 'header.layout.liquid'
    */
-  '[name].[dir]'?: Pattern;
+  '[name].[dir]'?: Path;
   /**
    * Prefix directory and suffix filename with `.` dot separator.
    *
    * @example
    * 'layout/header.liquid' > 'layout.header.liquid'
    */
-  '[dir].[name]'?: Pattern;
+  '[dir].[name]'?: Path;
 }
 
 type Paths = {
@@ -781,7 +738,7 @@ type Paths = {
    *   }
    * }
    */
-  snippets?: Pattern | RenameSnippets
+  snippets?: Path | RenameSnippets
   /**
    * A glob string, glob array or rename `output → input` key/value object of files to be uploaded as sections.
    *
@@ -835,55 +792,55 @@ type Paths = {
    *   ]
    * }
    */
-  sections?: Pattern | Rename;
+  sections?: Path | Rename;
   /**
    * A glob string or glob array of files to be uploaded as blocks
    *
    * @default 'source/blocks/*.{liquid}'
    */
-  blocks?: Pattern;
+  blocks?: Path;
   /**
    * A glob string or glob array of files to be uploaded as templates.
    *
    * @default 'source/templates/*.{liquid,json}'
    */
-  templates?: Pattern;
+  templates?: Path;
   /**
    * A glob string or glob array of files to be uploaded asas metaobject templates
    *
    * @default 'source/templates/metaobject/*.{liquid,json}'
    */
-  metaobject?: Pattern;
+  metaobject?: Path;
   /**
    * A glob string or glob array of files to be uploaded as template/customers
    *
    * @default 'source/templates/customers/*.{liquid,json}'
    */
-  customers?: Pattern;
+  customers?: Path;
   /**
    * A glob string or glob array of files to be uploaded as assets
    *
    * @default 'source/assets/*'
    */
-  assets?: Pattern;
+  assets?: Path;
   /**
    * A glob string or glob array of files to be uploaded as layouts
    *
    * @default 'source/layout/*.liquid'
    */
-  layout?: Pattern;
+  layout?: Path;
   /**
    * A glob string or glob array of files to be uploaded as configs, i.e, `settings_schema.json`
    *
    * @default 'source/config/.json'
    */
-  config?: Pattern;
+  config?: Path;
   /**
    * A glob string or glob array of files to be uploaded as config, i.e, `en.default.json`
    *
    * @default 'source/locales/*.json'
    */
-  locales?: Pattern;
+  locales?: Path;
   /**
    * A glob string or glob array of files to be uploaded as **shared schema** `.json` or `.schema` files.
    *
@@ -903,9 +860,11 @@ type Paths = {
    */
   metafields?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * A glob string or glob array string to be uploaded, published and controlled as `pages`
    *
@@ -913,33 +872,41 @@ type Paths = {
    */
   pages?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/blogs/*'
    */
   blogs?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/menus/*.json'
    */
   navigation?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/policies/*.{html,md}'
    */
   policies?: Path;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * **This option will be available in later versions**
+   * ---
    *
    * @default 'source/+/files/**'
    */
@@ -1235,6 +1202,15 @@ type PostCSSConfig = (
   | any
 );
 
+type SassOptions = Pick<
+  Options<'sync'>,
+  | 'fatalDeprecations'
+  | 'functions'
+  | 'futureDeprecations'
+  | 'quietDeps'
+  | 'silenceDeprecations'
+>
+
 /**
  * Style Minification
  */
@@ -1278,7 +1254,7 @@ type TailwindConfig = Config$1 & {
   config: string[]
 }
 
-type SASSConfig = {
+type SASSConfig = SassOptions & {
   /**
    * Whether or not to generate sourcemaps
    *
@@ -1299,18 +1275,6 @@ type SASSConfig = {
    * @default true
    */
   warnings?: boolean;
-  /**
-   * This option is passed to SASS Dart compile instance. If this option is set to `true`,
-   * Sass won’t print warnings that are caused by dependencies. A "dependency" is defined
-   * as any file that’s loaded through external sources.
-   *
-   * This is useful for silencing deprecation warnings that you can’t fix on your own.
-   * However, please also notify your dependencies of the deprecations so that they can get
-   * fixed as soon as possible!
-   *
-   * @default false
-   */
-  quietDeps?: boolean;
   /**
    * A list of paths to include, ie: node_modules.
    *
@@ -1439,14 +1403,18 @@ type StyleTransform<T = string | string[]> = {
    */
   sass?: boolean | SASSConfig;
   /**
-   * **NOTE YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
+   *
+   * ---
    *
    * Terse Style (CSS) Minification
    *
    * > Uses [clean-css](https://github.com/clean-css/clean-css) minification
    * > Uses [purge-css](https://github.com/FullHuman/purgecss)
    */
-  terse?: boolean | SASSConfig;
+  terse?: boolean | OptionsOutput;
 }
 
 /* -------------------------------------------- */
@@ -1498,6 +1466,7 @@ type SVGFile = {
   /**
    * Rename the svg file/s. The same name as source file will be used
    * when undefined. Accepts namespaces, `[file]`, `[dir]` and `[ext]`.
+   *
    * ---
    *
    * @default undefined
@@ -1688,14 +1657,7 @@ type Processors = {
   /**
    * [Markdown](https://github.com/markdown-it/markdown-it) Config
    */
-  markdown?: Options;
-}
-
-interface Publishing {
-  /**
-   * Git publish
-   */
-  git: Git;
+  markdown?: Options$1;
 }
 
 /**
@@ -1822,7 +1784,7 @@ type JSONTransform = {
    * An optional string list of paths/filenames to exclude
    * from processing, ie: pass through
    *
-   * @default false
+   * @default []
    */
   exclude?: string[];
   /**
@@ -1906,9 +1868,12 @@ type LiquidTransform = {
 
 type Transforms = {
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/style/)
-   *
    * **Style File transforms**
+   *
+   * Style transformations perform CSS processing. Syncify supports various cascades,
+   * including SASS, Tailwind and PostCSS.
+   *
+   * [Syncify Documentation](https://syncify.sh/options/transform/style/)
    *
    * @example
    *
@@ -1979,14 +1944,13 @@ type Transforms = {
   style?: StyleTransformer;
 
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/script/)
-   *
    * **JavaScript/TypeScript Transforms**
    *
    * Script inputs can be defined a few different ways depending on your preference.
    * You can also override ESBuild `processor` defined options on a per-file basis.
    * Options 1, 2 and 3 are typically the preferred structures.
    *
+   * [Syncify Documentation](https://syncify.sh/options/transform/script/)
    *
    * @example
    *
@@ -2045,36 +2009,32 @@ type Transforms = {
    */
   script?: false | ScriptTransformer
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/svg/)
-   *
    * **SVG File Transforms**
    *
    * Inline SVG files and Sprites generation. Uses SVGO under the hood
    * and can export as assets (or snippets).
+   *
+   *  [Syncify Documentation](https://syncify.sh/options/transform/svg/)
    */
   svg?: SVGTransformer;
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/json/)
-   *
    * **JSON File Transforms**
    *
    * Options defined here are used when writing to the file system and
-   * uploading `.json` files to themes. When running sync operations that
-   * import from remote sources will also use these options, they include:
+   * uploading `.json` files to themes. When running `sy pull` or operations
+   * that import from online stores, configuration defined here will be respected.
    *
-   * - `--merge`
-   * - `--pull`
-   * - `--download`
+   * [Syncify Documentation](https://syncify.sh/options/transform/json/)
    */
   json?: JSONTransform;
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/liquid/)
-   *
    * **Liquid File Transforms**
    *
    * Liquid transform options are terse-specific and related to minification operations.
    * Syncify uses HTML Minifier Terser under the hood, it has been configured to work with
    * Liquid files.
+   *
+   * [Syncify Documentation](https://syncify.sh/options/transform/liquid/)
    *
    * > **NOTE**
    *
@@ -2083,7 +2043,11 @@ type Transforms = {
    */
   liquid?: LiquidTransform;
   /**
-   * ###### [DOCUMENTATION](https://syncify.sh/options/transform/svg/)
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
+   *
+   * ---
    *
    * **Markdown File Transforms**
    *
@@ -2143,7 +2107,7 @@ type VC = {
  *
  * The `defineConfig` named export used within `syncify.config.js` (or `.ts`) configuration files.
  */
-interface Config extends Directories {
+type Config = Directories & {
   /**
    * Specify the text-editor you use for development. This is optional and when
    * left undefined, Syncify will attempt guess your preferred editor.
@@ -2168,9 +2132,13 @@ interface Config extends Directories {
    */
   paths?: Paths;
   /**
-   * **NOT YET AVAILABLE**
+   * > **NOT YET AVAILABLE**
+   * >
+   * > **This option will be available in later versions**
    *
-   * > Syncify plugins are planned in future releases!
+   * ---
+   *
+   * Syncify plugins are planned in future releases!
    */
   plugins?: never;
   /**
@@ -2194,12 +2162,6 @@ interface Config extends Directories {
    * Console log options
    */
   log?: Logger;
-  /**
-   * **Publish**
-   *
-   * Provide publish configuration
-   */
-  publish?: Publishing;
   /**
    * **Git**
    *
@@ -2255,10 +2217,10 @@ declare const env: {
 };
 
 /**
- * Define Config (named export)
+ * Syncify Define Config (named export)
  *
  * Used in `syncify.config.js` or `syncify.config.ts` files and provides type completions to the export.
  */
 declare const defineConfig: (config: Config) => Config;
 
-export { type Config, type Directories, type ESBuildConfig, type ESBuildTarget, type Git, type HOT, type JSONTerse, type JSONTransform, type LiquidTerse, type LiquidTransform, type Logger, type Paths, type Pattern, type PostCSSConfig, type Processors, type Publishing, type Rename, type SASSConfig, type SVGFile, type SVGSprite, type SVGTransform, type SVGTransformer, type ScriptTransform, type ScriptTransformer, type Stash, type StyleTerse, type StyleTransform, type StyleTransformer, type TailwindConfig, type Transforms, type VC, defineConfig, env };
+export { type Config, type Directories, type ESBuildConfig, type ESBuildTarget, type Git, type HOT, type JSONTerse, type JSONTransform, type LiquidTerse, type LiquidTransform, type Logger, type Paths, type PostCSSConfig, type Processors, type Rename, type SASSConfig, type SVGFile, type SVGSprite, type SVGTransform, type SVGTransformer, type SassOptions, type ScriptTransform, type ScriptTransformer, type StyleTerse, type StyleTransform, type StyleTransformer, type TailwindConfig, type Transforms, type VC, defineConfig, env };
