@@ -11,7 +11,7 @@ anchors:
 
 # Syncify Straps
 
-Syncify Straps serve as a comprehensive resource for developers, offering an extensive collection of open-source themes and usage examples made available under the [Github Orgisation](https://github.com/SyncifyCLI). Straps are invaluable for anyone aiming to explore the full potential of Syncify through real-world implementations. They showcase the capabilities of Syncify and illustrate the varied methods by which it can be integrated into different projects.
+Syncify Straps serve as a comprehensive resource for developers, offering an extensive collection of open-source themes and usage examples made available under the [Github Organization](https://github.com/SyncifyCLI). Straps are invaluable for anyone aiming to explore the full potential of Syncify through real-world implementations. They showcase the capabilities of Syncify and illustrate the varied methods by which it can be integrated into different projects.
 
 > Straps are easily accessible and can be installed directly via the CLI using the `sy init` command.
 

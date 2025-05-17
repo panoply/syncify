@@ -51,7 +51,7 @@ Remote client used to perform HOT and Live Reloading with [Syncify](https://sync
 
 ### @syncify/json
 
-Parser for JSON files and embedded regions present within Shopify themes. This package will mimic [JSON5](https://github.com/json5/json5) behavior and leverages [comment-json](https://github.com/kaelzhang/node-comment-json) for preservation occurences of both block or line comments contained in JSON. Throws informative errors on parse failures, supports deep-sorting, equality and formatting capabilities.
+Parser for JSON files and embedded regions present within Shopify themes. This package will mimic [JSON5](https://github.com/json5/json5) behavior and leverages [comment-json](https://github.com/kaelzhang/node-comment-json) for preservation occurrences of both block or line comments contained in JSON. Throws informative errors on parse failures, supports deep-sorting, equality and formatting capabilities.
 
 - NPM
 - Github
