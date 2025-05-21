@@ -360,7 +360,7 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
         if (prop !== 'settings') block[prop] = schema[i][prop];
       }
 
-      if (block.type === '@app') {
+      if (block.type === '@theme' || block.type === '@app') {
         blocks.push(block);
         continue;
       }
