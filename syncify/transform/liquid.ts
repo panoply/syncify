@@ -248,7 +248,7 @@ export async function LiquidTransform (file: File) {
 
   }
 
-  if (file.type === Type.Section) {
+  if (file.type === Type.Section || file.type === Type.Block) {
     input = await CreateSection(file);
     if (input === null) return null;
   }
