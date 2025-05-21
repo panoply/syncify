@@ -330,6 +330,8 @@ export function parse (path: string) {
       return section(define(Namespace.Sections, Type.Section, Kind.Liquid));
     } else if (paths.snippets.match(path)) {
       return snippet(define(Namespace.Snippets, Type.Snippet, Kind.Liquid));
+    } else if (paths.blocks.match(path)) {
+      return snippet(define(Namespace.Blocks, Type.Block, Kind.Liquid));
     } else if (paths.layout.match(path)) {
       return define(Namespace.Layout, Type.Layout, Kind.Liquid);
     } else if (paths.templates.match(path)) {
@@ -445,6 +447,8 @@ export function importFile (key: string, outputPath: string): File {
     return define(key, Namespace.Sections);
   } else if (key.startsWith('snippets/')) {
     return define(key, Namespace.Snippets);
+  } else if (key.startsWith('blocks/')) {
+    return define(key, Namespace.Blocks);
   } else if (key.startsWith('layout/')) {
     return define(key, Namespace.Layout);
   } else if (key.startsWith('customers/', 10)) {
