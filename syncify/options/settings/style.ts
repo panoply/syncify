@@ -60,6 +60,7 @@ async function getExternalModules () {
 
   if ($.processor.tailwind.installed) {
 
+    await $import('@tailwindcss/postcss');
     await $import('tailwindcss');
 
     const tw = await readConfigFile<TailwindConfig>('tailwind.config', 'Tailwind', (config) => {
