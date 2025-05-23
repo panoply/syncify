@@ -127,7 +127,7 @@ export async function Create () {
   /* -------------------------------------------- */
 
   const pkguri = join(state.projectPath, 'package.json');
-  const access = await PromptCredentialsFile({ greeting: false, keychain: true });
+  const access = await PromptCredentialsFile({ keychain: true });
 
   // Clone the strap from and add into project
   await CreateStrap();
