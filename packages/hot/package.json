@@ -1,6 +1,6 @@
 {
   "name": "@syncify/hot",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "access": "restricted",
   "type": "module",
   "scripts": {
@@ -23,6 +23,6 @@
     "@syncify/tsconfig": "workspace:^",
     "esbuild": "catalog:",
     "fs-extra": "catalog:",
-    "morphdom": "^2.7.4"
+    "morphdom": "^2.7.5"
   }
 }

@@ -14,29 +14,34 @@ The module is injected after page load and `connect()` is automatically invoked.
 
 ```ts
 // INIT
-window.syncify.connect(/* options */);
+window.Syncify.connect(/* options */);
 
 // STATUS
 //
-window.syncify.isReady: boolean
-window.syncify.isConnected: boolean;
+window.Syncify.isReady: boolean
+window.Syncify.isConnected: boolean;
 
 // RELOADS
 //
-window.syncify.assets(): void;
-window.syncify.reload(): void;
-window.syncify.refresh(): void
+window.Syncify.assets(): void;
+window.Syncify.reload(): void;
+window.Syncify.refresh(): void
 
 // SECTIONS
 //
-window.syncify.sections.get()
-window.syncify.sections.list()
-window.syncify.sections.load()
+window.Syncify.sections.get()
+window.Syncify.sections.list()
+window.Syncify.sections.load()
 
 // LABEL
 //
-window.syncify.style.parent({ /* CSS */ });
-window.syncify.style.label({ /* CSS */ });
+window.Syncify.style.parent({ /* CSS */ });
+window.Syncify.style.label({ /* CSS */ });
+
+// HOOKS
+window.Syncify.onReload((syncify) => {})
+window.Syncify.onAsset((type, url) => { /* return false to cancel */ })
+window.Syncify.onMorph((oldDom, newDom) => { /* return false to cancel */})
 ```
 
 # Contributing

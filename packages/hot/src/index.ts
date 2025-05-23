@@ -1,7 +1,8 @@
+/* eslint-disable n/no-callback-literal */
 import morph from 'morphdom';
 import { LiteralUnion } from 'type-fest';
 
-import { Options } from './options';
+import { Instance, Options } from './options';
 import { PatchWebComponents } from './patch';
 
 export type Alias = {
@@ -31,143 +32,26 @@ declare global {
         role: 'main' | 'unpublished'
       }
     }
-    syncify: {
-      /**
-       * The HOT Module version number
-       */
-      version?: string;
-      /**
-       * Returns the current `template` name according to Liquid objects
-       */
-      get template(): string;
-      /**
-       * Connect Syncify
-       */
-      connect?: (options?: Options) => void;
-       /**
-       * Disconnect Syncify
-       */
-      disconnect?: () => void;
-       /**
-       * Sends a message to the server of websocket to informs upon the current template.
-       * In most cases, this will be dispatched automatically, but in some cases you may
-       * control the rendering cycle and need to issue this programmatically.
-       */
-      route?: (params?: { directory: string; template: string; }) => void;
-      /**
-       * Check to see if Syncify is ready or not
-       */
-      isReady: boolean;
-      /**
-       * Whether or not the websocket is connected
-       */
-      isConnected: boolean;
-      /**
-       * A set of web components registered in the DOM.
-       */
-      WebC?: Map<string, string>;
-      /**
-       * The current options used
-       */
-      options?: Options;
-      /**
-       * List of errors encountered
-       */
-      errors?: Array<{
-        /**
-         * Error title
-         */
-        title: string;
-        /**
-         * Description
-         */
-        description: string;
-        /**
-         * Group
-         */
-        group: string;
-      }>
-      /**
-       * Page section maps
-       */
-      sections?: {
-        /**
-         * Returns the object where section ids are properties
-         * and the values are an array list of dynamic applied ids.
-         * Returns `null` if no section exist.
-         */
-        list: () => {
-          /**
-           * Map holds the dynamic identifiers
-           */
-          map: {
-            [id: string]: string[];
-          },
-          /**
-           * Alias is template defined sections
-           */
-          alias: {
-            [template: string]: {
-              [section: string]: string[];
-            }
-          }
-        }
-        /**
-         * Method for loading section id maps. Helpful when executing
-         * OTW (Over the wire) page replacements like SPX. When invoked,
-         * it will obtains all the section ids in the document body.
-         *
-         * This is called at runtime in HOT method. Returns the object map
-         * of matches of `null` if no sections exist.
-         */
-        load: (dom?: HTMLElement) => { [id: string]: string[]; };
-        /**
-         * Returns all elements matching the provided `id` which is obtained
-         * via the websocket `data` parameter. Query Selects all matches. If
-         * no matches are found, returns null.
-         */
-        get: (id: string[]) => NodeListOf<HTMLElement>;
-
-      };
-      /**
-       * Full page refresh
-       */
-      refresh?: () => void;
-      /**
-       * HOT reloads the `<body>`
-       */
-      reload?: (callback?: (dom: Document) => void) => void;
-      /**
-       * HOT Reloads all assets
-       */
-      assets?: () => void;
-      /**
-       * Change the label style
-       */
-      style?: {
-        /**
-         * The dynamic parent node
-         */
-        parent: (style: Partial<CSSStyleDeclaration>) => void;
-        /**
-         * The inner node which contains the event text
-         */
-        label: (style: Partial<CSSStyleDeclaration>) => void;
-      }
-    }
+    Syncify: Instance
   }
 }
 
-(function syncify (options: Options) {
+(function Syncify (options: Options) {
 
   if (!document) return;
-  if (!window.syncify) {
-    window.syncify = Object.create(null);
-    window.syncify.version = VERSION;
+  if (!window.Syncify) {
+    window.Syncify = Object.create(null);
+    window.Syncify.version = VERSION;
   }
 
-  const WebC = new Map();
   const errors = [];
+  const WebC = new Map();
+  const hooks = {
+    reload: new Set<(instance: Instance) => void>(),
+    morph: new Set<(oldDom: HTMLElement, newDom: HTMLElement) => false | void>(),
+    assets: new Set<(type: 'stylesheet' | 'script', url: string) => false | void>()
+  };
+
   const flags: Options['flags'] = {
     'no-preview-bar': false,
     'no-checkout-preloads': false,
@@ -189,7 +73,7 @@ declare global {
   let serverUrl: string = `http://localhost:${options.server}/`;
   let socketUrl: string = `ws://localhost:${options.socket}/ws`;
 
-  Object.defineProperty(window.syncify, 'options', {
+  Object.defineProperty(window.Syncify, 'options', {
     get () { return options; },
     set (config) {
       for (const p in options) {
@@ -439,9 +323,9 @@ declare global {
     const dragEnd = () => { isDragging = false; };
 
     const events = [
-      [ 'mousedown', dragStart ],
-      [ 'mousemove', drag ],
-      [ 'mouseup', dragEnd ],
+      [ 'pointerdown', dragStart ],
+      [ 'pointermove', drag ],
+      [ 'pointerup', dragEnd ],
       [ 'touchstart', dragStart ],
       [ 'touchmove', drag ],
       [ 'touchend', dragEnd ]
@@ -495,15 +379,15 @@ declare global {
 
       // #C11E62
 
-      if (window.syncify && typeof window.syncify.style !== 'object') {
+      if (window.Syncify && typeof window.Syncify.style !== 'object') {
 
-        window.syncify.style = Object.create(null);
+        window.Syncify.style = Object.create(null);
 
-        window.syncify.style.parent = (
+        window.Syncify.style.parent = (
           style: Partial<CSSStyleDeclaration>
         ) => Object.assign(parent.style, style);
 
-        window.syncify.style.label = (
+        window.Syncify.style.label = (
           style: Partial<CSSStyleDeclaration>
         ) => Object.assign(node, style);
 
@@ -652,7 +536,7 @@ declare global {
 
           } else {
 
-            window.syncify.errors.push({
+            window.Syncify.errors.push({
               title: 'Unknown Section',
               description: `Syncify encountered an issue mapping the section id: ${id}`,
               group: 'section'
@@ -719,7 +603,18 @@ declare global {
       const href = node.getAttribute('href');
 
       if (assetMatch(href, uri)) {
-        node.setAttribute('href', serverUrl + params(href));
+
+        const newUrl = serverUrl + params(href);
+
+        for (const callback of hooks.assets) {
+          if (callback('stylesheet', newUrl) === false) {
+            console.log('SYNCIFY: Stylesheet reload was cancelled by onAsset hook');
+            return;
+          }
+        }
+
+        node.setAttribute('href', newUrl);
+
       }
     }
 
@@ -745,8 +640,17 @@ declare global {
 
         const promise = new Promise((resolve, reject) => {
 
+          const newUrl = serverUrl + params(src);
+
+          for (const callback of hooks.assets) {
+            if (callback('script', newUrl) === false) {
+              console.log('SYNCIFY: Script reload was cancelled by onAsset hook');
+              return;
+            }
+          }
+
           const script = document.createElement('script');
-          script.setAttribute('src', serverUrl + params(src));
+          script.setAttribute('src', newUrl);
           const attrs = Array.from(node.attributes);
 
           for (const attr of attrs) {
@@ -757,7 +661,7 @@ declare global {
 
           script.onload = () => resolve(src);
           script.onerror = (e) => {
-            console.error('HOT Script failed to reload:', e);
+            console.error('SYNCIFY: HOT Script failed to reload:', e);
             reject(new Error('HOT Script Error'));
           };
 
@@ -810,7 +714,9 @@ declare global {
 
     assets(newDom).then(() => {
 
-      morph(document.body, newDom.body, morphs);
+      const oldDom = document.body;
+
+      morph(oldDom, newDom.body, morphs);
 
       sections.load(document.body);
       label.mount(document.body);
@@ -831,9 +737,7 @@ declare global {
     }
 
     socket = new WebSocket(socketUrl);
-
     ws(socket);
-
   }
 
   function ws (socket: WebSocket) {
@@ -841,39 +745,28 @@ declare global {
     if (!isNaN(timeout)) clearTimeout(timeout);
 
     socket.addEventListener('close', () => {
-
       if (retrying === 0) {
         console.warn('HOT Reconnection will continue to be attempted until a hard-refresh');
       }
-
       retrying > 0 || label.event('DISCONNECTED', '10px');
       isConnected = false;
       retrying++;
       timeout = setTimeout(websocket, 2500);
-
     });
 
     socket.addEventListener('open', () => {
-
       if (!isConnected) {
-
         isConnected = true;
         label.event(method === 'hot' ? 'HOT' : 'LIVE');
         route();
-
       } else {
-
         timer.start();
         label.event('Reconnecting');
-
         HOTBody().then(() => {
-
           label.event(`Reconnected in ${timer.stop()}`);
           isConnected = true;
           route();
-
         });
-
       }
     });
 
@@ -891,14 +784,19 @@ declare global {
 
     const PREFIX = method === 'hot' ? 'HOT ' : 'LIVE ';
 
+    function onReloadHooks () {
+
+      for (const callback of hooks.reload) {
+        callback(window.Syncify);
+      }
+
+    }
+
     socket.addEventListener('message', function ({ data }: { data: Data }) {
 
       if (data === 'reload') {
-
         label.event('Refresh');
-
         return top.location.reload();
-
       } else if (data === 'replace') {
 
         timer.start();
@@ -907,10 +805,9 @@ declare global {
         if (!isNaN(timeout)) clearTimeout(timeout);
 
         return HOTBody().then(() => {
-
           label.event(`Reloaded in ${timer.stop()}`);
           timeout = NaN;
-
+          onReloadHooks();
         });
 
       } else if (data.startsWith('alias|')) {
@@ -930,6 +827,8 @@ declare global {
             label.event(`Reloaded in ${timer.stop()}`);
 
             timeout = NaN;
+
+            onReloadHooks();
 
           });
 
@@ -952,18 +851,30 @@ declare global {
 
             const uri = `${location.pathname}?sections=${id}`;
 
+            let failed = false;
+
             return request(uri, 'json').then((value: Record<string, string>) => {
 
               nodes.forEach(node => {
                 morph(node, value[id], {
                   childrenOnly: true,
-                  onBeforeElUpdated: (fromEl: Element, toEl: Element) => !fromEl.isEqualNode(toEl)
+                  onBeforeElUpdated: (fromEl: Element, toEl: Element) => {
+                    if (fromEl.isEqualNode(toEl)) return false;
+                    if (hooks.morph.size > 0) {
+                      for (const callback of hooks.morph) {
+                        if (callback(fromEl as HTMLElement, toEl as HTMLElement) === false) return false;
+                      }
+                    }
+                    return true;
+                  }
                 });
               });
 
               label.event(`Reloaded in ${timer.stop()}`);
 
             }).catch(e => {
+
+              if (!failed) failed = true;
 
               errors.push({
                 title: 'XHR Error fetching section',
@@ -972,6 +883,21 @@ declare global {
               });
 
               console.error('SYNCIFY: ', e);
+
+            }).finally(() => {
+
+              if (failed) {
+
+                reload(() => {
+                  label.event(`Reloaded in ${timer.stop()}`);
+                  onReloadHooks();
+                });
+
+              } else {
+
+                onReloadHooks();
+
+              }
 
             });
 
@@ -1065,7 +991,7 @@ declare global {
 
       const curDom = isReady ? disconnect() : document.body;
 
-      if (typeof config === 'object') window.syncify.options = config;
+      if (typeof config === 'object') window.Syncify.options = config;
 
       sections.load(curDom);
 
@@ -1078,15 +1004,48 @@ declare global {
     }
   }
 
+  function onReload (callback: (instance: Instance) => void) {
+    if (hooks.reload.has(callback)) {
+      console.warn('SYNCIFY: Duplicated onReload hook signature');
+    } else {
+      hooks.reload.add(callback);
+    }
+  }
+
+  function onMorph (callback: (fromEl: HTMLElement, toEl: HTMLElement) => false | void) {
+    if (hooks.morph.has(callback)) {
+      console.warn('SYNCIFY: Duplicated onMorph hook signature');
+    } else {
+      hooks.morph.add(callback);
+    }
+  }
+
+  function onAsset (callback: (type: 'stylesheet' | 'script', url: string) => false | void) {
+    if (hooks.assets.has(callback)) {
+      console.warn('SYNCIFY: Duplicated onAsset hook signature');
+    } else {
+      hooks.assets.add(callback);
+    }
+  }
+
+  function onConnect (callback: () => void) {
+    if (hooks.assets.has(callback)) {
+      console.warn('SYNCIFY: Duplicated onConnect hook signature');
+    } else {
+      hooks.assets.add(callback);
+    }
+  }
+
   /* -------------------------------------------- */
   /* EXPOSED METHODS                              */
   /* -------------------------------------------- */
 
-  Object.defineProperties(window.syncify, {
+  Object.defineProperties(window.Syncify, {
     isReady: { get () { return isReady; } },
     isConnected: { get () { return isConnected; } },
     errors: { get () { return errors; } },
     WebC: { get () { return WebC; } },
+    hooks: { get () { return hooks; } },
     template: { get () { return template; } },
     connect: { value: connect },
     disconnect: { value: disconnect },
@@ -1094,7 +1053,11 @@ declare global {
     route: { value: route },
     assets: { value: assets },
     refresh: { value: refresh },
-    reload: { value: reload }
+    reload: { value: reload },
+    onAsset: { value: onAsset },
+    onMorph: { value: onMorph },
+    onReload: { value: onReload },
+    onConnect: { value: onConnect }
   });
 
   document.addEventListener('readystatechange', function () {
