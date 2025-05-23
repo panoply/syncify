@@ -11,8 +11,7 @@
     "**/.vscode": false,
     "**/coverage": true,
     "**/.idea": true,
-    "**/.bundle": true,
-    "**/node_modules": true
+    "**/.bundle": true
   },
   "files.associations": {
     "*.json": "jsonc",
