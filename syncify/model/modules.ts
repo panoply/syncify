@@ -1,6 +1,11 @@
 /* eslint-disable quote-props */
 import type { Dependencies, Import, ImportMap } from 'types';
 
+import { join } from 'node:path';
+import { createRequire } from 'node:module';
+import { pathToFileURL } from 'node:url';
+
+import { $ } from '$';
 import { throws } from '~cli/throws';
 import { o } from '~utils';
 
@@ -33,7 +38,19 @@ export const $import = Object.assign(async function <T extends Dependencies> (na
 
   try {
 
-    const resolve = await import(name);
+    let resolve;
+
+    if (id === 'tailwind') {
+
+      const fileUrl = pathToFileURL(createRequire(join($.cwd, name)).resolve(name)).href;
+
+      resolve = await import(fileUrl);
+
+    } else {
+
+      resolve = await import(name);
+
+    }
 
     $import[id] = as ? resolve : resolve.default || resolve;
 
