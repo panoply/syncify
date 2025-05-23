@@ -98,7 +98,6 @@
     "@syncify/json": "workspace:^",
     "@syncify/turndown": "workspace:^",
     "@syncify/uws": "workspace:^",
-    "@tailwindcss/postcss": "^4.1.7",
     "adm-zip": "^0.5.16",
     "cbor-x": "^1.6.0",
     "clean-css": "^5.3.3",
@@ -164,6 +163,9 @@
     "write-package": "^7.1.0"
   },
   "peerDependenciesMeta": {
+    "@tailwindcss/postcss": {
+      "optional": true
+    },
     "tailwindcss": {
       "optional": true
     }
