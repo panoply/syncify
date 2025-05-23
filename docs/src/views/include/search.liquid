@@ -2,7 +2,7 @@
   class="search d-none d-md-flex"
   spx-component="search"
   spx-search:source="{{ '/syncify.json' | url }}"
-  spx@keypress="search.onKeyboard">
+  spx@keydown="search.onKeyboard">
   <input
     type="search"
     name="search"

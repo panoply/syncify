@@ -16,22 +16,22 @@ Syncify offers robust JavaScript bundling capabilities, tree-shaking, code split
 
 Get started using one the example straps for a real-world implementation reference.
 
-:::: grid row
-::: grid col-6
+:: row
+:: col-6
 
 ```bash
 sy create using-javascript
 ```
 
-:::
-::: grid col-6
+::
+:: col-6
 
 ```bash
 sy create using-typescript
 ```
 
-:::
-::::
+::
+::
 
 ---
 

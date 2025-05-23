@@ -12,18 +12,9 @@ export class Dropdown extends spx.Component({
     form: String,
     accordion: String,
     kind: String,
-    required: {
-      typeof: Boolean,
-      default: false
-    },
-    collapse: {
-      typeof: String,
-      default: 'closed'
-    },
-    type: {
-      typeof: String,
-      default: 'dropdown'
-    }
+    required: false,
+    collapse: 'closed',
+    type: 'dropdown'
   },
   nodes: <const>[
     'button',
@@ -70,9 +61,9 @@ export class Dropdown extends spx.Component({
 
     this.state.collapse = 'opened';
     this.view.classList.add('is-open');
-    this.buttonNode.removeClass('selected');
+    this.buttonNode.classList.remove('selected');
 
-    if (this.hasAccordion) this.inViewport();
+    if (this.accordionExists) this.inViewport();
 
     // listen for outside clicks
     addEventListener('click', this.outsideClick.bind(this));

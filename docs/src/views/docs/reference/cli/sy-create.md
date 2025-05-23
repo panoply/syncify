@@ -47,10 +47,10 @@ Examples:
 
 The `sy create` command accepts one optional flag to modify its behavior. This is particularly useful for understanding functionality, syntax, or troubleshooting without running the command itself.
 
-:::: grid row mt-2 mb-5
-::: grid col-12 col-md-11 fs-sm
+:: row mt-2 mb-5
+:: col-12 col-md-11 fs-sm
 
 {% include './flags/--help.md' %}
 
-:::
-::::
+::
+::

@@ -25,8 +25,8 @@ anchors:
 
 The `json` transform governs how Syncify processes `.json` and `.schema` files in your project, including theme configurations, metafields, and other JSON-based structures. This transform is optional, you can skip it entirely, and Syncify will fallback to the default settings when omitted from your configuration. See [usage](/usage/transform/json/) documentation.
 
-:::: grid row mt-5
-::: grid col-9 opts fs-sm
+:: row mt-5
+:: col-9 opts fs-sm
 
 # `crlf`
 
@@ -96,7 +96,7 @@ Minifies `.json` files in the templates directory when `{js} true`. Use `{js} fa
 
 A list of glob patterns (e.g., `**/debug.json`) to exclude specific `.json` files from minification. Files matching these patterns stay unminified, even if their directory is targeted. Empty`[]` by default.
 
-:::
-::::
+::
+::
 
 ---

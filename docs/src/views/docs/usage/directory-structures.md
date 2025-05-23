@@ -21,8 +21,8 @@ Syncify projects adopt a hierarchical **input** ➔ **output** structure, allowi
 
 > Syncify currently enforces a strict hierarchical structure and does not support flat structures. However, plans are in place to introduce flat structure compatibility in a future minor version release.
 
-:::: grid row dir-struc my-5
-::: grid col fs-sm bd-bad
+:: row dir-struc my-5
+:: col fs-sm bd-bad
 
 <h4 class="bad mb-1">Flat Structure</h4>
 
@@ -40,13 +40,13 @@ An example of a flat structure where the theme directories are exposed in the ro
 └── templates^
 ```
 
-:::
-::: grid px-0 pt-5 col-auto ac-center stash-next tc
+::
+:: px-0 pt-5 col-auto ac-center stash-next tc
 
 {% svg 'arrow-right', 'icon-output mt-4'%}
 
-:::
-::: grid col fs-sm bd-good
+::
+:: col fs-sm bd-good
 
 <h4 class="good mb-1">Hierarchical</h4>
 
@@ -66,8 +66,8 @@ An example of a hierarchical structure where theme directories are placed inside
 └── theme/
 ```
 
-:::
-::::
+::
+::
 
 <h3 class="vs"> Hierarchical <span>VS</span> Flat Structures</h3>
 
@@ -83,8 +83,8 @@ The last notable limitation the developers should consider is the longevity, in 
 
 The base directory `input` and `output` path references point to theme source and distribution files. The values you provide will refer to a directory name that is relative to the root of your project. You **cannot** define multi-level directories (e.g: `some/dir`) or reverse paths (e.g: `../dir`). You can pass these references within a Syncify configuration file or via the CLI.
 
-:::: grid row ai-stretch mb-5
-::: grid col fs-sm
+:: row ai-stretch mb-5
+:: col fs-sm
 
 ```treeview
 /
@@ -94,13 +94,13 @@ The base directory `input` and `output` path references point to theme source an
 └── syncify.config.ts
 ```
 
-:::
-::: grid px-0 col-auto ac-center stash-next
+::
+:: px-0 col-auto ac-center stash-next
 
 {% svg 'arrow-right', 'icon-output'%}
 
-:::
-::: grid col-8
+::
+:: col-8
 
 <!-- prettier-ignore -->
 ```js
@@ -112,8 +112,8 @@ export default defineConfig({
 })
 ```
 
-:::
-::::
+::
+::
 
 Syncify expects projects to have an **input** directory path which contains theme **source** files. Files contained within an input directory are written to your defined **output** directory path. The generated output will be reflective of your online store and in most cases you will add the output directory to your `.gitignore` file because it can always be rebuilt from input. If you are coming from the Shopify CLI, it is important to understand that flat structures are not possible in Syncify and all projects must adhere to **input** ➔ **output** architecture.
 
@@ -127,8 +127,8 @@ The `paths` option lets you customize your theme structure, resolved relative to
 
 ##### Default Defintions:
 
-:::: grid row ai-stretch dir-each mb-5
-::: grid col fs-sm
+:: row ai-stretch dir-each mb-5
+:: col fs-sm
 
 ```treeview
 source/
@@ -158,13 +158,13 @@ source/
 └── tsconfig.json
 ```
 
-:::
-::: grid px-0 col-auto ac-center stash-next
+::
+:: px-0 col-auto ac-center stash-next
 
 {% svg 'arrow-right', 'icon-output'%}
 
-:::
-::: grid col-8
+::
+:: col-8
 
 <!-- prettier-ignore -->
 ```js
@@ -195,8 +195,8 @@ export default defineConfig({
 })
 ```
 
-:::
-::::
+::
+::
 
 ---
 
@@ -226,8 +226,8 @@ export default defineConfig({
 
 Assume we are executing a pull operation and
 
-:::: grid row dir-each my-5
-::: grid col-5 fs-sm
+:: row dir-each my-5
+:: col-5 fs-sm
 
 #### Breakdown
 
@@ -243,8 +243,8 @@ sy pull --new -F sections -F snippets
 - search.liquid
 - button.liquid
 
-:::
-::: grid col fs-sm
+::
+:: col fs-sm
 
 ```treeview
 /
@@ -264,8 +264,8 @@ sy pull --new -F sections -F snippets
 └── syncify.config.ts
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```treeview
 /
@@ -285,8 +285,8 @@ sy pull --new -F sections -F snippets
 └── syncify.config.ts
 ```
 
-:::
-::::
+::
+::
 
 <!--prettier-ignore-->
 ```js
@@ -328,8 +328,8 @@ To illustrate the practical impact, consider running the `sy-pull` command to im
 
 Sticking to the default structure isn’t ideal with Syncify. Instead, you’re encouraged to craft an input (theme) structure that fits your project, aligns with your workflow, and reflects your preferences. The `paths` option empowers you to define a tailored setup, giving you control over how your theme is organized. Below is a basic example of how to create a customized structure using `paths`, showcasing the flexibility to adapt the layout to your specific needs.
 
-:::: grid row ai-stretch dir-each my-5
-::: grid col fs-sm
+:: row ai-stretch dir-each my-5
+:: col fs-sm
 
 ```treeview
 /
@@ -356,13 +356,13 @@ Sticking to the default structure isn’t ideal with Syncify. Instead, you’re 
 └── syncify.config.ts
 ```
 
-:::
-::: grid px-0 col-auto ac-center
+::
+:: px-0 col-auto ac-center
 
 {% svg 'arrow-right', 'icon-output'%}
 
-:::
-::: grid col-8
+::
+:: col-8
 
 <!-- prettier-ignore -->
 ```js
@@ -389,8 +389,8 @@ export default defineConfig({
 })
 ```
 
-:::
-::::
+::
+::
 
 ---
 
@@ -400,8 +400,8 @@ The `paths` option in Syncify lets developers customize output filenames for spe
 
 Below are examples of **input** and **output** structures to demonstrate this. The **input** includes a `sections` directory with three sub-directories: blocks, product, layouts and a snippets directory with a cards sub-directory plus two unnested snippet files. The **output** illustrates the resulting structure when using the rename object feature to shape themes.
 
-:::: grid row mb-4 ai-center
-::: grid col fill-papyrus
+:: row mb-4 ai-center
+:: col fill-papyrus
 
 ##### Input Structure: `{js} { input: 'source' }`
 
@@ -426,13 +426,13 @@ source/
         └── social-icons.liquid
 ```
 
-:::
-::: grid col-auto
+::
+:: col-auto
 
 {% svg 'arrow-right', 'icon-output'%}
 
-:::
-::: grid col
+::
+:: col
 
 ##### Output Structure `{js} { output: 'theme' }`
 
@@ -457,8 +457,8 @@ theme/
     └── templates/
 ```
 
-:::
-::::
+::
+::
 
 > This rename object pairs rename patterns with glob patterns, all are resolved relative to the **input** directory.
 
@@ -516,8 +516,8 @@ By default, Syncify will attempt to automatically pinpoint write destinates with
 
 ##### Configuration `syncify.config.ts`
 
-:::: grid row mb-4 ac-center
-::: grid col pr-0 stash-height
+:: row mb-4 ac-center
+:: col pr-0 stash-height
 
 <!--prettier-ignore-->
 ```js
@@ -541,8 +541,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col-auto pl-0 stash-header fs-sm stash-height
+::
+:: col-auto pl-0 stash-header fs-sm stash-height
 
 <div class="pl-4 pr-3 pt-3 fs-sm bd stash-bd ">
 
@@ -572,8 +572,8 @@ Target pattern at index and write to sub-directory
 
 </div>
 
-:::
-::::
+::
+::
 
 > Stash directories are designed to provide developers a grouping mechinsim for remote files obtained during [pull](/cli/sy-pull/) operations. We will wlak through a common use-case situation where you'll need stash references
 
@@ -581,8 +581,8 @@ Target pattern at index and write to sub-directory
 
 Let’s examine a real-world scenario requiring stash references. Imagine you need to integrate changes from a remote theme edited by multiple developers. You’re using Syncify with custom structures, while they use the Shopify CLI with basic, flat structures. Their setups are simple and beginner-level, lacking sub-directories, whereas your professional approach leverages tailored layouts. In this example, we use section [rename](/renaming-files/) path patterns. While this explicit, verbose mapping isn’t inherently flawed, it can create issues when collaborating with developers or syncing with flat-structure projects built via Shopify CLI.
 
-:::: grid row mb-4 ai-center
-::: grid col
+:: row mb-4 ai-center
+:: col
 
 <!--prettier-ignore-->
 ```js
@@ -602,13 +602,13 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col-auto pt-5 stash-next
+::
+:: col-auto pt-5 stash-next
 
 {% svg 'arrow-right', 'icon-output'%}
 
-:::
-::: grid col
+::
+:: col
 
 ```treeview
 source/
@@ -626,8 +626,8 @@ source/
 
 ```
 
-:::
-::::
+::
+::
 
 # TODO
 

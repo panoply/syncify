@@ -47,8 +47,8 @@ Syncify can compile TypeScript, JavaScript, TSX and JSX file types. It supports 
 
 Script transforms support several different configuration structures. We will focus on the most basic in this example, but its important to consider that there is no one-size, fits-all approach and developers are encourage to use their preferred model.
 
-:::: grid row dir-each my-4
-::: grid col-7
+:: row dir-each my-4
+:: col-7
 
 <!-- prettier-ignore -->
 ```js
@@ -66,8 +66,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col fs-sm
+::
+:: col fs-sm
 
 ```treeview
 source/
@@ -83,15 +83,15 @@ source/
 └── jsconfig.json
 ```
 
-:::
-::::
+::
+::
 
 ---
 
 # Style Transform
 
-:::: grid row dir-each my-4
-::: grid col-7
+:: row dir-each my-4
+:: col-7
 
 <!-- prettier-ignore -->
 ```js
@@ -110,8 +110,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col fs-sm
+::
+:: col fs-sm
 
 ```treeview
 source/
@@ -128,15 +128,15 @@ source/
 └── package.json
 ```
 
-:::
-::::
+::
+::
 
 ---
 
 # SVG Transform
 
-:::: grid row dir-each my-4
-::: grid col-7
+:: row dir-each my-4
+:: col-7
 
 <!-- prettier-ignore -->
 ```js
@@ -155,8 +155,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col fs-sm
+::
+:: col fs-sm
 
 ```treeview
 source/
@@ -173,15 +173,15 @@ source/
 └── package.json
 ```
 
-:::
-::::
+::
+::
 
 ---
 
 # JSON Transform
 
-:::: grid row dir-each my-4
-::: grid col-7
+:: row dir-each my-4
+:: col-7
 
 <!-- prettier-ignore -->
 ```js
@@ -200,8 +200,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col fs-sm
+::
+:: col fs-sm
 
 ```treeview
 source/
@@ -218,15 +218,15 @@ source/
 └── package.json
 ```
 
-:::
-::::
+::
+::
 
 ---
 
 # Liquid Transform
 
-:::: grid row dir-each my-4
-::: grid col-7
+:: row dir-each my-4
+:: col-7
 
 <!-- prettier-ignore -->
 ```js
@@ -245,8 +245,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col fs-sm
+::
+:: col fs-sm
 
 ```treeview
 source/
@@ -263,5 +263,5 @@ source/
 └── package.json
 ```
 
-:::
-::::
+::
+::

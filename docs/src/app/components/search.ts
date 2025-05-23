@@ -3,49 +3,52 @@ import type { SearchContent, SearchHeading, SearchIndex, SearchPage } from '@e11
 import { matchSorter } from 'match-sorter';
 import spx, { SPX } from 'spx';
 
-import { glue } from '../utils';
-
 export class Search extends spx.Component({
   id: 'search',
+  nodes: <const>[
+    'list',
+    'input',
+    'active'
+  ],
   state: {
     active: Boolean,
     query: String,
-    source: String,
-    index: Number
-  },
-  nodes: <const>[
-    'list',
-    'input'
-  ]
+    source: String
+  }
 }) {
 
-  get selected (): HTMLElement {
-    return this.listNode[this.state.index];
-  }
+  private keymap = {
+    ArrowUp: 'previous',
+    Up: 'previous',
+    ArrowDown: 'next',
+    Down: 'next'
+  };
 
-  /**
-   * SPX Connect Lifecyle Method
-   */
   public async connect () {
 
-    this.index = await this.getJSON();
+    this.index = await spx.http<SearchIndex>(this.state.source);
 
   }
 
-  /**
-   * Get search index
-   */
-  private async getJSON () {
+  /** Keypress event via `spx@window:keydown` */
+  public onKeyboard (event: KeyboardEvent) {
 
-    return (await fetch(this.state.source)).json();
+    if (!this.state.active || this.result.length === 0) return;
 
-  }
+    if (event.key in this.keymap) {
 
-  /** Keypress event via `spx@window:keypress` */
-  public onKeyboard (event: SPX.KeyboardEvent) {
+      event.preventDefault();
 
-    console.log(event);
+      const item = this.listNode.querySelector('li[tabindex="0"]');
+      const goto = this.keymap[event.key];
+      const find = item[goto + 'ElementSibling'] as HTMLElement;
+      const next = find || this.listNode.children[goto === 'next' ? 0 : this.listNode.childElementCount - 1];
 
+      item.setAttribute('tabindex', '-1');
+      next.setAttribute('tabindex', '0');
+      next.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
+
+    }
   };
 
   private hide () {
@@ -66,13 +69,9 @@ export class Search extends spx.Component({
   }
 
   outsideClick (event: Event) {
-
     if (this.listNode !== event.target && this.inputNode !== event.target) {
-
       this.hide();
-
     }
-
   }
 
   onFocus () {
@@ -122,7 +121,7 @@ export class Search extends spx.Component({
 
         this.listNode.innerHTML = '';
         this.listNode.classList.add('no-results');
-        this.noResults.innerHTML = this.nothing;
+        this.noResults = this.nothing;
         this.listNode.appendChild(this.noResults);
 
       } else {
@@ -155,16 +154,13 @@ export class Search extends spx.Component({
   sentence (text: string, match: RegExp) {
 
     const R = 4;
-
     const offset = text.search(match);
 
     if (offset === 0) return text;
 
     const before = text.slice(0, offset);
-
     // Split the words before the match
     const words = before.trim().split(/\s+/);
-
     // Check for a full stop within the last 4 words
     const dot = before.lastIndexOf('.', offset);
 
@@ -182,41 +178,36 @@ export class Search extends spx.Component({
     content: SearchContent;
   }>) {
 
-    const match = new RegExp(`(${query})`, 'gi');
+    const match = new RegExp(`(?:(?<=\\s)[a-z]+)?(${query})`, 'gi');
 
     this.listNode.classList.contains('no-results') && this.listNode.classList.remove('no-results');
     this.listNode.innerHTML = '';
 
-    const nodes = result.map(({ content, page, heading }) => {
+    const nodes = result.map(({ content, page, heading }, index) => {
 
       const sentence = content.type === 'heading' ? content.text : this.sentence(content.text, match);
       const located = content.type === 'heading' ? page.title : this.index.content[heading.cidx[0]].text;
-      const node = document.createElement('li');
 
-      node.innerHTML = glue(
-        `<a href="${heading.anchor}" class="d-flex ai-center">`,
-        '<div class="w-icon">',
-        '<svg class="icon">',
-        `<use xlink:href="#svg-search-${content.type}"></use>`,
-        '</svg>',
-        '</div>',
-        '<div class="px-3">',
-        '<div class="result">',
-        `${sentence.replace(match, '<strong>$1</strong>')}`,
-        '</div>',
-        '<div class="d-block upper ff-heading fw-bold fc-dark-gray fs-xs">',
-        `${located}`,
-        '</div>',
-        '</div>',
-        '<div class="w-icon">',
-        '<svg class="icon icon-goto">',
-        '<use xlink:href="#svg-search-goto"></use>',
-        '</svg>',
-        '</div>',
-        '</a>'
-      );
-
-      return node;
+      return spx.dom`
+        <li tabindex="${index === 0 ? '0' : '-1'}">
+          <a href="${heading.anchor}" class="d-flex ai-center">
+            <div class="w-icon">
+              <svg class="icon"><use xlink:href="#svg-search-${content.type}"></use></svg>
+            </div>
+            <div class="px-3">
+              <div class="result">
+                ${sentence.replace(match, '<strong>$1</strong>')}
+              </div>
+              <div class="d-block upper ff-heading fw-bold fc-dark-gray fs-xs">
+                ${located}
+              </div>
+            </div>
+            <div class="w-icon">
+              <svg class="icon icon-goto"><use xlink:href="#svg-search-goto"></use></svg>
+            </div>
+          </a>
+        </li>
+      `;
 
     });
 
@@ -224,25 +215,30 @@ export class Search extends spx.Component({
 
   }
 
-  get nothing () {
-    return glue(
-      '<div class="row jc-center">',
-      `<h4 class="col-12 tc mb-3">"<span class="fc-gray normal">${this.state.query}</span>"</h4>`,
-      '<h6 class="col-12 fs-xs tc mb-3 fc-white">',
-      'Nothing Found',
-      '</h6>',
-      '<div class="col-auto">',
-      '<svg class="icon icon-clown mx-auto">',
-      '<use xlink:href="#svg-clown"></use>',
-      '</svg>',
-      '</div>',
-      '</div>'
-    );
+  get nothing (): HTMLLIElement {
+
+    return spx.dom`
+      <li>
+        <div class="row jc-center">
+          <h4 class="col-12 tc mb-3">
+            "<span class="fc-gray normal">${this.state.query}</span>"
+          </h4>
+          <h6 class="col-12 fs-xs tc mb-3 fc-white">
+            Nothing Found
+          </h6>
+          <div class="col-auto">
+            <svg class="icon icon-clown mx-auto">
+            <use xlink:href="#svg-clown"></use>
+            </svg>
+          </div>
+        </div>
+      </li>
+    `;
   }
 
   public index: SearchIndex;
   public result: SearchContent[] = [];
   public match = { keys: [ { threshold: matchSorter.rankings.CONTAINS, key: 'text' } ] };
-  public noResults: HTMLLIElement = document.createElement('li');
+  public noResults: HTMLLIElement;
 
 }

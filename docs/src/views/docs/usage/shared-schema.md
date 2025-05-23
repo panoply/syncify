@@ -24,8 +24,8 @@ In theme development, we often need to reuse schema across multiple sections. Ho
 
 Shared Schema usage begins with the `schema` configuration `paths` option. The `schema` paths option is where Syncify will resolve shared schema JSON files. By default, Syncify assumes your shared schema files exist within a directory named `schema` relative to the `input` base directory, see below:
 
-:::: grid row
-::: grid col
+:: row
+:: col
 
 ```js
 import { defineConfig } from '@syncify/cli';
@@ -40,8 +40,8 @@ export default defineConfig({
 
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```treeview
 /
@@ -54,8 +54,8 @@ export default defineConfig({
         └── baz.schema
 ```
 
-:::
-::::
+::
+::
 
 The above example is the **default** configuration the Syncify will adhere to using, wherein shared schema files are to exist within a `source/schema` directory. Shared Schema files can use `.schema` or `.json` extension, both are valid and will be interepreted as JSON with the difference being that files using the `.schema` extension support intellisense features and generally the preferred format to apply is `.schema` as the VSCode Liquid extension has built-in intellisense support for files using the `.schema` extension.
 
@@ -82,8 +82,8 @@ There are several different structures you can use for defining `settings` and `
 
 ### Setting Singleton
 
-:::: grid row
-::: grid col
+:: row
+:: col
 
 ```json
 {
@@ -98,8 +98,8 @@ There are several different structures you can use for defining `settings` and `
 }
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```liquid
 {{ section.settings.info }}
@@ -117,8 +117,8 @@ There are several different structures you can use for defining `settings` and `
 
 ```
 
-:::
-::::
+::
+::
 
 ---
 
@@ -126,8 +126,8 @@ There are several different structures you can use for defining `settings` and `
 
 Below is an example of a shared schema settings spread. The approach accepts an array list of settings and when referenced in sections will spread the output.
 
-:::: grid row
-::: grid col
+:: row
+:: col
 
 ```json
 {
@@ -146,8 +146,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 }
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```liquid
 
@@ -166,8 +166,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 {% endschema %}
 ```
 
-:::
-::::
+::
+::
 
 ---
 
@@ -175,8 +175,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 
 Below is an example of a shared schema settings spread. The approach accepts an array list of settings and when referenced in sections will spread the output. Below is an example of a shared schema settings spread. The approach accepts an array list of settings and when referenced in sections will spread the output.
 
-:::: grid row dir-each
-::: grid col
+:: row dir-each
+:: col
 
 ```json
 {
@@ -194,8 +194,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 }
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```liquid
 
@@ -215,15 +215,15 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 
 ```
 
-:::
-::::
+::
+::
 
 ---
 
 ### Block Singleton
 
-:::: grid row dir-each
-::: grid col
+:: row dir-each
+:: col
 
 ```json
 {
@@ -242,8 +242,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 }
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```liquid
 
@@ -268,8 +268,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 
 ```
 
-:::
-::::
+::
+::
 
 ---
 
@@ -277,8 +277,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 
 Below is an example of a shared schema settings spread. The approach accepts an array list of settings and when referenced in sections will spread the output. Below is an example of a shared schema settings spread. The approach accepts an array list of settings and when referenced in sections will spread the output.
 
-:::: grid row
-::: grid col
+:: row
+:: col
 
 ```json
 {
@@ -312,8 +312,8 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 }
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```liquid
 
@@ -348,5 +348,5 @@ Below is an example of a shared schema settings spread. The approach accepts an 
 
 ```
 
-:::
-::::
+::
+::

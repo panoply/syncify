@@ -36,8 +36,8 @@ In order to best illustrate how the metafield sync capabilities work it is impor
 2. Syncify will use the sub-directory names as the metafield
 3. `namespace` and the JSON file names contained within each namespace directory are used as the metafield `key` name.
 
-:::: grid row mb-4 ai-center
-::: grid col fill-papyrus
+:: row mb-4 ai-center
+:: col fill-papyrus
 
 ##### Input Structure: `{js} { input: 'source' }`
 
@@ -53,13 +53,13 @@ In order to best illustrate how the metafield sync capabilities work it is impor
 
 {% endraw %}
 
-:::
-::: grid col-auto
+::
+:: col-auto
 
 {% svg 'arrow-right', 'icon-output'%}
 
-:::
-::: grid col
+::
+:: col
 
 ##### Output Structure `{js} { output: 'theme' }`
 
@@ -75,5 +75,5 @@ source/
             └── weight.json
 ```
 
-:::
-::::
+::
+::

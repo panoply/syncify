@@ -31,8 +31,8 @@ Before going ahead with the quickstart, please ensure you have all the following
 
 If you haven't already installed Syncify, proceed with a global installation. Although installing Syncify on a per-project basis is an option, global installation is generally preferred. This approach avoids the need to prefix the binary with your package manager each time you use them. For the purpose of this quickstart guide, we will install Syncify globally:
 
-:::: grid row mt-5
-::: grid col-12 col-md-6 pr-4 mb-5
+:: row mt-5
+:: col-12 col-md-6 pr-4 mb-5
 
 #### PNPM
 
@@ -40,8 +40,8 @@ If you haven't already installed Syncify, proceed with a global installation. Al
 pnpm add @syncify/cli -g
 ```
 
-:::
-::: grid col-12 col-md-6 pl-4 mb-5
+::
+:: col-12 col-md-6 pl-4 mb-5
 
 #### NPM
 
@@ -49,8 +49,8 @@ pnpm add @syncify/cli -g
 npm i @syncify/cli -g
 ```
 
-:::
-::: grid col-12 col-md-6 pr-4
+::
+:: col-12 col-md-6 pr-4
 
 #### YARN
 
@@ -58,8 +58,8 @@ npm i @syncify/cli -g
 yarn add @syncify/cli -g
 ```
 
-:::
-::: grid col-12 col-md-6 pl-4
+::
+:: col-12 col-md-6 pl-4
 
 #### BUN
 
@@ -67,8 +67,8 @@ yarn add @syncify/cli -g
 bun add @syncify/cli -g
 ```
 
-:::
-::::
+::
+::
 
 ---
 
@@ -76,8 +76,8 @@ bun add @syncify/cli -g
 
 After installing Syncify, use the `sy init` command to initialize a new project. This command analyzes the current directory and guides you through an interactive setup prompt. It's the fastest way to get started using Syncify.
 
-:::: grid row mt-5
-::: grid col-12 col-md-6 fs-sm pr-5
+:: row mt-5
+:: col-12 col-md-6 fs-sm pr-5
 
 #### Global Binary 👍
 
@@ -85,8 +85,8 @@ After installing Syncify, use the `sy init` command to initialize a new project.
 sy init
 ```
 
-:::
-::: grid col-12 col-md-6 fs-sm
+::
+:: col-12 col-md-6 fs-sm
 
 #### Local Binary 👎
 
@@ -94,8 +94,8 @@ sy init
 pnpm sy init
 ```
 
-:::
-::::
+::
+::
 
 > If you execute `sy init` inside an existing theme project that is determined to be using a flat-directory structure, Syncify will complain due to the enforced [hierarchical](/usage/directory-structures/) structure it imposes.
 
@@ -105,8 +105,8 @@ pnpm sy init
 
 If you're looking to test things out, you can select [straps](https://github.com/syncifycli/). These straps provide pre-configured themes and usage examples that help developers kickstart their development with Syncify. To generate a new project, we'll use the bare-bones [Dusk Theme](https://github.com/syncifycli/dusk) strap. Run the `create` command along with `"dusk"` and Syncify will create a project based on that strap:
 
-:::: grid row mt-5
-::: grid col-12 col-md-6 fs-sm pr-5
+:: row mt-5
+:: col-12 col-md-6 fs-sm pr-5
 
 #### Global Binary 👍
 
@@ -114,8 +114,8 @@ If you're looking to test things out, you can select [straps](https://github.com
 sy create "dusk"
 ```
 
-:::
-::: grid col-12 col-md-6 fs-sm
+::
+:: col-12 col-md-6 fs-sm
 
 #### Local Binary 👎
 
@@ -123,8 +123,8 @@ sy create "dusk"
 pnpm sy create "dusk"
 ```
 
-:::
-::::
+::
+::
 
 > Omitting the strap target name (i.e, `"dusk"`) and running `{bash} sy create` will provide you with a list of usage examples and themes to select from. All straps are open source and available on [github](https://github.com/syncifycli/).
 
@@ -134,8 +134,8 @@ pnpm sy create "dusk"
 
 If you've provided Syncify with store access, the `sy create` command would have offered you the option to publish the generated theme directly to your Shopify store. If the theme has already been published, you can proceed with development. However, if you haven't provided store access or published the theme, you'll need to do so before development can start. Use the `publish` command, which will verify store access and guide you through setting up authorization if needed, before moving forward.
 
-:::: grid row mt-5
-::: grid col-12 col-md-6 fs-sm pr-5
+:: row mt-5
+:: col-12 col-md-6 fs-sm pr-5
 
 #### Global Binary 👍
 
@@ -143,8 +143,8 @@ If you've provided Syncify with store access, the `sy create` command would have
 sy publish
 ```
 
-:::
-::: grid col-12 col-md-6 fs-sm
+::
+:: col-12 col-md-6 fs-sm
 
 #### Local Binary 👎
 
@@ -152,8 +152,8 @@ sy publish
 pnpm sy publish
 ```
 
-:::
-::::
+::
+::
 
 > When prompted to specify the theme role, select `development` to prevent creating an additional theme or overwriting an existing live theme. For more information and a detailed overview, see the [publishing](/usage/publishing) (usage) guide.
 

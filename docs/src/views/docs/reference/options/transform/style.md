@@ -16,29 +16,29 @@ The `style` transform option simplifies the process of bundling CSS, SCSS, or SA
 
 Get started using one the example straps for a real-world implementation reference.
 
-:::: grid row
-::: grid col-4
+:: row
+:: col-4
 
 ```bash
 sy create using-postcss
 ```
 
-:::
-::: grid col-4
+::
+:: col-4
 
 ```bash
 sy create using-tailwind
 ```
 
-:::
-::: grid col-4
+::
+:: col-4
 
 ```bash
 sy create using-sass
 ```
 
-:::
-::::
+::
+::
 
 ---
 

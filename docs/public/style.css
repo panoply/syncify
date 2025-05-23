@@ -12130,6 +12130,7 @@ h1 > code, .h1 > code {
   background-color: #2e2e2f;
   border: #373b3e 0.01rem solid;
   border-radius: 7px;
+  scroll-padding: 14px;
   overflow-y: scroll;
   margin: 0;
   padding: 0;
@@ -12152,13 +12153,6 @@ h1 > code, .h1 > code {
 .search .search-list.no-results {
   padding: 40px 0;
 }
-.search .search-list.no-results li:first-of-type {
-  background-color: #2e2e2f;
-  border: none;
-}
-.search .search-list.no-results li:first-of-type a {
-  color: #ffffff;
-}
 .search .search-list.no-results > li {
   display: flex;
   height: 100%;
@@ -12179,22 +12173,19 @@ h1 > code, .h1 > code {
   margin: 4px;
   background-color: #1b1b1b;
 }
-.search .search-list li:first-of-type {
-  background-color: #121212;
-}
-.search .search-list li:first-of-type a {
+.search .search-list li[tabindex="0"] a {
   color: #ffffff;
 }
-.search .search-list li:first-of-type .result strong {
+.search .search-list li[tabindex="0"] .result strong {
   text-decoration: underline;
   color: #4ebb74;
 }
-.search .search-list li.active, .search .search-list li:hover {
+.search .search-list li[tabindex="0"], .search .search-list li:hover {
   transition: background-color 20ms linear 20ms;
   background-color: #121212;
   cursor: pointer;
 }
-.search .search-list li.active .icon-goto, .search .search-list li:hover .icon-goto {
+.search .search-list li[tabindex="0"] .icon-goto, .search .search-list li:hover .icon-goto {
   opacity: 1;
 }
 .search .search-list li a {

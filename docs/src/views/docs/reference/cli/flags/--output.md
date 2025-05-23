@@ -10,26 +10,26 @@ You can override or redefine the `output` directory via the command line using t
 
 For example, to set the `dist` directory as the output and trigger a theme build:
 
-:::: grid row ai-center my-5
-::: grid col
+:: row ai-center my-5
+:: col
 
 ```bash
 syncify --build --output dist
 ```
 
-:::
-::: grid col-auto fs-sm ff-head pt-3 d-none d-sm-flex
+::
+:: col-auto fs-sm ff-head pt-3 d-none d-sm-flex
 
 OR
 
-:::
-::: grid col
+::
+:: col
 
 ```bash
 sy -b -o dist
 ```
 
-:::
-::::
+::
+::
 
 This option is useful when you need to dynamically change the output directory for specific builds. Ensure the provided path is valid and follows Syncify’s directory structure guidelines to avoid complications during file syncing.

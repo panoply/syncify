@@ -20,29 +20,29 @@ The core distribution size of Syncify is approximately `{js} 400kb` (excluding d
 
 <div class="col-12 mt-3 bd rd-2 px-4 mb-5">
 
-:::: grid row
-::: grid col pr-5 br ll-check pt-4
+:: row
+:: col pr-5 br ll-check pt-4
 
 #### Node
 
 Compatible v20^
 
-:::
-::: grid col pr-5 br ll-check pt-4
+::
+:: col pr-5 br ll-check pt-4
 
 #### Bun
 
 Compatible v1^
 
-:::
-::: grid col pr-5 ll-check pt-4
+::
+:: col pr-5 ll-check pt-4
 
 #### Deno
 
 Uncompatible
 
-:::
-::::
+::
+::
 
 </div>
 
@@ -50,29 +50,29 @@ Uncompatible
 
 <div class="col-12 mt-3 bd rd-2 px-4 mb-5">
 
-:::: grid row
-::: grid col pr-5 br ll-check pt-4
+:: row
+:: col pr-5 br ll-check pt-4
 
 #### MacOS
 
 Fully supported.
 
-:::
-::: grid col pr-5 br ll-check pt-4
+::
+:: col pr-5 br ll-check pt-4
 
 #### Windows
 
 Partial support.
 
-:::
-::: grid col pr-5 ll-check pt-4
+::
+:: col pr-5 ll-check pt-4
 
 #### Linux
 
 Partial support.
 
-:::
-::::
+::
+::
 
 </div>
 
@@ -80,29 +80,29 @@ Partial support.
 
 <div class="col-12 mt-3 bd rd-2 px-4 mb-5">
 
-:::: grid row
-::: grid col pr-5 br ll-check pt-4
+:: row
+:: col pr-5 br ll-check pt-4
 
 #### JavaScript
 
 Fully supported.
 
-:::
-::: grid col pr-5 br ll-check pt-4
+::
+:: col pr-5 br ll-check pt-4
 
 #### TypeScript
 
 Fully supported.
 
-:::
-::: grid col pr-5 ll-check pt-4
+::
+:: col pr-5 ll-check pt-4
 
 #### ESM + CJS
 
 Fully supported.
 
-:::
-::::
+::
+::
 
 </div>
 
@@ -110,29 +110,29 @@ Fully supported.
 
 <div class="col-12 mt-3 bd rd-2 px-4 mb-5">
 
-:::: grid row
-::: grid col pr-5 br ll-check pt-4
+:: row
+:: col pr-5 br ll-check pt-4
 
 #### PNPM
 
 Fully supported v8^
 
-:::
-::: grid col pr-5 br ll-check pt-4
+::
+:: col pr-5 br ll-check pt-4
 
 #### NPM
 
 Fully supported v8^
 
-:::
-::: grid col pr-5 ll-check pt-4
+::
+:: col pr-5 ll-check pt-4
 
 #### Yarn
 
 Fully supported v1^
 
-:::
-::::
+::
+::
 
 </div>
 

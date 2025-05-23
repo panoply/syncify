@@ -25,6 +25,6 @@ export default spx({
     trigger: 'href'
   },
   progress: {
-    bgColor: 'red'
+    bgColor: '#198754'
   }
 });

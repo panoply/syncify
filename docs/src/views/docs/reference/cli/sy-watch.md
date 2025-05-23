@@ -19,8 +19,8 @@ sy watch --flags    # Pass an accepted flag to modify watch execution
 
 The `sy watch` command accepts several flags that allow you to customize its behavior in watch mode. Certain flags can alter how Syncify processes file modifications or unlock additional watch mode features, such as enabling [HOT Reloads](/usage/hot-reloding/) for real-time updates in the Shopify environment.
 
-:::: grid row mt-4 mb-5
-::: grid col-12 col-md-11 p-4 fs-sm
+:: row mt-4 mb-5
+:: col-12 col-md-11 p-4 fs-sm
 
 {% include './flags/--target.md' %}
 
@@ -36,5 +36,5 @@ The `sy watch` command accepts several flags that allow you to customize its beh
 
 {% include './flags/--help.md' %}
 
-:::
-::::
+::
+::

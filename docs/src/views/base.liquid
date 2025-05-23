@@ -32,7 +32,7 @@
           {%- include 'include/sidebar' -%}
         </aside>
         <div id="content"
-        class="row jc-center {% if anchors %}jc-md-around{% else %}jc-md-start pl-4{% endif %} content-offset">
+          class="row jc-center {% if anchors %}jc-md-around{% else %}jc-md-start pl-4{% endif %} content-offset">
           <main class="col-11 col-sm-9 pb-4">
             {%- include 'include/breadcrumb' -%}
             {{- content -}}
@@ -42,7 +42,8 @@
             <div
               class="col-auto anchors d-none d-md-unset"
               spx-component="scrollspy"
-              >
+              spx-scrollspy:class="fc-green"
+            >
               <ul>
                 {%- for name in anchors -%}
                   <li>
@@ -61,8 +62,5 @@
     {%- sprite -%}
     {%- search 'syncify' -%}
 
-    <div
-      class="drawer-backdrop"
-      spx-node="drawer.backdrop"></div>
   </body>
 </html>

@@ -31,8 +31,8 @@ TODO: Inform on how Syncify targets unpublished theme roles VS how the Shopify C
 
 Defining targets within a `package.json` file is the **recommended** method to use for managing store and theme references. You can specify project targets within an object located on the syncify → stores property. For each store, you need to provide the shop name, the target name for the theme, and the theme id. The structure within the package.json file for managing your Shopify stores and themes looks like this:
 
-:::: grid row mt-2
-::: grid col-12 col-md-6 pr-4 mb-5 targets-height
+:: row mt-2
+:: col-12 col-md-6 pr-4 mb-5 targets-height
 
 ##### Single Store + Multiple themes
 
@@ -52,8 +52,8 @@ Defining targets within a `package.json` file is the **recommended** method to u
 }
 ```
 
-:::
-::: grid col-12 col-md-6 pl-4 mb-5 targets-height
+::
+:: col-12 col-md-6 pl-4 mb-5 targets-height
 
 ##### Multiple Stores + Themes
 
@@ -74,15 +74,15 @@ Defining targets within a `package.json` file is the **recommended** method to u
 }
 ```
 
-:::
-::::
+::
+::
 
 # Alternatives
 
 The `stores.toml` or `stores.yaml` files serve as alternative methods for defining targets, particularly if you're not using NPM modules or prefer to keep store references in a dedicated file. These files enable you to manage your Shopify store configurations independently of your `package.json`. Here are the structures these files should follow:
 
-:::: grid row mt-5
-::: grid col-12 col-md-6 pr-4 mb-2
+:: row mt-5
+:: col-12 col-md-6 pr-4 mb-2
 
 #### Using Toml File
 
@@ -96,8 +96,8 @@ The `stores.toml` or `stores.yaml` files serve as alternative methods for defini
   stage = 123456789
 ```
 
-:::
-::: grid col-12 col-md-6 pl-4 mb-2
+::
+:: col-12 col-md-6 pl-4 mb-2
 
 #### Using Yaml File
 
@@ -111,8 +111,8 @@ The `stores.toml` or `stores.yaml` files serve as alternative methods for defini
   stage: 123456789
 ```
 
-:::
-::::
+::
+::
 
 > It recommended to use these methods as a **last resort** since they necessitate additional parsing steps, which can potentially impact runtime performance.
 

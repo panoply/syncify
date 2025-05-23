@@ -69,6 +69,11 @@ function tabs (tokens, index) {
 
 }
 
+function strip (input) {
+  const output = input.replace(/\{([a-z]+)\}(.*?)/g, (_, language, code) => papyrus.inline(code, { language }));
+  return output;
+}
+
 /**
  * Eleventy Build
  *
@@ -118,9 +123,21 @@ module.exports = defineConfig(function (config) {
   config.addLiquidShortcode('schema', () => '{% schema %}');
   config.addLiquidShortcode('endschema', () => '{% endschema %}');
   config.addPlugin(sprite, { inputPath: './src/assets/svg' });
-  config.addPlugin(search, { minify: true });
   config.addPlugin(terser);
   config.addPassthroughCopy({ 'src/assets/fonts/': 'assets/fonts' });
+  config.addPlugin(search, {
+    minify: true,
+    onHeading: strip,
+    onContent: strip,
+    ignore: {
+      syntax: [
+        /^<[a-z]/g,
+        '{{',
+        '{%',
+        '::'
+      ]
+    }
+  });
 
   return {
     htmlTemplateEngine: 'liquid',

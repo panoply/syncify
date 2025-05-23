@@ -13,8 +13,8 @@ The `output` option specifies where the generated Shopify theme will be written.
 
 When the `output` option is `{ts} undefined`, Syncify automatically defaults to the `theme` directory. You are discouraged from using subdirectories, as this can complicate project organization and potentially cause build issues.
 
-:::: grid row ai-center my-5
-::: grid col-4
+:: row ai-center my-5
+:: col-4
 
 ```treeview
 /
@@ -24,8 +24,8 @@ When the `output` option is `{ts} undefined`, Syncify automatically defaults to 
 └── syncify.config.ts
 ```
 
-:::
-::: grid col
+::
+:: col
 
 ```js
 import { defineConfig } from '@syncify/cli';
@@ -36,7 +36,7 @@ export default defineConfig({
 });
 ```
 
-:::
-::::
+::
+::
 
 > For best results, avoid setting subdirectory paths to prevent structural issues. Refer to the [Directory Structure](/usage/directory-structure/) documentation for detailed guidance on managing project paths in Syncify.

@@ -8,8 +8,8 @@ permalink: '/options/input/index.html'
 
 The `input` option defines the source directory containing theme files and must be set to a relative path. It accepts a `string` value type and defaults to `source`. Reverse paths (e.g., `../`) are not allowed to ensure the integrity and security of file referencing. When left `{ts} undefined`, Syncify will automatically fall back to the default `source` directory.
 
-:::: grid row ai-center my-5
-::: grid col
+:: row ai-center my-5
+:: col
 
 ```js
 import { defineConfig } from '@syncify/cli';
@@ -20,8 +20,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::: grid col-4
+::
+:: col-4
 
 ```treeview
 /
@@ -31,8 +31,8 @@ export default defineConfig({
 └── syncify.config.ts
 ```
 
-:::
-::::
+::
+::
 
 > It is recommended not to set subdirectory paths, as this can complicate project structure. For a detailed guide on how project paths are handled in Syncify, refer to the [Directory Structure](/usage/directory-structure/) documentation.
 

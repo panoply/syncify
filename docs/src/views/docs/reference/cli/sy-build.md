@@ -48,8 +48,8 @@ sy build liquid             # Run build on Liquid files
 
 The `sy build` command accepts several flags that allow you to customize its behavior in **build** mode. Certain flags can alter how Syncify processes file modifications.
 
-:::: grid row mt-2 mb-5
-::: grid col-12 col-md-9 fs-sm
+:: row mt-2 mb-5
+:: col-12 col-md-9 fs-sm
 
 {% include './flags/--target.md' %}
 
@@ -57,5 +57,5 @@ The `sy build` command accepts several flags that allow you to customize its beh
 
 {% include './flags/--clean.md' %}
 
-:::
-::::
+::
+::

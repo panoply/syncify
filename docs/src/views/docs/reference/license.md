@@ -24,8 +24,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-:::: grid row
-::: grid col-12 fs-sm ll-check
+:: row
+:: col-12 fs-sm ll-check
 
 ##### Freedom to Use
 
@@ -51,5 +51,5 @@ You must include the original copyright notice and a copy of the license in any 
 
 The Apache License 2.0 is compatible with many other open-source licenses, like the MIT License and GPL v3.
 
-:::
-::::
+::
+::

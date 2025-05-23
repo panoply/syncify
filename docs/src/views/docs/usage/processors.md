@@ -38,8 +38,8 @@ Some third-party tools either require or allow the use of configuration files (e
 
 For instance, if you have a `postcss.config.js` file in your project, then Syncify will detect this file at runtime and use its exported value when processing CSS with PostCSS, setting it as the default for `processor.postcss` options. Below is an example of how we can leverage the `processor` option and eliminate additional config files in our projects workspace.
 
-:::: grid row ai-center my-5
-::: grid col fs-sm
+:: row ai-center my-5
+:: col fs-sm
 
 <!-- prettier-ignore -->
 ```js
@@ -53,13 +53,13 @@ module.exports = {
 };
 ```
 
-:::
-::: grid px-0 col-auto
+::
+:: px-0 col-auto
 
 {% svg 'arrow-right', 'icon-output'%}
 
-:::
-::: grid col
+::
+:: col
 
 <!-- prettier-ignore -->
 ```js
@@ -73,8 +73,8 @@ export default defineConfig({
 });
 ```
 
-:::
-::::
+::
+::
 
 # Transform Overrides
 

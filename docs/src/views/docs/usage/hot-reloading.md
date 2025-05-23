@@ -28,8 +28,8 @@ Syncify's HOT Reloading functionality is enabled through the integration of [uWe
 
 This injection approach enables real-time, incremental updates by simulating a localhost environment within your remote store. External assets like stylesheets and scripts that would normally be served through the themes assets CDN (referenced via `{html} <script src="">` and `{html} <link rel="">` tags) are instead routed through **uWebSockets**. This direct serving from your local environment ensures instantaneous updates while maintaining the context of your remote store, effectively bridging the gap between local development and remote deployment.
 
-:::: grid row my-5
-::: grid col-6 fs-sm
+:: row my-5
+:: col-6 fs-sm
 
 #### Before Injection
 
@@ -52,8 +52,8 @@ The HOT Snippet will be injected after `{html} <head>` element.
 
 {% endraw %}
 
-:::
-::: grid col-6 fs-sm
+::
+:: col-6 fs-sm
 
 #### After Injection
 
@@ -75,8 +75,8 @@ The layout file has injected {% raw %}`{liquid} {% render %}`{% endraw %} snippe
 ```
 
 {% endraw %}
-:::
-::::
+::
+::
 
 ---
 
@@ -96,8 +96,8 @@ Both approaches have their trade-offs. While Syncify's method requires DOM injec
 
 The `--hot` flag must be passed when running `sy watch` mode to enable HOT Reloading. You can control and fine grain HOT Reloading behaviour on the `hot` option within config files, but in most cases the defaults will work just fine.
 
-:::: grid row my-5
-::: grid col-12 col-md-6 fs-sm pr-5
+:: row my-5
+:: col-12 col-md-6 fs-sm pr-5
 
 #### Global Binary 👍
 
@@ -105,8 +105,8 @@ The `--hot` flag must be passed when running `sy watch` mode to enable HOT Reloa
 sy watch --hot
 ```
 
-:::
-::: grid col-12 col-md-6 fs-sm
+::
+:: col-12 col-md-6 fs-sm
 
 #### Local Binary 👎
 
@@ -114,8 +114,8 @@ sy watch --hot
 pnpm sy watch --hot
 ```
 
-:::
-::::
+::
+::
 
 ### Config Options
 

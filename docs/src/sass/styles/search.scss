@@ -103,6 +103,7 @@
     background-color: $ebony;
     border: $border-color $border-width solid;
     border-radius: 7px;
+    scroll-padding: 14px;
     overflow-y: scroll;
     margin: 0;
     padding: 0;
@@ -129,15 +130,6 @@
     &.no-results {
       padding: 40px 0;
 
-      li:first-of-type {
-        background-color: $ebony;
-        border: none;
-
-        a {
-          color: $white;
-        }
-      }
-
       > li {
         display: flex;
         height: 100%;
@@ -161,9 +153,7 @@
       margin: 4px;
       background-color: #1b1b1b;
 
-      &:first-of-type {
-        background-color: $body-bg;
-
+      &[tabindex='0'] {
         a {
           color: $white;
         }
@@ -174,7 +164,7 @@
         }
       }
 
-      &.active,
+      &[tabindex='0'],
       &:hover {
         transition: background-color 20ms linear 20ms;
         background-color: $body-bg;

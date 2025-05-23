@@ -32,8 +32,8 @@ next:
 
 Modes in Syncify define distinct execution tasks that drive your Shopify theme development workflow. Each mode corresponds to a specific command, enabling developers to perform actions like building, syncing, or managing themes with precision. There are a range of modes available, designed to tackle everything from setup to deployment.
 
-:::: grid row jc-center
-::: grid col-12
+:: row jc-center
+:: col-12
 
 ```bash
 Modes:
@@ -55,11 +55,11 @@ Modes:
   sy doctor                   # Helps diagnose and patch any potential issues in local projects
 ```
 
-:::
-::::
+::
+::
 
-:::: grid row mt-5
-::: grid col-12 col-md-12 fs-sm
+:: row mt-5
+:: col-12 col-md-12 fs-sm
 
 ## sy init
 
@@ -125,7 +125,7 @@ The sy prune mode clears and resets Syncify’s project cache, eliminating stale
 
 The sy doctor mode analyzes your local project for potential issues and suggests fixes. It checks configurations, file integrity, and Syncify’s health, acting as a troubleshooting assistant. Use this when something feels off—whether it’s build errors or sync failures—to diagnose and patch problems efficiently.
 
-:::
-::::
+::
+::
 
 ---

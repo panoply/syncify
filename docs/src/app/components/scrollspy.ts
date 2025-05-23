@@ -2,51 +2,34 @@ import spx from 'spx';
 
 export class ScrollSpy extends spx.Component({
   name: 'scrollspy',
-  nodes: <const>[
-    'href',
-    'anchor'
-  ],
+  nodes: <const>[ 'href', 'anchor' ],
   state: {
-    threshold: 0,
-    rootMargin: '0px'
+    class: String,
+    anchors: Array<string>
   }
 }) {
 
-  /**
-   * Stimulus: Initialize
-   */
-  connect () {
-
-    this.options = {
-      rootMargin: this.state.rootMargin,
-      threshold: this.state.threshold
-    };
-
-  }
-
   onmount () {
 
+    if (!this.hrefExists) return;
+
     window.onscroll = this.onScroll.bind(this);
-    this.hrefNode.classList.add('fc-green');
-    this.anchors = this.hrefNodes.map(a => a.href.slice(a.href.lastIndexOf('#') + 1));
 
-  }
+    this.hrefNode.classList.add(this.state.class);
+    this.state.anchors.length === 0 && this.hrefNodes.forEach(a => {
+      this.state.anchors.push(a.href.slice(a.href.lastIndexOf('#') + 1));
+    });
 
-  unmount (): void {
-
-    this.anchors = [];
+    this.onScroll();
 
   }
 
   onScroll () {
-
     this.anchorNodes.forEach((node, i) => {
-      if (this.anchors.includes(node.id)) {
-        const next = node.getBoundingClientRect().top - 150;
-        if (next < window.screenY && this.hrefNodes[i]) {
-          this.hrefNodes.forEach(href => href.classList.remove('fc-green'));
-          this.hrefNodes[i].classList.add('fc-green');
-        }
+      if (!this.state.anchors.includes(node.id)) return;
+      if (node.getBoundingClientRect().top < window.screenY && this.hrefNodes[i]) {
+        this.hrefNodes.forEach(href => href.classList.remove(this.state.class));
+        this.hrefNodes[i].classList.add(this.state.class);
       }
     });
   };
@@ -54,9 +37,5 @@ export class ScrollSpy extends spx.Component({
   /* -------------------------------------------- */
   /* TYPE VALUES                                  */
   /* -------------------------------------------- */
-
-  anchors: string[];
-  observer: IntersectionObserver;
-  options: IntersectionObserverInit;
 
 }
