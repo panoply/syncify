@@ -21,10 +21,13 @@
 
   }
 
+  const green = (text) => `\x1b[1;32m${text}\x1b[0m`;
+  const gray = (text) => `\x1b[0;90m${text}\x1b[0m`;
+  const whiteBold = (text) => `\x1b[1;37m${text}\x1b[0m`;
+
   // Read package.json for version information
   const cwd = process.cwd();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const gray = (text) => `\x1b[0;90m${text}\x1b[0m`;
 
   // Files to be generated
   const syncifyDir = path.join(os.homedir(), '.syncify');

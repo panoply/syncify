@@ -33,6 +33,7 @@
   const syncifyDir = path.join(os.homedir(), '.syncify');
   const keychainFile = path.join(syncifyDir, '.keychain');
   const versionsFile = path.join(syncifyDir, '.version');
+  const projectsFile = path.join(syncifyDir, '.projects');
   const notifyIconFile = path.join(syncifyDir, 'icon.png');
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
@@ -62,6 +63,14 @@
     logName();
     fs.writeFileSync(keychainFile, '{}');
     console.log(`  ${created} ${gray(keychainFile)}`);
+    hasNewline = 2;
+  }
+
+  // Lets create the .syncify/.projects file if it does not exist
+  if (!fs.existsSync(projectsFile)) {
+    logName();
+    fs.writeFileSync(projectsFile, '{}');
+    console.log(`  ${created} ${gray(projectsFile)}`);
     hasNewline = 2;
   }
 
