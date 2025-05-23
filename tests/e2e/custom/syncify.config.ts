@@ -71,7 +71,11 @@ export default defineConfig({
     },
     script: {
       input: './source/scripts/bundle.ts',
-      rename: '[file].min'
+      rename: '[file].min',
+      target: 'es2018',
+      esbuild: {
+        minify: true
+      }
     },
     style: [
       {
