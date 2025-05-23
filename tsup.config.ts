@@ -245,9 +245,7 @@ export const options: Options = {
   keepNames: false,
   format: 'cjs',
   esbuildPlugins: [
-    // @ts-expect-error
     gql(),
-    // @ts-expect-error
     gqlfile()
   ],
   esbuildOptions (options) {
