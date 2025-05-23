@@ -98,7 +98,7 @@
     "@syncify/json": "workspace:^",
     "@syncify/turndown": "workspace:^",
     "@syncify/uws": "workspace:^",
-    "@tailwindcss/postcss": "^4.0.14",
+    "@tailwindcss/postcss": "^4.1.7",
     "adm-zip": "^0.5.16",
     "cbor": "^10.0.3",
     "clean-css": "^5.3.3",
