@@ -61,11 +61,8 @@ import { $, q } from '$';
  * native manner, with the exception that `string` input is expected.
  */
 function log (...message: string[]): typeof log {
-
   forEach(line => console.write(line), message);
-
   return log;
-
 };
 
 log.runtime = _.TUI('runtime');

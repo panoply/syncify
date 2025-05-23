@@ -406,11 +406,7 @@ error.read = (details: string, entries: { [name: string]: string }) => {
   };
 };
 
-error.json = (
-  err: JSONError,
-  file: string | Partial<File>,
-  ...contexts: [ string?, number? ] | [ number?, string? ]
-) => {
+error.json = (e: JSONError, file: string | Partial<File>, ...contexts: [ string?, number? ] | [ number?, string? ]) => {
 
   let details: string = 'JSON Parse Error';
   let lineOffset: number = 0;
@@ -425,31 +421,31 @@ error.json = (
     }
   }
 
-  const frame = codeframe(err.source, {
+  const frame = codeframe(e.source, {
     language: 'json',
     start: {
-      line: err.line + lineOffset,
-      column: err.column
+      line: e.line + lineOffset,
+      column: e.column
     }
   });
 
   if (lineOffset > 0) {
-    message = err.message
-    .replace(/(line number:?|line:?) (\d+)/i, `$1 ${err.line + lineOffset}`)
+    message = e.message
+    .replace(/(line number:?|line:?) (\d+)/i, `$1 ${e.line + lineOffset}`)
     .replace(/Line \d+:\s+/, NIL);
   } else {
-    message = err.message.replace(/Line \d+:\s+/, NIL);
+    message = e.message.replace(/Line \d+:\s+/, NIL);
   }
 
-  _.Create({ type: 'error' })
+  _.Create({ type: 'eor' })
   .Prepend(details, _.bold)
   .Wrap(_.capture.numbers(message, _.bold), _.redBright)
   .NL
   .Insert(frame)
   .Context({
     entries: {
-      line: err.line + lineOffset,
-      column: err.column,
+      line: e.line + lineOffset,
+      column: e.column,
       input: isString(file) ? relative($.cwd, file) : file.relative,
       processor: _.neonMagenta('JSON')
     }

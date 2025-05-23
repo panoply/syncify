@@ -213,13 +213,7 @@ throws.dependency = (dependencies: string[]) => {
 
 };
 
-throws.option = ({
-  option,
-  name,
-  value,
-  expects,
-  reason = [ NIL ]
-}: {
+throws.option = ({ option, name, value, expects, reason = [ NIL ] }: {
   /**
    * The config option key.
    */
