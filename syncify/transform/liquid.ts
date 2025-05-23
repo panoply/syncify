@@ -240,12 +240,10 @@ export async function LiquidTransform (file: File) {
 
   if ($.mode.watch) timer.start();
 
-  let input = await readFile(file.input, 'utf8');
+  let input = await readFile(file.input, 'utf-8');
 
   if ($.mode.hot && $.hot.layouts.includes(file.base)) {
-
     input = injectRenderSnippet(input);
-
   }
 
   if (file.type === Type.Section || file.type === Type.Block) {
@@ -269,16 +267,18 @@ export async function LiquidTransform (file: File) {
 
   }
 
-  if ($.mode.hot && $.mode.bulk === false) {
-    if (file.type === Type.Section) {
+  if ($.mode.hot) {
+    if ($.mode.bulk === false) {
+      if (file.type === Type.Section) {
 
-      $.wss.alias(JSON.stringify($.hot.alias));
-      $.wss.section(file.name);
+        $.wss.alias(JSON.stringify($.hot.alias));
+        $.wss.section(file.name);
 
+      } else {
+        await q.http.onIdle().then(() => $.wss.replace());
+      }
     } else {
-
       await q.http.onIdle().then(() => $.wss.replace());
-
     }
   }
 
