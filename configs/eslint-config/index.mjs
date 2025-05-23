@@ -17,7 +17,7 @@ export default [
       '**/*.mjs'
     ],
     plugins: {
-      '@typescript-eslint': plugin,
+      '@typescript-eslint': plugin
     },
     languageOptions: {
       sourceType: 'module',
@@ -28,7 +28,6 @@ export default [
       'import/internal-regex': '^@syncify/'
     },
     rules: {
-
 
       'sort-imports': [
         'error',

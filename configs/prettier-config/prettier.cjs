@@ -30,7 +30,7 @@ module.exports = {
     {
       files: [ '**/*.json', '**/*.jsonc', '**/*.schema' ],
       options: {
-        parser: 'json',
+        parser: 'json-stringify',
         printWidth: 80
       }
     },
