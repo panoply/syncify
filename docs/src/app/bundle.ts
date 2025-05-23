@@ -21,7 +21,7 @@ export default spx({
   },
   logLevel: 1,
   hover: {
-    threshold: 100,
+    threshold: 0,
     trigger: 'href'
   },
   progress: {
