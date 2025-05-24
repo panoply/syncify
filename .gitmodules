@@ -1,3 +1,6 @@
+[submodule "straps/themes/skeleton"]
+	path = straps/themes/skeleton
+	url = https://github.com/syncifycli/skeleton.git
 [submodule "straps/themes/dusk"]
 	path = straps/themes/dusk
 	url = https://github.com/syncifycli/dusk.git
