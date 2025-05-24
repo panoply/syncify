@@ -1,0 +1,13 @@
+{
+  "name": "skeleton",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "syncify": {
+    "stores": {
+      "syncify": {
+        "skeleton": 137200533745
+      }
+    }
+  }
+}
