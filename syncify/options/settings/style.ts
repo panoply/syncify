@@ -56,10 +56,23 @@ async function getExternalModules () {
     $.processor.postcss.config = postcss.config;
   }
 
-  $.processor.tailwind.installed = getModules($.pkg, 'tailwindcss');
+  const hasTailwind: boolean = u.values($.config.transform.style).some(style => style.tailwind === true);
 
-  if ($.processor.tailwind.installed) {
+  if (hasTailwind) {
 
+    const tailwindPostcss = getModules($.pkg, '@tailwindcss/postcss');
+    const tailwind = getModules($.pkg, 'tailwindcss');
+
+    switch (false) {
+      case tailwindPostcss || tailwind:
+        throws.dependency([ '@tailwindcss/postcss', 'tailwindcss' ]);
+      case tailwindPostcss:
+        throws.dependency([ '@tailwindcss/postcss' ]);
+      case tailwind:
+        throws.dependency([ 'tailwind' ]);
+    }
+
+    await $import('@tailwindcss/postcss');
     await $import('tailwindcss');
 
     const tw = await readConfigFile<TailwindConfig>('tailwind.config', 'Tailwind', (config) => {
@@ -146,10 +159,6 @@ export async function setStyleConfig () {
     }
 
     if (has('tailwind')) {
-
-      if (!$.processor.tailwind.installed) {
-        throws.dependency([ 'tailwindcss' ]);
-      }
 
       const override = u.isObject(style.tailwind);
 
