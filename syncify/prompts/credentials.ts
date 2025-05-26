@@ -79,7 +79,7 @@ export interface CredentialsPrompt {
    * Access scopes
    *
    */
-  scopes: Record<AccessScopes, boolean>
+  scopes: Partial<Record<AccessScopes, boolean>>
 }
 
 /* -------------------------------------------- */
@@ -149,33 +149,25 @@ export async function PromptCredentialsFile (options: {
   /* DOMAIN ------------------------------------- */
 
   if (state.domain === null) {
-
     state.domain = await PromptStoreDomain();
-
   }
 
   /* API TOKEN ---------------------------------- */
 
   if (state.token === null) {
-
     state.token = await PromptStoreToken();
-
   }
 
   /* METHOD FALLBACK ---------------------------- */
 
   if (state.method === null) {
-
     state.method = await PromptStoreMethod();
-
   }
 
   /* TOKEN NAME --------------------------------- */
 
   if (state.method === 'keychain') {
-
     state.name = await PromptTokenName();
-
   }
 
   /* ADDING NEW CREDENTIAL ---------------------- */
