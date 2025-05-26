@@ -92,7 +92,9 @@ export async function PromptTargetFileTemplate ({ store, method, targets }: {
 
   const template = method === 'package.json'
     ? JsonTemplate(store.name)
-    : method === 'stores.toml' ? await TomlTemplate(store.name) : await YamlTemplate(store.name);
+    : method === 'stores.toml'
+      ? await TomlTemplate(store.name)
+      : await YamlTemplate(store.name);
 
   const fields: Fields[] = [];
 
