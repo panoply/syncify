@@ -103,6 +103,7 @@ async function getTargetFile () {
     if (await pathExists(path)) {
       type = i;
       $.file.targets = path;
+      $.project.targetSource = TARGET_FILES[i];
       return type;
     }
   }
@@ -187,45 +188,39 @@ export async function getTargets (options?: {
   if (action === Action.NOTHING) {
     if ($.pkg !== null) {
       if (hasPath('syncify.stores', $.pkg)) {
-
         if (isObject($.pkg.syncify.stores)) {
 
           method = 'package.json';
 
           if (isEmpty($.pkg.syncify.stores)) {
-
             action = Action.PROMPT_THEMES;
             method = 'package.json';
-
           } else {
-
             target = $.pkg.syncify.stores;
-
+            $.project.targetSource = 'package.json';
           }
 
         } else {
-
           throws([
             `Invalid store/theme target references defined in ${bold('package.json')} file`
           ], [
             `Syncify expects and ${cyan('object')} type structure`
           ]);
-
         }
-
       } else if (has('syncify', $.pkg)) {
         action = Action.PKG_KEY;
         method = 'package.json';
       } else {
         action = Action.CHECK_FILES;
       }
-
     } else {
       action = Action.CHECK_FILES;
     }
   }
 
-  if (action === Action.CHECK_FILES || action === Action.PKG_KEY) {
+  if (
+    action === Action.CHECK_FILES ||
+    action === Action.PKG_KEY) {
 
     const targets = await getStoresFromFile();
 
@@ -234,20 +229,13 @@ export async function getTargets (options?: {
       method = $.file.targets.endsWith('toml') ? 'stores.toml' : 'stores.yaml';
 
       if (isEmpty(targets)) {
-
         action = Action.PROMPT_THEMES;
-
       } else {
-
         action = Action.NOTHING;
         target = targets;
-
       }
-
     } else if (action === Action.CHECK_FILES) {
-
       action = Action.PROMPT;
-
     }
   }
 
@@ -256,7 +244,6 @@ export async function getTargets (options?: {
 
   if (action === Action.PROMPT) {
     if ($.project.credentials !== null) {
-
       banner = true;
       action = Action.PROMPT_THEMES;
       method = await PromptStorage([
@@ -264,7 +251,6 @@ export async function getTargets (options?: {
         'to be defined in your projects root directory. Please select a storage method to use',
         'and follow the prompts' + COL
       ]);
-
     }
   }
 
