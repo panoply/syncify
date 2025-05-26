@@ -126,17 +126,11 @@ export async function setStyleConfig () {
     if (has('postcss')) {
 
       if (u.isArray(style.postcss) && style.postcss.length > 0) {
-
         u.defineProperty(bundle, 'postcss', { get () { return style.postcss; } });
-
       } else {
-
         if (u.isBoolean(style.postcss) && style.postcss !== false && u.isNil(style.postcss) === false) {
-
           u.defineProperty(bundle, 'postcss', { get () { return u.merge($.processor.postcss.config); } });
-
         } else {
-
           throws.typeError(
             {
               option: 'style',
@@ -148,9 +142,7 @@ export async function setStyleConfig () {
         }
       }
     } else {
-
       u.defineProperty(bundle, 'postcss', { get () { return u.merge($.processor.postcss.config); } });
-
     }
 
     if (has('tailwind')) {
@@ -177,7 +169,6 @@ export async function setStyleConfig () {
               '*.{css,js,ts,jsx,tsx,vue,svelte,liquid,json,schema}'
             )
           ];
-
         }
 
         u.defineProperty(bundle, 'tailwind', { get () { return tw; } });
