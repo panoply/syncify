@@ -9,7 +9,7 @@ package
 versions
 node_modules
 
-test/e2e/custom/dist
+test/e2e/**/theme/**
 dump.rdb
 !packages/tests
 packages/**/dist
