@@ -137,6 +137,7 @@ command(
         'help'
       ],
       accepts: [
+        'skeleton',
         'dawn',
         'dusk',
         'silk',

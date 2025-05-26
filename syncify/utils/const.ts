@@ -273,10 +273,11 @@ export const STRAP_THEMES: [
   desciption: string,
   unavailable?: boolean
 ][] = [
-  [ 'dusk', '    Stripped down skeleton theme structure' ],
-  [ 'dawn', '    The official Shopify slop using Syncify' ],
-  [ 'silk', '    Advanced Hybrid with SPX and mithril.js', true ],
-  [ 'hexx', '    Intermediate starting point with basics', true ]
+  [ 'skeleton', '    Based on Shopify Skeleton with no feautres' ],
+  [ 'dusk', '        Stripped down bare-minimum theme structure' ],
+  [ 'dawn', '        The official Shopify slop using Syncify' ],
+  [ 'silk', '        Advanced Hybrid with SPX and mithril.js', true ],
+  [ 'hexx', '        Intermediate starting point with basics', true ]
 ];
 
 /**
