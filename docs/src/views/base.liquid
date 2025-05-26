@@ -10,46 +10,34 @@
       spx-eval="false"
       defer></script>
   </head>
-
   <body>
-
     {%- if page.url == '/' -%}
-
       {%- include 'include/landing' -%}
-
     {%- else -%}
-
       {%- include 'include/navbar' -%}
-
-      <div
-        class="container-fluid container-wrapper"
-        >
-        <aside
-          class="vh-100 d-none d-sm-block sidebar drawer-left drawer-panel"
-          spx-component="drawer"
-          spx-drawer:direction="left"
-          spx-drawer:width="280">
-          {%- include 'include/sidebar' -%}
-        </aside>
-        <div id="content"
+      <div class="container-fluid container-wrapper">
+        {%- include 'include/sidebar' -%}
+        <div
+          id="content"
           class="row jc-center {% if anchors %}jc-md-around{% else %}jc-md-start pl-4{% endif %} content-offset">
-          <main class="col-11 col-sm-9 pb-4">
+          <main class="col-12 col-sm-11 col-lg-9 pb-4">
             {%- include 'include/breadcrumb' -%}
             {{- content -}}
             {%- include 'include/paginate' -%}
           </main>
           {%- if anchors -%}
             <div
-              class="col-auto anchors d-none d-md-unset"
+              class="col-auto anchors d-none d-sm-unset"
               spx-component="scrollspy"
-              spx-scrollspy:class="fc-green"
-            >
+              spx-scrollspy:class="fc-green">
               <ul>
                 {%- for name in anchors -%}
                   <li>
                     <a
                       href="{{ name | anchor }}"
-                      spx-node="scrollspy.href">{{- name -}}</a>
+                      spx-node="scrollspy.href">
+                      {{- name -}}
+                    </a>
                   </li>
                 {%- endfor -%}
               </ul>

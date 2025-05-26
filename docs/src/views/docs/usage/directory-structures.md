@@ -22,7 +22,7 @@ Syncify projects adopt a hierarchical **input** ➔ **output** structure, allowi
 > Syncify currently enforces a strict hierarchical structure and does not support flat structures. However, plans are in place to introduce flat structure compatibility in a future minor version release.
 
 :: row dir-struc my-5
-:: col fs-sm bd-bad
+:: col-12 col-md fs-sm bd-bad
 
 <h4 class="bad mb-1">Flat Structure</h4>
 
@@ -41,12 +41,12 @@ An example of a flat structure where the theme directories are exposed in the ro
 ```
 
 ::
-:: px-0 pt-5 col-auto ac-center stash-next tc
+:: px-0 pt-5 col-auto ac-center stash-next tc d-none d-md-unset
 
 {% svg 'arrow-right', 'icon-output mt-4'%}
 
 ::
-:: col fs-sm bd-good
+:: col-12 col-md fs-sm bd-good mt-5 mt-sm-0
 
 <h4 class="good mb-1">Hierarchical</h4>
 
@@ -84,7 +84,7 @@ The last notable limitation the developers should consider is the longevity, in 
 The base directory `input` and `output` path references point to theme source and distribution files. The values you provide will refer to a directory name that is relative to the root of your project. You **cannot** define multi-level directories (e.g: `some/dir`) or reverse paths (e.g: `../dir`). You can pass these references within a Syncify configuration file or via the CLI.
 
 :: row ai-stretch mb-5
-:: col fs-sm
+:: col-12 col-md fs-sm mb-3 mb-md-0
 
 ```treeview
 /
@@ -95,12 +95,12 @@ The base directory `input` and `output` path references point to theme source an
 ```
 
 ::
-:: px-0 col-auto ac-center stash-next
+:: px-0 col-auto ac-center stash-next d-none d-md-unset
 
 {% svg 'arrow-right', 'icon-output'%}
 
 ::
-:: col-8
+:: co-12 col-md-8
 
 <!-- prettier-ignore -->
 ```js
@@ -128,7 +128,7 @@ The `paths` option lets you customize your theme structure, resolved relative to
 ##### Default Defintions:
 
 :: row ai-stretch dir-each mb-5
-:: col fs-sm
+:: col-12 col-md fs-sm mb-3 mb-sm-0
 
 ```treeview
 source/
@@ -159,12 +159,12 @@ source/
 ```
 
 ::
-:: px-0 col-auto ac-center stash-next
+:: px-0 col-auto ac-center stash-next d-none d-sm-unset
 
 {% svg 'arrow-right', 'icon-output'%}
 
 ::
-:: col-8
+:: col-12 col-md-8
 
 <!-- prettier-ignore -->
 ```js

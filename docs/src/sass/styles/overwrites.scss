@@ -324,6 +324,10 @@ h1 {
   justify-content: space-between;
   align-items: center;
 
+  &.h1-x2 {
+    font-size: 2.5rem !important;
+  }
+
   > code.language-typescript,
   > code.language-bash {
     float: right;
@@ -479,6 +483,7 @@ ul.compare-list {
   .fs-sm {
     font-size: 0.895rem !important;
   }
+
   h6 {
     font-size: 0.875rem;
     font-weight: 300;
@@ -493,10 +498,13 @@ ul.compare-list {
 }
 
 .drawer-panel {
-  background-color: $body-bg !important;
+  @include media-breakpoint-down(sm) {
+    background-color: rgb(7 7 7 / 77%) !important;
+    backdrop-filter: blur(6px);
+  }
 }
 .drawer-left {
-  width: 200px;
+  width: 240px;
 }
 
 .opts > h1 > code {
@@ -584,5 +592,15 @@ ul.compare-list {
 .ai-stretch {
   pre.papyrus {
     height: 100% !important;
+  }
+}
+
+.btn-back {
+  border: $border-width solid $white;
+  border-radius: $border-radius;
+
+  &:hover {
+    border-color: $green;
+    color: $green;
   }
 }

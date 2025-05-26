@@ -1,12 +1,15 @@
 <div class="row mt-5">
   {%- for auth in authentication -%}
     <div class="{{- auth.col }} mb-3">
-      <h4>{{- auth.group -}}</h4>
-      <p class="fs-sm">{{- auth.description -}}</p>
+      <h4>
+        {{- auth.group -}}</h4>
+      <p class="fs-sm">
+        {{- auth.description -}}</p>
       <ul class="no-lst">
         {%- for scope in auth.scopes -%}
           <li class="mb-3">
-            <code class="fs-sm">{{- scope -}}</code>
+            <code class="fs-sm">
+              {{- scope -}}</code>
           </li>
         {%- endfor -%}
       </ul>
@@ -19,6 +22,6 @@
   width="100%"
   style="border: 5px solid #2d333a;border-radius: 10px;">
   <source
-    src="https://brixtol.cloud/open-source/shopify-token.mp4"
-    type="video/mp4">
+  src="https://brixtol.cloud/open-source/shopify-token.mp4"
+  type="video/mp4">
 </video>

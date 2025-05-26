@@ -1,149 +1,156 @@
-<div class="sidebar-scroll px-3 pr-md-3 w-100 br">
-  <nav
-    class="sidebar-menu mt-4 mb-2 sticky"
-    spx-component="sidebar"
-    data-relapse>
+<aside
+  class="vh-100 d-none d-sm-block sidebar drawer-left drawer-panel"
+  spx-component="drawer"
+  spx-drawer:direction="left"
+  spx-drawer:width="300">
+  <div class="sidebar-scroll px-3 pr-md-3 w-100 br">
+    <nav
+      class="sidebar-menu mt-4 mb-2 sticky"
+      spx-component="sidebar"
+      data-relapse>
 
-    {%- if page.url contains '/releases/' -%}
-      {%- assign links = navigation.releases -%}
-    {%- else -%}
-      {%- assign links = navigation.docs -%}
-    {%- endif -%}
-
-    {%- assign has_child = false -%}
-
-    {%- for parent in links -%}
-
-      {%- if parent.url -%}
-        <a
-          spx-scroll="0"
-          href="{{ parent.url | url }}"
-          aria-expanded="true"
-          spx-node="sidebar.link"
-          spx@click="sidebar.onLink"
-          class="menu-links {% if parent.url contains page.url -%}active{%- endif -%}">
-          {{- parent.title -}}
-        </a>
-
+      {%- if page.url contains '/releases/' -%}
+        {%- assign links = navigation.releases -%}
       {%- else -%}
+        {%- assign links = navigation.docs -%}
+      {%- endif -%}
 
-        {%-
-          liquid
-          #
-          # PARENT NAVIGATION GROUP
-          #
-          assign mapped_groups = parent.links | map: 'url'
-          assign parent_expand = false
-          if mapped_groups contains page.url
-            assign parent_expand = true
-          endif
-          for child in parent.links
-            if child.links
-              assign mapped_child = child.links | map: 'url'
-              assign child_expand = false
-              if mapped_child contains page.url
-                assign child_expand = true
-                assign parent_expand = true
-                assign selected = child.title
-                break
-              endif
-            endif
-          endfor
-        -%}
+      {%- assign has_child = false -%}
 
-        <button
-          type="button"
-          {%- if parent_expand -%}
+      {%- for parent in links -%}
+
+        {%- if parent.url -%}
+          <a
+            spx-scroll="0"
+            href="{{ parent.url | url }}"
             aria-expanded="true"
-            class="menu"
-          {%- else -%}
-            class="menu"
-          {%- endif -%}>
-          {{- parent.title -}}
-        </button>
-        <div class="d-block">
-          <ul
-            class="menu-list rel my-0"
-            {%- unless parent_expand -%}
-              hidden="true"
-            {%- endunless -%}>
+            spx-node="sidebar.link"
+            spx@click="sidebar.onLink"
+            class="menu-links {% if parent.url contains page.url -%}active{%- endif -%}">
+            {{- parent.title -}}
+          </a>
 
-            {%- for child in parent.links -%}
-              {%- if child.links -%}
+        {%- else -%}
 
-                <li data-relapse>
+          {%- liquid
+            #
+            # PARENT NAVIGATION GROUP
+            #
+            assign mapped_groups = parent.links | map: 'url'
+            assign parent_expand = false
+            if mapped_groups contains page.url
+              assign parent_expand = true
+            endif
+            for child in parent.links
+              if child.links
+                assign mapped_child = child.links | map: 'url'
+                assign child_expand = false
+                if mapped_child contains page.url
+                  assign child_expand = true
+                  assign parent_expand = true
+                  assign selected = child.title
+                  break
+                endif
+              endif
+            endfor
+            -%}
 
-                  {%- if child.links and child.url -%}
+          
+
+          <button
+            type="button"
+            {%- if parent_expand -%}
+              aria-expanded="true"
+              class="menu"
+            {%- else -%}
+              class="menu"
+            {%- endif -%}>
+            {{- parent.title -}}
+          </button>
+          <div class="d-block">
+            <ul
+              class="menu-list rel my-0"
+              {%- unless parent_expand -%}
+                hidden="true"
+              {%- endunless -%}>
+
+              {%- for child in parent.links -%}
+                {%- if child.links -%}
+
+                  <li data-relapse>
+
+                    {%- if child.links and child.url -%}
+                      <a
+                        spx-scroll="0"
+                        spx-node="sidebar.link"
+                        href="{{ child.url | url }}"
+                        {%- if parent_expand and selected == child.title or page.url == child.url -%}
+                          aria-expanded="true"
+                          class="menu-links py-0 active"
+                        {%- else -%}
+                          class="menu-links py-0"
+                        {%- endif -%}>
+                        {{- child.title | escape -}}
+                      </a>
+                    {%- else -%}
+                      <button
+                        type="button"
+                        {%- if parent_expand and selected == child.title -%}
+                          aria-expanded="true"
+                          class="menu-links py-0"
+                        {%- else -%}
+                          class="menu-links py-0"
+                        {%- endif -%}>
+                        {{- child.title -}}
+                      </button>
+                    {%- endif -%}
+                    <div>
+                      <ul
+                        class="submenu-list rel pl-2"
+                        {%- unless child_expand -%}
+                          hidden="true"
+                        {%- endunless -%}>
+
+                        {%- for item in child.links -%}
+                          <li class="pl-1">
+                            <a
+                              spx-scroll="0"
+                              spx-node="sidebar.link"
+                              spx@click="sidebar.onLink"
+                              href="{{ item.url | url }}"
+                              {%- if page.url == item.url -%}
+                                class="active"
+                              {%- endif -%}>
+                              {{- item.title | escape -}}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  </li>
+
+                {%- else -%}
+                  <li>
                     <a
                       spx-scroll="0"
-                      spx-node="sidebar.link"
                       href="{{ child.url | url }}"
-                      {%- if parent_expand and selected == child.title or page.url == child.url -%}
-                        aria-expanded="true"
-                        class="menu-links py-0 active"
-                      {%- else -%}
-                        class="menu-links py-0"
+                      aria-disabled="true"
+                      spx-node="sidebar.link"
+                      spx@click="sidebar.onLink"
+                      {%- if page.url == child.url -%}
+                        class="active"
                       {%- endif -%}>
                       {{- child.title | escape -}}
                     </a>
-                  {%- else -%}
-                    <button
-                      type="button"
-                      {%- if parent_expand and selected == child.title -%}
-                        aria-expanded="true"
-                        class="menu-links py-0"
-                      {%- else -%}
-                        class="menu-links py-0"
-                      {%- endif -%}>
-                      {{- child.title -}}
-                    </button>
-                  {%- endif -%}
-                  <div>
-                    <ul
-                      class="submenu-list rel pl-2"
-                      {%- unless child_expand -%}
-                        hidden="true"
-                      {%- endunless -%}>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
 
-                      {%- for item in child.links -%}
-                        <li class="pl-1">
-                          <a
-                            spx-scroll="0"
-                            spx-node="sidebar.link"
-                            spx@click="sidebar.onLink"
-                            href="{{ item.url | url }}"
-                            {%- if page.url == item.url -%}
-                              class="active"
-                            {%- endif -%}>
-                            {{- item.title | escape -}}
-                          </a>
-                        </li>
-                      {%- endfor -%}
-                    </ul>
-                  </div>
-                </li>
+            </ul>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
 
-              {%- else -%}
-                <li>
-                  <a
-                    spx-scroll="0"
-                    href="{{ child.url | url }}"
-                    aria-disabled="true"
-                    spx-node="sidebar.link"
-                    spx@click="sidebar.onLink"
-                    {%- if page.url == child.url -%}
-                      class="active"
-                    {%- endif -%}>
-                    {{- child.title | escape -}}
-                  </a>
-                </li>
-              {%- endif -%}
-            {%- endfor -%}
-
-          </ul>
-        </div>
-      {%- endif -%}
-    {%- endfor -%}
-
-  </nav>
-</div>
+    </nav>
+  </div>
+</aside>

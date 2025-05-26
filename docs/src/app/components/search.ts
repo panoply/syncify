@@ -1,4 +1,4 @@
-import type { SearchContent, SearchHeading, SearchIndex, SearchPage } from '@e11ty/eleventy-plugin-search-index';
+import type { SearchContent, SearchHeading, SearchIndex, SearchPage } from 'e11ty';
 
 import { matchSorter } from 'match-sorter';
 import spx, { SPX } from 'spx';
@@ -208,7 +208,6 @@ export class Search extends spx.Component({
           </a>
         </li>
       `;
-
     });
 
     this.listNode.append(...nodes);
@@ -216,7 +215,6 @@ export class Search extends spx.Component({
   }
 
   get nothing (): HTMLLIElement {
-
     return spx.dom`
       <li>
         <div class="row jc-center">
@@ -238,7 +236,14 @@ export class Search extends spx.Component({
 
   public index: SearchIndex;
   public result: SearchContent[] = [];
-  public match = { keys: [ { threshold: matchSorter.rankings.CONTAINS, key: 'text' } ] };
   public noResults: HTMLLIElement;
+  public match = {
+    keys: [
+      {
+        threshold: matchSorter.rankings.CONTAINS,
+        key: 'text'
+      }
+    ]
+  };
 
 }

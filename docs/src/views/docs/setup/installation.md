@@ -15,7 +15,7 @@ Syncify is distributed as a CommonJS (CJS) module but is compatible with ECMAScr
 Syncify requires users to have both [Node](https://nodejs.org/) (v20 or higher) and [Git](https://git-scm.com/) (v2.2 or higher) installed on their system. While Syncify is compatible with various package managers, for the optimal experience, it's advisable to consider using [pnpm](https://pnpm.js.org/en/cli/install).
 
 :: row mt-5
-:: col-12 col-md-6 pr-4 mb-5
+:: col-12 col-md-6 pr-md-4 mb-5
 
 #### PNPM
 
@@ -24,7 +24,7 @@ pnpm add @syncify/cli -g
 ```
 
 ::
-:: col-12 col-md-6 pl-4 mb-5
+:: col-12 col-md-6 pl-md-4 mb-5
 
 #### NPM
 
@@ -33,7 +33,7 @@ npm i @syncify/cli -g
 ```
 
 ::
-:: col-12 col-md-6 pr-4
+:: col-12 col-md-6 pr-md-4 mb-5 mb-md-0
 
 #### YARN
 
@@ -42,7 +42,7 @@ yarn add @syncify/cli -g
 ```
 
 ::
-:: col-12 col-md-6 pl-4
+:: col-12 col-md-6 pl-md-4
 
 #### BUN
 

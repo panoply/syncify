@@ -18,11 +18,5 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "noEmitOnError": true,
-    "baseUrl": ".",
-    "paths": {
-      "types": [
-        "./scripts/eleventy.d.ts"
-      ]
-    }
   }
 }

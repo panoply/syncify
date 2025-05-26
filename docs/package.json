@@ -36,11 +36,10 @@
     "not dead"
   ],
   "dependencies": {
-    "fuse.js": "^7.1.0",
-    "match-sorter": "^8.0.1",
+    "match-sorter": "^8.0.2",
     "qvp": "^0.3.2",
     "relapse": "^0.9.1",
-    "spx": "0.0.7-rc.0"
+    "spx": "0.0.2-rc.1"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.0",
@@ -49,9 +48,9 @@
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
     "cssnano": "^7.0.7",
-    "e11ty": "^0.1.4",
+    "e11ty": "^0.1.5",
     "markdown-it-container": "^4.0.0",
-    "netlify-cli": "^21.4.2",
+    "netlify-cli": "^21.5.0",
     "papyrus": "^0.7.3",
     "postcss": "catalog:",
     "postcss-cli": "^11.0.1",

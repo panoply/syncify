@@ -16,8 +16,10 @@
         spx-target="body">
         {%- svg 'logo-text', 'navbar-logo' -%}
       </a>
-      <span class="col-auto pl-0 fs-xs fc-white ff-heading upper mt-2 d-none d-sm-unset ">
-        <small class="navbar-version">version</small>
+      <span class="col-auto pl-0 fs-xs fc-white ff-heading upper mt-2 d-none d-lg-unset ">
+        <small class="navbar-version">
+          version
+        </small>
         {{- pkg.version -}}
       </span>
 
@@ -35,7 +37,7 @@
               {{- navigation.navbar.documentation.title -}}
             </a>
           </li>
-          <li>
+          <li >
             <a
               href="{{ navigation.navbar.releases.url }}"
               spx-target="body"
@@ -72,7 +74,7 @@
           </a>
         </div>
       </div>
-      <div class="col-auto d-none d-sm-unset">
+      <div class="col-auto d-none d-lg-unset">
         {%- include 'include/search' -%}
       </div>
     </nav>
