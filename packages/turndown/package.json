@@ -1,14 +1,24 @@
 {
   "name": "@syncify/turndown",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "access": "restricted",
   "description": "Hard forked variation of Turndown for usage within Syncify",
-  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "dts": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup --minify"
   },
-  "keywords": ["turndown", "syncify"],
+  "keywords": [
+    "turndown",
+    "syncify"
+  ],
   "author": {
     "name": "Νικολας Σαββιδης",
     "url": "https://github.com/panoply/syncify",
@@ -16,13 +26,26 @@
   },
   "license": "(MIT OR Apache-2.0)",
   "tsup": {
-    "entry": ["./src/index.ts"],
-    "dts": true
-  },
-  "dependencies": {
-    "turndown": "^7.2.0"
+    "entry": [
+      "./src/index.ts"
+    ],
+    "dts": true,
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "treeshake": true,
+    "target": "node20",
+    "splitting": true,
+    "platform": "node",
+    "clean": true,
+    "bundle": true,
+    "noExternal": [
+      "turndown"
+    ]
   },
   "devDependencies": {
-    "@types/turndown": "^5.0.5"
+    "@types/turndown": "^5.0.5",
+    "turndown": "^7.2.0"
   }
 }
