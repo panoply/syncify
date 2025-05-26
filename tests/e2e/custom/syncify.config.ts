@@ -81,7 +81,7 @@ export default defineConfig({
       {
         input: './source/styles/base.css',
         rename: '[file].min',
-        tailwind: true
+        tailwind: false
       }
     ],
     svg: {
@@ -96,8 +96,8 @@ export default defineConfig({
   },
   processor: {
     postcss: [
-      require('autoprefixer'),
-      require('@tailwindcss/postcss')
+      require('autoprefixer')
+
     ]
   }
 });
