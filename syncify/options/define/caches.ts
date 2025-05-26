@@ -7,7 +7,7 @@ import { updateProject } from './project';
 import { throws } from '~cli/throws';
 import { CACHE_FILES, READ_WRITE_OWNER } from '~const';
 import { clearCache, decode, save } from '~process/cache';
-import { forEach, o } from '~utils';
+import { forEach, m, o } from '~utils';
 
 import { $, q } from '$';
 
@@ -135,6 +135,7 @@ export async function getCaches () {
 
     }
   }
+
   $.cache.uri = o();
 
   for (const file of CACHE_FILES) {
@@ -144,15 +145,12 @@ export async function getCaches () {
     if (await pathExists($.cache.uri[file])) {
 
       q.cache.add(async () => {
-
         $.cache[file] = await decode($.cache.uri[file]);
-
       });
 
     } else {
 
-      $.cache[file] = file === 'paths' ? new Map() : {};
-
+      $.cache[file] = file === 'paths' ? m() : {};
       q.cache.add(save($.cache.uri[file], $.cache[file]));
 
     }
