@@ -256,9 +256,7 @@ export async function LiquidTransform (file: File) {
 
   if ($.mode.build) return file.value;
   if (file.type !== Type.Style && $.processor.tailwind.map !== null) {
-
     await tailwindParse(file).then(themeFilesUpsertMap);
-
   } else {
 
     log.syncing(file.key, { hot: $.mode.hot });
@@ -270,10 +268,8 @@ export async function LiquidTransform (file: File) {
   if ($.mode.hot) {
     if ($.mode.bulk === false) {
       if (file.type === Type.Section) {
-
         $.wss.alias(JSON.stringify($.hot.alias));
         $.wss.section(file.name);
-
       } else {
         await q.http.onIdle().then(() => $.wss.replace());
       }
