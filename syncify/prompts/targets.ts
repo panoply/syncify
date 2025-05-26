@@ -172,6 +172,16 @@ export async function PromptTargetFileTemplate ({ store, method, targets }: {
 /**
  * Prompt selection of stores themes to be associated as targets
  * from store/s
+ *
+ * @todo
+ * When there are multiple themes with the same name, you can only select the
+ * first occurence of that theme in the list. I need to figure a workaround
+ * for this, for example, if there are 2 theme using the name 'dev'
+ *
+ * - dev
+ * - dev
+ *
+ * You can only select the first, which is not really ideal.
  */
 export async function PromptSelectThemes (method: LiteralString<
   | 'package.json'
