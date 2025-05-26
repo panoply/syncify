@@ -232,7 +232,7 @@ export function getTransform <T extends Transform.Resolved[] | Transform.Resolve
 
       const { paths, match } = getResolvedPaths<Transform.Resolver>(transforms, globPath);
 
-      opts.flatten
+      return opts.flatten
         ? <T>paths.map<Transform.Resolved>(input => ({ input, rename: basename(input), snippet: false }))
         : <T>{ input: paths, rename: '[name].[ext]', snippet: false, match };
 
