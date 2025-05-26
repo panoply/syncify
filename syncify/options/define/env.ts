@@ -104,7 +104,11 @@ export async function getEnv (cwd = $.cwd) {
 
 export async function getKeychain () {
 
-  $.keychain = await readJson($.file.keychain);
+  // We may already have the keychain in state
+  //
+  if ($.keychain === null) {
+    $.keychain = await readJson($.file.keychain);
+  }
 
   if (!isEmpty($.keychain)) {
 

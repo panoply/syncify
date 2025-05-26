@@ -189,6 +189,7 @@ export const $ = new class Bundle {
    */
   public file: Type.Files = o<Type.Files>({
     keychain: join(this.home, '.keychain'),
+    projects: join(this.home, '.projects'),
     pkg: join(this.cwd, 'package.json'),
     notifier: join(this.home, 'icon.png'),
     project: null,
@@ -212,6 +213,12 @@ export const $ = new class Bundle {
    * > This will be `null` and populated at runtime in one of the first operations to occur.
    */
   public project: Type.Project = null;
+
+  /**
+   * The `.projects` json file reference which is used are a mapping reference to all syncify
+   * projects on the device. The key represents uri, value is the cache directory name.
+   */
+  public projects: { [uri: string]: string } = null;
 
   /**
    * The installation binary being used
