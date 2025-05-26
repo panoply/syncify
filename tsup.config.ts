@@ -105,6 +105,7 @@ const noExternal = [
   //
   'anymatch',
   'dotenv',
+  'enquirer',
   'p-map',
   'p-queue',
   'tree-kill',
@@ -128,9 +129,8 @@ const external = [
   // Required as dependencies
   //
   '@parcel/watcher',
+  'cbor-x',
   'xior',
-  'cbor',
-  'enquirer',
   'esbuild',
   'fast-glob',
   'fs-extra',
