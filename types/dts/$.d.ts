@@ -365,6 +365,18 @@ export interface Files {
    * '/Users/sissel/.syncify/eb4e712f2f3970b7/{name}'
    */
   project: string;
+ /**
+   * The cached `.projects` config file
+   *
+   * > If `null` no file exists or has been associated to project.
+   *
+   * @default
+   * '/Users/sissel/.syncify/.projects'
+   *
+   * @example
+   * '/Users/sissel/.syncify/.projects'
+   */
+  projects: string;
   /**
    * **READY AT RUNTIME**
    *
@@ -497,6 +509,20 @@ export interface Keychain {
 }
 
 export interface Project {
+ /**
+  * The project hash token
+  *
+  * @example
+  * 'eb4e712f2f3970b7'
+  */
+  hash: string;
+  /**
+   * The cache uri
+   *
+   * @example
+   * '/Users/sissel/.syncify/eb4e712f2f3970b7/'
+   */
+  cache: string;
  /**
   * The CWD of the project
   *
