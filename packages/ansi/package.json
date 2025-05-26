@@ -1,6 +1,6 @@
 {
   "name": "@syncify/ansi",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "access": "restricted",
   "description": "ANSI Colors, Symbols and TUI related terminal enchancements for Syncify.",
   "scripts": {
@@ -39,6 +39,7 @@
       "cjs"
     ],
     "splitting": false,
+    "shims": true,
     "dts": true,
     "clean": true,
     "bundle": true,
@@ -52,7 +53,7 @@
     ]
   },
   "devDependencies": {
-    "ansis": "^3.10.0",
+    "ansis": "^4.0.0",
     "log-update": "^6.1.0",
     "type-fest": "catalog:",
     "wrap-ansi": "^9.0.0"
