@@ -30,9 +30,8 @@ function syncTheme (storeName: string, themeTarget: string, themeId: number) {
 /**
  * Set Targets
  *
- * Resolves Shopify stores and themes from the `package.json`
- * and `.env` file locations relative to the current
- * working directory.
+ * Resolves Shopify stores and themes from the `package.json` and `.env` file locations
+ * relative to the current working directory.
  *
  * **RUNTIME CALLS**
  *
