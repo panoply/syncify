@@ -7,7 +7,7 @@ width="270px">
 </p>
 <h1></h1>
 
-Syncify is a specialized tool designed for Shopify theme development. It offers an array of features that significantly enhance productivity, integration and workflow on the Shopify platform. Created to address the in-house mediocrity of the OSS (theme dev) offerings by the Shopify team, Syncify delivers a sophisticated, high-performance, and customizable toolkit that streamlines workflows and integrates with modern tooling.
+Syncify is a specialized tool designed for Shopify theme development. It offers an array of features that significantly enhance productivity, integration and workflow on the Shopify platform. Created to address the mediocrity of OSS (theme dev) offerings from the Shopify team, Syncify delivers a sophisticated, high-performance, and customizable toolkit that streamlines workflows and integrates with modern tooling.
 
 <h4>
   Read Documentation&nbsp;&nbsp;➠&nbsp;&nbsp;https://syncify.sh
@@ -17,19 +17,19 @@ Syncify is a specialized tool designed for Shopify theme development. It offers 
 
 If you are seeking a tool that has considered requirement factors across the modern Shopify Theme Development ecosystem, and would like a solution that produces performance-focused optimizations at the development process level with features designed for the complexities of modern e-commerce, see the below core capabilities offerred by Syncify:
 
-<i><strong>✓&nbsp;&nbsp;<samp>Custom input → output directory structures for tailored project organization.</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Compiling TypeScript, JavaScript, TSX, and JSX to support modern web development practices</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Tailwind, PostCSS, and SASS stylesheet support for advanced CSS management</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Terse minification of Markup and Liquid to optimize performance</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Static pages with Markdown → Markup transformation for content creation flexibility</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Metafield, Redirects, and Navigation synchronization for seamless data management</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Version Controlled theme distribution ensuring consistency and traceability</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Shared Schemas as a superset implementation for enhanced data modeling</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Frontmatter controlled liquid level configuration to fine-tune template behavior</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>SVG transform and sprite generation processing for efficient icon and graphic handling</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Multistore and theme parallel synchronization to manage multiple storefronts</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Websocket HOT Reloads with CFH control and morphing for real-time development feedback</samp></strong></i><br>
-<i><strong>✓&nbsp;&nbsp;<samp>Git-based automations with CI baked integrations for streamlined development workflows</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Custom input → output directory structures.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Supports TypeScript, JavaScript, TSX, and JSX.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Tailwind, PostCSS, and SASS stylesheet support.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Terse minification of Markup and Liquid.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Static pages with Markdown → Markup transformation.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Metafield, Redirects, and Navigation data management.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Version Controlled theme distribution and traceability.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Shared Schemas as a superset implementation.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Frontmatter controlled liquid level configuration.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>SVG transform and sprite generation processing.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Multistore and theme parallel synchronization.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Websocket HOT Reloads with CFH control and morphing.</samp></strong></i><br>
+<i><strong>✓&nbsp;&nbsp;<samp>Git-based automations with CI baked integrations.</samp></strong></i><br>
 
 <h1></h1>
 
@@ -39,7 +39,7 @@ The [Syncify Straps](https://github.com/SyncifyCLI) github organization provides
 
 ### Editor Intergration
 
-For an integrated development experience in your text editor, please consider using the [VSCode Liquid](https://github.com/panoply/vscode-liquid) extension which has built-in support for Syncify. VSCode Liquid is the independent alternative to the Shopify backed extension which is maintained and created by the same author of Syncify.
+For an integrated development experience in your text editor, please consider using the [VSCode Liquid](https://github.com/panoply/vscode-liquid) extension which has built-in support for Syncify. VSCode Liquid is an independent alternative to the Shopify backed extension.
 
 ### Getting Help?
 
@@ -56,7 +56,7 @@ You can install Syncify as a development dependency or globally. There are a cou
 
   <h3> GLOBAL INSTALL&nbsp;&nbsp;⮂&nbsp;&nbsp;SY CLI BINARY </h3>
 
-Install Syncify globally to make the CLI binary available system-wide so you can use commands anywhere on your computer. The <a href="/packages/config/">@syncify/config</a> package can be leveraged on a per-project basis along side global installations for configuration file TypeScript support.
+Install Syncify globally to make the CLI binary available system-wide so you can use commands anywhere on your computer. The <a href="https://github.com/panoply/syncify/tree/next/packages/config/packages/config">@syncify/config</a> package can be leveraged on a per-project basis along side global installations for configuration file TypeScript support.
 
 <br>
 </td></tr></table>
@@ -68,7 +68,7 @@ Install Syncify globally to make the CLI binary available system-wide so you can
 The most stable and latest version of Syncify is available for consumption via the [NPM Registry](https://www.npmjs.com/package/@syncify/cli).
 
 ```bash
-$ pnpm add @syncify/cli --global
+pnpm add @syncify/cli --global
 ```
 
 ## Nightly Release
@@ -76,7 +76,7 @@ $ pnpm add @syncify/cli --global
 The nightly releases of Syncify can be installed using the `@next` version tag via NPM, code is on [next](https://github.com/panoply/syncify/tree/next) branch.
 
 ```bash
-$ pnpm add @syncify/cli@next --global
+pnpm add @syncify/cli@next --global
 ```
 
 ## Unstable Release
@@ -84,8 +84,43 @@ $ pnpm add @syncify/cli@next --global
 The unstable releases of Syncify can be installed using the `@unstable` version tag via NPM, code is on [unstable](https://github.com/panoply/syncify/tree/unstable) branch.
 
 ```bash
-$ pnpm add @syncify/cli@unstable --global
+pnpm add @syncify/cli@unstable --global
 ```
+
+# Packages
+
+This repository hosts a collection of sub-packages available for download through the NPM Registry. Each package includes a detailed **readme** that provides comprehensive insights into its specific use cases, functionality, and implementation details. All packages can be used standalone, independently of the Syncify CLI.
+
+- [@syncify/acquire](https://github.com/panoply/syncify/tree/next/packages/acquire)
+- [@syncify/ansi](https://github.com/panoply/syncify/tree/next/packages/ansi)
+- [@syncify/codeframe](https://github.com/panoply/syncify/tree/next/packages/codeframe)
+- [@syncify/codegen](https://github.com/panoply/syncify/tree/next/packages/codegen)
+- [@syncify/config](https://github.com/panoply/syncify/tree/next/packages/config)
+- [@syncify/glue](https://github.com/panoply/syncify/tree/next/packages/glue)
+- [@syncify/hot](https://github.com/panoply/syncify/tree/next/packages/hot)
+- [@syncify/json](https://github.com/panoply/syncify/tree/next/packages/json)
+- [@syncify/kill](https://github.com/panoply/syncify/tree/next/packages/kill)
+- [@syncify/schema](https://github.com/panoply/syncify/tree/next/packages/schema)
+- [@syncify/tests](https://github.com/panoply/syncify/tree/next/packages/tests)
+- [@syncify/timer](https://github.com/panoply/syncify/tree/next/packages/timer)
+- [@syncify/turndown](https://github.com/panoply/syncify/tree/next/packages/turndown)
+- [@syncify/types](https://github.com/panoply/syncify/tree/next/packages/types)
+- [@syncify/update](https://github.com/panoply/syncify/tree/next/packages/update)
+- [@syncify/uws](https://github.com/panoply/syncify/tree/next/packages/uws)
+
+<details>
+<summary>
+  Config Packages
+</summary>
+<p>
+
+- [@syncify/eslint-config](https://github.com/panoply/syncify/tree/next/configs/eslint-config)
+- [@syncify/prettier-config](https://github.com/panoply/syncify/tree/next/configs/prettier-config)
+- [@syncify/stylelint-config](https://github.com/panoply/syncify/tree/next/configs/stylelint-config)
+- [@syncify/tsconfig](https://github.com/panoply/syncify/tree/next/configs/tsconfig)
+
+</p>
+</details>
 
 # Contributing
 
@@ -183,7 +218,7 @@ pnpm @cli      <cmd>        # Targets the @syncify/cli package (main package)
 
 Syncify does not use Shopify OSS offerrings, you will find zero `@shopify/*` projects in the codebase. Interfacing with the Shopify API is handled with a custom client. The client is extensively typed and the TypeScript definitions are generated using [codegen](https://the-guild.dev/graphql/codegen). The repository comes with definitions and introspection included so there is no need to pull or regenerate.
 
-# Author / License
+# Author / Licensing
 
 Syncify was created and is maintained by [Νικολας Σαββιδης](https://github.com/panoply). Shopify has no affiliation with this project and does not fund Syncify; it is a completely independent solution. Choosing to leverage Syncify helps keep these independent projects alive and sends a clear message to Shopify that the community drives innovation.
 
@@ -192,9 +227,9 @@ Syncify was created and is maintained by [Νικολας Σαββιδης](https
 Special thanks to the talented developers who have contributed to Syncify. This project has been in development for several years, and without these individuals, it wouldn't have progressed this far.
 
 - [Kim Skinner](https://github.com/WolfGreyDev)
-- [Mansedan](https://github.com/webdeveman)
 - [Taksh](https://github.com/taksh108)
-- [David Warrington](https://ellodave.dev/)
+- [Mansedan](https://github.com/webdeveman)
+- [David Warrington](https://ellodave.dev)
 
 ### Donate / Sponsor
 
