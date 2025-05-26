@@ -18,23 +18,25 @@
     "preserveLine": 1,
     "endNewline": false,
     "liquid": {
-      "commentIndent": true,
-      "delimiterPlacement": "consistent",
-      "delimiterTrims": "always",
-      "lineBreakSeparator": "before",
+      "argumentLineBreak": 3,
       "indentAttribute": true,
+      "lineBreakSeparator": "after",
       "equipoiseSpacing": true,
-      "commentPreserve": false,
       "quoteConvert": "single",
-      "filterLineBreak": 3,
-      "argumentLineBreak": 3
+      "ignoreTagList": []
     },
     "markup": {
       "quoteConvert": "double",
-      "forceIndent": false,
-      "ignoreJS": false,
-      "attributeLineBreak": 2,
-      "preserveText": true
+      "selfCloseSpace": true,
+      "stripAttributeLines": true,
+      "valueLineBreak": "force-indent",
+      "forceIndent": true,
+      "commentIndent": true,
+      "valueSpacing": "wrap",
+      "ignoreJS": true,
+      "ignoreCSS": false,
+      "ignoreJSON": false,
+      "attributeLineBreak": 2
     },
     "json": {
       "braceAllman": true,
