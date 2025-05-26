@@ -1,6 +1,6 @@
 {
   "name": "@syncify/uws",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "access": "restricted",
   "description": "Packaged reference of uWebSockets.js for usage within Syncify",
   "main": "./dist/index.js",
@@ -25,6 +25,6 @@
     "dts": true
   },
   "dependencies": {
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.51.0"
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.52.0"
   }
 }
