@@ -49,7 +49,7 @@ export async function getTSConfig (): Promise<Tsconfig> {
 
   try {
 
-    const file = await readFile($.file.tsconfig, 'utf8');
+    const file = await readFile($.file.tsconfig, 'utf-8');
     const config = parse<Tsconfig>(file);
 
     return config;
@@ -120,7 +120,9 @@ export async function getConfigFile (): Promise<Config> {
         file: $.file.config,
         cwd: $.cwd,
         tsconfig,
-        type: has('type', $.pkg) ? $.pkg.type : 'commonjs',
+        type: has('type', $.pkg)
+          ? $.pkg.type
+          : 'commonjs',
         onRebuild: $.mode.watch ? (bundle: Config) => {
           $.config = bundle; // rebuild configuration file
           $.running && event.emit('restart', Configure);

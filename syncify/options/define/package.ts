@@ -15,6 +15,8 @@ import { $ } from '$';
 
 /**
  * Get package.json (sync)
+ *
+ * Synchronous assignment of {@link $.pkg}
  */
 export function getPkgSync () {
 
@@ -41,7 +43,9 @@ export function getPkgSync () {
  * argument is provided. If the `cwd` argument is undefined, the {@link $.pkg}
  * reference is reset.
  *
- * When the function returns `null` it indicates that no `package.json` was found.
+ * > **NOTE**
+ * >
+ * > The parsed JSON will always be returned, even when {@link $.pkg} is reset.
  */
 export async function getPkg (cwd?: string) {
 
@@ -58,6 +62,8 @@ export async function getPkg (cwd?: string) {
 
       $.pkg = json;
 
+      return json;
+
     } catch (e) {
 
       throw error.json(e, parsePackageJson(path));
@@ -66,7 +72,12 @@ export async function getPkg (cwd?: string) {
 
   } else {
 
-    if ($.file.project !== null && $.project.targetSource === 'package.json') $.project.targetSource = null;
+    // We will need to reset the project targetSource reference if
+    // it was previously being used for targets but has since been
+    // removed or replaced.
+    if (
+      $.file.project !== null &&
+      $.project.targetSource === 'package.json') $.project.targetSource = null;
 
   }
 }
@@ -85,16 +96,28 @@ export async function setPkg (json: PKG, cwd?: string) {
 
     if (cwd) {
 
-      await writePackage(join(cwd, 'package.json'), json, { indent: $.json.useTab ? '\t' : $.json.indent });
+      await writePackage(join(cwd, 'package.json'), json, {
+        indent: $.json.useTab
+          ? '\t'
+          : $.json.indent
+      });
 
       return getPkg(cwd);
 
     } else {
 
       if ($.pkg === null) {
-        await writePackage($.file.pkg, json, { indent: $.json.useTab ? '\t' : $.json.indent });
+
+        await writePackage($.file.pkg, json, {
+          indent: $.json.useTab
+            ? '\t'
+            : $.json.indent
+        });
+
       } else {
+
         await updatePackage($.file.pkg, json);
+
       }
 
       return getPkg();
@@ -118,7 +141,9 @@ export async function setPkg (json: PKG, cwd?: string) {
  */
 export async function setPkgSyncify (pkg: PKG = $.pkg) {
 
-  const syncify = has('syncify', pkg) ? pkg.syncify : <PackageConfig>{};
+  const syncify = has('syncify', pkg)
+    ? pkg.syncify
+    : <PackageConfig>{};
 
   // Lets attempt to write stores within package.json based on the .env values
   if ($.file.env !== null && isEmpty($.env.vars) === false) {
