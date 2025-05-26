@@ -4,7 +4,7 @@ import { basename, join } from 'node:path';
 import { promisify } from 'node:util';
 import zlib from 'node:zlib';
 
-import cbor from 'cbor';
+import { decode as cborDecode, encode as cborEncode } from 'cbor-x';
 import { readFile } from 'fs-extra';
 import writeFileAtomic from 'write-file-atomic';
 
@@ -35,9 +35,7 @@ export async function decode <T = any> (uri: string): Promise<T> {
   const content = await readFile(uri);
   const gunzip = await gunzipAsync(content);
 
-  return cbor.decode(gunzip, {
-    preferMap: uri.endsWith('paths')
-  });
+  return cborDecode(gunzip);
 
 };
 
@@ -62,10 +60,7 @@ export function save (uri: Cache.UriKeys, data?: any) {
       if (!data) data = $.cache[uri];
     }
 
-    const encoded = await cbor.encodeAsync(data, {
-      omitUndefinedProperties: true,
-      canonical: true
-    });
+    const encoded = cborEncode(data);
 
     const gzip = await gzipAsync(encoded);
 
