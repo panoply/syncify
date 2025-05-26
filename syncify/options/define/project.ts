@@ -24,26 +24,23 @@ export async function createProject (path: string) {
  * Update project references and write atomic
  */
 export function updateProject () {
-
   if ($.file.project !== null) {
     q.cache.add(async () => {
       await writeFileAtomic($.file.project, JSON.stringify($.project));
     });
   }
-
 }
 
 export function projectProxy (model: Project) {
 
   return new Proxy(model, {
     set: (target: Project, prop: string, value: ValueOf<Project>) => {
-      if (has(prop, target)) {
-        const current = target[prop];
-        if (current !== value) {
-          target[prop] = value;
-          updateProject();
-        }
+
+      if (has(prop, target) && target[prop] !== value) {
+        target[prop] = value;
+        updateProject();
       }
+
       return true;
     }
   });
