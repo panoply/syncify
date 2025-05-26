@@ -167,6 +167,10 @@ export async function PromptTargetFileTemplate ({ store, method, targets }: {
 
 }
 
+/**
+ * Prompt selection of stores themes to be associated as targets
+ * from store/s
+ */
 export async function PromptSelectThemes (method: LiteralString<
   | 'package.json'
   | 'stores.toml'
