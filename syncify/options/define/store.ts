@@ -21,10 +21,6 @@ import { $ } from '$';
 
 const enum TargetFile {
   /**
-   * No external `stores.toml` or `stores.yaml` config file exists.
-   */
-  NONE = -1,
-  /**
    * An external `stores.toml` file is present
    */
   TOML = 0,
@@ -35,7 +31,11 @@ const enum TargetFile {
   /**
    * An external `stores.yml` file is present
    */
-  YML = 2
+  YML = 2,
+  /**
+   * No external `stores.toml` or `stores.yaml` config file exists.
+   */
+  NONE = 3,
 }
 
 export const enum Action {
@@ -189,22 +189,18 @@ export async function getTargets (options?: {
     if ($.pkg !== null) {
       if (hasPath('syncify.stores', $.pkg)) {
         if (isObject($.pkg.syncify.stores)) {
-
           method = 'package.json';
-
           if (isEmpty($.pkg.syncify.stores)) {
             action = Action.PROMPT_THEMES;
-            method = 'package.json';
           } else {
             target = $.pkg.syncify.stores;
             $.project.targetSource = 'package.json';
           }
-
         } else {
           throws([
             `Invalid store/theme target references defined in ${bold('package.json')} file`
           ], [
-            `Syncify expects and ${cyan('object')} type structure`
+            `Syncify expects an ${cyan('object')} type structure`
           ]);
         }
       } else if (has('syncify', $.pkg)) {
@@ -218,16 +214,17 @@ export async function getTargets (options?: {
     }
   }
 
-  if (
-    action === Action.CHECK_FILES ||
-    action === Action.PKG_KEY) {
+  if (action === Action.CHECK_FILES) {
+
+    // We need to reset targetSource if it is defined
+    // The user may have deleted or changed their targets
+    // configuration, this ensures we can prompt correctly.
+    if ($.project.targetSource !== null) $.project.targetSource = null;
 
     const targets = await getStoresFromFile();
 
     if (targets !== null) {
-
       method = $.file.targets.endsWith('toml') ? 'stores.toml' : 'stores.yaml';
-
       if (isEmpty(targets)) {
         action = Action.PROMPT_THEMES;
       } else {
