@@ -172,15 +172,50 @@ export async function setStyleConfig () {
 
         if (tw && u.isUndefined(tw.watchedFiles)) tw.watchedFiles = [];
 
-        if (u.isArray(tw.watchedFiles) && u.isEmpty(tw.watchedFiles)) {
-          tw.watchedFiles = [
-            join(
-              $.dirs.input,
-              '**',
-              '*.{css,js,ts,jsx,tsx,vue,svelte,liquid,json,schema}'
-            )
-          ];
-        }
+        if ($.mode.watch && has('watch')) {
+
+          if (!u.isArray(style.watch)) {
+            throws.typeError(
+              {
+                option: 'styles',
+                name: 'watch',
+                provided: style.watch,
+                expects: 'string[]'
+              }
+            );
+          }
+
+          for (const uri of style.watch) {
+
+            const globs = await glob(join($.dirs.input, uri));
+
+            if (globs.length === 0 && uri[0] !== '!') {
+              warn('Cannot resolve watch glob/path uri', uri);
+            }
+
+            for (const p of globs) {
+              if (await exists(p)) {
+                tw.watchedFiles.push(p);
+              } else {
+                warn('No file exists in path', p);
+              }
+            }
+
+          };
+
+        } else {
+
+          if (u.isArray(tw.watchedFiles) && u.isEmpty(tw.watchedFiles)) {
+            tw.watchedFiles.push(
+              join(
+                $.dirs.input,
+                '**',
+                '*.{css,js,ts,jsx,tsx,vue,svelte,liquid,json,schema}'
+              )
+            );
+          }
+
+        };
 
         u.defineProperty(bundle, 'tailwind', { get () { return tw; } });
 
