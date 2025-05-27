@@ -170,10 +170,12 @@ export async function setStyleConfig () {
 
         const tw = u.merge(override ? style.tailwind as TailwindConfig : $.processor.tailwind.config);
 
-        if (u.isArray(tw.content) && u.isEmpty(tw.content)) {
-          tw.content = [
+        if (tw && u.isUndefined(tw.watchedFiles)) tw.watchedFiles = [];
+
+        if (u.isArray(tw.watchedFiles) && u.isEmpty(tw.watchedFiles)) {
+          tw.watchedFiles = [
             join(
-              relative($.cwd, $.dirs.input),
+              $.dirs.input,
               '**',
               '*.{css,js,ts,jsx,tsx,vue,svelte,liquid,json,schema}'
             )
@@ -182,9 +184,9 @@ export async function setStyleConfig () {
 
         u.defineProperty(bundle, 'tailwind', { get () { return tw; } });
 
-        if ($.mode.watch && u.isArray(bundle.tailwind.content)) {
+        if ($.mode.watch && u.isArray(bundle.tailwind.watchedFiles)) {
 
-          const files = await glob(bundle.tailwind.content as string[]);
+          const files = await glob(bundle.tailwind.watchedFiles as string[]);
 
           if ($.processor.tailwind.map === null) {
             $.processor.tailwind.map = u.o();
