@@ -108,6 +108,8 @@ async function jsonCompare (file: File, local: string) {
 
       if (data === null) return null;
 
+      if (data && data.change === false) return data.actual.string;
+
       json.push(data);
 
     }
@@ -155,27 +157,35 @@ async function jsonCompare (file: File, local: string) {
       ]
     });
 
-    if (action === 'open') {
+    switch (action) {
 
-      const uri = join($.dirs.temp, file.key);
+      case 'open':
 
-      await writeFile(uri, json[0].string);
+        const uri = join($.dirs.temp, file.key);
 
-      u.openInEditor(uri);
+        await writeFile(uri, json[0].string);
 
-      return null;
+        u.openInEditor(uri);
 
-    } else if (action === 'push') {
+        return null;
 
-      return json[0].string;
+      case 'push':
 
-    } else if (action === 'pull') {
+        return json[0].actual.string;
 
-      // TODO - Handle multiple-theme/store writes
+      case 'pull':
 
-      await writeFile(file.input, json[0].string);
+        // TODO - Handle multiple-theme/store writes
 
-      return null;
+        await writeFile(file.input, json[0].string);
+
+        return null;
+
+      case 'stash':
+
+      case 'cancel':
+
+        return null;
 
     }
 
@@ -263,6 +273,14 @@ export async function JsonTransform (file: File): Promise<string> {
   }
 
   if ($.mode.build) return file.value;
+
+  if (file.value === null) {
+
+    log.skipped(file.key, 'user cancelled');
+
+    return;
+
+  }
 
   if (runChecksum(file.input, file.value)) {
 
