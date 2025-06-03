@@ -183,8 +183,12 @@ async function jsonCompare (file: File, local: string) {
 
       case 'stash':
 
+        log.skipped(file.key, 'stash unavailable');
+        return null;
+
       case 'cancel':
 
+        log.skipped(file.key, 'user cancelled');
         return null;
 
     }
@@ -274,13 +278,7 @@ export async function JsonTransform (file: File): Promise<string> {
 
   if ($.mode.build) return file.value;
 
-  if (file.value === null) {
-
-    log.skipped(file.key, 'user cancelled');
-
-    return;
-
-  }
+  if (file.value === null) return;
 
   if (runChecksum(file.input, file.value)) {
 
