@@ -2,7 +2,7 @@ import type { AccessScopes, LiteralString } from 'types';
 
 import { join } from 'node:path';
 
-import { rm, writeFile } from 'fs-extra';
+import { rm, writeFile, pathExists } from 'fs-extra';
 
 import * as _ from '@syncify/ansi';
 import { kill } from '@syncify/kill';
@@ -317,6 +317,10 @@ async function CreateStrap (options: { repository: string; name: string; project
 
   log.spinner('Cloning Strap', { color: _.neonGreen });
 
+  if (await pathExists(join(options.projectPath, '.git'))) {
+    return ErrorGitInitialized();
+  }
+
   await execAsync(`git clone --depth 1 ${options.repository} .`);
   await delay(); // Ensure clone has finished
   await rm(join(options.projectPath, '.git'), { recursive: true, force: true });
@@ -375,6 +379,34 @@ function ErrorFlatStructure () {
   .Line('Please refer to the documentation for more information:', _.gray)
   .NL
   .Line(`${_.CHV} ${_.underline('https://syncify.sh/usage/directory-structures')}`, _.gray)
+  .NL
+  .End($.log.group)
+  .BR
+  .toLog();
+
+  $.running ? kill.exit(0) : process.exit(0);
+
+}
+
+/**
+ * Throws when attempting to clone a repository in a project that already has git initialized
+ */
+function ErrorGitInitialized () {
+
+  _
+  .Create({ type: 'error' })
+  .Line(`GIT ALREADY INITIALIZED ${_.BAD}`, _.bold)
+  .NL
+  .Line('Attempting to clone theme into existing directory that')
+  .Line('already has git initialized.')
+  .Tree('info')
+  .NL
+  .Line('How to fix?', _.gray.bold)
+  .Line(`You will need to remove the existing  ${_.blue('.git')} folder.`, _.gray)
+  .Line(`Run '${_.red('rm -rf .git')}' in your project directory.`, _.gray)
+  .NL
+  .Line(`WARNING: This could be dangerous.`, _.bold)
+  .Line(`Ensure you're in the right directory before attempting fix!`)
   .NL
   .End($.log.group)
   .BR
