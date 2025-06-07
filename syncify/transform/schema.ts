@@ -194,8 +194,10 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
   for (let i = 0, s = schema.length; i < s; i++) {
 
     if (!has('$ref', schema[i])) {
+
       settings.push(schema[i]);
       continue;
+
     }
 
     const [ key, prop ] = schema[i].$ref.split('.');
@@ -208,24 +210,68 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
 
         if (isArray(shared.schema[prop])) {
 
-          // Settings Spread Shared Schema
-          //
-          settings.push(...(shared.schema[prop] as SettingsSpread));
+          if (!shared.schema[prop].some(item => has('$ref', item))) {
+
+            settings.push(...(shared.schema[prop] as SettingsSpread));
+            continue;
+
+          };
+
+          const schemaSettings: SettingsSpread = [];
+
+          for (const schemaItem of shared.schema[prop]) {
+
+            if (has('$ref', schemaItem)) {
+
+              const injectedSettings = InjectSettings(file, [schemaItem]) as SettingsSpread;
+              schemaSettings.push(...injectedSettings);
+
+            } else {
+
+              schemaSettings.push(...([schemaItem] as SettingsSpread));
+
+            }
+
+          }
+
+          settings.push(...schemaSettings);
 
         } else if (isObject(shared.schema[prop])) {
 
           if (has('settings', shared.schema[prop])) {
 
-            // Settings Group Shared Schema
-            //
-            settings.push(...(shared.schema[prop] as SettingsGroup).settings);
+            if (!shared.schema[prop].settings.some(item => has('$ref', item))) {
+
+              settings.push(...(shared.schema[prop] as SettingsGroup).settings);
+              continue;
+
+            };
+
+            const schemaSettings: SettingsSpread = [];
+
+            for (const schemaItem of shared.schema[prop].settings) {
+
+              if (has('$ref', schemaItem)) {
+
+                const injectedSettings = InjectSettings(file, [schemaItem]) as SettingsSpread;
+                schemaSettings.push(...injectedSettings);
+
+              } else {
+
+                schemaSettings.push(...([schemaItem] as SettingsSpread));
+
+              }
+
+            }
+
+            settings.push(...schemaSettings);
 
           } else {
 
-            // Settings Singleton
-            //
             settings.push(shared.schema[prop] as SettingsSingleton);
+
           }
+
         }
 
       } else {
@@ -300,14 +346,22 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
           if (isArray(shared.schema[prop])) {
 
-            // Blocks Spread
-            //
+            for (const block of shared.schema[prop]) {
+
+              block.settings = InjectSettings(file, block.settings) as SettingsSpread;
+
+            }
+
             blocks.push(...(shared.schema[prop] as BlockSpread));
 
           } else {
 
-            // Blocks Singleton
-            //
+            if (has('settings', shared.schema[prop])) {
+
+              shared.schema[prop].settings = InjectSettings(file, shared.schema[prop].settings) as SettingsSpread;
+
+            }
+
             blocks.push(shared.schema[prop] as BlockSingleton);
 
           }
@@ -369,85 +423,7 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
       if (has('settings', schema[i])) {
 
-        for (const setting of schema[i].settings) {
-
-          if (has('$ref', setting)) {
-
-            const [ key, prop ] = setting.$ref.split('.');
-
-            if ($.section.shared.has(key)) {
-
-              const shared = $.section.shared.get(key);
-
-              if (has(prop, shared.schema)) {
-
-                if (isArray(shared.schema[prop])) {
-
-                  // Settings Spread Shared Schema
-                  //
-                  block.settings.push(...(shared.schema[prop] as SettingsSpread));
-
-                } else if (isObject(shared.schema[prop])) {
-
-                  if (has('settings', shared.schema[prop])) {
-
-                    // Settings Group Shared Schema
-                    //
-                    block.settings.push(...(shared.schema[prop] as SettingsGroup).settings);
-                  } else {
-
-                    // Settings Singleton
-                    //
-                    block.settings.push(shared.schema[prop] as SettingsSingleton);
-                  }
-                }
-
-              } else {
-                if ($.mode.build) {
-
-                  warn.schema(file, {
-                    shared: prop,
-                    $ref: schema[i].$ref,
-                    schema: `blocks ${ARR} settings`,
-                    message: [
-                      `An unknown Shared Schema key reference of ${bold(schema[i].$ref)} was provided`,
-                      `to the ${bold('blocks')} schema id ${bold(setting.id)} within section file`,
-                      `${bold(file.base)}. The shared schema file exists, but the key ${bold(prop)} does not.`
-                    ]
-                  });
-
-                } else {
-                  log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
-                }
-              }
-
-            } else {
-              if ($.mode.build) {
-
-                warn.schema(file, {
-                  shared: prop,
-                  $ref: schema[i].$ref,
-                  schema: `blocks ${ARR} settings`,
-                  message: [
-                    `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
-                    `to ${bold('blocks')} schema id ${bold(setting.id)} within section file ${bold(file.base)}.`,
-                    'There is no known shared schema file using that name.'
-                  ]
-
-                });
-
-              } else {
-                log.warn(`unknown $ref ${bold(setting.$ref)} `, file.base);
-              }
-            }
-
-          } else {
-
-            block.settings.push(setting);
-
-          }
-
-        }
+        block.settings = InjectSettings(file, schema[i].settings)
 
       }
 
