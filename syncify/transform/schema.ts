@@ -223,6 +223,30 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
 
             if (has('$ref', schemaItem)) {
 
+               if (schemaItem.$ref === schema[i].$ref) {
+
+                if ($.mode.build) {
+
+                  warn.schema(file, {
+                    shared: shared.uri,
+                    $ref: schema[i].$ref,
+                    schema: 'settings',
+                    message: [
+                      `Shared Schema reference of ${bold(schema[i].$ref)} was provided.`,
+                      `This caused a loop and has been skipped. Please check your provided schema.`
+                    ]
+                  });
+
+                } else {
+
+                  log.warn(`shared schema loop detected (skipping this schema): ${bold(schema[i].$ref)}`, file.base);
+
+                }
+
+                continue;
+
+              }
+
               const injectedSettings = InjectSettings(file, [schemaItem]) as SettingsSpread;
               schemaSettings.push(...injectedSettings);
 
@@ -252,6 +276,30 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
             for (const schemaItem of shared.schema[prop].settings) {
 
               if (has('$ref', schemaItem)) {
+
+                if (schemaItem.$ref === schema[i].$ref) {
+
+                  if ($.mode.build) {
+
+                    warn.schema(file, {
+                      shared: shared.uri,
+                      $ref: schema[i].$ref,
+                      schema: 'settings',
+                      message: [
+                        `Shared Schema reference of ${bold(schema[i].$ref)} was provided.`,
+                        `This caused a loop and has been skipped. Please check your provided schema.`
+                      ]
+                    });
+
+                  } else {
+
+                    log.warn(`shared schema loop detected (skipping this schema): ${bold(schema[i].$ref)}`, file.base);
+
+                  }
+
+                  continue;
+
+                }
 
                 const injectedSettings = InjectSettings(file, [schemaItem]) as SettingsSpread;
                 schemaSettings.push(...injectedSettings);
