@@ -142,15 +142,33 @@ async function setSchemaJson () {
       const schema = parse<SchemaSectionTag>(data.slice(indices.begin, indices.ender));
       const schemaProp = hasProp(schema);
 
-      if (schemaProp('settings')) {
-        for (const setting of schema.settings) {
+      function buildSettingsCache (file, settings) {
+
+        if (has('settings', settings)) {
+          settings = settings.settings
+        };
+
+        for (const setting of settings) {
           if (has('$ref', setting)) {
-            const fname = setting.$ref.split('.')[0];
-            if (shared.has(fname)) {
-              $.cache.schema[shared.get(fname).uri].add(file);
+
+            const [ key, prop ] = setting.$ref.split('.');
+
+            if (shared.has(key)) {
+
+              if ($.cache.schema[shared.get(key).uri].has(file)) continue;
+
+              $.cache.schema[shared.get(key).uri].add(file);
+              buildSettingsCache(file, shared.get(key).schema[prop]);
+
             }
+
           }
         }
+
+      }
+
+      if (schemaProp('settings')) {
+        buildSettingsCache(file, schema.settings);
       }
 
       if (schemaProp('blocks')) {
@@ -191,4 +209,5 @@ async function setSchemaJson () {
     }
   }
 
+  console.log(['$.cache.schema', $.cache.schema]);
 }
