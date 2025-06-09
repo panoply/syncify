@@ -119,8 +119,9 @@ async function setSchemaJson () {
 
   const { shared } = $.section;
   const warn = warnOption('Section Schema');
+  const files = [...$.paths.blocks.input, ...$.paths.sections.input];
 
-  for (const file of $.paths.sections.input) {
+  for (const file of files) {
 
     const read = await readFile(file, 'utf8');
     const hash = checksum(read);
@@ -167,33 +168,39 @@ async function setSchemaJson () {
 
       }
 
+      function buildBlockCache (file, blocks) {
+
+        for (const block of blocks) {
+
+          const blockProp = hasProp(block);
+
+          if (blockProp('$ref')) {
+
+            const [ key, prop ] = block.$ref.split('.');
+
+            if (shared.has(key)) {
+
+              if ($.cache.schema[shared.get(key).uri].has(file)) continue;
+
+              $.cache.schema[shared.get(key).uri].add(file);
+              buildBlockCache(file, shared.get(key).schema[prop]);
+
+            }
+
+          }
+
+          if (blockProp('settings')) {
+            buildSettingsCache(file, block.settings);
+          }
+        }
+      }
+
       if (schemaProp('settings')) {
         buildSettingsCache(file, schema.settings);
       }
 
       if (schemaProp('blocks')) {
-        for (const block of schema.blocks) {
-
-          const blockProp = hasProp(block);
-
-          if (blockProp('$ref')) {
-            const fname = block.$ref.split('.')[0];
-            if (shared.has(fname)) {
-              $.cache.schema[shared.get(fname).uri].add(file);
-            }
-          }
-
-          if (blockProp('settings')) {
-            for (const setting of block.settings) {
-              if (has('$ref', setting)) {
-                const fname = setting.$ref.split('.')[0];
-                if (shared.has(fname)) {
-                  $.cache.schema[shared.get(fname).uri].add(file);
-                }
-              }
-            }
-          }
-        }
+        buildBlockCache(file, schema.blocks);
       }
 
     } catch (e) {
@@ -209,5 +216,4 @@ async function setSchemaJson () {
     }
   }
 
-  console.log(['$.cache.schema', $.cache.schema]);
 }

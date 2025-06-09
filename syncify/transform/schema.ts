@@ -23,7 +23,7 @@ import { log } from '~cli/log';
 import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File, Type } from '~file';
-import { themeFilesUpsertMap } from '~http/themeFiles';
+import { LiquidTransform } from '~liquid';
 import { checksum, defineProperty, has, hasProp, isArray, isObject, plur, toArray } from '~utils';
 
 import { $, q } from '$';
@@ -394,13 +394,12 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
           if (isArray(shared.schema[prop])) {
 
-            for (const block of shared.schema[prop]) {
+            for (let block of shared.schema[prop]) {
 
-              block.settings = InjectSettings(file, block.settings) as SettingsSpread;
+              [block] = InjectBlocks(file, [block] as BlockSpread);
+              blocks.push(block as BlockSingleton);
 
             }
-
-            blocks.push(...(shared.schema[prop] as BlockSpread));
 
           } else {
 
@@ -611,17 +610,15 @@ export async function SchemaTransform (file: File) {
     });
   });
 
-  log.process('Shared Schema', `${sections.length} ${plur('section', sections.length)}`);
+  log.process('Shared Schema', `${sections.length} ${plur('file', sections.length)}`);
 
   const files = await getSchemaFiles(sections);
 
-  if (files.length > 1) {
-    log.syncing(`${files.length} files`);
-  } else {
-    log.syncing(files[0].key);
-  }
+  log.nl();
 
-  await themeFilesUpsertMap(files);
+  for (const file of files) {
+    await LiquidTransform(file);
+  }
 
   if ($.mode.hot && $.mode.bulk === false) {
     for (const section of files) {
