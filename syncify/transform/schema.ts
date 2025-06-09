@@ -195,7 +195,7 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
 
     if (!has('$ref', schema[i])) {
 
-      settings.push(schema[i]);
+      settings.push(schema[i] as SettingsSingleton);
       continue;
 
     }
@@ -208,117 +208,56 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
 
       if (has(prop, shared.schema)) {
 
+        if (isObject(shared.schema[prop]) && !has('settings', shared.schema[prop])) {
+
+          settings.push(shared.schema[prop] as SettingsSingleton);
+          continue;
+
+        }
+
+        if (isObject(shared.schema[prop]) && has('settings', shared.schema[prop])) {
+
+          const setting: SettingsSpread = InjectSettings(file, shared.schema[prop].settings);
+
+          settings.push(...(setting));
+          continue;
+
+        }
+
         if (isArray(shared.schema[prop])) {
 
-          if (!shared.schema[prop].some(item => has('$ref', item))) {
+          for (const item of shared.schema[prop]) {
 
-            settings.push(...(shared.schema[prop] as SettingsSpread));
-            continue;
+            if (item.$ref && item.$ref === schema[i].$ref) {
 
-          };
+              if ($.mode.build) {
 
-          const schemaSettings: SettingsSpread = [];
-
-          for (const schemaItem of shared.schema[prop]) {
-
-            if (has('$ref', schemaItem)) {
-
-               if (schemaItem.$ref === schema[i].$ref) {
-
-                if ($.mode.build) {
-
-                  warn.schema(file, {
-                    shared: shared.uri,
-                    $ref: schema[i].$ref,
-                    schema: 'settings',
-                    message: [
-                      `Shared Schema reference of ${bold(schema[i].$ref)} was provided.`,
-                      `This caused a loop and has been skipped. Please check your provided schema.`
-                    ]
-                  });
-
-                } else {
-
-                  log.warn(`shared schema loop detected (skipping this schema): ${bold(schema[i].$ref)}`, file.base);
-
-                }
-
-                continue;
-
-              }
-
-              const injectedSettings = InjectSettings(file, [schemaItem]) as SettingsSpread;
-              schemaSettings.push(...injectedSettings);
-
-            } else {
-
-              schemaSettings.push(...([schemaItem] as SettingsSpread));
-
-            }
-
-          }
-
-          settings.push(...schemaSettings);
-
-        } else if (isObject(shared.schema[prop])) {
-
-          if (has('settings', shared.schema[prop])) {
-
-            if (!shared.schema[prop].settings.some(item => has('$ref', item))) {
-
-              settings.push(...(shared.schema[prop] as SettingsGroup).settings);
-              continue;
-
-            };
-
-            const schemaSettings: SettingsSpread = [];
-
-            for (const schemaItem of shared.schema[prop].settings) {
-
-              if (has('$ref', schemaItem)) {
-
-                if (schemaItem.$ref === schema[i].$ref) {
-
-                  if ($.mode.build) {
-
-                    warn.schema(file, {
-                      shared: shared.uri,
-                      $ref: schema[i].$ref,
-                      schema: 'settings',
-                      message: [
-                        `Shared Schema reference of ${bold(schema[i].$ref)} was provided.`,
-                        `This caused a loop and has been skipped. Please check your provided schema.`
-                      ]
-                    });
-
-                  } else {
-
-                    log.warn(`shared schema loop detected (skipping this schema): ${bold(schema[i].$ref)}`, file.base);
-
-                  }
-
-                  continue;
-
-                }
-
-                const injectedSettings = InjectSettings(file, [schemaItem]) as SettingsSpread;
-                schemaSettings.push(...injectedSettings);
+                warn.schema(file, {
+                  shared: shared.uri,
+                  $ref: schema[i].$ref,
+                  schema: 'settings',
+                  message: [
+                    `Shared Schema reference of ${bold(schema[i].$ref)} was provided.`,
+                    `This caused a loop and has been skipped. Please check your provided schema.`
+                  ]
+                });
 
               } else {
 
-                schemaSettings.push(...([schemaItem] as SettingsSpread));
+                log.warn(`shared schema loop detected (skipping this schema): ${bold(schema[i].$ref)}`, file.base);
 
               }
 
+              continue;
+
             }
 
-            settings.push(...schemaSettings);
-
-          } else {
-
-            settings.push(shared.schema[prop] as SettingsSingleton);
+            const setting: SettingsSpread = InjectSettings(file, [item] as SettingsSpread);
+            settings.push(...(setting));
 
           }
+
+          continue;
 
         }
 
