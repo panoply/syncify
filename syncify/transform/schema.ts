@@ -238,7 +238,7 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
                   schema: 'settings',
                   message: [
                     `Shared Schema reference of ${bold(schema[i].$ref)} was provided.`,
-                    `This caused a loop and has been skipped. Please check your provided schema.`
+                    'This caused a loop and has been skipped. Please check your provided schema.'
                   ]
                 });
 
@@ -252,7 +252,7 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
 
             }
 
-            const setting: SettingsSpread = InjectSettings(file, [item] as SettingsSpread);
+            const setting: SettingsSpread = InjectSettings(file, [ item ] as SettingsSpread);
             settings.push(...(setting));
 
           }
@@ -335,7 +335,7 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
             for (let block of shared.schema[prop]) {
 
-              [block] = InjectBlocks(file, [block] as BlockSpread);
+              [ block ] = InjectBlocks(file, [ block ] as BlockSpread);
               blocks.push(block as BlockSingleton);
 
             }
@@ -409,7 +409,7 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
 
       if (has('settings', schema[i])) {
 
-        block.settings = InjectSettings(file, schema[i].settings)
+        block.settings = InjectSettings(file, schema[i].settings);
 
       }
 
