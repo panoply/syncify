@@ -119,7 +119,7 @@ async function setSchemaJson () {
 
   const { shared } = $.section;
   const warn = warnOption('Section Schema');
-  const files = [...$.paths.blocks.input, ...$.paths.sections.input];
+  const files = [ ...$.paths.blocks.input, ...$.paths.sections.input ];
 
   for (const file of files) {
 
@@ -146,7 +146,7 @@ async function setSchemaJson () {
       function buildSettingsCache (file, settings) {
 
         if (has('settings', settings)) {
-          settings = settings.settings
+          settings = settings.settings;
         };
 
         for (const setting of settings) {
