@@ -64,7 +64,11 @@ export namespace Schema {
     /**
      * Reference to shared schema
      */
-    $ref?: string
+    $ref?: string;
+    /**
+     * An object to hold setting value overrides
+     */
+    _settings?: object;
   }
 
   export interface Number extends Common<'number'> {
@@ -427,7 +431,15 @@ export interface SchemaBlocks {
   /**
    * Reference to shared schema
    */
-  $ref?: string
+  $ref?: string;
+  /**
+    * An object to hold setting value overrides
+    */
+  _settings?: object;
+  /**
+    * An object to hold block value overrides
+    */
+  _blocks?: object;
 }
 
 export interface EnabledOn {
