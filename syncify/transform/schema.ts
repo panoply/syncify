@@ -4,7 +4,7 @@ import type {
   SchemaBlocks,
   SchemaSectionTag,
   SchemaSettings,
-  SettingsGroup,
+  SettingsSchema,
   SettingsSingleton,
   SettingsSpread,
   SharedSchema
@@ -13,7 +13,7 @@ import type {
 import { readFile } from 'fs-extra';
 import pMap from 'p-map';
 
-import { ARR, bold } from '@syncify/ansi';
+import { bold } from '@syncify/ansi';
 import { glue } from '@syncify/glue';
 import { parse } from '@syncify/json';
 
@@ -24,7 +24,7 @@ import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File, Type } from '~file';
 import { LiquidTransform } from '~liquid';
-import { checksum, defineProperty, has, hasProp, isArray, isObject, plur, toArray } from '~utils';
+import { checksum, defineProperty, has, hasProp, isArray, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray } from '~utils';
 
 import { $, q } from '$';
 
@@ -178,6 +178,95 @@ export async function ExtractSchema (file: File): Promise<[
 }
 
 /**
+ * Overrides Builder
+ *
+ * Takes the current schema item and the existing overrides,
+ * to compute the new set of overrides for the next level of recursion.
+ *
+ * @param schema The schema object being processed (can be a setting or a block).
+ * @param overrides The computed overrides from the previous levels of recursion.
+ * @param type [default: 'setting'] A scoping setting that determines how to process the schema and overrides
+ *
+ * @returns A new object with updated block or settings overrides.
+ */
+export function OverridesBuilder (
+  schema: SchemaSettings | SchemaBlocks,
+  overrides: { [key: string]: any; _blocks?: object; _settings?: object; },
+  type: 'block' | 'setting' = 'setting'
+) {
+
+  const allowedProps: string[] = [];
+
+  if (type === 'setting') {
+
+    schema = schema as SchemaSettings;
+
+    allowedProps.push('id', 'label', 'info', 'visible_if', 'default');
+
+    if (has('_settings', schema)) {
+      schema = merge(schema, schema._settings);
+    }
+
+    if (has('_settings', overrides)) {
+      overrides = merge(overrides, overrides._settings);
+    }
+  }
+
+  if (type === 'block') {
+
+    schema = schema as SchemaBlocks;
+
+    allowedProps.push('name', 'type');
+
+    if (has('_blocks', schema)) {
+      schema = merge(schema, schema._blocks);
+    }
+
+    if (has('_blocks', overrides)) {
+      overrides = merge(overrides, overrides._blocks);
+    }
+  }
+
+  overrides = omit([ '_blocks', '_settings' ], overrides);
+
+  for (const [ key, value ] of Object.entries(schema)) {
+
+    if (!s(allowedProps).has(key)) {
+      delete overrides[key];
+      continue;
+    }
+
+    if (!has(key, overrides)) {
+      overrides[key] = value;
+      continue;
+    }
+
+    if (isNull(value) || isNull(overrides[key])) {
+      continue;
+    }
+
+    if (key === 'visible_if') {
+      // This mixes liquid in a string so could be dangerous searching for wildcard '*' values
+      continue;
+    }
+
+    if (isString(value)) {
+
+      if (overrides[key].includes('*')) {
+        overrides[key] = replaceAllOccurrences(overrides[key], '*', value);
+      }
+
+      continue;
+
+    }
+
+  }
+
+  return o(overrides);
+
+}
+
+/**
  * Inject Settings
  *
  * Traverses the `settings[]` of section schema and replaces all
@@ -187,15 +276,30 @@ export async function ExtractSchema (file: File): Promise<[
  * Any unknown or undefined schema references will be omitted
  *
  */
-export function InjectSettings (file: File, schema: SchemaSettings[]) {
+export function InjectSettings (file: File, schema: SchemaSettings[], overrides: { [key: string]: any; _blocks?: object; _settings?: object; } = {}) {
 
   const settings: SchemaSettings[] = [];
 
   for (let i = 0, s = schema.length; i < s; i++) {
 
+    const settingsOverrides = OverridesBuilder(schema[i], o(overrides), 'setting');
+
     if (!has('$ref', schema[i])) {
 
-      settings.push(schema[i] as SettingsSingleton);
+      const setting: SettingsSingleton = o(schema[i]);
+
+      for (const [ key, value ] of Object.entries(settingsOverrides)) {
+
+        if (isNull(value)) {
+          delete setting[key];
+          continue;
+        }
+
+        setting[key] = value;
+
+      };
+
+      settings.push(setting);
       continue;
 
     }
@@ -210,14 +314,16 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
 
         if (isObject(shared.schema[prop]) && !has('settings', shared.schema[prop])) {
 
-          settings.push(shared.schema[prop] as SettingsSingleton);
+          const setting: SettingsSpread = InjectSettings(file, [ (shared.schema[prop] as SettingsSingleton) ], settingsOverrides);
+
+          settings.push(...(setting));
           continue;
 
         }
 
         if (isObject(shared.schema[prop]) && has('settings', shared.schema[prop])) {
 
-          const setting: SettingsSpread = InjectSettings(file, shared.schema[prop].settings);
+          const setting: SettingsSpread = InjectSettings(file, (shared.schema[prop] as SettingsSchema).settings, settingsOverrides);
 
           settings.push(...(setting));
           continue;
@@ -252,7 +358,8 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
 
             }
 
-            const setting: SettingsSpread = InjectSettings(file, [ item ] as SettingsSpread);
+            const setting: SettingsSpread = InjectSettings(file, [ item ] as SettingsSpread, o(settingsOverrides));
+
             settings.push(...(setting));
 
           }
@@ -315,84 +422,16 @@ export function InjectSettings (file: File, schema: SchemaSettings[]) {
  * Any unknown or undefined schema references will be omitted
  *
  */
-export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
+export function InjectBlocks (file: File, schema: SchemaBlocks[], overrides: { [key: string]: any; _blocks?: object; _settings?: object; } = {}) {
 
   const blocks: SchemaBlocks[] = [];
 
   for (let i = 0, s = schema.length; i < s; i++) {
 
-    if (has('$ref', schema[i])) {
+    const blockOverrides = OverridesBuilder(schema[i], o(overrides), 'block');
+    const settingsOverrides = OverridesBuilder(schema[i], o(overrides), 'setting');
 
-      const [ key, prop ] = schema[i].$ref.split('.');
-
-      if ($.section.shared.has(key)) {
-
-        const shared = $.section.shared.get(key);
-
-        if (has(prop, shared.schema)) {
-
-          if (isArray(shared.schema[prop])) {
-
-            for (let block of shared.schema[prop]) {
-
-              [ block ] = InjectBlocks(file, [ block ] as BlockSpread);
-              blocks.push(block as BlockSingleton);
-
-            }
-
-          } else {
-
-            if (has('settings', shared.schema[prop])) {
-
-              shared.schema[prop].settings = InjectSettings(file, shared.schema[prop].settings) as SettingsSpread;
-
-            }
-
-            blocks.push(shared.schema[prop] as BlockSingleton);
-
-          }
-
-        } else {
-
-          if ($.mode.build) {
-
-            warn.schema(file, {
-              shared: prop,
-              $ref: schema[i].$ref,
-              schema: 'blocks',
-              message: [
-                `An unknown Shared Schema key reference of ${bold(schema[i].$ref)} was provided`,
-                `to the ${bold('blocks')} within section file ${bold(file.base)}. The shared schema`,
-                `file exists, but the key ${bold(prop)} does not.`
-              ]
-            });
-
-          } else {
-            log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
-          }
-
-        }
-      } else {
-
-        if ($.mode.build) {
-
-          warn.schema(file, {
-            shared: prop,
-            $ref: schema[i].$ref,
-            schema: 'blocks',
-            message: [
-              `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
-              `to ${bold('blocks')} within section file ${bold(file.base)}. There is no known shared`,
-              'schema file using that name.'
-            ]
-          });
-
-        } else {
-          log.warn(`unknown $ref ${bold(schema[i].$ref)} `, file.base);
-        }
-      }
-
-    } else {
+    if (!has('$ref', schema[i])) {
 
       const block = <SchemaBlocks>{};
 
@@ -405,17 +444,89 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[]) {
         continue;
       }
 
+      for (const [ key, value ] of Object.entries(blockOverrides)) {
+
+        if (isNull(value)) {
+          delete block[key];
+          continue;
+        }
+
+        block[key] = value;
+
+      };
+
       block.settings = [];
 
       if (has('settings', schema[i])) {
-
-        block.settings = InjectSettings(file, schema[i].settings);
-
+        block.settings = InjectSettings(file, schema[i].settings, settingsOverrides);
       }
 
-      blocks.push(block);
+      blocks.push(block as BlockSingleton);
+
+      continue;
 
     }
+
+    const [ key, prop ] = schema[i].$ref.split('.');
+
+    if ($.section.shared.has(key)) {
+
+      const shared = $.section.shared.get(key);
+
+      if (has(prop, shared.schema)) {
+
+        if (!isArray(shared.schema[prop])) {
+          shared.schema[prop] = [ shared.schema[prop] ] as BlockSpread;
+        }
+
+        for (let block of shared.schema[prop]) {
+
+          [ block ] = InjectBlocks(file, [ block ] as BlockSpread, { _blocks: blockOverrides, _settings: settingsOverrides });
+
+          blocks.push(block);
+
+        }
+
+      } else {
+
+        if ($.mode.build) {
+
+          warn.schema(file, {
+            shared: prop,
+            $ref: schema[i].$ref,
+            schema: 'blocks',
+            message: [
+              `An unknown Shared Schema key reference of ${bold(schema[i].$ref)} was provided`,
+              `to the ${bold('blocks')} within section file ${bold(file.base)}. The shared schema`,
+              `file exists, but the key ${bold(prop)} does not.`
+            ]
+          });
+
+        } else {
+          log.warn(`undefined $ref ${bold(prop)} in ${bold(key)} `, file.base);
+        }
+
+      }
+    } else {
+
+      if ($.mode.build) {
+
+        warn.schema(file, {
+          shared: prop,
+          $ref: schema[i].$ref,
+          schema: 'blocks',
+          message: [
+            `An unknown Shared Schema file reference ${bold(schema[i].$ref)} was provided`,
+            `to ${bold('blocks')} within section file ${bold(file.base)}. There is no known shared`,
+            'schema file using that name.'
+          ]
+        });
+
+      } else {
+        log.warn(`unknown $ref ${bold(schema[i].$ref)} `, file.base);
+      }
+    }
+
   }
 
   return blocks;

@@ -1245,6 +1245,24 @@ export function constructTree (paths: string[]): Array<{
 
 }
 
+/**
+ * **replaceAllOccurrences**
+ *
+ * Searches a string for all occurrences of a substring and replaces them.
+ *
+ * @param inputString The original string to process.
+ * @param searchCriteria The substring (string) to search for.
+ * @param replacement The string value to replace each match.
+ */
+export function replaceAllOccurrences (inputString: string, searchCriteria: string, replacement: string): string {
+
+  if (typeof searchCriteria === 'string' && searchCriteria === '') {
+    return inputString;
+  }
+
+  return inputString.replaceAll(searchCriteria, replacement);
+}
+
 /* -------------------------------------------- */
 /* SIZES                                        */
 /* -------------------------------------------- */
