@@ -12,7 +12,7 @@ import { throws } from '~cli/throws';
 import { warnOption } from '~cli/warnings';
 import { error } from '~errors';
 import { GetSchemaIndices } from '~schema';
-import { checksum, defineProperty, has, hasProp, includes, isArray, isObject, merge, s } from '~utils';
+import { checksum, defineProperty, has, hasProp, isArray, isObject, s } from '~utils';
 
 import { $ } from '$';
 
