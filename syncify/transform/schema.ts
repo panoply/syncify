@@ -24,7 +24,7 @@ import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File, Type } from '~file';
 import { LiquidTransform } from '~liquid';
-import { checksum, defineProperty, has, hasProp, isArray, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray } from '~utils';
+import { checksum, defineProperty, has, hasProp, includes, isArray, isEmpty, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray } from '~utils';
 
 import { $, q } from '$';
 
@@ -191,17 +191,21 @@ export async function ExtractSchema (file: File): Promise<[
  */
 export function OverridesBuilder (
   schema: SchemaSettings | SchemaBlocks,
-  overrides: { [key: string]: any; _blocks?: object; _settings?: object; },
+  overrides: {
+    [key: string]: { label: string; value: string; } | string | object;
+    _blocks?: object;
+    _settings?: object;
+  },
   type: 'block' | 'setting' = 'setting'
 ) {
 
-  const allowedProps: string[] = [];
+  let allowedProps: string[] = [];
 
   if (type === 'setting') {
 
     schema = schema as SchemaSettings;
 
-    allowedProps.push('id', 'label', 'info', 'visible_if', 'default');
+    allowedProps.push('id', 'label', 'info', 'visible_if', 'default', 'options');
 
     if (has('_settings', schema)) {
       schema = merge(schema, schema._settings);
@@ -210,6 +214,7 @@ export function OverridesBuilder (
     if (has('_settings', overrides)) {
       overrides = merge(overrides, overrides._settings);
     }
+
   }
 
   if (type === 'block') {
@@ -227,17 +232,20 @@ export function OverridesBuilder (
     }
   }
 
-  overrides = omit([ '_blocks', '_settings' ], overrides);
+  overrides = omit([ '_blocks', '_settings' ], overrides) as typeof overrides;
 
   for (const [ key, value ] of Object.entries(schema)) {
 
-    if (!s(allowedProps).has(key)) {
-      delete overrides[key];
-      continue;
+    if (key === 'type' && value !== 'select' && includes('options', allowedProps)) {
+      allowedProps = allowedProps.filter(function (item) {
+        return item !== 'options';
+      });
+
+      delete overrides.options;
     }
 
-    if (!has(key, overrides)) {
-      overrides[key] = value;
+    if (!s(allowedProps).has(key)) {
+      delete overrides[key];
       continue;
     }
 
@@ -252,11 +260,127 @@ export function OverridesBuilder (
 
     if (isString(value)) {
 
-      if (overrides[key].includes('*')) {
+      if (!has(key, overrides)) {
+        overrides[key] = value;
+        continue;
+      }
+
+      if (isString(overrides[key]) && overrides[key].includes('*')) {
         overrides[key] = replaceAllOccurrences(overrides[key], '*', value);
       }
 
       continue;
+
+    }
+
+    if (key === 'options') {
+
+      const override = overrides[key] as { label?: string; value?: string };
+
+      if (isObject(value) && !isArray(value)) {
+
+        const option = value as { label?: string; value?: string };
+
+        if (!has(key, overrides)) {
+
+          overrides[key] = {
+            label: option.label ?? '',
+            value: option.value ?? ''
+          };
+
+          continue;
+
+        }
+
+        if (isObject(override)) {
+
+          if (has('label', override) && isString(override.label) && override.label?.includes('*')) {
+
+            override.label = replaceAllOccurrences(override.label, '*', option.label);
+
+          }
+
+          if (has('value', override) && isString(override.value) && override.value?.includes('*')) {
+
+            override.value = replaceAllOccurrences(override.value, '*', option.value);
+
+          }
+
+        }
+
+        continue;
+
+      }
+
+      if (schema.type === 'select' || schema.type === 'radio') {
+
+        if (isArray(value) && has('options', overrides) && isObject(override)) {
+
+          const options: object[] = [];
+
+          for (let option of value) {
+
+            option = o(option);
+
+            if (has('label', override)) {
+
+              if (isEmpty(override.label)) {
+
+                override.label = '*';
+
+              }
+
+              if (isString(override.label)) {
+
+                if (override.label.includes('*')) {
+
+                  option.label = replaceAllOccurrences(override.label, '*', option.label);
+
+                } else {
+
+                  option.label = override.label;
+
+                }
+
+              };
+
+            }
+
+            if (has('value', override)) {
+
+              if (isEmpty(override.value)) {
+
+                override.value = '*';
+
+              }
+
+              if (isString(override.value)) {
+
+                if (override.value.includes('*')) {
+
+                  option.value = replaceAllOccurrences(override.value, '*', option.value);
+
+                } else {
+
+                  option.value = override.value;
+
+                }
+
+              }
+
+            }
+
+            options.push(option);
+
+          }
+
+          overrides[key] = options;
+
+          continue;
+
+        }
+
+      }
 
     }
 
