@@ -76,7 +76,16 @@ export async function getConfigFile (): Promise<Config> {
 
   if ($.project.syncifyConfig !== null) {
     if (await pathExists($.project.syncifyConfig)) {
-      $.file.config = $.project.syncifyConfig;
+      if ($.project.syncifyConfig === $.file.pkg) {
+        if ($.pkg !== null && hasPath('syncify.config', $.pkg) && isEmpty($.pkg.syncify.config) === false) {
+          $.project.syncifyConfig = $.file.config = $.file.pkg;
+          return $.pkg.syncify.config;
+        } else {
+          $.file.config = null;
+        }
+      } else {
+        $.file.config = $.project.syncifyConfig;
+      }
     } else {
       $.file.config = null;
     }
