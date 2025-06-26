@@ -1,4 +1,4 @@
-import type { SchemaSectionTag, SchemaSettings, SharedSchema } from 'types';
+import type { SchemaBlocks, SchemaSectionTag, SchemaSettings, SettingsGroup, SharedSchema } from 'types';
 
 import { basename, extname, relative } from 'node:path';
 
@@ -12,7 +12,7 @@ import { throws } from '~cli/throws';
 import { warnOption } from '~cli/warnings';
 import { error } from '~errors';
 import { GetSchemaIndices } from '~schema';
-import { checksum, defineProperty, has, hasProp, isArray, isObject, s } from '~utils';
+import { checksum, defineProperty, has, hasProp, includes, isArray, isObject, merge, s } from '~utils';
 
 import { $ } from '$';
 
@@ -143,32 +143,51 @@ async function setSchemaJson () {
       const schema = parse<SchemaSectionTag>(data.slice(indices.begin, indices.ender));
       const schemaProp = hasProp(schema);
 
-      function buildSettingsCache (file, settings) {
+      function buildSettingsCache (file: string, settings: SchemaSettings[]) {
 
-        if (has('settings', settings)) {
-          settings = settings.settings;
-        };
+        const refs = [];
 
         for (const setting of settings) {
+
           if (has('$ref', setting)) {
 
             const [ key, prop ] = setting.$ref.split('.');
 
             if (shared.has(key)) {
 
-              if ($.cache.schema[shared.get(key).uri].has(file)) continue;
+              if (!$.cache.schema[shared.get(key).uri].has(file)) {
 
-              $.cache.schema[shared.get(key).uri].add(file);
-              buildSettingsCache(file, shared.get(key).schema[prop]);
+                $.cache.schema[shared.get(key).uri].add(file);
+
+                if (has('settings', shared.get(key).schema[prop])) {
+
+                  refs.push((shared.get(key).schema[prop] as SettingsGroup).settings);
+
+                  continue;
+
+                }
+
+                refs.push(shared.get(key).schema[prop]);
+
+              }
 
             }
 
           }
         }
 
+        for (const settings of refs) {
+
+          buildSettingsCache(file, settings);
+
+        }
+
       }
 
-      function buildBlockCache (file, blocks) {
+      function buildBlockCache (file: string, blocks: SchemaBlocks[]) {
+
+        const blockRefs: SchemaBlocks[] = [];
+        const settingsRefs = [];
 
         for (const block of blocks) {
 
@@ -180,27 +199,49 @@ async function setSchemaJson () {
 
             if (shared.has(key)) {
 
-              if ($.cache.schema[shared.get(key).uri].has(file)) continue;
+              if (!$.cache.schema[shared.get(key).uri].has(file)) {
 
-              $.cache.schema[shared.get(key).uri].add(file);
-              buildBlockCache(file, shared.get(key).schema[prop]);
+                $.cache.schema[shared.get(key).uri].add(file);
+
+                blockRefs.push(shared.get(key).schema[prop] as SchemaBlocks);
+
+              };
 
             }
 
           }
 
           if (blockProp('settings')) {
-            buildSettingsCache(file, block.settings);
+
+            settingsRefs.push(block.settings);
+
           }
         }
+
+        for (const block of blockRefs) {
+
+          buildBlockCache(file, [ block ]);
+
+        }
+
+        for (const settings of settingsRefs) {
+
+          buildSettingsCache(file, settings);
+
+        }
+
       }
 
       if (schemaProp('settings')) {
+
         buildSettingsCache(file, schema.settings);
+
       }
 
       if (schemaProp('blocks')) {
+
         buildBlockCache(file, schema.blocks);
+
       }
 
     } catch (e) {
@@ -214,6 +255,7 @@ async function setSchemaJson () {
       warn('JSON Parse Error', relative($.cwd, file));
 
     }
+
   }
 
 }
