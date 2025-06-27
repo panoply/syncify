@@ -16,7 +16,7 @@ import { SchemaTransform } from '~transform/schema';
 import { ScriptTransform } from '~transform/script';
 import { StyleTransform } from '~transform/style';
 import { SvgTransform } from '~transform/svg';
-import { getChunk, isObject, reduce } from '~utils';
+import { getChunk, isEmpty, isObject, reduce } from '~utils';
 
 import { $, q } from '$';
 
@@ -77,6 +77,32 @@ async function Change (changes: ParcelWatcher.Event[]) {
       log.changed(file);
 
       if (change.type === 'delete') {
+
+        if (file.namespace === 'schema') {
+
+          log.nl();
+
+          if (!isEmpty($.cache.schema[file.input])) {
+
+            log.warn('The following files may require your attention!');
+
+            for (const section of $.cache.schema[file.input]) {
+
+              log.line(section);
+
+            }
+
+          } else {
+
+            log.line('No files are affected');
+
+          }
+
+          delete $.cache.schema[file.input];
+
+          return;
+
+        }
 
         await themeFilesDeleteMap(file);
 
