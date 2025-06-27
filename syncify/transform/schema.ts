@@ -603,6 +603,12 @@ export function InjectBlocks (file: File, schema: SchemaBlocks[], overrides: { [
 
       const shared = $.section.shared.get(key);
 
+      if (!$.cache.schema[shared.uri].has(file.input)) {
+
+        $.cache.schema[shared.uri].add(file.input);
+
+      }
+
       if (has(prop, shared.schema)) {
 
         if (!isArray(shared.schema[prop])) {
