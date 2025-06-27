@@ -434,6 +434,12 @@ export function InjectSettings (file: File, schema: SchemaSettings[], overrides:
 
       const shared = $.section.shared.get(key);
 
+      if (!$.cache.schema[shared.uri].has(file.input)) {
+
+        $.cache.schema[shared.uri].add(file.input);
+
+      }
+
       if (has(prop, shared.schema)) {
 
         if (isObject(shared.schema[prop]) && !has('settings', shared.schema[prop])) {
@@ -704,6 +710,10 @@ async function ParseSharedSchema (file: File) {
           if (has('$description', setting)) delete setting.$description;
         }
       }
+    }
+
+    if (!$.cache.schema[file.input]) {
+      $.cache.schema[file.input] = s();
     }
 
     return $.section.shared.set(file.name, { uri: file.input, schema }).get(file.name);
