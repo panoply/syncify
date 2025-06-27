@@ -79,7 +79,9 @@ async function setSharedSchema () {
         }
       }
 
-      $.cache.schema[uri] = s();
+      if (!$.cache.schema[uri]) {
+        $.cache.schema[uri] = s();
+      }
       $.section.shared.set(key, { uri, schema });
 
     } catch (e) {
