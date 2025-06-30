@@ -24,7 +24,7 @@ import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File, Type } from '~file';
 import { LiquidTransform } from '~liquid';
-import { checksum, defineProperty, has, hasProp, includes, isArray, isEmpty, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray } from '~utils';
+import { checksum, defineProperty, has, hasProp, includes, isArray, isEmpty, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray, values } from '~utils';
 
 import { $, q } from '$';
 
@@ -755,6 +755,12 @@ export async function CreateSection <T extends SchemaSectionTag> (file: File<T>)
   const [ before, schema, after ] = read;
 
   if (schema === null) return before;
+
+  const schemaFiles = values($.cache.schema);
+
+  for (const schemaFile of schemaFiles) {
+    schemaFile.delete(file.input);
+  }
 
   const schemaProp = hasProp(schema);
 
