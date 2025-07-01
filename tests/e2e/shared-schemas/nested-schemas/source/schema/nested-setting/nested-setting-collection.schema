@@ -1,0 +1,10 @@
+{
+    "basic": {
+        "$description": "This is a spread, containing two more spreads",
+        "settings": [
+            {
+                "$ref": "nested-setting-spread.combo"
+            }
+        ]
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "text": [
+        {
+            "$ref": "basic-input-singleton.text"
+        },
+        {
+            "$ref": "basic-input-singleton.textarea"
+        }
+    ],
+    "other": [
+        {
+            "$ref": "basic-input-singleton.checkbox"
+        },
+        {
+            "$ref": "basic-input-singleton.number"
+        }
+    ],
+    "combo": [
+        {
+            "$ref": "nested-setting-spread.text"
+        },
+        {
+            "$ref": "nested-setting-spread.other"
+        }
+    ]
+}

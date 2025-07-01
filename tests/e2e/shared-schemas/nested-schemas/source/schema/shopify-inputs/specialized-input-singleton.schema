@@ -1,0 +1,177 @@
+{
+    "article": {
+        "type": "article",
+        "id": "featured_article",
+        "label": "Featured Article",
+        "info": "Select an article to feature."
+    },
+    "blog": {
+        "type": "blog",
+        "id": "featured_blog",
+        "label": "Featured Blog",
+        "info": "Select a blog to feature posts from."
+    },
+    "collection": {
+        "type": "collection",
+        "id": "featured_collection",
+        "label": "Featured Collection",
+        "info": "Select a collection to display."
+    },
+    "collection_list": {
+        "type": "collection_list",
+        "id": "featured_collections",
+        "label": "Featured Collections",
+        "limit": 4,
+        "info": "Select up to 4 collections."
+    },
+    "color": {
+        "type": "color",
+        "id": "heading_color",
+        "label": "Heading Color",
+        "default": "#333333",
+        "info": "Choose a color for the headings."
+    },
+    "color_background": {
+        "type": "color_background",
+        "id": "section_background",
+        "label": "Section Background",
+        "default": "linear-gradient(to right, #ffffff, #f0f0f0)",
+        "info": "Set a solid color or gradient for the background."
+    },
+    "color_scheme": {
+        "type": "color_scheme",
+        "id": "section_color_scheme",
+        "label": "Color Scheme",
+        "info": "Select a predefined color scheme for this section."
+    },
+    "color_scheme_group": {
+        "type": "header",
+        "content": "Color Scheme Group",
+        "info": "This is a header to group color scheme settings. The actual input is 'color_scheme'."
+    },
+    "font_picker": {
+        "type": "font_picker",
+        "id": "body_font",
+        "label": "Body Font",
+        "default": "helvetica_n4",
+        "info": "Select the main font for body text."
+    },
+    "html": {
+        "type": "html",
+        "id": "custom_html_block",
+        "label": "Custom HTML",
+        "placeholder": "<p>Enter your custom HTML code here.</p>",
+        "info": "Allows for custom HTML markup."
+    },
+    "image_picker": {
+        "type": "image_picker",
+        "id": "banner_image",
+        "label": "Banner Image",
+        "info": "Upload or select an image for the banner."
+    },
+    "inline_richtext": {
+        "type": "inline_richtext",
+        "id": "announcement_text",
+        "label": "Announcement Text",
+        "default": "<p>Use <strong>bold</strong> and <em>italic</em> text.</p>",
+        "info": "A simple rich text editor for single-line content."
+    },
+    "link_list": {
+        "type": "link_list",
+        "id": "footer_menu",
+        "label": "Footer Menu",
+        "default": "footer",
+        "info": "Select a menu (link list) for the footer."
+    },
+    "liquid": {
+        "type": "liquid",
+        "id": "custom_liquid",
+        "label": "Custom Liquid",
+        "info": "For advanced users. Insert custom Liquid code."
+    },
+    "metaobject": {
+        "type": "metaobject",
+        "id": "author_profile",
+        "label": "Author Profile",
+        "definition": "author",
+        "info": "Select a metaobject entry for an author."
+    },
+    "metaobject_list": {
+        "type": "metaobject_list",
+        "id": "product_materials",
+        "label": "Product Materials",
+        "definition": "material",
+        "info": "Select a list of metaobject entries for materials."
+    },
+    "page": {
+        "type": "page",
+        "id": "contact_page",
+        "label": "Contact Page",
+        "info": "Select a page to link to."
+    },
+    "product": {
+        "type": "product",
+        "id": "featured_product",
+        "label": "Featured Product",
+        "info": "Select a single product to feature."
+    },
+    "product_list": {
+        "type": "product_list",
+        "id": "new_arrivals",
+        "label": "New Arrivals",
+        "limit": 5,
+        "info": "Select a list of products to display."
+    },
+    "richtext": {
+        "type": "richtext",
+        "id": "page_content",
+        "label": "Page Content",
+        "default": "<p>Start building your content here. You can add headings, lists, and more.</p>",
+        "info": "A full-featured rich text editor for block-level content."
+    },
+    "text_alignment": {
+        "type": "text_alignment",
+        "id": "section_heading_alignment",
+        "label": "Heading Alignment",
+        "default": "left",
+        "options": [
+            {
+                "value": "left",
+                "label": "Left"
+            },
+            {
+                "value": "center",
+                "label": "Center"
+            },
+            {
+                "value": "right",
+                "label": "Right"
+            }
+        ],
+        "info": "Align the text for the section heading."
+    },
+    "url": {
+        "type": "url",
+        "id": "button_link",
+        "label": "Button Link",
+        "info": "Enter any internal or external URL."
+    },
+    "video": {
+        "type": "video",
+        "id": "promotional_video",
+        "label": "Promotional Video",
+        "info": "Select a video from the files in your Shopify admin."
+    },
+    "video_url": {
+        "type": "video_url",
+        "id": "background_video_url",
+        "label": "Background Video URL",
+        "accept": [
+            "youtube",
+            "vimeo"
+        ],
+        "default": "https://www.youtube.com/watch?v=your_video_id",
+        "placeholder": "Enter a YouTube or Vimeo URL",
+        "info": "Link to a video on YouTube or Vimeo."
+    }
+}

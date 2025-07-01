@@ -1,0 +1,14 @@
+{# This will return a single object }
+{# This object is a schema with a ref to a singleton }
+{# The final result should be a text type setting }
+
+{% schema %}
+    {
+        "name": "Nested Setting - Spread",
+        "settings": [
+            {
+                "$ref": "nested-setting-spread.text"
+            }
+        ]
+    }
+{% endschema %}

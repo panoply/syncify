@@ -1,0 +1,20 @@
+{
+    "basic": [
+        {
+            "type": "text",
+            "id": "custom_text",
+            "label": "Your Name",
+            "default": "John Doe",
+            "placeholder": "e.g., John Doe",
+            "info": "Please enter your full name."
+        },
+        {
+            "type": "textarea",
+            "id": "custom_textarea",
+            "label": "Your Message",
+            "default": "This is a a custom message",
+            "placeholder": "Write your message here...",
+            "info": "Provide any additional details or comments."
+        }
+    ]
+}

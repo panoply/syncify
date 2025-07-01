@@ -1,0 +1,12 @@
+{
+  "unwantedRecommendations": [
+    "shopify.theme-check-vscode",
+    "neilding.language-liquid"
+  ],
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "sissel.shopify-liquid",
+    "vscode-icons-team.vscode-icons",
+    "dbaeumer.vscode-eslint"
+  ]
+}

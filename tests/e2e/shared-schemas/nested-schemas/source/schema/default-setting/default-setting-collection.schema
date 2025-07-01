@@ -1,0 +1,15 @@
+{
+    "basic": {
+        "$description": "Used in hover intellisense",
+        "settings": [
+            {
+                "type": "text",
+                "id": "custom_text",
+                "label": "Your Name",
+                "default": "John Doe",
+                "placeholder": "e.g., John Doe",
+                "info": "Please enter your full name."
+            }
+        ]
+    }
+}
