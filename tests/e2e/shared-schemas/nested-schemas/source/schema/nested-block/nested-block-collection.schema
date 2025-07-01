@@ -1,0 +1,20 @@
+{
+    "combo": [
+        {
+            "$ref": "nested-block-singleton.text"
+        },
+        {
+            "$ref": "nested-block-singleton.other"
+        },
+        {
+            "$description": "This has an extra level of nesting",
+            "name": "Deep",
+            "type": "deep",
+            "settings": [
+                {
+                    "$ref": "nested-setting-spread.combo"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{# this will reference a singleton block }
+{# this singleton block will reference the combo spread settings schema }
+{# the combo settings will reference a spread }
+{# the spread will reference 2 singletons }
+{# the result is a single block with 2 settings }
+
+{% schema %}
+{
+    "name": "Nested Block - Singleton",
+    "blocks": [
+        {
+            "$ref": "nested-block-singleton.text"
+        }
+    ]
+}
+{% endschema %}

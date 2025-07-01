@@ -1,0 +1,29 @@
+{
+    "text": {
+        "name": "Text",
+        "type": "text",
+        "settings": [
+            {
+                "$ref": "nested-setting-spread.text"
+            }
+        ]
+    },
+    "other": {
+        "name": "Other",
+        "type": "other",
+        "settings": [
+            {
+                "$ref": "nested-setting-spread.other"
+            }
+        ]
+    },
+    "combo": {
+        "name": "Combo",
+        "type": "combo",
+        "settings": [
+            {
+                "$ref": "nested-setting-spread.combo"
+            }
+        ]
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "basic": [
+        {
+            "$description": "Lorem ipsum",
+            "name": "foo",
+            "type": "foo",
+            "settings": [
+                {
+                    "type": "article",
+                    "id": "something",
+                    "label": "Something"
+                }
+            ]
+        },
+        {
+            "$description": "Info about block",
+            "name": "bar",
+            "type": "bar",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Example",
+                    "default": "Hello World"
+                }
+            ]
+        }
+    ]
+}

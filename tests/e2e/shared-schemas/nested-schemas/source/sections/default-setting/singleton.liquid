@@ -1,0 +1,13 @@
+{# this should result in a single setting object being returned }
+{# object should be a text type }
+
+{% schema %}
+  {
+    "name": "Singleton",
+    "settings": [
+      {
+        "$ref": "basic-input-singleton.text"
+      }
+    ]
+  }
+{% endschema %}

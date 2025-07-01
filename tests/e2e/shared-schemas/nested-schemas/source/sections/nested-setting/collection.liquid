@@ -1,0 +1,17 @@
+{# This will reference a collection type schema }
+{# The collection schema is referencing a schema spread }
+{# The schema spread is referencing 2 more schema spreads }
+{# Both spreads are referencing 2 singletons }
+{# The result is 4 objects containing the following settings: text, textarea, checkbox, number }
+{# This is 5 levels deep in nested schemas }
+
+{% schema %}
+{
+    "name": "Nested Settings - Collection",
+    "settings": [
+        {
+            "$ref": "nested-setting-collection.basic"
+        }
+    ]
+}
+{% endschema %}

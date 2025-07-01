@@ -1,0 +1,14 @@
+{
+    "text": {
+        "name": "Sample",
+        "type": "sample",
+        "settings": [
+            {
+                "type": "text",
+                "id": "title",
+                "label": "Example",
+                "default": "Hello World"
+            }
+        ]
+    }
+}

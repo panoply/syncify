@@ -1,0 +1,16 @@
+{# this will reference a collection block }
+{# this collection block will reference 2 block shared schemas }
+{# each block will reference a spread schema }
+{# the spread will reference 2 singletons }
+{# the result is a 2 blocks with 4 settings }
+
+{% schema %}
+{
+    "name": "Nested Block - Singleton",
+    "blocks": [
+        {
+            "$ref": "nested-block-collection.combo"
+        }
+    ]
+}
+{% endschema %}
