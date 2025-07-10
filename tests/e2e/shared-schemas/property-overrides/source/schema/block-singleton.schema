@@ -1,0 +1,29 @@
+{
+    "text": {
+        "name": "Text Block",
+        "type": "text",
+        "settings": [
+            {
+                "$ref": "basic-input-singleton.text"
+            }
+        ]
+    },
+    "select": {
+        "name": "Select Block",
+        "type": "select",
+        "settings": [
+            {
+                "$ref": "basic-input-singleton.select"
+            }
+        ]
+    },
+    "radio": {
+        "name": "Radio Block",
+        "type": "radio",
+        "settings": [
+            {
+                "$ref": "basic-input-singleton.radio"
+            }
+        ]
+    },
+}

@@ -1,0 +1,20 @@
+{# this should output 2 settings of the same singleton }
+{# each setting will have the id (foo & bar respectively) passed to the schema }
+
+{% schema %}
+{
+    "name": "Basic Singleton - String",
+    "settings": [
+        {
+            "$ref": "basic-input-singleton.text",
+            "id": "foo"
+        },
+        {
+            "$ref": "basic-input-singleton.text",
+            "_settings": {
+                "id": "bar"
+            }
+        },
+    ]
+}
+{% endschema %}

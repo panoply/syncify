@@ -1,0 +1,18 @@
+{# this reference calls a spread schema }
+{# it will pass the id of foo to every setting inside the schema }
+{# nested schemas will inherit this id value and pass it to the final singleton }
+{# a wildcard has been passed so we can combine the final values to give us valid output }
+
+{% schema %}
+{
+    "name": "Spread Setting - String",
+    "settings": [
+        {
+            "$ref": "settings-spread.string",
+            "_settings": {
+                "id": "foo_*"
+            }
+        }
+    ]
+}
+{% endschema %}

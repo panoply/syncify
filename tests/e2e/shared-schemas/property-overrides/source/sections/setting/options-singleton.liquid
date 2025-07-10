@@ -1,0 +1,28 @@
+{# this references a singleton with options (select/radio) }
+{# options with a label and/or value will be passed to the final singleton setting }
+{# we use a wildcard to inherit values from the caller reference }
+
+{% schema %}
+  {
+    "name": "Settings Single - Option",
+    "settings": [
+      {
+        "$ref": "basic-input-singleton.select",
+        "id": "foo_*",
+        "options": {
+          "label": "foo *",
+          "value": "foo_*"
+        }
+      }, {
+        "$ref": "basic-input-singleton.select",
+        "_settings": {
+          "id": "bar_*",
+          "options": {
+            "label": "bar *",
+            "value": "bar_*"
+          }
+        }
+      }
+    ]
+  }
+{% endschema %}

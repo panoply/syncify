@@ -1,0 +1,30 @@
+{# this references a collection block schema }
+{# the schema has 2 blocks }
+{# each block will have "Foo " and "foo_" as prefixes for name and type properties }
+{# all settings inside these blocks will have "bar_" prefix in the id property }
+{# all settings will have the info property removed }
+{# settings that have either select or radio types will prefix with the values in the options }
+{# default values haven't changed for settings except for the options types which automatically resolve }
+
+{% schema %}
+  {
+    "name": "Block Spread",
+    "blocks": [
+      {
+        "$ref": "block-spread.nested",
+        "_blocks": {
+          "name": "Foo *",
+          "type": "foo_*"
+        },
+        "_settings": {
+          "id": "bar_*",
+          "info": null,
+          "options": {
+            "label": "Baz *",
+            "value": "qux_*"
+          }
+        }
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,20 @@
+{
+    "nested": [
+        {
+            "name": "Text Block",
+            "type": "text",
+            "settings": [
+                {
+                    "$ref": "basic-input-singleton.text"
+                }
+            ]
+        },
+        {
+            "$ref": "block-singleton.radio",
+            "_blocks": {
+                "name": "Nested *",
+                "type": "nested_*"
+            }
+        }
+    ]
+}

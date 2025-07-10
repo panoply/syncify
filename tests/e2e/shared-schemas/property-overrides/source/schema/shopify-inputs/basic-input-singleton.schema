@@ -1,0 +1,86 @@
+{
+    "checkbox": {
+        "type": "checkbox",
+        "id": "custom_checkbox",
+        "label": "Enable feature",
+        "default": true,
+        "info": "Check this box to turn on the amazing feature."
+    },
+    "number": {
+        "type": "number",
+        "id": "custom_number",
+        "label": "Quantity",
+        "default": 5,
+        "placeholder": "Enter a number",
+        "info": "Specify the number of items."
+    },
+    "radio": {
+        "type": "radio",
+        "id": "custom_radio",
+        "label": "Choose an option",
+        "options": [
+            {
+                "value": "option1",
+                "label": "Option 1"
+            },
+            {
+                "value": "option2",
+                "label": "Option 2"
+            },
+            {
+                "value": "option3",
+                "label": "Option 3"
+            }
+        ],
+        "default": "option2",
+        "info": "Select one of the choices above."
+    },
+    "range": {
+        "type": "range",
+        "id": "custom_range",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Discount Percentage",
+        "default": 25,
+        "info": "Slide to set the discount percentage."
+    },
+    "select": {
+        "type": "select",
+        "id": "custom_select",
+        "label": "Select a size",
+        "options": [
+            {
+                "value": "small",
+                "label": "Small"
+            },
+            {
+                "value": "medium",
+                "label": "Medium"
+            },
+            {
+                "value": "large",
+                "label": "Large"
+            }
+        ],
+        "default": "medium",
+        "info": "Choose the desired size from the list."
+    },
+    "text": {
+        "type": "text",
+        "id": "custom_text",
+        "label": "Your Name",
+        "default": "John Doe",
+        "placeholder": "e.g., John Doe",
+        "info": "Please enter your full name."
+    },
+    "textarea": {
+        "type": "textarea",
+        "id": "custom_textarea",
+        "label": "Your Message",
+        "default": "This is a a custom message",
+        "placeholder": "Write your message here...",
+        "info": "Provide any additional details or comments."
+    }
+}
