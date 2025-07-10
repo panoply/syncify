@@ -205,7 +205,7 @@ export function OverridesBuilder (
 
     schema = schema as SchemaSettings;
 
-    allowedProps.push('id', 'label', 'info', 'visible_if', 'default', 'options');
+    allowedProps.push('id', 'label', 'info', 'visible_if', 'default', 'options', 'placeholder');
 
     if (has('_settings', schema)) {
       schema = merge(schema, schema._settings);
