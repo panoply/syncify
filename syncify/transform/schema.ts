@@ -265,6 +265,10 @@ export function OverridesBuilder (
 
     if (isString(value)) {
 
+      if ((schema.type === 'select' || schema.type === 'radio') && key === 'default' && type === 'setting') {
+        continue;
+      }
+
       if (!has(key, overrides)) {
         overrides[key] = value;
         continue;
@@ -308,6 +312,8 @@ export function OverridesBuilder (
           if (has('value', override) && isString(override.value) && override.value?.includes('*')) {
 
             override.value = replaceAllOccurrences(override.value, '*', option.value);
+
+            overrides.default = override.value;
 
           }
 
@@ -372,6 +378,8 @@ export function OverridesBuilder (
                 }
 
               }
+
+              overrides.default = option.value;
 
             }
 
