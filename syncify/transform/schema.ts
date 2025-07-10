@@ -250,6 +250,11 @@ export function OverridesBuilder (
     }
 
     if (isNull(value) || isNull(overrides[key])) {
+
+      if (!has(key, overrides)) {
+        overrides[key] = value;
+      }
+
       continue;
     }
 
