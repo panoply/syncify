@@ -236,7 +236,7 @@ export function OverridesBuilder (
 
   for (const [ key, value ] of Object.entries(schema)) {
 
-    if (key === 'type' && value !== 'select' && includes('options', allowedProps)) {
+    if (key === 'type' && value !== 'select' && value !== 'radio' && includes('options', allowedProps)) {
       allowedProps = allowedProps.filter(function (item) {
         return item !== 'options';
       });
