@@ -1,0 +1,24 @@
+{# this reference calls a spread schema }
+{# the schema has a singleton setting and 2 references other schemas }
+{# the labels and values will be passed to both settings }
+{# the nested schema has additional values added to the option label and value values }
+{# default properties are not required and are automatically applied to match option value changes }
+{# the final setting (text) shouldn't have any }
+
+{% schema %}
+{
+    "name": "Settings Spread - Options",
+    "settings": [
+        {
+            "$ref": "settings-spread.options",
+            "_settings": {
+                "default": "test_*",
+                "options": {
+                    "label": "foo *",
+                    "value": "bar_*"
+                }
+            }
+        }
+    ]
+}
+{% endschema %}

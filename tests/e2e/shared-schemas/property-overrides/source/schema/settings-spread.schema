@@ -1,0 +1,56 @@
+{
+    "string": [
+        {
+            "type": "text",
+            "id": "custom_text",
+            "label": "Your Name",
+            "default": "John Doe",
+            "placeholder": "e.g., John Doe",
+            "info": "Please enter your full name."
+        },
+        {
+            "$description": "This ref will overwrite the id value in the text singleton",
+            "$ref": "basic-input-singleton.text",
+            "_settings": {
+                "id": "bar"
+            }
+        }
+    ],
+    "options": [
+        {
+            "$ref": "basic-input-singleton.text"
+        },
+        {
+            "type": "select",
+            "id": "custom_select",
+            "label": "Select a size",
+            "options": [
+                {
+                    "value": "small",
+                    "label": "Small"
+                },
+                {
+                    "value": "medium",
+                    "label": "Medium"
+                },
+                {
+                    "value": "large",
+                    "label": "Large"
+                }
+            ],
+            "default": "medium",
+            "info": "Choose the desired size from the list."
+        },
+        {
+            "$ref": "basic-input-singleton.select",
+            "_settings": {
+                "id": "bar",
+                "default": "nested_value_*",
+                "options": {
+                    "label": "nested_label_*",
+                    "value": "nested_value_*"
+                }
+            }
+        }
+    ]
+}

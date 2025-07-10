@@ -1,0 +1,22 @@
+{# this references two block singletons }
+{# the properties of name and type will have their values modified }
+{# the wildcard allows for value inheriting }
+
+{% schema %}
+  {
+    "name": "Block Singleton",
+    "blocks": [
+      {
+        "$ref": "block-singleton.text",
+        "name": "foo",
+        "type": "foo"
+      }, {
+        "$ref": "block-singleton.text",
+        "_blocks": {
+          "name": "bar *",
+          "type": "bar_*"
+        }
+      }
+    ]
+  }
+{% endschema %}

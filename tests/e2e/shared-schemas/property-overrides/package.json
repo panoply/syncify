@@ -1,0 +1,9 @@
+{
+  "name": "dusk",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@syncify/config": "^0.0.8"
+  }
+}

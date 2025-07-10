@@ -1,0 +1,21 @@
+{# this reference calls a spread schema }
+{# it will pass the null values to every setting within the schema }
+{# each of the settings will have the default, info and placeholder values removed as a result }
+{# the nested schema will also inherit the null values from this reference }
+{# placing a null value at any level of nesting will result in the value being removed }
+
+{% schema %}
+  {
+    "name": "Setting Spread - Null",
+    "settings": [
+      {
+        "$ref": "settings-spread.string",
+        "_settings": {
+          "default": null,
+          "info": null,
+          "placeholder": null
+        }
+      }
+    ]
+  }
+{% endschema %}

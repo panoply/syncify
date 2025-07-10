@@ -1,0 +1,20 @@
+{# this references a block spread schema }
+{# the schema has a singleton block and a reference to another block singleton (nested) }
+{# we are passing the values for the properties of name and type to each of these blocks }
+{# the nested reference also has additional values passed to these properties }
+{# using wildcards we're able to inherit values from the previous caller }
+
+{% schema %}
+  {
+    "name": "Block Spread",
+    "blocks": [
+      {
+        "$ref": "block-spread.nested",
+        "_blocks": {
+          "name": "Foo *",
+          "type": "foo_*"
+        }
+      }
+    ]
+  }
+{% endschema %}

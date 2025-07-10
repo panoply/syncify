@@ -1,0 +1,19 @@
+{# this reference will result in a single setting }
+{# the setting will have info, placeholder and default removed from the output }
+
+{% schema %}
+  {
+    "name": "Singleton Setting - Null",
+    "settings": [
+      {
+        "$ref": "basic-input-singleton.text",
+        "_settings": {
+          "id": "test",
+          "info": null,
+          "placeholder": null,
+          "default": null
+        }
+      }
+    ]
+  }
+{% endschema %}

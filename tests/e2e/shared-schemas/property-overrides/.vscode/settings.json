@@ -1,0 +1,29 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/pnpm-lock.yaml": true
+  },
+  "json.schemas": [
+    {
+      "url": "https://unpkg.com/@syncify/schema/pkg.json",
+      "fileMatch": [
+        "package.json"
+      ],
+    },
+    {
+      "url": "https://unpkg.com/@syncify/schema/sections.json",
+      "fileMatch": [
+        "*.schema"
+      ],
+    }
+  ],
+  "[scss]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  },
+  "[liquid]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "sissel.shopify-liquid"
+  }
+}
