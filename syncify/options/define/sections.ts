@@ -121,7 +121,96 @@ async function setSchemaJson () {
 
   const { shared } = $.section;
   const warn = warnOption('Section Schema');
-  const files = [ ...$.paths.blocks.input, ...$.paths.sections.input ];
+  const files = [ ...$.paths.blocks.input, ...$.paths.sections.input, ...$.paths.config.input ];
+
+  function buildSettingsCache (file: string, settings: SchemaSettings[]) {
+
+    const refs = [];
+
+    for (const setting of settings) {
+
+      if (has('$ref', setting)) {
+
+        const [ key, prop ] = setting.$ref.split('.');
+
+        if (shared.has(key)) {
+
+          if (!$.cache.schema[shared.get(key).uri].has(file)) {
+
+            $.cache.schema[shared.get(key).uri].add(file);
+
+            if (has('settings', shared.get(key).schema[prop])) {
+
+              refs.push((shared.get(key).schema[prop] as SettingsGroup).settings);
+
+              continue;
+
+            }
+
+            refs.push(shared.get(key).schema[prop]);
+
+          }
+
+        }
+
+      }
+    }
+
+    for (const settings of refs) {
+
+      buildSettingsCache(file, settings);
+
+    }
+
+  }
+
+  function buildBlockCache (file: string, blocks: SchemaBlocks[]) {
+
+    const blockRefs: SchemaBlocks[] = [];
+    const settingsRefs = [];
+
+    for (const block of blocks) {
+
+      const blockProp = hasProp(block);
+
+      if (blockProp('$ref')) {
+
+        const [ key, prop ] = block.$ref.split('.');
+
+        if (shared.has(key)) {
+
+          if (!$.cache.schema[shared.get(key).uri].has(file)) {
+
+            $.cache.schema[shared.get(key).uri].add(file);
+
+            blockRefs.push(shared.get(key).schema[prop] as SchemaBlocks);
+
+          };
+
+        }
+
+      }
+
+      if (blockProp('settings')) {
+
+        settingsRefs.push(block.settings);
+
+      }
+    }
+
+    for (const block of blockRefs) {
+
+      buildBlockCache(file, [ block ]);
+
+    }
+
+    for (const settings of settingsRefs) {
+
+      buildSettingsCache(file, settings);
+
+    }
+
+  }
 
   for (const file of files) {
 
@@ -133,130 +222,75 @@ async function setSchemaJson () {
     $.cache.checksum[file] = hash;
 
     const data = read.toString();
-    const indices = GetSchemaIndices(data);
 
-    if (indices === null) {
-      warn('Liquid Parse Error', relative($.cwd, file));
+    if (file.includes('/config/') && file.includes('settings_schema.json')) {
+
+      const schema = parse(data);
+
+      schema.slice(1).forEach((setting: {name: string, settings: any[]}) => {
+        if (has('settings', setting) && isArray(setting.settings)) {
+
+          try {
+
+            buildSettingsCache(file, setting.settings);
+
+          } catch (e) {
+
+            if (has(file, $.cache.sections)) {
+
+              delete $.cache.sections[file];
+
+            }
+
+            warn('Config Parse Error', relative($.cwd, file));
+          }
+
+        }
+      });
+
       continue;
-    }
-
-    try {
-
-      const schema = parse<SchemaSectionTag>(data.slice(indices.begin, indices.ender));
-      const schemaProp = hasProp(schema);
-
-      function buildSettingsCache (file: string, settings: SchemaSettings[]) {
-
-        const refs = [];
-
-        for (const setting of settings) {
-
-          if (has('$ref', setting)) {
-
-            const [ key, prop ] = setting.$ref.split('.');
-
-            if (shared.has(key)) {
-
-              if (!$.cache.schema[shared.get(key).uri].has(file)) {
-
-                $.cache.schema[shared.get(key).uri].add(file);
-
-                if (has('settings', shared.get(key).schema[prop])) {
-
-                  refs.push((shared.get(key).schema[prop] as SettingsGroup).settings);
-
-                  continue;
-
-                }
-
-                refs.push(shared.get(key).schema[prop]);
-
-              }
-
-            }
-
-          }
-        }
-
-        for (const settings of refs) {
-
-          buildSettingsCache(file, settings);
-
-        }
-
-      }
-
-      function buildBlockCache (file: string, blocks: SchemaBlocks[]) {
-
-        const blockRefs: SchemaBlocks[] = [];
-        const settingsRefs = [];
-
-        for (const block of blocks) {
-
-          const blockProp = hasProp(block);
-
-          if (blockProp('$ref')) {
-
-            const [ key, prop ] = block.$ref.split('.');
-
-            if (shared.has(key)) {
-
-              if (!$.cache.schema[shared.get(key).uri].has(file)) {
-
-                $.cache.schema[shared.get(key).uri].add(file);
-
-                blockRefs.push(shared.get(key).schema[prop] as SchemaBlocks);
-
-              };
-
-            }
-
-          }
-
-          if (blockProp('settings')) {
-
-            settingsRefs.push(block.settings);
-
-          }
-        }
-
-        for (const block of blockRefs) {
-
-          buildBlockCache(file, [ block ]);
-
-        }
-
-        for (const settings of settingsRefs) {
-
-          buildSettingsCache(file, settings);
-
-        }
-
-      }
-
-      if (schemaProp('settings')) {
-
-        buildSettingsCache(file, schema.settings);
-
-      }
-
-      if (schemaProp('blocks')) {
-
-        buildBlockCache(file, schema.blocks);
-
-      }
-
-    } catch (e) {
-
-      if (has(file, $.cache.sections)) {
-
-        delete $.cache.sections[file];
-
-      }
-
-      warn('JSON Parse Error', relative($.cwd, file));
 
     }
+
+    if (file.includes('/sections/') || file.includes('/blocks/')) {
+
+      const indices = GetSchemaIndices(data);
+
+      if (indices === null) {
+        warn('Liquid Parse Error', relative($.cwd, file));
+        continue;
+      }
+
+      try {
+
+        const schema = parse<SchemaSectionTag>(data.slice(indices.begin, indices.ender));
+        const schemaProp = hasProp(schema);
+
+        if (schemaProp('settings')) {
+
+          buildSettingsCache(file, schema.settings);
+
+        }
+
+        if (schemaProp('blocks')) {
+
+          buildBlockCache(file, schema.blocks);
+
+        }
+
+      } catch (e) {
+
+        if (has(file, $.cache.sections)) {
+
+          delete $.cache.sections[file];
+
+        }
+
+        warn('JSON Parse Error', relative($.cwd, file));
+
+      }
+
+    };
 
   }
 

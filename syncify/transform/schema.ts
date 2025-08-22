@@ -23,6 +23,7 @@ import { log } from '~cli/log';
 import { warn } from '~cli/warnings';
 import { error } from '~errors';
 import { File, Type } from '~file';
+import { JsonTransform } from '~json';
 import { LiquidTransform } from '~liquid';
 import { checksum, defineProperty, has, hasProp, includes, isArray, isEmpty, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray, values } from '~utils';
 
@@ -826,7 +827,20 @@ export async function SchemaTransform (file: File) {
   log.nl();
 
   for (const file of files) {
-    await LiquidTransform(file);
+    switch (file.type) {
+
+      case Type.Section:
+      case Type.Block:
+
+        await LiquidTransform(file);
+        break;
+
+      case Type.Config:
+
+        await JsonTransform(file);
+        break;
+
+    }
   }
 
   if ($.mode.hot && $.mode.bulk === false) {

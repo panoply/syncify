@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { readFile, writeFile } from 'fs-extra';
 
-import { evaluate, ParseEvaluate, stringify } from '@syncify/json';
+import { evaluate, parse, ParseEvaluate, stringify } from '@syncify/json';
 import { timer } from '@syncify/timer';
 
 import { log } from '~cli/log';
@@ -14,6 +14,7 @@ import { themeFilesGet, themeFilesUpsertMap } from '~http/themeFiles';
 import { runChecksum } from '~process/cache';
 import { prompt } from '~prompt';
 import { theme } from '~prompts/enquirer';
+import { InjectSettings } from '~schema';
 import { tailwindParse } from '~style';
 import * as u from '~utils';
 
@@ -261,7 +262,7 @@ export async function JsonTransform (file: File): Promise<string> {
 
   if (!u.isString(read)) return;
 
-  const local = read.trim();
+  let local = read.trim();
 
   file.size = u.byteSize(local);
 
@@ -270,8 +271,34 @@ export async function JsonTransform (file: File): Promise<string> {
     return;
   }
 
+  if (file.name === 'settings_schema') {
+
+    const schemaFiles = u.values($.cache.schema);
+
+    for (const schemaFile of schemaFiles) {
+      schemaFile.delete(file.input);
+    }
+
+    const settings = parse(local);
+
+    settings.slice(1).forEach((schema: {name: string, settings: any[]}) => {
+      if (u.has('settings', schema) && u.isArray(schema.settings)) {
+        schema.settings = InjectSettings(file, schema.settings);
+      }
+    });
+
+    local = stringify(settings);
+
+  }
+
   if ($.mode.build === false && isDiff(file.type)) {
+
+    if (file.name === 'settings_schema') {
+      file.value = await jsonCompile(file, local);
+    }
+
     file.value = await jsonCompare(file, local);
+
   } else {
     file.value = await jsonCompile(file, local);
   }
