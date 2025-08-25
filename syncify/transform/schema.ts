@@ -25,7 +25,7 @@ import { error } from '~errors';
 import { File, Type } from '~file';
 import { JsonTransform } from '~json';
 import { LiquidTransform } from '~liquid';
-import { checksum, defineProperty, has, hasProp, includes, isArray, isEmpty, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray, values } from '~utils';
+import { checksum, defineProperty, has, hasProp, isArray, isEmpty, isNull, isObject, isString, merge, o, omit, plur, replaceAllOccurrences, s, toArray, values } from '~utils';
 
 import { $, q } from '$';
 
@@ -179,6 +179,107 @@ export async function ExtractSchema (file: File): Promise<[
 }
 
 /**
+ * Properties relating to sidebar settings.
+ */
+export const sidebarProps = [
+  'content'
+];
+
+/**
+ * Properties common to all schema setting types, derived from `Schema.Common`.
+ */
+export const commonProps = [
+  'id',
+  'label',
+  'info'
+];
+
+/**
+ * Specific properties setting types, derived from `Schema.Common`.
+ */
+const headerProps: string[] = [];
+const paragraphProps = [ 'info' ];
+const checkboxProps = [ 'default' ];
+const numberProps = [ 'default', 'placeholder' ];
+const radioProps = [ 'options', 'default' ];
+const rangeProps = [ 'min', 'max', 'step', 'unit', 'default' ];
+const selectProps = [ 'options', 'default' ];
+const textProps = [ 'placeholder', 'default' ];
+const textareaProps = [ 'placeholder', 'default' ];
+const articleProps: string[] = [];
+const blogProps: string[] = [];
+const collectionProps: string[] = [];
+const imagePickerProps: string[] = [];
+const videoProps: string[] = [];
+const pageProps: string[] = [];
+const productProps: string[] = [];
+const collectionListProps = [ 'limit' ];
+const colorProps = [ 'default' ];
+const colorBackgroundProps = [ 'default' ];
+const fontPickerProps = [ 'default' ];
+const htmlProps = [ 'placeholder', 'default' ];
+const inlineRichTextProps = [ 'default' ];
+const linkListProps = [ 'default' ];
+const liquidProps = [ 'default' ];
+const productListProps = [ 'limit' ];
+const richTextProps = [ 'default' ];
+const urlProps = [ 'default' ];
+const videoUrlProps = [ 'placeholder', 'accept' ];
+
+/**
+ * A map that provides an array of all allowed property names for a given
+ * schema setting 'type'. It combines the common properties with the
+ * type-specific properties.
+ *
+ * @example
+ * const propsForRange = allowedPropsMap.range;
+ */
+export const allowedPropsMap: Record<string, string[]> = {
+  // Sidebar Inputs
+  header: [ ...sidebarProps, ...headerProps ],
+  paragraph: [ ...sidebarProps, ...paragraphProps ],
+
+  // Basic Inputs
+  checkbox: [ ...commonProps, ...checkboxProps ],
+  number: [ ...commonProps, ...numberProps ],
+  radio: [ ...commonProps, ...radioProps ],
+  range: [ ...commonProps, ...rangeProps ],
+  select: [ ...commonProps, ...selectProps ],
+  text: [ ...commonProps, ...textProps ],
+  textarea: [ ...commonProps, ...textareaProps ],
+
+  // Specialized Inputs
+  article: [ ...commonProps, ...articleProps ],
+  blog: [ ...commonProps, ...blogProps ],
+  collection: [ ...commonProps, ...collectionProps ],
+  collection_list: [ ...commonProps, ...collectionListProps ],
+  color: [ ...commonProps, ...colorProps ],
+  color_background: [ ...commonProps, ...colorBackgroundProps ],
+  font_picker: [ ...commonProps, ...fontPickerProps ],
+  html: [ ...commonProps, ...htmlProps ],
+  image_picker: [ ...commonProps, ...imagePickerProps ],
+  inline_richtext: [ ...commonProps, ...inlineRichTextProps ],
+  link_list: [ ...commonProps, ...linkListProps ],
+  liquid: [ ...commonProps, ...liquidProps ],
+  page: [ ...commonProps, ...pageProps ],
+  product: [ ...commonProps, ...productProps ],
+  product_list: [ ...commonProps, ...productListProps ],
+  richtext: [ ...commonProps, ...richTextProps ],
+  url: [ ...commonProps, ...urlProps ],
+  video: [ ...commonProps, ...videoProps ],
+  video_url: [ ...commonProps, ...videoUrlProps ]
+};
+
+/**
+ * A single array containing all unique property names available across all
+ * setting types. This is useful for validating properties or filtering
+ * out any keys that are not valid for any setting.
+ */
+export const allAvailableSettingProps = [
+  ...new Set(Object.values(allowedPropsMap).flat())
+];
+
+/**
  * Overrides Builder
  *
  * Takes the current schema item and the existing overrides,
@@ -200,13 +301,133 @@ export function OverridesBuilder (
   type: 'block' | 'setting' = 'setting'
 ) {
 
-  let allowedProps: string[] = [];
+  const allowedProps: string[] = [];
 
   if (type === 'setting') {
 
     schema = schema as SchemaSettings;
 
-    allowedProps.push('id', 'label', 'info', 'visible_if', 'default', 'options', 'placeholder', 'content');
+    switch (true) {
+      case has('$ref', schema):
+        allowedProps.push(...allAvailableSettingProps);
+        break;
+
+      case schema.type === 'header':
+        allowedProps.push(...allowedPropsMap.header);
+        break;
+
+      case schema.type === 'paragraph':
+        allowedProps.push(...allowedPropsMap.paragraph);
+        break;
+
+      case schema.type === 'checkbox':
+        allowedProps.push(...allowedPropsMap.checkbox);
+        break;
+
+      case schema.type === 'number':
+        allowedProps.push(...allowedPropsMap.number);
+        break;
+
+      case schema.type === 'radio':
+        allowedProps.push(...allowedPropsMap.radio);
+        break;
+
+      case schema.type === 'range':
+        allowedProps.push(...allowedPropsMap.range);
+        break;
+
+      case schema.type === 'select':
+        allowedProps.push(...allowedPropsMap.select);
+        break;
+
+      case schema.type === 'text':
+        allowedProps.push(...allowedPropsMap.text);
+        break;
+
+      case schema.type === 'textarea':
+        allowedProps.push(...allowedPropsMap.textarea);
+        break;
+
+      case schema.type === 'article':
+        allowedProps.push(...allowedPropsMap.article);
+        break;
+
+      case schema.type === 'blog':
+        allowedProps.push(...allowedPropsMap.blog);
+        break;
+
+      case schema.type === 'collection':
+        allowedProps.push(...allowedPropsMap.collection);
+        break;
+
+      case schema.type === 'collection_list':
+        allowedProps.push(...allowedPropsMap.collection_list);
+        break;
+
+      case schema.type === 'color':
+        allowedProps.push(...allowedPropsMap.color);
+        break;
+
+      case schema.type === 'color_background':
+        allowedProps.push(...allowedPropsMap.color_background);
+        break;
+
+      case schema.type === 'font_picker':
+        allowedProps.push(...allowedPropsMap.font_picker);
+        break;
+
+      case schema.type === 'html':
+        allowedProps.push(...allowedPropsMap.html);
+        break;
+
+      case schema.type === 'image_picker':
+        allowedProps.push(...allowedPropsMap.image_picker);
+        break;
+
+      case schema.type === 'inline_richtext':
+        allowedProps.push(...allowedPropsMap.inline_richtext);
+        break;
+
+      case schema.type === 'link_list':
+        allowedProps.push(...allowedPropsMap.link_list);
+        break;
+
+      case schema.type === 'liquid':
+        allowedProps.push(...allowedPropsMap.liquid);
+        break;
+
+      case schema.type === 'page':
+        allowedProps.push(...allowedPropsMap.page);
+        break;
+
+      case schema.type === 'product':
+        allowedProps.push(...allowedPropsMap.product);
+        break;
+
+      case schema.type === 'product_list':
+        allowedProps.push(...allowedPropsMap.product_list);
+        break;
+
+      case schema.type === 'richtext':
+        allowedProps.push(...allowedPropsMap.richtext);
+        break;
+
+      case schema.type === 'url':
+        allowedProps.push(...allowedPropsMap.url);
+        break;
+
+      case schema.type === 'video':
+        allowedProps.push(...allowedPropsMap.video);
+        break;
+
+      case schema.type === 'video_url':
+        allowedProps.push(...allowedPropsMap.video_url);
+        break;
+
+      default:
+        allowedProps.push(...commonProps);
+        break;
+    }
 
     if (has('_settings', schema)) {
       schema = merge(schema, schema._settings);
@@ -237,37 +458,12 @@ export function OverridesBuilder (
 
   for (const [ key, value ] of Object.entries(schema)) {
 
-    if (key === 'type' && value !== 'select' && value !== 'radio' && includes('options', allowedProps)) {
-      allowedProps = allowedProps.filter(function (item) {
-        return item !== 'options';
-      });
+    for (const [ key ] of Object.entries(overrides)) {
 
-      delete overrides.options;
-    }
+      if (!s(allowedProps).has(key)) {
+        delete overrides[key];
+      }
 
-    if (key === 'type' && value !== 'header' && value !== 'paragraph' && includes('content', allowedProps)) {
-      allowedProps = allowedProps.filter(function (item) {
-        return item !== 'content';
-      });
-
-      delete overrides.content;
-    }
-
-    if (key === 'type' && (value === 'header' || value === 'paragraph')) {
-      allowedProps.forEach(item => {
-        if (item !== 'content') {
-          delete overrides[item];
-        }
-      });
-
-      allowedProps.filter(function (item) {
-        return item === 'content';
-      });
-    }
-
-    if (!s(allowedProps).has(key)) {
-      delete overrides[key];
-      continue;
     }
 
     if (isNull(value) || isNull(overrides[key])) {
@@ -280,7 +476,6 @@ export function OverridesBuilder (
     }
 
     if (key === 'visible_if') {
-      // This mixes liquid in a string so could be dangerous searching for wildcard '*' values
       continue;
     }
 
