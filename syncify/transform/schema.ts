@@ -206,7 +206,7 @@ export function OverridesBuilder (
 
     schema = schema as SchemaSettings;
 
-    allowedProps.push('id', 'label', 'info', 'visible_if', 'default', 'options', 'placeholder');
+    allowedProps.push('id', 'label', 'info', 'visible_if', 'default', 'options', 'placeholder', 'content');
 
     if (has('_settings', schema)) {
       schema = merge(schema, schema._settings);
@@ -243,6 +243,26 @@ export function OverridesBuilder (
       });
 
       delete overrides.options;
+    }
+
+    if (key === 'type' && value !== 'header' && value !== 'paragraph' && includes('content', allowedProps)) {
+      allowedProps = allowedProps.filter(function (item) {
+        return item !== 'content';
+      });
+
+      delete overrides.content;
+    }
+
+    if (key === 'type' && (value === 'header' || value === 'paragraph')) {
+      allowedProps.forEach(item => {
+        if (item !== 'content') {
+          delete overrides[item];
+        }
+      });
+
+      allowedProps.filter(function (item) {
+        return item === 'content';
+      });
     }
 
     if (!s(allowedProps).has(key)) {
