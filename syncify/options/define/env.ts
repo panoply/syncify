@@ -44,7 +44,7 @@ export async function getEnv (cwd = $.cwd) {
   //
   if ($.file.env !== null) {
 
-    const env = dotenv.config({ path: $.file.env });
+    const env = dotenv.config({ path: $.file.env, quiet: true });
 
     if (env.error) {
       error.throw(env.error, { path: $.file.env });
