@@ -675,7 +675,7 @@ error.acquire = (e: AcquireError) => {
 
   _.Create({ type: 'error' })
   .Append(e.type.toUpperCase(), _.bold.red)
-  .True(e.summary, tui => tui.Header(e.summary, _.bold.red))
+  .True(e.summary, tui => tui.Append(e.summary, _.bold.red))
   .Wrap(e.message, _.redBright)
   .Context({ entries: { ...e.context } })
   .Tree('info')

@@ -728,6 +728,18 @@ log.retrying = (file: string, theme: Type.Theme) => console.info(
 );
 
 /**
+ * Log Replaced - `teal`
+ *
+ * @example
+ *
+ * '│ replaced » remote ⥂ local → dir/file.ext ~ '
+ */
+log.replaced = (from: string, to: string, time: string) => console.info(
+  _.Prefix('replaced', `${from} ${_.ARL} ${to}`),
+  _.teal
+);
+
+/**
  * Log Reloaded - `whiteBright`
  *
  * @example
