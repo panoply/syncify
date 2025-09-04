@@ -2,7 +2,7 @@ import type { AccessScopes, LiteralString } from 'types';
 
 import { join } from 'node:path';
 
-import { rm, writeFile, pathExists } from 'fs-extra';
+import { pathExists, rm, writeFile } from 'fs-extra';
 
 import * as _ from '@syncify/ansi';
 import { kill } from '@syncify/kill';
@@ -405,8 +405,8 @@ function ErrorGitInitialized () {
   .Line(`You will need to remove the existing  ${_.blue('.git')} folder.`, _.gray)
   .Line(`Run '${_.red('rm -rf .git')}' in your project directory.`, _.gray)
   .NL
-  .Line(`WARNING: This could be dangerous.`, _.bold)
-  .Line(`Ensure you're in the right directory before attempting fix!`)
+  .Line('WARNING: This could be dangerous.', _.bold)
+  .Line('Ensure you\'re in the right directory before attempting fix!')
   .NL
   .End($.log.group)
   .BR

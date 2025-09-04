@@ -31,7 +31,9 @@ export function setSvgOptions () {
 
   // Convert to an array if styles is using an object
   // configuration model, else just shortcut the options.
-  const svgs = getTransform<SVGTransform[]>($.config.transform.svg, { flatten: false });
+  const svgs = getTransform<SVGTransform[]>($.config.transform.svg, {
+    flatten: false
+  });
 
   for (const svg of svgs as Merge<SVGTransform, & {
     input: string[];

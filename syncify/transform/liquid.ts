@@ -255,8 +255,11 @@ export async function LiquidTransform (file: File) {
   file.value = await transform(file, input);
 
   if ($.mode.build) return file.value;
+
   if (file.type !== Type.Style && $.processor.tailwind.map !== null) {
+
     await tailwindParse(file).then(themeFilesUpsertMap);
+
   } else {
 
     log.syncing(file.key, { hot: $.mode.hot });
