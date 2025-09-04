@@ -2,15 +2,5 @@
 function index(param) {
   console.log(param);
 }
-function collection(param) {
-  console.log(param);
-}
-function product(param) {
-  console.log(param);
-}
-export {
-  collection,
-  index,
-  product
-};
+index("hello rasmus");
 //# sourceMappingURL=script.min.ts.js.map

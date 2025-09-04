@@ -1,0 +1,14 @@
+{
+  "version": "0.0.0",
+  "name": "e2e",
+  "private": true,
+  "description": "",
+  "license": "UNLICENSED",
+  "syncify": {
+    "stores": {
+      "syncify": {
+        "foo": 136656060657
+      }
+    }
+  }
+}

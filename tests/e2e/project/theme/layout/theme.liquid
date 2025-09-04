@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="{{ request.locale.iso_code }}">
   <head>
+{%- render 'hot.js' -%}
+
     <meta charset="utf-8">
     <meta
       http-equiv="X-UA-Compatible"
@@ -19,6 +21,7 @@
     </style>
 
     {{ 'style.css' | asset_url | stylesheet_tag }}
+     <script src="{{ 'script.min.ts.js' | asset_url  }}"></script>
 
     {{ content_for_header }}
 

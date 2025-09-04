@@ -11,6 +11,9 @@
     },
     "config": {
       "transform": {
+        "json": {
+          "stripComments": true
+        },
         "script": {
           "input": "assets/script.ts",
           "format": "esm",
