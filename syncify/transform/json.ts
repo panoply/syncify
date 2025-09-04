@@ -161,13 +161,18 @@ async function jsonCompare (file: File, local: string) {
       ]
     });
 
-    switch (action) {
+    if (action === 'open') {
 
-      case 'open':
-
-        const uri = join($.dirs.temp, file.key);
+      const uri = join($.dirs.temp, file.key);
 
         await writeFile(uri, json[0].string);
+      await ensureDir(parentPath(uri));
+
+      await writeFile(uri, json[0].string).catch(
+        error.write('Failed to write remote file to temp cache', {
+          file: file.key
+        })
+      );
 
         u.openInEditor(uri);
 

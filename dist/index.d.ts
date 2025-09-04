@@ -1251,7 +1251,19 @@ type StyleTerse = OptionsOutput & {
 }
 
 type TailwindConfig = Config$1 & {
-  config: string[]
+  /**
+   * Legacy config setting for tailwind.config.js
+   * This is only needed for edge cases in Tailwind v4
+   *
+   * @default []
+   */
+  config: string[];
+  /**
+   * Array containing pre-glob paths for files to be watched
+   *
+   * @default []
+   */
+  watchedFiles: string[];
 }
 
 type SASSConfig = SassOptions & {
