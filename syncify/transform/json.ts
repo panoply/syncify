@@ -285,6 +285,8 @@ export async function JsonTransform (file: File): Promise<string> {
     file.value = await jsonCompile(file, local);
   }
 
+  if (u.isNil(file.value)) return; // likely an error
+
   if ($.mode.build) return file.value;
 
   if (file.value === null) return;
