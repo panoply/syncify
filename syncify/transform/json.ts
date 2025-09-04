@@ -2,7 +2,7 @@ import type { ArrayPromptOptions } from 'types';
 
 import { join } from 'node:path';
 
-import { readFile, writeFile } from 'fs-extra';
+import { ensureDir, readFile, writeFile } from 'fs-extra';
 
 import { evaluate, ParseEvaluate, stringify } from '@syncify/json';
 import { timer } from '@syncify/timer';
@@ -16,6 +16,7 @@ import { prompt } from '~prompt';
 import { theme } from '~prompts/enquirer';
 import { tailwindParse } from '~style';
 import * as u from '~utils';
+import { parentPath } from '~utils/paths';
 
 import { $, q } from '$';
 
