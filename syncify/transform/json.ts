@@ -1,5 +1,3 @@
-import type { ArrayPromptOptions } from 'types';
-
 import { join } from 'node:path';
 
 import { ensureDir, readFile, writeFile } from 'fs-extra';
@@ -12,8 +10,7 @@ import { error } from '~errors';
 import { File, Type } from '~file';
 import { themeFilesGet, themeFilesUpsertMap } from '~http/themeFiles';
 import { runChecksum } from '~process/cache';
-import { prompt } from '~prompt';
-import { theme } from '~prompts/enquirer';
+import { Action } from '~prompts/action';
 import { tailwindParse } from '~style';
 import * as u from '~utils';
 import { parentPath } from '~utils/paths';
@@ -132,76 +129,72 @@ async function jsonCompare (file: File, local: string) {
 
     log.nl();
 
-    const { action } = await prompt<{ action: string }>(<ArrayPromptOptions>{
-      name: 'action',
-      type: 'select',
-      multiple: false,
-      message: 'action',
-      theme,
-      choices: [
-        {
-          name: 'open',
-          hint: 'View the remote version in your editor'
-        },
-        {
-          name: 'push',
-          hint: 'Replaces the remote version with local version'
-        },
-        {
-          name: 'pull',
-          hint: 'Replaces the local version with the remote version'
-        },
-        {
-          name: 'stash',
-          hint: 'Stash the remote version and push the local version'
-        },
-        {
-          name: 'cancel',
-          hint: 'Cancel the sync operation'
-        }
-      ]
-    });
+    const action = await Action('Select Action', [
+      {
+        name: 'open',
+        hint: 'View the remote version in your editor'
+      },
+      {
+        name: 'push',
+        hint: 'Replaces the remote version with local version'
+      },
+      {
+        name: 'pull',
+        hint: 'Replaces the local version with the remote version'
+      },
+      {
+        name: 'stash',
+        hint: 'Stash the remote version and push the local version'
+      },
+      {
+        name: 'cancel',
+        hint: 'Cancel the sync operation'
+      }
+    ]);
 
     if (action === 'open') {
 
-      const uri = join($.dirs.temp, file.key);
+      try {
 
+        const uri = join($.dirs.temp, file.key);
+        await ensureDir(parentPath(uri));
         await writeFile(uri, json[0].string);
-      await ensureDir(parentPath(uri));
-
-      await writeFile(uri, json[0].string).catch(
-        error.write('Failed to write remote file to temp cache', {
-          file: file.key
-        })
-      );
 
         u.openInEditor(uri);
 
-        return null;
+      } catch (e) {
 
-      case 'push':
+        error.write('Failed writing remote file to temp cache', {
+          file: file.key
+        });
+      }
+    } else if (action === 'push') {
 
-        return json[0].actual.string;
+      return json[0].string;
 
-      case 'pull':
+    } else if (action === 'pull') {
 
-        // TODO - Handle multiple-theme/store writes
+      // TODO - Handle multiple-theme/store writes
 
-        await writeFile(file.input, json[0].string);
+      const output = json[0].string;
 
-        return null;
+      await writeFile(file.input, output).catch(error.write('Local file could not be update', {
+        file: file.key
+      }));
 
-      case 'stash':
+      log.replaced(file.relative, file.key, u.stringSize(output));
 
-        log.skipped(file.key, 'stash unavailable');
-        return null;
+    } else if (action === 'stash') {
 
-      case 'cancel':
+      log.skipped(file.key, 'stash unavailable');
 
-        log.skipped(file.key, 'user cancelled');
-        return null;
+    } else if (action === 'cancel') {
+
+      log.skipped(file.key, 'user cancelled');
 
     }
+
+    return null;
 
   }
 
