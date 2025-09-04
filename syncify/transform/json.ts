@@ -204,7 +204,7 @@ async function jsonCompare (file: File, local: string) {
 
   }
 
-  return json[0].string;
+  return json.length === 0 ? local : json[0].string;
 
 }
 
