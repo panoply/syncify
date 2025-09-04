@@ -62,6 +62,7 @@ export type Prefixes = LiteralUnion<(
   | 'queued'
   | 'rejected'
   | 'reloaded'
+  | 'replaced'
   | 'release'
   | 'retrying'
   | 'skipped'
