@@ -56,7 +56,11 @@ export function parseJson (file: File, actual: string, expected?: string) {
  */
 export async function jsonCompile (file: File, json: string | ParseEvaluate) {
 
-  const { parsed, string } = u.isString(json) ? parseJson(file, json) : json;
+  const parse = u.isString(json) ? parseJson(file, json) : json;
+
+  if (parse === null) return;
+
+  const { parsed, string } = parse;
   const indent = $.json.terse.enabled ? indentSize(file.type) : $.json.indent;
   const output = indent === 0 ? stringify(parsed, {
     removeComments: true,
