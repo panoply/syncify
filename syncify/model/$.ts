@@ -496,22 +496,21 @@ export const $ = new class Bundle {
    *
    * @default []
    */
-  public liquid: Type.LiquidBundle = o({
+  public liquid: Type.LiquidBundle = o<Type.LiquidBundle >({
     terse: {
       enabled: false,
       exclude: null,
       liquid: {
-        minifySchema: true
+        minifySchema: false,
+        stripTrims: false
       },
       markup: {
-
         // EXPOSED
         //
         minifyCSS: true,
         minifyJS: true,
         collapseWhitespace: true,
         removeComments: true,
-
         // OVERRIDES
         //
         caseSensitive: false,
