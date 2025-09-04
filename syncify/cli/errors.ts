@@ -372,18 +372,31 @@ error.throw = (e: any, entries: { [name: string]: string | number }) => {
   }
 };
 
-error.write = (message: string, context: {[name: string]: string,}) => (e: NodeJS.ErrnoException) => {
+error.write = (details: string, context?: { [name: string]: string }) => {
 
-  _.Create({ type: 'error' })
-  .NL
-  .Wrap(e.message)
-  .Context({ stack: e.stack, entries: { ...context, code: e.code, name: e.name, details: message } })
-  .NL
-  .toLog({ clear: true });
+  return function (e: NodeJS.ErrnoException) {
+
+    _
+    .Create({ type: 'error' })
+    .Header('WRITE ERROR')
+    .Wrap(e.message)
+    .NL
+    .Context({
+      stack: e.stack,
+      entries: {
+        code: e.code,
+        details,
+        ...context,
+        name: e.name
+      }
+    })
+    .toLog({ clear: true });
+
+  };
 
 };
 
-error.read = (details: string, entries: { [name: string]: string }) => {
+error.read = (details: string, context: { [name: string]: string }) => {
 
   return function (e: NodeJS.ErrnoException) {
 
@@ -397,7 +410,7 @@ error.read = (details: string, entries: { [name: string]: string }) => {
       entries: {
         code: e.code,
         details,
-        ...entries,
+        ...context,
         name: e.name
       }
     })
@@ -437,7 +450,7 @@ error.json = (e: JSONError, file: string | Partial<File>, ...contexts: [ string?
     message = e.message.replace(/Line \d+:\s+/, NIL);
   }
 
-  _.Create({ type: 'eor' })
+  _.Create({ type: 'error' })
   .Prepend(details, _.bold)
   .Wrap(_.capture.numbers(message, _.bold), _.redBright)
   .NL
