@@ -25,7 +25,7 @@ export class AcquireError extends Error {
 
     super(error);
 
-    const message = error.message.split('\n');
+    const message = error.message.trim().split('\n');
 
     if (error?.code) {
       this.summary = 'SYNCIFY CONFIG ERROR';

@@ -12,7 +12,7 @@ import { esbuildExternalPlugin, esbuildInjectionPlugin } from './plugins';
 import { $tsconfig, tsconfigPaths } from './tsconfig';
 import { $import, CJSorESM, outfile } from './utils';
 
-export { $import, $require } from './utils';
+export { $import } from './utils';
 export { $tsconfig };
 export { AcquireError };
 
@@ -180,13 +180,13 @@ export function acquire<T = any> (options: AcquireOptions): Promise<T> {
 
       const { text } = result.outputFiles[0];
 
-      await fs.promises.writeFile(output, text, 'utf8');
+      await fs.promises.writeFile(output, text, 'utf-8');
 
       let $module: any;
 
       try {
 
-        $module = await $import(output, { format });
+        $module = await $import(output, format);
 
       } catch (e) {
 

@@ -89,39 +89,19 @@ export function CJSorESM (file: string, type?: string): 'esm' | 'cjs' {
  * @param format
  * The format which determines the import
  */
-export async function $import <T = any> (input: string, { format }: { format: 'esm' | 'cjs' }): Promise<T> {
+export async function $import <T = any> (input: string, format?: 'esm' | 'cjs'): Promise<T> {
 
   if (format === 'esm') {
 
     // For ES modules, use dynamic import which returns a promise
     return import(pathToFileURL(input).href);
 
-  } else if (format === 'cjs') {
-
-    // For CommonJS, use require
-    return createRequire(import.meta.url)(input);
-
   } else {
 
-    return require(input);
+    const { href } = pathToFileURL(createRequire(import.meta.url).resolve(input));
+    const $module = await import(href);
 
+    return $module.default || $module;
   }
 
 };
-
-/**
- * `$require`
- *
- * Import requires a module based on execution environment. When determined to be in
- * an ESM environment {@link createRequire} will be used, whereas CJS will apply
- * {@link require} imports.
- *
- * > Use the {@link $import} utility for format specific importing.
- *
- * @param name The import pkg or path
- */
-export function $require <T> (name: string): T {
-
-  return typeof require === 'function' ? require(name) : createRequire(import.meta.url)(name);
-
-}
